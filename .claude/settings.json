@@ -5,5 +5,19 @@
     "hookify@claude-code-plugins": false,
     "hookify@claude-plugins-official": false,
     "superpowers-developing-for-claude-code@superpowers-marketplace": false
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command // \"\"' | grep -q 'git commit' && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"REMINDER: You just committed. Check if the Current Status section of CLAUDE.md needs updating (what was done, what is next). If you already updated it this session, ignore this.\"}}' || true",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
   }
 }
