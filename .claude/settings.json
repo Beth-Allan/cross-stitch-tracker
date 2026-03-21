@@ -1,0 +1,9 @@
+{
+  "enabledPlugins": {
+    "laravel-simplifier@laravel": false,
+    "superpowers-laravel@superpowers-laravel-marketplace": false,
+    "hookify@claude-code-plugins": false,
+    "hookify@claude-plugins-official": false,
+    "superpowers-developing-for-claude-code@superpowers-marketplace": false
+  }
+}
