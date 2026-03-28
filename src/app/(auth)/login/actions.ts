@@ -1,6 +1,7 @@
 "use server"
 
 import { signIn } from "@/lib/auth"
+import { checkRateLimit } from "@/lib/rate-limit"
 import { loginSchema } from "@/lib/validations/auth"
 import { AuthError } from "next-auth"
 
@@ -18,6 +19,14 @@ export async function loginAction(
     return { error: parsed.error.errors[0].message }
   }
 
+  // Rate limit check BEFORE signIn so the message reaches the user directly
+  const rateCheck = checkRateLimit(parsed.data.email)
+  if (!rateCheck.allowed) {
+    return {
+      error: `Too many attempts. Try again in ${rateCheck.retryAfter} seconds.`,
+    }
+  }
+
   try {
     await signIn("credentials", {
       email: parsed.data.email,
@@ -27,6 +36,7 @@ export async function loginAction(
     return {}
   } catch (error) {
     if (error instanceof AuthError) {
+      console.error("Auth error:", error.type, error.message)
       if (error.type === "CredentialsSignin") {
         return { error: "Invalid credentials" }
       }
