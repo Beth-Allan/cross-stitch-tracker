@@ -19,6 +19,7 @@
 - Installed GSD v1.30.0 (task mgmt, session persistence, context freshness)
 - **Phase 1 complete:** Next.js 16 scaffold, Tailwind v4 design tokens (emerald/amber/stone), Prisma 7 + Neon, shadcn/ui, Vitest, Auth.js v5 with rate limiting, branded login page, app shell with sidebar/topbar/user menu, 7 placeholder pages, PWA manifest
 - **Impeccable audit/polish complete:** audit (11→16/20), normalize (tokens), harden (a11y), adapt (touch targets), polish (focus-visible), clarify (user-facing copy), delight (placeholder icons/pills)
+- **Code quality infrastructure:** Prettier + Tailwind plugin, Vitest + RTL + jsdom, Husky pre-commit/pre-push hooks, GitHub branch protection, Node 22 pinning, CI with format check + test steps
 
 ### In Progress
 
@@ -26,12 +27,10 @@
 
 ### Next Up
 
-1. Set up test infrastructure (Vitest + testing patterns) before Phase 2 begins
-2. `/gsd:discuss-phase 2` or `/gsd:plan-phase 2` — Core Project Management (charts, designers, genres)
+1. `/gsd:discuss-phase 2` or `/gsd:plan-phase 2` — Core Project Management (charts, designers, genres)
 
 ### Blockers / Decisions Needed
 
-- **Testing:** Vitest is installed but no tests or patterns exist. Must set up test infrastructure (component testing strategy, test utilities, example tests) before Phase 2 adds business logic.
 - PWA on-device testing deferred (needs deployment) — tracked in 01-HUMAN-UAT.md
 - `.env.local` bcrypt hashes must escape `$` as `\$` (Next.js env variable interpolation)
 
@@ -105,6 +104,26 @@ public/                   # Static assets, PWA manifest
 - **Supply junction tables:** Three separate tables (ProjectThread, ProjectBead, ProjectSpecialty) — NOT polymorphic
 - **Calculated fields:** Computed at query time or via database views, not stored redundantly
 
+### Testing
+
+- **Colocated tests:** `button.test.tsx` lives next to `button.tsx`, not in a centralized `__tests__/` tree
+- **Shared test utilities only** in `src/__tests__/` (`setup.ts`, `test-utils.tsx`)
+- **Import from test-utils:** `import { render, screen } from "@/__tests__/test-utils"` — not directly from `@testing-library/react`
+- **Scope:** Unit and component tests only. Do not mock Prisma, Next.js routing, or framework internals.
+- **Coverage:** Run `npm run test:coverage` to check. No enforcement threshold yet.
+
+### Formatting
+
+- **Prettier** handles all formatting — do not manually adjust whitespace or semicolons
+- **Tailwind class sorting** is automatic via `prettier-plugin-tailwindcss`
+- Pre-commit hook runs Prettier + ESLint on staged files automatically
+
+### Git Hooks
+
+- **Pre-commit:** lint-staged runs Prettier (format) then ESLint (lint) on staged files
+- **Pre-push:** `npm run build` runs to catch type errors before CI
+- Do not skip hooks with `--no-verify` unless explicitly told to by the user
+
 ---
 
 ## Key File Locations
@@ -136,10 +155,9 @@ public/                   # Static assets, PWA manifest
 2. Check **Current Status** section above
 3. Read the relevant phase in `CROSS_STITCH_TRACKER_PLAN.md` if needed
 
-### Pre-Commit
+### Pre-Commit (Automated)
 
-- Run `npm run build` (catches TypeScript errors)
-- Run `npm run lint`
+- **Hooks handle it:** Pre-commit runs Prettier + ESLint via lint-staged; pre-push runs `npm run build`
 - Prisma schema changes: `npx prisma migrate dev --name <description>`
 
 ### PR Conventions
@@ -155,6 +173,11 @@ public/                   # Static assets, PWA manifest
 npm run dev              # Start dev server
 npm run build            # Production build + type-check
 npm run lint             # ESLint
+npm test                 # Run tests (verbose)
+npm run test:watch       # Interactive test runner
+npm run test:coverage    # Coverage report
+npm run format           # Format all files with Prettier
+npm run format:check     # Check formatting (used in CI)
 npx prisma studio        # Visual database browser
 npx prisma migrate dev   # Apply schema changes locally
 npx prisma generate      # Regenerate Prisma client after schema changes
