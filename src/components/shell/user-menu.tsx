@@ -1,13 +1,12 @@
 "use client"
 
 import { LogOut } from "lucide-react"
+import { toast } from "sonner"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -25,6 +24,13 @@ export function UserMenu({ user }: UserMenuProps) {
     .toUpperCase()
     .slice(0, 2)
 
+  async function handleLogout() {
+    const result = await logoutAction()
+    if (!result.success) {
+      toast.error(result.error)
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-stone-100 dark:hover:bg-stone-800 focus:outline-none">
@@ -40,14 +46,10 @@ export function UserMenu({ user }: UserMenuProps) {
           <p className="text-xs text-muted-foreground">{user.email}</p>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem
-            onClick={() => logoutAction()}
-          >
-            <LogOut className="w-4 h-4" strokeWidth={1.5} />
-            Log out
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
+        <DropdownMenuItem onClick={handleLogout}>
+          <LogOut className="w-4 h-4" strokeWidth={1.5} />
+          Log out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

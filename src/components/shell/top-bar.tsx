@@ -2,10 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Menu, Search, Clock, Plus, Scissors } from "lucide-react"
+import { Menu, Search, Clock, Plus } from "lucide-react"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -15,14 +13,18 @@ import {
 } from "@/components/ui/sheet"
 import { UserMenu } from "./user-menu"
 import { navigationItems } from "./nav-items"
+import { Logo } from "./logo"
+import { NavItemLink } from "./nav-item-link"
 
 interface TopBarProps {
   user: { name: string; email: string }
 }
 
 export function TopBar({ user }: TopBarProps) {
-  const pathname = usePathname()
   const [sheetOpen, setSheetOpen] = useState(false)
+
+  const mainItems = navigationItems.filter((item) => item.label !== "Settings")
+  const settingsItems = navigationItems.filter((item) => item.label === "Settings")
 
   return (
     <header className="h-14 border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 flex items-center gap-3 px-4 shrink-0 pt-[env(safe-area-inset-top)]">
@@ -46,9 +48,7 @@ export function TopBar({ user }: TopBarProps) {
                 onClick={() => setSheetOpen(false)}
                 className="px-4 py-5 flex items-center gap-3 border-b border-stone-200 dark:border-stone-800"
               >
-                <div className="w-8 h-8 rounded-lg bg-emerald-600 dark:bg-emerald-500 flex items-center justify-center shrink-0">
-                  <Scissors className="w-4 h-4 text-white dark:text-emerald-950" strokeWidth={1.5} />
-                </div>
+                <Logo />
                 <span className="font-heading text-base font-semibold text-stone-900 dark:text-stone-100 truncate">
                   Cross Stitch Tracker
                 </span>
@@ -56,66 +56,24 @@ export function TopBar({ user }: TopBarProps) {
 
               {/* Nav items */}
               <div className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
-                {navigationItems
-                  .filter((item) => item.label !== "Settings")
-                  .map((item) => {
-                    const isCurrentPage = item.href === "/"
-                      ? pathname === "/"
-                      : pathname.startsWith(item.href)
-
-                    const content = (
-                      <div
-                        className={cn(
-                          "w-full flex items-center gap-3 rounded-lg transition-colors text-sm px-3 py-2.5",
-                          !item.active && "opacity-50 cursor-not-allowed text-stone-400 dark:text-stone-500",
-                          item.active && isCurrentPage &&
-                            "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-medium",
-                          item.active && !isCurrentPage &&
-                            "text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
-                        )}
-                      >
-                        <item.icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />
-                        <span className="truncate">{item.label}</span>
-                      </div>
-                    )
-
-                    return item.active ? (
-                      <Link key={item.href} href={item.href} onClick={() => setSheetOpen(false)}>
-                        {content}
-                      </Link>
-                    ) : (
-                      <div key={item.href}>{content}</div>
-                    )
-                  })}
+                {mainItems.map((item) => (
+                  <NavItemLink
+                    key={item.href}
+                    item={item}
+                    onClick={() => setSheetOpen(false)}
+                  />
+                ))}
               </div>
 
               {/* Settings at bottom */}
               <div className="py-3 px-2 border-t border-stone-200 dark:border-stone-800">
-                {navigationItems
-                  .filter((item) => item.label === "Settings")
-                  .map((item) => {
-                    const content = (
-                      <div
-                        className={cn(
-                          "w-full flex items-center gap-3 rounded-lg transition-colors text-sm px-3 py-2.5",
-                          !item.active && "opacity-50 cursor-not-allowed text-stone-400 dark:text-stone-500",
-                          item.active &&
-                            "text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
-                        )}
-                      >
-                        <item.icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />
-                        <span className="truncate">{item.label}</span>
-                      </div>
-                    )
-
-                    return item.active ? (
-                      <Link key={item.href} href={item.href} onClick={() => setSheetOpen(false)}>
-                        {content}
-                      </Link>
-                    ) : (
-                      <div key={item.href}>{content}</div>
-                    )
-                  })}
+                {settingsItems.map((item) => (
+                  <NavItemLink
+                    key={item.href}
+                    item={item}
+                    onClick={() => setSheetOpen(false)}
+                  />
+                ))}
               </div>
             </nav>
           </SheetContent>
