@@ -21,8 +21,8 @@ describe("SizeBadge", () => {
   });
   it("calculates from dimensions when stitchCount is 0", () => {
     render(
-      <SizeBadge stitchCount={0} stitchesWide={100} stitchesHigh={200} />,
+      <SizeBadge stitchCount={0} stitchesWide={200} stitchesHigh={200} />,
     );
-    expect(screen.getByText("Large")).toBeInTheDocument(); // 100*200 = 20000
+    expect(screen.getByText("Large")).toBeInTheDocument(); // 200*200 = 40000
   });
 });
