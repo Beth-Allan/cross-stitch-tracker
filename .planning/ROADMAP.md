@@ -39,7 +39,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md — Scaffold Next.js 16, design system tokens, Prisma 7 + Neon, PWA manifest
 - [x] 01-02-PLAN.md — Auth.js v5 credentials, rate limiting, branded login page
-- [ ] 01-03-PLAN.md — App shell (sidebar, TopBar, UserMenu), placeholder pages, responsive layout
+- [x] 01-03-PLAN.md — App shell (sidebar, TopBar, UserMenu), placeholder pages, responsive layout
 **UI hint**: yes
 
 ### Phase 2: Core Project Management

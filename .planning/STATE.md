@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-03-28T18:20:37.041Z"
+stopped_at: Checkpoint on 01-03-PLAN.md Task 3 (visual verification)
+last_updated: "2026-03-28T18:25:56.566Z"
 last_activity: 2026-03-28
 progress:
   total_phases: 9
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01 P01 | 7min | 2 tasks | 25 files |
 | Phase 01 P02 | 1min | 2 tasks | 9 files |
+| Phase 01 P03 | 4min | 2 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,7 @@ Recent decisions affecting current work:
 - [Research]: Next.js 16, Prisma 7, Tailwind v4, Auth.js v5 beta, Zod 4 — updated from original plan
 - [Phase 01]: Zod 3.24.4 stable (v4 still beta), Prisma 7 imports from generated/prisma/client, shadcn v4.1.1 adds @base-ui/react
 - [Phase 01]: No new dependencies for auth -- all packages (next-auth, bcryptjs, zod) installed in Plan 01
+- [Phase 01]: AppShell is Server Component; Sidebar/TopBar/UserMenu are Client Components (server-client split)
 
 ### Pending Todos
 
@@ -79,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-28T18:20:37.038Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-03-28T18:25:56.563Z
+Stopped at: Checkpoint on 01-03-PLAN.md Task 3 (visual verification)
 Resume file: None

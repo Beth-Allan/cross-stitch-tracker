@@ -58,8 +58,8 @@
 ### Infrastructure
 
 - [x] **INFRA-01**: Auth.js single-user authentication protecting all app routes
-- [ ] **INFRA-02**: App shell with MainNav, TopBar, UserMenu matching design system
-- [ ] **INFRA-03**: Responsive design working on Mac browser and iPhone
+- [x] **INFRA-02**: App shell with MainNav, TopBar, UserMenu matching design system
+- [x] **INFRA-03**: Responsive design working on Mac browser and iPhone
 - [x] **INFRA-04**: PWA installable (home screen icon, full-screen launch)
 - [x] **INFRA-05**: Design system tokens (emerald/amber/stone, Fraunces/Source Sans 3/JetBrains Mono, status colors)
 
@@ -109,8 +109,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | INFRA-01 | Phase 1 | Complete |
-| INFRA-02 | Phase 1 | Pending |
-| INFRA-03 | Phase 1 | Pending |
+| INFRA-02 | Phase 1 | Complete |
+| INFRA-03 | Phase 1 | Complete |
 | INFRA-04 | Phase 1 | Complete |
 | INFRA-05 | Phase 1 | Complete |
 | PROJ-01 | Phase 2 | Pending |
