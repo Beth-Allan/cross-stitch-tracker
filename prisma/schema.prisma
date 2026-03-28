@@ -11,3 +11,76 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum ProjectStatus {
+  UNSTARTED
+  KITTING
+  KITTED
+  IN_PROGRESS
+  ON_HOLD
+  FINISHED
+  FFO
+}
+
+model Designer {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  website   String?
+  charts    Chart[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Genre {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  charts    Chart[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Chart {
+  id                     String    @id @default(cuid())
+  name                   String
+  designer               Designer? @relation(fields: [designerId], references: [id])
+  designerId             String?
+  coverImageUrl          String?
+  coverThumbnailUrl      String?
+  stitchCount            Int       @default(0)
+  stitchCountApproximate Boolean   @default(false)
+  stitchesWide           Int       @default(0)
+  stitchesHigh           Int       @default(0)
+  genres                 Genre[]
+  isPaperChart           Boolean   @default(false)
+  isFormalKit            Boolean   @default(false)
+  isSAL                  Boolean   @default(false)
+  kitColorCount          Int?
+  digitalWorkingCopyUrl  String?
+  dateAdded              DateTime  @default(now())
+  project                Project?
+  notes                  String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+}
+
+model Project {
+  id                   String        @id @default(cuid())
+  chart                Chart         @relation(fields: [chartId], references: [id], onDelete: Cascade)
+  chartId              String        @unique
+  userId               String        @default("1")
+  status               ProjectStatus @default(UNSTARTED)
+  startDate            DateTime?
+  finishDate           DateTime?
+  ffoDate              DateTime?
+  finishPhotoUrl       String?
+  startingStitches     Int           @default(0)
+  stitchesCompleted    Int           @default(0)
+  fabricId             String?
+  projectBin           String?
+  ipadApp              String?
+  needsOnionSkinning   Boolean       @default(false)
+  wantToStartNext      Boolean       @default(false)
+  preferredStartSeason String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+}
