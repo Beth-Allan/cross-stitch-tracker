@@ -219,6 +219,19 @@ Matches CI configuration (`node-version: 22` in `ci.yml`).
 6. CI updates — add format:check and test steps
 7. GitHub branch protection — last, after CI is fully configured
 
+## GSD Integration
+
+After implementation, update project artifacts so GSD workflows stay aware of the new quality gates:
+
+- **CLAUDE.md Current Status:** Mark test infrastructure blocker as resolved. Update "Next Up" to point at Phase 2.
+- **CLAUDE.md Conventions:** Add testing conventions (colocated files, import from test-utils, what to test/not test).
+- **CLAUDE.md Common Commands:** Add `npm run test:watch`, `npm run test:coverage`, `npm run format`, `npm run format:check`.
+- **CLAUDE.md Pre-Commit:** Update to reflect the actual hook pipeline (Prettier + ESLint on commit, build on push).
+- **.planning/STATE.md:** Update to reflect this work as completed infrastructure task.
+- **CI awareness:** GSD's `/gsd:execute-phase` and `/gsd:quick` workflows will automatically benefit from the hooks — no special config needed. The hooks enforce quality at the Git level regardless of workflow.
+
+---
+
 ## Risks
 
 - **Prettier + existing code:** The initial format run may touch many files. Isolated commit mitigates git blame noise.
