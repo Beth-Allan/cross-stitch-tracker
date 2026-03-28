@@ -52,7 +52,14 @@ Plans:
   3. User can upload a digital working copy (PDF/image) via presigned R2 URL and download it later
   4. User can set and change project status through all 7 stages (Unstarted through FFO)
   5. App displays auto-calculated size category (Mini/Small/Medium/Large/BAP) based on stitch count
-**Plans**: TBD
+**Plans:** 5 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Prisma schema (Chart/Project/Designer/Genre), R2 client, Zod schemas, utilities, type definitions
+- [ ] 02-02-PLAN.md — Server Actions (chart CRUD, file uploads, inline entity creation)
+- [ ] 02-03-PLAN.md — Chart form UI (add/edit) with upload components and inline entity dialogs
+- [ ] 02-04-PLAN.md — Chart detail page, charts list page, status/size badges, status control
+- [ ] 02-05-PLAN.md — Human verification of full chart lifecycle
 **UI hint**: yes
 
 ### Phase 3: Project Metadata & Browsing
@@ -145,7 +152,7 @@ Note: Phases 3, 4, and 5 all depend on Phase 2 but not on each other. They could
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 0/3 | Planning complete | - |
-| 2. Core Project Management | 0/TBD | Not started | - |
+| 2. Core Project Management | 0/5 | Planning complete | - |
 | 3. Project Metadata & Browsing | 0/TBD | Not started | - |
 | 4. Reference Data | 0/TBD | Not started | - |
 | 5. Supply Management & Shopping | 0/TBD | Not started | - |
