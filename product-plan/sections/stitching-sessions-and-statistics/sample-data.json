@@ -1,0 +1,185 @@
+{
+  "_meta": {
+    "models": {
+      "stitchSession": "A single stitching session log entry with date, stitch count, optional photo, and optional time spent. Belongs to a project.",
+      "activeProject": "A lightweight project reference for the session log modal's project picker. Only includes projects with In Progress or On Hold status.",
+      "heroStats": "Pre-calculated headline numbers: stitches today, this week, this month, this year.",
+      "personalBest": "A record-setting achievement (e.g., most stitches in a single day) with the date and project it happened on.",
+      "monthlyStitchTotal": "Aggregated stitch count for one month, used to render the monthly bar chart.",
+      "calendarDay": "A single day on the stitching calendar showing which projects were worked on and how many stitches.",
+      "projectStat": "A derived statistic about the project collection (e.g., total WIPs, project closest to completion).",
+      "supplyStat": "A derived statistic about supply usage across projects.",
+      "projectSessionSummary": "Per-project session rollup shown on the Chart Detail Sessions tab."
+    },
+    "relationships": [
+      "StitchSession belongs to Project (via projectId)",
+      "ActiveProject is a read-only projection of Project filtered to active statuses",
+      "HeroStats, PersonalBests, MonthlyTotals, CalendarDays, ProjectStats, and SupplyStats are all computed from StitchSession + Project + Supply data"
+    ]
+  },
+  "sessions": [
+    { "id": "sess-1", "projectId": "proj-1", "date": "2026-03-19", "stitchCount": 423, "photoUrl": null, "timeSpentMinutes": 75 },
+    { "id": "sess-2", "projectId": "proj-3", "date": "2026-03-19", "stitchCount": 185, "photoUrl": null, "timeSpentMinutes": null },
+    { "id": "sess-3", "projectId": "proj-1", "date": "2026-03-18", "stitchCount": 512, "photoUrl": "/photos/enchanted-forest-progress-mar18.jpg", "timeSpentMinutes": 90 },
+    { "id": "sess-4", "projectId": "proj-6", "date": "2026-03-17", "stitchCount": 287, "photoUrl": null, "timeSpentMinutes": 55 },
+    { "id": "sess-5", "projectId": "proj-1", "date": "2026-03-16", "stitchCount": 380, "photoUrl": null, "timeSpentMinutes": 65 },
+    { "id": "sess-6", "projectId": "proj-3", "date": "2026-03-15", "stitchCount": 612, "photoUrl": "/photos/autumn-retreat-halfway.jpg", "timeSpentMinutes": 120 },
+    { "id": "sess-7", "projectId": "proj-1", "date": "2026-03-14", "stitchCount": 290, "photoUrl": null, "timeSpentMinutes": 50 },
+    { "id": "sess-8", "projectId": "proj-6", "date": "2026-03-10", "stitchCount": 345, "photoUrl": null, "timeSpentMinutes": 60 },
+    { "id": "sess-9", "projectId": "proj-1", "date": "2026-03-08", "stitchCount": 1247, "photoUrl": "/photos/enchanted-forest-marathon.jpg", "timeSpentMinutes": 240 },
+    { "id": "sess-10", "projectId": "proj-3", "date": "2026-03-05", "stitchCount": 478, "photoUrl": null, "timeSpentMinutes": 85 },
+    { "id": "sess-11", "projectId": "proj-1", "date": "2026-03-02", "stitchCount": 356, "photoUrl": null, "timeSpentMinutes": 60 },
+    { "id": "sess-12", "projectId": "proj-6", "date": "2026-03-01", "stitchCount": 198, "photoUrl": null, "timeSpentMinutes": 35 },
+    { "id": "sess-13", "projectId": "proj-1", "date": "2026-02-27", "stitchCount": 445, "photoUrl": null, "timeSpentMinutes": 80 },
+    { "id": "sess-14", "projectId": "proj-3", "date": "2026-02-22", "stitchCount": 530, "photoUrl": null, "timeSpentMinutes": 95 },
+    { "id": "sess-15", "projectId": "proj-1", "date": "2026-02-18", "stitchCount": 620, "photoUrl": "/photos/enchanted-forest-progress-feb.jpg", "timeSpentMinutes": 110 },
+    { "id": "sess-16", "projectId": "proj-6", "date": "2026-02-14", "stitchCount": 410, "photoUrl": null, "timeSpentMinutes": 70 },
+    { "id": "sess-17", "projectId": "proj-3", "date": "2026-02-10", "stitchCount": 392, "photoUrl": null, "timeSpentMinutes": 75 },
+    { "id": "sess-18", "projectId": "proj-1", "date": "2026-02-05", "stitchCount": 315, "photoUrl": null, "timeSpentMinutes": 55 },
+    { "id": "sess-19", "projectId": "proj-5", "date": "2026-01-15", "stitchCount": 156, "photoUrl": "/photos/mini-bottle-lily-finished.jpg", "timeSpentMinutes": 30 },
+    { "id": "sess-20", "projectId": "proj-5", "date": "2026-01-12", "stitchCount": 340, "photoUrl": null, "timeSpentMinutes": 60 },
+    { "id": "sess-21", "projectId": "proj-1", "date": "2026-01-08", "stitchCount": 489, "photoUrl": null, "timeSpentMinutes": 85 },
+    { "id": "sess-22", "projectId": "proj-5", "date": "2026-01-05", "stitchCount": 280, "photoUrl": null, "timeSpentMinutes": 50 },
+    { "id": "sess-23", "projectId": "proj-3", "date": "2026-01-03", "stitchCount": 567, "photoUrl": null, "timeSpentMinutes": 100 },
+    { "id": "sess-24", "projectId": "proj-1", "date": "2025-12-28", "stitchCount": 890, "photoUrl": null, "timeSpentMinutes": 180 },
+    { "id": "sess-25", "projectId": "proj-5", "date": "2025-12-20", "stitchCount": 410, "photoUrl": null, "timeSpentMinutes": 70 },
+    { "id": "sess-26", "projectId": "proj-6", "date": "2025-12-15", "stitchCount": 520, "photoUrl": null, "timeSpentMinutes": 90 },
+    { "id": "sess-27", "projectId": "proj-3", "date": "2025-12-10", "stitchCount": 445, "photoUrl": null, "timeSpentMinutes": 80 },
+    { "id": "sess-28", "projectId": "proj-1", "date": "2025-12-05", "stitchCount": 378, "photoUrl": null, "timeSpentMinutes": 65 },
+    { "id": "sess-29", "projectId": "proj-6", "date": "2025-11-28", "stitchCount": 310, "photoUrl": null, "timeSpentMinutes": 55 },
+    { "id": "sess-30", "projectId": "proj-1", "date": "2025-11-20", "stitchCount": 456, "photoUrl": null, "timeSpentMinutes": 80 }
+  ],
+  "activeProjects": [
+    { "id": "proj-1", "chartName": "Enchanted Forest Sampler", "coverImageUrl": "/samples/enchanted-forest.jpg", "status": "In Progress", "stitchCount": 45200, "stitchesCompleted": 15368, "progressPercent": 34 },
+    { "id": "proj-3", "chartName": "Gold Collection: Autumn Retreat", "coverImageUrl": "/samples/autumn-retreat.jpg", "status": "In Progress", "stitchCount": 62400, "stitchesCompleted": 31200, "progressPercent": 50 },
+    { "id": "proj-6", "chartName": "Maritime Mystery SAL", "coverImageUrl": "/samples/maritime-mystery.jpg", "status": "In Progress", "stitchCount": 34000, "stitchesCompleted": 9800, "progressPercent": 29 }
+  ],
+  "heroStats": {
+    "stitchesToday": 608,
+    "stitchesThisWeek": 1407,
+    "stitchesThisMonth": 5313,
+    "stitchesThisYear": 9843
+  },
+  "personalBests": [
+    { "label": "Best Day This Year", "value": 1247, "date": "2026-03-08", "projectName": "Enchanted Forest Sampler" },
+    { "label": "Best Day All Time", "value": 1580, "date": "2025-07-12", "projectName": "Enchanted Forest Sampler" },
+    { "label": "Longest Streak", "value": 12, "date": "2025-09-20", "endDate": "2025-10-01", "projectName": "Multiple projects" }
+  ],
+  "monthlyTotals": [
+    { "month": "Jan", "year": 2026, "totalStitches": 1832 },
+    { "month": "Feb", "year": 2026, "totalStitches": 2712 },
+    { "month": "Mar", "year": 2026, "totalStitches": 5313 },
+    { "month": "Apr", "year": 2026, "totalStitches": 0 },
+    { "month": "May", "year": 2026, "totalStitches": 0 },
+    { "month": "Jun", "year": 2026, "totalStitches": 0 },
+    { "month": "Jul", "year": 2026, "totalStitches": 0 },
+    { "month": "Aug", "year": 2026, "totalStitches": 0 },
+    { "month": "Sep", "year": 2026, "totalStitches": 0 },
+    { "month": "Oct", "year": 2026, "totalStitches": 0 },
+    { "month": "Nov", "year": 2026, "totalStitches": 0 },
+    { "month": "Dec", "year": 2026, "totalStitches": 0 }
+  ],
+  "calendarDays": [
+    { "date": "2026-03-01", "sessions": [{ "projectId": "proj-6", "projectName": "Maritime Mystery SAL", "stitchCount": 198 }] },
+    { "date": "2026-03-02", "sessions": [{ "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "stitchCount": 356 }] },
+    { "date": "2026-03-05", "sessions": [{ "projectId": "proj-3", "projectName": "Autumn Retreat", "stitchCount": 478 }] },
+    { "date": "2026-03-08", "sessions": [{ "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "stitchCount": 1247 }] },
+    { "date": "2026-03-10", "sessions": [{ "projectId": "proj-6", "projectName": "Maritime Mystery SAL", "stitchCount": 345 }] },
+    { "date": "2026-03-14", "sessions": [{ "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "stitchCount": 290 }] },
+    { "date": "2026-03-15", "sessions": [{ "projectId": "proj-3", "projectName": "Autumn Retreat", "stitchCount": 612 }] },
+    { "date": "2026-03-16", "sessions": [{ "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "stitchCount": 380 }] },
+    { "date": "2026-03-17", "sessions": [{ "projectId": "proj-6", "projectName": "Maritime Mystery SAL", "stitchCount": 287 }] },
+    { "date": "2026-03-18", "sessions": [{ "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "stitchCount": 512 }] },
+    { "date": "2026-03-19", "sessions": [{ "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "stitchCount": 423 }, { "projectId": "proj-3", "projectName": "Autumn Retreat", "stitchCount": 185 }] }
+  ],
+  "projectStats": [
+    { "label": "Total Projects", "value": 8 },
+    { "label": "In Progress", "value": 3, "detail": "Enchanted Forest, Autumn Retreat, Maritime Mystery" },
+    { "label": "Finished", "value": 1, "detail": "Stargazer Lily" },
+    { "label": "Unstarted", "value": 2 },
+    { "label": "Kitting", "value": 1 },
+    { "label": "Kitted / Ready", "value": 1 },
+    { "label": "Projects Started 2026", "value": 0 },
+    { "label": "Projects Finished 2026", "value": 1, "detail": "Stargazer Lily — Jan 15" },
+    { "label": "Closest to Completion", "value": "Autumn Retreat", "detail": "50% — 31,200 of 62,400 stitches" },
+    { "label": "Largest Project", "value": "Autumn Retreat", "detail": "62,400 total stitches (BAP)" }
+  ],
+  "supplyStats": [
+    { "label": "Most-Used DMC Color", "value": "DMC 310 (Black)", "detail": "Used in 5 projects" },
+    { "label": "Most Colors in Project", "value": "Autumn Retreat", "detail": "87 DMC colors" },
+    { "label": "Total Unique DMC Colors", "value": "142 across all projects" }
+  ],
+  "projectSessionSummary": {
+    "projectId": "proj-1",
+    "projectName": "Enchanted Forest Sampler",
+    "totalStitches": 6801,
+    "sessionsLogged": 13,
+    "averagePerSession": 523,
+    "firstSessionDate": "2025-11-20",
+    "lastSessionDate": "2026-03-19"
+  },
+  "yearInReview": {
+    "year": 2026,
+    "availableYears": [2026, 2025, 2024],
+    "heroStats": {
+      "totalStitches": 9843,
+      "sessionsLogged": 24,
+      "stitchingDays": 19,
+      "hoursStitched": 18.5
+    },
+    "monthlyTotals": [
+      { "month": "Jan", "year": 2026, "totalStitches": 1832 },
+      { "month": "Feb", "year": 2026, "totalStitches": 2712 },
+      { "month": "Mar", "year": 2026, "totalStitches": 5313 },
+      { "month": "Apr", "year": 2026, "totalStitches": 0 },
+      { "month": "May", "year": 2026, "totalStitches": 0 },
+      { "month": "Jun", "year": 2026, "totalStitches": 0 },
+      { "month": "Jul", "year": 2026, "totalStitches": 0 },
+      { "month": "Aug", "year": 2026, "totalStitches": 0 },
+      { "month": "Sep", "year": 2026, "totalStitches": 0 },
+      { "month": "Oct", "year": 2026, "totalStitches": 0 },
+      { "month": "Nov", "year": 2026, "totalStitches": 0 },
+      { "month": "Dec", "year": 2026, "totalStitches": 0 }
+    ],
+    "monthlyPace": [
+      { "month": "Jan", "avgStitchesPerDay": 59 },
+      { "month": "Feb", "avgStitchesPerDay": 97 },
+      { "month": "Mar", "avgStitchesPerDay": 280 }
+    ],
+    "projectTimeline": [
+      { "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "firstSession": "2026-01-08", "lastSession": "2026-03-19", "totalStitches": 5081, "sessions": 11, "statusColour": "#6ee7b7" },
+      { "projectId": "proj-3", "projectName": "Gold Collection: Autumn Retreat", "firstSession": "2026-01-03", "lastSession": "2026-03-19", "totalStitches": 2752, "sessions": 6, "statusColour": "#6ee7b7" },
+      { "projectId": "proj-6", "projectName": "Maritime Mystery SAL", "firstSession": "2026-03-01", "lastSession": "2026-03-17", "totalStitches": 1030, "sessions": 4, "statusColour": "#6ee7b7" },
+      { "projectId": "proj-5", "projectName": "Stargazer Lily", "firstSession": "2026-01-05", "lastSession": "2026-01-15", "totalStitches": 776, "sessions": 3, "statusColour": "#6ee7b7" }
+    ],
+    "highlights": [
+      { "label": "Busiest Month", "value": "March", "detail": "5,313 stitches across 11 sessions" },
+      { "label": "Busiest Day", "value": "Mar 8", "detail": "1,247 stitches — Enchanted Forest Sampler" },
+      { "label": "Longest Gap", "value": "18 days", "detail": "Jan 15 – Feb 5" },
+      { "label": "Projects Worked On", "value": "4", "detail": "Enchanted Forest, Autumn Retreat, Maritime Mystery, Stargazer Lily" },
+      { "label": "Projects Started", "value": "0", "detail": "All active projects started in 2025" },
+      { "label": "Projects Finished", "value": "1", "detail": "Stargazer Lily — Jan 15" }
+    ],
+    "topProjects": [
+      { "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "totalStitches": 5081, "sessions": 11, "percentOfYearTotal": 52 },
+      { "projectId": "proj-3", "projectName": "Gold Collection: Autumn Retreat", "totalStitches": 2752, "sessions": 6, "percentOfYearTotal": 28 },
+      { "projectId": "proj-6", "projectName": "Maritime Mystery SAL", "totalStitches": 1030, "sessions": 4, "percentOfYearTotal": 10 },
+      { "projectId": "proj-5", "projectName": "Stargazer Lily", "totalStitches": 776, "sessions": 3, "percentOfYearTotal": 8 }
+    ],
+    "favouriteSupplies": [
+      { "category": "thread", "name": "DMC 310 (Black)", "code": "310", "colourHex": "#2d2d2d", "projectCount": 4, "detail": "Used in all 4 projects" },
+      { "category": "thread", "name": "DMC blanc (White)", "code": "blanc", "colourHex": "#f5f5f5", "projectCount": 3, "detail": "Used in 3 projects" },
+      { "category": "thread", "name": "DMC 3799 (Pewter Grey)", "code": "3799", "colourHex": "#5c5c5c", "projectCount": 3 },
+      { "category": "thread", "name": "DMC 986 (Forest Green)", "code": "986", "colourHex": "#2e6e3f", "projectCount": 2 },
+      { "category": "thread", "name": "DMC 3371 (Black Brown)", "code": "3371", "colourHex": "#3b2414", "projectCount": 2 },
+      { "category": "bead", "name": "Mill Hill 02014 (Black)", "projectCount": 2, "detail": "Enchanted Forest + Maritime Mystery" },
+      { "category": "bead", "name": "Mill Hill 00557 (Gold)", "projectCount": 1, "detail": "Autumn Retreat" },
+      { "category": "specialty", "name": "Kreinik #4 Braid 002 (Gold)", "projectCount": 1, "detail": "Autumn Retreat accents" }
+    ],
+    "newThisYear": {
+      "chartsAdded": 3,
+      "suppliesAdded": 14,
+      "fabricsAdded": 2
+    }
+  }
+}

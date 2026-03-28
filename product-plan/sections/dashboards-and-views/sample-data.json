@@ -1,0 +1,353 @@
+{
+  "_meta": {
+    "models": {
+      "recentChart": "A recently added chart shown on the Main Dashboard, with basic metadata for card rendering.",
+      "buriedTreasure": "An unstarted chart that has been in the library the longest, surfaced to encourage rediscovery.",
+      "spotlightProject": "A randomly selected project shown as a large featured card on the Main Dashboard.",
+      "whatsNextProject": "A kitted or want-to-start project shown on Pattern Dive's What's Next tab, sorted by priority.",
+      "fabricRequirementRow": "A project with calculated fabric dimensions at multiple counts, shown on Pattern Dive's Fabric Requirements tab.",
+      "storageGroup": "A storage location with its assigned projects and fabric, shown on Pattern Dive's Storage View tab.",
+      "projectGoals": "A project's planning data: priority ranking, milestones, timing preferences, rotation schedule, and notes.",
+      "projectMilestone": "A single milestone goal within a project's plan (e.g., 'Reach 25%') with optional target date and completion status.",
+      "shoppingThreadNeed": "An unfulfilled thread need aggregated across projects for the Shopping Cart.",
+      "shoppingBeadNeed": "An unfulfilled bead need aggregated across projects for the Shopping Cart.",
+      "shoppingSpecialtyNeed": "An unfulfilled specialty item need aggregated across projects for the Shopping Cart.",
+      "shoppingFabricNeed": "A fabric that needs to be purchased, either from need-to-buy flag or from an unassigned project requirement.",
+      "shoppingCartSummary": "Aggregate counts and per-project breakdown of all shopping needs.",
+      "collectionStats": "Aggregate statistics about the user's entire cross stitch collection, shown in the dashboard sidebar.",
+      "goalsSummary": "Teaser summary of upcoming milestones and planned project starts, shown on the dashboard with a link to the full Goals view."
+    },
+    "relationships": [
+      "RecentChart and BuriedTreasure are read-only projections of Chart + Project data",
+      "SpotlightProject is a randomly selected Project + Chart projection",
+      "WhatsNextProject is filtered from Projects where status is Kitted or wantToStartNext is true",
+      "FabricRequirementRow is computed from Project.stitchesWide/stitchesHigh at multiple fabric counts",
+      "StorageGroup groups Projects and Fabrics by StorageLocation",
+      "ProjectGoals belongs to Project, contains many ProjectMilestone",
+      "ShoppingThreadNeed aggregates ProjectThread records where isFulfilled is false, grouped by Thread",
+      "ShoppingFabricNeed comes from Fabric.needToBuy or Projects without assigned fabric",
+      "ShoppingCartSummary is computed from all shopping need arrays",
+      "CollectionStats is computed from all Projects",
+      "GoalsSummary is computed from ProjectGoals with upcoming milestones and planned starts"
+    ]
+  },
+  "recentCharts": [
+    { "chartId": "chart-10", "projectId": "proj-10", "name": "Winter Wonderland BAP", "designerName": "Heaven and Earth Designs", "coverImageUrl": "/samples/winter-wonderland.jpg", "status": "Unstarted", "dateAdded": "2026-03-15", "stitchCount": 185000, "sizeCategory": "BAP" },
+    { "chartId": "chart-9", "projectId": "proj-9", "name": "Moonlit Garden", "designerName": "Mirabilia", "coverImageUrl": null, "status": "On Hold", "dateAdded": "2026-03-10", "stitchCount": 40000, "sizeCategory": "Large" },
+    { "chartId": "chart-11", "projectId": "proj-11", "name": "Christmas Village Stocking", "designerName": "Dimensions", "coverImageUrl": "/samples/christmas-village.jpg", "status": "Unstarted", "dateAdded": "2026-03-08", "stitchCount": 8500, "sizeCategory": "Small" },
+    { "chartId": "chart-12", "projectId": "proj-12", "name": "Peacock Mandala", "designerName": "Ink Circles", "coverImageUrl": "/samples/peacock-mandala.jpg", "status": "Unstarted", "dateAdded": "2026-03-01", "stitchCount": 32000, "sizeCategory": "Medium" },
+    { "chartId": "chart-7", "projectId": "proj-7", "name": "Mini Bottle: Rose", "designerName": "Nora Corbett", "coverImageUrl": null, "status": "Kitting", "dateAdded": "2026-02-20", "stitchCount": 1350, "sizeCategory": "Mini" },
+    { "chartId": "chart-13", "projectId": "proj-13", "name": "Celtic Santa #1", "designerName": "Long Dog Samplers", "coverImageUrl": "/samples/celtic-santa-1.jpg", "status": "Unstarted", "dateAdded": "2026-02-14", "stitchCount": 15000, "sizeCategory": "Medium" },
+    { "chartId": "chart-14", "projectId": "proj-14", "name": "Fairy Garden Cottage", "designerName": "Nora Corbett", "coverImageUrl": "/samples/fairy-garden.jpg", "status": "Unstarted", "dateAdded": "2026-02-01", "stitchCount": 22000, "sizeCategory": "Medium" },
+    { "chartId": "chart-2", "projectId": "proj-2", "name": "Celtic Dragon Mandala", "designerName": "Ink Circles", "coverImageUrl": "/samples/celtic-dragon.jpg", "status": "Kitted", "dateAdded": "2026-01-25", "stitchCount": 28000, "sizeCategory": "Medium" },
+    { "chartId": "chart-6", "projectId": "proj-6", "name": "Maritime Mystery SAL", "designerName": "Long Dog Samplers", "coverImageUrl": "/samples/maritime-mystery.jpg", "status": "In Progress", "dateAdded": "2026-01-15", "stitchCount": 34000, "sizeCategory": "Medium" },
+    { "chartId": "chart-4", "projectId": "proj-4", "name": "Wildflower Garden Sampler", "designerName": "Stoney Creek", "coverImageUrl": "/samples/wildflower-garden.jpg", "status": "Unstarted", "dateAdded": "2026-01-10", "stitchCount": 38000, "sizeCategory": "Large" }
+  ],
+  "buriedTreasures": [
+    { "chartId": "chart-15", "projectId": "proj-15", "name": "Victorian Rose Bellpull", "designerName": "Stoney Creek", "coverImageUrl": null, "dateAdded": "2023-06-12", "daysInLibrary": 1013, "sizeCategory": "Small", "genres": ["Floral", "Victorian"] },
+    { "chartId": "chart-16", "projectId": "proj-16", "name": "Dragon's Lair", "designerName": "Heaven and Earth Designs", "coverImageUrl": "/samples/dragons-lair.jpg", "dateAdded": "2023-11-03", "daysInLibrary": 869, "sizeCategory": "BAP", "genres": ["Fantasy", "Dragon"] },
+    { "chartId": "chart-17", "projectId": "proj-17", "name": "Tuscan Landscape", "designerName": "Dimensions", "coverImageUrl": "/samples/tuscan-landscape.jpg", "dateAdded": "2024-02-28", "daysInLibrary": 752, "sizeCategory": "Large", "genres": ["Landscape"] },
+    { "chartId": "chart-18", "projectId": "proj-18", "name": "Japanese Garden Bridge", "designerName": "Heaven and Earth Designs", "coverImageUrl": null, "dateAdded": "2024-05-15", "daysInLibrary": 675, "sizeCategory": "Large", "genres": ["Landscape", "Garden"] },
+    { "chartId": "chart-4", "projectId": "proj-4", "name": "Wildflower Garden Sampler", "designerName": "Stoney Creek", "coverImageUrl": "/samples/wildflower-garden.jpg", "dateAdded": "2024-08-22", "daysInLibrary": 576, "sizeCategory": "Large", "genres": ["Nature", "Sampler"] }
+  ],
+  "spotlight": {
+    "projectId": "proj-16",
+    "chartId": "chart-16",
+    "name": "Dragon's Lair",
+    "designerName": "Heaven and Earth Designs",
+    "coverImageUrl": "/samples/dragons-lair.jpg",
+    "status": "Unstarted",
+    "genres": ["Fantasy", "Dragon"],
+    "sizeCategory": "BAP",
+    "stitchCount": 210000,
+    "progressPercent": null
+  },
+  "whatsNextProjects": [
+    { "projectId": "proj-2", "chartId": "chart-2", "name": "Celtic Dragon Mandala", "designerName": "Ink Circles", "coverImageUrl": "/samples/celtic-dragon.jpg", "status": "Kitted", "kittingPercent": 100, "sizeCategory": "Medium", "stitchCount": 28000, "priorityRanking": 1, "preferredStartTiming": "April 2026" },
+    { "projectId": "proj-7", "chartId": "chart-7", "name": "Mini Bottle: Rose", "designerName": "Nora Corbett", "coverImageUrl": null, "status": "Kitting", "kittingPercent": 62, "sizeCategory": "Mini", "stitchCount": 1350, "priorityRanking": 2, "preferredStartTiming": null },
+    { "projectId": "proj-4", "chartId": "chart-4", "name": "Wildflower Garden Sampler", "designerName": "Stoney Creek", "coverImageUrl": "/samples/wildflower-garden.jpg", "status": "Unstarted", "kittingPercent": 25, "sizeCategory": "Large", "stitchCount": 38000, "priorityRanking": 3, "preferredStartTiming": "Summer 2026" },
+    { "projectId": "proj-14", "chartId": "chart-14", "name": "Fairy Garden Cottage", "designerName": "Nora Corbett", "coverImageUrl": "/samples/fairy-garden.jpg", "status": "Unstarted", "kittingPercent": 0, "sizeCategory": "Medium", "stitchCount": 22000, "priorityRanking": null, "preferredStartTiming": null }
+  ],
+  "fabricRequirements": [
+    { "projectId": "proj-2", "projectName": "Celtic Dragon Mandala", "stitchesWide": 250, "stitchesHigh": 250, "assignedFabricId": null, "assignedFabricName": null, "assignedFabricFits": null, "matchingFabrics": [
+      { "fabricId": "fab-4", "fabricName": "Antique White Lugana", "brandName": "Zweigart", "count": 25, "colour": "Antique White", "widthInches": 18, "heightInches": 24 },
+      { "fabricId": "fab-7", "fabricName": "Summer Meadow", "brandName": "Picture This Plus", "count": 28, "colour": "Hand-dyed Green", "widthInches": 20, "heightInches": 20 }
+    ]},
+    { "projectId": "proj-4", "projectName": "Wildflower Garden Sampler", "stitchesWide": 180, "stitchesHigh": 300, "assignedFabricId": null, "assignedFabricName": null, "assignedFabricFits": null, "matchingFabrics": [
+      { "fabricId": "fab-4", "fabricName": "Antique White Lugana", "brandName": "Zweigart", "count": 25, "colour": "Antique White", "widthInches": 18, "heightInches": 24 }
+    ]},
+    { "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "stitchesWide": 200, "stitchesHigh": 280, "assignedFabricId": "fab-1", "assignedFabricName": "Driftwood Princess", "assignedFabricFits": true, "matchingFabrics": [
+      { "fabricId": "fab-1", "fabricName": "Driftwood Princess", "brandName": "Picture This Plus", "count": 28, "colour": "Hand-dyed Tan", "widthInches": 18, "heightInches": 24 }
+    ]},
+    { "projectId": "proj-3", "projectName": "Gold Collection: Autumn Retreat", "stitchesWide": 350, "stitchesHigh": 280, "assignedFabricId": "fab-2", "assignedFabricName": "White Standard", "assignedFabricFits": false, "matchingFabrics": [] },
+    { "projectId": "proj-10", "projectName": "Winter Wonderland BAP", "stitchesWide": 400, "stitchesHigh": 550, "assignedFabricId": null, "assignedFabricName": null, "assignedFabricFits": null, "matchingFabrics": [] },
+    { "projectId": "proj-7", "projectName": "Mini Bottle: Rose", "stitchesWide": 45, "stitchesHigh": 80, "assignedFabricId": null, "assignedFabricName": null, "assignedFabricFits": null, "matchingFabrics": [
+      { "fabricId": "fab-4", "fabricName": "Antique White Lugana", "brandName": "Zweigart", "count": 25, "colour": "Antique White", "widthInches": 18, "heightInches": 24 },
+      { "fabricId": "fab-3", "fabricName": "Stormy Night", "brandName": "Picture This Plus", "count": 32, "colour": "Hand-dyed Charcoal", "widthInches": 14, "heightInches": 18 },
+      { "fabricId": "fab-7", "fabricName": "Summer Meadow", "brandName": "Picture This Plus", "count": 28, "colour": "Hand-dyed Green", "widthInches": 20, "heightInches": 20 }
+    ]}
+  ],
+  "storageGroups": [
+    {
+      "locationId": "loc-1",
+      "locationName": "Bin A",
+      "items": [
+        { "type": "project", "id": "proj-1", "name": "Enchanted Forest Sampler", "status": "In Progress", "fabricName": "Driftwood Princess", "coverImageUrl": "/samples/enchanted-forest.jpg" },
+        { "type": "project", "id": "proj-3", "name": "Gold Collection: Autumn Retreat", "status": "In Progress", "fabricName": "White Standard", "coverImageUrl": "/samples/autumn-retreat.jpg" },
+        { "type": "fabric", "id": "fab-4", "name": "Antique White Lugana" }
+      ]
+    },
+    {
+      "locationId": "loc-2",
+      "locationName": "Bin B",
+      "items": [
+        { "type": "project", "id": "proj-6", "name": "Maritime Mystery SAL", "status": "In Progress", "fabricName": "Barn Red Aida", "coverImageUrl": "/samples/maritime-mystery.jpg" },
+        { "type": "project", "id": "proj-9", "name": "Moonlit Garden", "status": "On Hold", "coverImageUrl": null }
+      ]
+    },
+    {
+      "locationId": "loc-3",
+      "locationName": "Bin C",
+      "items": [
+        { "type": "project", "id": "proj-2", "name": "Celtic Dragon Mandala", "status": "Kitted", "coverImageUrl": "/samples/celtic-dragon.jpg" },
+        { "type": "project", "id": "proj-7", "name": "Mini Bottle: Rose", "status": "Kitting", "coverImageUrl": null },
+        { "type": "fabric", "id": "fab-3", "name": "Stormy Night" }
+      ]
+    },
+    {
+      "locationId": "loc-4",
+      "locationName": "Living Room Shelf",
+      "items": [
+        { "type": "fabric", "id": "fab-7", "name": "Summer Meadow" },
+        { "type": "fabric", "id": "fab-1", "name": "Driftwood Princess" }
+      ]
+    },
+    {
+      "locationId": "loc-5",
+      "locationName": "Basement Tub",
+      "items": [
+        { "type": "project", "id": "proj-15", "name": "Victorian Rose Bellpull", "status": "Unstarted", "coverImageUrl": null },
+        { "type": "fabric", "id": "fab-2", "name": "White Standard" },
+        { "type": "fabric", "id": "fab-5", "name": "Barn Red Aida" }
+      ]
+    }
+  ],
+  "heroStats": {
+    "totalWIPs": 4,
+    "averageProgress": 31,
+    "closestToCompletion": { "projectId": "proj-3", "name": "Gold Collection: Autumn Retreat", "percent": 50 },
+    "finishedThisYear": 1,
+    "finishedAllTime": 5,
+    "totalStitchesAllProjects": 284368
+  },
+  "progressBuckets": [
+    {
+      "id": "unstarted", "label": "Unstarted", "range": "Not yet started",
+      "projects": [
+        { "projectId": "proj-2", "name": "Celtic Dragon Mandala", "designerName": "Ink Circles", "coverImageUrl": "/samples/celtic-dragon.jpg", "status": "Kitted", "progressPercent": 0, "totalStitches": 62500, "completedStitches": 0, "lastStitchedDate": null, "stitchingDays": 0 },
+        { "projectId": "proj-4", "name": "Wildflower Garden Sampler", "designerName": "Country Cottage Needleworks", "coverImageUrl": null, "status": "Kitting", "progressPercent": 0, "totalStitches": 54000, "completedStitches": 0, "lastStitchedDate": null, "stitchingDays": 0 },
+        { "projectId": "proj-7", "name": "Mini Bottle: Rose", "designerName": "Mill Hill", "coverImageUrl": null, "status": "Kitting", "progressPercent": 0, "totalStitches": 3600, "completedStitches": 0, "lastStitchedDate": null, "stitchingDays": 0 },
+        { "projectId": "proj-10", "name": "Winter Wonderland BAP", "designerName": "Heaven and Earth Designs", "coverImageUrl": null, "status": "Unstarted", "progressPercent": 0, "totalStitches": 210000, "completedStitches": 0, "lastStitchedDate": null, "stitchingDays": 0 },
+        { "projectId": "proj-11", "name": "Cottage Garden", "designerName": "Dimensions", "coverImageUrl": null, "status": "Unstarted", "progressPercent": 0, "totalStitches": 28000, "completedStitches": 0, "lastStitchedDate": null, "stitchingDays": 0 },
+        { "projectId": "proj-12", "name": "Starry Night Reproduction", "designerName": "Scarlet Quince", "coverImageUrl": null, "status": "Unstarted", "progressPercent": 0, "totalStitches": 145000, "completedStitches": 0, "lastStitchedDate": null, "stitchingDays": 0 },
+        { "projectId": "proj-13", "name": "Peacock Tapestry", "designerName": "Chatelaine", "coverImageUrl": null, "status": "Unstarted", "progressPercent": 0, "totalStitches": 89000, "completedStitches": 0, "lastStitchedDate": null, "stitchingDays": 0 },
+        { "projectId": "proj-15", "name": "Victorian Rose Bellpull", "designerName": "Just Nan", "coverImageUrl": null, "status": "Unstarted", "progressPercent": 0, "totalStitches": 12000, "completedStitches": 0, "lastStitchedDate": null, "stitchingDays": 0 }
+      ]
+    },
+    {
+      "id": "0-25", "label": "Just Getting Started", "range": "0.1% – 24.9%",
+      "projects": [
+        { "projectId": "proj-6", "name": "Maritime Mystery SAL", "designerName": "Long Dog Samplers", "coverImageUrl": "/samples/maritime-mystery.jpg", "status": "In Progress", "progressPercent": 12, "totalStitches": 48000, "completedStitches": 5760, "lastStitchedDate": "2026-03-15", "stitchingDays": 22 },
+        { "projectId": "proj-14", "name": "Autumn Mandala", "designerName": "Chatelaine", "coverImageUrl": null, "status": "In Progress", "progressPercent": 3, "totalStitches": 72000, "completedStitches": 2160, "lastStitchedDate": "2026-02-28", "stitchingDays": 5 }
+      ]
+    },
+    {
+      "id": "25-50", "label": "Making Progress", "range": "25% – 49.9%",
+      "projects": [
+        { "projectId": "proj-1", "name": "Enchanted Forest Sampler", "designerName": "Ink Circles", "coverImageUrl": "/samples/enchanted-forest.jpg", "status": "In Progress", "progressPercent": 34, "totalStitches": 56000, "completedStitches": 19040, "lastStitchedDate": "2026-03-26", "stitchingDays": 87 },
+        { "projectId": "proj-9", "name": "Moonlit Garden", "designerName": "Dimensions", "coverImageUrl": null, "status": "On Hold", "progressPercent": 28, "totalStitches": 32000, "completedStitches": 8960, "lastStitchedDate": "2025-11-10", "stitchingDays": 34 }
+      ]
+    },
+    {
+      "id": "50-75", "label": "Over Halfway!", "range": "50% – 74.9%",
+      "projects": [
+        { "projectId": "proj-3", "name": "Gold Collection: Autumn Retreat", "designerName": "Dimensions", "coverImageUrl": "/samples/autumn-retreat.jpg", "status": "In Progress", "progressPercent": 50, "totalStitches": 98000, "completedStitches": 49000, "lastStitchedDate": "2026-03-22", "stitchingDays": 142 }
+      ]
+    },
+    {
+      "id": "75-100", "label": "Almost There!", "range": "75% – 99.9%",
+      "projects": []
+    },
+    {
+      "id": "finished", "label": "Finished", "range": "100% complete",
+      "projects": [
+        { "projectId": "proj-5", "name": "Autumn Leaves Bookmark", "designerName": "Mill Hill", "coverImageUrl": null, "status": "Finished", "progressPercent": 100, "totalStitches": 4200, "completedStitches": 4200, "lastStitchedDate": "2026-02-10", "stitchingDays": 8 },
+        { "projectId": "proj-8", "name": "Star Touched Meadow SAL", "designerName": "Carolyn Manning", "coverImageUrl": "/samples/star-touched-meadow.jpg", "status": "Finished", "progressPercent": 100, "totalStitches": 71148, "completedStitches": 71148, "lastStitchedDate": "2025-08-20", "stitchingDays": 155 },
+        { "projectId": "proj-16", "name": "Christmas Ornament Set", "designerName": "Mill Hill", "coverImageUrl": null, "status": "Finished", "progressPercent": 100, "totalStitches": 2400, "completedStitches": 2400, "lastStitchedDate": "2025-12-15", "stitchingDays": 4 },
+        { "projectId": "proj-17", "name": "Lavender Sachet", "designerName": "Just Nan", "coverImageUrl": null, "status": "Finished", "progressPercent": 100, "totalStitches": 5600, "completedStitches": 5600, "lastStitchedDate": "2025-06-01", "stitchingDays": 12 },
+        { "projectId": "proj-18", "name": "Dragon Dreams", "designerName": "Heaven and Earth Designs", "coverImageUrl": null, "status": "FFO", "progressPercent": 100, "totalStitches": 156000, "completedStitches": 156000, "lastStitchedDate": "2024-09-30", "stitchingDays": 312 }
+      ]
+    }
+  ],
+  "finishedProjects": [
+    {
+      "projectId": "proj-8", "name": "Star Touched Meadow SAL", "designerName": "Carolyn Manning",
+      "coverImageUrl": "/samples/star-touched-meadow.jpg", "fabricDescription": "20ct White Aida by Zweigart",
+      "startDate": "2024-07-04", "finishDate": "2025-08-20",
+      "startToFinishDays": 413, "stitchingDays": 155, "stitchingHours": 310,
+      "totalStitches": 71148, "projectColours": 106, "beadCount": 0, "specialtyCount": 2,
+      "avgDailyStitches": 459, "avgSessionStitches": 580, "mostDailyStitches": 1097, "mostSessionStitches": 1420,
+      "sizeCategory": "Large", "genres": ["SAL", "Sampler", "Floral"]
+    },
+    {
+      "projectId": "proj-18", "name": "Dragon Dreams", "designerName": "Heaven and Earth Designs",
+      "coverImageUrl": null, "fabricDescription": "25ct Cream Lugana by Zweigart",
+      "startDate": "2022-01-15", "finishDate": "2024-09-30",
+      "startToFinishDays": 989, "stitchingDays": 312, "stitchingHours": 780,
+      "totalStitches": 156000, "projectColours": 142, "beadCount": 0, "specialtyCount": 0,
+      "avgDailyStitches": 500, "avgSessionStitches": 620, "mostDailyStitches": 1854, "mostSessionStitches": 2100,
+      "sizeCategory": "Extra Large", "genres": ["Fantasy", "Full Coverage"]
+    },
+    {
+      "projectId": "proj-5", "name": "Autumn Leaves Bookmark", "designerName": "Mill Hill",
+      "coverImageUrl": null, "fabricDescription": "14ct Perforated Paper",
+      "startDate": "2026-01-20", "finishDate": "2026-02-10",
+      "startToFinishDays": 21, "stitchingDays": 8, "stitchingHours": 12,
+      "totalStitches": 4200, "projectColours": 12, "beadCount": 45, "specialtyCount": 0,
+      "avgDailyStitches": 525, "avgSessionStitches": 525, "mostDailyStitches": 820, "mostSessionStitches": 820,
+      "sizeCategory": "Tiny", "genres": ["Bookmark", "Autumn"]
+    },
+    {
+      "projectId": "proj-16", "name": "Christmas Ornament Set", "designerName": "Mill Hill",
+      "coverImageUrl": null, "fabricDescription": "14ct Perforated Paper",
+      "startDate": "2025-12-01", "finishDate": "2025-12-15",
+      "startToFinishDays": 14, "stitchingDays": 4, "stitchingHours": 6,
+      "totalStitches": 2400, "projectColours": 8, "beadCount": 120, "specialtyCount": 0,
+      "avgDailyStitches": 600, "avgSessionStitches": 600, "mostDailyStitches": 900, "mostSessionStitches": 900,
+      "sizeCategory": "Tiny", "genres": ["Christmas", "Ornament"]
+    },
+    {
+      "projectId": "proj-17", "name": "Lavender Sachet", "designerName": "Just Nan",
+      "coverImageUrl": null, "fabricDescription": "28ct Antique White Linen by Wichelt",
+      "startDate": "2025-05-10", "finishDate": "2025-06-01",
+      "startToFinishDays": 22, "stitchingDays": 12, "stitchingHours": 18,
+      "totalStitches": 5600, "projectColours": 15, "beadCount": 32, "specialtyCount": 1,
+      "avgDailyStitches": 467, "avgSessionStitches": 467, "mostDailyStitches": 780, "mostSessionStitches": 780,
+      "sizeCategory": "Small", "genres": ["Floral", "Finishing"]
+    }
+  ],
+  "goals": [
+    {
+      "projectId": "proj-1",
+      "projectName": "Enchanted Forest Sampler",
+      "coverImageUrl": "/samples/enchanted-forest.jpg",
+      "currentProgress": 34,
+      "priorityRanking": 1,
+      "preferredStartTiming": null,
+      "rotationPreference": "Daily",
+      "milestones": [
+        { "id": "ms-1", "label": "Reach 25%", "targetPercent": 25, "targetDate": null, "completed": true },
+        { "id": "ms-2", "label": "Reach 50%", "targetPercent": 50, "targetDate": "2026-06-30", "completed": false },
+        { "id": "ms-3", "label": "Finish page 1 backstitching", "targetPercent": null, "targetDate": "2026-04-15", "completed": false },
+        { "id": "ms-4", "label": "Reach 75%", "targetPercent": 75, "targetDate": "2026-12-31", "completed": false }
+      ],
+      "planningNotes": "Primary focus project. Stitching daily, aiming for steady progress. Want to finish by end of 2027."
+    },
+    {
+      "projectId": "proj-3",
+      "projectName": "Gold Collection: Autumn Retreat",
+      "coverImageUrl": "/samples/autumn-retreat.jpg",
+      "currentProgress": 50,
+      "priorityRanking": 2,
+      "preferredStartTiming": null,
+      "rotationPreference": "Weekly",
+      "milestones": [
+        { "id": "ms-5", "label": "Reach 50%", "targetPercent": 50, "targetDate": null, "completed": true },
+        { "id": "ms-6", "label": "Finish sky section", "targetPercent": null, "targetDate": "2026-05-01", "completed": false },
+        { "id": "ms-7", "label": "Reach 75%", "targetPercent": 75, "targetDate": "2026-09-30", "completed": false }
+      ],
+      "planningNotes": "Rotation piece — stitch on this when Enchanted Forest feels repetitive."
+    },
+    {
+      "projectId": "proj-6",
+      "projectName": "Maritime Mystery SAL",
+      "coverImageUrl": "/samples/maritime-mystery.jpg",
+      "currentProgress": 29,
+      "priorityRanking": 3,
+      "preferredStartTiming": null,
+      "rotationPreference": "Monthly",
+      "milestones": [
+        { "id": "ms-8", "label": "Complete Part 4", "targetPercent": null, "targetDate": "2026-04-30", "completed": false },
+        { "id": "ms-9", "label": "Reach 50%", "targetPercent": 50, "targetDate": null, "completed": false }
+      ],
+      "planningNotes": "SAL releases quarterly. Stitch each part as it comes out."
+    },
+    {
+      "projectId": "proj-2",
+      "projectName": "Celtic Dragon Mandala",
+      "coverImageUrl": "/samples/celtic-dragon.jpg",
+      "currentProgress": 0,
+      "priorityRanking": 1,
+      "preferredStartTiming": "April 2026",
+      "rotationPreference": null,
+      "milestones": [
+        { "id": "ms-10", "label": "Start stitching", "targetPercent": null, "targetDate": "2026-04-01", "completed": false },
+        { "id": "ms-11", "label": "Reach 10%", "targetPercent": 10, "targetDate": "2026-05-31", "completed": false }
+      ],
+      "planningNotes": "Fully kitted and ready to go. Starting after current rotation cycle."
+    }
+  ],
+  "shoppingProjects": [
+    { "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "designerName": "Ink Circles", "coverImageUrl": "/samples/enchanted-forest.jpg", "status": "In Progress", "threadCount": 2, "beadCount": 0, "specialtyCount": 0, "fabricNeeded": false },
+    { "projectId": "proj-2", "projectName": "Celtic Dragon Mandala", "designerName": "Ink Circles", "coverImageUrl": "/samples/celtic-dragon.jpg", "status": "Kitted", "threadCount": 1, "beadCount": 1, "specialtyCount": 1, "fabricNeeded": false },
+    { "projectId": "proj-3", "projectName": "Gold Collection: Autumn Retreat", "designerName": "Dimensions", "coverImageUrl": "/samples/autumn-retreat.jpg", "status": "In Progress", "threadCount": 2, "beadCount": 0, "specialtyCount": 0, "fabricNeeded": false },
+    { "projectId": "proj-4", "projectName": "Wildflower Garden Sampler", "designerName": "Stoney Creek", "coverImageUrl": "/samples/wildflower-garden.jpg", "status": "Unstarted", "threadCount": 1, "beadCount": 0, "specialtyCount": 0, "fabricNeeded": true },
+    { "projectId": "proj-6", "projectName": "Maritime Mystery SAL", "designerName": "Long Dog Samplers", "coverImageUrl": "/samples/maritime-mystery.jpg", "status": "In Progress", "threadCount": 1, "beadCount": 0, "specialtyCount": 0, "fabricNeeded": false },
+    { "projectId": "proj-7", "projectName": "Mini Bottle: Rose", "designerName": "Nora Corbett", "coverImageUrl": null, "status": "Kitting", "threadCount": 1, "beadCount": 1, "specialtyCount": 0, "fabricNeeded": false },
+    { "projectId": "proj-10", "projectName": "Winter Wonderland BAP", "designerName": "Heaven and Earth Designs", "coverImageUrl": "/samples/winter-wonderland.jpg", "status": "Unstarted", "threadCount": 0, "beadCount": 0, "specialtyCount": 0, "fabricNeeded": true }
+  ],
+  "shoppingThreads": [
+    { "threadId": "t-310", "brandName": "DMC", "colorCode": "310", "colorName": "Black", "hexColor": "#000000", "totalRequired": 12, "totalAcquired": 8, "totalRemaining": 4, "unit": "skeins", "projects": [{ "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "quantityNeeded": 2 }, { "projectId": "proj-3", "projectName": "Gold Collection: Autumn Retreat", "quantityNeeded": 1 }, { "projectId": "proj-2", "projectName": "Celtic Dragon Mandala", "quantityNeeded": 1 }] },
+    { "threadId": "t-815", "brandName": "DMC", "colorCode": "815", "colorName": "Medium Garnet", "hexColor": "#7B3B3A", "totalRequired": 4, "totalAcquired": 2, "totalRemaining": 2, "unit": "skeins", "projects": [{ "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "quantityNeeded": 2 }] },
+    { "threadId": "t-3799", "brandName": "DMC", "colorCode": "3799", "colorName": "Very Dark Pewter Gray", "hexColor": "#424242", "totalRequired": 6, "totalAcquired": 6, "totalRemaining": 0, "unit": "skeins", "projects": [{ "projectId": "proj-3", "projectName": "Gold Collection: Autumn Retreat", "quantityNeeded": 0 }] },
+    { "threadId": "t-986", "brandName": "DMC", "colorCode": "986", "colorName": "Very Dark Forest Green", "hexColor": "#1C5B28", "totalRequired": 5, "totalAcquired": 3, "totalRemaining": 2, "unit": "skeins", "projects": [{ "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "quantityNeeded": 1 }, { "projectId": "proj-4", "projectName": "Wildflower Garden Sampler", "quantityNeeded": 1 }] },
+    { "threadId": "t-blanc", "brandName": "DMC", "colorCode": "Blanc", "colorName": "White", "hexColor": "#FFFFFF", "totalRequired": 8, "totalAcquired": 5, "totalRemaining": 3, "unit": "skeins", "projects": [{ "projectId": "proj-3", "projectName": "Gold Collection: Autumn Retreat", "quantityNeeded": 2 }, { "projectId": "proj-6", "projectName": "Maritime Mystery SAL", "quantityNeeded": 1 }] },
+    { "threadId": "t-727", "brandName": "DMC", "colorCode": "727", "colorName": "Very Light Topaz", "hexColor": "#F5D98E", "totalRequired": 3, "totalAcquired": 1, "totalRemaining": 2, "unit": "skeins", "projects": [{ "projectId": "proj-2", "projectName": "Celtic Dragon Mandala", "quantityNeeded": 2 }] },
+    { "threadId": "t-550", "brandName": "DMC", "colorCode": "550", "colorName": "Very Dark Violet", "hexColor": "#5B2C6F", "totalRequired": 2, "totalAcquired": 0, "totalRemaining": 2, "unit": "skeins", "projects": [{ "projectId": "proj-7", "projectName": "Mini Bottle: Rose", "quantityNeeded": 2 }] },
+    { "threadId": "t-ecru", "brandName": "DMC", "colorCode": "Ecru", "colorName": "Ecru", "hexColor": "#F0E6D3", "totalRequired": 3, "totalAcquired": 1.5, "totalRemaining": 1.5, "unit": "skeins", "projects": [{ "projectId": "proj-4", "projectName": "Wildflower Garden Sampler", "quantityNeeded": 1.5 }] }
+  ],
+  "shoppingBeads": [
+    { "beadId": "b-00557", "brandName": "Mill Hill", "productCode": "00557", "colorName": "Gold", "hexColor": "#D4A843", "totalRequired": 1, "totalAcquired": 0, "totalRemaining": 1, "unit": "packages", "projects": [{ "projectId": "proj-7", "projectName": "Mini Bottle: Rose", "quantityNeeded": 1 }] },
+    { "beadId": "b-02013", "brandName": "Mill Hill", "productCode": "02013", "colorName": "Red Red", "hexColor": "#CC0000", "totalRequired": 2, "totalAcquired": 1, "totalRemaining": 1, "unit": "packages", "projects": [{ "projectId": "proj-2", "projectName": "Celtic Dragon Mandala", "quantityNeeded": 1 }] }
+  ],
+  "shoppingSpecialty": [
+    { "specialtyItemId": "sp-002hl", "brandName": "Kreinik", "productCode": "002HL", "description": "Gold Hi Lustre Blending Filament", "hexColor": "#D4A843", "totalRequired": 2, "totalAcquired": 1, "totalRemaining": 1, "unit": "items", "projects": [{ "projectId": "proj-2", "projectName": "Celtic Dragon Mandala", "quantityNeeded": 1 }] }
+  ],
+  "shoppingFabrics": [
+    { "fabricId": "fab-6", "description": "28ct Midnight Blue Evenweave", "count": 28, "type": "Evenweave", "colorPreference": "Blue / Dark", "stitchesWide": null, "stitchesHigh": null, "preferredCounts": [28], "brandPreference": "Wichelt", "linkedProjectId": null, "linkedProjectName": null, "matchingFabrics": [] },
+    { "fabricId": "fab-8", "description": "18ct Black Aida", "count": 18, "type": "Aida", "colorPreference": "Black / Dark", "stitchesWide": null, "stitchesHigh": null, "preferredCounts": [18], "brandPreference": "Zweigart", "linkedProjectId": null, "linkedProjectName": null, "matchingFabrics": [] },
+    { "fabricId": null, "description": "Fabric for Wildflower Garden Sampler", "count": null, "type": "Linen", "colorPreference": "Cream or Natural", "stitchesWide": 180, "stitchesHigh": 300, "preferredCounts": [14, 18, 28], "brandPreference": null, "linkedProjectId": "proj-4", "linkedProjectName": "Wildflower Garden Sampler", "matchingFabrics": [{ "fabricId": "stash-fab-1", "fabricName": "28ct Antique White Cashel Linen", "brandName": "Zweigart", "count": 28, "colour": "Antique White", "widthInches": 18, "heightInches": 27 }] },
+    { "fabricId": null, "description": "Fabric for Winter Wonderland BAP", "count": null, "type": "Lugana", "colorPreference": "White or Cream", "stitchesWide": 400, "stitchesHigh": 550, "preferredCounts": [18, 25], "brandPreference": null, "linkedProjectId": "proj-10", "linkedProjectName": "Winter Wonderland BAP", "matchingFabrics": [] }
+  ],
+  "collectionStats": {
+    "totalProjects": 18,
+    "totalWIP": 4,
+    "totalOnHold": 1,
+    "totalUnstarted": 8,
+    "totalFinished": 5,
+    "totalStitchesCompleted": 284368,
+    "mostRecentFinish": { "projectId": "proj-5", "name": "Autumn Leaves Bookmark", "finishDate": "2026-02-10" },
+    "largestProject": { "projectId": "proj-10", "name": "Winter Wonderland BAP", "stitchCount": 210000 }
+  },
+  "goalsSummary": {
+    "upcomingMilestones": [
+      { "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "milestoneLabel": "Finish page 1 backstitching", "targetDate": "2026-04-15", "currentPercent": 34, "targetPercent": null },
+      { "projectId": "proj-6", "projectName": "Maritime Mystery SAL", "milestoneLabel": "Complete Part 4", "targetDate": "2026-04-30", "currentPercent": 29, "targetPercent": null },
+      { "projectId": "proj-3", "projectName": "Gold Collection: Autumn Retreat", "milestoneLabel": "Finish sky section", "targetDate": "2026-05-01", "currentPercent": 50, "targetPercent": null },
+      { "projectId": "proj-1", "projectName": "Enchanted Forest Sampler", "milestoneLabel": "Reach 50%", "targetDate": "2026-06-30", "currentPercent": 34, "targetPercent": 50 }
+    ],
+    "plannedStarts": [
+      { "projectId": "proj-2", "projectName": "Celtic Dragon Mandala", "plannedTiming": "April 2026" }
+    ]
+  }
+}

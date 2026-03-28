@@ -88,33 +88,33 @@ The current Notion system has ~50+ fields per project, multiple related database
 
 These terms have specific meanings in the cross stitch world and in this project. This glossary should be referenced during development to ensure the data model and UI use correct terminology.
 
-| Term | Definition |
-|------|-----------|
-| **Chart / Pattern** | The design/instructions for a cross stitch project. Can be digital (PDF), paper, or part of a kit. Used somewhat interchangeably with "project" in early stages, but a chart is the *design* and a project is the *instance of working on it*. |
-| **WIP** | Work In Progress — a project currently being stitched |
-| **FFO** | Fully Finished Object — a project that has been stitched AND finished (framed, made into a pillow, etc.). Distinct from "finished stitching." |
-| **Kitted** | A calculated state meaning ALL of the following are true: has digital working copy, is in a project bag, stash has been checked for existing supplies, all needed thread is acquired, fabric is assigned and in the bag, all beads (if needed) are in the bag, all specialty items (if needed) are in the bag, any onion skinning is complete, and the chart is loaded into an app or ready to load |
-| **Onion Skinning** | Re-charting a paper chart or non-enhanced PDF with heavy backstitch in charting software (e.g., MacStitch) so it can be properly loaded into iPad stitching apps |
-| **SAL** | Stitch-Along — a single design released in parts over time (e.g., monthly). One project, multiple chart parts that get added progressively. Stitch count and supply needs may evolve as new parts are released. |
-| **Series** | A collection of independent but related patterns (e.g., "Mini Bottles" series, "Celtic Santas"). Each chart is its own project, but they belong to a named group. Similar to a book series tracker. |
-| **DMC** | The most common brand of cross stitch embroidery floss/thread. Has a standardized catalog of ~500 numbered colors. |
-| **Anchor** | Another brand of embroidery thread, with its own color numbering system |
-| **Kreinik** | A brand of specialty metallic threads and braids used for decorative effects |
-| **Mill Hill** | A common brand of glass beads used in cross stitch |
-| **Floss / Thread** | The embroidery thread used for stitching. Tracked by brand, color code, and color family. |
-| **Fabric** | The base material stitched onto. Key attributes: brand, count (holes per inch), type (Aida, linen, lugana, etc.), color, and dimensions |
-| **Count** | Fabric measurement — holes per inch (e.g., 14ct, 18ct, 28ct). Higher count = smaller stitches = more detail. Affects how large a finished piece will be. |
-| **Aida** | A type of cross stitch fabric with a clear grid pattern. Easiest to stitch on. |
-| **Linen** | A type of cross stitch fabric; more advanced, stitched over two threads |
-| **Lugana** | A type of evenweave fabric, popular for its drape and texture |
-| **Skein** | A standard unit of embroidery thread. Projects specify how many skeins of each color are needed. |
-| **BAP** | Big Ass Project — community term for very large cross stitch designs (50,000+ stitches) |
-| **Stash** | The stitcher's collection of supplies (thread, fabric, beads, charts, etc.) |
-| **Project Bag** | Physical bag/pouch containing all supplies for a single project |
-| **Project Bin** | Physical storage container (accordion folder) holding multiple project bags. Currently ~4-5 bins stored in a bookcase. Essentially a location label. |
-| **Markup R-XP / Saga** | iPad applications used for viewing charts and tracking stitch progress while stitching |
-| **MacStitch** | Mac software used for charting and onion skinning patterns |
-| **Digital Working Copy** | A personal-use digital copy of a chart (PDF or image). Allowed as long as it's never shared. Stored within the app for reference. |
+| Term                     | Definition                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Chart / Pattern**      | The design/instructions for a cross stitch project. Can be digital (PDF), paper, or part of a kit. Used somewhat interchangeably with "project" in early stages, but a chart is the _design_ and a project is the _instance of working on it_.                                                                                                                                                      |
+| **WIP**                  | Work In Progress — a project currently being stitched                                                                                                                                                                                                                                                                                                                                               |
+| **FFO**                  | Fully Finished Object — a project that has been stitched AND finished (framed, made into a pillow, etc.). Distinct from "finished stitching."                                                                                                                                                                                                                                                       |
+| **Kitted**               | A calculated state meaning ALL of the following are true: has digital working copy, is in a project bag, stash has been checked for existing supplies, all needed thread is acquired, fabric is assigned and in the bag, all beads (if needed) are in the bag, all specialty items (if needed) are in the bag, any onion skinning is complete, and the chart is loaded into an app or ready to load |
+| **Onion Skinning**       | Re-charting a paper chart or non-enhanced PDF with heavy backstitch in charting software (e.g., MacStitch) so it can be properly loaded into iPad stitching apps                                                                                                                                                                                                                                    |
+| **SAL**                  | Stitch-Along — a single design released in parts over time (e.g., monthly). One project, multiple chart parts that get added progressively. Stitch count and supply needs may evolve as new parts are released.                                                                                                                                                                                     |
+| **Series**               | A collection of independent but related patterns (e.g., "Mini Bottles" series, "Celtic Santas"). Each chart is its own project, but they belong to a named group. Similar to a book series tracker.                                                                                                                                                                                                 |
+| **DMC**                  | The most common brand of cross stitch embroidery floss/thread. Has a standardized catalog of ~500 numbered colors.                                                                                                                                                                                                                                                                                  |
+| **Anchor**               | Another brand of embroidery thread, with its own color numbering system                                                                                                                                                                                                                                                                                                                             |
+| **Kreinik**              | A brand of specialty metallic threads and braids used for decorative effects                                                                                                                                                                                                                                                                                                                        |
+| **Mill Hill**            | A common brand of glass beads used in cross stitch                                                                                                                                                                                                                                                                                                                                                  |
+| **Floss / Thread**       | The embroidery thread used for stitching. Tracked by brand, color code, and color family.                                                                                                                                                                                                                                                                                                           |
+| **Fabric**               | The base material stitched onto. Key attributes: brand, count (holes per inch), type (Aida, linen, lugana, etc.), color, and dimensions                                                                                                                                                                                                                                                             |
+| **Count**                | Fabric measurement — holes per inch (e.g., 14ct, 18ct, 28ct). Higher count = smaller stitches = more detail. Affects how large a finished piece will be.                                                                                                                                                                                                                                            |
+| **Aida**                 | A type of cross stitch fabric with a clear grid pattern. Easiest to stitch on.                                                                                                                                                                                                                                                                                                                      |
+| **Linen**                | A type of cross stitch fabric; more advanced, stitched over two threads                                                                                                                                                                                                                                                                                                                             |
+| **Lugana**               | A type of evenweave fabric, popular for its drape and texture                                                                                                                                                                                                                                                                                                                                       |
+| **Skein**                | A standard unit of embroidery thread. Projects specify how many skeins of each color are needed.                                                                                                                                                                                                                                                                                                    |
+| **BAP**                  | Big Ass Project — community term for very large cross stitch designs (50,000+ stitches)                                                                                                                                                                                                                                                                                                             |
+| **Stash**                | The stitcher's collection of supplies (thread, fabric, beads, charts, etc.)                                                                                                                                                                                                                                                                                                                         |
+| **Project Bag**          | Physical bag/pouch containing all supplies for a single project                                                                                                                                                                                                                                                                                                                                     |
+| **Project Bin**          | Physical storage container (accordion folder) holding multiple project bags. Currently ~4-5 bins stored in a bookcase. Essentially a location label.                                                                                                                                                                                                                                                |
+| **Markup R-XP / Saga**   | iPad applications used for viewing charts and tracking stitch progress while stitching                                                                                                                                                                                                                                                                                                              |
+| **MacStitch**            | Mac software used for charting and onion skinning patterns                                                                                                                                                                                                                                                                                                                                          |
+| **Digital Working Copy** | A personal-use digital copy of a chart (PDF or image). Allowed as long as it's never shared. Stored within the app for reference.                                                                                                                                                                                                                                                                   |
 
 ---
 
@@ -125,13 +125,14 @@ These terms have specific meanings in the cross stitch world and in this project
 The central feature. Every chart/project is a rich record with extensive metadata.
 
 **Project Metadata Fields:**
+
 - Chart image / cover photo
 - Digital working copy (PDF upload and storage)
 - Project name
 - Designer (relation)
 - Stitch count — exact if known, approximate if not, with a flag for which type
 - Stitches wide × stitches high (separate fields)
-- Size category (auto-calculated from stitch count): BAP (50,000+), Large (25,000–49,999), Medium (5,000–24,999), Small (1,000–4,999), Mini (under 1,000). *Note: Medium/Large boundary is still being refined by user.*
+- Size category (auto-calculated from stitch count): BAP (50,000+), Large (25,000–49,999), Medium (5,000–24,999), Small (1,000–4,999), Mini (under 1,000). _Note: Medium/Large boundary is still being refined by user._
 - Genre tags (Animals, People, Beach, Canada, etc. — user-addable over time)
 - Collection / Series membership
 - Status (customizable, see below)
@@ -149,6 +150,7 @@ The central feature. Every chart/project is a rich record with extensive metadat
 - Date added to tracker
 
 **Status System:**
+
 - Must be customizable / flexible
 - Covers a wide range from "just added the chart" through various kitting stages to "actively stitching" to "finished" to "FFO"
 - "Kitted" is a calculated/composite status (see glossary) — the app should be able to determine this automatically based on whether all kitting conditions are met, and show "80% kitted — still needs 3 DMC colors and fabric" style feedback
@@ -156,6 +158,7 @@ The central feature. Every chart/project is a rich record with extensive metadat
 - Kitting sub-statuses or flags: needs digital copy, needs fabric, needs thread, needs beads, needs specialty items, needs onion skinning, needs to be loaded to app
 
 **SAL Support:**
+
 - A SAL is one project that receives additional chart parts over time
 - Must support adding new chart PDFs (parts) to an existing project
 - Stitch count may be updated as new parts are revealed
@@ -163,6 +166,7 @@ The central feature. Every chart/project is a rich record with extensive metadat
 - Should track which parts have been released/received
 
 **Series Support:**
+
 - A named collection of independent projects
 - Track series membership and completion (e.g., "4 of 12 Mini Bottles complete")
 - Series-level statistics: percentage of series complete, patterns owned vs. total in series
@@ -172,18 +176,21 @@ The central feature. Every chart/project is a rich record with extensive metadat
 Three parallel supply databases, all linkable to projects with per-project quantity tracking.
 
 **Thread Database:**
+
 - Pre-seeded with full DMC catalog (~500 colors) — this is a major UX win
 - Additional brands supported: Anchor, and user-addable brands
 - Per-thread fields: brand, color code, color name, color swatch (hex value or image), color family (blue, red, green, etc.)
 - NOT currently tracking total skeins in personal stash (just per-project), but architecture should allow adding this later for multi-user flexibility
 
 **Bead Database:**
+
 - Brand (Mill Hill is most common, but user-addable)
 - Color/product code
 - Image/swatch
 - Color family
 
 **Specialty Item Database:**
+
 - Brand (Kreinik is most common, but user-addable)
 - Product code / type
 - Image/swatch
@@ -191,6 +198,7 @@ Three parallel supply databases, all linkable to projects with per-project quant
 
 **Project ↔ Supply Linking (Junction Data):**
 For each supply item linked to a project, track:
+
 - Stitch count for that color (if known)
 - Quantity required (skeins, bead containers, etc.)
 - Quantity acquired / in project
@@ -198,6 +206,7 @@ For each supply item linked to a project, track:
 - Whether enough has been acquired (calculated boolean)
 
 **Shopping List (Auto-Generated):**
+
 - Shows all supplies across all projects where quantity needed > quantity acquired
 - Grouped by project
 - For each item: supply code, color swatch, quantity still needed, total required, quantity already acquired
@@ -206,6 +215,7 @@ For each supply item linked to a project, track:
 ### 4.3 Stitching Session Logging & Statistics (Priority 3)
 
 **Session Entry Fields:**
+
 - Date (defaults to today, editable for backfilling)
 - Project (relation — select from active projects)
 - Stitch count for session
@@ -215,7 +225,8 @@ For each supply item linked to a project, track:
 **Statistics Engine:**
 This is a key differentiator from Notion. The app should calculate and display a comprehensive range of statistics. Everything listed below was either explicitly requested or derived from the existing Notion system.
 
-*Stitch Statistics:*
+_Stitch Statistics:_
+
 - Stitches today, yesterday, this week, this month, this year
 - Stitches by year (2024, 2025, 2026, etc.)
 - Total stitches since tracking began
@@ -223,7 +234,8 @@ This is a key differentiator from Notion. The app should calculate and display a
 - Most stitches in a single day (this year, last year, all time)
 - Monthly stitch totals (for bar charts)
 
-*Project Statistics:*
+_Project Statistics:_
+
 - Total projects/charts in stash
 - Count by status: unstarted, kitting, kitted, WIP, finished, FFO
 - Count by completion bracket: ≤10%, 11–25%, 26–50%, 51–75%, 76–99%
@@ -233,20 +245,23 @@ This is a key differentiator from Notion. The app should calculate and display a
 - Project closest to completion
 - Largest project (by stitch count)
 
-*Supply Statistics:*
+_Supply Statistics:_
+
 - Project using the most DMC colors
 - Project using the most beads
 - Project using the most specialty items
 - Most-used DMC color (across all projects)
 - Total unique DMC colors in use
 
-*Calendar / Timeline:*
+_Calendar / Timeline:_
+
 - Monthly stitching calendar showing which project was worked on each day and stitch count
 - Monthly stitch bar graphs for the year
 
 ### 4.4 Fabric Tracking (Priority 4)
 
 **Fabric Record Fields:**
+
 - Fabric name (e.g., "Driftwood Princess" — designer-given names)
 - Photo (optional)
 - Brand (relation to fabric brand)
@@ -260,28 +275,33 @@ This is a key differentiator from Notion. The app should calculate and display a
 - Need to buy (boolean/checkbox)
 
 **Fabric Brand Database:**
+
 - Brand name (Zweigart, etc.)
 - Website
 - Linked fabric records
 
 **Fabric Size Calculations:**
+
 - Given a project's stitch width × stitch height and a fabric count, calculate required fabric dimensions
 - Display this in a view that helps the user match projects to available fabric
 
 ### 4.5 Designer Tracking
 
 **Designer Record Fields:**
+
 - Name
 - Website
 - Linked projects/charts
 
 **Usage:**
+
 - Primarily for filtering and statistics ("most patterns by designer")
 - Browsing "all charts by Designer X" should be supported
 
 ### 4.6 Dashboard & Views (Priority spans all phases)
 
 **General Dashboard Philosophy:**
+
 - Customizable and rearrangeable — ideally drag-and-drop widgets
 - Multiple specialized pages/views for different contexts
 - Support gallery, list, and table view types
@@ -289,12 +309,14 @@ This is a key differentiator from Notion. The app should calculate and display a
 
 **Planned Dashboard Pages:**
 
-*Main Dashboard:*
+_Main Dashboard:_
+
 - Quick-action buttons: track stitches, add new chart, add fabric, add designer, add thread/bead/specialty
 - Recently added charts (last 10) with image, name, designer, stitch count, size category, genre
 - Navigation to all other pages
 
-*Pattern Dive:*
+_Pattern Dive:_
+
 - "Next to start" section
 - Gallery/list views filterable by: ready to start (kitted), size category, kitting needs
 - Table view for all projects
@@ -302,30 +324,35 @@ This is a key differentiator from Notion. The app should calculate and display a
 - Overall pattern stash gallery
 - Storage bin view (which projects are where)
 
-*Project Dashboard (Active Work):*
+_Project Dashboard (Active Work):_
+
 - Current WIPs with progress
 - Finished projects
 - Sorted views: by percent complete, by monthly goals, by least complete
 - Extensible — user was still developing this in Notion
 
-*Stitching Stats Page:*
+_Stitching Stats Page:_
+
 - All statistics from section 4.3 displayed as widgets/cards
 - Monthly stitch bar graphs
 - Stitching calendar
 - Stitch tracking table (raw session data)
 
-*Shopping Cart:*
+_Shopping Cart:_
+
 - Per-project tabs
 - Thread/floss needs with: DMC code, color swatch, quantity needed, required, acquired
 - Bead needs (same format)
 - Specialty item needs (same format)
 
-*Yearly Summary Pages (2024, 2025, 2026, etc.):*
+_Yearly Summary Pages (2024, 2025, 2026, etc.):_
+
 - Projects stitched on, finished, progress made
 - Year-specific statistics
 - Designed to be shareable on social media (future phase)
 
-*Monthly Summary Pages:*
+_Monthly Summary Pages:_
+
 - Same concept at monthly granularity
 - Also designed for social media sharing (future phase)
 
@@ -367,38 +394,39 @@ This is a key differentiator from Notion. The app should calculate and display a
 
 Each project-supply link carries its own data:
 
-| Field | Description |
-|-------|-------------|
-| project_id | FK to project |
-| supply_id | FK to thread/bead/specialty item |
-| supply_type | Discriminator: thread, bead, or specialty |
-| stitch_count | Number of stitches using this supply (if known) |
-| quantity_required | Skeins/containers/units needed |
-| quantity_acquired | Skeins/containers/units currently in project |
-| quantity_needed | Calculated: required - acquired |
-| is_fulfilled | Calculated: acquired >= required |
+| Field             | Description                                     |
+| ----------------- | ----------------------------------------------- |
+| project_id        | FK to project                                   |
+| supply_id         | FK to thread/bead/specialty item                |
+| supply_type       | Discriminator: thread, bead, or specialty       |
+| stitch_count      | Number of stitches using this supply (if known) |
+| quantity_required | Skeins/containers/units needed                  |
+| quantity_acquired | Skeins/containers/units currently in project    |
+| quantity_needed   | Calculated: required - acquired                 |
+| is_fulfilled      | Calculated: acquired >= required                |
 
 > **Implementation Note:** Prisma does not natively support polymorphic relations (a single `supply_id` pointing to Thread, Bead, or Specialty). The recommended approach is **three separate junction tables** (`ProjectThread`, `ProjectBead`, `ProjectSpecialty`), each carrying the quantity/fulfillment fields above. This is idiomatic Prisma, preserves full type safety, and the shopping list query becomes a simple `UNION` across the three tables in PostgreSQL.
 
 ### SAL-Specific Modeling
 
 A SAL project has additional structure:
+
 - Multiple chart files (parts), each with: part number, file (PDF), date released/received
 - Stitch count is cumulative and may be updated as parts are added
 - Supply list grows over time as new parts introduce new colors
 
 ### Key Calculated Fields
 
-| Field | Derivation |
-|-------|------------|
-| Size category | Derived from total stitch count using defined brackets |
-| Progress % | (starting_stitches + stitches_from_sessions) / total_stitch_count |
-| Stitches remaining | total_stitch_count - (starting_stitches + stitches_from_sessions) |
-| Kitted status | Composite check: has_digital_copy AND has_fabric AND all_thread_fulfilled AND all_beads_fulfilled AND all_specialty_fulfilled AND onion_skinning_complete_or_not_needed AND app_loaded_or_ready |
-| Kitting progress | Percentage/count of kitting conditions met |
-| Shopping list | All project-supply links where is_fulfilled = false |
-| Fabric size needed | (stitch_width / fabric_count + margin) × (stitch_height / fabric_count + margin) |
-| Series completion | Count of finished projects in series / total projects in series |
+| Field              | Derivation                                                                                                                                                                                      |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Size category      | Derived from total stitch count using defined brackets                                                                                                                                          |
+| Progress %         | (starting_stitches + stitches_from_sessions) / total_stitch_count                                                                                                                               |
+| Stitches remaining | total_stitch_count - (starting_stitches + stitches_from_sessions)                                                                                                                               |
+| Kitted status      | Composite check: has_digital_copy AND has_fabric AND all_thread_fulfilled AND all_beads_fulfilled AND all_specialty_fulfilled AND onion_skinning_complete_or_not_needed AND app_loaded_or_ready |
+| Kitting progress   | Percentage/count of kitting conditions met                                                                                                                                                      |
+| Shopping list      | All project-supply links where is_fulfilled = false                                                                                                                                             |
+| Fabric size needed | (stitch_width / fabric_count + margin) × (stitch_height / fabric_count + margin)                                                                                                                |
+| Series completion  | Count of finished projects in series / total projects in series                                                                                                                                 |
 
 ---
 
@@ -415,6 +443,7 @@ A SAL project has additional structure:
 ### Filtering Requirements
 
 Users need to filter projects by:
+
 - Status (any combination)
 - Size category
 - Designer
@@ -443,6 +472,7 @@ Users need to filter projects by:
 **Goal:** A working app where you can add, view, edit, and manage cross stitch projects with rich metadata. The minimum viable "better than nothing."
 
 **Features:**
+
 - Authentication (single user, but built with multi-user architecture in mind)
 - Project CRUD with full metadata fields (all fields from section 4.1)
 - Digital working copy upload and storage (PDF/image)
@@ -461,6 +491,7 @@ Users need to filter projects by:
 **Goal:** Full supply tracking with the auto-generated shopping list.
 
 **Features:**
+
 - Thread database (pre-seeded with full DMC catalog ~500 colors including color swatches)
 - Bead database with brand management
 - Specialty item database with brand management
@@ -478,6 +509,7 @@ Users need to filter projects by:
 **Goal:** Quick session logging and comprehensive statistics.
 
 **Features:**
+
 - Stitch session logging: date (defaults today), project, stitch count, optional photo, optional time
 - Quick-log flow optimized for speed (this happens every stitching session)
 - Progress tracking: auto-update project completion based on logged sessions
@@ -494,6 +526,7 @@ Users need to filter projects by:
 **Goal:** The rich, customizable multi-view experience that makes this feel like a proper application.
 
 **Features:**
+
 - Fabric tracking (CRUD, brands, all fields from section 4.4)
 - Fabric ↔ project linking
 - Fabric size auto-calculation based on stitch count and fabric count
@@ -512,6 +545,7 @@ Users need to filter projects by:
 **Goal:** Social features, summary pages, PWA enhancements, and preparing for potential multi-user support.
 
 **Features:**
+
 - Yearly and monthly summary pages with shareable layouts
 - Social media share card generation (stats, progress, finishes)
 - PWA offline support (especially for session logging)
@@ -530,18 +564,18 @@ Users need to filter projects by:
 
 ### Stack Summary
 
-| Layer | Choice | Key Rationale |
-|-------|--------|---------------|
-| **Framework** | Next.js 14+ (App Router) | One language (TypeScript) across frontend and backend; React built-in for rich interactive UI; excellent Claude Code support |
-| **Language** | TypeScript | Type safety across the complex data model; catches errors at build time; types flow from Prisma schema through API to components |
-| **Database** | PostgreSQL (hosted on Neon) | Superior aggregation, window functions, and CTEs for the statistics engine; natural fit for deeply relational data with junction tables |
-| **ORM** | Prisma | Readable schema definition; auto-generated TypeScript types; intuitive relation queries; clean handling of junction tables with data |
-| **File Storage** | Cloudflare R2 | S3-compatible API (no lock-in); 10 GB free tier covers current needs (~2.5 GB of PDFs + images); zero egress fees |
-| **Frontend UI** | React + Tailwind CSS | Core styling and layout via Tailwind; React ecosystem provides mature libraries for every view type needed |
-| **UI Libraries** | TanStack Table, Recharts, dnd-kit | TanStack Table for sortable/filterable project tables; Recharts for stitch statistics charts and graphs; dnd-kit for drag-and-drop dashboard widgets |
-| **Authentication** | Auth.js (NextAuth.js) | Simple single-user setup now; scales to multi-user with OAuth providers without architectural changes |
-| **Hosting** | Vercel (application) | Push-to-deploy from GitHub; free tier covers single-user; serverless architecture scales automatically if multi-user is added |
-| **App Type** | Progressive Web App (PWA) | Installable on iPhone home screen; app-like experience without Safari chrome; offline session logging capability in later phases |
+| Layer              | Choice                            | Key Rationale                                                                                                                                        |
+| ------------------ | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Framework**      | Next.js 14+ (App Router)          | One language (TypeScript) across frontend and backend; React built-in for rich interactive UI; excellent Claude Code support                         |
+| **Language**       | TypeScript                        | Type safety across the complex data model; catches errors at build time; types flow from Prisma schema through API to components                     |
+| **Database**       | PostgreSQL (hosted on Neon)       | Superior aggregation, window functions, and CTEs for the statistics engine; natural fit for deeply relational data with junction tables              |
+| **ORM**            | Prisma                            | Readable schema definition; auto-generated TypeScript types; intuitive relation queries; clean handling of junction tables with data                 |
+| **File Storage**   | Cloudflare R2                     | S3-compatible API (no lock-in); 10 GB free tier covers current needs (~2.5 GB of PDFs + images); zero egress fees                                    |
+| **Frontend UI**    | React + Tailwind CSS              | Core styling and layout via Tailwind; React ecosystem provides mature libraries for every view type needed                                           |
+| **UI Libraries**   | TanStack Table, Recharts, dnd-kit | TanStack Table for sortable/filterable project tables; Recharts for stitch statistics charts and graphs; dnd-kit for drag-and-drop dashboard widgets |
+| **Authentication** | Auth.js (NextAuth.js)             | Simple single-user setup now; scales to multi-user with OAuth providers without architectural changes                                                |
+| **Hosting**        | Vercel (application)              | Push-to-deploy from GitHub; free tier covers single-user; serverless architecture scales automatically if multi-user is added                        |
+| **App Type**       | Progressive Web App (PWA)         | Installable on iPhone home screen; app-like experience without Safari chrome; offline session logging capability in later phases                     |
 
 ### Decision Rationale
 
@@ -569,12 +603,12 @@ A PWA provides the "app-like on iPhone" requirement without maintaining a separa
 
 ### Cost Projection
 
-| Service | Free Tier | Paid Tier (if needed) |
-|---------|-----------|----------------------|
-| Vercel | Hobby plan — sufficient for single-user | Pro: $20/month (likely only needed for multi-user) |
-| Neon | 0.5 GB storage, 190 compute hours/month | Launch: $19/month (if storage exceeds free tier) |
-| Cloudflare R2 | 10 GB storage, 1M requests/month | $0.015/GB/month beyond free tier |
-| **Total (single-user)** | **$0/month** | **$5–40/month if any tier is exceeded** |
+| Service                 | Free Tier                               | Paid Tier (if needed)                              |
+| ----------------------- | --------------------------------------- | -------------------------------------------------- |
+| Vercel                  | Hobby plan — sufficient for single-user | Pro: $20/month (likely only needed for multi-user) |
+| Neon                    | 0.5 GB storage, 190 compute hours/month | Launch: $19/month (if storage exceeds free tier)   |
+| Cloudflare R2           | 10 GB storage, 1M requests/month        | $0.015/GB/month beyond free tier                   |
+| **Total (single-user)** | **$0/month**                            | **$5–40/month if any tier is exceeded**            |
 
 ---
 

@@ -164,3 +164,8 @@ prisma/migrations/*.sql.bak
 # OS files
 .DS_Store
 Thumbs.db
+
+src/generated/
+
+# Worktrees
+.worktrees/

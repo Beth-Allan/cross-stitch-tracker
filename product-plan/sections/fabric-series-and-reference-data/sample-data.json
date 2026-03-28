@@ -1,0 +1,207 @@
+{
+  "_meta": {
+    "models": {
+      "fabric": "A piece of cross stitch fabric with brand, count, type, color attributes, dimensions, and optional project link. Tracks need-to-buy status for shopping.",
+      "fabricBrand": "A fabric manufacturer (e.g., Zweigart, Wichelt). Tracks name and website.",
+      "designer": "A cross stitch pattern designer with aggregated stats: chart count, projects started/finished, top genre.",
+      "designerChart": "A chart belonging to a designer, shown in the designer detail modal with project status.",
+      "series": "A named collection of related charts with completion tracking across member projects.",
+      "seriesMember": "A chart within a series, shown in series detail with project status and progress.",
+      "storageLocation": "A user-created physical storage location (bin, shelf, room) with counts of assigned items.",
+      "fabricSizeCalculation": "A computed result showing whether a fabric piece can fit a project at its count, with required dimensions."
+    },
+    "relationships": [
+      "Fabric belongs to FabricBrand (via brandId)",
+      "Fabric optionally belongs to Project (via linkedProjectId)",
+      "Designer has many DesignerChart",
+      "Series has many SeriesMember (charts in the collection)",
+      "StorageLocation has many Project and Fabric (via project.projectBin and fabric assignment)",
+      "FabricSizeCalculation is computed from Fabric.count + Project.stitchesWide/stitchesHigh"
+    ]
+  },
+  "fabricBrands": [
+    { "id": "fb-1", "name": "Zweigart", "website": "https://www.zweigart.com" },
+    { "id": "fb-2", "name": "Wichelt", "website": "https://www.wichelt.com" },
+    { "id": "fb-3", "name": "Charles Craft", "website": null },
+    { "id": "fb-4", "name": "Picture This Plus", "website": "https://www.picturethisplus.com" },
+    { "id": "fb-5", "name": "Lakeside Linens", "website": "https://www.lakesidelinens.com" }
+  ],
+  "fabrics": [
+    {
+      "id": "fab-1",
+      "name": "Driftwood Princess",
+      "brandId": "fb-4",
+      "photoUrl": "/photos/fabric-driftwood-princess.jpg",
+      "count": 28,
+      "type": "Linen",
+      "colorFamily": "Cream",
+      "colorType": "Hand-dyed",
+      "shortestEdgeInches": 18,
+      "longestEdgeInches": 24,
+      "linkedProjectId": "proj-1",
+      "needToBuy": false
+    },
+    {
+      "id": "fab-2",
+      "name": "White Standard",
+      "brandId": "fb-1",
+      "photoUrl": null,
+      "count": 14,
+      "type": "Aida",
+      "colorFamily": "White",
+      "colorType": "White",
+      "shortestEdgeInches": 15,
+      "longestEdgeInches": 18,
+      "linkedProjectId": "proj-3",
+      "needToBuy": false
+    },
+    {
+      "id": "fab-3",
+      "name": "Stormy Night",
+      "brandId": "fb-5",
+      "photoUrl": "/photos/fabric-stormy-night.jpg",
+      "count": 32,
+      "type": "Linen",
+      "colorFamily": "Gray",
+      "colorType": "Hand-dyed",
+      "shortestEdgeInches": 20,
+      "longestEdgeInches": 26,
+      "linkedProjectId": null,
+      "needToBuy": false
+    },
+    {
+      "id": "fab-4",
+      "name": "Antique White Lugana",
+      "brandId": "fb-1",
+      "photoUrl": null,
+      "count": 25,
+      "type": "Lugana",
+      "colorFamily": "Cream",
+      "colorType": "Natural",
+      "shortestEdgeInches": 12,
+      "longestEdgeInches": 15,
+      "linkedProjectId": null,
+      "needToBuy": false
+    },
+    {
+      "id": "fab-5",
+      "name": "Barn Red Aida",
+      "brandId": "fb-3",
+      "photoUrl": null,
+      "count": 14,
+      "type": "Aida",
+      "colorFamily": "Red",
+      "colorType": "Brights",
+      "shortestEdgeInches": 12,
+      "longestEdgeInches": 18,
+      "linkedProjectId": "proj-6",
+      "needToBuy": false
+    },
+    {
+      "id": "fab-6",
+      "name": "Midnight Blue Evenweave",
+      "brandId": "fb-2",
+      "photoUrl": null,
+      "count": 28,
+      "type": "Evenweave",
+      "colorFamily": "Blue",
+      "colorType": "Dark",
+      "shortestEdgeInches": 0,
+      "longestEdgeInches": 0,
+      "linkedProjectId": null,
+      "needToBuy": true
+    },
+    {
+      "id": "fab-7",
+      "name": "Summer Meadow",
+      "brandId": "fb-4",
+      "photoUrl": "/photos/fabric-summer-meadow.jpg",
+      "count": 36,
+      "type": "Linen",
+      "colorFamily": "Green",
+      "colorType": "Hand-dyed",
+      "shortestEdgeInches": 14,
+      "longestEdgeInches": 18,
+      "linkedProjectId": null,
+      "needToBuy": false
+    },
+    {
+      "id": "fab-8",
+      "name": "Black Aida",
+      "brandId": "fb-1",
+      "photoUrl": null,
+      "count": 18,
+      "type": "Aida",
+      "colorFamily": "Black",
+      "colorType": "Dark",
+      "shortestEdgeInches": 0,
+      "longestEdgeInches": 0,
+      "linkedProjectId": null,
+      "needToBuy": true
+    }
+  ],
+  "designers": [
+    { "id": "des-1", "name": "Heaven and Earth Designs", "website": "https://heavenandearthdesigns.com", "chartCount": 5, "projectsStarted": 3, "projectsFinished": 1, "topGenre": "Fantasy" },
+    { "id": "des-2", "name": "Dimensions", "website": "https://www.dimensions-crafts.com", "chartCount": 3, "projectsStarted": 2, "projectsFinished": 1, "topGenre": "Landscape" },
+    { "id": "des-3", "name": "Mirabilia", "website": "https://mirabilia.com", "chartCount": 4, "projectsStarted": 1, "projectsFinished": 0, "topGenre": "Fantasy" },
+    { "id": "des-4", "name": "Ink Circles", "website": "https://www.inkcircles.com", "chartCount": 2, "projectsStarted": 1, "projectsFinished": 0, "topGenre": "Mandala" },
+    { "id": "des-5", "name": "Stoney Creek", "website": "https://www.stoneycreek.com", "chartCount": 6, "projectsStarted": 2, "projectsFinished": 2, "topGenre": "Seasonal" },
+    { "id": "des-6", "name": "Long Dog Samplers", "website": "https://www.longdogsamplers.co.uk", "chartCount": 3, "projectsStarted": 1, "projectsFinished": 0, "topGenre": "Sampler" },
+    { "id": "des-7", "name": "Nora Corbett", "website": null, "chartCount": 8, "projectsStarted": 4, "projectsFinished": 3, "topGenre": "Fairy" }
+  ],
+  "designerCharts": [
+    { "id": "chart-1", "chartName": "Enchanted Forest Sampler", "stitchCount": 45200, "sizeCategory": "Large", "projectStatus": "In Progress", "progressPercent": 34, "coverImageUrl": "/samples/enchanted-forest.jpg" },
+    { "id": "chart-3", "chartName": "Gold Collection: Autumn Retreat", "stitchCount": 62400, "sizeCategory": "BAP", "projectStatus": "In Progress", "progressPercent": 50, "coverImageUrl": "/samples/autumn-retreat.jpg" },
+    { "id": "chart-5", "chartName": "Mini Bottle: Lily", "stitchCount": 1200, "sizeCategory": "Mini", "projectStatus": "Finished", "progressPercent": 100, "coverImageUrl": "/samples/mini-bottle-lily.jpg" },
+    { "id": "chart-7", "chartName": "Mini Bottle: Rose", "stitchCount": 1350, "sizeCategory": "Mini", "projectStatus": "Kitting", "progressPercent": null, "coverImageUrl": null },
+    { "id": "chart-8", "chartName": "Celtic Dragon Mandala", "stitchCount": 28000, "sizeCategory": "Medium", "projectStatus": null, "progressPercent": null, "coverImageUrl": "/samples/celtic-dragon.jpg" }
+  ],
+  "series": [
+    { "id": "ser-1", "name": "Mini Bottles", "memberCount": 7, "finishedCount": 3, "completionPercent": 43 },
+    { "id": "ser-2", "name": "Celtic Santas", "memberCount": 4, "finishedCount": 0, "completionPercent": 0 },
+    { "id": "ser-3", "name": "Seasonal Samplers", "memberCount": 4, "finishedCount": 2, "completionPercent": 50 },
+    { "id": "ser-4", "name": "Nora Corbett Fairies", "memberCount": 6, "finishedCount": 3, "completionPercent": 50 },
+    { "id": "ser-5", "name": "Gold Collection Landscapes", "memberCount": 3, "finishedCount": 1, "completionPercent": 33 }
+  ],
+  "seriesMembers": [
+    { "chartId": "chart-5", "chartName": "Mini Bottle: Lily", "designerName": "Nora Corbett", "stitchCount": 1200, "coverImageUrl": "/samples/mini-bottle-lily.jpg", "projectStatus": "Finished", "progressPercent": 100 },
+    { "chartId": "chart-7", "chartName": "Mini Bottle: Rose", "designerName": "Nora Corbett", "stitchCount": 1350, "coverImageUrl": null, "projectStatus": "Kitting", "progressPercent": null },
+    { "chartId": "chart-mb3", "chartName": "Mini Bottle: Daisy", "designerName": "Nora Corbett", "stitchCount": 1180, "coverImageUrl": "/samples/mini-bottle-daisy.jpg", "projectStatus": "Finished", "progressPercent": 100 },
+    { "chartId": "chart-mb4", "chartName": "Mini Bottle: Iris", "designerName": "Nora Corbett", "stitchCount": 1420, "coverImageUrl": null, "projectStatus": "Unstarted", "progressPercent": null },
+    { "chartId": "chart-mb5", "chartName": "Mini Bottle: Violet", "designerName": "Nora Corbett", "stitchCount": 1290, "coverImageUrl": "/samples/mini-bottle-violet.jpg", "projectStatus": "Finished", "progressPercent": 100 },
+    { "chartId": "chart-mb6", "chartName": "Mini Bottle: Sunflower", "designerName": "Nora Corbett", "stitchCount": 1380, "coverImageUrl": null, "projectStatus": "Unstarted", "progressPercent": null },
+    { "chartId": "chart-mb7", "chartName": "Mini Bottle: Orchid", "designerName": "Nora Corbett", "stitchCount": 1310, "coverImageUrl": null, "projectStatus": "Unstarted", "progressPercent": null }
+  ],
+  "storageLocations": [
+    { "id": "loc-1", "name": "Bin A", "projectCount": 3 },
+    { "id": "loc-2", "name": "Bin B", "projectCount": 2 },
+    { "id": "loc-3", "name": "Bin C", "projectCount": 2 },
+    { "id": "loc-4", "name": "Living Room Shelf", "projectCount": 1 },
+    { "id": "loc-5", "name": "Basement Tub", "projectCount": 4 }
+  ],
+  "storageLocationDetails": {
+    "loc-1": {
+      "location": { "id": "loc-1", "name": "Bin A", "projectCount": 3 },
+      "projects": [
+        { "id": "proj-1", "name": "Enchanted Forest Sampler", "status": "In Progress", "fabric": { "id": "fab-1", "name": "Driftwood Princess", "count": 28, "type": "Linen" } },
+        { "id": "proj-3", "name": "Autumn Retreat", "status": "Kitting", "fabric": { "id": "fab-3", "name": "Stormy Night", "count": 18, "type": "Aida" } },
+        { "id": "proj-7", "name": "Mini Bottle: Rose", "status": "Kitting", "fabric": null }
+      ]
+    },
+    "loc-5": {
+      "location": { "id": "loc-5", "name": "Basement Tub", "projectCount": 4 },
+      "projects": [
+        { "id": "proj-2", "name": "Celtic Dragon Mandala", "status": "In Progress", "fabric": { "id": "fab-4", "name": "Antique White Lugana", "count": 25, "type": "Lugana" } },
+        { "id": "proj-4", "name": "Wildflower Garden Sampler", "status": "Unstarted", "fabric": { "id": "fab-2", "name": "White Standard", "count": 14, "type": "Aida" } },
+        { "id": "proj-8", "name": "Winter Wonderland BAP", "status": "Unstarted", "fabric": null },
+        { "id": "proj-9", "name": "Garden Party Mandala", "status": "Finished", "fabric": { "id": "fab-6", "name": "Midnight Blue Evenweave", "count": 28, "type": "Evenweave" } }
+      ]
+    }
+  },
+  "fabricSizeCalculations": [
+    { "projectId": "proj-2", "projectName": "Celtic Dragon Mandala", "stitchesWide": 250, "stitchesHigh": 250, "requiredWidthInches": 14.93, "requiredHeightInches": 14.93, "fits": true },
+    { "projectId": "proj-4", "projectName": "Wildflower Garden Sampler", "stitchesWide": 180, "stitchesHigh": 300, "requiredWidthInches": 12.43, "requiredHeightInches": 16.71, "fits": true },
+    { "projectId": "proj-7", "projectName": "Mini Bottle: Rose", "stitchesWide": 45, "stitchesHigh": 80, "requiredWidthInches": 7.61, "requiredHeightInches": 8.86, "fits": true },
+    { "projectId": "proj-8", "projectName": "Winter Wonderland BAP", "stitchesWide": 400, "stitchesHigh": 550, "requiredWidthInches": 20.29, "requiredHeightInches": 25.64, "fits": false }
+  ]
+}

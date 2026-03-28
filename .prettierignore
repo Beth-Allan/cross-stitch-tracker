@@ -1,0 +1,15 @@
+# Build output
+.next/
+out/
+coverage/
+
+# Generated code
+src/generated/
+
+# Package manager
+node_modules/
+
+# Planning/tooling (not project code)
+.claude/
+.planning/
+product-plan/
