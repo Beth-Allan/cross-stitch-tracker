@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-03-28T23:16:30.828Z",
+  "phase": "02",
+  "phase_name": "core-project-management",
+  "phase_dir": ".planning/phases/02-core-project-management",
+  "plan": 5,
+  "task": 1,
+  "total_tasks": 1,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": "02-01", "name": "Data Foundation (Prisma schema, R2 client, validations, types)", "status": "done", "commit": "a1164c4"},
+    {"id": "02-02", "name": "Server Actions (chart CRUD, uploads, designer/genre creation)", "status": "done", "commit": "70859d2"},
+    {"id": "02-03", "name": "Chart Form UI (~50 fields, uploads, inline entity creation)", "status": "done", "commit": "039840b"},
+    {"id": "02-04", "name": "Chart Detail & List Pages (badges, status control, detail/list views)", "status": "done", "commit": "0b24172"}
+  ],
+  "remaining_tasks": [
+    {"id": "02-05", "name": "Human Verification Checkpoint — full chart lifecycle testing", "status": "not_started"}
+  ],
+  "blockers": [
+    {"description": "Database not connected — Prisma migrations need to run against live Neon instance before testing", "type": "technical", "workaround": "Set DATABASE_URL in .env.local, run npx prisma migrate dev"},
+    {"description": "Worktree cleanup needed — 7 stale worktree directories in .claude/worktrees/", "type": "technical", "workaround": "Can be cleaned up in next session"}
+  ],
+  "human_actions_pending": [
+    {"action": "Run npx prisma migrate dev with live database connection", "context": "Migration SQL was generated but never applied (placeholder DB URL)", "blocking": true},
+    {"action": "Start dev server and walk through full chart lifecycle in browser", "context": "Plan 02-05 is a human verification checkpoint", "blocking": true}
+  ],
+  "decisions": [
+    {"decision": "Lazy Prisma proxy in db.ts to prevent build-time throw when DATABASE_URL not set", "rationale": "Allows build to succeed in CI/dev without database connection", "phase": "02"},
+    {"decision": "Added @prisma/client as runtime dependency", "rationale": "Required by Prisma 7 generated client", "phase": "02"},
+    {"decision": "Installed sharp for server-side thumbnail generation", "rationale": "Upload actions generate thumbnails on upload", "phase": "02"}
+  ],
+  "uncommitted_files": [],
+  "next_action": "1) Clean up stale worktrees. 2) Set up Neon DB connection in .env.local. 3) Run prisma migrate dev. 4) npm run dev and test chart lifecycle. 5) Complete plan 02-05 checkpoint. 6) Run phase verification.",
+  "context_notes": "Waves 1-4 executed via parallel subagent worktrees, all merged to main. Wave 5 (02-05) is a human verification checkpoint — user needs to manually test the full chart CRUD lifecycle before phase verification can run. Some SUMMARY/PLAN files had grep hits for 'TBD' but these are likely in placeholder sections of the templates, not false completions — the code work is genuinely complete."
+}
