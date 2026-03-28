@@ -27,8 +27,12 @@ export async function loginAction(
     return {}
   } catch (error) {
     if (error instanceof AuthError) {
-      return { error: "Invalid credentials" }
+      if (error.type === "CredentialsSignin") {
+        return { error: "Invalid credentials" }
+      }
+      return { error: "Something went wrong" }
     }
+    // Re-throw NEXT_REDIRECT and other non-auth errors
     throw error
   }
 }

@@ -6,6 +6,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
@@ -34,21 +35,19 @@ export function UserMenu({ user }: UserMenuProps) {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={8} className="w-56">
-        <DropdownMenuLabel>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-foreground">{user.name}</span>
-            <span className="text-xs text-muted-foreground">{user.email}</span>
-          </div>
-        </DropdownMenuLabel>
+        <div className="px-1.5 py-1.5">
+          <p className="text-sm font-medium text-foreground">{user.name}</p>
+          <p className="text-xs text-muted-foreground">{user.email}</p>
+        </div>
         <DropdownMenuSeparator />
-        <form action={logoutAction}>
+        <DropdownMenuGroup>
           <DropdownMenuItem
-            render={<button type="submit" className="w-full" />}
+            onClick={() => logoutAction()}
           >
             <LogOut className="w-4 h-4" strokeWidth={1.5} />
             Log out
           </DropdownMenuItem>
-        </form>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )
