@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed quick/260328-igi (auth security hardening)
-last_updated: "2026-03-28T19:22:23.321Z"
+stopped_at: Completed quick/260328-im6 (fix shell navigation and DRY cleanup)
+last_updated: "2026-03-28T19:30:04.000Z"
 last_activity: 2026-03-28
 progress:
   total_phases: 9
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 Phase: 2
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-03-28 - Completed quick task 260328-igi: Fix critical and high auth/security issues from phase 1 code review
+Last activity: 2026-03-28 - Completed quick task 260328-im6: Fix shell navigation issues and DRY cleanup
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -69,6 +69,7 @@ Recent decisions affecting current work:
 - [Phase 01]: Zod 3.24.4 stable (v4 still beta), Prisma 7 imports from generated/prisma/client, shadcn v4.1.1 adds @base-ui/react
 - [Phase 01]: No new dependencies for auth -- all packages (next-auth, bcryptjs, zod) installed in Plan 01
 - [Phase 01]: AppShell is Server Component; Sidebar/TopBar/UserMenu are Client Components (server-client split)
+- [Quick 260328-im6]: Used isRedirectError for proper redirect detection in logout try-catch
 
 ### Pending Todos
 
@@ -84,9 +85,10 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260328-igi | Fix critical and high auth/security issues from phase 1 code review | 2026-03-28 | cd7eb7f | [260328-igi-fix-critical-and-high-auth-security-issu](./quick/260328-igi-fix-critical-and-high-auth-security-issu/) |
+| 260328-im6 | Fix shell navigation issues and DRY cleanup | 2026-03-28 | 7ba52dc | [260328-im6-fix-shell-navigation-issues-and-dry-clea](./quick/260328-im6-fix-shell-navigation-issues-and-dry-clea/) |
 
 ## Session Continuity
 
-Last session: 2026-03-28T19:22:23.319Z
-Stopped at: Completed quick/260328-igi (auth security hardening)
+Last session: 2026-03-28T19:30:04.000Z
+Stopped at: Completed quick/260328-im6 (fix shell navigation and DRY cleanup)
 Resume file: None
