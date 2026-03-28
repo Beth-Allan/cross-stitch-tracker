@@ -166,3 +166,6 @@ prisma/migrations/*.sql.bak
 Thumbs.db
 
 src/generated/
+
+# Worktrees
+.worktrees/
