@@ -55,7 +55,7 @@ Plans:
 **Plans:** 5 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Prisma schema (Chart/Project/Designer/Genre), R2 client, Zod schemas, utilities, type definitions
+- [x] 02-01-PLAN.md — Prisma schema (Chart/Project/Designer/Genre), R2 client, Zod schemas, utilities, type definitions
 - [ ] 02-02-PLAN.md — Server Actions (chart CRUD, file uploads, inline entity creation)
 - [ ] 02-03-PLAN.md — Chart form UI (add/edit) with upload components and inline entity dialogs
 - [ ] 02-04-PLAN.md — Chart detail page, charts list page, status/size badges, status control
