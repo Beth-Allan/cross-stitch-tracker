@@ -99,9 +99,7 @@ export function TopBar({ user }: TopBarProps) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() =>
-            toast("Coming soon", { description: "You'll be able to add and manage charts here." })
-          }
+          render={<Link href="/charts/new" />}
           className="flex min-h-11 items-center gap-1.5 sm:min-h-0"
         >
           <Plus className="h-3.5 w-3.5" strokeWidth={2} />
