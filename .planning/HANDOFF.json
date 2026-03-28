@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-28T23:16:30.828Z",
+  "timestamp": "2026-03-28T23:55:00.000Z",
   "phase": "02",
   "phase_name": "core-project-management",
   "phase_dir": ".planning/phases/02-core-project-management",
@@ -15,22 +15,23 @@
     {"id": "02-04", "name": "Chart Detail & List Pages (badges, status control, detail/list views)", "status": "done", "commit": "0b24172"}
   ],
   "remaining_tasks": [
-    {"id": "02-05", "name": "Human Verification Checkpoint — full chart lifecycle testing", "status": "not_started"}
+    {"id": "02-05", "name": "Human Verification Checkpoint — full chart lifecycle testing", "status": "in_progress"}
   ],
   "blockers": [
-    {"description": "Database not connected — Prisma migrations need to run against live Neon instance before testing", "type": "technical", "workaround": "Set DATABASE_URL in .env.local, run npx prisma migrate dev"},
-    {"description": "Worktree cleanup needed — 7 stale worktree directories in .claude/worktrees/", "type": "technical", "workaround": "Can be cleaned up in next session"}
+    {"description": "Chart form UI does not match DesignOS design — needs full rebuild before verification can proceed", "type": "technical", "workaround": "Rebuild from product-plan/sections/project-management/components/ChartAddForm.tsx and FormFields.tsx"}
   ],
   "human_actions_pending": [
-    {"action": "Run npx prisma migrate dev with live database connection", "context": "Migration SQL was generated but never applied (placeholder DB URL)", "blocking": true},
-    {"action": "Start dev server and walk through full chart lifecycle in browser", "context": "Plan 02-05 is a human verification checkpoint", "blocking": true}
+    {"action": "Rebuild chart form to match DesignOS design", "context": "Current form was auto-generated and ignores the designed sub-components (GenrePicker pills, StitchCountFields, PatternTypeFields radio buttons, StartPreferenceFields, CoverImageUpload drop zone, dropdown presets for Bin/App)", "blocking": true},
+    {"action": "Test full chart lifecycle in browser after rebuild", "context": "DB is connected, migration applied, dev server running on port 3000", "blocking": true}
   ],
   "decisions": [
     {"decision": "Lazy Prisma proxy in db.ts to prevent build-time throw when DATABASE_URL not set", "rationale": "Allows build to succeed in CI/dev without database connection", "phase": "02"},
     {"decision": "Added @prisma/client as runtime dependency", "rationale": "Required by Prisma 7 generated client", "phase": "02"},
-    {"decision": "Installed sharp for server-side thumbnail generation", "rationale": "Upload actions generate thumbnails on upload", "phase": "02"}
+    {"decision": "prisma.config.ts loads .env.local explicitly", "rationale": "dotenv default is .env, but Next.js convention is .env.local", "phase": "02"},
+    {"decision": "CLAUDE.md modularized — tech stack and design context moved to docs/", "rationale": "613 lines was too long for agents to reliably read; reference material separated from rules", "phase": "02"},
+    {"decision": "DesignOS enforcement added — guardrail, DESIGN-REFERENCE.md, read_first requirement", "rationale": "Phase 2 auto-generated form ignored user's design work; three-layer enforcement prevents recurrence", "phase": "02"}
   ],
   "uncommitted_files": [],
-  "next_action": "1) Clean up stale worktrees. 2) Set up Neon DB connection in .env.local. 3) Run prisma migrate dev. 4) npm run dev and test chart lifecycle. 5) Complete plan 02-05 checkpoint. 6) Run phase verification.",
-  "context_notes": "Waves 1-4 executed via parallel subagent worktrees, all merged to main. Wave 5 (02-05) is a human verification checkpoint — user needs to manually test the full chart CRUD lifecycle before phase verification can run. Some SUMMARY/PLAN files had grep hits for 'TBD' but these are likely in placeholder sections of the templates, not false completions — the code work is genuinely complete."
+  "next_action": "1) Rebuild chart form from DesignOS design (ChartAddForm.tsx + FormFields.tsx). 2) Test chart lifecycle. 3) Complete 02-05 checkpoint.",
+  "context_notes": "DB is connected and migrated. Dev server on port 3000. Chart form exists at /charts/new but UI doesn't match designs — needs rebuild using product-plan/sections/project-management/ as spec. Key design files: ChartAddForm.tsx (page layout), FormFields.tsx (sub-components: SearchableSelect, GenrePicker, CoverImageUpload, StitchCountFields, PatternTypeFields, StartPreferenceFields). Screenshot: chart-add-form.png."
 }

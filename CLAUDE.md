@@ -21,19 +21,25 @@
 - **Impeccable audit/polish complete:** audit (11→16/20), normalize (tokens), harden (a11y), adapt (touch targets), polish (focus-visible), clarify (user-facing copy), delight (placeholder icons/pills)
 - **Code quality infrastructure:** Prettier + Tailwind plugin, Vitest + RTL + jsdom, Husky pre-commit/pre-push hooks, GitHub branch protection, Node 22 pinning, CI with format check + test steps
 - **Phase 2 plans 01-04 complete:** Prisma schema (Chart/Project/Designer/Genre), R2 client, Zod validations, chart CRUD Server Actions, file upload with presigned URLs + thumbnails, chart add/edit form (~50 fields), chart detail/list pages, status/size badges, status control
+- **DB connected:** Neon DATABASE_URL configured, migration applied, Prisma client generated
+- **Worktrees cleaned up:** 8 stale agent worktree directories removed
+- **CLAUDE.md modularized:** 613→340 lines, tech stack → docs/tech-stack.md, design context → docs/design-context.md
+- **DesignOS enforcement:** UI Implementation Rules added to CLAUDE.md, DESIGN-REFERENCE.md created, guardrail + read_first requirement for all UI tasks
+- **Chart form routes restored:** /charts/new and /charts/[id]/edit pages + TopBar button wired
 
 ### In Progress
 
-- Phase 2 plan 02-05: Human verification checkpoint (needs DB setup + manual testing)
+- Phase 2 plan 02-05: Human verification checkpoint — chart form needs rebuild to match DesignOS design
 
 ### Next Up
 
-1. Rebuild chart form to match DesignOS design reference
-2. Test full chart lifecycle in browser
+1. Rebuild chart form from DesignOS reference (`product-plan/sections/project-management/components/ChartAddForm.tsx` + `FormFields.tsx`)
+2. Test full chart lifecycle in browser (create, view, edit, status transitions, delete)
 3. Complete 02-05 checkpoint, then phase verification
 
 ### Blockers / Decisions Needed
 
+- Chart form UI doesn't match DesignOS design — needs full rebuild before verification
 - PWA on-device testing deferred (needs deployment) — tracked in 01-HUMAN-UAT.md
 - `.env.local` bcrypt hashes must escape `$` as `\$` (Next.js env variable interpolation)
 
