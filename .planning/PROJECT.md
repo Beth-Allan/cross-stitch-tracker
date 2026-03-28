@@ -67,7 +67,7 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 **Design system complete:** Emerald/amber/stone color palette. Fraunces headings, Source Sans 3 body, JetBrains Mono hero stats only. 7 status colors mapped to Tailwind classes. Full design token CSS, tailwind config, and font setup documented.
 
-**50+ components designed:** All 7 sections have React components with TypeScript types, sample data, and screenshots in `~/projects/cross-stitch-tracker-design/product-plan/`. Components use relative imports, ready for adaptation to Next.js.
+**50+ components designed:** All 7 sections have React components with TypeScript types, sample data, and screenshots in `product-plan/`. Components use relative imports, ready for adaptation to Next.js.
 
 **Design sections map to implementation:**
 1. Project Management — chart CRUD, detail views, SAL support
@@ -92,7 +92,7 @@ A stitcher can manage their entire chart collection and supplies faster and more
 - **Calculated fields**: Computed at query time, never stored redundantly in database
 - **Single user**: Auth.js single-user setup now, multi-user aware architecture
 - **Budget**: Free tier (Vercel + Neon + R2) must suffice for single-user indefinitely
-- **Design reference**: Components in `~/projects/cross-stitch-tracker-design/product-plan/` — adapt to Next.js App Router patterns, don't copy Vite-specific code directly
+- **Design reference**: Components in `product-plan/` — adapt to Next.js App Router patterns, don't copy Vite-specific code directly
 - **Server-first**: Server Components by default, Client Components only for interactivity
 
 ## Key Decisions
