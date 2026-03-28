@@ -3,7 +3,7 @@
 ## Current Status
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Phase:** 1 of 5 — Foundation & Core Project Management
+**Phase:** 1 complete, Phase 2 next — Core Project Management
 **Last Updated:** 2026-03-28
 
 ### Done
@@ -15,19 +15,17 @@
 - Added Security Rules (auth, input validation, secrets, headers, deps) to CLAUDE.md
 - Evaluated 20 tools for project orchestration — chose GSD (get-shit-done)
 - Installed GSD v1.30.0 (task mgmt, session persistence, context freshness)
+- **Phase 1 complete:** Next.js 16 scaffold, Tailwind v4 design tokens (emerald/amber/stone), Prisma 7 + Neon, shadcn/ui, Vitest, Auth.js v5 with rate limiting, branded login page, app shell with sidebar/topbar/user menu, 7 placeholder pages, PWA manifest
 
 ### In Progress
-- Design components ready to import (user completed external design process)
+- Nothing active
 
 ### Next Up
-1. Run `/gsd:new-project` to initialize GSD with CROSS_STITCH_TRACKER_PLAN.md
-2. Import design components/tokens into project
-3. Scaffold Next.js 14 + TypeScript + Tailwind + Prisma project
-4. Prisma schema: Project, Designer, Genre entities
-5. Auth.js single-user setup
+1. `/gsd:discuss-phase 2` or `/gsd:plan-phase 2` — Core Project Management (charts, designers, genres)
 
 ### Blockers / Decisions Needed
-- None currently
+- PWA on-device testing deferred (needs deployment) — tracked in 01-HUMAN-UAT.md
+- `.env.local` bcrypt hashes must escape `$` as `\$` (Next.js env variable interpolation)
 
 ---
 
