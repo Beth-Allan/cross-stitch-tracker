@@ -38,13 +38,13 @@ Declared values (multiples of 4, already in Tailwind v4 defaults):
 | xs | 4px | Icon gaps (gap-1), inline padding, dot-to-label in badges |
 | sm | 8px | Form field internal padding, compact gaps between badges |
 | md | 16px | Default element spacing, form field vertical rhythm (space-y-4) |
-| lg | 20px | Section padding inside cards (px-5 py-4 per design reference) |
-| xl | 24px | Section gaps, grid gaps between info cards |
-| 2xl | 32px | Page horizontal padding (p-5 lg:p-8 per design reference) |
-| 3xl | 48px | Not used in this phase |
+| lg | 24px | Section gaps, grid gaps between info cards |
+| xl | 32px | Page horizontal padding (p-5 lg:p-8 per design reference) |
+| 2xl | 48px | Not used in this phase |
+| 3xl | 64px | Not used in this phase |
 
 Exceptions:
-- Form section dividers use pt-5 (20px) top padding with a top border, matching the design reference SectionHeading component
+- Form section dividers and card internal padding use 20px (px-5 py-4 per design reference SectionHeading component) -- justified by design reference alignment; use p-5 utility directly, not the lg token
 - Cover image upload drop zone: 128px min-height (h-32)
 - Detail page cover image: max-height 320px (max-h-80) for hero display
 - Touch targets: all interactive elements minimum 44px tap target on mobile
@@ -56,11 +56,12 @@ Exceptions:
 | Role | Size | Weight | Line Height | Font Family | Usage |
 |------|------|--------|-------------|-------------|-------|
 | Body | 14px (text-sm) | 400 (normal) | 1.5 (leading-normal) | Source Sans 3 | Form inputs, detail row values, general text |
-| Label | 11px (text-xs) | 600 (semibold) | 1.5 | Source Sans 3 | Form field labels, section headings, detail row labels -- ALL CAPS with tracking-wider |
+| Label | 12px (text-xs) | 600 (semibold) | 1.5 | Source Sans 3 | Form field labels, section headings, detail row labels -- ALL CAPS with tracking-wider |
 | Heading | 24px (text-2xl) | 600 (semibold) | 1.2 (leading-tight) | Fraunces | Page titles ("Add New Chart", chart name on detail page) |
-| Stat | 14px (text-sm) | 500 (medium) | 1.5 | JetBrains Mono | Progress percentage, stitch count numbers on detail page ONLY |
+| Stat | 14px (text-sm) | 400 (normal) | 1.5 | JetBrains Mono | Progress percentage, stitch count numbers on detail page ONLY |
 
 Notes:
+- Two weights only: 400 (normal) and 600 (semibold). JetBrains Mono stat numbers are visually distinct due to the monospace font family itself; no additional weight needed.
 - Form field labels use uppercase tracking-wider pattern: `text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500`
 - Section headings use uppercase tracking-widest: `text-xs font-semibold uppercase tracking-widest text-stone-400 dark:text-stone-500`
 - Info card titles on detail page use Fraunces at text-sm font-semibold
@@ -188,12 +189,12 @@ Components needed for this phase, mapped to shadcn and custom:
     - Want to start next checkbox
     - Preferred Start (season/month/year selector)
 
-[Footer: border-t, right-aligned "Cancel" (ghost) + "Add Chart" (emerald-600 filled)]
+[Footer: border-t, right-aligned "Back to Charts" (ghost) + "Add Chart" (emerald-600 filled)]
 ```
 
 ### Edit Chart Page (`/charts/[id]/edit`)
 
-Same layout as Add Chart, pre-populated with existing data. Page title: "Edit Chart". Submit button: "Save Changes".
+Same layout as Add Chart, pre-populated with existing data. Page title: "Edit Chart". Submit button: "Save Changes". Cancel button: "Discard Changes" (ghost).
 
 ### Chart Detail Page (`/charts/[id]`)
 
@@ -210,7 +211,7 @@ Same layout as Add Chart, pre-populated with existing data. Page title: "Edit Ch
 [Tab bar: Overview | Supplies | Sessions]
   (Supplies and Sessions are placeholders for Phase 5 and Phase 6)
 
-[Overview tab content: grid-cols-1 lg:grid-cols-2 gap-5]
+[Overview tab content: grid-cols-1 lg:grid-cols-2 gap-6]
   LEFT COLUMN:
     - Stitching Progress card (only for started projects)
       - Progress bar with percentage (JetBrains Mono for the number)
@@ -241,6 +242,8 @@ Same layout as Add Chart, pre-populated with existing data. Page title: "Edit Ch
   Each row: cover thumbnail (small), chart name, designer, status badge, size badge, date added
   Click row -> navigate to /charts/[id]
 ```
+
+**Focal point:** The chart name column is the primary visual anchor. Chart names render in font-semibold (600) text-sm Source Sans 3, left-aligned, as the first text element after the thumbnail. All other columns (designer, status, size, date) use normal weight and muted color (text-stone-500) to create clear hierarchy. On empty state, the focal point shifts to the centered CTA button "Add Your First Chart".
 
 **Source:** Design reference screenshots (chart-add-form.png, chart-detail.png), ChartAddForm.tsx, ChartDetail.tsx
 
@@ -282,7 +285,7 @@ Same layout as Add Chart, pre-populated with existing data. Page title: "Edit Ch
 
 ### Inline Entity Creation (Designer/Genre)
 - Searchable select shows "Add {entity}" option at bottom of dropdown
-- Clicking opens a Dialog with a single text input + Cancel/Add buttons
+- Clicking opens a Dialog with a single text input + "Keep Chart" / "Add" buttons (for cancel/confirm)
 - On save: Server Action creates entity, dialog closes, new entity auto-selected in the form
 - The form is NOT lost -- inline creation is non-destructive to form state
 
@@ -297,9 +300,11 @@ Same layout as Add Chart, pre-populated with existing data. Page title: "Edit Ch
 
 | Element | Copy |
 |---------|------|
-| Primary CTA (form) | "Add Chart" (new) / "Save Changes" (edit) |
+| Primary CTA (form, new) | "Add Chart" |
+| Primary CTA (form, edit) | "Save Changes" |
 | Primary CTA (TopBar) | "+ Add Chart" (amber button, already exists from Phase 1) |
-| Cancel action | "Cancel" |
+| Form cancel (new chart) | "Back to Charts" |
+| Form cancel (edit chart) | "Discard Changes" |
 | Empty state heading (charts list) | "No charts yet" |
 | Empty state body | "Add your first chart to start tracking your cross-stitch collection." |
 | Empty state CTA | "Add Your First Chart" (emerald-600 button) |
@@ -309,8 +314,9 @@ Same layout as Add Chart, pre-populated with existing data. Page title: "Edit Ch
 | Error: R2 not configured | "File storage is not configured. Cover photo and file uploads are unavailable." |
 | Delete confirmation title | "Delete Chart" |
 | Delete confirmation body | "This will permanently delete {chart name} and all associated project data. This cannot be undone." |
-| Delete confirmation button | "Delete Chart" (destructive red) |
-| Delete cancel button | "Cancel" |
+| Delete confirm button | "Delete Chart" (destructive red) |
+| Delete dismiss button | "Keep Chart" |
+| Inline entity dialog dismiss | "Keep Chart" |
 | Toast: chart created | "Chart added" |
 | Toast: chart updated | "Changes saved" |
 | Toast: chart deleted | "Chart deleted" |
@@ -387,7 +393,7 @@ Every view must handle these states:
 | Tablet (640-1024px) | Form at max-w-2xl centered. Detail page info cards start at 2-column grid. |
 | Desktop (>1024px) | Form at max-w-2xl centered with p-8. Detail page uses full 2-column grid for info cards. |
 
-Form footer (Cancel + Submit) always right-aligned, sticky on mobile if needed for long form scrolling.
+Form footer ("Back to Charts"/"Discard Changes" + Submit) always right-aligned, sticky on mobile if needed for long form scrolling.
 
 ---
 
@@ -400,7 +406,7 @@ Form footer (Cancel + Submit) always right-aligned, sticky on mobile if needed f
 | File upload | Drop zone has role="button" and keyboard activation (Enter/Space) |
 | Form errors | aria-invalid on errored fields, aria-describedby linking to error message |
 | Dialog | Focus trapped inside dialog, ESC closes, focus returns to trigger |
-| Delete confirmation | Destructive button is NOT auto-focused; cancel button gets initial focus |
+| Delete confirmation | Destructive button is NOT auto-focused; "Keep Chart" button gets initial focus |
 | Labels | All form inputs have associated labels (explicit via htmlFor or implicit wrapping) |
 | Status change | Select/dropdown is keyboard navigable, status change announced via aria-live region |
 
