@@ -1,0 +1,22 @@
+/* Design Tokens for Cross Stitch Tracker */
+
+:root {
+  /* Colors — Tailwind palette names */
+  --color-primary: emerald;     /* Buttons, links, progress bars, navigation accents */
+  --color-secondary: amber;     /* CTAs, interactive moments, warnings, period badges */
+  --color-neutral: stone;       /* Backgrounds, text, borders, empty states */
+
+  /* Typography — Google Fonts */
+  --font-heading: 'Fraunces', serif;
+  --font-body: 'Source Sans 3', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Status Colors (project lifecycle) */
+  --status-unstarted: var(--tw-stone);
+  --status-kitting: var(--tw-amber);
+  --status-kitted: var(--tw-emerald);
+  --status-in-progress: var(--tw-sky);
+  --status-on-hold: var(--tw-orange);
+  --status-finished: var(--tw-violet);
+  --status-ffo: var(--tw-rose);
+}

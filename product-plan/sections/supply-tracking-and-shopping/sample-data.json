@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "models": {
+      "thread": "An embroidery thread/floss record. Pre-seeded with the DMC catalog. Tracks brand, color code, name, hex swatch, and color family.",
+      "bead": "A glass bead record used in cross stitch. Tracks brand, product code, name, hex swatch, and color family.",
+      "specialtyItem": "A specialty supply such as metallic threads or braids. Tracks brand, product code, name, description, and hex swatch.",
+      "supplyBrand": "A supply manufacturer (DMC, Mill Hill, Kreinik, Anchor, etc.). Shared across all supply types.",
+      "projectThread": "Junction linking a project to a thread with per-project quantity data: stitch count for color, required, acquired, still needed, fulfillment status.",
+      "projectBead": "Junction linking a project to a bead with per-project quantity data: required, acquired, still needed, fulfillment status.",
+      "projectSpecialty": "Junction linking a project to a specialty item with per-project quantity data: required, acquired, still needed, fulfillment status."
+    },
+    "relationships": [
+      "Thread belongs to SupplyBrand",
+      "Bead belongs to SupplyBrand",
+      "SpecialtyItem belongs to SupplyBrand",
+      "ProjectThread belongs to Project and Thread",
+      "ProjectBead belongs to Project and Bead",
+      "ProjectSpecialty belongs to Project and SpecialtyItem"
+    ]
+  },
+  "supplyBrands": [
+    { "id": "sb-1", "name": "DMC", "website": "https://www.dmc.com", "supplyType": "thread" },
+    { "id": "sb-2", "name": "Anchor", "website": "https://www.anchorcrafts.com", "supplyType": "thread" },
+    { "id": "sb-3", "name": "Mill Hill", "website": "https://www.millhill.com", "supplyType": "bead" },
+    { "id": "sb-4", "name": "Kreinik", "website": "https://www.kreinik.com", "supplyType": "specialty" },
+    { "id": "sb-5", "name": "Rainbow Gallery", "website": "https://www.rainbowgallery.com", "supplyType": "specialty" }
+  ],
+  "threads": [
+    { "id": "thr-1", "brandId": "sb-1", "colorCode": "310", "colorName": "Black", "hexColor": "#000000", "colorFamily": "Black" },
+    { "id": "thr-2", "brandId": "sb-1", "colorCode": "blanc", "colorName": "White", "hexColor": "#FFFFFF", "colorFamily": "White" },
+    { "id": "thr-3", "brandId": "sb-1", "colorCode": "321", "colorName": "Red", "hexColor": "#C72B3B", "colorFamily": "Red" },
+    { "id": "thr-4", "brandId": "sb-1", "colorCode": "815", "colorName": "Medium Garnet", "hexColor": "#873540", "colorFamily": "Red" },
+    { "id": "thr-5", "brandId": "sb-1", "colorCode": "898", "colorName": "Very Dark Coffee Brown", "hexColor": "#4B3327", "colorFamily": "Brown" },
+    { "id": "thr-6", "brandId": "sb-1", "colorCode": "3799", "colorName": "Very Dark Pewter Gray", "hexColor": "#3C3C3C", "colorFamily": "Gray" },
+    { "id": "thr-7", "brandId": "sb-1", "colorCode": "504", "colorName": "Very Light Blue Green", "hexColor": "#B2D8CC", "colorFamily": "Green" },
+    { "id": "thr-8", "brandId": "sb-1", "colorCode": "725", "colorName": "Medium Light Topaz", "hexColor": "#E5C050", "colorFamily": "Yellow" },
+    { "id": "thr-9", "brandId": "sb-1", "colorCode": "932", "colorName": "Light Antique Blue", "hexColor": "#97B2C9", "colorFamily": "Blue" },
+    { "id": "thr-10", "brandId": "sb-1", "colorCode": "3768", "colorName": "Dark Gray Green", "hexColor": "#5B7065", "colorFamily": "Green" },
+    { "id": "thr-11", "brandId": "sb-1", "colorCode": "677", "colorName": "Very Light Old Gold", "hexColor": "#E8D5A0", "colorFamily": "Yellow" },
+    { "id": "thr-12", "brandId": "sb-1", "colorCode": "356", "colorName": "Medium Terra Cotta", "hexColor": "#C47458", "colorFamily": "Orange" },
+    { "id": "thr-13", "brandId": "sb-1", "colorCode": "501", "colorName": "Dark Blue Green", "hexColor": "#4B7A6A", "colorFamily": "Green" },
+    { "id": "thr-14", "brandId": "sb-1", "colorCode": "3865", "colorName": "Winter White", "hexColor": "#FAF8F0", "colorFamily": "White" },
+    { "id": "thr-15", "brandId": "sb-1", "colorCode": "3371", "colorName": "Black Brown", "hexColor": "#1E1108", "colorFamily": "Brown" },
+    { "id": "thr-16", "brandId": "sb-2", "colorCode": "403", "colorName": "Black", "hexColor": "#000000", "colorFamily": "Black" }
+  ],
+  "beads": [
+    { "id": "bead-1", "brandId": "sb-3", "productCode": "00123", "colorName": "Cream", "hexColor": "#F5E6C8", "colorFamily": "Neutral" },
+    { "id": "bead-2", "brandId": "sb-3", "productCode": "00332", "colorName": "Emerald", "hexColor": "#009966", "colorFamily": "Green" },
+    { "id": "bead-3", "brandId": "sb-3", "productCode": "00557", "colorName": "Gold", "hexColor": "#D4A017", "colorFamily": "Yellow" },
+    { "id": "bead-4", "brandId": "sb-3", "productCode": "02013", "colorName": "Red Red", "hexColor": "#CC0000", "colorFamily": "Red" },
+    { "id": "bead-5", "brandId": "sb-3", "productCode": "00081", "colorName": "Jet", "hexColor": "#0A0A0A", "colorFamily": "Black" },
+    { "id": "bead-6", "brandId": "sb-3", "productCode": "03053", "colorName": "Dusty Teal", "hexColor": "#6B8E8E", "colorFamily": "Blue" },
+    { "id": "bead-7", "brandId": "sb-3", "productCode": "00275", "colorName": "Coral", "hexColor": "#E87461", "colorFamily": "Orange" }
+  ],
+  "specialtyItems": [
+    { "id": "spec-1", "brandId": "sb-4", "productCode": "002", "colorName": "Gold", "description": "#4 Very Fine Braid", "hexColor": "#D4A017" },
+    { "id": "spec-2", "brandId": "sb-4", "productCode": "032", "colorName": "Pearl", "description": "#4 Very Fine Braid", "hexColor": "#F0E8D8" },
+    { "id": "spec-3", "brandId": "sb-4", "productCode": "001", "colorName": "Silver", "description": "#8 Fine Braid", "hexColor": "#C0C0C0" },
+    { "id": "spec-4", "brandId": "sb-4", "productCode": "085", "colorName": "Peacock", "description": "#4 Very Fine Braid", "hexColor": "#006B5F" },
+    { "id": "spec-5", "brandId": "sb-5", "productCode": "PB05", "colorName": "White", "description": "Petite Treasure Braid", "hexColor": "#FFFFFF" }
+  ],
+  "projectThreads": [
+    { "id": "pt-1", "projectId": "proj-1", "threadId": "thr-1", "stitchCount": 4200, "quantityRequired": 3, "quantityAcquired": 3, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pt-2", "projectId": "proj-1", "threadId": "thr-7", "stitchCount": 3800, "quantityRequired": 2, "quantityAcquired": 2, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pt-3", "projectId": "proj-1", "threadId": "thr-10", "stitchCount": 5100, "quantityRequired": 3, "quantityAcquired": 3, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pt-4", "projectId": "proj-1", "threadId": "thr-13", "stitchCount": 2600, "quantityRequired": 2, "quantityAcquired": 2, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pt-5", "projectId": "proj-1", "threadId": "thr-11", "stitchCount": 1800, "quantityRequired": 1, "quantityAcquired": 1, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pt-6", "projectId": "proj-1", "threadId": "thr-9", "stitchCount": 3200, "quantityRequired": 2, "quantityAcquired": 2, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pt-7", "projectId": "proj-2", "threadId": "thr-1", "stitchCount": 2100, "quantityRequired": 2, "quantityAcquired": 2, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pt-8", "projectId": "proj-2", "threadId": "thr-6", "stitchCount": 5400, "quantityRequired": 3, "quantityAcquired": 3, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pt-9", "projectId": "proj-2", "threadId": "thr-9", "stitchCount": 1200, "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false },
+    { "id": "pt-10", "projectId": "proj-2", "threadId": "thr-12", "stitchCount": 800, "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false },
+    { "id": "pt-11", "projectId": "proj-2", "threadId": "thr-14", "stitchCount": 3600, "quantityRequired": 2, "quantityAcquired": 1, "quantityNeeded": 1, "isFulfilled": false },
+    { "id": "pt-12", "projectId": "proj-4", "threadId": "thr-3", "stitchCount": 1400, "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false },
+    { "id": "pt-13", "projectId": "proj-4", "threadId": "thr-4", "stitchCount": 900, "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false },
+    { "id": "pt-14", "projectId": "proj-4", "threadId": "thr-1", "stitchCount": 2200, "quantityRequired": 2, "quantityAcquired": 2, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pt-15", "projectId": "proj-4", "threadId": "thr-8", "stitchCount": 600, "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false },
+    { "id": "pt-16", "projectId": "proj-4", "threadId": "thr-11", "stitchCount": 1100, "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false },
+    { "id": "pt-17", "projectId": "proj-4", "threadId": "thr-2", "stitchCount": 500, "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false },
+    { "id": "pt-18", "projectId": "proj-6", "threadId": "thr-9", "stitchCount": 4800, "quantityRequired": 3, "quantityAcquired": 3, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pt-19", "projectId": "proj-6", "threadId": "thr-5", "stitchCount": 2200, "quantityRequired": 2, "quantityAcquired": 2, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pt-20", "projectId": "proj-6", "threadId": "thr-1", "stitchCount": 1500, "quantityRequired": 1, "quantityAcquired": 1, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pt-21", "projectId": "proj-8", "threadId": "thr-9", "stitchCount": 180, "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false },
+    { "id": "pt-22", "projectId": "proj-8", "threadId": "thr-7", "stitchCount": 120, "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false },
+    { "id": "pt-23", "projectId": "proj-8", "threadId": "thr-1", "stitchCount": 200, "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false },
+    { "id": "pt-24", "projectId": "proj-8", "threadId": "thr-12", "stitchCount": 90, "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false }
+  ],
+  "projectBeads": [
+    { "id": "pb-1", "projectId": "proj-5", "beadId": "bead-1", "quantityRequired": 1, "quantityAcquired": 1, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pb-2", "projectId": "proj-5", "beadId": "bead-3", "quantityRequired": 1, "quantityAcquired": 1, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "pb-3", "projectId": "proj-6", "beadId": "bead-6", "quantityRequired": 2, "quantityAcquired": 0, "quantityNeeded": 2, "isFulfilled": false },
+    { "id": "pb-4", "projectId": "proj-6", "beadId": "bead-7", "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false }
+  ],
+  "projectSpecialty": [
+    { "id": "ps-1", "projectId": "proj-1", "specialtyItemId": "spec-1", "quantityRequired": 1, "quantityAcquired": 1, "quantityNeeded": 0, "isFulfilled": true },
+    { "id": "ps-2", "projectId": "proj-4", "specialtyItemId": "spec-1", "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false },
+    { "id": "ps-3", "projectId": "proj-4", "specialtyItemId": "spec-4", "quantityRequired": 1, "quantityAcquired": 0, "quantityNeeded": 1, "isFulfilled": false }
+  ]
+}
