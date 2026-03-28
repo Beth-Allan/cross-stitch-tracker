@@ -1,2 +1,1 @@
-// Global test setup for Vitest
-// Add shared mocks and setup here as tests grow
+import "@testing-library/jest-dom/vitest";
