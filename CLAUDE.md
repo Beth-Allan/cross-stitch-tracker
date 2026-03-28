@@ -21,9 +21,12 @@
 - Nothing active
 
 ### Next Up
-1. `/gsd:discuss-phase 2` or `/gsd:plan-phase 2` — Core Project Management (charts, designers, genres)
+1. Run impeccable audit/polish on shell (new conversation — context is deep)
+2. Set up test infrastructure (Vitest + testing patterns) before Phase 2 begins
+3. `/gsd:discuss-phase 2` or `/gsd:plan-phase 2` — Core Project Management (charts, designers, genres)
 
 ### Blockers / Decisions Needed
+- **Testing:** Vitest is installed but no tests or patterns exist. Must set up test infrastructure (component testing strategy, test utilities, example tests) before Phase 2 adds business logic.
 - PWA on-device testing deferred (needs deployment) — tracked in 01-HUMAN-UAT.md
 - `.env.local` bcrypt hashes must escape `$` as `\$` (Next.js env variable interpolation)
 

@@ -12,6 +12,13 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // GSD tooling (vendored, not project code)
+    ".claude/**",
+    ".planning/**",
+    // Design reference components (not production code)
+    "product-plan/**",
+    // Build scripts
+    "scripts/**",
   ]),
 ]);
 
