@@ -4,7 +4,7 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Phase:** 1 complete, Phase 2 next — Core Project Management
+**Phase:** 2 in progress — Core Project Management (plans 1-4 done, checkpoint pending)
 **Last Updated:** 2026-03-28
 
 ### Done
@@ -20,19 +20,25 @@
 - **Phase 1 complete:** Next.js 16 scaffold, Tailwind v4 design tokens (emerald/amber/stone), Prisma 7 + Neon, shadcn/ui, Vitest, Auth.js v5 with rate limiting, branded login page, app shell with sidebar/topbar/user menu, 7 placeholder pages, PWA manifest
 - **Impeccable audit/polish complete:** audit (11→16/20), normalize (tokens), harden (a11y), adapt (touch targets), polish (focus-visible), clarify (user-facing copy), delight (placeholder icons/pills)
 - **Code quality infrastructure:** Prettier + Tailwind plugin, Vitest + RTL + jsdom, Husky pre-commit/pre-push hooks, GitHub branch protection, Node 22 pinning, CI with format check + test steps
+- **Phase 2 plans 01-04 complete:** Prisma schema (Chart/Project/Designer/Genre), R2 client, Zod validations, chart CRUD Server Actions, file upload with presigned URLs + thumbnails, chart add/edit form (~50 fields), chart detail/list pages, status/size badges, status control
 
 ### In Progress
 
-- Nothing active
+- Phase 2 plan 02-05: Human verification checkpoint (needs DB setup + manual testing)
 
 ### Next Up
 
-1. `/gsd:discuss-phase 2` or `/gsd:plan-phase 2` — Core Project Management (charts, designers, genres)
+1. `/gsd:resume-work` — resume phase 2 execution
+2. Set up Neon DB connection, run `npx prisma migrate dev`
+3. Test full chart lifecycle in browser
+4. Complete 02-05 checkpoint, then phase verification
 
 ### Blockers / Decisions Needed
 
+- Database connection needed: configure Neon DATABASE_URL in .env.local before testing
 - PWA on-device testing deferred (needs deployment) — tracked in 01-HUMAN-UAT.md
 - `.env.local` bcrypt hashes must escape `$` as `\$` (Next.js env variable interpolation)
+- 7 stale worktree directories in .claude/worktrees/ need cleanup
 
 ---
 
