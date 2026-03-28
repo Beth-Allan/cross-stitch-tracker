@@ -34,7 +34,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Layout is usable on both Mac browser and iPhone without horizontal scroll or broken elements
   4. App can be installed to iPhone home screen and launches in full-screen mode
   5. Database connects to Neon with pooled and direct URLs, Prisma migrations run cleanly
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Scaffold Next.js 16, design system tokens, Prisma 7 + Neon, PWA manifest
+- [ ] 01-02-PLAN.md — Auth.js v5 credentials, rate limiting, branded login page
+- [ ] 01-03-PLAN.md — App shell (sidebar, TopBar, UserMenu), placeholder pages, responsive layout
 **UI hint**: yes
 
 ### Phase 2: Core Project Management
@@ -139,7 +144,7 @@ Note: Phases 3, 4, and 5 all depend on Phase 2 but not on each other. They could
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Infrastructure | 0/TBD | Not started | - |
+| 1. Foundation & Infrastructure | 0/3 | Planning complete | - |
 | 2. Core Project Management | 0/TBD | Not started | - |
 | 3. Project Metadata & Browsing | 0/TBD | Not started | - |
 | 4. Reference Data | 0/TBD | Not started | - |
