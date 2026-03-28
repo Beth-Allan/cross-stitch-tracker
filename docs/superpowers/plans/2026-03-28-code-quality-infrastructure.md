@@ -16,34 +16,35 @@
 
 ### Created
 
-| File | Purpose |
-|------|---------|
-| `.nvmrc` | Node version pinning for `nvm use` |
-| `.editorconfig` | Editor-agnostic indentation/charset/newline rules |
-| `prettier.config.mjs` | Prettier config with Tailwind plugin |
-| `.prettierignore` | Exclude generated files and build output from formatting |
-| `src/__tests__/test-utils.tsx` | Custom render wrapper, re-exports RTL |
-| `src/components/placeholder-page.test.tsx` | Smoke test validating the test setup works |
-| `.husky/pre-commit` | Runs lint-staged on commit |
-| `.husky/pre-push` | Runs `npm run build` on push |
+| File                                       | Purpose                                                  |
+| ------------------------------------------ | -------------------------------------------------------- |
+| `.nvmrc`                                   | Node version pinning for `nvm use`                       |
+| `.editorconfig`                            | Editor-agnostic indentation/charset/newline rules        |
+| `prettier.config.mjs`                      | Prettier config with Tailwind plugin                     |
+| `.prettierignore`                          | Exclude generated files and build output from formatting |
+| `src/__tests__/test-utils.tsx`             | Custom render wrapper, re-exports RTL                    |
+| `src/components/placeholder-page.test.tsx` | Smoke test validating the test setup works               |
+| `.husky/pre-commit`                        | Runs lint-staged on commit                               |
+| `.husky/pre-push`                          | Runs `npm run build` on push                             |
 
 ### Modified
 
-| File | What Changes |
-|------|-------------|
-| `package.json` | `engines`, new scripts, `lint-staged` config, `prepare` script |
-| `vitest.config.ts` | Environment → jsdom, coverage config |
-| `tsconfig.json` | Add `"types": ["vitest/globals"]` |
-| `src/__tests__/setup.ts` | Import jest-dom matchers |
-| `.github/workflows/ci.yml` | Add format:check and test steps |
-| `CLAUDE.md` | Update status, conventions, commands |
-| `.planning/STATE.md` | Update progress |
+| File                       | What Changes                                                   |
+| -------------------------- | -------------------------------------------------------------- |
+| `package.json`             | `engines`, new scripts, `lint-staged` config, `prepare` script |
+| `vitest.config.ts`         | Environment → jsdom, coverage config                           |
+| `tsconfig.json`            | Add `"types": ["vitest/globals"]`                              |
+| `src/__tests__/setup.ts`   | Import jest-dom matchers                                       |
+| `.github/workflows/ci.yml` | Add format:check and test steps                                |
+| `CLAUDE.md`                | Update status, conventions, commands                           |
+| `.planning/STATE.md`       | Update progress                                                |
 
 ---
 
 ## Task 1: Node Version Pinning
 
 **Files:**
+
 - Create: `.nvmrc`
 - Modify: `package.json`
 
@@ -85,6 +86,7 @@ git commit -m "chore: pin Node 22 via .nvmrc and engines field"
 ## Task 2: Prettier + EditorConfig Setup
 
 **Files:**
+
 - Create: `prettier.config.mjs`
 - Create: `.editorconfig`
 - Create: `.prettierignore`
@@ -169,6 +171,7 @@ git commit -m "chore: add Prettier with Tailwind plugin and EditorConfig"
 ## Task 3: Format Existing Codebase
 
 **Files:**
+
 - Modify: All source files (auto-formatted)
 
 This is an isolated commit so Prettier formatting changes don't pollute real feature diffs.
@@ -209,6 +212,7 @@ Isolated commit for clean git blame. No logic changes."
 ## Task 4: Testing Infrastructure
 
 **Files:**
+
 - Modify: `vitest.config.ts`
 - Modify: `tsconfig.json`
 - Modify: `src/__tests__/setup.ts`
@@ -376,6 +380,7 @@ wrapper, coverage config, and a smoke test for PlaceholderPage."
 ## Task 5: Husky + lint-staged
 
 **Files:**
+
 - Create: `.husky/pre-commit`
 - Create: `.husky/pre-push`
 - Modify: `package.json` (add `prepare` script, `lint-staged` config)
@@ -454,6 +459,7 @@ git commit -m "chore: add Husky pre-commit (lint-staged) and pre-push (build)"
 ## Task 6: CI Updates
 
 **Files:**
+
 - Modify: `.github/workflows/ci.yml`
 
 - [ ] **Step 1: Update CI workflow**
@@ -517,6 +523,7 @@ git commit -m "ci: add format check and test steps to CI pipeline"
 ## Task 7: GitHub Branch Protection
 
 **Files:**
+
 - No file changes — GitHub API configuration only
 
 - [ ] **Step 1: Set up branch protection rules**
@@ -538,6 +545,7 @@ EOF
 ```
 
 This sets:
+
 - Required status check: `build` job must pass
 - Strict: branch must be up-to-date with main
 - `enforce_admins: false`: allows admin bypass (but we never use it without asking)
@@ -611,22 +619,26 @@ Expected: JSON response showing `required_status_checks` with `build` context, `
 ## Task 8: GSD Integration + CLAUDE.md Updates
 
 **Files:**
+
 - Modify: `CLAUDE.md`
 - Modify: `.planning/STATE.md`
 
 - [ ] **Step 1: Update CLAUDE.md Current Status**
 
 In the `### Done` section, add:
+
 ```
 - **Code quality infrastructure:** Prettier + Tailwind plugin, Vitest + RTL + jsdom, Husky pre-commit/pre-push hooks, GitHub branch protection, Node 22 pinning
 ```
 
 In `### Blockers / Decisions Needed`, remove:
+
 ```
 - **Testing:** Vitest is installed but no tests or patterns exist. Must set up test infrastructure (component testing strategy, test utilities, example tests) before Phase 2 adds business logic.
 ```
 
 In `### Next Up`, update to:
+
 ```
 1. `/gsd:discuss-phase 2` or `/gsd:plan-phase 2` — Core Project Management (charts, designers, genres)
 ```
@@ -637,6 +649,7 @@ In the `## Conventions` section, replace "Conventions not yet established..." wi
 
 ```markdown
 ### Testing
+
 - **Colocated tests:** `button.test.tsx` lives next to `button.tsx`, not in a centralized `__tests__/` tree
 - **Shared test utilities only** in `src/__tests__/` (`setup.ts`, `test-utils.tsx`)
 - **Import from test-utils:** `import { render, screen } from "@/__tests__/test-utils"` — not directly from `@testing-library/react`
@@ -644,11 +657,13 @@ In the `## Conventions` section, replace "Conventions not yet established..." wi
 - **Coverage:** Run `npm run test:coverage` to check. No enforcement threshold yet.
 
 ### Formatting
+
 - **Prettier** handles all formatting — do not manually adjust whitespace or semicolons
 - **Tailwind class sorting** is automatic via `prettier-plugin-tailwindcss`
 - Pre-commit hook runs Prettier + ESLint on staged files automatically
 
 ### Git Hooks
+
 - **Pre-commit:** lint-staged runs Prettier (format) then ESLint (lint) on staged files
 - **Pre-push:** `npm run build` runs to catch type errors before CI
 - Do not skip hooks with `--no-verify` unless explicitly told to by the user

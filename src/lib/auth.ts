@@ -1,6 +1,6 @@
-import NextAuth from "next-auth"
-import Credentials from "next-auth/providers/credentials"
-import bcrypt from "bcryptjs"
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
@@ -11,36 +11,30 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         try {
-          const email = credentials.email as string
-          const password = credentials.password as string
+          const email = credentials.email as string;
+          const password = credentials.password as string;
 
           // Validate required env vars before any logic
-          if (
-            !process.env.AUTH_USER_EMAIL ||
-            !process.env.AUTH_USER_PASSWORD_HASH
-          ) {
+          if (!process.env.AUTH_USER_EMAIL || !process.env.AUTH_USER_PASSWORD_HASH) {
             console.error(
-              "Missing AUTH_USER_EMAIL or AUTH_USER_PASSWORD_HASH environment variables"
-            )
-            return null
+              "Missing AUTH_USER_EMAIL or AUTH_USER_PASSWORD_HASH environment variables",
+            );
+            return null;
           }
 
           // Single-user credentials from environment variables
           if (
             email === process.env.AUTH_USER_EMAIL &&
-            (await bcrypt.compare(
-              password,
-              process.env.AUTH_USER_PASSWORD_HASH
-            ))
+            (await bcrypt.compare(password, process.env.AUTH_USER_PASSWORD_HASH))
           ) {
-            return { id: "1", name: "Stitcher", email }
+            return { id: "1", name: "Stitcher", email };
           }
 
           // Generic failure (D-02): don't reveal which field is wrong
-          return null
+          return null;
         } catch (error) {
-          console.error("authorize error:", error)
-          return null
+          console.error("authorize error:", error);
+          return null;
         }
       },
     }),
@@ -52,4 +46,4 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/login",
   },
-})
+});

@@ -1,5 +1,5 @@
-import { Scissors } from "lucide-react"
-import { PlaceholderPage } from "@/components/placeholder-page"
+import { Scissors } from "lucide-react";
+import { PlaceholderPage } from "@/components/placeholder-page";
 
 export default function ChartsPage() {
   return (
@@ -8,5 +8,5 @@ export default function ChartsPage() {
       description="Your chart collection, organized and searchable. Browse, filter, and track every pattern you own."
       icon={Scissors}
     />
-  )
+  );
 }

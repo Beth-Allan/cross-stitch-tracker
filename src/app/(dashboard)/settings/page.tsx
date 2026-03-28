@@ -1,5 +1,5 @@
-import { Settings } from "lucide-react"
-import { PlaceholderPage } from "@/components/placeholder-page"
+import { Settings } from "lucide-react";
+import { PlaceholderPage } from "@/components/placeholder-page";
 
 export default function SettingsPage() {
   return (
@@ -8,5 +8,5 @@ export default function SettingsPage() {
       description="Preferences and customization, coming soon."
       icon={Settings}
     />
-  )
+  );
 }

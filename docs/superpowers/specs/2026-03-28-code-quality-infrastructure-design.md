@@ -31,20 +31,24 @@ Establish the full code quality stack before Phase 2 adds business logic. Every 
 ### Configuration
 
 **`vitest.config.ts`:**
+
 - Change `environment` from `"node"` to `"jsdom"`
 - Keep `globals: true`
 - Keep setup file at `./src/__tests__/setup.ts`
 - Keep path alias `@ -> ./src`
 
 **`src/__tests__/setup.ts`:**
+
 - Import `@testing-library/jest-dom/vitest` for matcher extensions
 
 **TypeScript:**
+
 - Add Vitest global types to `tsconfig.json` compilerOptions: `"types": ["vitest/globals"]`
 
 ### Test Utilities
 
 **`src/__tests__/test-utils.tsx`:**
+
 - Custom `render()` wrapper providing app-level providers (empty for now, ready for future context providers)
 - Re-exports everything from `@testing-library/react`
 - Convention: tests import from `@/__tests__/test-utils` instead of `@testing-library/react` directly
@@ -81,6 +85,7 @@ Establish the full code quality stack before Phase 2 adds business logic. Every 
 ### Configuration
 
 **`prettier.config.mjs`:**
+
 ```js
 export default {
   semi: true,
@@ -92,6 +97,7 @@ export default {
 ```
 
 **`.editorconfig`:**
+
 ```ini
 root = true
 
@@ -130,16 +136,19 @@ insert_final_newline = true
 ### Hooks
 
 **pre-commit** (via lint-staged):
+
 1. Prettier formats staged files (runs first, writes fixes)
 2. ESLint checks formatted files with `--fix` (runs second)
 3. lint-staged auto-re-stages any changes
 
 **pre-push:**
+
 - Runs `npm run build` to catch type errors before they reach CI
 
 ### Configuration
 
 **`lint-staged` in `package.json`:**
+
 ```json
 {
   "lint-staged": {
@@ -152,11 +161,13 @@ insert_final_newline = true
 Note: lint-staged runs commands in order per glob. The Prettier glob is broader (catches config files, markdown, CSS). The ESLint glob targets only source files.
 
 **`.husky/pre-commit`:**
+
 ```sh
 npx lint-staged
 ```
 
 **`.husky/pre-push`:**
+
 ```sh
 npm run build
 ```
@@ -172,13 +183,13 @@ npm run build
 
 ### Rules for `main`
 
-| Rule | Value |
-|------|-------|
-| Require PR before merge | Yes |
-| Required status checks | `build` job from CI |
-| Require branch up-to-date | Yes |
-| Allow admin bypass | Yes (never used without explicit user permission) |
-| Require reviews | No (solo project) |
+| Rule                      | Value                                             |
+| ------------------------- | ------------------------------------------------- |
+| Require PR before merge   | Yes                                               |
+| Required status checks    | `build` job from CI                               |
+| Require branch up-to-date | Yes                                               |
+| Allow admin bypass        | Yes (never used without explicit user permission) |
+| Require reviews           | No (solo project)                                 |
 
 ### Implementation
 
@@ -192,11 +203,13 @@ npm run build
 ### Files
 
 **`.nvmrc`:**
+
 ```
 22
 ```
 
 **`package.json` engines:**
+
 ```json
 {
   "engines": {

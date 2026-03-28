@@ -1,26 +1,22 @@
-import type { LucideIcon } from "lucide-react"
+import type { LucideIcon } from "lucide-react";
 
 interface PlaceholderPageProps {
-  title: string
-  description: string
-  icon: LucideIcon
+  title: string;
+  description: string;
+  icon: LucideIcon;
 }
 
 export function PlaceholderPage({ title, description, icon: Icon }: PlaceholderPageProps) {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
-      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-        <Icon className="h-7 w-7 text-primary/70" strokeWidth={1.5} />
+      <div className="bg-primary/10 mb-5 flex h-14 w-14 items-center justify-center rounded-2xl">
+        <Icon className="text-primary/70 h-7 w-7" strokeWidth={1.5} />
       </div>
-      <h1 className="font-heading text-2xl font-semibold text-foreground mb-2">
-        {title}
-      </h1>
-      <p className="text-sm text-muted-foreground max-w-xs mb-4">
-        {description}
-      </p>
-      <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+      <h1 className="font-heading text-foreground mb-2 text-2xl font-semibold">{title}</h1>
+      <p className="text-muted-foreground mb-4 max-w-xs text-sm">{description}</p>
+      <span className="bg-muted text-muted-foreground inline-flex items-center rounded-full px-3 py-1 text-xs font-medium">
         Coming soon
       </span>
     </div>
-  )
+  );
 }

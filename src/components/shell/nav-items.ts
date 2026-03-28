@@ -6,13 +6,13 @@ import {
   BarChart3,
   ShoppingCart,
   Settings,
-} from "lucide-react"
-import type { LucideIcon } from "lucide-react"
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 export interface NavItem {
-  label: string
-  href: string
-  icon: LucideIcon
+  label: string;
+  href: string;
+  icon: LucideIcon;
 }
 
 export const navigationItems: NavItem[] = [
@@ -23,4 +23,4 @@ export const navigationItems: NavItem[] = [
   { label: "Statistics", href: "/stats", icon: BarChart3 },
   { label: "Shopping", href: "/shopping", icon: ShoppingCart },
   { label: "Settings", href: "/settings", icon: Settings },
-]
+];

@@ -1,5 +1,5 @@
-import { BarChart3 } from "lucide-react"
-import { PlaceholderPage } from "@/components/placeholder-page"
+import { BarChart3 } from "lucide-react";
+import { PlaceholderPage } from "@/components/placeholder-page";
 
 export default function StatisticsPage() {
   return (
@@ -8,5 +8,5 @@ export default function StatisticsPage() {
       description="Beautiful stats that make your stitching journey visible. Trends, milestones, and achievements."
       icon={BarChart3}
     />
-  )
+  );
 }

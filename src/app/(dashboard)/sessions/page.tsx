@@ -1,5 +1,5 @@
-import { Clock } from "lucide-react"
-import { PlaceholderPage } from "@/components/placeholder-page"
+import { Clock } from "lucide-react";
+import { PlaceholderPage } from "@/components/placeholder-page";
 
 export default function SessionsPage() {
   return (
@@ -8,5 +8,5 @@ export default function SessionsPage() {
       description="Log every stitching session and watch your progress grow over time."
       icon={Clock}
     />
-  )
+  );
 }

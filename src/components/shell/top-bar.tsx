@@ -1,78 +1,63 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Menu, Search, Clock, Plus } from "lucide-react"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetTitle,
-} from "@/components/ui/sheet"
-import { UserMenu } from "./user-menu"
-import { navigationItems } from "./nav-items"
-import { Logo } from "./logo"
-import { NavItemLink } from "./nav-item-link"
+import { useState } from "react";
+import Link from "next/link";
+import { Menu, Search, Clock, Plus } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetTrigger, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { UserMenu } from "./user-menu";
+import { navigationItems } from "./nav-items";
+import { Logo } from "./logo";
+import { NavItemLink } from "./nav-item-link";
 
 interface TopBarProps {
-  user: { name: string; email: string }
+  user: { name: string; email: string };
 }
 
 export function TopBar({ user }: TopBarProps) {
-  const [sheetOpen, setSheetOpen] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false);
 
-  const mainItems = navigationItems.filter((item) => item.label !== "Settings")
-  const settingsItems = navigationItems.filter((item) => item.label === "Settings")
+  const mainItems = navigationItems.filter((item) => item.label !== "Settings");
+  const settingsItems = navigationItems.filter((item) => item.label === "Settings");
 
   return (
-    <header className="h-14 border-b border-border bg-card flex items-center gap-3 px-4 shrink-0 pt-[env(safe-area-inset-top)]">
+    <header className="border-border bg-card flex h-14 shrink-0 items-center gap-3 border-b px-4 pt-[env(safe-area-inset-top)]">
       {/* Mobile hamburger with Sheet drawer */}
       <div className="md:hidden">
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger
-            render={
-              <Button variant="ghost" size="icon" className="md:hidden min-h-11 min-w-11" />
-            }
+            render={<Button variant="ghost" size="icon" className="min-h-11 min-w-11 md:hidden" />}
           >
-            <Menu className="w-5 h-5" strokeWidth={1.5} />
+            <Menu className="h-5 w-5" strokeWidth={1.5} />
             <span className="sr-only">Open navigation</span>
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0" showCloseButton={false}>
             <SheetTitle className="sr-only">Navigation</SheetTitle>
-            <nav aria-label="Main" className="flex flex-col h-full">
+            <nav aria-label="Main" className="flex h-full flex-col">
               {/* Logo in drawer */}
               <Link
                 href="/"
                 onClick={() => setSheetOpen(false)}
-                className="px-4 py-5 flex items-center gap-3 border-b border-sidebar-border outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                className="border-sidebar-border focus-visible:ring-ring flex items-center gap-3 border-b px-4 py-5 outline-none focus-visible:ring-2 focus-visible:ring-inset"
               >
                 <Logo />
-                <span className="font-heading text-base font-semibold text-sidebar-foreground truncate">
+                <span className="font-heading text-sidebar-foreground truncate text-base font-semibold">
                   Cross Stitch Tracker
                 </span>
               </Link>
 
               {/* Nav items */}
-              <div className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
+              <div className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
                 {mainItems.map((item) => (
-                  <NavItemLink
-                    key={item.href}
-                    item={item}
-                    onClick={() => setSheetOpen(false)}
-                  />
+                  <NavItemLink key={item.href} item={item} onClick={() => setSheetOpen(false)} />
                 ))}
               </div>
 
               {/* Settings at bottom */}
-              <div className="py-3 px-2 border-t border-sidebar-border">
+              <div className="border-sidebar-border border-t px-2 py-3">
                 {settingsItems.map((item) => (
-                  <NavItemLink
-                    key={item.href}
-                    item={item}
-                    onClick={() => setSheetOpen(false)}
-                  />
+                  <NavItemLink key={item.href} item={item} onClick={() => setSheetOpen(false)} />
                 ))}
               </div>
             </nav>
@@ -81,14 +66,14 @@ export function TopBar({ user }: TopBarProps) {
       </div>
 
       {/* Search placeholder (non-interactive until search is built) */}
-      <div className="flex-1 max-w-md">
+      <div className="max-w-md flex-1">
         <div className="relative">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50"
+            className="text-muted-foreground/50 absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
             strokeWidth={1.5}
           />
           <div
-            className="w-full pl-9 pr-3 py-2 text-sm bg-muted/50 border border-input/50 rounded-lg text-muted-foreground/60 select-none"
+            className="bg-muted/50 border-input/50 text-muted-foreground/60 w-full rounded-lg border py-2 pr-3 pl-9 text-sm select-none"
             aria-hidden="true"
           >
             Search coming soon...
@@ -97,23 +82,29 @@ export function TopBar({ user }: TopBarProps) {
       </div>
 
       {/* Quick actions */}
-      <div className="flex items-center gap-2 ml-auto">
+      <div className="ml-auto flex items-center gap-2">
         <Button
           variant="secondary"
           size="sm"
-          onClick={() => toast("Coming soon", { description: "You'll be able to log your stitching sessions here." })}
-          className="flex items-center gap-1.5 min-h-11 sm:min-h-0"
+          onClick={() =>
+            toast("Coming soon", {
+              description: "You'll be able to log your stitching sessions here.",
+            })
+          }
+          className="flex min-h-11 items-center gap-1.5 sm:min-h-0"
         >
-          <Clock className="w-3.5 h-3.5" strokeWidth={2} />
+          <Clock className="h-3.5 w-3.5" strokeWidth={2} />
           <span className="hidden sm:inline">Log Stitches</span>
         </Button>
         <Button
           variant="outline"
           size="sm"
-          onClick={() => toast("Coming soon", { description: "You'll be able to add and manage charts here." })}
-          className="flex items-center gap-1.5 min-h-11 sm:min-h-0"
+          onClick={() =>
+            toast("Coming soon", { description: "You'll be able to add and manage charts here." })
+          }
+          className="flex min-h-11 items-center gap-1.5 sm:min-h-0"
         >
-          <Plus className="w-3.5 h-3.5" strokeWidth={2} />
+          <Plus className="h-3.5 w-3.5" strokeWidth={2} />
           <span className="hidden sm:inline">Add Chart</span>
         </Button>
 
@@ -123,5 +114,5 @@ export function TopBar({ user }: TopBarProps) {
         </div>
       </div>
     </header>
-  )
+  );
 }

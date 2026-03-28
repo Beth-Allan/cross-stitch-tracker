@@ -1,5 +1,5 @@
-import { ShoppingCart } from "lucide-react"
-import { PlaceholderPage } from "@/components/placeholder-page"
+import { ShoppingCart } from "lucide-react";
+import { PlaceholderPage } from "@/components/placeholder-page";
 
 export default function ShoppingPage() {
   return (
@@ -8,5 +8,5 @@ export default function ShoppingPage() {
       description="Smart shopping lists, built from your projects. Never buy duplicate thread again."
       icon={ShoppingCart}
     />
-  )
+  );
 }
