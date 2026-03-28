@@ -1,3 +1,6 @@
+// NOTE: In-memory store — resets on serverless cold start.
+// Acceptable for single-user app. For multi-user, replace with Redis or similar persistent store.
+
 const attempts = new Map<string, { count: number; lastAttempt: number }>()
 const MAX_ATTEMPTS = 5
 const COOLDOWN_MS = 30_000
@@ -29,8 +32,4 @@ export function checkRateLimit(key: string): {
   record.count++
   record.lastAttempt = now
   return { allowed: true }
-}
-
-export function resetRateLimit(key: string): void {
-  attempts.delete(key)
 }
