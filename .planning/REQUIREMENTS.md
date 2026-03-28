@@ -60,8 +60,8 @@
 - [ ] **INFRA-01**: Auth.js single-user authentication protecting all app routes
 - [ ] **INFRA-02**: App shell with MainNav, TopBar, UserMenu matching design system
 - [ ] **INFRA-03**: Responsive design working on Mac browser and iPhone
-- [ ] **INFRA-04**: PWA installable (home screen icon, full-screen launch)
-- [ ] **INFRA-05**: Design system tokens (emerald/amber/stone, Fraunces/Source Sans 3/JetBrains Mono, status colors)
+- [x] **INFRA-04**: PWA installable (home screen icon, full-screen launch)
+- [x] **INFRA-05**: Design system tokens (emerald/amber/stone, Fraunces/Source Sans 3/JetBrains Mono, status colors)
 
 ## v2 Requirements
 
@@ -111,8 +111,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-01 | Phase 1 | Pending |
 | INFRA-02 | Phase 1 | Pending |
 | INFRA-03 | Phase 1 | Pending |
-| INFRA-04 | Phase 1 | Pending |
-| INFRA-05 | Phase 1 | Pending |
+| INFRA-04 | Phase 1 | Complete |
+| INFRA-05 | Phase 1 | Complete |
 | PROJ-01 | Phase 2 | Pending |
 | PROJ-02 | Phase 2 | Pending |
 | PROJ-03 | Phase 2 | Pending |
