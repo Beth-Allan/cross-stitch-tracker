@@ -22,13 +22,14 @@ export function NavItemLink({ item, collapsed = false, onClick }: NavItemLinkPro
     <Link
       href={item.href}
       onClick={onClick}
+      aria-current={isCurrentPage ? "page" : undefined}
       className={cn(
-        "w-full flex items-center gap-3 rounded-lg transition-colors text-sm",
+        "w-full flex items-center gap-3 rounded-lg transition-colors text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring",
         collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2.5",
         isCurrentPage &&
-          "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-medium",
+          "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
         !isCurrentPage &&
-          "text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-900 dark:hover:text-stone-200"
+          "text-sidebar-foreground/70 hover:bg-muted hover:text-sidebar-foreground"
       )}
     >
       <item.icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />

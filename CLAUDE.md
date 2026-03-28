@@ -16,14 +16,14 @@
 - Evaluated 20 tools for project orchestration — chose GSD (get-shit-done)
 - Installed GSD v1.30.0 (task mgmt, session persistence, context freshness)
 - **Phase 1 complete:** Next.js 16 scaffold, Tailwind v4 design tokens (emerald/amber/stone), Prisma 7 + Neon, shadcn/ui, Vitest, Auth.js v5 with rate limiting, branded login page, app shell with sidebar/topbar/user menu, 7 placeholder pages, PWA manifest
+- **Impeccable audit/polish complete:** audit (11→16/20), normalize (tokens), harden (a11y), adapt (touch targets), polish (focus-visible), clarify (user-facing copy), delight (placeholder icons/pills)
 
 ### In Progress
 - Nothing active
 
 ### Next Up
-1. Run impeccable audit/polish on shell (new conversation — context is deep)
-2. Set up test infrastructure (Vitest + testing patterns) before Phase 2 begins
-3. `/gsd:discuss-phase 2` or `/gsd:plan-phase 2` — Core Project Management (charts, designers, genres)
+1. Set up test infrastructure (Vitest + testing patterns) before Phase 2 begins
+2. `/gsd:discuss-phase 2` or `/gsd:plan-phase 2` — Core Project Management (charts, designers, genres)
 
 ### Blockers / Decisions Needed
 - **Testing:** Vitest is installed but no tests or patterns exist. Must set up test infrastructure (component testing strategy, test utilities, example tests) before Phase 2 adds business logic.

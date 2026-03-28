@@ -16,7 +16,7 @@ export function LoginForm() {
           <div className="space-y-2">
             <label
               htmlFor="email"
-              className="text-sm font-medium text-stone-700 dark:text-stone-300"
+              className="text-sm font-medium text-foreground"
             >
               Email
             </label>
@@ -32,7 +32,7 @@ export function LoginForm() {
           <div className="space-y-2">
             <label
               htmlFor="password"
-              className="text-sm font-medium text-stone-700 dark:text-stone-300"
+              className="text-sm font-medium text-foreground"
             >
               Password
             </label>
@@ -45,7 +45,7 @@ export function LoginForm() {
             />
           </div>
           {state?.error && (
-            <p className="text-sm text-destructive">{state.error}</p>
+            <p role="alert" className="text-sm text-destructive">{state.error}</p>
           )}
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? "Signing in..." : "Sign in"}

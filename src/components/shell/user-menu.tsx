@@ -33,7 +33,7 @@ export function UserMenu({ user }: UserMenuProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-stone-100 dark:hover:bg-stone-800 focus:outline-none">
+      <DropdownMenuTrigger className="flex items-center justify-center gap-2 rounded-lg px-2 py-1.5 min-h-11 min-w-11 transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 outline-none">
         <Avatar size="sm">
           <AvatarFallback className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 text-xs font-medium">
             {initials}
