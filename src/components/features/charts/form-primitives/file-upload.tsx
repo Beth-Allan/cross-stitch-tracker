@@ -10,7 +10,6 @@ type UploadState = "idle" | "uploading" | "complete" | "error";
 
 interface FileUploadProps {
   chartId?: string;
-  currentFileUrl?: string | null;
   currentFileName?: string | null;
   onUploadComplete: (key: string, fileName: string) => void;
   onRemove: () => void;
@@ -18,7 +17,6 @@ interface FileUploadProps {
 
 export function FileUpload({
   chartId,
-  currentFileUrl,
   currentFileName,
   onUploadComplete,
   onRemove,
@@ -105,9 +103,6 @@ export function FileUpload({
     onRemove();
   }, [onRemove]);
 
-  // Suppress unused variable warning -- currentFileUrl reserved for download link in future
-  void currentFileUrl;
-
   return (
     <div>
       <input
@@ -120,15 +115,13 @@ export function FileUpload({
       />
 
       {state === "complete" && fileName ? (
-        <div className="flex items-center gap-2 rounded-lg border border-stone-200 px-3 py-2 dark:border-stone-700">
-          <FileText className="size-4 shrink-0 text-stone-500" />
-          <span className="flex-1 truncate text-sm text-stone-700 dark:text-stone-300">
-            {fileName}
-          </span>
+        <div className="border-border flex items-center gap-2 rounded-lg border px-3 py-2">
+          <FileText className="text-muted-foreground size-4 shrink-0" />
+          <span className="text-foreground flex-1 truncate text-sm">{fileName}</span>
           <button
             type="button"
             onClick={handleRemove}
-            className="rounded p-0.5 text-stone-400 transition-colors hover:text-stone-600 dark:hover:text-stone-300"
+            className="text-muted-foreground hover:text-foreground rounded p-0.5 transition-colors"
             aria-label="Remove file"
           >
             <X className="size-4" />

@@ -147,7 +147,7 @@ export function CoverImageUpload({
       />
 
       {state === "complete" && preview ? (
-        <div className="relative h-32 overflow-hidden rounded-lg border-2 border-stone-200 dark:border-stone-700">
+        <div className="border-border relative h-32 overflow-hidden rounded-lg border-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={preview} alt="Cover image preview" className="h-full w-full object-cover" />
           <button
@@ -179,15 +179,15 @@ export function CoverImageUpload({
           className={cn(
             "flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors",
             isDragOver
-              ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20"
-              : "border-stone-200 hover:border-emerald-500 hover:bg-emerald-50/50 dark:border-stone-700 dark:hover:border-emerald-500 dark:hover:bg-emerald-950/20",
+              ? "border-primary bg-primary/10"
+              : "border-border hover:border-primary/50 hover:bg-primary/5",
             state === "error" && "border-destructive",
           )}
         >
           {state === "uploading" ? (
             <>
-              <Loader2 className="mb-2 size-6 animate-spin text-stone-400" />
-              <span className="text-sm text-stone-500 dark:text-stone-400">Uploading...</span>
+              <Loader2 className="text-muted-foreground/50 mb-2 size-6 animate-spin" />
+              <span className="text-muted-foreground text-sm">Uploading...</span>
             </>
           ) : state === "error" ? (
             <div className="text-center">
@@ -206,11 +206,11 @@ export function CoverImageUpload({
             </div>
           ) : (
             <>
-              <Upload className="mb-2 size-6 text-stone-400" strokeWidth={1.5} />
-              <span className="text-sm text-stone-500 dark:text-stone-400">
+              <Upload className="text-muted-foreground/50 mb-2 size-6" strokeWidth={1.5} />
+              <span className="text-muted-foreground text-sm">
                 Drop an image here or click to upload
               </span>
-              <span className="text-xs text-stone-400">PNG, JPG up to 5MB</span>
+              <span className="text-muted-foreground/70 text-xs">PNG, JPG up to 5MB</span>
             </>
           )}
         </div>
