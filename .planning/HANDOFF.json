@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-28T23:59:00.000Z",
+  "timestamp": "2026-03-29T16:59:48.819Z",
   "phase": "02",
   "phase_name": "core-project-management",
   "phase_dir": ".planning/phases/02-core-project-management",
@@ -12,27 +12,24 @@
     {"id": "02-01", "name": "Data Foundation (Prisma schema, R2 client, validations, types)", "status": "done", "commit": "a1164c4"},
     {"id": "02-02", "name": "Server Actions (chart CRUD, uploads, designer/genre creation)", "status": "done", "commit": "70859d2"},
     {"id": "02-03", "name": "Chart Form UI (~50 fields, uploads, inline entity creation)", "status": "done", "commit": "039840b"},
-    {"id": "02-04", "name": "Chart Detail & List Pages (badges, status control, detail/list views)", "status": "done", "commit": "0b24172"}
+    {"id": "02-04", "name": "Chart Detail & List Pages (badges, status control, detail/list views)", "status": "done", "commit": "0b24172"},
+    {"id": "02-05", "name": "Human Verification Checkpoint — chart form rebuild + lifecycle testing", "status": "in_progress", "progress": "Chart form rebuild complete on feature branch (21 commits, 41 tests passing, build green). Ready to merge and test."}
   ],
   "remaining_tasks": [
-    {"id": "02-05", "name": "Human Verification Checkpoint — chart form rebuild + lifecycle testing", "status": "in_progress"}
+    {"id": "02-05-merge", "name": "Merge feature/chart-form-rebuild to main", "status": "not_started"},
+    {"id": "02-05-test", "name": "Test full chart lifecycle in browser (create, view, edit, status, delete)", "status": "not_started"},
+    {"id": "02-05-complete", "name": "Complete 02-05 checkpoint and phase verification", "status": "not_started"}
   ],
   "blockers": [],
   "human_actions_pending": [],
   "decisions": [
-    {"decision": "Lazy Prisma proxy in db.ts to prevent build-time throw when DATABASE_URL not set", "rationale": "Allows build to succeed in CI/dev without database connection", "phase": "02"},
-    {"decision": "Added @prisma/client as runtime dependency", "rationale": "Required by Prisma 7 generated client", "phase": "02"},
-    {"decision": "prisma.config.ts loads .env.local explicitly", "rationale": "dotenv default is .env, but Next.js convention is .env.local", "phase": "02"},
-    {"decision": "CLAUDE.md modularized — tech stack and design context moved to docs/", "rationale": "613 lines was too long for agents to reliably read; reference material separated from rules", "phase": "02"},
-    {"decision": "DesignOS enforcement added — guardrail, DESIGN-REFERENCE.md, read_first requirement", "rationale": "Phase 2 auto-generated form ignored user's design work; three-layer enforcement prevents recurrence", "phase": "02"},
-    {"decision": "Chart form ground-up rebuild (not incremental patch)", "rationale": "Current form diverges from DesignOS in ~15 ways; no users/data so clean slate is better foundation", "phase": "02"},
-    {"decision": "shadcn Combobox (Popover+Command) over custom SearchableSelect", "rationale": "Free a11y, keyboard nav, focus management; restyled with emerald highlights", "phase": "02"},
-    {"decision": "shadcn Dialog for edit modal", "rationale": "Focus trapping, escape, ARIA, overlay click handling built in", "phase": "02"},
-    {"decision": "Inline genre add (pill row), dialog for designer add", "rationale": "Genre is just a name (inline is faster); designer needs name+website (dialog gives room)", "phase": "02"},
-    {"decision": "Native radio for Digital/Paper (no shadcn RadioGroup)", "rationale": "Only 2 options, KISS; revisit if more radio groups appear", "phase": "02"},
-    {"decision": "Semantic design tokens only, no hardcoded Tailwind colors", "rationale": "Follows phase 1 pattern; dark mode comes free", "phase": "02"}
+    {"decision": "Ground-up chart form rebuild (not incremental patch)", "rationale": "~15 DesignOS divergences; no users/data so clean slate is better", "phase": "02"},
+    {"decision": "DialogTrigger uses render prop (base-ui) not asChild (Radix)", "rationale": "Project uses @base-ui/react under shadcn v4", "phase": "02"},
+    {"decision": "StartPreferenceFields derives from props (no internal state)", "rationale": "ESLint rule blocked setState in useEffect; derived state is cleaner", "phase": "02"},
+    {"decision": "Native checkbox with accent-primary instead of shadcn Checkbox", "rationale": "No shadcn Checkbox installed; native + accent-primary is KISS for 2 options", "phase": "02"},
+    {"decision": "Installed @testing-library/user-event@14.5.2", "rationale": "Was missing from devDependencies; needed for form interaction tests", "phase": "02"}
   ],
   "uncommitted_files": [],
-  "next_action": "1) Start new session. 2) Create implementation plan from design spec using superpowers:writing-plans. 3) Execute plan to rebuild chart form.",
-  "context_notes": "Design spec at docs/superpowers/specs/2026-03-28-chart-form-rebuild-design.md. Architecture: useChartForm hook + 8 section components + 10 form primitives, shared between add form and edit modal. Server actions, Zod schemas, types, route pages stay mostly untouched. Upload URLs need Zod schema extension. R2 not configured in .env.local yet."
+  "next_action": "1) Merge feature/chart-form-rebuild to main (or create PR). 2) Run dev server, test full chart lifecycle. 3) Complete 02-05 checkpoint.",
+  "context_notes": "Currently on branch feature/chart-form-rebuild (21 commits ahead of main). All code builds and tests pass. The rebuild replaced the 651-line monolithic chart-form.tsx with composable architecture: useChartForm hook + 10 form primitives + 8 sections + 2 surfaces (ChartAddForm full-page, ChartEditModal tabbed dialog). Design spec at docs/superpowers/specs/2026-03-28-chart-form-rebuild-design.md, implementation plan at docs/superpowers/plans/2026-03-28-chart-form-rebuild.md. R2 still not configured — uploads will show graceful error."
 }
