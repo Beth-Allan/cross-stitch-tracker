@@ -29,17 +29,29 @@
 
 ### In Progress
 
-- Phase 2 plan 02-05: Human verification checkpoint — chart form needs rebuild to match DesignOS design
+- Phase 2 plan 02-05: Human verification checkpoint — chart form rebuild designed, ready for implementation plan
+
+### Done This Session
+
+- **Chart form rebuild design spec complete** (`docs/superpowers/specs/2026-03-28-chart-form-rebuild-design.md`)
+  - Full gap analysis: DesignOS design vs current implementation (~15 divergences cataloged)
+  - Ground-up rebuild architecture: `useChartForm` hook + 8 section components + 10 form primitives
+  - Both surfaces: full-page add form + tabbed edit modal (shadcn Dialog)
+  - Key decisions: shadcn Combobox (restyled) over custom, inline genre add, designer dialog, semantic tokens only, upload wiring with R2 graceful degradation
+  - DRY enforced via shared hook + composable sections (zero field duplication)
+  - Deep review caught 11 issues (test location, modal a11y, isDirty conflicts, type coercion, etc.) — all fixed
 
 ### Next Up
 
-1. Rebuild chart form from DesignOS reference (`product-plan/sections/project-management/components/ChartAddForm.tsx` + `FormFields.tsx`)
-2. Test full chart lifecycle in browser (create, view, edit, status transitions, delete)
-3. Complete 02-05 checkpoint, then phase verification
+1. **Create implementation plan** from design spec (invoke `superpowers:writing-plans`)
+2. Execute plan: delete old form, build primitives → sections → surfaces → hook → tests
+3. Test full chart lifecycle in browser (create, view, edit, status transitions, delete)
+4. Complete 02-05 checkpoint, then phase verification
 
 ### Blockers / Decisions Needed
 
-- Chart form UI doesn't match DesignOS design — needs full rebuild before verification
+- R2 not configured in `.env.local` — uploads will show graceful error until credentials added
+- Zod schema needs extension for upload URL fields (`coverImageUrl`, `coverThumbnailUrl`, `digitalFileUrl`)
 - PWA on-device testing deferred (needs deployment) — tracked in 01-HUMAN-UAT.md
 - `.env.local` bcrypt hashes must escape `$` as `\$` (Next.js env variable interpolation)
 

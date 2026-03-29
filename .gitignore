@@ -169,3 +169,6 @@ src/generated/
 
 # Worktrees
 .worktrees/
+
+# Superpowers brainstorm sessions
+.superpowers/

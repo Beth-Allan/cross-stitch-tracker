@@ -101,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-28T23:13:36.340Z
-Stopped at: Completed 02-04-PLAN.md
-Resume file: None
+Last session: 2026-03-28
+Stopped at: Chart form rebuild design spec complete, ready for implementation plan
+Resume file: docs/superpowers/specs/2026-03-28-chart-form-rebuild-design.md
