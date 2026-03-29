@@ -124,4 +124,74 @@ describe("ChartAddForm", () => {
     expect(screen.getByText("Sampler")).toBeInTheDocument();
     expect(screen.getByText("Landscape")).toBeInTheDocument();
   });
+
+  it("displays server-side error when action returns failure", async () => {
+    mockCreateChart.mockResolvedValue({
+      success: false,
+      error: "Failed to create chart",
+    });
+
+    const user = userEvent.setup();
+    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "Test Chart");
+    await user.type(screen.getByLabelText(/total stitch count/i), "5000");
+    await user.click(screen.getByRole("button", { name: /add chart/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Failed to create chart")).toBeInTheDocument();
+    });
+  });
+
+  it("displays generic error on unexpected throw", async () => {
+    mockCreateChart.mockRejectedValue(new Error("Network failure"));
+
+    const user = userEvent.setup();
+    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "Test Chart");
+    await user.type(screen.getByLabelText(/total stitch count/i), "5000");
+    await user.click(screen.getByRole("button", { name: /add chart/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
+    });
+  });
+
+  it("disables submit button during pending state", async () => {
+    // Return a never-resolving promise to keep isPending true
+    mockCreateChart.mockReturnValue(new Promise(() => {}));
+
+    const user = userEvent.setup();
+    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "Test Chart");
+    await user.type(screen.getByLabelText(/total stitch count/i), "5000");
+    await user.click(screen.getByRole("button", { name: /add chart/i }));
+
+    await waitFor(() => {
+      const button = screen.getByRole("button", { name: /adding/i });
+      expect(button).toBeDisabled();
+    });
+  });
+
+  it("clears validation error when field is corrected", async () => {
+    const user = userEvent.setup();
+    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+
+    // Fill stitch count but leave name empty, then submit
+    await user.type(screen.getByLabelText(/total stitch count/i), "5000");
+    await user.click(screen.getByRole("button", { name: /add chart/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Chart name is required")).toBeInTheDocument();
+    });
+
+    // Now type a name — error should clear
+    await user.type(screen.getByLabelText(/chart name/i), "Fixed Name");
+
+    await waitFor(() => {
+      expect(screen.queryByText("Chart name is required")).not.toBeInTheDocument();
+    });
+  });
 });
