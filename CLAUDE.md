@@ -4,8 +4,8 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Phase:** 2 in progress — Core Project Management (plans 1-4 done, checkpoint pending)
-**Last Updated:** 2026-03-28
+**Phase:** 2 in progress — Core Project Management (plans 1-4 done, chart form rebuild complete on feature branch)
+**Last Updated:** 2026-03-29
 
 ### Done
 
@@ -26,93 +26,25 @@
 - **CLAUDE.md modularized:** 613→340 lines, tech stack → docs/tech-stack.md, design context → docs/design-context.md
 - **DesignOS enforcement:** UI Implementation Rules added to CLAUDE.md, DESIGN-REFERENCE.md created, guardrail + read_first requirement for all UI tasks
 - **Chart form routes restored:** /charts/new and /charts/[id]/edit pages + TopBar button wired
+- **Chart form rebuild complete** (branch: `feature/chart-form-rebuild`, 20 commits, 41 tests passing, build green):
+  - Design spec with full gap analysis (`docs/superpowers/specs/2026-03-28-chart-form-rebuild-design.md`)
+  - Implementation plan (`docs/superpowers/plans/2026-03-28-chart-form-rebuild.md`)
+  - Architecture: `useChartForm` hook + 8 section components + 10 form primitives + 2 surfaces
+  - Zod schema extended with upload URL fields, server actions updated
+  - Full-page add form (`ChartAddForm`) + tabbed edit modal (`ChartEditModal` via shadcn Dialog)
+  - Inline designer creation (dialog) + inline genre creation (pill input)
+  - All semantic design tokens (no hardcoded colors), a11y (aria, fieldset, role=alert)
+  - Dirty tracking + beforeunload warning, friendly Zod error messages
+  - 11 integration tests (6 add form + 5 edit modal), all passing
 
 ### In Progress
 
-- Phase 2 plan 02-05: Human verification checkpoint — chart form rebuild designed, ready for implementation plan
-
-### Done This Session
-
-- **Chart form rebuild design spec complete** (`docs/superpowers/specs/2026-03-28-chart-form-rebuild-design.md`)
-  - Full gap analysis: DesignOS design vs current implementation (~15 divergences cataloged)
-  - Ground-up rebuild architecture: `useChartForm` hook + 8 section components + 10 form primitives
-  - Both surfaces: full-page add form + tabbed edit modal (shadcn Dialog)
-  - Key decisions: shadcn Combobox (restyled) over custom, inline genre add, designer dialog, semantic tokens only, upload wiring with R2 graceful degradation
-  - DRY enforced via shared hook + composable sections (zero field duplication)
-  - Deep review caught 11 issues (test location, modal a11y, isDirty conflicts, type coercion, etc.) — all fixed
-- **Task 1: Cleanup and directory scaffolding complete**
-  - Deleted old monolithic form: `chart-form.tsx`, `chart-form.test.tsx`, `searchable-select.tsx`, `genre-picker.tsx`, `inline-entity-dialog.tsx`
-  - Created directory structure: `form-primitives/` and `sections/`
-  - Moved upload components: `cover-image-upload.tsx`, `file-upload.tsx` → `form-primitives/`
-  - Ready for primitives/sections/surfaces build
-- **Task 2: Zod schema and server actions updated**
-  - Added three URL fields to `chartFormSchema`: `coverImageUrl`, `coverThumbnailUrl`, `digitalFileUrl` (all optional, nullable)
-  - Updated `createChart()`: maps fields to Prisma columns (with `digitalFileUrl` → `digitalWorkingCopyUrl`)
-  - Updated `updateChart()`: same mapping for consistency
-  - Prettier + ESLint ran automatically via pre-commit hook
-- **Task 3: FormField and SectionHeading primitives created**
-  - FormField: flex column, label + error, semantic tokens
-  - SectionHeading: text-lg font-semibold text-foreground
-- **Task 4: StyledCheckbox primitive created**
-  - Native checkbox with accent-primary styling
-  - Label wrapper with hover effect, useId for accessibility
-- **Task 5: SearchableSelect primitive created**
-  - Restyled shadcn Combobox with DRY value/text separation
-  - Debounced search, empty state, no-match handling, clear button
-  - Semantic tokens, focus ring, disabled state styling
-- **Task 6: GenrePicker primitive created**
-  - Pill toggle grid with inline text input for adding new genres
-  - Uses relatedTarget blur check to prevent premature cancel
-  - Error handling: keeps input open, refocuses on error
-- **Task 7: StitchCountFields, PatternTypeFields, StartPreferenceFields created**
-  - StitchCountFields: W×H dimension inputs + total count + auto-calculate from dimensions + size category badge
-  - PatternTypeFields: native radio group (Digital/Paper) + conditional Formal Kit with colour count + SAL checkbox
-  - StartPreferenceFields: period/year composite selects, fully controlled (no internal state — derives from prop)
-  - Fixed: removed `setState` inside `useEffect` (ESLint rule) → now a pure controlled component
-- **Task 8: Upload components rewired with semantic tokens**
-  - Updated `cover-image-upload.tsx`: border-stone-200 → border-border, border-emerald-500 → border-primary, hardcoded grey icons → text-muted-foreground/50, helper text → text-muted-foreground/70
-  - Updated `file-upload.tsx`: removed unused `currentFileUrl` prop, replaced hardcoded stone colors with semantic tokens (text-muted-foreground, text-foreground, border-border, etc.)
-  - Both files now use design tokens exclusively, no hardcoded Tailwind colors
-- **Task 9: InlineDesignerDialog created**
-  - `src/components/features/charts/inline-designer-dialog.tsx`
-  - Adapted from spec: used `render` prop on `DialogTrigger` (base-ui API, not `asChild`)
-  - Name (required) + website (optional URL) fields, error display, reset on close, retry-on-error UX
-- **Task 10: useChartForm hook created**
-  - `src/components/features/charts/use-chart-form.ts`
-  - Owns all 25+ fields, dirty tracking, beforeunload warning, Zod validation with friendly error map
-  - Inline designer/genre creation, server action submission for both create and edit modes
-  - Fixed: split create/edit branches to resolve union type narrowing issue on `response.chartId`
-  - Type check: clean (only 2 pre-existing errors for missing `chart-form` module — future task)
-- **Task 11: All 8 section components created**
-  - `src/components/features/charts/sections/`: BasicInfoSection, StitchCountSection, GenreSection, PatternTypeSection, ProjectSetupSection, DatesSection, GoalsSection, NotesSection
-  - Each composes form primitives into field groups with SectionHeading dividers
-  - Type check: clean (same 2 pre-existing errors for missing `chart-form` module, none from new files)
-- **Task 12: ChartAddForm surface created**
-  - `src/components/features/charts/chart-add-form.tsx`
-  - Composes all 8 sections with `useChartForm` hook (create mode)
-  - Back link, Fraunces heading, cancel with dirty check, submit with pending spinner
-  - Adapted: `onDigitalFileChange` handler ignores unused `fileName` second arg from section prop contract
-  - Type check: clean (only 2 pre-existing errors for missing old `chart-form` module — resolved in Task 14)
-- **Task 13: ChartEditModal surface created**
-  - `src/components/features/charts/chart-edit-modal.tsx`
-  - shadcn Dialog (base-ui) with Basic Info and Details tabs, controlled via `open`/`onOpenChange` props
-  - Uses `useChartForm` hook in edit mode — same 8 sections, form state persists across tab switches
-  - isDirty guard on close (window.confirm), footer Cancel + Save Changes buttons inside `<form>` for submit
-  - Dialog API: `showCloseButton={false}` + manual X button; `onOpenChange` intercepts close for dirty check
-  - Type check: clean (only 2 pre-existing errors for missing old `chart-form` module)
-- **Task 14: Route pages updated**
-  - `/charts/new` → `ChartAddForm` wired with designers/genres from DB
-  - `/charts/[id]/edit` → `ChartEditModal` wired with chart data, designers, genres
-  - Pre-existing `chart-form` module errors resolved (old module deleted in Task 1)
-- **Task 15: ChartAddForm integration tests complete**
-  - `src/components/features/charts/chart-add-form.test.tsx` — 6 tests, all passing
-  - Installed `@testing-library/user-event@14.5.2` (was missing from devDependencies)
-  - Adaptation: `getByText("Notes")` → `getByRole("heading", { name: "Notes" })` (NotesSection renders both `h2` and `label` with that text)
+- Phase 2 plan 02-05: Human verification checkpoint — chart form rebuild ready to merge and test
 
 ### Next Up
 
-1. **Task 16:** Integration tests — ChartEditModal
-2. **Task 17:** Full build verification (`npm run build`)
+1. **Merge `feature/chart-form-rebuild` to main** (or create PR)
+2. Test full chart lifecycle in browser (create, view, edit, status transitions, delete)
 3. Complete 02-05 checkpoint, then phase verification
 
 ### Blockers / Decisions Needed
