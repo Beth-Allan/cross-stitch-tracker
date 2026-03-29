@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { ChartAddForm } from "./chart-add-form";
+import { createMockDesigner, createMockGenre } from "@/__tests__/mocks";
 
 const mockPush = vi.fn();
 
@@ -28,19 +29,11 @@ vi.mock("@/lib/actions/upload-actions", () => ({
   getPresignedUploadUrl: vi.fn(),
 }));
 
-const mockDesigners = [
-  {
-    id: "d1",
-    name: "Designer One",
-    website: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
+const mockDesigners = [createMockDesigner({ id: "d1", name: "Designer One" })];
 
 const mockGenres = [
-  { id: "g1", name: "Sampler", createdAt: new Date(), updatedAt: new Date() },
-  { id: "g2", name: "Landscape", createdAt: new Date(), updatedAt: new Date() },
+  createMockGenre({ id: "g1", name: "Sampler" }),
+  createMockGenre({ id: "g2", name: "Landscape" }),
 ];
 
 describe("ChartAddForm", () => {

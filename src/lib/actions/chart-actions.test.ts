@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { createMockPrisma } from "@/__tests__/mocks";
 
 // Mock auth to return null (unauthenticated)
 vi.mock("@/lib/auth", () => ({
@@ -6,19 +7,9 @@ vi.mock("@/lib/auth", () => ({
 }));
 
 // Mock prisma to prevent actual DB calls
+const mockPrisma = createMockPrisma();
 vi.mock("@/lib/db", () => ({
-  prisma: {
-    chart: {
-      create: vi.fn(),
-      findMany: vi.fn(),
-      findUnique: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-    },
-    project: { update: vi.fn() },
-    designer: { create: vi.fn(), findMany: vi.fn() },
-    genre: { create: vi.fn(), findMany: vi.fn() },
-  },
+  prisma: mockPrisma,
 }));
 
 // Mock next/cache to prevent server-only errors in test
