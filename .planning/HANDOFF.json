@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-29T16:59:48.819Z",
+  "timestamp": "2026-03-29T19:30:00.000Z",
   "phase": "02",
   "phase_name": "core-project-management",
   "phase_dir": ".planning/phases/02-core-project-management",
@@ -13,23 +13,22 @@
     {"id": "02-02", "name": "Server Actions (chart CRUD, uploads, designer/genre creation)", "status": "done", "commit": "70859d2"},
     {"id": "02-03", "name": "Chart Form UI (~50 fields, uploads, inline entity creation)", "status": "done", "commit": "039840b"},
     {"id": "02-04", "name": "Chart Detail & List Pages (badges, status control, detail/list views)", "status": "done", "commit": "0b24172"},
-    {"id": "02-05", "name": "Human Verification Checkpoint — chart form rebuild + lifecycle testing", "status": "in_progress", "progress": "Chart form rebuild complete on feature branch (21 commits, 41 tests passing, build green). Ready to merge and test."}
+    {"id": "02-05", "name": "Human Verification Checkpoint", "status": "in_progress", "progress": "PR #2 open. UAT found chart detail + gallery need DesignOS alignment. New plan 02-06 needed."}
   ],
   "remaining_tasks": [
-    {"id": "02-05-merge", "name": "Merge feature/chart-form-rebuild to main", "status": "not_started"},
-    {"id": "02-05-test", "name": "Test full chart lifecycle in browser (create, view, edit, status, delete)", "status": "not_started"},
-    {"id": "02-05-complete", "name": "Complete 02-05 checkpoint and phase verification", "status": "not_started"}
+    {"id": "02-05-merge", "name": "Merge PR #2 (chart form rebuild)", "status": "not_started"},
+    {"id": "02-06-plan", "name": "Discuss + plan gallery/detail DesignOS rebuild", "status": "not_started"},
+    {"id": "02-06-execute", "name": "Build ChartGallery, ChartCard, ChartListRow, FilterBar, enrich ChartDetail", "status": "not_started"},
+    {"id": "02-07-verify", "name": "Final human verification + phase close", "status": "not_started"}
   ],
   "blockers": [],
-  "human_actions_pending": [],
+  "human_actions_pending": ["Review/merge PR #2: https://github.com/Beth-Allan/cross-stitch-tracker/pull/2"],
   "decisions": [
-    {"decision": "Ground-up chart form rebuild (not incremental patch)", "rationale": "~15 DesignOS divergences; no users/data so clean slate is better", "phase": "02"},
-    {"decision": "DialogTrigger uses render prop (base-ui) not asChild (Radix)", "rationale": "Project uses @base-ui/react under shadcn v4", "phase": "02"},
-    {"decision": "StartPreferenceFields derives from props (no internal state)", "rationale": "ESLint rule blocked setState in useEffect; derived state is cleaner", "phase": "02"},
-    {"decision": "Native checkbox with accent-primary instead of shadcn Checkbox", "rationale": "No shadcn Checkbox installed; native + accent-primary is KISS for 2 options", "phase": "02"},
-    {"decision": "Installed @testing-library/user-event@14.5.2", "rationale": "Was missing from devDependencies; needed for form interaction tests", "phase": "02"}
+    {"decision": "Chart detail and gallery pages need full DesignOS rebuild (02-06)", "rationale": "UAT revealed 4 missing components and significant divergence from design", "phase": "02"},
+    {"decision": "Quick-add for Project Bin and iPad App", "rationale": "User requested inline creation matching Designer dropdown pattern", "phase": "02"},
+    {"decision": "Goals & Plans form section may differ from DesignOS", "rationale": "Noted for Phase 8 revisit — acceptable for now", "phase": "02"}
   ],
   "uncommitted_files": [],
-  "next_action": "1) Merge feature/chart-form-rebuild to main (or create PR). 2) Run dev server, test full chart lifecycle. 3) Complete 02-05 checkpoint.",
-  "context_notes": "Currently on branch feature/chart-form-rebuild (21 commits ahead of main). All code builds and tests pass. The rebuild replaced the 651-line monolithic chart-form.tsx with composable architecture: useChartForm hook + 10 form primitives + 8 sections + 2 surfaces (ChartAddForm full-page, ChartEditModal tabbed dialog). Design spec at docs/superpowers/specs/2026-03-28-chart-form-rebuild-design.md, implementation plan at docs/superpowers/plans/2026-03-28-chart-form-rebuild.md. R2 still not configured — uploads will show graceful error."
+  "next_action": "1) Merge PR #2 when form testing is satisfactory. 2) /gsd:discuss-phase 2 to discuss gallery/detail rebuild. 3) Plan + execute 02-06. 4) Final verification.",
+  "context_notes": "On branch feature/chart-form-rebuild (23 commits ahead of main). PR #2 open. The chart form rebuild (add form + edit modal) is complete and high-fidelity to DesignOS. But the chart DETAIL page and chart GALLERY/LIST page were built quick-and-functional in Plan 02-04 and never aligned to the DesignOS designs. Four components are completely missing (ChartGallery, ChartCard, ChartListRow, FilterBar) and ChartDetail needs significant enrichment. A new plan 02-06 must be created and executed before Phase 2 can close."
 }
