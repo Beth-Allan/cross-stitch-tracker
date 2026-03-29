@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getChart } from "@/lib/actions/chart-actions";
 import { getDesigners } from "@/lib/actions/designer-actions";
 import { getGenres } from "@/lib/actions/genre-actions";
-import { ChartForm } from "@/components/features/charts/chart-form";
+import { EditChartPageClient } from "./edit-client";
 
 export default async function EditChartPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -10,5 +10,5 @@ export default async function EditChartPage({ params }: { params: Promise<{ id: 
 
   if (!chart) notFound();
 
-  return <ChartForm mode="edit" initialData={chart} designers={designers} genres={genres} />;
+  return <EditChartPageClient chart={chart} designers={designers} genres={genres} />;
 }
