@@ -40,6 +40,11 @@
   - Key decisions: shadcn Combobox (restyled) over custom, inline genre add, designer dialog, semantic tokens only, upload wiring with R2 graceful degradation
   - DRY enforced via shared hook + composable sections (zero field duplication)
   - Deep review caught 11 issues (test location, modal a11y, isDirty conflicts, type coercion, etc.) — all fixed
+- **Task 1: Cleanup and directory scaffolding complete**
+  - Deleted old monolithic form: `chart-form.tsx`, `chart-form.test.tsx`, `searchable-select.tsx`, `genre-picker.tsx`, `inline-entity-dialog.tsx`
+  - Created directory structure: `form-primitives/` and `sections/`
+  - Moved upload components: `cover-image-upload.tsx`, `file-upload.tsx` → `form-primitives/`
+  - Ready for primitives/sections/surfaces build
 
 ### Next Up
 
