@@ -50,13 +50,26 @@
   - Updated `createChart()`: maps fields to Prisma columns (with `digitalFileUrl` → `digitalWorkingCopyUrl`)
   - Updated `updateChart()`: same mapping for consistency
   - Prettier + ESLint ran automatically via pre-commit hook
+- **Task 3: FormField and SectionHeading primitives created**
+  - FormField: flex column, label + error, semantic tokens
+  - SectionHeading: text-lg font-semibold text-foreground
+- **Task 4: StyledCheckbox primitive created**
+  - Native checkbox with accent-primary styling
+  - Label wrapper with hover effect, useId for accessibility
+- **Task 5: SearchableSelect primitive created**
+  - Restyled shadcn Combobox with DRY value/text separation
+  - Debounced search, empty state, no-match handling, clear button
+  - Semantic tokens, focus ring, disabled state styling
+- **Task 6: GenrePicker primitive created**
+  - Pill toggle grid with inline text input for adding new genres
+  - Uses relatedTarget blur check to prevent premature cancel
+  - Error handling: keeps input open, refocuses on error
 
 ### Next Up
 
-1. Task 3: FormField and SectionHeading primitives
-2. Task 4: StyledCheckbox primitive
-3. Continue with remaining 14 tasks through full integration tests
-4. Complete 02-05 checkpoint, then phase verification
+1. Task 7: DesignerDialog (inline entity creation modal)
+2. Continue with remaining 11 tasks through full integration tests
+3. Complete 02-05 checkpoint, then phase verification
 
 ### Blockers / Decisions Needed
 
