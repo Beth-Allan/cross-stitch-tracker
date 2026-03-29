@@ -94,9 +94,17 @@ export function ChartEditModal({
         </DialogHeader>
 
         {/* Tab bar */}
-        <div className="border-border mt-4 flex gap-0 border-b px-6">
+        <div
+          role="tablist"
+          aria-label="Edit chart sections"
+          className="border-border mt-4 flex gap-0 border-b px-6"
+        >
           <button
             type="button"
+            role="tab"
+            id="chart-edit-basic-tab"
+            aria-selected={activeTab === "basic"}
+            aria-controls="chart-edit-basic-panel"
             onClick={() => setActiveTab("basic")}
             className={`border-b-2 px-1 pb-2 text-sm font-medium transition-colors ${
               activeTab === "basic"
@@ -108,6 +116,10 @@ export function ChartEditModal({
           </button>
           <button
             type="button"
+            role="tab"
+            id="chart-edit-details-tab"
+            aria-selected={activeTab === "details"}
+            aria-controls="chart-edit-details-panel"
             onClick={() => setActiveTab("details")}
             className={`ml-6 border-b-2 px-1 pb-2 text-sm font-medium transition-colors ${
               activeTab === "details"
@@ -124,7 +136,12 @@ export function ChartEditModal({
           {/* Tab content */}
           <div className="flex-1 overflow-y-auto px-6 py-5">
             {activeTab === "basic" ? (
-              <div className="space-y-5">
+              <div
+                role="tabpanel"
+                id="chart-edit-basic-panel"
+                aria-labelledby="chart-edit-basic-tab"
+                className="space-y-5"
+              >
                 <BasicInfoSection
                   name={form.values.name}
                   designerId={form.values.designerId}
@@ -159,7 +176,12 @@ export function ChartEditModal({
                 />
               </div>
             ) : (
-              <div className="space-y-5">
+              <div
+                role="tabpanel"
+                id="chart-edit-details-panel"
+                aria-labelledby="chart-edit-details-tab"
+                className="space-y-5"
+              >
                 <GenreSection
                   genres={form.genres}
                   selectedIds={form.values.genreIds}

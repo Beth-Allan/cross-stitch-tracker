@@ -3,7 +3,7 @@ import { z } from "zod";
 export const chartFormSchema = z.object({
   chart: z
     .object({
-      name: z.string().min(1, "Chart name is required").max(200, "Chart name too long"),
+      name: z.string().trim().min(1, "Chart name is required").max(200, "Chart name too long"),
       designerId: z.string().nullable().default(null),
       coverImageUrl: z.string().url().nullable().default(null),
       coverThumbnailUrl: z.string().url().nullable().default(null),
@@ -31,9 +31,21 @@ export const chartFormSchema = z.object({
     projectBin: z.string().nullable().default(null),
     ipadApp: z.string().nullable().default(null),
     needsOnionSkinning: z.boolean().default(false),
-    startDate: z.string().nullable().default(null),
-    finishDate: z.string().nullable().default(null),
-    ffoDate: z.string().nullable().default(null),
+    startDate: z
+      .string()
+      .nullable()
+      .default(null)
+      .refine((val) => val === null || !isNaN(Date.parse(val)), { message: "Invalid date" }),
+    finishDate: z
+      .string()
+      .nullable()
+      .default(null)
+      .refine((val) => val === null || !isNaN(Date.parse(val)), { message: "Invalid date" }),
+    ffoDate: z
+      .string()
+      .nullable()
+      .default(null)
+      .refine((val) => val === null || !isNaN(Date.parse(val)), { message: "Invalid date" }),
     wantToStartNext: z.boolean().default(false),
     preferredStartSeason: z.string().nullable().default(null),
     startingStitches: z.number().int().min(0).default(0),
@@ -43,14 +55,14 @@ export const chartFormSchema = z.object({
 export type ChartFormInput = z.infer<typeof chartFormSchema>;
 
 export const designerSchema = z.object({
-  name: z.string().min(1, "Designer name is required").max(200, "Designer name too long"),
+  name: z.string().trim().min(1, "Designer name is required").max(200, "Designer name too long"),
   website: z.string().url("Must be a valid URL").nullable().default(null),
 });
 
 export type DesignerInput = z.infer<typeof designerSchema>;
 
 export const genreSchema = z.object({
-  name: z.string().min(1, "Genre name is required").max(100, "Genre name too long"),
+  name: z.string().trim().min(1, "Genre name is required").max(100, "Genre name too long"),
 });
 
 export type GenreInput = z.infer<typeof genreSchema>;

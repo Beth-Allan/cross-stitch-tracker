@@ -1,15 +1,9 @@
 "use server";
 
 import { z } from "zod";
-import { auth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { genreSchema } from "@/lib/validations/chart";
-
-async function requireAuth() {
-  const session = await auth();
-  if (!session?.user) throw new Error("Unauthorized");
-  return session;
-}
 
 export async function createGenre(formData: unknown) {
   await requireAuth();

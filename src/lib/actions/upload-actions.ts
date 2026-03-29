@@ -5,7 +5,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { nanoid } from "nanoid";
 import sharp from "sharp";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { getR2Client, R2_BUCKET_NAME } from "@/lib/r2";
 import {
@@ -13,12 +13,6 @@ import {
   ALLOWED_IMAGE_TYPES,
   ALLOWED_FILE_TYPES,
 } from "@/lib/validations/upload";
-
-async function requireAuth() {
-  const session = await auth();
-  if (!session?.user) throw new Error("Unauthorized");
-  return session.user;
-}
 
 const VALID_CHART_FIELDS = ["coverImageUrl", "coverThumbnailUrl", "digitalWorkingCopyUrl"] as const;
 

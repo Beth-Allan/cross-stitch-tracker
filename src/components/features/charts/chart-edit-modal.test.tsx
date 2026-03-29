@@ -110,8 +110,8 @@ describe("ChartEditModal", () => {
   it("shows Basic Info and Details tabs", () => {
     renderModal();
 
-    expect(screen.getByRole("button", { name: "Basic Info" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Details" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Basic Info" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Details" })).toBeInTheDocument();
   });
 
   it("shows Save Changes button", () => {
@@ -144,13 +144,13 @@ describe("ChartEditModal", () => {
     expect(screen.getByLabelText(/chart name/i)).toHaveValue("Test Chart");
 
     // Switch to Details tab
-    await user.click(screen.getByRole("button", { name: "Details" }));
+    await user.click(screen.getByRole("tab", { name: "Details" }));
 
     // Details tab content should appear (Genre section)
     expect(screen.getByText("Genre(s)")).toBeInTheDocument();
 
     // Switch back to Basic Info tab
-    await user.click(screen.getByRole("button", { name: "Basic Info" }));
+    await user.click(screen.getByRole("tab", { name: "Basic Info" }));
 
     // Chart name should still be pre-populated
     expect(screen.getByLabelText(/chart name/i)).toHaveValue("Test Chart");

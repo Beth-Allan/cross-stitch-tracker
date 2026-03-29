@@ -2,16 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { chartFormSchema } from "@/lib/validations/chart";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
-
-async function requireAuth() {
-  const session = await auth();
-  if (!session?.user) throw new Error("Unauthorized");
-  return session.user;
-}
 
 export async function createChart(formData: unknown) {
   const user = await requireAuth();
@@ -49,7 +43,7 @@ export async function createChart(formData: unknown) {
         notes: chart.notes,
         project: {
           create: {
-            userId: user.id ?? "1",
+            userId: user.id,
             status: project.status,
             fabricId: project.fabricId,
             projectBin: project.projectBin,

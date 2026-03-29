@@ -11,17 +11,10 @@ interface InfoCardProps {
 
 export function InfoCard({ icon: Icon, title, children, className }: InfoCardProps) {
   return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-xl border border-stone-200/60 bg-white dark:border-stone-800 dark:bg-stone-900",
-        className,
-      )}
-    >
-      <div className="flex items-center gap-2 border-b border-stone-100 px-5 py-3.5 dark:border-stone-800">
-        <Icon className="h-4 w-4 text-stone-400 dark:text-stone-500" strokeWidth={1.5} />
-        <h3 className="font-heading text-sm font-semibold text-stone-900 dark:text-stone-100">
-          {title}
-        </h3>
+    <div className={cn("bg-card border-border overflow-hidden rounded-xl border", className)}>
+      <div className="border-border flex items-center gap-2 border-b px-5 py-3.5">
+        <Icon className="text-muted-foreground h-4 w-4" strokeWidth={1.5} />
+        <h3 className="font-heading text-foreground text-sm font-semibold">{title}</h3>
       </div>
       <div className="px-5 py-4">{children}</div>
     </div>

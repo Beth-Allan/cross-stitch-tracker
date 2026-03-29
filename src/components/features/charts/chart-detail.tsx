@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ChartWithProject } from "@/types/chart";
-import { STATUS_CONFIG } from "@/lib/utils/status";
 import { getEffectiveStitchCount, calculateSizeCategory } from "@/lib/utils/size-category";
 import { deleteChart } from "@/lib/actions/chart-actions";
 import { getPresignedDownloadUrl } from "@/lib/actions/upload-actions";
@@ -27,6 +26,7 @@ import { InfoCard } from "./info-card";
 import { DetailRow } from "./detail-row";
 import { ProgressBar } from "./progress-bar";
 import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/link-button";
 import {
   Dialog,
   DialogContent,
@@ -117,10 +117,10 @@ export function ChartDetail({ chart }: ChartDetailProps) {
 
           {/* Action buttons */}
           <div className="flex items-center gap-2 pt-2">
-            <Button variant="outline" render={<Link href={`/charts/${chart.id}/edit`} />}>
+            <LinkButton href={`/charts/${chart.id}/edit`} variant="outline">
               <Pencil className="size-4" data-icon="inline-start" />
               Edit
-            </Button>
+            </LinkButton>
             <DeleteChartDialog chartId={chart.id} chartName={chart.name} />
           </div>
         </div>

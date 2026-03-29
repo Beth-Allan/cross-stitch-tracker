@@ -4,7 +4,7 @@ import { getCharts } from "@/lib/actions/chart-actions";
 import { getEffectiveStitchCount } from "@/lib/utils/size-category";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { SizeBadge } from "@/components/features/charts/size-badge";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/link-button";
 
 export default async function ChartsPage() {
   const charts = await getCharts();
@@ -14,10 +14,10 @@ export default async function ChartsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-semibold">Charts</h1>
-        <Button render={<Link href="/charts/new" />}>
+        <LinkButton href="/charts/new">
           <Plus className="size-4" data-icon="inline-start" />
           Add Chart
-        </Button>
+        </LinkButton>
       </div>
 
       {/* Content */}
@@ -36,12 +36,12 @@ function EmptyState() {
       <p className="mt-1 max-w-sm text-sm text-stone-500 dark:text-stone-400">
         Add your first chart to start tracking your cross-stitch collection.
       </p>
-      <Button
+      <LinkButton
+        href="/charts/new"
         className="mt-6 bg-emerald-600 text-white hover:bg-emerald-700"
-        render={<Link href="/charts/new" />}
       >
         Add Your First Chart
-      </Button>
+      </LinkButton>
     </div>
   );
 }

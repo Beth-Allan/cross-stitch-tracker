@@ -68,11 +68,15 @@ export function FileUpload({
           return;
         }
 
-        await fetch(result.url, {
+        const uploadResponse = await fetch(result.url, {
           method: "PUT",
           body: file,
           headers: { "Content-Type": file.type },
         });
+
+        if (!uploadResponse.ok) {
+          throw new Error("Upload failed");
+        }
 
         setFileName(file.name);
         setState("complete");

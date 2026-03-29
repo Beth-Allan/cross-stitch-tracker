@@ -11,14 +11,14 @@ export function DetailRow({ label, value, className }: DetailRowProps) {
   return (
     <div
       className={cn(
-        "flex items-start justify-between gap-4 border-b border-stone-100 py-2.5 last:border-b-0 dark:border-stone-800/60",
+        "border-border/60 flex items-start justify-between gap-4 border-b py-2.5 last:border-b-0",
         className,
       )}
     >
-      <span className="shrink-0 text-xs font-semibold tracking-wider text-stone-500 uppercase dark:text-stone-400">
+      <span className="text-muted-foreground shrink-0 text-xs font-semibold tracking-wider uppercase">
         {label}
       </span>
-      <span className="text-right text-sm text-stone-700 dark:text-stone-300">{value}</span>
+      <span className="text-foreground text-right text-sm">{value}</span>
     </div>
   );
 }

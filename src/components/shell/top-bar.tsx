@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu, Search, Clock, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/link-button";
 import { Sheet, SheetTrigger, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { UserMenu } from "./user-menu";
 import { navigationItems } from "./nav-items";
@@ -96,15 +97,15 @@ export function TopBar({ user }: TopBarProps) {
           <Clock className="h-3.5 w-3.5" strokeWidth={2} />
           <span className="hidden sm:inline">Log Stitches</span>
         </Button>
-        <Button
+        <LinkButton
+          href="/charts/new"
           variant="outline"
           size="sm"
-          render={<Link href="/charts/new" />}
           className="flex min-h-11 items-center gap-1.5 sm:min-h-0"
         >
           <Plus className="h-3.5 w-3.5" strokeWidth={2} />
           <span className="hidden sm:inline">Add Chart</span>
-        </Button>
+        </LinkButton>
 
         {/* User menu */}
         <div className="ml-1">

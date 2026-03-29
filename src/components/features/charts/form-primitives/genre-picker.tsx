@@ -56,6 +56,7 @@ export function GenrePicker({ genres, selectedIds, onToggle, onAddGenre }: Genre
             key={genre.id}
             type="button"
             onClick={() => onToggle(genre.id)}
+            aria-pressed={selected}
             className={cn(
               "rounded-full border px-3 py-1.5 text-xs transition-colors",
               selected
@@ -68,27 +69,40 @@ export function GenrePicker({ genres, selectedIds, onToggle, onAddGenre }: Genre
         );
       })}
       {isAdding ? (
-        <input
-          ref={inputRef}
-          type="text"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              void handleSubmit();
-            }
-            if (e.key === "Escape") {
-              setIsAdding(false);
-              setNewName("");
-            }
-          }}
-          onBlur={handleBlur}
-          autoFocus
-          placeholder="Genre name"
-          disabled={isSubmitting}
-          className="border-primary/30 bg-background focus:ring-ring w-40 rounded-full border px-3 py-1.5 text-xs focus:ring-2 focus:outline-none"
-        />
+        <div className="flex items-center gap-1.5" onBlur={handleBlur}>
+          <label htmlFor="new-genre" className="sr-only">
+            New genre name
+          </label>
+          <input
+            id="new-genre"
+            ref={inputRef}
+            type="text"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void handleSubmit();
+              }
+              if (e.key === "Escape") {
+                setIsAdding(false);
+                setNewName("");
+              }
+            }}
+            autoFocus
+            placeholder="Genre name"
+            disabled={isSubmitting}
+            className="border-primary/30 bg-background focus:ring-ring w-40 rounded-full border px-3 py-1.5 text-xs focus:ring-2 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => void handleSubmit()}
+            disabled={isSubmitting || !newName.trim()}
+            className="border-primary/30 text-primary hover:bg-primary/10 disabled:text-muted-foreground rounded-full border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-50"
+          >
+            Add
+          </button>
+        </div>
       ) : (
         <button
           type="button"

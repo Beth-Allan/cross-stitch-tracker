@@ -69,11 +69,15 @@ export function CoverImageUpload({
           return;
         }
 
-        await fetch(result.url, {
+        const uploadResponse = await fetch(result.url, {
           method: "PUT",
           body: file,
           headers: { "Content-Type": file.type },
         });
+
+        if (!uploadResponse.ok) {
+          throw new Error("Upload failed");
+        }
 
         const objectUrl = URL.createObjectURL(file);
         setPreview(objectUrl);

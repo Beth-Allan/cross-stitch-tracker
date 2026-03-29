@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { SectionHeading } from "../form-primitives/section-heading";
 import { FormField } from "../form-primitives/form-field";
@@ -40,6 +41,9 @@ export function BasicInfoSection({
   onAddDesigner,
   errors,
 }: BasicInfoSectionProps) {
+  const [designerDialogOpen, setDesignerDialogOpen] = useState(false);
+  const [designerDialogName, setDesignerDialogName] = useState("");
+
   const designerOptions = designers.map((d) => ({
     value: d.id,
     label: d.name,
@@ -66,13 +70,15 @@ export function BasicInfoSection({
             value={designerId}
             onChange={onDesignerChange}
             placeholder="Select designer..."
+            onAddNew={(searchTerm) => {
+              setDesignerDialogName(searchTerm);
+              setDesignerDialogOpen(true);
+            }}
           />
           <InlineDesignerDialog
-            trigger={
-              <button type="button" className="text-primary mt-1 text-xs hover:underline">
-                + Add new designer
-              </button>
-            }
+            open={designerDialogOpen}
+            onOpenChange={setDesignerDialogOpen}
+            initialName={designerDialogName}
             onSubmit={onAddDesigner}
           />
         </FormField>
