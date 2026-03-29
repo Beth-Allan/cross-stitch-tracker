@@ -45,18 +45,22 @@
   - Created directory structure: `form-primitives/` and `sections/`
   - Moved upload components: `cover-image-upload.tsx`, `file-upload.tsx` → `form-primitives/`
   - Ready for primitives/sections/surfaces build
+- **Task 2: Zod schema and server actions updated**
+  - Added three URL fields to `chartFormSchema`: `coverImageUrl`, `coverThumbnailUrl`, `digitalFileUrl` (all optional, nullable)
+  - Updated `createChart()`: maps fields to Prisma columns (with `digitalFileUrl` → `digitalWorkingCopyUrl`)
+  - Updated `updateChart()`: same mapping for consistency
+  - Prettier + ESLint ran automatically via pre-commit hook
 
 ### Next Up
 
-1. **Create implementation plan** from design spec (invoke `superpowers:writing-plans`)
-2. Execute plan: delete old form, build primitives → sections → surfaces → hook → tests
-3. Test full chart lifecycle in browser (create, view, edit, status transitions, delete)
+1. Task 3: FormField and SectionHeading primitives
+2. Task 4: StyledCheckbox primitive
+3. Continue with remaining 14 tasks through full integration tests
 4. Complete 02-05 checkpoint, then phase verification
 
 ### Blockers / Decisions Needed
 
 - R2 not configured in `.env.local` — uploads will show graceful error until credentials added
-- Zod schema needs extension for upload URL fields (`coverImageUrl`, `coverThumbnailUrl`, `digitalFileUrl`)
 - PWA on-device testing deferred (needs deployment) — tracked in 01-HUMAN-UAT.md
 - `.env.local` bcrypt hashes must escape `$` as `\$` (Next.js env variable interpolation)
 
