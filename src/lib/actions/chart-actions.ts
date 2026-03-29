@@ -23,11 +23,7 @@ export async function createChart(formData: unknown) {
     // Auto-calculate stitch count from dimensions when not provided directly
     let effectiveStitchCount = chart.stitchCount;
     let effectiveApproximate = chart.stitchCountApproximate;
-    if (
-      effectiveStitchCount === 0 &&
-      chart.stitchesWide > 0 &&
-      chart.stitchesHigh > 0
-    ) {
+    if (effectiveStitchCount === 0 && chart.stitchesWide > 0 && chart.stitchesHigh > 0) {
       effectiveStitchCount = chart.stitchesWide * chart.stitchesHigh;
       effectiveApproximate = true;
     }
@@ -36,6 +32,9 @@ export async function createChart(formData: unknown) {
       data: {
         name: chart.name,
         designerId: chart.designerId,
+        coverImageUrl: chart.coverImageUrl,
+        coverThumbnailUrl: chart.coverThumbnailUrl,
+        digitalWorkingCopyUrl: chart.digitalFileUrl,
         stitchCount: effectiveStitchCount,
         stitchCountApproximate: effectiveApproximate,
         stitchesWide: chart.stitchesWide,
@@ -56,12 +55,8 @@ export async function createChart(formData: unknown) {
             projectBin: project.projectBin,
             ipadApp: project.ipadApp,
             needsOnionSkinning: project.needsOnionSkinning,
-            startDate: project.startDate
-              ? new Date(project.startDate)
-              : null,
-            finishDate: project.finishDate
-              ? new Date(project.finishDate)
-              : null,
+            startDate: project.startDate ? new Date(project.startDate) : null,
+            finishDate: project.finishDate ? new Date(project.finishDate) : null,
             ffoDate: project.ffoDate ? new Date(project.ffoDate) : null,
             wantToStartNext: project.wantToStartNext,
             preferredStartSeason: project.preferredStartSeason,
@@ -92,11 +87,7 @@ export async function updateChart(chartId: string, formData: unknown) {
 
     let effectiveStitchCount = chart.stitchCount;
     let effectiveApproximate = chart.stitchCountApproximate;
-    if (
-      effectiveStitchCount === 0 &&
-      chart.stitchesWide > 0 &&
-      chart.stitchesHigh > 0
-    ) {
+    if (effectiveStitchCount === 0 && chart.stitchesWide > 0 && chart.stitchesHigh > 0) {
       effectiveStitchCount = chart.stitchesWide * chart.stitchesHigh;
       effectiveApproximate = true;
     }
@@ -106,6 +97,9 @@ export async function updateChart(chartId: string, formData: unknown) {
       data: {
         name: chart.name,
         designerId: chart.designerId,
+        coverImageUrl: chart.coverImageUrl,
+        coverThumbnailUrl: chart.coverThumbnailUrl,
+        digitalWorkingCopyUrl: chart.digitalFileUrl,
         stitchCount: effectiveStitchCount,
         stitchCountApproximate: effectiveApproximate,
         stitchesWide: chart.stitchesWide,
@@ -125,12 +119,8 @@ export async function updateChart(chartId: string, formData: unknown) {
             projectBin: project.projectBin,
             ipadApp: project.ipadApp,
             needsOnionSkinning: project.needsOnionSkinning,
-            startDate: project.startDate
-              ? new Date(project.startDate)
-              : null,
-            finishDate: project.finishDate
-              ? new Date(project.finishDate)
-              : null,
+            startDate: project.startDate ? new Date(project.startDate) : null,
+            finishDate: project.finishDate ? new Date(project.finishDate) : null,
             ffoDate: project.ffoDate ? new Date(project.ffoDate) : null,
             wantToStartNext: project.wantToStartNext,
             preferredStartSeason: project.preferredStartSeason,
