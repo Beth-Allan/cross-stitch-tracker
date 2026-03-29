@@ -98,9 +98,10 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260328-igi | Fix critical and high auth/security issues from phase 1 code review | 2026-03-28 | cd7eb7f | [260328-igi-fix-critical-and-high-auth-security-issu](./quick/260328-igi-fix-critical-and-high-auth-security-issu/) |
 | 260328-im6 | Fix shell navigation issues and DRY cleanup | 2026-03-28 | 7ba52dc | [260328-im6-fix-shell-navigation-issues-and-dry-clea](./quick/260328-im6-fix-shell-navigation-issues-and-dry-clea/) |
+| 260329-oj1 | Centralize test mocks and create test factories | 2026-03-29 | 00676af | [260329-oj1-centralize-test-mocks-and-create-test-fa](./quick/260329-oj1-centralize-test-mocks-and-create-test-fa/) |
 
 ## Session Continuity
 
-Last session: 2026-03-28
-Stopped at: Chart form rebuild design spec complete, ready for implementation plan
-Resume file: docs/superpowers/specs/2026-03-28-chart-form-rebuild-design.md
+Last session: 2026-03-29
+Stopped at: Completed quick task 260329-oj1 (centralize test mocks)
+Resume file: .planning/quick/260329-oj1-centralize-test-mocks-and-create-test-fa/260329-oj1-SUMMARY.md
