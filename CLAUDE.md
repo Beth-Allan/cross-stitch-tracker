@@ -13,17 +13,19 @@
 - Impeccable audit/polish, code quality infrastructure (Prettier, Vitest, Husky, CI)
 - Phase 2 plans 01-04: schema, R2, validations, CRUD, forms, detail/list pages
 - Chart form rebuild complete (PR #2, 41 tests)
+- CodeRabbit review fixes applied (auth, a11y, validation, uploads, semantic tokens)
+- Four-layer defense system: LinkButton + auth-guard abstractions, ESLint rules, convention docs, path-scoped rules
+- CLAUDE.md restructured (348 → 175 lines), conventions moved to docs/conventions/
 
 ### In Progress
 
 - PR #2 open: https://github.com/Beth-Allan/cross-stitch-tracker/pull/2
-- Code review fixes from CodeRabbit applied
 
 ### Next Up
 
-1. Merge PR #2
-2. Discuss + plan 02-06: Chart detail & gallery DesignOS rebuild
-3. Execute 02-06, then final verification + phase close
+1. Evaluate whether to continue on current stack or start fresh
+2. If continuing: merge PR #2, add failure-mode tests (auth session, upload, a11y)
+3. Discuss + plan 02-06: Chart detail & gallery DesignOS rebuild
 
 ### Blockers
 
