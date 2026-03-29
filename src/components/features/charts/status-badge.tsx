@@ -9,8 +9,7 @@ interface StatusBadgeProps {
 
 export function StatusBadge({ status, size = "sm" }: StatusBadgeProps) {
   const config = STATUS_CONFIG[status];
-  const sizeClasses =
-    size === "sm" ? "text-xs px-2 py-0.5" : "text-sm px-2.5 py-1";
+  const sizeClasses = size === "sm" ? "text-xs px-2 py-0.5" : "text-sm px-2.5 py-1";
 
   return (
     <span
@@ -22,10 +21,7 @@ export function StatusBadge({ status, size = "sm" }: StatusBadgeProps) {
         config.darkBgClass,
       )}
     >
-      <span
-        aria-hidden="true"
-        className={cn("h-1.5 w-1.5 rounded-full", config.dotClass)}
-      />
+      <span aria-hidden="true" className={cn("h-1.5 w-1.5 rounded-full", config.dotClass)} />
       {config.label}
     </span>
   );

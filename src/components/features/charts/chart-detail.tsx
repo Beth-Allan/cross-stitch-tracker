@@ -17,10 +17,7 @@ import {
 import { toast } from "sonner";
 import type { ChartWithProject } from "@/types/chart";
 import { STATUS_CONFIG } from "@/lib/utils/status";
-import {
-  getEffectiveStitchCount,
-  calculateSizeCategory,
-} from "@/lib/utils/size-category";
+import { getEffectiveStitchCount, calculateSizeCategory } from "@/lib/utils/size-category";
 import { deleteChart } from "@/lib/actions/chart-actions";
 import { getPresignedDownloadUrl } from "@/lib/actions/upload-actions";
 import { StatusBadge } from "./status-badge";
@@ -67,9 +64,7 @@ export function ChartDetail({ chart }: ChartDetailProps) {
     chart.stitchesHigh,
   );
   const sizeCategory =
-    effectiveStitchCount > 0
-      ? calculateSizeCategory(effectiveStitchCount)
-      : null;
+    effectiveStitchCount > 0 ? calculateSizeCategory(effectiveStitchCount) : null;
 
   return (
     <div className="space-y-6">
@@ -85,10 +80,7 @@ export function ChartDetail({ chart }: ChartDetailProps) {
       {/* Header section */}
       <div className="flex flex-col gap-6 lg:flex-row">
         {/* Cover image */}
-        <CoverImage
-          coverImageUrl={chart.coverImageUrl}
-          chartName={chart.name}
-        />
+        <CoverImage coverImageUrl={chart.coverImageUrl} chartName={chart.name} />
 
         {/* Metadata */}
         <div className="flex-1 space-y-3">
@@ -97,9 +89,7 @@ export function ChartDetail({ chart }: ChartDetailProps) {
             {chart.name}
           </h1>
           {chart.designer && (
-            <p className="text-sm text-stone-500 dark:text-stone-400">
-              by {chart.designer.name}
-            </p>
+            <p className="text-sm text-stone-500 dark:text-stone-400">by {chart.designer.name}</p>
           )}
           <div className="flex flex-wrap items-center gap-3 text-sm text-stone-600 dark:text-stone-400">
             {effectiveStitchCount > 0 && (
@@ -137,9 +127,7 @@ export function ChartDetail({ chart }: ChartDetailProps) {
       </div>
 
       {/* Status control */}
-      {project && (
-        <StatusControl chartId={chart.id} currentStatus={status} />
-      )}
+      {project && <StatusControl chartId={chart.id} currentStatus={status} />}
 
       {/* Tabs */}
       <Tabs defaultValue="overview">
@@ -183,13 +171,8 @@ function CoverImage({
   return (
     <div className="flex max-h-80 w-full items-center justify-center rounded-lg bg-gradient-to-br from-stone-100 to-stone-200 lg:w-80 dark:from-stone-800 dark:to-stone-900">
       <div className="flex flex-col items-center gap-2 py-16">
-        <Image
-          className="h-8 w-8 text-stone-300 dark:text-stone-600"
-          strokeWidth={1.5}
-        />
-        <span className="text-xs text-stone-400 dark:text-stone-500">
-          No cover image
-        </span>
+        <Image className="h-8 w-8 text-stone-300 dark:text-stone-600" strokeWidth={1.5} />
+        <span className="text-xs text-stone-400 dark:text-stone-500">No cover image</span>
       </div>
     </div>
   );
@@ -197,13 +180,7 @@ function CoverImage({
 
 /* ---- Delete Dialog ---- */
 
-function DeleteChartDialog({
-  chartId,
-  chartName,
-}: {
-  chartId: string;
-  chartName: string;
-}) {
+function DeleteChartDialog({ chartId, chartName }: { chartId: string; chartName: string }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -231,23 +208,15 @@ function DeleteChartDialog({
         <DialogHeader>
           <DialogTitle>Delete Chart</DialogTitle>
           <DialogDescription>
-            This will permanently delete {chartName} and all associated project
-            data. This cannot be undone.
+            This will permanently delete {chartName} and all associated project data. This cannot be
+            undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button
-            variant="ghost"
-            onClick={() => setOpen(false)}
-            autoFocus
-          >
+          <Button variant="ghost" onClick={() => setOpen(false)} autoFocus>
             Keep Chart
           </Button>
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isPending}
-          >
+          <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
             {isPending ? "Deleting..." : "Delete Chart"}
           </Button>
         </DialogFooter>
@@ -267,8 +236,7 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
   );
 
   const showProgress =
-    project &&
-    ["IN_PROGRESS", "ON_HOLD", "FINISHED", "FFO"].includes(project.status);
+    project && ["IN_PROGRESS", "ON_HOLD", "FINISHED", "FFO"].includes(project.status);
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -290,10 +258,7 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
               value={`${formatNumber(Math.max(0, effectiveStitchCount - project.stitchesCompleted))} stitches`}
             />
             {project.startingStitches > 0 && (
-              <DetailRow
-                label="Starting Stitches"
-                value={formatNumber(project.startingStitches)}
-              />
+              <DetailRow label="Starting Stitches" value={formatNumber(project.startingStitches)} />
             )}
           </div>
         </InfoCard>
@@ -309,10 +274,7 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
       {/* Pattern Details */}
       <InfoCard icon={FileText} title="Pattern Details" className="lg:col-span-2">
         <div>
-          <DetailRow
-            label="Format"
-            value={chart.isPaperChart ? "Paper" : "Digital"}
-          />
+          <DetailRow label="Format" value={chart.isPaperChart ? "Paper" : "Digital"} />
           <DetailRow
             label="Kit"
             value={
@@ -324,9 +286,7 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
             }
           />
           <DetailRow label="SAL" value={chart.isSAL ? "Yes" : "No"} />
-          <WorkingCopyRow
-            digitalWorkingCopyUrl={chart.digitalWorkingCopyUrl}
-          />
+          <WorkingCopyRow digitalWorkingCopyUrl={chart.digitalWorkingCopyUrl} />
         </div>
       </InfoCard>
 
@@ -334,14 +294,8 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
       {project && (
         <InfoCard icon={Settings} title="Project Setup" className="lg:col-span-2">
           <div>
-            <DetailRow
-              label="Fabric"
-              value={project.fabricId ?? "Not assigned"}
-            />
-            <DetailRow
-              label="Project Bin"
-              value={project.projectBin ?? "-"}
-            />
+            <DetailRow label="Fabric" value={project.fabricId ?? "Not assigned"} />
+            <DetailRow label="Project Bin" value={project.projectBin ?? "-"} />
             <DetailRow label="iPad App" value={project.ipadApp ?? "-"} />
             <DetailRow
               label="Onion Skinning"
@@ -355,14 +309,8 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
       <InfoCard icon={Calendar} title="Dates" className="lg:col-span-2">
         <div>
           <DetailRow label="Added" value={formatDate(chart.dateAdded)} />
-          <DetailRow
-            label="Started"
-            value={formatDate(project?.startDate)}
-          />
-          <DetailRow
-            label="Finished"
-            value={formatDate(project?.finishDate)}
-          />
+          <DetailRow label="Started" value={formatDate(project?.startDate)} />
+          <DetailRow label="Finished" value={formatDate(project?.finishDate)} />
           <DetailRow label="FFO" value={formatDate(project?.ffoDate)} />
         </div>
       </InfoCard>
@@ -372,11 +320,7 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
 
 /* ---- Working Copy Download ---- */
 
-function WorkingCopyRow({
-  digitalWorkingCopyUrl,
-}: {
-  digitalWorkingCopyUrl: string | null;
-}) {
+function WorkingCopyRow({ digitalWorkingCopyUrl }: { digitalWorkingCopyUrl: string | null }) {
   const [isDownloading, setIsDownloading] = useState(false);
 
   async function handleDownload() {

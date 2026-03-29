@@ -21,11 +21,7 @@ export default async function ChartsPage() {
       </div>
 
       {/* Content */}
-      {charts.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <ChartsList charts={charts} />
-      )}
+      {charts.length === 0 ? <EmptyState /> : <ChartsList charts={charts} />}
     </div>
   );
 }
@@ -34,14 +30,9 @@ function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
       <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800">
-        <Scissors
-          className="h-7 w-7 text-stone-400 dark:text-stone-500"
-          strokeWidth={1.5}
-        />
+        <Scissors className="h-7 w-7 text-stone-400 dark:text-stone-500" strokeWidth={1.5} />
       </div>
-      <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-100">
-        No charts yet
-      </h2>
+      <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-100">No charts yet</h2>
       <p className="mt-1 max-w-sm text-sm text-stone-500 dark:text-stone-400">
         Add your first chart to start tracking your cross-stitch collection.
       </p>
@@ -63,19 +54,19 @@ function ChartsList({ charts }: { charts: ChartWithRelations[] }) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-stone-100 dark:border-stone-800">
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
+            <th className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-stone-400 uppercase dark:text-stone-500">
               Chart
             </th>
-            <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500 sm:table-cell">
+            <th className="hidden px-4 py-3 text-left text-xs font-semibold tracking-wider text-stone-400 uppercase sm:table-cell dark:text-stone-500">
               Designer
             </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
+            <th className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-stone-400 uppercase dark:text-stone-500">
               Status
             </th>
-            <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500 md:table-cell">
+            <th className="hidden px-4 py-3 text-left text-xs font-semibold tracking-wider text-stone-400 uppercase md:table-cell dark:text-stone-500">
               Size
             </th>
-            <th className="hidden px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500 lg:table-cell">
+            <th className="hidden px-4 py-3 text-right text-xs font-semibold tracking-wider text-stone-400 uppercase lg:table-cell dark:text-stone-500">
               Added
             </th>
           </tr>
@@ -97,8 +88,7 @@ function ChartRow({ chart }: { chart: ChartWithRelations }) {
     chart.stitchesWide,
     chart.stitchesHigh,
   );
-  const stitchDisplay =
-    count > 0 ? `${new Intl.NumberFormat().format(count)} stitches` : null;
+  const stitchDisplay = count > 0 ? `${new Intl.NumberFormat().format(count)} stitches` : null;
   const dateAdded = chart.dateAdded.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -108,19 +98,14 @@ function ChartRow({ chart }: { chart: ChartWithRelations }) {
   return (
     <tr className="group transition-colors hover:bg-stone-50 dark:hover:bg-stone-800/50">
       <td className="px-4 py-3">
-        <Link
-          href={`/charts/${chart.id}`}
-          className="flex items-center gap-3"
-        >
+        <Link href={`/charts/${chart.id}`} className="flex items-center gap-3">
           <CoverThumbnail url={chart.coverThumbnailUrl} name={chart.name} />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-stone-900 dark:text-stone-100">
               {chart.name}
             </p>
             {stitchDisplay && (
-              <p className="text-xs text-stone-400 dark:text-stone-500">
-                {stitchDisplay}
-              </p>
+              <p className="text-xs text-stone-400 dark:text-stone-500">{stitchDisplay}</p>
             )}
           </div>
         </Link>
@@ -141,21 +126,13 @@ function ChartRow({ chart }: { chart: ChartWithRelations }) {
         />
       </td>
       <td className="hidden px-4 py-3 text-right lg:table-cell">
-        <span className="text-sm text-stone-500 dark:text-stone-400">
-          {dateAdded}
-        </span>
+        <span className="text-sm text-stone-500 dark:text-stone-400">{dateAdded}</span>
       </td>
     </tr>
   );
 }
 
-function CoverThumbnail({
-  url,
-  name,
-}: {
-  url: string | null;
-  name: string;
-}) {
+function CoverThumbnail({ url, name }: { url: string | null; name: string }) {
   if (url) {
     return (
       <img
@@ -168,10 +145,7 @@ function CoverThumbnail({
 
   return (
     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-800 dark:to-stone-700">
-      <Image
-        className="h-4 w-4 text-stone-400 dark:text-stone-500"
-        strokeWidth={1.5}
-      />
+      <Image className="h-4 w-4 text-stone-400 dark:text-stone-500" strokeWidth={1.5} />
     </div>
   );
 }

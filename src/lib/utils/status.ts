@@ -69,6 +69,4 @@ export const STATUS_CONFIG: Record<
   },
 };
 
-export const PROJECT_STATUSES = Object.keys(
-  STATUS_CONFIG,
-) as ProjectStatus[];
+export const PROJECT_STATUSES = Object.keys(STATUS_CONFIG) as ProjectStatus[];

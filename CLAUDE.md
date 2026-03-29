@@ -64,11 +64,55 @@
   - Pill toggle grid with inline text input for adding new genres
   - Uses relatedTarget blur check to prevent premature cancel
   - Error handling: keeps input open, refocuses on error
+- **Task 7: StitchCountFields, PatternTypeFields, StartPreferenceFields created**
+  - StitchCountFields: W×H dimension inputs + total count + auto-calculate from dimensions + size category badge
+  - PatternTypeFields: native radio group (Digital/Paper) + conditional Formal Kit with colour count + SAL checkbox
+  - StartPreferenceFields: period/year composite selects, fully controlled (no internal state — derives from prop)
+  - Fixed: removed `setState` inside `useEffect` (ESLint rule) → now a pure controlled component
+- **Task 8: Upload components rewired with semantic tokens**
+  - Updated `cover-image-upload.tsx`: border-stone-200 → border-border, border-emerald-500 → border-primary, hardcoded grey icons → text-muted-foreground/50, helper text → text-muted-foreground/70
+  - Updated `file-upload.tsx`: removed unused `currentFileUrl` prop, replaced hardcoded stone colors with semantic tokens (text-muted-foreground, text-foreground, border-border, etc.)
+  - Both files now use design tokens exclusively, no hardcoded Tailwind colors
+- **Task 9: InlineDesignerDialog created**
+  - `src/components/features/charts/inline-designer-dialog.tsx`
+  - Adapted from spec: used `render` prop on `DialogTrigger` (base-ui API, not `asChild`)
+  - Name (required) + website (optional URL) fields, error display, reset on close, retry-on-error UX
+- **Task 10: useChartForm hook created**
+  - `src/components/features/charts/use-chart-form.ts`
+  - Owns all 25+ fields, dirty tracking, beforeunload warning, Zod validation with friendly error map
+  - Inline designer/genre creation, server action submission for both create and edit modes
+  - Fixed: split create/edit branches to resolve union type narrowing issue on `response.chartId`
+  - Type check: clean (only 2 pre-existing errors for missing `chart-form` module — future task)
+- **Task 11: All 8 section components created**
+  - `src/components/features/charts/sections/`: BasicInfoSection, StitchCountSection, GenreSection, PatternTypeSection, ProjectSetupSection, DatesSection, GoalsSection, NotesSection
+  - Each composes form primitives into field groups with SectionHeading dividers
+  - Type check: clean (same 2 pre-existing errors for missing `chart-form` module, none from new files)
+- **Task 12: ChartAddForm surface created**
+  - `src/components/features/charts/chart-add-form.tsx`
+  - Composes all 8 sections with `useChartForm` hook (create mode)
+  - Back link, Fraunces heading, cancel with dirty check, submit with pending spinner
+  - Adapted: `onDigitalFileChange` handler ignores unused `fileName` second arg from section prop contract
+  - Type check: clean (only 2 pre-existing errors for missing old `chart-form` module — resolved in Task 14)
+- **Task 13: ChartEditModal surface created**
+  - `src/components/features/charts/chart-edit-modal.tsx`
+  - shadcn Dialog (base-ui) with Basic Info and Details tabs, controlled via `open`/`onOpenChange` props
+  - Uses `useChartForm` hook in edit mode — same 8 sections, form state persists across tab switches
+  - isDirty guard on close (window.confirm), footer Cancel + Save Changes buttons inside `<form>` for submit
+  - Dialog API: `showCloseButton={false}` + manual X button; `onOpenChange` intercepts close for dirty check
+  - Type check: clean (only 2 pre-existing errors for missing old `chart-form` module)
+- **Task 14: Route pages updated**
+  - `/charts/new` → `ChartAddForm` wired with designers/genres from DB
+  - `/charts/[id]/edit` → `ChartEditModal` wired with chart data, designers, genres
+  - Pre-existing `chart-form` module errors resolved (old module deleted in Task 1)
+- **Task 15: ChartAddForm integration tests complete**
+  - `src/components/features/charts/chart-add-form.test.tsx` — 6 tests, all passing
+  - Installed `@testing-library/user-event@14.5.2` (was missing from devDependencies)
+  - Adaptation: `getByText("Notes")` → `getByRole("heading", { name: "Notes" })` (NotesSection renders both `h2` and `label` with that text)
 
 ### Next Up
 
-1. Task 7: DesignerDialog (inline entity creation modal)
-2. Continue with remaining 11 tasks through full integration tests
+1. **Task 16:** Integration tests — ChartEditModal
+2. **Task 17:** Full build verification (`npm run build`)
 3. Complete 02-05 checkpoint, then phase verification
 
 ### Blockers / Decisions Needed

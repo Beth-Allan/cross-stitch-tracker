@@ -15,12 +15,10 @@ export function DetailRow({ label, value, className }: DetailRowProps) {
         className,
       )}
     >
-      <span className="shrink-0 text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+      <span className="shrink-0 text-xs font-semibold tracking-wider text-stone-500 uppercase dark:text-stone-400">
         {label}
       </span>
-      <span className="text-right text-sm text-stone-700 dark:text-stone-300">
-        {value}
-      </span>
+      <span className="text-right text-sm text-stone-700 dark:text-stone-300">{value}</span>
     </div>
   );
 }

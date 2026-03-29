@@ -7,12 +7,7 @@ interface ProgressBarProps {
   color?: string;
 }
 
-export function ProgressBar({
-  value,
-  max,
-  className,
-  color = "bg-emerald-500",
-}: ProgressBarProps) {
+export function ProgressBar({ value, max, className, color = "bg-emerald-500" }: ProgressBarProps) {
   const percentage = max > 0 ? Math.min(Math.round((value / max) * 100), 100) : 0;
 
   return (
@@ -23,7 +18,7 @@ export function ProgressBar({
           style={{ width: `${percentage}%` }}
         />
       </div>
-      <span className="font-mono text-sm tabular-nums text-stone-600 dark:text-stone-400">
+      <span className="font-mono text-sm text-stone-600 tabular-nums dark:text-stone-400">
         {percentage}%
       </span>
     </div>

@@ -1,10 +1,6 @@
 "use server";
 
-import {
-  PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-} from "@aws-sdk/client-s3";
+import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { nanoid } from "nanoid";
 import sharp from "sharp";
@@ -24,11 +20,7 @@ async function requireAuth() {
   return session.user;
 }
 
-const VALID_CHART_FIELDS = [
-  "coverImageUrl",
-  "coverThumbnailUrl",
-  "digitalWorkingCopyUrl",
-] as const;
+const VALID_CHART_FIELDS = ["coverImageUrl", "coverThumbnailUrl", "digitalWorkingCopyUrl"] as const;
 
 type ChartFileField = (typeof VALID_CHART_FIELDS)[number];
 
@@ -45,9 +37,7 @@ export async function getPresignedUploadUrl(input: unknown) {
     // Validate content type based on category
     if (
       validated.category === "covers" &&
-      !ALLOWED_IMAGE_TYPES.includes(
-        validated.contentType as (typeof ALLOWED_IMAGE_TYPES)[number],
-      )
+      !ALLOWED_IMAGE_TYPES.includes(validated.contentType as (typeof ALLOWED_IMAGE_TYPES)[number])
     ) {
       return {
         success: false as const,
@@ -56,9 +46,7 @@ export async function getPresignedUploadUrl(input: unknown) {
     }
     if (
       validated.category === "files" &&
-      !ALLOWED_FILE_TYPES.includes(
-        validated.contentType as (typeof ALLOWED_FILE_TYPES)[number],
-      )
+      !ALLOWED_FILE_TYPES.includes(validated.contentType as (typeof ALLOWED_FILE_TYPES)[number])
     ) {
       return {
         success: false as const,
@@ -67,9 +55,7 @@ export async function getPresignedUploadUrl(input: unknown) {
     }
 
     // Sanitize filename: remove path separators, limit length
-    const sanitizedName = validated.fileName
-      .replace(/[/\\]/g, "-")
-      .slice(0, 100);
+    const sanitizedName = validated.fileName.replace(/[/\\]/g, "-").slice(0, 100);
     const key = `${validated.category}/${validated.projectId}/${nanoid()}-${sanitizedName}`;
 
     const command = new PutObjectCommand({
@@ -86,8 +72,7 @@ export async function getPresignedUploadUrl(input: unknown) {
   } catch {
     return {
       success: false as const,
-      error:
-        "File storage is not configured. Cover photo and file uploads are unavailable.",
+      error: "File storage is not configured. Cover photo and file uploads are unavailable.",
     };
   }
 }
@@ -95,18 +80,12 @@ export async function getPresignedUploadUrl(input: unknown) {
 /**
  * Step 3: After client uploads to R2, save the key reference in the database.
  */
-export async function confirmUpload(input: {
-  chartId: string;
-  field: string;
-  key: string;
-}) {
+export async function confirmUpload(input: { chartId: string; field: string; key: string }) {
   await requireAuth();
 
   try {
     // Validate field is one of the allowed chart file fields
-    if (
-      !VALID_CHART_FIELDS.includes(input.field as ChartFileField)
-    ) {
+    if (!VALID_CHART_FIELDS.includes(input.field as ChartFileField)) {
       return {
         success: false as const,
         error: `Invalid field. Allowed: ${VALID_CHART_FIELDS.join(", ")}`,
@@ -146,8 +125,7 @@ export async function getPresignedDownloadUrl(key: string) {
   } catch {
     return {
       success: false as const,
-      error:
-        "File storage is not configured. Downloads are unavailable.",
+      error: "File storage is not configured. Downloads are unavailable.",
     };
   }
 }
@@ -176,10 +154,7 @@ export async function deleteFile(key: string) {
  * Generate a 400x400 WebP thumbnail from a cover image stored in R2.
  * Fetches the original, processes with sharp, uploads thumbnail, updates DB.
  */
-export async function generateThumbnail(
-  chartId: string,
-  coverKey: string,
-) {
+export async function generateThumbnail(chartId: string, coverKey: string) {
   await requireAuth();
 
   try {

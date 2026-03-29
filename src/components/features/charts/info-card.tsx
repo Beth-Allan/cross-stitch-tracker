@@ -18,10 +18,7 @@ export function InfoCard({ icon: Icon, title, children, className }: InfoCardPro
       )}
     >
       <div className="flex items-center gap-2 border-b border-stone-100 px-5 py-3.5 dark:border-stone-800">
-        <Icon
-          className="h-4 w-4 text-stone-400 dark:text-stone-500"
-          strokeWidth={1.5}
-        />
+        <Icon className="h-4 w-4 text-stone-400 dark:text-stone-500" strokeWidth={1.5} />
         <h3 className="font-heading text-sm font-semibold text-stone-900 dark:text-stone-100">
           {title}
         </h3>

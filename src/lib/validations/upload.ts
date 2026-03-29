@@ -1,10 +1,6 @@
 import { z } from "zod";
 
-export const ALLOWED_IMAGE_TYPES = [
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-] as const;
+export const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
 
 export const ALLOWED_FILE_TYPES = [
   "image/png",

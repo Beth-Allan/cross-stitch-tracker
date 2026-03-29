@@ -20,9 +20,7 @@ describe("SizeBadge", () => {
     expect(container.textContent).toBe("");
   });
   it("calculates from dimensions when stitchCount is 0", () => {
-    render(
-      <SizeBadge stitchCount={0} stitchesWide={200} stitchesHigh={200} />,
-    );
+    render(<SizeBadge stitchCount={0} stitchesWide={200} stitchesHigh={200} />);
     expect(screen.getByText("Large")).toBeInTheDocument(); // 200*200 = 40000
   });
 });

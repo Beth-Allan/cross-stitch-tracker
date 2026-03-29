@@ -1,10 +1,4 @@
-import type {
-  Chart,
-  Project,
-  Designer,
-  Genre,
-  ProjectStatus,
-} from "@/generated/prisma/client";
+import type { Chart, Project, Designer, Genre, ProjectStatus } from "@/generated/prisma/client";
 import type { SizeCategory } from "@/lib/utils/size-category";
 
 export type ChartWithProject = Chart & {

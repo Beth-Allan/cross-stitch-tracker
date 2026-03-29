@@ -31,9 +31,7 @@ export function StatusControl({ chartId, currentStatus }: StatusControlProps) {
     startTransition(async () => {
       const result = await updateChartStatus(chartId, validStatus);
       if (result.success) {
-        toast.success(
-          `Status changed to ${STATUS_CONFIG[validStatus].label}`,
-        );
+        toast.success(`Status changed to ${STATUS_CONFIG[validStatus].label}`);
       } else {
         setStatus(previousStatus);
         toast.error("Something went wrong. Please try again.");
@@ -43,7 +41,7 @@ export function StatusControl({ chartId, currentStatus }: StatusControlProps) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
+      <span className="text-xs font-semibold tracking-wider text-stone-400 uppercase dark:text-stone-500">
         Status
       </span>
       <Select value={status} onValueChange={handleStatusChange} disabled={isPending}>

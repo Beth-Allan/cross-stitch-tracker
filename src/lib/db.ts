@@ -5,9 +5,7 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefi
 
 function createPrismaClient(): PrismaClient {
   if (!process.env.DATABASE_URL) {
-    throw new Error(
-      "DATABASE_URL environment variable is not set. Check your .env.local file.",
-    );
+    throw new Error("DATABASE_URL environment variable is not set. Check your .env.local file.");
   }
 
   const adapter = new PrismaNeon({

@@ -39,9 +39,7 @@ describe("chart-actions auth guard", () => {
 
   it("updateChartStatus throws Unauthorized when no session", async () => {
     const { updateChartStatus } = await import("./chart-actions");
-    await expect(updateChartStatus("some-id", "IN_PROGRESS")).rejects.toThrow(
-      "Unauthorized",
-    );
+    await expect(updateChartStatus("some-id", "IN_PROGRESS")).rejects.toThrow("Unauthorized");
   });
 
   it("getChart throws Unauthorized when no session", async () => {
