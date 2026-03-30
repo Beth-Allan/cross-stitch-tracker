@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/link-button";
 
 interface ErrorBoundaryProps {
   error: Error;
@@ -27,9 +27,9 @@ export default function DashboardError({ error, reset }: ErrorBoundaryProps) {
             <p className="text-muted-foreground mt-2 text-sm">
               Your session may have expired. Please log in again.
             </p>
-            <Button render={<Link href="/login" />} className="mt-6">
+            <LinkButton href="/login" className="mt-6">
               Go to login
-            </Button>
+            </LinkButton>
           </>
         ) : (
           <>

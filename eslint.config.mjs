@@ -20,6 +20,42 @@ const eslintConfig = defineConfig([
     // Build scripts
     "scripts/**",
   ]),
+  // Project-specific guardrails — prevent patterns we've debugged
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          // Catch <Button render={<Link ... />}> — causes hydration mismatches.
+          // Use <LinkButton> instead. See docs/conventions/base-ui-patterns.md
+          selector:
+            "JSXElement[openingElement.name.name='Button'] JSXAttribute[name.name='render'] JSXElement[openingElement.name.name='Link']",
+          message:
+            'Do not use Button render={<Link>}. Use <LinkButton href="..."> instead. See docs/conventions/base-ui-patterns.md',
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/lib/actions/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              // Force using shared requireAuth from auth-guard.ts
+              // instead of importing auth directly in action files
+              name: "@/lib/auth",
+              message:
+                "Import { requireAuth } from '@/lib/auth-guard' instead. See docs/conventions/auth-patterns.md",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;

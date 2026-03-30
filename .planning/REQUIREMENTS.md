@@ -7,11 +7,11 @@
 
 ### Project Management
 
-- [ ] **PROJ-01**: User can create, view, edit, and delete cross-stitch projects with ~50 metadata fields
-- [ ] **PROJ-02**: User can upload cover photo and view it in gallery/detail views
-- [ ] **PROJ-03**: User can upload and store digital working copies (PDF/image) via presigned R2 URLs
-- [ ] **PROJ-04**: User can set and change project status (Unstarted, Kitting, Kitted, In Progress, On Hold, Finished, FFO)
-- [ ] **PROJ-05**: App auto-calculates size category (Mini/Small/Medium/Large/BAP) from stitch count
+- [x] **PROJ-01**: User can create, view, edit, and delete cross-stitch projects with ~50 metadata fields
+- [x] **PROJ-02**: User can upload cover photo and view it in gallery/detail views
+- [x] **PROJ-03**: User can upload and store digital working copies (PDF/image) via presigned R2 URLs
+- [x] **PROJ-04**: User can set and change project status (Unstarted, Kitting, Kitted, In Progress, On Hold, Finished, FFO)
+- [x] **PROJ-05**: App auto-calculates size category (Mini/Small/Medium/Large/BAP) from stitch count
 - [ ] **PROJ-06**: User can create, edit, and delete designers and link them to projects
 - [ ] **PROJ-07**: User can create, edit, and manage genre tags and apply them to projects
 - [ ] **PROJ-08**: User can add SAL parts (PDF uploads) to a project with evolving stitch counts and supply needs
@@ -113,11 +113,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-03 | Phase 1 | Complete |
 | INFRA-04 | Phase 1 | Complete |
 | INFRA-05 | Phase 1 | Complete |
-| PROJ-01 | Phase 2 | Pending |
-| PROJ-02 | Phase 2 | Pending |
-| PROJ-03 | Phase 2 | Pending |
-| PROJ-04 | Phase 2 | Pending |
-| PROJ-05 | Phase 2 | Pending |
+| PROJ-01 | Phase 2 | Complete |
+| PROJ-02 | Phase 2 | Complete |
+| PROJ-03 | Phase 2 | Complete |
+| PROJ-04 | Phase 2 | Complete |
+| PROJ-05 | Phase 2 | Complete |
 | PROJ-06 | Phase 3 | Pending |
 | PROJ-07 | Phase 3 | Pending |
 | PROJ-08 | Phase 3 | Pending |
