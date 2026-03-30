@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { ProjectStatus } from "@/generated/prisma/client";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
 
 export const chartFormSchema = z.object({
@@ -25,7 +26,9 @@ export const chartFormSchema = z.object({
       path: ["stitchCount"],
     }),
   project: z.object({
-    status: z.enum(PROJECT_STATUSES as [string, ...string[]]).default("UNSTARTED"),
+    status: z
+      .enum(PROJECT_STATUSES as unknown as [ProjectStatus, ...ProjectStatus[]])
+      .default("UNSTARTED"),
     fabricId: z.string().nullable().default(null),
     projectBin: z.string().nullable().default(null),
     ipadApp: z.string().nullable().default(null),
