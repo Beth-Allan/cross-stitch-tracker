@@ -23,15 +23,17 @@
 - All 8 PR #2 review findings fixed (error handling, validation, logging)
 - Second review pass: owner scoping on all chart actions, timezone fix for date-only fields, server-side file size validation, upload chartId fallback, LinkButton rel safety, dialog non-null fix — 73 tests, build clean
 - Prisma 7 schema fix (removed datasource url, CI passing)
+- PR #2 merged, all branches pruned (11 stale branches removed)
 
 ### In Progress
 
-- PR #2 open: https://github.com/Beth-Allan/cross-stitch-tracker/pull/2
+- Nothing — clean slate on main
 
 ### Next Up
 
-1. Push and merge PR #2
-2. Discuss + plan 02-06: Chart detail & gallery DesignOS rebuild
+1. Discuss Phase 2 remaining work (chart detail page + gallery need DesignOS rebuild)
+2. Plan + execute remaining Phase 2 plans
+3. Phase 2 verification
 
 ### Blockers
 

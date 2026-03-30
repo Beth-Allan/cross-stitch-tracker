@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-29T19:30:00.000Z",
+  "timestamp": "2026-03-30T00:30:00.000Z",
   "phase": "02",
   "phase_name": "core-project-management",
   "phase_dir": ".planning/phases/02-core-project-management",
@@ -13,22 +13,24 @@
     {"id": "02-02", "name": "Server Actions (chart CRUD, uploads, designer/genre creation)", "status": "done", "commit": "70859d2"},
     {"id": "02-03", "name": "Chart Form UI (~50 fields, uploads, inline entity creation)", "status": "done", "commit": "039840b"},
     {"id": "02-04", "name": "Chart Detail & List Pages (badges, status control, detail/list views)", "status": "done", "commit": "0b24172"},
-    {"id": "02-05", "name": "Human Verification Checkpoint", "status": "in_progress", "progress": "PR #2 open. UAT found chart detail + gallery need DesignOS alignment. New plan 02-06 needed."}
+    {"id": "02-05-merge", "name": "Merge PR #2 (chart form rebuild + review fixes)", "status": "done", "commit": "c30d920"}
   ],
   "remaining_tasks": [
-    {"id": "02-05-merge", "name": "Merge PR #2 (chart form rebuild)", "status": "not_started"},
-    {"id": "02-06-plan", "name": "Discuss + plan gallery/detail DesignOS rebuild", "status": "not_started"},
-    {"id": "02-06-execute", "name": "Build ChartGallery, ChartCard, ChartListRow, FilterBar, enrich ChartDetail", "status": "not_started"},
+    {"id": "02-06-discuss", "name": "Discuss gallery/detail DesignOS rebuild approach", "status": "not_started"},
+    {"id": "02-06-plan", "name": "Plan ChartGallery, ChartCard, ChartListRow, FilterBar, enrich ChartDetail", "status": "not_started"},
+    {"id": "02-06-execute", "name": "Build gallery/detail DesignOS rebuild", "status": "not_started"},
     {"id": "02-07-verify", "name": "Final human verification + phase close", "status": "not_started"}
   ],
   "blockers": [],
-  "human_actions_pending": ["Review/merge PR #2: https://github.com/Beth-Allan/cross-stitch-tracker/pull/2"],
+  "human_actions_pending": [],
   "decisions": [
     {"decision": "Chart detail and gallery pages need full DesignOS rebuild (02-06)", "rationale": "UAT revealed 4 missing components and significant divergence from design", "phase": "02"},
     {"decision": "Quick-add for Project Bin and iPad App", "rationale": "User requested inline creation matching Designer dropdown pattern", "phase": "02"},
-    {"decision": "Goals & Plans form section may differ from DesignOS", "rationale": "Noted for Phase 8 revisit — acceptable for now", "phase": "02"}
+    {"decision": "Goals & Plans form section may differ from DesignOS", "rationale": "Noted for Phase 8 revisit — acceptable for now", "phase": "02"},
+    {"decision": "Owner scoping added to all chart actions", "rationale": "Second review pass found all reads/writes were unscoped to authenticated user", "phase": "02"},
+    {"decision": "Server-side file size validation added", "rationale": "Client-only check was bypassable — added to upload schema", "phase": "02"}
   ],
   "uncommitted_files": [],
-  "next_action": "1) Merge PR #2 when form testing is satisfactory. 2) /gsd:discuss-phase 2 to discuss gallery/detail rebuild. 3) Plan + execute 02-06. 4) Final verification.",
-  "context_notes": "On branch feature/chart-form-rebuild (23 commits ahead of main). PR #2 open. The chart form rebuild (add form + edit modal) is complete and high-fidelity to DesignOS. But the chart DETAIL page and chart GALLERY/LIST page were built quick-and-functional in Plan 02-04 and never aligned to the DesignOS designs. Four components are completely missing (ChartGallery, ChartCard, ChartListRow, FilterBar) and ChartDetail needs significant enrichment. A new plan 02-06 must be created and executed before Phase 2 can close."
+  "next_action": "1) /gsd:discuss-phase 2 to discuss gallery/detail rebuild. 2) Plan + execute 02-06. 3) Final verification.",
+  "context_notes": "On main branch. PR #2 merged (73 tests, CI green). All stale branches pruned. Plans 01-04 complete. Chart form, CRUD, uploads, auth all working. Chart DETAIL page and GALLERY/LIST page were built quick-and-functional and need DesignOS alignment. Four components missing (ChartGallery, ChartCard, ChartListRow, FilterBar) and ChartDetail needs enrichment."
 }
