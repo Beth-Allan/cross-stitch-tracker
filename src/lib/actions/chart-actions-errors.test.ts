@@ -116,4 +116,28 @@ describe("chart-actions authenticated error paths", () => {
 
     expect(result).toEqual({ success: false, error: "Failed to update chart status" });
   });
+
+  it("getChart returns null and logs on Prisma error", async () => {
+    const { getChart } = await import("./chart-actions");
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockPrisma.chart.findUnique.mockRejectedValueOnce(new Error("DB connection lost"));
+
+    const result = await getChart("chart-1");
+
+    expect(result).toBeNull();
+    expect(consoleSpy).toHaveBeenCalledWith("getChart error:", expect.any(Error));
+    consoleSpy.mockRestore();
+  });
+
+  it("getCharts returns empty array and logs on Prisma error", async () => {
+    const { getCharts } = await import("./chart-actions");
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockPrisma.chart.findMany.mockRejectedValueOnce(new Error("DB connection lost"));
+
+    const result = await getCharts();
+
+    expect(result).toEqual([]);
+    expect(consoleSpy).toHaveBeenCalledWith("getCharts error:", expect.any(Error));
+    consoleSpy.mockRestore();
+  });
 });

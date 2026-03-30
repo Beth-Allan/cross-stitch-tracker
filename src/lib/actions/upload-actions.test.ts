@@ -90,7 +90,7 @@ describe("upload-actions failure modes", () => {
       }
     });
 
-    it("returns error on Zod validation failure (missing fields)", async () => {
+    it("returns validation-specific message on Zod validation failure (not 'storage not configured')", async () => {
       const { getPresignedUploadUrl } = await import("./upload-actions");
 
       const result = await getPresignedUploadUrl({});
@@ -98,7 +98,64 @@ describe("upload-actions failure modes", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(typeof result.error).toBe("string");
+        // Must NOT say "storage not configured" for a validation error
+        expect(result.error).not.toContain("not configured");
       }
+    });
+
+    it("returns generic error and logs console.error on unexpected R2 error", async () => {
+      const { getPresignedUploadUrl } = await import("./upload-actions");
+      const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      vi.mocked(getSignedUrl).mockRejectedValueOnce(new Error("Unexpected S3 timeout"));
+
+      const result = await getPresignedUploadUrl({
+        fileName: "photo.png",
+        contentType: "image/png",
+        category: "covers",
+        projectId: "p1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).not.toContain("not configured");
+        expect(result.error).toBe("Failed to generate upload URL");
+      }
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe("getPresignedDownloadUrl", () => {
+    it("returns 'not configured' error when R2 is not configured", async () => {
+      const { getPresignedDownloadUrl } = await import("./upload-actions");
+      mockGetR2Client.mockImplementation(() => {
+        throw new Error("R2 environment variables not configured");
+      });
+
+      const result = await getPresignedDownloadUrl("some-key");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toContain("not configured");
+      }
+    });
+
+    it("returns generic error and logs on unexpected R2 error", async () => {
+      const { getPresignedDownloadUrl } = await import("./upload-actions");
+      const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      vi.mocked(getSignedUrl).mockRejectedValueOnce(new Error("Unexpected timeout"));
+
+      const result = await getPresignedDownloadUrl("some-key");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).not.toContain("not configured");
+        expect(result.error).toBe("Failed to generate download URL");
+      }
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
     });
   });
 
