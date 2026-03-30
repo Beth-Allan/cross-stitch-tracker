@@ -12,10 +12,15 @@
 - Phase 1 complete: scaffold, design tokens, auth, app shell, 7 pages, PWA
 - Impeccable audit/polish, code quality infrastructure (Prettier, Vitest, Husky, CI)
 - Phase 2 plans 01-04: schema, R2, validations, CRUD, forms, detail/list pages
-- Chart form rebuild complete (PR #2, 41 tests)
+- Chart form rebuild complete (PR #2, 41 tests -> 59 tests with failure-mode coverage)
 - CodeRabbit review fixes applied (auth, a11y, validation, uploads, semantic tokens)
+- Failure-mode tests added: chart action errors, upload failures, form error states (18 new tests)
+- Centralized test mocks + factories in `src/__tests__/mocks/`
+- Quality gates added: TDD, impeccable reviews, design review blocking gate (`.claude/rules/`)
 - Four-layer defense system: LinkButton + auth-guard abstractions, ESLint rules, convention docs, path-scoped rules
 - CLAUDE.md restructured (348 → 175 lines), conventions moved to docs/conventions/
+- 4-agent PR review complete — 8 issues found, fix list saved
+- All 8 PR #2 review findings fixed (error handling, validation, logging) — 71 tests, build clean
 
 ### In Progress
 
@@ -23,9 +28,8 @@
 
 ### Next Up
 
-1. Evaluate whether to continue on current stack or start fresh
-2. If continuing: merge PR #2, add failure-mode tests (auth session, upload, a11y)
-3. Discuss + plan 02-06: Chart detail & gallery DesignOS rebuild
+1. Merge PR #2
+2. Discuss + plan 02-06: Chart detail & gallery DesignOS rebuild
 
 ### Blockers
 
@@ -101,6 +105,8 @@ Detailed conventions live in `docs/conventions/` and are enforced by `.claude/ru
 - **Import test utils from `@/__tests__/test-utils`** — not `@testing-library/react`
 - **Prettier handles formatting** — never manually adjust
 - **Pin exact versions** in package.json (no `^` or `~`)
+- **TDD mandatory** — tests before implementation in all plans (see `.claude/rules/testing-requirements.md`)
+- **Impeccable gates** — polish after UI plans, audit at phase boundaries (see `.claude/rules/quality-gates.md`)
 
 ---
 
