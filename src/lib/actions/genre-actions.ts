@@ -24,5 +24,10 @@ export async function createGenre(formData: unknown) {
 export async function getGenres() {
   await requireAuth();
 
-  return prisma.genre.findMany({ orderBy: { name: "asc" } });
+  try {
+    return await prisma.genre.findMany({ orderBy: { name: "asc" } });
+  } catch (error) {
+    console.error("getGenres error:", error);
+    return [];
+  }
 }

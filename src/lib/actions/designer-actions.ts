@@ -24,5 +24,10 @@ export async function createDesigner(formData: unknown) {
 export async function getDesigners() {
   await requireAuth();
 
-  return prisma.designer.findMany({ orderBy: { name: "asc" } });
+  try {
+    return await prisma.designer.findMany({ orderBy: { name: "asc" } });
+  } catch (error) {
+    console.error("getDesigners error:", error);
+    return [];
+  }
 }

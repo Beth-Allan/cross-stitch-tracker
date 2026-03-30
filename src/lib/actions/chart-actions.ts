@@ -178,17 +178,27 @@ export async function updateChartStatus(chartId: string, status: string) {
 export async function getChart(chartId: string) {
   await requireAuth();
 
-  return prisma.chart.findUnique({
-    where: { id: chartId },
-    include: { project: true, designer: true, genres: true },
-  });
+  try {
+    return await prisma.chart.findUnique({
+      where: { id: chartId },
+      include: { project: true, designer: true, genres: true },
+    });
+  } catch (error) {
+    console.error("getChart error:", error);
+    return null;
+  }
 }
 
 export async function getCharts() {
   await requireAuth();
 
-  return prisma.chart.findMany({
-    include: { project: true, designer: true, genres: true },
-    orderBy: { dateAdded: "desc" },
-  });
+  try {
+    return await prisma.chart.findMany({
+      include: { project: true, designer: true, genres: true },
+      orderBy: { dateAdded: "desc" },
+    });
+  } catch (error) {
+    console.error("getCharts error:", error);
+    return [];
+  }
 }

@@ -74,7 +74,7 @@ describe("upload-actions failure modes", () => {
     it("returns error when R2 is not configured", async () => {
       const { getPresignedUploadUrl } = await import("./upload-actions");
       mockGetR2Client.mockImplementation(() => {
-        throw new Error("R2 not configured");
+        throw new Error("R2 environment variables not configured");
       });
 
       const result = await getPresignedUploadUrl({

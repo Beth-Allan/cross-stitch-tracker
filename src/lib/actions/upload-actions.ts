@@ -5,6 +5,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { nanoid } from "nanoid";
 import sharp from "sharp";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { getR2Client, R2_BUCKET_NAME } from "@/lib/r2";
@@ -25,30 +26,39 @@ type ChartFileField = (typeof VALID_CHART_FIELDS)[number];
 export async function getPresignedUploadUrl(input: unknown) {
   await requireAuth();
 
+  // Validate input separately so Zod errors get their own message
+  let validated;
   try {
-    const validated = uploadRequestSchema.parse(input);
-
-    // Validate content type based on category
-    if (
-      validated.category === "covers" &&
-      !ALLOWED_IMAGE_TYPES.includes(validated.contentType as (typeof ALLOWED_IMAGE_TYPES)[number])
-    ) {
-      return {
-        success: false as const,
-        error: `Invalid image type. Allowed: ${ALLOWED_IMAGE_TYPES.join(", ")}`,
-      };
+    validated = uploadRequestSchema.parse(input);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false as const, error: error.errors[0].message };
     }
-    if (
-      validated.category === "files" &&
-      !ALLOWED_FILE_TYPES.includes(validated.contentType as (typeof ALLOWED_FILE_TYPES)[number])
-    ) {
-      return {
-        success: false as const,
-        error: `Invalid file type. Allowed: ${ALLOWED_FILE_TYPES.join(", ")}`,
-      };
-    }
+    return { success: false as const, error: "Invalid upload request" };
+  }
 
-    // Sanitize filename: remove path separators, limit length
+  // Validate content type based on category
+  if (
+    validated.category === "covers" &&
+    !ALLOWED_IMAGE_TYPES.includes(validated.contentType as (typeof ALLOWED_IMAGE_TYPES)[number])
+  ) {
+    return {
+      success: false as const,
+      error: `Invalid image type. Allowed: ${ALLOWED_IMAGE_TYPES.join(", ")}`,
+    };
+  }
+  if (
+    validated.category === "files" &&
+    !ALLOWED_FILE_TYPES.includes(validated.contentType as (typeof ALLOWED_FILE_TYPES)[number])
+  ) {
+    return {
+      success: false as const,
+      error: `Invalid file type. Allowed: ${ALLOWED_FILE_TYPES.join(", ")}`,
+    };
+  }
+
+  // R2 operations in separate try/catch
+  try {
     const sanitizedName = validated.fileName.replace(/[/\\]/g, "-").slice(0, 100);
     const key = `${validated.category}/${validated.projectId}/${nanoid()}-${sanitizedName}`;
 
@@ -63,11 +73,18 @@ export async function getPresignedUploadUrl(input: unknown) {
     });
 
     return { success: true as const, url, key };
-  } catch {
-    return {
-      success: false as const,
-      error: "File storage is not configured. Cover photo and file uploads are unavailable.",
-    };
+  } catch (error) {
+    console.error("getPresignedUploadUrl R2 error:", error);
+    if (
+      error instanceof Error &&
+      error.message.includes("R2 environment variables not configured")
+    ) {
+      return {
+        success: false as const,
+        error: "File storage is not configured. Cover photo and file uploads are unavailable.",
+      };
+    }
+    return { success: false as const, error: "Failed to generate upload URL" };
   }
 }
 
@@ -116,11 +133,18 @@ export async function getPresignedDownloadUrl(key: string) {
     });
 
     return { success: true as const, url };
-  } catch {
-    return {
-      success: false as const,
-      error: "File storage is not configured. Downloads are unavailable.",
-    };
+  } catch (error) {
+    console.error("getPresignedDownloadUrl R2 error:", error);
+    if (
+      error instanceof Error &&
+      error.message.includes("R2 environment variables not configured")
+    ) {
+      return {
+        success: false as const,
+        error: "File storage is not configured. Downloads are unavailable.",
+      };
+    }
+    return { success: false as const, error: "Failed to generate download URL" };
   }
 }
 
