@@ -21,37 +21,36 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 01 — foundation-infrastructure
+**Current focus:** Phase 02 — core-project-management (forms done, detail/gallery need DesignOS rebuild)
 
 ## Current Position
 
 Phase: 2
-Plan: Not started
-Status: Ready to execute
+Plan: 4/4 complete (plans 01-04 executed; detail page + gallery remain as future plans)
+Status: Executing — PR #2 open with review fixes applied
 Last activity: 2026-03-30 - Completed quick task 260329-p5l: fix PR #2 review findings
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 11% (1/9 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 7
+- Average duration: ~6min
+- Total execution time: ~41min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| Phase 01 | 3 | 12min | 4min |
+| Phase 02 | 4 | 29min | 7min |
 
 **Recent Trend:**
 
-- Last 5 plans: -
-- Trend: -
-
-*Updated after each plan completion*
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
 | Phase 01 P01 | 7min | 2 tasks | 25 files |
 | Phase 01 P02 | 1min | 2 tasks | 9 files |
 | Phase 01 P03 | 4min | 2 tasks | 16 files |

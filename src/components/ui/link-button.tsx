@@ -18,10 +18,21 @@ export function LinkButton({
   size,
   className,
   children,
+  target,
+  rel,
   ...props
 }: LinkButtonProps) {
+  const safeRel =
+    target === "_blank" ? [rel, "noopener noreferrer"].filter(Boolean).join(" ") : rel;
+
   return (
-    <Link href={href} className={buttonVariants({ variant, size, className })} {...props}>
+    <Link
+      href={href}
+      className={buttonVariants({ variant, size, className })}
+      target={target}
+      rel={safeRel}
+      {...props}
+    >
       {children}
     </Link>
   );

@@ -51,6 +51,17 @@ function formatDate(date: Date | null | undefined): string {
   });
 }
 
+/** Format a date-only value (YYYY-MM-DD stored as midnight UTC) without timezone shift. */
+function formatDateOnly(date: Date | null | undefined): string {
+  if (!date) return "-";
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 interface ChartDetailProps {
   chart: ChartWithProject;
 }
@@ -309,9 +320,9 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
       <InfoCard icon={Calendar} title="Dates" className="lg:col-span-2">
         <div>
           <DetailRow label="Added" value={formatDate(chart.dateAdded)} />
-          <DetailRow label="Started" value={formatDate(project?.startDate)} />
-          <DetailRow label="Finished" value={formatDate(project?.finishDate)} />
-          <DetailRow label="FFO" value={formatDate(project?.ffoDate)} />
+          <DetailRow label="Started" value={formatDateOnly(project?.startDate)} />
+          <DetailRow label="Finished" value={formatDateOnly(project?.finishDate)} />
+          <DetailRow label="FFO" value={formatDateOnly(project?.ffoDate)} />
         </div>
       </InfoCard>
     </div>

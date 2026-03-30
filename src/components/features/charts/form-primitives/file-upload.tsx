@@ -52,8 +52,9 @@ export function FileUpload({
         const result = await getPresignedUploadUrl({
           fileName: file.name,
           contentType: file.type,
+          fileSize: file.size,
           category: "files",
-          projectId: chartId,
+          projectId: chartId || "unsaved",
         });
 
         if ("success" in result && !result.success) {

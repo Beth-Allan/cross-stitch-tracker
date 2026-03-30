@@ -53,8 +53,9 @@ export function CoverImageUpload({
         const result = await getPresignedUploadUrl({
           fileName: file.name,
           contentType: file.type,
+          fileSize: file.size,
           category: "covers",
-          projectId: chartId,
+          projectId: chartId || "unsaved",
         });
 
         if ("success" in result && !result.success) {

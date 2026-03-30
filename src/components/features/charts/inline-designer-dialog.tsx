@@ -31,7 +31,7 @@ export function InlineDesignerDialog({
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : uncontrolledOpen;
-  const setOpen = isControlled ? controlledOnOpenChange! : setUncontrolledOpen;
+  const setOpen = isControlled ? (controlledOnOpenChange ?? (() => {})) : setUncontrolledOpen;
 
   const [name, setName] = useState(initialName);
   const [website, setWebsite] = useState("");

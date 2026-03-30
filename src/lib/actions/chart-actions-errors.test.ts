@@ -85,6 +85,8 @@ describe("chart-actions authenticated error paths", () => {
 
   it("updateChart returns error on DB failure", async () => {
     const { updateChart } = await import("./chart-actions");
+    // Ownership check must pass before the update is attempted
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
     mockPrisma.chart.update.mockRejectedValueOnce(new Error("DB connection lost"));
 
     const result = await updateChart("chart-1", validFormData);
@@ -92,13 +94,33 @@ describe("chart-actions authenticated error paths", () => {
     expect(result).toEqual({ success: false, error: "Failed to update chart" });
   });
 
+  it("updateChart returns not found for unowned chart", async () => {
+    const { updateChart } = await import("./chart-actions");
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({ project: { userId: "other-user" } });
+
+    const result = await updateChart("chart-1", validFormData);
+
+    expect(result).toEqual({ success: false, error: "Chart not found" });
+  });
+
   it("deleteChart returns error on DB failure", async () => {
     const { deleteChart } = await import("./chart-actions");
+    // Ownership check must pass before the delete is attempted
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
     mockPrisma.chart.delete.mockRejectedValueOnce(new Error("DB connection lost"));
 
     const result = await deleteChart("chart-1");
 
     expect(result).toEqual({ success: false, error: "Failed to delete chart" });
+  });
+
+  it("deleteChart returns not found for unowned chart", async () => {
+    const { deleteChart } = await import("./chart-actions");
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({ project: { userId: "other-user" } });
+
+    const result = await deleteChart("chart-1");
+
+    expect(result).toEqual({ success: false, error: "Chart not found" });
   });
 
   it("updateChartStatus returns error for invalid status string", async () => {
@@ -110,6 +132,8 @@ describe("chart-actions authenticated error paths", () => {
 
   it("updateChartStatus returns error on DB failure", async () => {
     const { updateChartStatus } = await import("./chart-actions");
+    // Ownership check must pass before the update is attempted
+    mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
     mockPrisma.project.update.mockRejectedValueOnce(new Error("DB connection lost"));
 
     const result = await updateChartStatus("chart-1", "IN_PROGRESS");

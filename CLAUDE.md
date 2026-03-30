@@ -62,7 +62,7 @@ Cross-stitch project management app replacing Notion. Tracks 500+ charts through
 | Auth         | Auth.js v5 beta         |
 | Hosting      | Vercel (PWA)            |
 
-**Full stack details:** [`docs/tech-stack.md`](docs/tech-stack.md)
+**Full-stack details:** [`docs/tech-stack.md`](docs/tech-stack.md)
 
 **IMPORTANT:** These are all bleeding-edge versions. See `.claude/rules/bleeding-edge-libs.md` and check Context7 before using version-specific APIs.
 

@@ -45,6 +45,7 @@ describe("upload-actions failure modes", () => {
       const result = await getPresignedUploadUrl({
         fileName: "test.exe",
         contentType: "application/x-msdownload",
+        fileSize: 1024,
         category: "covers",
         projectId: "p1",
       });
@@ -61,6 +62,7 @@ describe("upload-actions failure modes", () => {
       const result = await getPresignedUploadUrl({
         fileName: "test.exe",
         contentType: "application/x-msdownload",
+        fileSize: 1024,
         category: "files",
         projectId: "p1",
       });
@@ -80,6 +82,7 @@ describe("upload-actions failure modes", () => {
       const result = await getPresignedUploadUrl({
         fileName: "photo.png",
         contentType: "image/png",
+        fileSize: 1024,
         category: "covers",
         projectId: "p1",
       });
@@ -112,6 +115,7 @@ describe("upload-actions failure modes", () => {
       const result = await getPresignedUploadUrl({
         fileName: "photo.png",
         contentType: "image/png",
+        fileSize: 1024,
         category: "covers",
         projectId: "p1",
       });

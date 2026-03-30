@@ -73,9 +73,18 @@ export async function createChart(formData: unknown) {
 }
 
 export async function updateChart(chartId: string, formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    // Verify ownership
+    const existing = await prisma.chart.findUnique({
+      where: { id: chartId },
+      select: { project: { select: { userId: true } } },
+    });
+    if (!existing?.project || existing.project.userId !== user.id) {
+      return { success: false as const, error: "Chart not found" };
+    }
+
     const validated = chartFormSchema.parse(formData);
     const { chart, project } = validated;
 
@@ -138,9 +147,18 @@ export async function updateChart(chartId: string, formData: unknown) {
 }
 
 export async function deleteChart(chartId: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    // Verify ownership
+    const existing = await prisma.chart.findUnique({
+      where: { id: chartId },
+      select: { project: { select: { userId: true } } },
+    });
+    if (!existing?.project || existing.project.userId !== user.id) {
+      return { success: false as const, error: "Chart not found" };
+    }
+
     await prisma.chart.delete({ where: { id: chartId } });
     revalidatePath("/charts");
     return { success: true as const };
@@ -151,10 +169,19 @@ export async function deleteChart(chartId: string) {
 }
 
 export async function updateChartStatus(chartId: string, status: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validatedStatus = z.enum(PROJECT_STATUSES as [string, ...string[]]).parse(status);
+
+    // Scope update to owned projects only
+    const project = await prisma.project.findUnique({
+      where: { chartId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Chart not found" };
+    }
 
     await prisma.project.update({
       where: { chartId },
@@ -176,13 +203,18 @@ export async function updateChartStatus(chartId: string, status: string) {
 }
 
 export async function getChart(chartId: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
-    return await prisma.chart.findUnique({
+    const chart = await prisma.chart.findUnique({
       where: { id: chartId },
       include: { project: true, designer: true, genres: true },
     });
+    // Only return charts owned by the current user
+    if (chart && chart.project && chart.project.userId !== user.id) {
+      return null;
+    }
+    return chart;
   } catch (error) {
     console.error("getChart error:", error);
     return null;
@@ -190,10 +222,11 @@ export async function getChart(chartId: string) {
 }
 
 export async function getCharts() {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     return await prisma.chart.findMany({
+      where: { project: { userId: user.id } },
       include: { project: true, designer: true, genres: true },
       orderBy: { dateAdded: "desc" },
     });

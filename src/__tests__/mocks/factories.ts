@@ -113,7 +113,7 @@ export function createMockPrisma() {
       update: vi.fn(),
       delete: vi.fn(),
     },
-    project: { update: vi.fn() },
+    project: { findUnique: vi.fn(), update: vi.fn() },
     designer: { create: vi.fn(), findMany: vi.fn() },
     genre: { create: vi.fn(), findMany: vi.fn() },
   };
