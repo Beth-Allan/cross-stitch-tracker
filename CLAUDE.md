@@ -5,7 +5,7 @@
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
 **Phase:** 2 in progress — Core Project Management (forms done, detail page + gallery need DesignOS rebuild)
-**Last Updated:** 2026-03-29
+**Last Updated:** 2026-03-30
 
 ### Done
 
@@ -20,7 +20,9 @@
 - Four-layer defense system: LinkButton + auth-guard abstractions, ESLint rules, convention docs, path-scoped rules
 - CLAUDE.md restructured (348 → 175 lines), conventions moved to docs/conventions/
 - 4-agent PR review complete — 8 issues found, fix list saved
-- All 8 PR #2 review findings fixed (error handling, validation, logging) — 71 tests, build clean
+- All 8 PR #2 review findings fixed (error handling, validation, logging)
+- Second review pass: owner scoping on all chart actions, timezone fix for date-only fields, server-side file size validation, upload chartId fallback, LinkButton rel safety, dialog non-null fix — 73 tests, build clean
+- Prisma 7 schema fix (removed datasource url, CI passing)
 
 ### In Progress
 
@@ -28,7 +30,7 @@
 
 ### Next Up
 
-1. Merge PR #2
+1. Push and merge PR #2
 2. Discuss + plan 02-06: Chart detail & gallery DesignOS rebuild
 
 ### Blockers
