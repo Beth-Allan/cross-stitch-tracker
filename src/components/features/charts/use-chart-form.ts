@@ -237,7 +237,8 @@ export function useChartForm({
           }
           onSuccess(initialData!.id);
         }
-      } catch {
+      } catch (error) {
+        console.error("Chart form submission error:", error);
         setErrors({ _form: "An unexpected error occurred" });
       } finally {
         setIsPending(false);

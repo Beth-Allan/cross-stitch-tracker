@@ -1,13 +1,14 @@
 import { z } from "zod";
+import { PROJECT_STATUSES } from "@/lib/utils/status";
 
 export const chartFormSchema = z.object({
   chart: z
     .object({
       name: z.string().trim().min(1, "Chart name is required").max(200, "Chart name too long"),
       designerId: z.string().nullable().default(null),
-      coverImageUrl: z.string().url().nullable().default(null),
-      coverThumbnailUrl: z.string().url().nullable().default(null),
-      digitalFileUrl: z.string().url().nullable().default(null),
+      coverImageUrl: z.string().min(1).nullable().default(null),
+      coverThumbnailUrl: z.string().min(1).nullable().default(null),
+      digitalFileUrl: z.string().min(1).nullable().default(null),
       stitchCount: z.number().int().min(0).default(0),
       stitchCountApproximate: z.boolean().default(false),
       stitchesWide: z.number().int().min(0).default(0),
@@ -24,9 +25,7 @@ export const chartFormSchema = z.object({
       path: ["stitchCount"],
     }),
   project: z.object({
-    status: z
-      .enum(["UNSTARTED", "KITTING", "KITTED", "IN_PROGRESS", "ON_HOLD", "FINISHED", "FFO"])
-      .default("UNSTARTED"),
+    status: z.enum(PROJECT_STATUSES as [string, ...string[]]).default("UNSTARTED"),
     fabricId: z.string().nullable().default(null),
     projectBin: z.string().nullable().default(null),
     ipadApp: z.string().nullable().default(null),

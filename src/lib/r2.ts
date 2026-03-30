@@ -27,4 +27,11 @@ export function getR2Client(): S3Client {
   return _r2Client;
 }
 
-export const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME ?? "cross-stitch-tracker";
+export const R2_BUCKET_NAME = (() => {
+  const bucket = process.env.R2_BUCKET_NAME;
+  if (!bucket) {
+    console.warn("R2_BUCKET_NAME not set, falling back to default 'cross-stitch-tracker'");
+    return "cross-stitch-tracker";
+  }
+  return bucket;
+})();
