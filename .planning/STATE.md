@@ -1,36 +1,46 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
+milestone_name: MVP — Replace Notion
 status: executing
-stopped_at: "PR #2 merged, branches pruned, ready for Phase 2 discuss"
-last_updated: "2026-03-30"
-last_activity: "2026-03-30 - Merged PR #2, cleaned up 11 stale branches"
+stopped_at: "Roadmap restructured to lean MVP (4 milestones, 10 phases). Phase 2 verification next."
+last_updated: "2026-04-07"
+last_activity: "2026-04-07 - Restructured roadmap from 9-phase waterfall to 4-milestone lean MVP"
 progress:
-  total_phases: 9
+  total_phases: 10
   completed_phases: 1
   total_plans: 8
   completed_plans: 7
-  percent: 11
+  percent: 10
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-28)
+See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 02 — core-project-management (forms done, detail/gallery need DesignOS rebuild)
+**Current focus:** Milestone 1 MVP — Phase 2 verification, then Phase 3 (Designer/Genre pages) + Phase 4 (Supplies & Fabric)
 
 ## Current Position
 
+Milestone: 1 (MVP — "Replace Notion")
 Phase: 2
-Plan: 4/4 complete (plans 01-04 executed; detail page + gallery remain as future plans)
-Status: PR #2 merged — ready to discuss remaining Phase 2 plans
-Last activity: 2026-03-30 - Merged PR #2, cleaned up branches
+Plan: 4/4 complete (plans 01-04 executed; 02-05 is human verification)
+Status: Ready for Phase 2 human verification, then Phases 3+4
+Last activity: 2026-04-07 - Roadmap restructured to lean MVP
 
-Progress: [█░░░░░░░░░] 11% (1/9 phases complete)
+Progress: [█░░░░░░░░░] 10% (1/10 phases complete)
+
+## Milestone Structure (restructured 2026-04-07)
+
+| Milestone | Theme | Phases | Status |
+|-----------|-------|--------|--------|
+| 1 | MVP — "Replace Notion" | 1-4 | In Progress |
+| 2 | Browse & Organize | 5-6 | Not started |
+| 3 | Track & Measure | 7-8 | Not started |
+| 4 | Motivation & Planning | 9-10 | Not started |
 
 ## Performance Metrics
 
@@ -66,16 +76,15 @@ Progress: [█░░░░░░░░░] 11% (1/9 phases complete)
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Roadmap]: Fine granularity (9 phases) derived from 34 requirements across 9 categories
-- [Roadmap]: Phases 3, 4, 5 are parallel-capable (all depend on Phase 2, not each other)
+- [Roadmap 2026-04-07]: Restructured from 9-phase waterfall to 4-milestone lean MVP. CRUD + supplies + fabric → deploy → iterate.
+- [Roadmap 2026-04-07]: Designer/genre pages in MVP (Phase 3), not just inline creation
+- [Roadmap 2026-04-07]: Fabric bundled with supplies (Phase 4). Pre-seeded DMC catalog in MVP.
+- [Roadmap 2026-04-07]: Sessions/stats come AFTER browsing/dashboards (Milestone 3). Kitting auto-calc + SAL deferred.
+- [Roadmap]: Phases 3 and 4 are parallel-capable (both depend on Phase 2, not each other)
 - [Research]: Next.js 16, Prisma 7, Tailwind v4, Auth.js v5 beta, Zod 4 — updated from original plan
 - [Phase 01]: Zod 3.24.4 stable (v4 still beta), Prisma 7 imports from generated/prisma/client, shadcn v4.1.1 adds @base-ui/react
-- [Phase 01]: No new dependencies for auth -- all packages (next-auth, bcryptjs, zod) installed in Plan 01
 - [Phase 01]: AppShell is Server Component; Sidebar/TopBar/UserMenu are Client Components (server-client split)
-- [Quick 260328-im6]: Used isRedirectError for proper redirect detection in logout try-catch
-- [Infra]: Code quality stack (Prettier, Vitest+RTL, Husky, CI pipeline, branch protection) established before Phase 2
 - [Phase 02]: Lazy R2 singleton to avoid crash when env vars not configured
-- [Phase 02]: Migration SQL generated without live DB -- will apply when Neon is connected
 - [Phase 02]: requireAuth helper returns session.user directly for type-safe access in Server Actions
 - [Phase 02]: Upload actions gracefully degrade when R2 not configured (return error, don't crash)
 - [Phase 02]: Scrolling sections (not tabs) for chart form layout; stub files for parallel plan dependencies
@@ -88,7 +97,9 @@ None yet.
 
 ### Blockers/Concerns
 
-- Research flags Phase 6 (statistics) for TypedSQL/CTE research before planning
+- R2 not configured — uploads degrade gracefully
+- `.env.local` bcrypt hashes must escape `$` as `\$`
+- Research flags Phase 8 (sessions/statistics) for TypedSQL/CTE research before planning
 - TanStack Table + React Compiler compatibility needs monitoring
 
 ### Quick Tasks Completed
@@ -103,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30
-Stopped at: PR #2 merged, branches pruned, ready for Phase 2 discuss (detail page + gallery DesignOS rebuild)
+Last session: 2026-04-07
+Stopped at: Roadmap restructured. Next: Phase 2 human verification (02-05), then discuss Phase 3 + Phase 4.
 Resume file: None

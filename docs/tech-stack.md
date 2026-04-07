@@ -73,18 +73,18 @@
 
 ## Alternatives Considered
 
-| Recommended               | Alternative          | When to Use Alternative                                                                                                                                                                              |
-| ------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Next.js 16                | Next.js 15           | Never for greenfield. v15 is Maintenance LTS (ends Oct 2026). Breaking change: v16 removed sync request APIs that v15 deprecated.                                                                    |
-| Prisma 7                  | Drizzle ORM          | If you need raw SQL control or have performance-critical queries. Prisma's readability and auto-generated types are more valuable for this project's complex relational model.                       |
-| @dnd-kit/core 6.x         | @dnd-kit/react 0.x   | When @dnd-kit/react reaches 1.0 stable. Currently pre-1.0 with minimal adoption.                                                                                                                     |
-| @dnd-kit/core 6.x         | react-beautiful-dnd  | Never. Deprecated and unmaintained since 2024.                                                                                                                                                       |
-| Serwist                   | next-pwa             | Never. next-pwa is unmaintained (last update 2+ years ago). Serwist is its maintained successor.                                                                                                     |
-| Serwist                   | Next.js built-in PWA | If you only need manifest + installability without service workers. Next.js has basic PWA support without external deps, but Serwist is needed for caching strategies and offline support (Phase 5). |
-| Recharts 3.x              | Victory / Nivo       | If you need more chart types. Recharts covers bar, line, pie, area -- sufficient for stitch statistics.                                                                                              |
-| Tailwind v4               | Tailwind v3          | Never for new projects. v4 is faster, simpler (CSS-native config), and the current version.                                                                                                          |
-| Custom components + Radix | shadcn/ui            | See detailed analysis below.                                                                                                                                                                         |
-| bcryptjs                  | bcrypt (native)      | If you control the server environment. bcryptjs is pure JS -- works everywhere including Vercel Edge, no native compilation issues.                                                                  |
+| Recommended               | Alternative          | When to Use Alternative                                                                                                                                                                               |
+| ------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Next.js 16                | Next.js 15           | Never for greenfield. v15 is Maintenance LTS (ends Oct 2026). Breaking change: v16 removed sync request APIs that v15 deprecated.                                                                     |
+| Prisma 7                  | Drizzle ORM          | If you need raw SQL control or have performance-critical queries. Prisma's readability and auto-generated types are more valuable for this project's complex relational model.                        |
+| @dnd-kit/core 6.x         | @dnd-kit/react 0.x   | When @dnd-kit/react reaches 1.0 stable. Currently pre-1.0 with minimal adoption.                                                                                                                      |
+| @dnd-kit/core 6.x         | react-beautiful-dnd  | Never. Deprecated and unmaintained since 2024.                                                                                                                                                        |
+| Serwist                   | next-pwa             | Never. next-pwa is unmaintained (last update 2+ years ago). Serwist is its maintained successor.                                                                                                      |
+| Serwist                   | Next.js built-in PWA | If you only need manifest + installability without service workers. Next.js has basic PWA support without external deps, but Serwist is needed for caching strategies and offline support (post-MVP). |
+| Recharts 3.x              | Victory / Nivo       | If you need more chart types. Recharts covers bar, line, pie, area -- sufficient for stitch statistics.                                                                                               |
+| Tailwind v4               | Tailwind v3          | Never for new projects. v4 is faster, simpler (CSS-native config), and the current version.                                                                                                           |
+| Custom components + Radix | shadcn/ui            | See detailed analysis below.                                                                                                                                                                          |
+| bcryptjs                  | bcrypt (native)      | If you control the server environment. bcryptjs is pure JS -- works everywhere including Vercel Edge, no native compilation issues.                                                                   |
 
 ## shadcn/ui Decision
 

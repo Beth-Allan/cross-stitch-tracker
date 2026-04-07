@@ -14,42 +14,48 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 (None yet — ship to validate)
 
-### Active
+### Active — MVP (Milestone 1: Phases 1-4)
 
-- [ ] Full chart/project CRUD with rich metadata (~50 fields), cover photos, digital working copy storage
-- [ ] Customizable status system with 7 statuses (Unstarted, Kitting, Kitted, In Progress, On Hold, Finished, FFO)
-- [ ] Auto-calculated kitted status and kitting progress indicators
-- [ ] SAL support (multi-part charts, evolving stitch counts and supply needs)
-- [ ] Designer CRUD with stats and detail views
-- [ ] Genre management (user-addable tags)
-- [ ] Size category auto-calculation from stitch count (Mini/Small/Medium/Large/BAP)
+- [x] App shell with MainNav, TopBar, UserMenu
+- [x] Auth.js single-user authentication
+- [x] Basic responsive design (Mac browser + iPhone)
+- [x] PWA installable (home screen icon, full-screen launch)
+- [x] Full chart/project CRUD with rich metadata (~50 fields), cover photos, digital working copy storage
+- [x] Customizable status system with 7 statuses (Unstarted, Kitting, Kitted, In Progress, On Hold, Finished, FFO)
+- [x] Size category auto-calculation from stitch count (Mini/Small/Medium/Large/BAP)
+- [ ] Designer CRUD with dedicated management pages
+- [ ] Genre management with dedicated management pages
 - [ ] Pre-seeded DMC thread catalog (~500 colors with hex swatches)
-- [ ] Thread, bead, and specialty item databases with brand management
+- [ ] Thread, bead, and specialty item databases (essentials)
 - [ ] Project-to-supply linking with per-project quantities (three separate junction tables)
+- [ ] Fabric CRUD with size auto-calculation
 - [ ] Auto-generated shopping lists grouped by project with fulfillment tracking
-- [ ] Quick stitch session logging (date, project, count, optional photo, optional time)
-- [ ] Auto-updating project progress from logged sessions
-- [ ] Comprehensive statistics engine (daily/weekly/monthly/yearly metrics)
-- [ ] Monthly stitch bar charts and stitching calendar view
-- [ ] Year in Review tab with 8 stat sections and year selector
-- [ ] Fabric CRUD with brand management and size auto-calculation
-- [ ] Series/collection management with completion tracking
-- [ ] Storage location management
+
+### Active — Post-MVP (Milestones 2-4)
+
 - [ ] Gallery card system with 3 status-specific layouts (WIP, Unstarted, Finished)
 - [ ] Reusable advanced filter bar with configurable dimensions and dismissible chips
 - [ ] Gallery/list/table view modes across all browsing contexts
+- [ ] Series/collection management with completion tracking
+- [ ] Storage location management
 - [ ] Main Dashboard (recently added, currently stitching, buried treasures, spotlight)
 - [ ] Pattern Dive (deep library browser with filtering, fabric requirements, storage views)
+- [ ] Quick stitch session logging (date, project, count, optional photo, optional time)
+- [ ] Auto-updating project progress from logged sessions
+- [ ] Comprehensive statistics engine (daily/weekly/monthly/yearly metrics)
 - [ ] Project Dashboard (active work tracking with goals and milestones)
 - [ ] Shopping Cart dashboard (aggregated supply and fabric needs)
+- [ ] Monthly stitch bar charts and stitching calendar view
+- [ ] Year in Review tab with 8 stat sections and year selector
 - [ ] Goal tracking (project-specific and global, milestone targets, frequency goals, deadlines)
 - [ ] Scheduling plans (project start dates, recurring stitching days, seasonal focus)
 - [ ] Multi-style rotation management (Focus+Rotate, Milestone, Daily, Round Robin, Random, Seasonal)
 - [ ] Achievement trophy case with auto-tracked milestones, streaks, and records
-- [ ] App shell with MainNav, TopBar, UserMenu
-- [ ] Auth.js single-user authentication
-- [ ] Basic responsive design (Mac browser + iPhone)
-- [ ] PWA installable (home screen icon, full-screen launch)
+
+### Deferred (no phase assigned)
+
+- [ ] Auto-calculated kitted status and kitting progress indicators (8 conditions)
+- [ ] SAL support (multi-part charts, evolving stitch counts and supply needs)
 
 ### Out of Scope
 
@@ -99,12 +105,18 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Design is source of truth over original plan | Scope evolved during design process — 7 sections reflect current vision | — Pending |
-| Section 8 dropped from MVP | PWA offline, multi-user, import/export, share cards all deferred | — Pending |
-| Year in Review in Section 3 (not separate) | Fits naturally with stats; no need for standalone section | — Pending |
-| Gallery Cards as shared section (5) | Reusable across dashboards and Pattern Dive — avoids duplication | — Pending |
-| Goals & Plans added as Section 7 | Rotation management, achievements, scheduling grew during design | — Pending |
-| Fine granularity (8-12 phases) | Complex project with 7 design sections — fine phases prevent overwhelm | — Pending |
+| Design is source of truth over original plan | Scope evolved during design process — 7 sections reflect current vision | Confirmed |
+| Section 8 dropped from MVP | PWA offline, multi-user, import/export, share cards all deferred | Confirmed |
+| Year in Review in Section 3 (not separate) | Fits naturally with stats; no need for standalone section | Confirmed |
+| Gallery Cards as shared section (5) | Reusable across dashboards and Pattern Dive — avoids duplication | Confirmed |
+| Goals & Plans added as Section 7 | Rotation management, achievements, scheduling grew during design | Confirmed |
+| **MVP restructure (2026-04-07)** | **Original 9-phase waterfall too slow to deploy. Regroup to 4 milestones, 10 phases. MVP = CRUD + supplies + fabric, then deploy. Post-MVP features prioritized by real usage.** | **Active** |
+| Designer/genre pages in MVP | User wants proper management from the start, not just inline creation | Active |
+| Fabric bundled with supplies (Phase 4) | Both are "stuff linked to projects"; fabric needed for kitting assessment | Active |
+| Pre-seeded DMC catalog in MVP | Search-and-select is the Notion-beater, not manual entry | Active |
+| Sessions after browsing/dashboards | Collection-level stats don't need sessions; activity stats do | Active |
+| Kitting auto-calc deferred | 8-condition kitting status is post-MVP; MVP tracks supplies but doesn't auto-compute "kitted" | Active |
+| SAL support deferred | Multi-part chart uploads add complexity; core chart CRUD is sufficient for MVP | Active |
 
 ## Evolution
 
@@ -124,4 +136,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-28 after initialization*
+*Last updated: 2026-04-07 after MVP restructure*

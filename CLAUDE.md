@@ -4,26 +4,17 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Phase:** 2 in progress — Core Project Management (forms done, detail page + gallery need DesignOS rebuild)
-**Last Updated:** 2026-03-30
+**Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 2 in progress
+**Last Updated:** 2026-04-07
+**Roadmap:** Restructured to 4 milestones / 10 phases (was 9 sequential phases)
 
 ### Done
 
 - Phase 1 complete: scaffold, design tokens, auth, app shell, 7 pages, PWA
-- Impeccable audit/polish, code quality infrastructure (Prettier, Vitest, Husky, CI)
 - Phase 2 plans 01-04: schema, R2, validations, CRUD, forms, detail/list pages
-- Chart form rebuild complete (PR #2, 41 tests -> 59 tests with failure-mode coverage)
-- CodeRabbit review fixes applied (auth, a11y, validation, uploads, semantic tokens)
-- Failure-mode tests added: chart action errors, upload failures, form error states (18 new tests)
-- Centralized test mocks + factories in `src/__tests__/mocks/`
-- Quality gates added: TDD, impeccable reviews, design review blocking gate (`.claude/rules/`)
-- Four-layer defense system: LinkButton + auth-guard abstractions, ESLint rules, convention docs, path-scoped rules
-- CLAUDE.md restructured (348 → 175 lines), conventions moved to docs/conventions/
-- 4-agent PR review complete — 8 issues found, fix list saved
-- All 8 PR #2 review findings fixed (error handling, validation, logging)
-- Second review pass: owner scoping on all chart actions, timezone fix for date-only fields, server-side file size validation, upload chartId fallback, LinkButton rel safety, dialog non-null fix — 73 tests, build clean
-- Prisma 7 schema fix (removed datasource url, CI passing)
-- PR #2 merged, all branches pruned (11 stale branches removed)
+- Code quality infrastructure (Prettier, Vitest, Husky, CI, 73 tests)
+- PR #2 merged with full review cycle (CodeRabbit + 4-agent review + fixes)
+- Roadmap restructured to lean MVP (2026-04-07): CRUD + supplies + fabric → deploy → iterate
 
 ### In Progress
 
@@ -31,9 +22,10 @@
 
 ### Next Up
 
-1. Discuss Phase 2 remaining work (chart detail page + gallery need DesignOS rebuild)
-2. Plan + execute remaining Phase 2 plans
-3. Phase 2 verification
+1. Phase 2 human verification (02-05-PLAN.md — test full chart lifecycle)
+2. Discuss + plan Phase 3 (Designer & Genre pages)
+3. Discuss + plan Phase 4 (Supplies & Fabric — parallel with Phase 3)
+4. Deploy MVP to Vercel after Phase 4
 
 ### Blockers
 

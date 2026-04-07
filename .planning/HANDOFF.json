@@ -1,11 +1,11 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-30T00:30:00.000Z",
+  "timestamp": "2026-04-07T23:10:15.608Z",
   "phase": "02",
   "phase_name": "core-project-management",
   "phase_dir": ".planning/phases/02-core-project-management",
   "plan": 5,
-  "task": 1,
+  "task": 0,
   "total_tasks": 1,
   "status": "paused",
   "completed_tasks": [
@@ -13,24 +13,41 @@
     {"id": "02-02", "name": "Server Actions (chart CRUD, uploads, designer/genre creation)", "status": "done", "commit": "70859d2"},
     {"id": "02-03", "name": "Chart Form UI (~50 fields, uploads, inline entity creation)", "status": "done", "commit": "039840b"},
     {"id": "02-04", "name": "Chart Detail & List Pages (badges, status control, detail/list views)", "status": "done", "commit": "0b24172"},
-    {"id": "02-05-merge", "name": "Merge PR #2 (chart form rebuild + review fixes)", "status": "done", "commit": "c30d920"}
+    {"id": "02-05-merge", "name": "Merge PR #2 (chart form rebuild + review fixes)", "status": "done", "commit": "c30d920"},
+    {"id": "roadmap", "name": "Roadmap restructure to lean MVP (4 milestones, 10 phases)", "status": "done", "commit": "uncommitted"}
   ],
   "remaining_tasks": [
-    {"id": "02-06-discuss", "name": "Discuss gallery/detail DesignOS rebuild approach", "status": "not_started"},
-    {"id": "02-06-plan", "name": "Plan ChartGallery, ChartCard, ChartListRow, FilterBar, enrich ChartDetail", "status": "not_started"},
-    {"id": "02-06-execute", "name": "Build gallery/detail DesignOS rebuild", "status": "not_started"},
-    {"id": "02-07-verify", "name": "Final human verification + phase close", "status": "not_started"}
+    {"id": "cleanup", "name": "Migrate docs/conventions/ to .claude/rules/ with glob patterns", "status": "not_started"},
+    {"id": "02-05", "name": "Phase 2 human verification (test chart lifecycle in browser)", "status": "not_started"},
+    {"id": "03-discuss", "name": "Discuss + plan Phase 3 (Designer & Genre pages)", "status": "not_started"},
+    {"id": "04-discuss", "name": "Discuss + plan Phase 4 (Supplies & Fabric)", "status": "not_started"}
   ],
-  "blockers": [],
-  "human_actions_pending": [],
+  "blockers": [
+    {"description": "R2 not configured — uploads degrade gracefully", "type": "external", "workaround": "Upload tests skip if R2 env vars not set"},
+    {"description": ".env.local bcrypt hashes must escape $ as \\$", "type": "technical", "workaround": "Documented in CLAUDE.md"}
+  ],
+  "human_actions_pending": [
+    {"action": "Run Phase 2 human verification (02-05-PLAN.md)", "context": "Test full chart CRUD lifecycle in browser before marking Phase 2 complete", "blocking": true}
+  ],
   "decisions": [
-    {"decision": "Chart detail and gallery pages need full DesignOS rebuild (02-06)", "rationale": "UAT revealed 4 missing components and significant divergence from design", "phase": "02"},
-    {"decision": "Quick-add for Project Bin and iPad App", "rationale": "User requested inline creation matching Designer dropdown pattern", "phase": "02"},
-    {"decision": "Goals & Plans form section may differ from DesignOS", "rationale": "Noted for Phase 8 revisit — acceptable for now", "phase": "02"},
-    {"decision": "Owner scoping added to all chart actions", "rationale": "Second review pass found all reads/writes were unscoped to authenticated user", "phase": "02"},
-    {"decision": "Server-side file size validation added", "rationale": "Client-only check was bypassable — added to upload schema", "phase": "02"}
+    {"decision": "MVP restructure: 4 milestones, 10 phases", "rationale": "Ship lean MVP faster — CRUD + supplies + fabric, then deploy and iterate", "phase": "all"},
+    {"decision": "Designer/genre pages in MVP (Phase 3)", "rationale": "User wants proper management from the start", "phase": "03"},
+    {"decision": "Fabric bundled with supplies (Phase 4)", "rationale": "Both are stuff linked to projects; fabric needed for kitting assessment", "phase": "04"},
+    {"decision": "Pre-seeded DMC catalog in MVP", "rationale": "Search-and-select is the Notion-beater", "phase": "04"},
+    {"decision": "Sessions after browsing/dashboards", "rationale": "Collection-level stats don't need sessions; activity stats do", "phase": "08"},
+    {"decision": "Kitting auto-calc + SAL deferred", "rationale": "Complexity not needed for MVP data entry", "phase": "deferred"},
+    {"decision": "docs/conventions/ should migrate to .claude/rules/", "rationale": "Rules auto-load via globs; docs require manual dispatch table in CLAUDE.md", "phase": "cleanup"}
   ],
-  "uncommitted_files": [],
-  "next_action": "1) /gsd:discuss-phase 2 to discuss gallery/detail rebuild. 2) Plan + execute 02-06. 3) Final verification.",
-  "context_notes": "On main branch. PR #2 merged (73 tests, CI green). All stale branches pruned. Plans 01-04 complete. Chart form, CRUD, uploads, auth all working. Chart DETAIL page and GALLERY/LIST page were built quick-and-functional and need DesignOS alignment. Four components missing (ChartGallery, ChartCard, ChartListRow, FilterBar) and ChartDetail needs enrichment."
+  "uncommitted_files": [
+    "CLAUDE.md",
+    ".planning/ROADMAP.md",
+    ".planning/REQUIREMENTS.md",
+    ".planning/PROJECT.md",
+    ".planning/STATE.md",
+    ".planning/DESIGN-REFERENCE.md",
+    ".claude/rules/ui-design-reference.md",
+    "docs/tech-stack.md"
+  ],
+  "next_action": "Commit roadmap restructure, then migrate docs/conventions/ to .claude/rules/, then Phase 2 human verification, then discuss Phases 3+4",
+  "context_notes": "Roadmap restructure complete but uncommitted. All 8 governing/reference files updated with new phase numbers. 40 requirement IDs verified (37 mapped, 3 deferred). Build passes. GSD plugin files also have unstaged changes from a separate update — don't mix with roadmap commit."
 }

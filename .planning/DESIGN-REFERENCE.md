@@ -12,7 +12,7 @@ Every UI component in this project has a DesignOS reference in `product-plan/sec
 
 ---
 
-## project-management (Phase 2)
+## project-management (Phases 2-3)
 
 ### Components
 - `product-plan/sections/project-management/components/ChartAddForm.tsx` — full-page add form
@@ -38,7 +38,7 @@ Every UI component in this project has a DesignOS reference in `product-plan/sec
 
 ---
 
-## supply-tracking-and-shopping (Phase 3)
+## supply-tracking-and-shopping (Phase 4)
 
 ### Components
 - `product-plan/sections/supply-tracking-and-shopping/components/SupplyCatalog.tsx`
@@ -59,7 +59,7 @@ Every UI component in this project has a DesignOS reference in `product-plan/sec
 
 ---
 
-## stitching-sessions-and-statistics (Phase 4)
+## stitching-sessions-and-statistics (Phases 8-9)
 
 ### Components
 - `product-plan/sections/stitching-sessions-and-statistics/components/StitchingDashboard.tsx`
@@ -86,7 +86,7 @@ Every UI component in this project has a DesignOS reference in `product-plan/sec
 
 ---
 
-## fabric-series-and-reference-data (Phase 5)
+## fabric-series-and-reference-data (Phases 3-4, 6)
 
 ### Components
 - `product-plan/sections/fabric-series-and-reference-data/components/FabricCatalog.tsx`
@@ -112,7 +112,7 @@ Every UI component in this project has a DesignOS reference in `product-plan/sec
 
 ---
 
-## gallery-cards-and-advanced-filtering (Phase 6)
+## gallery-cards-and-advanced-filtering (Phase 5)
 
 ### Components
 - `product-plan/sections/gallery-cards-and-advanced-filtering/components/GalleryCard.tsx`
@@ -130,7 +130,7 @@ Every UI component in this project has a DesignOS reference in `product-plan/sec
 
 ---
 
-## dashboards-and-views (Phase 7)
+## dashboards-and-views (Phases 7-8)
 
 ### Components
 - `product-plan/sections/dashboards-and-views/components/MainDashboard.tsx`
@@ -150,7 +150,7 @@ Every UI component in this project has a DesignOS reference in `product-plan/sec
 
 ---
 
-## goals-and-plans (Phase 8)
+## goals-and-plans (Phase 10)
 
 ### Components
 - `product-plan/sections/goals-and-plans/components/GoalsAndPlans.tsx`
