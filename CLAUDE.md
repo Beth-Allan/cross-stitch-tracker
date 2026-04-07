@@ -141,6 +141,8 @@ npx prisma migrate dev   # Apply schema changes
 npx prisma generate      # Regenerate client
 ```
 
+Prisma MCP tools are also available in-conversation: `Prisma-Studio`, `migrate-dev`, `migrate-reset`, `migrate-status` — use these instead of CLI when working interactively.
+
 ---
 
 ## Branching
