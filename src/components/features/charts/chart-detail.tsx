@@ -8,7 +8,6 @@ import {
   Calendar,
   FileText,
   Image,
-  Package,
   Pencil,
   Scissors,
   Settings,
@@ -36,7 +35,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 function formatNumber(n: number): string {
   return new Intl.NumberFormat().format(n);
@@ -82,7 +80,7 @@ export function ChartDetail({ chart }: ChartDetailProps) {
       {/* Back link */}
       <Link
         href="/charts"
-        className="inline-flex items-center gap-1.5 text-sm text-stone-500 transition-colors hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300"
+        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
       >
         <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
         Charts
@@ -96,13 +94,11 @@ export function ChartDetail({ chart }: ChartDetailProps) {
         {/* Metadata */}
         <div className="flex-1 space-y-3">
           <StatusBadge status={status} size="md" />
-          <h1 className="font-heading text-2xl font-semibold text-stone-900 dark:text-stone-100">
-            {chart.name}
-          </h1>
+          <h1 className="font-heading text-foreground text-2xl font-semibold">{chart.name}</h1>
           {chart.designer && (
-            <p className="text-sm text-stone-500 dark:text-stone-400">by {chart.designer.name}</p>
+            <p className="text-muted-foreground text-sm">Designer: {chart.designer.name}</p>
           )}
-          <div className="flex flex-wrap items-center gap-3 text-sm text-stone-600 dark:text-stone-400">
+          <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-sm">
             {effectiveStitchCount > 0 && (
               <span>
                 {approximate && "~"}
@@ -111,7 +107,7 @@ export function ChartDetail({ chart }: ChartDetailProps) {
             )}
             {chart.stitchesWide > 0 && chart.stitchesHigh > 0 && (
               <span>
-                {chart.stitchesWide} x {chart.stitchesHigh}
+                {chart.stitchesWide}w × {chart.stitchesHigh}h
               </span>
             )}
             {sizeCategory && (
@@ -122,9 +118,7 @@ export function ChartDetail({ chart }: ChartDetailProps) {
               />
             )}
           </div>
-          <p className="text-xs text-stone-400 dark:text-stone-500">
-            Added {formatDate(chart.dateAdded)}
-          </p>
+          <p className="text-muted-foreground/70 text-xs">Added {formatDate(chart.dateAdded)}</p>
 
           {/* Action buttons */}
           <div className="flex items-center gap-2 pt-2">
@@ -140,22 +134,8 @@ export function ChartDetail({ chart }: ChartDetailProps) {
       {/* Status control */}
       {project && <StatusControl chartId={chart.id} currentStatus={status} />}
 
-      {/* Tabs */}
-      <Tabs defaultValue="overview">
-        <TabsList variant="line">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="supplies" disabled>
-            Supplies
-          </TabsTrigger>
-          <TabsTrigger value="sessions" disabled>
-            Sessions
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="pt-6">
-          <OverviewTab chart={chart} />
-        </TabsContent>
-      </Tabs>
+      {/* Overview */}
+      <OverviewTab chart={chart} />
     </div>
   );
 }
@@ -180,10 +160,10 @@ function CoverImage({
   }
 
   return (
-    <div className="flex max-h-80 w-full items-center justify-center rounded-lg bg-gradient-to-br from-stone-100 to-stone-200 lg:w-80 dark:from-stone-800 dark:to-stone-900">
+    <div className="bg-muted flex max-h-80 w-full items-center justify-center rounded-lg lg:w-80">
       <div className="flex flex-col items-center gap-2 py-16">
-        <Image className="h-8 w-8 text-stone-300 dark:text-stone-600" strokeWidth={1.5} />
-        <span className="text-xs text-stone-400 dark:text-stone-500">No cover image</span>
+        <Image className="text-muted-foreground/40 h-8 w-8" strokeWidth={1.5} />
+        <span className="text-muted-foreground/70 text-xs">No cover image</span>
       </div>
     </div>
   );
@@ -224,7 +204,7 @@ function DeleteChartDialog({ chartId, chartName }: { chartId: string; chartName:
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)} autoFocus>
+          <Button variant="outline" onClick={() => setOpen(false)} autoFocus>
             Keep Chart
           </Button>
           <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
@@ -275,13 +255,6 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
         </InfoCard>
       )}
 
-      {/* Kitting Status */}
-      <InfoCard icon={Package} title="Kitting Status">
-        <p className="text-sm text-stone-400 dark:text-stone-500">
-          Supply tracking available in a future update
-        </p>
-      </InfoCard>
-
       {/* Pattern Details */}
       <InfoCard icon={FileText} title="Pattern Details" className="lg:col-span-2">
         <div>
@@ -301,28 +274,33 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
         </div>
       </InfoCard>
 
-      {/* Project Setup */}
-      {project && (
-        <InfoCard icon={Settings} title="Project Setup" className="lg:col-span-2">
-          <div>
-            <DetailRow label="Fabric" value={project.fabricId ?? "Not assigned"} />
-            <DetailRow label="Project Bin" value={project.projectBin ?? "-"} />
-            <DetailRow label="iPad App" value={project.ipadApp ?? "-"} />
-            <DetailRow
-              label="Onion Skinning"
-              value={project.needsOnionSkinning ? "Needed" : "Not needed"}
-            />
-          </div>
-        </InfoCard>
-      )}
+      {/* Project Setup — only show if any field has data */}
+      {project &&
+        (project.fabricId ||
+          project.projectBin ||
+          project.ipadApp ||
+          project.needsOnionSkinning) && (
+          <InfoCard icon={Settings} title="Project Setup" className="lg:col-span-2">
+            <div>
+              {project.fabricId && <DetailRow label="Fabric" value={project.fabricId} />}
+              {project.projectBin && <DetailRow label="Project Bin" value={project.projectBin} />}
+              {project.ipadApp && <DetailRow label="iPad App" value={project.ipadApp} />}
+              {project.needsOnionSkinning && <DetailRow label="Onion Skinning" value="Needed" />}
+            </div>
+          </InfoCard>
+        )}
 
-      {/* Dates */}
+      {/* Dates — always show Added, only show others if set */}
       <InfoCard icon={Calendar} title="Dates" className="lg:col-span-2">
         <div>
           <DetailRow label="Added" value={formatDate(chart.dateAdded)} />
-          <DetailRow label="Started" value={formatDateOnly(project?.startDate)} />
-          <DetailRow label="Finished" value={formatDateOnly(project?.finishDate)} />
-          <DetailRow label="FFO" value={formatDateOnly(project?.ffoDate)} />
+          {project?.startDate && (
+            <DetailRow label="Started" value={formatDateOnly(project.startDate)} />
+          )}
+          {project?.finishDate && (
+            <DetailRow label="Finished" value={formatDateOnly(project.finishDate)} />
+          )}
+          {project?.ffoDate && <DetailRow label="FFO" value={formatDateOnly(project.ffoDate)} />}
         </div>
       </InfoCard>
     </div>
@@ -359,7 +337,7 @@ function WorkingCopyRow({ digitalWorkingCopyUrl }: { digitalWorkingCopyUrl: stri
           <button
             onClick={handleDownload}
             disabled={isDownloading}
-            className="text-sm font-medium text-emerald-600 underline-offset-2 hover:underline disabled:opacity-50 dark:text-emerald-500"
+            className="text-primary text-sm font-medium underline-offset-2 hover:underline disabled:opacity-50"
           >
             {isDownloading ? "Loading..." : "Download"}
           </button>

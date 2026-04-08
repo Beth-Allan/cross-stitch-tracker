@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: MVP — Replace Notion
-status: executing
-stopped_at: "Roadmap restructured to lean MVP (4 milestones, 10 phases). Phase 2 verification next."
-last_updated: "2026-04-07"
-last_activity: "2026-04-07 - Restructured roadmap from 9-phase waterfall to 4-milestone lean MVP"
+milestone_name: milestone
+status: verifying
+stopped_at: "Completed conventions migration. Next: Phase 2 human verification (02-05), then discuss Phase 3 + Phase 4."
+last_updated: "2026-04-08T01:04:32.255Z"
+last_activity: "2026-04-07 - Phase 2 shipped — PR #3"
 progress:
   total_phases: 10
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 7
-  percent: 10
+  completed_plans: 8
+  percent: 100
 ---
 
 # Project State
@@ -29,7 +29,7 @@ Milestone: 1 (MVP — "Replace Notion")
 Phase: 2
 Plan: 4/4 complete (plans 01-04 executed; 02-05 is human verification)
 Status: Ready for Phase 2 human verification, then Phases 3+4
-Last activity: 2026-04-07 - Roadmap restructured to lean MVP
+Last activity: 2026-04-07 - Phase 2 shipped — PR #3
 
 Progress: [█░░░░░░░░░] 10% (1/10 phases complete)
 
@@ -111,9 +111,10 @@ None yet.
 | 260329-oj1 | Centralize test mocks and create test factories | 2026-03-29 | 00676af | [260329-oj1-centralize-test-mocks-and-create-test-fa](./quick/260329-oj1-centralize-test-mocks-and-create-test-fa/) |
 | 260329-ora | Add failure-mode tests for existing code | 2026-03-29 | 062cd37 | [260329-ora-add-failure-mode-tests-for-existing-code](./quick/260329-ora-add-failure-mode-tests-for-existing-code/) |
 | 260329-p5l | Fix PR #2 review findings (8 issues: error handling, validation, logging) | 2026-03-30 | 9421f2f | [260329-p5l-fix-the-issues-identified-in-pr-2-pr-2-r](./quick/260329-p5l-fix-the-issues-identified-in-pr-2-pr-2-r/) |
+| 260407-ozt | Migrate docs/conventions/ to .claude/rules/ with glob frontmatter | 2026-04-07 | 8640161 | [260407-ozt-migrate-docs-conventions-to-claude-rules](./quick/260407-ozt-migrate-docs-conventions-to-claude-rules/) |
 
 ## Session Continuity
 
 Last session: 2026-04-07
-Stopped at: Roadmap restructured. Next: Phase 2 human verification (02-05), then discuss Phase 3 + Phase 4.
+Stopped at: Completed conventions migration. Next: Phase 2 human verification (02-05), then discuss Phase 3 + Phase 4.
 Resume file: None

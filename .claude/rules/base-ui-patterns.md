@@ -1,3 +1,9 @@
+---
+globs:
+  - "src/components/**/*.tsx"
+  - "src/app/**/*.tsx"
+---
+
 # Base UI + Next.js Patterns
 
 > Battle-tested patterns for shadcn/ui v4 (built on @base-ui/react) with Next.js 16 App Router.
@@ -20,6 +26,22 @@ import { LinkButton } from "@/components/ui/link-button";
 
 Use `<Button>` only for actual buttons (onClick handlers, form submits).
 Use `<LinkButton>` for navigation that looks like a button.
+
+## buttonVariants lives in a shared module
+
+`buttonVariants` is defined in `button-variants.ts` (no `"use client"`), not in `button.tsx`. This is critical because `button.tsx` is a client module — importing anything from it in a Server Component causes a Next.js 16 runtime error: "Attempted to call X from the server but X is on the client."
+
+`button.tsx` re-exports `buttonVariants` for convenience, so client components can import from either location. But **Server Components must import from `button-variants`**:
+
+```tsx
+// In a Server Component:
+import { buttonVariants } from "@/components/ui/button-variants"; // CORRECT
+import { buttonVariants } from "@/components/ui/button";          // WRONG — runtime error
+
+// In a Client Component: either import works
+```
+
+If adding new CVA variant functions (e.g. `badgeVariants`), follow the same pattern: keep pure CSS logic in a non-client file so it's usable everywhere.
 
 ## Tailwind data-attribute variants
 

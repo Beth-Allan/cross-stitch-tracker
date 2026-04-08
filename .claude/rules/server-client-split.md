@@ -1,3 +1,9 @@
+---
+globs:
+  - "src/components/**/*.tsx"
+  - "src/app/**/*.tsx"
+---
+
 # Server/Client Component Patterns
 
 > Next.js 16 App Router: when to use "use client" and how to avoid hydration issues.
@@ -36,7 +42,7 @@ Server renders HTML, client hydrates it. Mismatches happen when server and clien
 - Using `Date.now()` or `Math.random()` in render
 - Conditional rendering based on `typeof window`
 
-**Fix:** Use `buttonVariants()` + `Link` instead of `Button render={<Link>}`. See `docs/conventions/base-ui-patterns.md`.
+**Fix:** Use `buttonVariants()` + `Link` instead of `Button render={<Link>}`. See `.claude/rules/base-ui-patterns.md`.
 
 ## Data fetching pattern
 

@@ -15,14 +15,17 @@
 - Code quality infrastructure (Prettier, Vitest, Husky, CI, 73 tests)
 - PR #2 merged with full review cycle (CodeRabbit + 4-agent review + fixes)
 - Roadmap restructured to lean MVP (2026-04-07): CRUD + supplies + fabric → deploy → iterate
+- Plugin audit + CI hardening (2026-04-07): 19 plugins cataloged, quality gates expanded, git workflow rule, CI concurrency/pinning
+- Migrated docs/conventions/ to .claude/rules/ with glob frontmatter (2026-04-07)
+- Phase 2 verification + UI polish (2026-04-07): 8 bug fixes, design critique, normalize/distill/delight/polish
 
 ### In Progress
 
-- Nothing — clean slate on main
+- Phase 2 PR under review
 
 ### Next Up
 
-1. Phase 2 human verification (02-05-PLAN.md — test full chart lifecycle)
+1. Merge Phase 2 PR
 2. Discuss + plan Phase 3 (Designer & Genre pages)
 3. Discuss + plan Phase 4 (Supplies & Fabric — parallel with Phase 3)
 4. Deploy MVP to Vercel after Phase 4
@@ -80,15 +83,12 @@ product-plan/sections/               # DesignOS components & screenshots
 
 ## Conventions
 
-Detailed conventions live in `docs/conventions/` and are enforced by `.claude/rules/`:
+Conventions auto-load via `.claude/rules/` glob patterns when touching relevant files:
 
-| When touching...    | Read first                                                 |
-| ------------------- | ---------------------------------------------------------- |
-| Components, UI      | `docs/conventions/base-ui-patterns.md`                     |
-| Auth, sessions      | `docs/conventions/auth-patterns.md`                        |
-| Forms, Zod, uploads | `docs/conventions/form-patterns.md`                        |
-| Server/Client split | `docs/conventions/server-client-split.md`                  |
-| Feature UI          | `.planning/DESIGN-REFERENCE.md` + `product-plan/sections/` |
+- **Components/UI** — `base-ui-patterns.md`, `server-client-split.md`, `component-implementation.md`
+- **Auth/sessions** — `auth-patterns.md`, `server-actions.md`
+- **Forms/validation** — `form-patterns.md`, `server-actions.md`
+- **Feature UI** — `.planning/DESIGN-REFERENCE.md` + `product-plan/sections/`
 
 ### Core rules (always apply)
 

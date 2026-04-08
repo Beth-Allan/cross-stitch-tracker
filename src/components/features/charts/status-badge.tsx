@@ -14,14 +14,17 @@ export function StatusBadge({ status, size = "sm" }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full font-medium",
+        "inline-flex items-center gap-1.5 rounded-full font-medium transition-colors duration-200",
         sizeClasses,
         config.bgClass,
         config.textClass,
         config.darkBgClass,
       )}
     >
-      <span aria-hidden="true" className={cn("h-1.5 w-1.5 rounded-full", config.dotClass)} />
+      <span
+        aria-hidden="true"
+        className={cn("h-1.5 w-1.5 rounded-full transition-colors duration-200", config.dotClass)}
+      />
       {config.label}
     </span>
   );

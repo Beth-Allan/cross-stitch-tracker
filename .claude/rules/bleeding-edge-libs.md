@@ -19,10 +19,11 @@ This project uses cutting-edge versions. Training data may be WRONG for these.
 **Before using any library API that might be version-specific:**
 
 1. Check Context7 for current documentation
-2. Check `docs/conventions/` for project-specific patterns we've already debugged
+2. Check `.claude/rules/` for project-specific patterns we've already debugged
 3. If unsure, verify in `node_modules/` source code rather than guessing
 
-**Known footguns documented in `docs/conventions/`:**
-- Auth.js: session.user.id requires explicit JWT callbacks → `auth-patterns.md`
-- Base UI: Button+Link hydration mismatch → `base-ui-patterns.md`
-- Tailwind v4: data-horizontal/data-vertical are custom variants, not broken → `base-ui-patterns.md`
+**Known footguns documented in `.claude/rules/`:**
+- Auth.js: session.user.id requires explicit JWT callbacks → `.claude/rules/auth-patterns.md`
+- Base UI: Button+Link hydration mismatch → `.claude/rules/base-ui-patterns.md`
+- Tailwind v4: data-horizontal/data-vertical are custom variants, not broken → `.claude/rules/base-ui-patterns.md`
+- Next.js 16: importing from `"use client"` modules in Server Components is a runtime error — keep shared utils (like `buttonVariants`) in non-client files → `.claude/rules/base-ui-patterns.md`
