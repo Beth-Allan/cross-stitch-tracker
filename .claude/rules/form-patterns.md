@@ -1,3 +1,10 @@
+---
+globs:
+  - "src/lib/validations/**/*.ts"
+  - "src/lib/actions/**/*.ts"
+  - "src/components/features/**/*.tsx"
+---
+
 # Form & Validation Patterns
 
 > Zod validation, form architecture, and common pitfalls.

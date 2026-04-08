@@ -1,3 +1,9 @@
+---
+globs:
+  - "src/components/**/*.tsx"
+  - "src/app/**/*.tsx"
+---
+
 # Base UI + Next.js Patterns
 
 > Battle-tested patterns for shadcn/ui v4 (built on @base-ui/react) with Next.js 16 App Router.

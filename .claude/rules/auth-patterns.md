@@ -1,3 +1,9 @@
+---
+globs:
+  - "src/lib/auth*.ts"
+  - "src/lib/actions/**/*.ts"
+---
+
 # Auth.js v5 Patterns
 
 > Patterns for Auth.js v5 (next-auth 5.0.0-beta.30) with JWT strategy.
