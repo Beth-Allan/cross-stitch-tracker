@@ -23,8 +23,8 @@ A stitcher can manage their entire chart collection and supplies faster and more
 - [x] Full chart/project CRUD with rich metadata (~50 fields), cover photos, digital working copy storage
 - [x] Customizable status system with 7 statuses (Unstarted, Kitting, Kitted, In Progress, On Hold, Finished, FFO)
 - [x] Size category auto-calculation from stitch count (Mini/Small/Medium/Large/BAP)
-- [ ] Designer CRUD with dedicated management pages
-- [ ] Genre management with dedicated management pages
+- [x] Designer CRUD with dedicated management pages — Validated in Phase 3: Designer & Genre Pages
+- [x] Genre management with dedicated management pages — Validated in Phase 3: Designer & Genre Pages
 - [ ] Pre-seeded DMC thread catalog (~500 colors with hex swatches)
 - [ ] Thread, bead, and specialty item databases (essentials)
 - [ ] Project-to-supply linking with per-project quantities (three separate junction tables)
