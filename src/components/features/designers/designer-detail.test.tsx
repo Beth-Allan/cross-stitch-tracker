@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen } from "@/__tests__/test-utils";
+import userEvent from "@testing-library/user-event";
 import { DesignerDetail } from "./designer-detail";
 import { createMockDesignerChart } from "@/__tests__/mocks";
 import type { DesignerDetail as DesignerDetailType } from "@/types/designer";
@@ -20,9 +21,7 @@ vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
-function createDesignerDetail(
-  overrides?: Partial<DesignerDetailType>,
-): DesignerDetailType {
+function createDesignerDetail(overrides?: Partial<DesignerDetailType>): DesignerDetailType {
   return {
     id: "d1",
     name: "Nora Corbett",
@@ -89,21 +88,13 @@ describe("DesignerDetail", () => {
   });
 
   it("does not render website line when no website", () => {
-    render(
-      <DesignerDetail
-        designer={createDesignerDetail({ website: null })}
-      />,
-    );
-    expect(
-      screen.queryByRole("link", { name: /visit.*website/i }),
-    ).not.toBeInTheDocument();
+    render(<DesignerDetail designer={createDesignerDetail({ website: null })} />);
+    expect(screen.queryByRole("link", { name: /visit.*website/i })).not.toBeInTheDocument();
   });
 
   it("renders notes when present", () => {
     render(<DesignerDetail designer={createDesignerDetail()} />);
-    expect(
-      screen.getByText(/Specializes in fairy designs/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Specializes in fairy designs/)).toBeInTheDocument();
   });
 
   it("renders stat items (Charts, Started, Finished, Top Genre)", () => {
@@ -146,27 +137,53 @@ describe("DesignerDetail", () => {
   });
 
   it('shows "No charts found for this designer" when charts array is empty', () => {
-    render(
-      <DesignerDetail
-        designer={createDesignerDetail({ charts: [], chartCount: 0 })}
-      />,
-    );
-    expect(
-      screen.getByText("No charts found for this designer"),
-    ).toBeInTheDocument();
+    render(<DesignerDetail designer={createDesignerDetail({ charts: [], chartCount: 0 })} />);
+    expect(screen.getByText("No charts found for this designer")).toBeInTheDocument();
   });
 
   it("edit button is present with aria-label", () => {
     render(<DesignerDetail designer={createDesignerDetail()} />);
-    expect(
-      screen.getByLabelText("Edit Nora Corbett"),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Edit Nora Corbett")).toBeInTheDocument();
   });
 
   it("delete button is present with aria-label", () => {
     render(<DesignerDetail designer={createDesignerDetail()} />);
-    expect(
-      screen.getByLabelText("Delete Nora Corbett"),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Delete Nora Corbett")).toBeInTheDocument();
+  });
+
+  it("clicking Stitches sort pill changes chart order by stitch count ascending", async () => {
+    const user = userEvent.setup();
+    // Charts: Autumn Fairy (15000), Spring Garden (8000), Winter Cottage (45000)
+    // Default sort: name asc -> Autumn Fairy, Spring Garden, Winter Cottage
+    // After clicking Stitches: Spring Garden(8000), Autumn Fairy(15000), Winter Cottage(45000)
+    render(<DesignerDetail designer={createDesignerDetail()} />);
+
+    await user.click(screen.getByRole("button", { name: /^stitches$/i }));
+
+    // Get all chart links (links to /charts/...) in DOM order
+    const chartLinks = screen
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("href")?.startsWith("/charts/"));
+
+    expect(chartLinks[0].textContent).toContain("Spring Garden");
+    expect(chartLinks[1].textContent).toContain("Autumn Fairy");
+    expect(chartLinks[2].textContent).toContain("Winter Cottage");
+  });
+
+  it("clicking Stitches sort pill twice reverses chart order to descending stitch count", async () => {
+    const user = userEvent.setup();
+    render(<DesignerDetail designer={createDesignerDetail()} />);
+
+    await user.click(screen.getByRole("button", { name: /^stitches$/i }));
+    await user.click(screen.getByRole("button", { name: /^stitches$/i }));
+
+    // Descending: Winter Cottage(45000), Autumn Fairy(15000), Spring Garden(8000)
+    const chartLinks = screen
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("href")?.startsWith("/charts/"));
+
+    expect(chartLinks[0].textContent).toContain("Winter Cottage");
+    expect(chartLinks[1].textContent).toContain("Autumn Fairy");
+    expect(chartLinks[2].textContent).toContain("Spring Garden");
   });
 });

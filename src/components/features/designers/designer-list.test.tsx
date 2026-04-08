@@ -181,4 +181,40 @@ describe("DesignerList", () => {
 
     expect(mockDeleteDesigner).toHaveBeenCalledWith("d2");
   });
+
+  it("clicking CHARTS header sorts designers by chart count (ascending first click)", async () => {
+    const user = userEvent.setup();
+    render(<DesignerList designers={mockDesigners} />);
+
+    // Default sort is name asc: Artecy, Heaven, Nora
+    // Clicking CHARTS once should sort ascending by chartCount: Artecy(3), Heaven(5), Nora(8)
+    await user.click(screen.getByText("CHARTS"));
+
+    // Query the desktop table rows (not mobile cards) to check order
+    const rows = screen.getAllByRole("row");
+    // rows[0] is the header row, rows[1..] are data rows
+    // The first data row should be Artecy (chartCount=3)
+    const firstDataRow = rows[1];
+    expect(firstDataRow.textContent).toContain("Artecy Cross Stitch");
+
+    // The last data row should be Nora (chartCount=8)
+    const lastDataRow = rows[rows.length - 1];
+    expect(lastDataRow.textContent).toContain("Nora Corbett");
+  });
+
+  it("clicking CHARTS header twice sorts designers by chart count descending", async () => {
+    const user = userEvent.setup();
+    render(<DesignerList designers={mockDesigners} />);
+
+    // Click CHARTS twice to sort descending: Nora(8), Heaven(5), Artecy(3)
+    await user.click(screen.getByText("CHARTS"));
+    await user.click(screen.getByText("CHARTS"));
+
+    const rows = screen.getAllByRole("row");
+    const firstDataRow = rows[1];
+    expect(firstDataRow.textContent).toContain("Nora Corbett");
+
+    const lastDataRow = rows[rows.length - 1];
+    expect(lastDataRow.textContent).toContain("Artecy Cross Stitch");
+  });
 });

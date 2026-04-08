@@ -142,4 +142,21 @@ describe("DesignerFormModal", () => {
       screen.getByText(/chart count, genre, and project stats are calculated automatically/i),
     ).toBeInTheDocument();
   });
+
+  it("shows server error below name field when createDesigner returns duplicate name error", async () => {
+    mockCreateDesigner.mockResolvedValue({
+      success: false,
+      error: "A designer with that name already exists",
+    });
+
+    const user = userEvent.setup();
+    renderModal();
+
+    await user.type(screen.getByLabelText(/name/i), "Heaven and Earth Designs");
+    await user.click(screen.getByRole("button", { name: /add designer/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("A designer with that name already exists")).toBeInTheDocument();
+    });
+  });
 });

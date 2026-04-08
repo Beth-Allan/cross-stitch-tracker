@@ -165,4 +165,32 @@ describe("GenreList", () => {
 
     expect(mockDeleteGenre).toHaveBeenCalledWith("g2");
   });
+
+  it("clicking CHARTS header sorts genres by chart count ascending on first click", async () => {
+    const user = userEvent.setup();
+    render(<GenreList genres={mockGenres} />);
+
+    // Default sort is name asc: Animals(5), Fantasy(12), Landscape(8)
+    // Clicking CHARTS once sorts ascending: Animals(5), Landscape(8), Fantasy(12)
+    await user.click(screen.getByText("CHARTS"));
+
+    // Query the desktop table rows to check DOM order
+    const rows = screen.getAllByRole("row");
+    // rows[0] is the header row, rows[1..] are data rows
+    expect(rows[1].textContent).toContain("Animals");
+    expect(rows[rows.length - 1].textContent).toContain("Fantasy");
+  });
+
+  it("clicking CHARTS header twice sorts genres by chart count descending", async () => {
+    const user = userEvent.setup();
+    render(<GenreList genres={mockGenres} />);
+
+    // Click CHARTS twice to sort descending: Fantasy(12), Landscape(8), Animals(5)
+    await user.click(screen.getByText("CHARTS"));
+    await user.click(screen.getByText("CHARTS"));
+
+    const rows = screen.getAllByRole("row");
+    expect(rows[1].textContent).toContain("Fantasy");
+    expect(rows[rows.length - 1].textContent).toContain("Animals");
+  });
 });

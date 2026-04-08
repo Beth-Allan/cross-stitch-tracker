@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen } from "@/__tests__/test-utils";
+import userEvent from "@testing-library/user-event";
 import { GenreDetail } from "./genre-detail";
 import { createMockGenreChart } from "@/__tests__/mocks";
 import type { GenreDetail as GenreDetailType } from "@/types/genre";
@@ -20,9 +21,7 @@ vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
-function createGenreDetail(
-  overrides?: Partial<GenreDetailType>,
-): GenreDetailType {
+function createGenreDetail(overrides?: Partial<GenreDetailType>): GenreDetailType {
   return {
     id: "g1",
     name: "Fantasy",
@@ -93,14 +92,8 @@ describe("GenreDetail", () => {
   });
 
   it('shows "No charts tagged with this genre" when charts array is empty', () => {
-    render(
-      <GenreDetail
-        genre={createGenreDetail({ charts: [], chartCount: 0 })}
-      />,
-    );
-    expect(
-      screen.getByText("No charts tagged with this genre"),
-    ).toBeInTheDocument();
+    render(<GenreDetail genre={createGenreDetail({ charts: [], chartCount: 0 })} />);
+    expect(screen.getByText("No charts tagged with this genre")).toBeInTheDocument();
   });
 
   it("edit button is present with aria-label", () => {
@@ -114,9 +107,7 @@ describe("GenreDetail", () => {
   });
 
   it("does NOT contain website or notes fields", () => {
-    const { container } = render(
-      <GenreDetail genre={createGenreDetail()} />,
-    );
+    const { container } = render(<GenreDetail genre={createGenreDetail()} />);
     expect(container.textContent).not.toMatch(/website/i);
     expect(container.textContent).not.toMatch(/notes/i);
   });
@@ -127,5 +118,41 @@ describe("GenreDetail", () => {
       name: /back to genres/i,
     });
     expect(backLink).toHaveAttribute("href", "/genres");
+  });
+
+  it("clicking Stitches sort pill changes chart order by stitch count ascending", async () => {
+    const user = userEvent.setup();
+    // Charts: Dragon's Lair (25000), Fairy Forest (12000), Unicorn Meadow (5000)
+    // Default sort: name asc -> Dragon's Lair, Fairy Forest, Unicorn Meadow
+    // After clicking Stitches asc: Unicorn Meadow(5000), Fairy Forest(12000), Dragon's Lair(25000)
+    render(<GenreDetail genre={createGenreDetail()} />);
+
+    await user.click(screen.getByRole("button", { name: /^stitches$/i }));
+
+    // Get all chart links (links to /charts/...) in DOM order
+    const chartLinks = screen
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("href")?.startsWith("/charts/"));
+
+    expect(chartLinks[0].textContent).toContain("Unicorn Meadow");
+    expect(chartLinks[1].textContent).toContain("Fairy Forest");
+    expect(chartLinks[2].textContent).toContain("Dragon");
+  });
+
+  it("clicking Stitches sort pill twice reverses chart order to descending stitch count", async () => {
+    const user = userEvent.setup();
+    render(<GenreDetail genre={createGenreDetail()} />);
+
+    await user.click(screen.getByRole("button", { name: /^stitches$/i }));
+    await user.click(screen.getByRole("button", { name: /^stitches$/i }));
+
+    // Descending: Dragon's Lair(25000), Fairy Forest(12000), Unicorn Meadow(5000)
+    const chartLinks = screen
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("href")?.startsWith("/charts/"));
+
+    expect(chartLinks[0].textContent).toContain("Dragon");
+    expect(chartLinks[1].textContent).toContain("Fairy Forest");
+    expect(chartLinks[2].textContent).toContain("Unicorn Meadow");
   });
 });
