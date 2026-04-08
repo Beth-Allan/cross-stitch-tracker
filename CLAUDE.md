@@ -17,14 +17,15 @@
 - Roadmap restructured to lean MVP (2026-04-07): CRUD + supplies + fabric → deploy → iterate
 - Plugin audit + CI hardening (2026-04-07): 19 plugins cataloged, quality gates expanded, git workflow rule, CI concurrency/pinning
 - Migrated docs/conventions/ to .claude/rules/ with glob frontmatter (2026-04-07)
+- Phase 2 verification + UI polish (2026-04-07): 8 bug fixes, design critique, normalize/distill/delight/polish
 
 ### In Progress
 
-- Nothing — clean slate on main
+- Phase 2 PR under review
 
 ### Next Up
 
-1. Phase 2 human verification (02-05-PLAN.md — test full chart lifecycle)
+1. Merge Phase 2 PR
 2. Discuss + plan Phase 3 (Designer & Genre pages)
 3. Discuss + plan Phase 4 (Supplies & Fabric — parallel with Phase 3)
 4. Deploy MVP to Vercel after Phase 4
