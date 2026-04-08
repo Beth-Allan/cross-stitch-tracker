@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GenreFormModal } from "./genre-form-modal";
+import { DeleteConfirmationDialog } from "@/components/features/designers/delete-confirmation-dialog";
 import { deleteGenre } from "@/lib/actions/genre-actions";
 import { toast } from "sonner";
 import type { GenreWithStats } from "@/types/genre";
@@ -218,6 +219,7 @@ export function GenreList({ genres }: GenreListProps) {
   const [search, setSearch] = useState("");
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editingGenre, setEditingGenre] = useState<GenreWithStats | null>(null);
+  const [deletingGenre, setDeletingGenre] = useState<GenreWithStats | null>(null);
 
   function handleSort(key: SortKey) {
     setSort((prev) =>
@@ -248,22 +250,15 @@ export function GenreList({ genres }: GenreListProps) {
 
   const hasSearch = search.length > 0;
 
-  async function handleDelete(genre: GenreWithStats) {
-    if (
-      !confirm(
-        `Delete "${genre.name}"? ${genre.chartCount} chart(s) will lose this genre tag. Charts will NOT be deleted.`,
-      )
-    ) {
-      return;
-    }
-
+  async function handleDeleteConfirmed() {
+    if (!deletingGenre) return;
     try {
-      const result = await deleteGenre(genre.id);
+      const result = await deleteGenre(deletingGenre.id);
       if (result.success) {
         toast.success("Genre deleted");
         router.refresh();
       } else {
-        toast.error(result.error);
+        toast.error(result.error ?? "Something went wrong. Please try again.");
       }
     } catch {
       toast.error("Something went wrong. Please try again.");
@@ -337,7 +332,7 @@ export function GenreList({ genres }: GenreListProps) {
                     key={genre.id}
                     genre={genre}
                     onEdit={() => setEditingGenre(genre)}
-                    onDelete={() => handleDelete(genre)}
+                    onDelete={() => setDeletingGenre(genre)}
                   />
                 ))}
               </tbody>
@@ -362,7 +357,7 @@ export function GenreList({ genres }: GenreListProps) {
               key={genre.id}
               genre={genre}
               onEdit={() => setEditingGenre(genre)}
-              onDelete={() => handleDelete(genre)}
+              onDelete={() => setDeletingGenre(genre)}
             />
           ))
         ) : (
@@ -387,6 +382,19 @@ export function GenreList({ genres }: GenreListProps) {
           if (!open) setEditingGenre(null);
         }}
         genre={editingGenre}
+      />
+
+      {/* Delete confirmation dialog */}
+      <DeleteConfirmationDialog
+        open={!!deletingGenre}
+        onOpenChange={(open) => {
+          if (!open) setDeletingGenre(null);
+        }}
+        title="Delete Genre?"
+        entityName={deletingGenre?.name ?? ""}
+        chartCount={deletingGenre?.chartCount ?? 0}
+        entityType="genre"
+        onConfirm={handleDeleteConfirmed}
       />
     </div>
   );

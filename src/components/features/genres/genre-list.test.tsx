@@ -134,4 +134,35 @@ describe("GenreList", () => {
     expect(screen.getAllByLabelText("Delete Landscape").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByLabelText("Delete Animals").length).toBeGreaterThanOrEqual(1);
   });
+
+  it("clicking delete button opens DeleteConfirmationDialog with genre info", async () => {
+    const user = userEvent.setup();
+    render(<GenreList genres={mockGenres} />);
+
+    const deleteButtons = screen.getAllByLabelText("Delete Fantasy");
+    await user.click(deleteButtons[0]);
+
+    expect(await screen.findByText("Delete Genre?")).toBeInTheDocument();
+    // Name appears in table row, mobile card, and dialog -- use getAllByText
+    expect(screen.getAllByText(/Fantasy/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/12 chart\(s\)/)).toBeInTheDocument();
+    expect(screen.getByText(/Charts will NOT be deleted/)).toBeInTheDocument();
+  });
+
+  it("confirming delete calls deleteGenre action", async () => {
+    const user = userEvent.setup();
+    const { deleteGenre: mockDeleteGenre } = await import("@/lib/actions/genre-actions");
+    vi.mocked(mockDeleteGenre).mockResolvedValue({ success: true });
+    render(<GenreList genres={mockGenres} />);
+
+    // Open delete dialog
+    const deleteButtons = screen.getAllByLabelText("Delete Landscape");
+    await user.click(deleteButtons[0]);
+
+    // Click the Delete button in the confirmation dialog
+    const confirmButton = await screen.findByRole("button", { name: /^delete$/i });
+    await user.click(confirmButton);
+
+    expect(mockDeleteGenre).toHaveBeenCalledWith("g2");
+  });
 });
