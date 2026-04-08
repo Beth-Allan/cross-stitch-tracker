@@ -29,7 +29,7 @@ Milestone: 1 (MVP — "Replace Notion")
 Phase: 2
 Plan: 4/4 complete (plans 01-04 executed; 02-05 is human verification)
 Status: Ready for Phase 2 human verification, then Phases 3+4
-Last activity: 2026-04-07 - Roadmap restructured to lean MVP
+Last activity: 2026-04-07 - Completed quick task 260407-ozt: Migrate docs/conventions/ to .claude/rules/
 
 Progress: [█░░░░░░░░░] 10% (1/10 phases complete)
 
@@ -111,9 +111,10 @@ None yet.
 | 260329-oj1 | Centralize test mocks and create test factories | 2026-03-29 | 00676af | [260329-oj1-centralize-test-mocks-and-create-test-fa](./quick/260329-oj1-centralize-test-mocks-and-create-test-fa/) |
 | 260329-ora | Add failure-mode tests for existing code | 2026-03-29 | 062cd37 | [260329-ora-add-failure-mode-tests-for-existing-code](./quick/260329-ora-add-failure-mode-tests-for-existing-code/) |
 | 260329-p5l | Fix PR #2 review findings (8 issues: error handling, validation, logging) | 2026-03-30 | 9421f2f | [260329-p5l-fix-the-issues-identified-in-pr-2-pr-2-r](./quick/260329-p5l-fix-the-issues-identified-in-pr-2-pr-2-r/) |
+| 260407-ozt | Migrate docs/conventions/ to .claude/rules/ with glob frontmatter | 2026-04-07 | 8640161 | [260407-ozt-migrate-docs-conventions-to-claude-rules](./quick/260407-ozt-migrate-docs-conventions-to-claude-rules/) |
 
 ## Session Continuity
 
 Last session: 2026-04-07
-Stopped at: Roadmap restructured. Next: Phase 2 human verification (02-05), then discuss Phase 3 + Phase 4.
+Stopped at: Completed conventions migration. Next: Phase 2 human verification (02-05), then discuss Phase 3 + Phase 4.
 Resume file: None
