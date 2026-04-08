@@ -60,9 +60,12 @@ describe("GenreList", () => {
   it("renders genre rows with name and chart count", () => {
     render(<GenreList genres={mockGenres} />);
 
-    expect(screen.getByText("Fantasy")).toBeInTheDocument();
-    expect(screen.getByText("Landscape")).toBeInTheDocument();
-    expect(screen.getByText("Animals")).toBeInTheDocument();
+    // Both desktop table and mobile cards render in jsdom (no CSS media queries)
+    // so genre names appear twice — use getAllByText
+    expect(screen.getAllByText("Fantasy").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Landscape").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Animals").length).toBeGreaterThanOrEqual(1);
+    // Chart counts appear in the desktop table
     expect(screen.getByText("12")).toBeInTheDocument();
     expect(screen.getByText("8")).toBeInTheDocument();
     expect(screen.getByText("5")).toBeInTheDocument();
@@ -71,7 +74,9 @@ describe("GenreList", () => {
   it("shows empty state 'No genres added yet' when list is empty", () => {
     render(<GenreList genres={[]} />);
 
-    expect(screen.getByText("No genres added yet")).toBeInTheDocument();
+    // Both desktop and mobile render the empty state
+    const matches = screen.getAllByText("No genres added yet");
+    expect(matches.length).toBeGreaterThanOrEqual(1);
   });
 
   it("shows filtered empty state 'No genres match your search' when search has no results", async () => {
@@ -81,7 +86,9 @@ describe("GenreList", () => {
     const searchInput = screen.getByPlaceholderText("Search genres...");
     await user.type(searchInput, "xyznonexistent");
 
-    expect(screen.getByText("No genres match your search")).toBeInTheDocument();
+    // Both desktop and mobile render the empty state
+    const matches = screen.getAllByText("No genres match your search");
+    expect(matches.length).toBeGreaterThanOrEqual(1);
   });
 
   it("filters genres by name when searching (case-insensitive)", async () => {
@@ -91,7 +98,9 @@ describe("GenreList", () => {
     const searchInput = screen.getByPlaceholderText("Search genres...");
     await user.type(searchInput, "fan");
 
-    expect(screen.getByText("Fantasy")).toBeInTheDocument();
+    // Fantasy should still appear (in both desktop+mobile views)
+    expect(screen.getAllByText("Fantasy").length).toBeGreaterThanOrEqual(1);
+    // The other genres should not appear in either view
     expect(screen.queryByText("Landscape")).not.toBeInTheDocument();
     expect(screen.queryByText("Animals")).not.toBeInTheDocument();
   });
@@ -100,26 +109,29 @@ describe("GenreList", () => {
     const user = userEvent.setup();
     render(<GenreList genres={mockGenres} />);
 
+    // With genres present, only the header "Add Genre" button renders (not empty state)
     const addButton = screen.getByRole("button", { name: /add genre/i });
     await user.click(addButton);
 
-    // The modal should appear with "Add Genre" title
+    // The modal should appear
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
   });
 
   it("has accessible edit buttons with aria-labels for each genre", () => {
     render(<GenreList genres={mockGenres} />);
 
-    expect(screen.getByLabelText("Edit Fantasy")).toBeInTheDocument();
-    expect(screen.getByLabelText("Edit Landscape")).toBeInTheDocument();
-    expect(screen.getByLabelText("Edit Animals")).toBeInTheDocument();
+    // Desktop + mobile both render edit buttons, so use getAllByLabelText
+    expect(screen.getAllByLabelText("Edit Fantasy").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByLabelText("Edit Landscape").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByLabelText("Edit Animals").length).toBeGreaterThanOrEqual(1);
   });
 
   it("has accessible delete buttons with aria-labels for each genre", () => {
     render(<GenreList genres={mockGenres} />);
 
-    expect(screen.getByLabelText("Delete Fantasy")).toBeInTheDocument();
-    expect(screen.getByLabelText("Delete Landscape")).toBeInTheDocument();
-    expect(screen.getByLabelText("Delete Animals")).toBeInTheDocument();
+    // Desktop + mobile both render delete buttons, so use getAllByLabelText
+    expect(screen.getAllByLabelText("Delete Fantasy").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByLabelText("Delete Landscape").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByLabelText("Delete Animals").length).toBeGreaterThanOrEqual(1);
   });
 });

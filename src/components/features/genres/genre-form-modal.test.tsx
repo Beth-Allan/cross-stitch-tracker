@@ -55,7 +55,9 @@ describe("GenreFormModal", () => {
       <GenreFormModal open={true} onOpenChange={mockOnOpenChange} />,
     );
 
-    expect(screen.getByText("Add Genre")).toBeInTheDocument();
+    // Title and submit button both say "Add Genre"
+    const addGenreElements = screen.getAllByText("Add Genre");
+    expect(addGenreElements.length).toBeGreaterThanOrEqual(2); // title + button
     expect(
       screen.getByRole("button", { name: /add genre/i }),
     ).toBeInTheDocument();
