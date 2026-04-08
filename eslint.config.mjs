@@ -28,11 +28,11 @@ const eslintConfig = defineConfig([
         "error",
         {
           // Catch <Button render={<Link ... />}> — causes hydration mismatches.
-          // Use <LinkButton> instead. See docs/conventions/base-ui-patterns.md
+          // Use <LinkButton> instead. See .claude/rules/base-ui-patterns.md
           selector:
             "JSXElement[openingElement.name.name='Button'] JSXAttribute[name.name='render'] JSXElement[openingElement.name.name='Link']",
           message:
-            'Do not use Button render={<Link>}. Use <LinkButton href="..."> instead. See docs/conventions/base-ui-patterns.md',
+            'Do not use Button render={<Link>}. Use <LinkButton href="..."> instead. See .claude/rules/base-ui-patterns.md',
         },
       ],
     },
@@ -49,7 +49,7 @@ const eslintConfig = defineConfig([
               // instead of importing auth directly in action files
               name: "@/lib/auth",
               message:
-                "Import { requireAuth } from '@/lib/auth-guard' instead. See docs/conventions/auth-patterns.md",
+                "Import { requireAuth } from '@/lib/auth-guard' instead. See .claude/rules/auth-patterns.md",
             },
           ],
         },

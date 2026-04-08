@@ -15,6 +15,7 @@
 - Code quality infrastructure (Prettier, Vitest, Husky, CI, 73 tests)
 - PR #2 merged with full review cycle (CodeRabbit + 4-agent review + fixes)
 - Roadmap restructured to lean MVP (2026-04-07): CRUD + supplies + fabric → deploy → iterate
+- Plugin audit + CI hardening (2026-04-07): 19 plugins cataloged, quality gates expanded, git workflow rule, CI concurrency/pinning
 
 ### In Progress
 
@@ -80,15 +81,12 @@ product-plan/sections/               # DesignOS components & screenshots
 
 ## Conventions
 
-Detailed conventions live in `docs/conventions/` and are enforced by `.claude/rules/`:
+Conventions auto-load via `.claude/rules/` glob patterns when touching relevant files:
 
-| When touching...    | Read first                                                 |
-| ------------------- | ---------------------------------------------------------- |
-| Components, UI      | `docs/conventions/base-ui-patterns.md`                     |
-| Auth, sessions      | `docs/conventions/auth-patterns.md`                        |
-| Forms, Zod, uploads | `docs/conventions/form-patterns.md`                        |
-| Server/Client split | `docs/conventions/server-client-split.md`                  |
-| Feature UI          | `.planning/DESIGN-REFERENCE.md` + `product-plan/sections/` |
+- **Components/UI** — `base-ui-patterns.md`, `server-client-split.md`, `component-implementation.md`
+- **Auth/sessions** — `auth-patterns.md`, `server-actions.md`
+- **Forms/validation** — `form-patterns.md`, `server-actions.md`
+- **Feature UI** — `.planning/DESIGN-REFERENCE.md` + `product-plan/sections/`
 
 ### Core rules (always apply)
 
