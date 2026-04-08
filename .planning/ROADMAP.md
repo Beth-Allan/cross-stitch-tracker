@@ -97,7 +97,13 @@ Plans:
   3. User can view a list of all genres with chart counts
   4. User can create, edit, and delete genres from a dedicated page
   5. Designer/genre detail views show associated charts
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Schema migration (Designer notes), validations, types, server actions (full CRUD for designers and genres)
+- [ ] 03-02-PLAN.md — Designer list page with sortable table, search, form modal, sidebar navigation
+- [ ] 03-03-PLAN.md — Genre list page with sortable table, search, form modal
+- [ ] 03-04-PLAN.md — Designer and genre detail pages, delete confirmation dialog, human verification
 **UI hint**: yes
 **Design refs**: `product-plan/sections/fabric-series-and-reference-data/` (DesignerPage, DesignerDetailModal, DesignerFormModal)
 
@@ -199,7 +205,7 @@ Note: Within milestones, phases with independent dependencies can run in paralle
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 3/3 | Complete | 2026-03-28 |
 | 2. Core Project Management | 4/5 | In Progress |  |
-| 3. Designer & Genre Pages | 0/TBD | Not started | - |
+| 3. Designer & Genre Pages | 0/4 | Not started | - |
 | 4. Supplies & Fabric | 0/TBD | Not started | - |
 | 5. Gallery & Filtering | 0/TBD | Not started | - |
 | 6. Reference Data | 0/TBD | Not started | - |
