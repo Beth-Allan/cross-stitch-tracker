@@ -51,15 +51,17 @@ Exceptions: Modal inner horizontal padding uses 32px (`px-8`) per DesignOS refer
 
 | Role | Size | Weight | Line Height | Font | Tailwind |
 |------|------|--------|-------------|------|----------|
-| Page heading | 24px | 700 (bold) | 1.2 | Fraunces | `font-heading text-2xl font-bold` |
+| Page heading | 24px | 600 (semibold) | 1.2 | Fraunces | `font-heading text-2xl font-semibold` |
 | Modal heading | 18px | 600 (semibold) | 1.2 | Fraunces | `font-heading text-lg font-semibold` |
 | Body / table cell | 14px | 400 (regular) | 1.5 | Source Sans 3 | `text-sm` |
-| Body emphasis | 14px | 500 (medium) | 1.5 | Source Sans 3 | `text-sm font-medium` |
+| Body emphasis | 14px | 600 (semibold) | 1.5 | Source Sans 3 | `text-sm font-semibold` |
 | Table header | 12px | 600 (semibold) | 1.5 | Source Sans 3 | `text-xs font-semibold uppercase tracking-wider` |
 | Stat value | 18px | 600 (semibold) | 1.2 | Source Sans 3 | `text-lg font-semibold` |
 | Stat label | 12px | 400 (regular) | 1.5 | Source Sans 3 | `text-xs uppercase tracking-wider` |
-| Badge / tag | 12px | 500 (medium) | 1.0 | Source Sans 3 | `text-xs font-medium` |
+| Badge / tag | 12px | 600 (semibold) | 1.0 | Source Sans 3 | `text-xs font-semibold` |
 | Helper text | 12px | 400 (regular) | 1.5 | Source Sans 3 | `text-xs` |
+
+**Weights used:** 400 (regular) and 600 (semibold) only. No other weights permitted in this phase.
 
 **Source:** DesignOS components, `docs/design-context.md`, `src/app/globals.css` font declarations
 
@@ -261,17 +263,42 @@ Same structure as designer detail but simpler: chart count only (no started/fini
 - **Icon:** Search icon (16px) positioned absolute left inside input
 - **Clear:** "Clear all" text button appears when any filter or search is active
 
+### Icon-Only Action Buttons (Accessibility)
+
+All icon-only buttons (no visible text label) must include an `aria-label` for screen readers. Use the entity name for context:
+
+| Icon | Context | aria-label |
+|------|---------|------------|
+| Pencil | Designer row / detail | `"Edit {designer name}"` |
+| Trash2 | Designer row / detail | `"Delete {designer name}"` |
+| Pencil | Genre row / detail | `"Edit {genre name}"` |
+| Trash2 | Genre row / detail | `"Delete {genre name}"` |
+| X (close) | Modal close button | `"Close dialog"` |
+| ExternalLink | Designer website | `"Visit {designer name} website"` |
+
+Example implementation:
+```tsx
+<Button variant="ghost" size="icon" aria-label={`Edit ${designer.name}`}>
+  <Pencil className="w-3.5 h-3.5" />
+</Button>
+<Button variant="ghost" size="icon" aria-label={`Delete ${designer.name}`}>
+  <Trash2 className="w-3.5 h-3.5" />
+</Button>
+```
+
 ### Row Actions (Desktop)
 
 - **Hover reveal:** Edit (Pencil) and Delete (Trash2) icons appear on row hover, 14px icons (`w-3.5 h-3.5`)
 - **Edit icon:** `text-muted-foreground` default, `hover:text-foreground hover:bg-muted` on hover
 - **Delete icon:** `text-muted-foreground` default, `hover:text-destructive hover:bg-destructive/10` on hover
 - **Row click (designer name):** Navigates to detail page (`/designers/[id]`)
+- **Accessibility:** All icon-only buttons use `aria-label` as defined in the table above
 
 ### Row Actions (Mobile Cards)
 
 - **Always visible:** Edit and Delete icons shown in card header, not hidden behind hover
 - **Card tap:** Navigates to detail page
+- **Accessibility:** Same `aria-label` pattern as desktop
 
 ### Modal Forms
 
@@ -296,7 +323,7 @@ Same structure as designer detail but simpler: chart count only (no started/fini
 - **Active pill:** `bg-emerald-50 text-emerald-700` with sort direction chevron
 - **Chart row:** Clickable, navigates to `/charts/[id]`
 - **Cover thumbnail:** 40x40px (`w-10 h-10`) rounded-lg. Placeholder uses Image icon from lucide if no cover
-- **Chart info:** Name (font-medium), stitch count + size category below (text-xs text-muted-foreground)
+- **Chart info:** Name (font-semibold), stitch count + size category below (text-xs text-muted-foreground)
 - **Status:** StatusBadge component on the right. Progress bar shown for In Progress charts only.
 
 ### Navigation
