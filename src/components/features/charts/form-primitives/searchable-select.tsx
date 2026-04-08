@@ -91,7 +91,7 @@ export function SearchableSelect({
                       className="text-primary"
                     >
                       <Plus className="mr-2 size-4" />
-                      Add &ldquo;{search || "new"}&rdquo;
+                      Add New
                     </CommandItem>
                   </CommandGroup>
                 </>

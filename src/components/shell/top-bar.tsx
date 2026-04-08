@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, Search, Clock, Plus } from "lucide-react";
+import { Menu, Clock, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { LinkButton } from "@/components/ui/link-button";
@@ -66,21 +66,8 @@ export function TopBar({ user }: TopBarProps) {
         </Sheet>
       </div>
 
-      {/* Search placeholder (non-interactive until search is built) */}
-      <div className="max-w-md flex-1">
-        <div className="relative">
-          <Search
-            className="text-muted-foreground/50 absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
-            strokeWidth={1.5}
-          />
-          <div
-            className="bg-muted/50 border-input/50 text-muted-foreground/60 w-full rounded-lg border py-2 pr-3 pl-9 text-sm select-none"
-            aria-hidden="true"
-          >
-            Search coming soon...
-          </div>
-        </div>
-      </div>
+      {/* Spacer */}
+      <div className="flex-1" />
 
       {/* Quick actions */}
       <div className="ml-auto flex items-center gap-2">

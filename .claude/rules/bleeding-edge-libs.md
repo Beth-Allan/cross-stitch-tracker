@@ -26,3 +26,4 @@ This project uses cutting-edge versions. Training data may be WRONG for these.
 - Auth.js: session.user.id requires explicit JWT callbacks → `.claude/rules/auth-patterns.md`
 - Base UI: Button+Link hydration mismatch → `.claude/rules/base-ui-patterns.md`
 - Tailwind v4: data-horizontal/data-vertical are custom variants, not broken → `.claude/rules/base-ui-patterns.md`
+- Next.js 16: importing from `"use client"` modules in Server Components is a runtime error — keep shared utils (like `buttonVariants`) in non-client files → `.claude/rules/base-ui-patterns.md`

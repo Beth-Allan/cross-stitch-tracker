@@ -200,3 +200,25 @@
     font-family: var(--font-heading);
   }
 }
+
+/* Loading skeleton animation */
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-skeleton-pulse {
+  animation: skeleton-pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-skeleton-pulse {
+    animation: none;
+    opacity: 0.5;
+  }
+}

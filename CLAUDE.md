@@ -16,6 +16,7 @@
 - PR #2 merged with full review cycle (CodeRabbit + 4-agent review + fixes)
 - Roadmap restructured to lean MVP (2026-04-07): CRUD + supplies + fabric → deploy → iterate
 - Plugin audit + CI hardening (2026-04-07): 19 plugins cataloged, quality gates expanded, git workflow rule, CI concurrency/pinning
+- Migrated docs/conventions/ to .claude/rules/ with glob frontmatter (2026-04-07)
 
 ### In Progress
 

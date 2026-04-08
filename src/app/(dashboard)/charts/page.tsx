@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Scissors, Image } from "lucide-react";
+import { Plus, Image } from "lucide-react";
 import { getCharts } from "@/lib/actions/chart-actions";
 import { getEffectiveStitchCount } from "@/lib/utils/size-category";
 import { StatusBadge } from "@/components/features/charts/status-badge";
@@ -29,17 +29,44 @@ export default async function ChartsPage() {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800">
-        <Scissors className="h-7 w-7 text-stone-400 dark:text-stone-500" strokeWidth={1.5} />
+      {/* Cross-stitch inspired grid pattern */}
+      <div className="mb-6 grid grid-cols-5 gap-1">
+        {[
+          "bg-emerald-200 dark:bg-emerald-800/40",
+          "bg-transparent",
+          "bg-amber-200 dark:bg-amber-800/40",
+          "bg-transparent",
+          "bg-emerald-200 dark:bg-emerald-800/40",
+          "bg-transparent",
+          "bg-emerald-300 dark:bg-emerald-700/40",
+          "bg-transparent",
+          "bg-emerald-300 dark:bg-emerald-700/40",
+          "bg-transparent",
+          "bg-amber-200 dark:bg-amber-800/40",
+          "bg-transparent",
+          "bg-emerald-400 dark:bg-emerald-600/40",
+          "bg-transparent",
+          "bg-amber-200 dark:bg-amber-800/40",
+          "bg-transparent",
+          "bg-emerald-300 dark:bg-emerald-700/40",
+          "bg-transparent",
+          "bg-emerald-300 dark:bg-emerald-700/40",
+          "bg-transparent",
+          "bg-emerald-200 dark:bg-emerald-800/40",
+          "bg-transparent",
+          "bg-amber-200 dark:bg-amber-800/40",
+          "bg-transparent",
+          "bg-emerald-200 dark:bg-emerald-800/40",
+        ].map((color, i) => (
+          <div key={i} className={`h-3 w-3 rounded-sm ${color}`} />
+        ))}
       </div>
-      <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-100">No charts yet</h2>
-      <p className="mt-1 max-w-sm text-sm text-stone-500 dark:text-stone-400">
-        Add your first chart to start tracking your cross-stitch collection.
+      <h2 className="font-heading text-foreground text-lg font-semibold">Your collection awaits</h2>
+      <p className="text-muted-foreground mt-1.5 max-w-xs text-sm">
+        Every great stash starts with one chart. Add your first and start tracking your stitching
+        journey.
       </p>
-      <LinkButton
-        href="/charts/new"
-        className="mt-6 bg-emerald-600 text-white hover:bg-emerald-700"
-      >
+      <LinkButton href="/charts/new" className="mt-6">
         Add Your First Chart
       </LinkButton>
     </div>
@@ -50,28 +77,28 @@ type ChartWithRelations = Awaited<ReturnType<typeof getCharts>>[number];
 
 function ChartsList({ charts }: { charts: ChartWithRelations[] }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900">
+    <div className="border-border bg-card overflow-hidden rounded-xl border">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-stone-100 dark:border-stone-800">
-            <th className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-stone-400 uppercase dark:text-stone-500">
+          <tr className="border-border/60 border-b">
+            <th className="text-muted-foreground px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase">
               Chart
             </th>
-            <th className="hidden px-4 py-3 text-left text-xs font-semibold tracking-wider text-stone-400 uppercase sm:table-cell dark:text-stone-500">
+            <th className="text-muted-foreground hidden px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase sm:table-cell">
               Designer
             </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-stone-400 uppercase dark:text-stone-500">
+            <th className="text-muted-foreground px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase">
               Status
             </th>
-            <th className="hidden px-4 py-3 text-left text-xs font-semibold tracking-wider text-stone-400 uppercase md:table-cell dark:text-stone-500">
+            <th className="text-muted-foreground hidden px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase md:table-cell">
               Size
             </th>
-            <th className="hidden px-4 py-3 text-right text-xs font-semibold tracking-wider text-stone-400 uppercase lg:table-cell dark:text-stone-500">
+            <th className="text-muted-foreground hidden px-4 py-3 text-right text-xs font-semibold tracking-wider uppercase lg:table-cell">
               Added
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
+        <tbody className="divide-border/60 divide-y">
           {charts.map((chart) => (
             <ChartRow key={chart.id} chart={chart} />
           ))}
@@ -96,24 +123,18 @@ function ChartRow({ chart }: { chart: ChartWithRelations }) {
   });
 
   return (
-    <tr className="group transition-colors hover:bg-stone-50 dark:hover:bg-stone-800/50">
+    <tr className="group hover:bg-muted/50 transition-colors">
       <td className="px-4 py-3">
         <Link href={`/charts/${chart.id}`} className="flex items-center gap-3">
           <CoverThumbnail url={chart.coverThumbnailUrl} name={chart.name} />
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-stone-900 dark:text-stone-100">
-              {chart.name}
-            </p>
-            {stitchDisplay && (
-              <p className="text-xs text-stone-400 dark:text-stone-500">{stitchDisplay}</p>
-            )}
+            <p className="text-foreground truncate text-sm font-semibold">{chart.name}</p>
+            {stitchDisplay && <p className="text-muted-foreground/70 text-xs">{stitchDisplay}</p>}
           </div>
         </Link>
       </td>
       <td className="hidden px-4 py-3 sm:table-cell">
-        <span className="text-sm text-stone-500 dark:text-stone-400">
-          {chart.designer?.name ?? "-"}
-        </span>
+        <span className="text-muted-foreground text-sm">{chart.designer?.name ?? "-"}</span>
       </td>
       <td className="px-4 py-3">
         <StatusBadge status={status} />
@@ -126,7 +147,7 @@ function ChartRow({ chart }: { chart: ChartWithRelations }) {
         />
       </td>
       <td className="hidden px-4 py-3 text-right lg:table-cell">
-        <span className="text-sm text-stone-500 dark:text-stone-400">{dateAdded}</span>
+        <span className="text-muted-foreground text-sm">{dateAdded}</span>
       </td>
     </tr>
   );
@@ -144,8 +165,8 @@ function CoverThumbnail({ url, name }: { url: string | null; name: string }) {
   }
 
   return (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-800 dark:to-stone-700">
-      <Image className="h-4 w-4 text-stone-400 dark:text-stone-500" strokeWidth={1.5} />
+    <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+      <Image className="text-muted-foreground/60 h-4 w-4" strokeWidth={1.5} />
     </div>
   );
 }

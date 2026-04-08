@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { buttonVariants } from "./button";
+import { buttonVariants } from "./button-variants";
 import type { VariantProps } from "class-variance-authority";
 
 interface LinkButtonProps
