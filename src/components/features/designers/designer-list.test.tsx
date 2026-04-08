@@ -6,9 +6,11 @@ import { createMockDesignerWithStats } from "@/__tests__/mocks";
 
 const mockCreateDesigner = vi.fn();
 const mockUpdateDesigner = vi.fn();
+const mockDeleteDesigner = vi.fn();
 vi.mock("@/lib/actions/designer-actions", () => ({
   createDesigner: (...args: unknown[]) => mockCreateDesigner(...args),
   updateDesigner: (...args: unknown[]) => mockUpdateDesigner(...args),
+  deleteDesigner: (...args: unknown[]) => mockDeleteDesigner(...args),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -146,5 +148,37 @@ describe("DesignerList", () => {
 
     const deleteArtecy = screen.getAllByLabelText("Delete Artecy Cross Stitch");
     expect(deleteArtecy.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("clicking delete button opens DeleteConfirmationDialog with designer info", async () => {
+    const user = userEvent.setup();
+    render(<DesignerList designers={mockDesigners} />);
+
+    // Click the first delete button (desktop row for "Heaven and Earth Designs")
+    const deleteButtons = screen.getAllByLabelText("Delete Heaven and Earth Designs");
+    await user.click(deleteButtons[0]);
+
+    // Dialog should appear with the designer name and chart count
+    expect(await screen.findByText("Delete Designer?")).toBeInTheDocument();
+    // Name appears in table row, mobile card, and dialog -- use getAllByText
+    expect(screen.getAllByText(/Heaven and Earth Designs/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/5 chart\(s\)/)).toBeInTheDocument();
+    expect(screen.getByText(/Charts will NOT be deleted/)).toBeInTheDocument();
+  });
+
+  it("confirming delete calls deleteDesigner action", async () => {
+    const user = userEvent.setup();
+    mockDeleteDesigner.mockResolvedValue({ success: true });
+    render(<DesignerList designers={mockDesigners} />);
+
+    // Open delete dialog
+    const deleteButtons = screen.getAllByLabelText("Delete Nora Corbett");
+    await user.click(deleteButtons[0]);
+
+    // Click the Delete button in the confirmation dialog
+    const confirmButton = await screen.findByRole("button", { name: /^delete$/i });
+    await user.click(confirmButton);
+
+    expect(mockDeleteDesigner).toHaveBeenCalledWith("d2");
   });
 });

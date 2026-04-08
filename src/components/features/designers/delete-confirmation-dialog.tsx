@@ -34,8 +34,13 @@ export function DeleteConfirmationDialog({
 
   function handleConfirm() {
     startTransition(async () => {
-      await onConfirm();
-      onOpenChange(false);
+      try {
+        await onConfirm();
+        onOpenChange(false);
+      } catch {
+        // onConfirm caller handles error reporting (toast);
+        // dialog stays open so user can retry
+      }
     });
   }
 

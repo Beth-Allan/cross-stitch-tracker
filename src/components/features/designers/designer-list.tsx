@@ -13,9 +13,12 @@ import {
   Users,
   Plus,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DesignerFormModal } from "./designer-form-modal";
+import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
+import { deleteDesigner } from "@/lib/actions/designer-actions";
 import type { DesignerWithStats } from "@/types/designer";
 
 /* ─── Types ─── */
@@ -67,6 +70,22 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
   const [search, setSearch] = useState("");
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editingDesigner, setEditingDesigner] = useState<DesignerWithStats | null>(null);
+  const [deletingDesigner, setDeletingDesigner] = useState<DesignerWithStats | null>(null);
+
+  async function handleDelete() {
+    if (!deletingDesigner) return;
+    try {
+      const result = await deleteDesigner(deletingDesigner.id);
+      if (result.success) {
+        toast.success("Designer deleted");
+        router.refresh();
+      } else {
+        toast.error(result.error ?? "Something went wrong. Please try again.");
+      }
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    }
+  }
 
   function handleSort(key: SortKey) {
     setSort((prev) =>
@@ -213,6 +232,7 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
                 key={designer.id}
                 designer={designer}
                 onEdit={() => setEditingDesigner(designer)}
+                onDelete={() => setDeletingDesigner(designer)}
               />
             ))}
             {filteredDesigners.length === 0 && (
@@ -238,6 +258,7 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
             key={designer.id}
             designer={designer}
             onEdit={() => setEditingDesigner(designer)}
+            onDelete={() => setDeletingDesigner(designer)}
           />
         ))}
         {filteredDesigners.length === 0 && (
@@ -265,6 +286,19 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
         }}
         designer={editingDesigner}
       />
+
+      {/* Delete confirmation dialog */}
+      <DeleteConfirmationDialog
+        open={!!deletingDesigner}
+        onOpenChange={(open) => {
+          if (!open) setDeletingDesigner(null);
+        }}
+        title="Delete Designer?"
+        entityName={deletingDesigner?.name ?? ""}
+        chartCount={deletingDesigner?.chartCount ?? 0}
+        entityType="designer"
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }
@@ -274,9 +308,11 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
 function DesignerRow({
   designer,
   onEdit,
+  onDelete,
 }: {
   designer: DesignerWithStats;
   onEdit: () => void;
+  onDelete: () => void;
 }) {
   return (
     <tr className="group hover:bg-muted/50 transition-colors">
@@ -327,6 +363,7 @@ function DesignerRow({
           </button>
           <button
             type="button"
+            onClick={onDelete}
             className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md p-1.5 transition-colors"
             aria-label={`Delete ${designer.name}`}
           >
@@ -343,9 +380,11 @@ function DesignerRow({
 function DesignerCard({
   designer,
   onEdit,
+  onDelete,
 }: {
   designer: DesignerWithStats;
   onEdit: () => void;
+  onDelete: () => void;
 }) {
   return (
     <div className="border-border bg-card rounded-xl border p-4 shadow-sm">
@@ -380,6 +419,7 @@ function DesignerCard({
           </button>
           <button
             type="button"
+            onClick={onDelete}
             className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md p-1.5 transition-colors"
             aria-label={`Delete ${designer.name}`}
           >

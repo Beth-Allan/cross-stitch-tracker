@@ -80,4 +80,43 @@ describe("DeleteConfirmationDialog", () => {
       screen.getByRole("button", { name: /^delete$/i }),
     ).toBeInTheDocument();
   });
+
+  it("closes dialog after successful onConfirm", async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    const onConfirm = vi.fn().mockResolvedValue(undefined);
+    render(
+      <DeleteConfirmationDialog
+        {...defaultProps}
+        onOpenChange={onOpenChange}
+        onConfirm={onConfirm}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: /^delete$/i }));
+    // Wait for the transition to complete
+    await vi.waitFor(() => {
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+  });
+
+  it("keeps dialog open when onConfirm throws", async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    const onConfirm = vi.fn().mockRejectedValue(new Error("Network error"));
+    render(
+      <DeleteConfirmationDialog
+        {...defaultProps}
+        onOpenChange={onOpenChange}
+        onConfirm={onConfirm}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: /^delete$/i }));
+    // Give the transition time to settle
+    await vi.waitFor(() => {
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+    });
+    // onOpenChange should NOT have been called with false
+    const closeCalls = onOpenChange.mock.calls.filter(([val]: [boolean]) => val === false);
+    expect(closeCalls).toHaveLength(0);
+  });
 });
