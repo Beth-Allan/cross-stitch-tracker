@@ -4,31 +4,31 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 3 planned, ready to execute
-**Last Updated:** 2026-04-07
+**Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 3 complete, Phase 4 next
+**Last Updated:** 2026-04-08
 **Roadmap:** Restructured to 4 milestones / 10 phases (was 9 sequential phases)
 
 ### Done
 
 - Phase 1 complete: scaffold, design tokens, auth, app shell, 7 pages, PWA
-- Phase 2 plans 01-04: schema, R2, validations, CRUD, forms, detail/list pages
-- Code quality infrastructure (Prettier, Vitest, Husky, CI, 73 tests)
-- PR #2 merged with full review cycle (CodeRabbit + 4-agent review + fixes)
-- Roadmap restructured to lean MVP (2026-04-07): CRUD + supplies + fabric → deploy → iterate
-- Plugin audit + CI hardening (2026-04-07): 19 plugins cataloged, quality gates expanded, git workflow rule, CI concurrency/pinning
-- Migrated docs/conventions/ to .claude/rules/ with glob frontmatter (2026-04-07)
-- Phase 2 verification + UI polish (2026-04-07): 8 bug fixes, design critique, normalize/distill/delight/polish
-- Phase 3 planned (2026-04-07): 4 plans in 3 waves — schema+actions, designer pages, genre pages, detail pages
+- Phase 2 complete: schema, R2, validations, CRUD, forms, detail/list pages, 73 tests
+- Phase 3 complete (2026-04-08): designer & genre pages — list, detail, create/edit/delete, 165 tests
+  - Gap closure plan 05: wired delete buttons on list pages, replaced window.confirm() with dialog
+  - Code review: 0 critical, 4 warnings, 4 info (advisory)
+  - 8 human UAT items pending (sort interaction, mobile layout, 404s, etc.)
+- Code quality infrastructure (Prettier, Vitest, Husky, CI)
+- PR #2 merged with full review cycle
+- Roadmap restructured to lean MVP (2026-04-07)
 
 ### In Progress
 
-- Phase 2 PR under review
+- Phase 2 PR under review (merge before Phase 4)
 
 ### Next Up
 
 1. Merge Phase 2 PR
-2. Execute Phase 3 (Designer & Genre pages) — `/gsd-execute-phase 3`
-3. Discuss + plan Phase 4 (Supplies & Fabric — parallel with Phase 3)
+2. Discuss + plan Phase 4 (Supplies & Fabric) — `/gsd-discuss-phase 4`
+3. Execute Phase 4 — `/gsd-execute-phase 4`
 4. Deploy MVP to Vercel after Phase 4
 
 ### Blockers
