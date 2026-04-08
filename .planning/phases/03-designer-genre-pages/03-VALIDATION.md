@@ -1,10 +1,11 @@
 ---
 phase: 3
 slug: designer-genre-pages
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-07
+audited: 2026-04-08
 ---
 
 # Phase 3 — Validation Strategy
@@ -21,7 +22,7 @@ created: 2026-04-07
 | **Config file** | vitest.config.ts |
 | **Quick run command** | `npm test` |
 | **Full suite command** | `npm test` |
-| **Estimated runtime** | ~15 seconds |
+| **Estimated runtime** | ~4 seconds |
 
 ---
 
@@ -30,7 +31,7 @@ created: 2026-04-07
 - **After every task commit:** Run `npm test`
 - **After every plan wave:** Run `npm test`
 - **Before `/gsd-verify-work`:** Full suite must be green
-- **Max feedback latency:** 15 seconds
+- **Max feedback latency:** 4 seconds
 
 ---
 
@@ -38,8 +39,19 @@ created: 2026-04-07
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| TBD | TBD | TBD | PROJ-06 | — | N/A | unit | `npm test` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | PROJ-07 | — | N/A | unit | `npm test` | ❌ W0 | ⬜ pending |
+| 03-01-01 | 01 | 1 | PROJ-06, PROJ-07 | T-03-01 | Auth guard on all actions | unit | `npx vitest run src/lib/actions/designer-actions.test.ts` | ✅ | ✅ green |
+| 03-01-01 | 01 | 1 | PROJ-06, PROJ-07 | T-03-02 | Zod validation on input | unit | `npx vitest run src/lib/actions/genre-actions.test.ts` | ✅ | ✅ green |
+| 03-01-02 | 01 | 1 | PROJ-06 | T-03-05 | $transaction atomic delete | unit | `npx vitest run src/lib/actions/designer-actions.test.ts` | ✅ | ✅ green |
+| 03-01-02 | 01 | 1 | PROJ-07 | T-03-05 | $transaction atomic delete | unit | `npx vitest run src/lib/actions/genre-actions.test.ts` | ✅ | ✅ green |
+| 03-02-01 | 02 | 2 | PROJ-06 | T-03-07 | Form validation + server action | unit | `npx vitest run src/components/features/designers/designer-list.test.tsx` | ✅ | ✅ green |
+| 03-02-01 | 02 | 2 | PROJ-06 | T-03-07 | Form create/edit with validation | unit | `npx vitest run src/components/features/designers/designer-form-modal.test.tsx` | ✅ | ✅ green |
+| 03-03-01 | 03 | 2 | PROJ-07 | T-03-09 | Form validation + server action | unit | `npx vitest run src/components/features/genres/genre-list.test.tsx` | ✅ | ✅ green |
+| 03-03-01 | 03 | 2 | PROJ-07 | T-03-09 | Form create/edit with validation | unit | `npx vitest run src/components/features/genres/genre-form-modal.test.tsx` | ✅ | ✅ green |
+| 03-04-01 | 04 | 3 | PROJ-06, PROJ-07 | T-03-11 | Delete confirmation + auth | unit | `npx vitest run src/components/features/designers/delete-confirmation-dialog.test.tsx` | ✅ | ✅ green |
+| 03-04-01 | 04 | 3 | PROJ-06 | T-03-12 | Detail page auth guard | unit | `npx vitest run src/components/features/designers/designer-detail.test.tsx` | ✅ | ✅ green |
+| 03-04-01 | 04 | 3 | PROJ-07 | T-03-12 | Detail page auth guard | unit | `npx vitest run src/components/features/genres/genre-detail.test.tsx` | ✅ | ✅ green |
+| 03-05-01 | 05 | 1 | PROJ-06 | T-03-05-01 | Delete from list via dialog | unit | `npx vitest run src/components/features/designers/designer-list.test.tsx` | ✅ | ✅ green |
+| 03-05-02 | 05 | 1 | PROJ-07 | T-03-05-02 | Delete from list via dialog | unit | `npx vitest run src/components/features/genres/genre-list.test.tsx` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -47,13 +59,46 @@ created: 2026-04-07
 
 ## Wave 0 Requirements
 
-- [ ] Designer action tests — CRUD operations with auth guard and validation
-- [ ] Genre action tests — CRUD operations with auth guard and validation
-- [ ] Designer page component tests — rendering, interactions, empty states
-- [ ] Genre page component tests — rendering, interactions, empty states
-- [ ] Detail page tests — chart list rendering, edit/delete flows
+*Existing test infrastructure (Vitest, test-utils, mock factories) covers all phase requirements.*
 
-*Existing test infrastructure (Vitest, test-utils, mock factories) covers framework needs.*
+---
+
+## Test Coverage Summary
+
+| Test File | Tests | Covers |
+|-----------|-------|--------|
+| designer-actions.test.ts | 18 | Auth guard (5), CRUD (8), stats (2), errors (3) |
+| genre-actions.test.ts | 18 | Auth guard (5), CRUD (8), stats (2), errors (3) |
+| designer-list.test.tsx | 12 | Table, search, empty states, sort interaction, delete flow |
+| designer-form-modal.test.tsx | 9 | Create/edit modes, validation, server error display |
+| designer-detail.test.tsx | 13 | Stats, chart list, links, empty state, chart sort pills |
+| delete-confirmation-dialog.test.tsx | 9 | Rendering, confirm, error resilience, entity variants |
+| genre-list.test.tsx | 13 | Table, search, empty states, sort interaction, delete flow |
+| genre-form-modal.test.tsx | 7 | Create/edit modes, validation, server error |
+| genre-detail.test.tsx | 11 | Chart count, chart list, links, empty state, chart sort pills |
+| **Total** | **110** | **(Phase 3 tests)** |
+
+Full suite: **174 tests** across 19 files — all green.
+
+---
+
+## Validation Audit 2026-04-08
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 5 |
+| Resolved | 5 |
+| Escalated | 0 |
+
+### Gaps Resolved
+
+| # | Gap | Test Added | File |
+|---|-----|-----------|------|
+| 1 | Designer list sort interaction | Click CHARTS header → rows reorder | designer-list.test.tsx |
+| 2 | Genre list sort interaction | Click CHARTS header → rows reorder | genre-list.test.tsx |
+| 3 | Designer form server error display | Mock error return → error text shown | designer-form-modal.test.tsx |
+| 4 | Designer detail chart sort pills | Click Stitches pill → charts reorder | designer-detail.test.tsx |
+| 5 | Genre detail chart sort pills | Click Stitches pill → charts reorder | genre-detail.test.tsx |
 
 ---
 
@@ -61,18 +106,20 @@ created: 2026-04-07
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| Sidebar navigation ordering | PROJ-06/07 | Visual layout verification | Confirm Designers and Genres appear below Charts in sidebar |
-| Cover thumbnail rendering | PROJ-06/07 | Image loading behavior | Check chart thumbnails display on detail pages |
+| Mobile card layout replaces table at < 768px | PROJ-06, PROJ-07 | CSS media queries not executed in jsdom | Resize browser below 768px, verify cards appear |
+| Sidebar shows Designers and Genres below Charts | PROJ-06, PROJ-07 | Visual layout ordering | Check sidebar navigation order |
+| Cover thumbnail rendering in chart rows | PROJ-06, PROJ-07 | Image loading in test environment | Verify chart thumbnails display on detail pages |
+| 404 page for non-existent designer/genre ID | PROJ-06, PROJ-07 | Server Component integration test | Navigate to /designers/nonexistent-id |
 
 ---
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 15s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 4s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** approved 2026-04-08
