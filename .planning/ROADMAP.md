@@ -104,7 +104,7 @@ Plans:
 - [x] 03-02-PLAN.md -- Designer list page with sortable table, search, form modal, sidebar navigation
 - [x] 03-03-PLAN.md -- Genre list page with sortable table, search, form modal
 - [x] 03-04-PLAN.md -- Designer and genre detail pages, delete confirmation dialog, human verification
-- [ ] 03-05-PLAN.md -- Gap closure: wire delete into designer list, replace confirm() in genre list, fix dialog error handling
+- [x] 03-05-PLAN.md -- Gap closure: wire delete into designer list, replace confirm() in genre list, fix dialog error handling
 **UI hint**: yes
 **Design refs**: `product-plan/sections/fabric-series-and-reference-data/` (DesignerPage, DesignerDetailModal, DesignerFormModal)
 
