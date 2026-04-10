@@ -35,7 +35,6 @@ const validFormData = {
   },
   project: {
     status: "UNSTARTED",
-    fabricId: null,
     projectBin: null,
     ipadApp: null,
     needsOnionSkinning: false,

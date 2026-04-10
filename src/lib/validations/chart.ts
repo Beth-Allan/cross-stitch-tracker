@@ -29,7 +29,6 @@ export const chartFormSchema = z.object({
     status: z
       .enum(PROJECT_STATUSES as unknown as [ProjectStatus, ...ProjectStatus[]])
       .default("UNSTARTED"),
-    fabricId: z.string().nullable().default(null),
     projectBin: z.string().nullable().default(null),
     ipadApp: z.string().nullable().default(null),
     needsOnionSkinning: z.boolean().default(false),

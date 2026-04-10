@@ -276,13 +276,11 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
 
       {/* Project Setup — only show if any field has data */}
       {project &&
-        (project.fabricId ||
-          project.projectBin ||
+        (project.projectBin ||
           project.ipadApp ||
           project.needsOnionSkinning) && (
           <InfoCard icon={Settings} title="Project Setup" className="lg:col-span-2">
             <div>
-              {project.fabricId && <DetailRow label="Fabric" value={project.fabricId} />}
               {project.projectBin && <DetailRow label="Project Bin" value={project.projectBin} />}
               {project.ipadApp && <DetailRow label="iPad App" value={project.ipadApp} />}
               {project.needsOnionSkinning && <DetailRow label="Onion Skinning" value="Needed" />}
