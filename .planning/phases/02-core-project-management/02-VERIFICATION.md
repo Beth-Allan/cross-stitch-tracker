@@ -1,21 +1,14 @@
 ---
 phase: 02-core-project-management
 verified: 2026-04-10T16:35:00Z
-status: gaps_found
-score: 4/5 roadmap success criteria verified
+status: human_needed
+score: 5/5 roadmap success criteria verified
 overrides_applied: 0
-gaps:
-  - truth: "User can create a project with ~50 metadata fields and view/edit/delete it"
-    status: partial
-    reason: "Build fails with TypeScript error in designer-actions.ts (line 163): 'notes' does not exist on Prisma-generated Designer type. The schema.prisma has notes String? on the Designer model, but the generated Prisma client pre-dates this field addition. Running prisma generate would resolve this. The chart CRUD itself is fully wired; the build failure is a generated-client drift issue."
-    artifacts:
-      - path: "src/lib/actions/designer-actions.ts"
-        issue: "Accesses designer.notes (lines 163, 188) but generated Prisma client does not include notes field in Designer type. npm run build fails with TS2339."
-      - path: "src/generated/prisma/models/Designer.ts"
-        issue: "Generated client does not include notes field — DesignerMinAggregateOutputType has id/name/website/createdAt/updatedAt only."
-    missing:
-      - "Run `npx prisma generate` to regenerate client from current schema.prisma (which already has notes String?)"
-      - "This is a generated-file drift issue, not a code logic issue — schema and actions are both correct"
+gaps: []
+resolved_gaps:
+  - truth: "Build fails with TS2339 on designer.notes — Prisma generated client drift"
+    resolved: "2026-04-10T16:40:00Z"
+    fix: "Ran npx prisma generate — generated client now includes notes field from schema"
 human_verification:
   - test: "Cover photo upload — end-to-end flow"
     expected: "Upload a cover image on /charts/new or /charts/[id]/edit. Cover displays in the detail page header and as a thumbnail in the charts list."
@@ -46,8 +39,8 @@ human_verification:
 
 **Phase Goal:** Users can create and manage cross-stitch projects with full metadata, cover photos, digital file storage, and status tracking
 **Verified:** 2026-04-10T16:35:00Z
-**Status:** gaps_found
-**Re-verification:** No — initial verification (retroactive)
+**Status:** human_needed
+**Re-verification:** No — initial verification (retroactive; Prisma client drift resolved post-verification)
 
 ---
 
@@ -57,13 +50,13 @@ human_verification:
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | User can create a project with ~50 metadata fields and view/edit/delete it | PARTIAL | Chart CRUD actions fully wired to Prisma (createChart, updateChart, deleteChart, getChart, getCharts). Form has 8 sections covering all metadata fields. Routes at /charts/new, /charts/[id]/edit, /charts/[id] all exist and are wired. **Build fails with TS2339** on `designer.notes` in `getDesigner` — Prisma client not regenerated after `notes String?` was added to schema. This is a generated-file drift issue, not a logic gap. |
+| 1 | User can create a project with ~50 metadata fields and view/edit/delete it | VERIFIED | Chart CRUD actions fully wired to Prisma (createChart, updateChart, deleteChart, getChart, getCharts). Form has 8 sections covering all metadata fields. Routes at /charts/new, /charts/[id]/edit, /charts/[id] all exist and are wired. Build passes after Prisma client regeneration. UAT confirmed all CRUD operations working (9/9 passed). |
 | 2 | User can upload a cover photo that displays in detail views | VERIFIED | `CoverImageUpload` component calls `getPresignedUploadUrl` with category "covers". `confirmUpload` saves key to `chart.coverImageUrl`. `chart-detail.tsx` renders cover with `<img src={coverImageUrl}>`. Graceful degradation confirmed in UAT. Full upload flow requires R2 (human verification item). |
 | 3 | User can upload a digital working copy via presigned R2 URL and download it later | VERIFIED | `FileUpload` component calls `getPresignedUploadUrl` with category "files". `upload-actions.ts` has `getPresignedDownloadUrl` returning a 3600s signed GET URL. `chart-detail.tsx` wires download handler calling `getPresignedDownloadUrl`. Graceful degradation message returned when R2 unconfigured. Full flow requires R2 (human verification item). |
 | 4 | User can set and change project status through all 7 stages | VERIFIED | `ProjectStatus` enum in schema has all 7 values (UNSTARTED, KITTING, KITTED, IN_PROGRESS, ON_HOLD, FINISHED, FFO). `STATUS_CONFIG` maps all 7 to labels and Tailwind classes. `StatusControl` client component wires to `updateChartStatus` server action with optimistic update and rollback. UAT 9/9 confirmed status change works. |
 | 5 | App displays auto-calculated size category based on stitch count | VERIFIED | `calculateSizeCategory` in `size-category.ts` maps 5 thresholds (Mini/Small/Medium/Large/BAP). `getEffectiveStitchCount` computes from dimensions when direct count is 0. `SizeBadge` renders colored badges. Both `charts/page.tsx` and `chart-detail.tsx` use SizeBadge. 14 unit tests cover boundary conditions. UAT confirmed colored badges working. |
 
-**Score:** 4/5 truths verified (1 partial due to build failure)
+**Score:** 5/5 truths verified
 
 ---
 
@@ -72,7 +65,7 @@ human_verification:
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
 | `prisma/schema.prisma` | Chart, Project, Designer, Genre models + ProjectStatus enum | VERIFIED | All 4 models present. ProjectStatus has 7 values. Chart has coverImageUrl, coverThumbnailUrl, digitalWorkingCopyUrl. Project has userId, status, dates, all project fields. |
-| `src/generated/prisma/` | Generated Prisma client with current schema | PARTIAL | Generated client exists but does not include `notes String?` on Designer (added in Phase 3 schema update). `DesignerMinAggregateOutputType` has only id/name/website/createdAt/updatedAt. |
+| `src/generated/prisma/` | Generated Prisma client with current schema | VERIFIED | Generated client regenerated 2026-04-10 — includes all fields including `notes String?` on Designer. |
 | `src/lib/r2.ts` | Lazy singleton R2 client | VERIFIED | `getR2Client()` lazy pattern — throws on first access if env vars missing (not on import). `R2_BUCKET_NAME` IIFE with fallback. |
 | `src/lib/utils/size-category.ts` | calculateSizeCategory + getEffectiveStitchCount | VERIFIED | Both functions exported. 5 thresholds: Mini <1000, Small 1000-4999, Medium 5000-24999, Large 25000-49999, BAP 50000+. |
 | `src/lib/utils/status.ts` | STATUS_CONFIG for all 7 statuses | VERIFIED | Full config map with label, bgClass, textClass, dotClass, darkBgClass for all 7 ProjectStatus values. |
@@ -134,7 +127,7 @@ human_verification:
 
 | Behavior | Command | Result | Status |
 |----------|---------|--------|--------|
-| TypeScript type-check passes | `npm run build` | FAILED — TS2339: Property 'notes' does not exist on Prisma Designer type in `designer-actions.ts` lines 163 and 188. Root cause: generated Prisma client drift (schema has `notes String?` but client was not regenerated). | FAIL |
+| TypeScript type-check passes | `npm run build` | All routes built, no errors. (Previously failed with TS2339 — resolved by `prisma generate` on 2026-04-10.) | PASS |
 | All tests pass | `npm test` | 174/174 tests pass across 19 test files. Vitest runs in JSDOM. One expected stderr from error-path test (intentional). | PASS |
 | Size category unit tests | Part of test suite | 14 tests in `size-category.test.ts` pass: Mini/Small/Medium/Large/BAP boundary conditions, dimension fallback, zero-count edge case. | PASS |
 | StatusBadge renders all statuses | Part of test suite | 4 tests confirm label rendering and aria-hidden dot for UNSTARTED, IN_PROGRESS, FFO. | PASS |
@@ -145,7 +138,7 @@ human_verification:
 
 | Requirement | Source Plans | Description | Status | Evidence |
 |-------------|-------------|-------------|--------|----------|
-| PROJ-01 | 02-01, 02-02, 02-03, 02-04, 02-05 | User can create, view, edit, and delete cross-stitch projects with ~50 metadata fields | SATISFIED (build gap) | createChart/updateChart/deleteChart server actions wired to Prisma. ChartAddForm has 8 sections covering all metadata. Detail/edit/list routes implemented. Build failure is generated-client drift unrelated to chart CRUD logic. UAT confirmed create/view/edit/delete all working. |
+| PROJ-01 | 02-01, 02-02, 02-03, 02-04, 02-05 | User can create, view, edit, and delete cross-stitch projects with ~50 metadata fields | SATISFIED | createChart/updateChart/deleteChart server actions wired to Prisma. ChartAddForm has 8 sections covering all metadata. Detail/edit/list routes implemented. Build passes. UAT confirmed create/view/edit/delete all working (9/9 passed). |
 | PROJ-02 | 02-02, 02-03, 02-04 | User can upload cover photo and view it in gallery/detail views | SATISFIED (R2 pending) | CoverImageUpload → getPresignedUploadUrl → client PUT → confirmUpload → DB. chart-detail.tsx renders `<img src={coverImageUrl}>`. Charts list renders thumbnail. Graceful degradation confirmed. R2 upload round-trip needs live R2. |
 | PROJ-03 | 02-02, 02-03, 02-04 | User can upload and store digital working copies via presigned R2 URLs | SATISFIED (R2 pending) | FileUpload → getPresignedUploadUrl (category "files") → confirmUpload → DB. getPresignedDownloadUrl wired in chart-detail. 3600s signed GET URL returned. Graceful degradation confirmed. |
 | PROJ-04 | 02-01, 02-02, 02-04 | User can set and change project status through all 7 stages | SATISFIED | All 7 ProjectStatus values in schema. STATUS_CONFIG covers all 7. updateChartStatus validates against PROJECT_STATUSES. StatusControl provides optimistic UI. UAT confirmed all 7 work with immediate badge update and toast. |
@@ -159,7 +152,7 @@ No orphaned requirements — PROJ-01 through PROJ-05 are the only Phase 2 requir
 
 | File | Line | Pattern | Severity | Impact |
 |------|------|---------|----------|--------|
-| `src/generated/prisma/models/Designer.ts` | Generated | Missing `notes` field — generated client predates schema change | BLOCKER | `npm run build` fails with TS2339 on `designer.notes` in two places in `designer-actions.ts`. Fix: `npx prisma generate`. |
+| `src/generated/prisma/models/Designer.ts` | Generated | (Resolved) Missing `notes` field — generated client predated schema change | RESOLVED | Fixed by running `npx prisma generate` on 2026-04-10. Build now passes. |
 | `src/components/features/charts/chart-add-form.tsx` | 38 | `window.confirm("You have unsaved changes...")` | WARNING | Browser confirm dialog is accessible but less polished than a custom dialog. Phase 3 designer work used `DeleteConfirmationDialog` instead. Consistent approach pending. |
 | `src/components/features/charts/chart-edit-modal.tsx` | 53 | `window.confirm("You have unsaved changes. Discard them?")` | WARNING | Same issue as chart-add-form. Not a functional blocker. |
 | `src/components/features/charts/sections/project-setup-section.tsx` | 67-75 | Fabric field disabled, options=[], onChange=noop | INFO | Intentional — labeled "Available in Phase 5", disabled prop set. Not a stub risk. |
@@ -210,17 +203,7 @@ No orphaned requirements — PROJ-01 through PROJ-05 are the only Phase 2 requir
 
 ### Gaps Summary
 
-One automated gap blocks a clean build:
-
-**TS2339 — Prisma generated client does not include `notes` on Designer**
-
-The `notes String?` field was added to `prisma/schema.prisma` during Phase 3 work (for the DesignerDetail type and form), but `prisma generate` was not re-run after that schema change. The generated client in `src/generated/prisma/models/Designer.ts` does not include `notes`, causing two TypeScript errors in `designer-actions.ts` (lines 163 and 188) and two in the test factories/mocks.
-
-This is a generated-file drift issue. The schema, actions, and types are all correct — only the generated client is stale.
-
-**Fix:** Run `npx prisma generate` (or the Prisma MCP `migrate-dev` tool). No logic changes needed.
-
-Note: This gap originated in Phase 3 work (adding notes to the designer schema), not in Phase 2's own plans. However, since it blocks `npm run build` for the full application including Phase 2 routes, it must be resolved before Phase 2 can be considered fully verified.
+No automated gaps remain. The Prisma client drift issue (TS2339 on `designer.notes`) was resolved by running `prisma generate` on 2026-04-10. Build passes, 174/174 tests pass.
 
 Six human verification items remain — all require either a live R2 configuration or a running browser (visual, interactive, or real-time behaviors). The core CRUD and status management have been UAT-verified (9/9 passed).
 
