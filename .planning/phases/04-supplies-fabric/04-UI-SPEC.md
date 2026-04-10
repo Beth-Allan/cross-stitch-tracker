@@ -47,6 +47,8 @@ Exceptions:
 - Color swatches: 28px (w-7 h-7) in supply rows, 20px (w-5 h-5) in search dropdown results — matches design reference
 - Touch targets: 44px minimum for mobile tap targets on supply row actions and tab buttons
 
+All exception values (28px, 20px, 44px) are multiples of 4, maintaining grid alignment with the 4px base unit.
+
 **Source:** Design reference components (ProjectSuppliesTab.tsx, SupplyCatalog.tsx)
 
 ---
@@ -62,9 +64,11 @@ Exceptions:
 
 **Additional rules:**
 - Table column headers: 12px, uppercase, tracking-wider, weight 600, Source Sans 3
-- Quantity numbers in supply rows: 14px, weight 500, tabular-nums (JetBrains Mono for percentage values only)
+- Quantity numbers in supply rows: 14px, weight 400, tabular-nums (JetBrains Mono for percentage values only)
 - Filter labels and "Req:" / "Got:" micro-labels: 12px, weight 400, text-muted-foreground
-- CTA buttons: 14px, weight 500, Source Sans 3
+- CTA buttons: 14px, weight 600, Source Sans 3
+
+**Weights used: 400 (regular) and 600 (semibold) only.** No intermediate weights.
 
 **Source:** Design reference components — consistent across SupplyCatalog, ProjectSuppliesTab, FabricFormModal
 
@@ -122,6 +126,12 @@ needsBorder(hex): boolean
 All swatches use `style={{ backgroundColor: hexColor }}` with shadow-sm. This is CSS background-color from hex strings -- no canvas, no SVG, no color picker library.
 
 **Source:** ProjectSuppliesTab.tsx needsBorder() helper, SupplyCatalog.tsx grid/table views
+
+---
+
+## Visual Focal Point
+
+**Focal point: color swatch grid** — the visual anchor for the /supplies page. The grid view of color swatches (48px rounded tiles in a responsive grid) is the primary visual landmark users see on arrival. All other UI elements (tabs, filters, view toggles) serve to navigate and refine the swatch grid.
 
 ---
 
@@ -198,9 +208,11 @@ PageHeader: "Supply Brands" (Fraunces 18px semibold)
 SearchBar: search input
 SortableTable: columns [Name, Website, Type, Actions]
   Row actions: Edit (Pencil icon), Delete (Trash2 icon)
+    Edit button: title="Edit brand", aria-label="Edit {name}"
+    Delete button: title="Delete brand", aria-label="Delete {name}"
 ```
 
-Follows designer-list.tsx pattern exactly.
+Follows designer-list.tsx pattern exactly. Icon-only row actions must include tooltip text (`title` attribute) and `aria-label` with the entity name for screen reader identification.
 
 ### /fabric (Fabric Catalog)
 
@@ -319,6 +331,18 @@ SupplySection (collapsible, 3 sections):
 - Close via X button, Cancel, or backdrop click
 - Validation errors shown inline below fields (text-destructive, text-sm)
 
+**Modal save button labels by context:**
+
+| Modal | Create Label | Edit Label |
+|-------|-------------|------------|
+| SupplyFormModal (thread) | "Add Thread" | "Save Changes" |
+| SupplyFormModal (bead) | "Add Bead" | "Save Changes" |
+| SupplyFormModal (specialty) | "Add Item" | "Save Changes" |
+| SupplyBrandFormModal | "Add Brand" | "Save Changes" |
+| FabricFormModal | "Add Fabric" | "Save Changes" |
+
+Cancel button label is always "Cancel" across all modals.
+
 ### Sortable Tables
 - Column header click toggles sort direction
 - Active sort column: emerald text with arrow indicator
@@ -335,6 +359,18 @@ SupplySection (collapsible, 3 sections):
 | Primary CTA (brands) | "Add Brand" |
 | Primary CTA (fabric) | "Add Fabric" |
 | Primary CTA (shopping fulfillment) | "Mark Acquired" |
+
+### Modal Button Labels
+
+| Context | Create Mode | Edit Mode |
+|---------|-------------|-----------|
+| Thread modal | "Add Thread" | "Save Changes" |
+| Bead modal | "Add Bead" | "Save Changes" |
+| Specialty modal | "Add Item" | "Save Changes" |
+| Brand modal | "Add Brand" | "Save Changes" |
+| Fabric modal | "Add Fabric" | "Save Changes" |
+
+All modals use "Cancel" for the dismiss action.
 
 ### Empty States
 
@@ -412,6 +448,7 @@ No third-party registries configured. No new shadcn components need to be instal
 | Modal focus trap | Focus stays within modal when open; Escape closes; return focus to trigger on close |
 | Sortable table headers | Use button role on clickable headers; aria-sort attribute on active column |
 | Remove button visibility | opacity-0 to opacity-100 on hover is mouse-only; ensure focus:opacity-100 for keyboard users |
+| Icon-only row actions (brands table) | Edit (Pencil) and Delete (Trash2) buttons: `title="Edit brand"` / `title="Delete brand"` + `aria-label="Edit {name}"` / `aria-label="Delete {name}"` with entity name interpolated |
 
 ---
 
