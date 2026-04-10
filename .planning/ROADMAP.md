@@ -119,7 +119,16 @@ Plans:
   4. User can create fabric records (brand, count, type, color, dimensions) and link to projects
   5. App auto-calculates required fabric size from stitch dimensions and fabric count
   6. Shopping list view shows unfulfilled supplies grouped by project
-**Plans**: TBD
+**Plans:** 7 plans
+
+Plans:
+- [ ] 04-01-PLAN.md -- Prisma schema (9 models + 3 junctions), types, validations, DMC seed data, fabric calculator, test factories
+- [ ] 04-02-PLAN.md -- Supply server actions (thread/bead/specialty/brand CRUD, junction CRUD, shopping list query)
+- [ ] 04-03-PLAN.md -- Fabric server actions (fabric/brand CRUD)
+- [ ] 04-04-PLAN.md -- Supply catalog UI (tabbed page, grid/table views, color swatches, brand management)
+- [ ] 04-05-PLAN.md -- Fabric catalog UI (list page, detail page, form modal, size calculator)
+- [ ] 04-06-PLAN.md -- Project supplies tab (inline search-to-add, editable quantities, kitting summary)
+- [ ] 04-07-PLAN.md -- Shopping list page, navigation updates, human verification
 **UI hint**: yes
 **Design refs**: `product-plan/sections/supply-tracking-and-shopping/` (all components), `product-plan/sections/fabric-series-and-reference-data/` (FabricCatalog, FabricDetail, FabricFormModal)
 **Deferred to later**: Kitting auto-calculation (8 conditions), kitting progress indicators, supply statistics, advanced brand management
@@ -207,7 +216,7 @@ Note: Within milestones, phases with independent dependencies can run in paralle
 | 1. Foundation & Infrastructure | 3/3 | Complete | 2026-03-28 |
 | 2. Core Project Management | 4/5 | In Progress |  |
 | 3. Designer & Genre Pages | 4/5 | In Progress | - |
-| 4. Supplies & Fabric | 0/TBD | Not started | - |
+| 4. Supplies & Fabric | 0/7 | Not started | - |
 | 5. Gallery & Filtering | 0/TBD | Not started | - |
 | 6. Reference Data | 0/TBD | Not started | - |
 | 7. Basic Dashboards | 0/TBD | Not started | - |
