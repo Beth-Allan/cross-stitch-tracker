@@ -5,13 +5,15 @@
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
 **Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 3 complete, Phase 4 next
-**Last Updated:** 2026-04-08
+**Last Updated:** 2026-04-10
 **Roadmap:** Restructured to 4 milestones / 10 phases (was 9 sequential phases)
 
 ### Done
 
 - Phase 1 complete: scaffold, design tokens, auth, app shell, 7 pages, PWA
-- Phase 2 complete: schema, R2, validations, CRUD, forms, detail/list pages, 73 tests
+- Phase 2 complete + verified: schema, R2, validations, CRUD, forms, detail/list pages, 174 tests
+  - VERIFICATION.md created retroactively (2026-04-10), 5/5 success criteria, status human_needed
+  - Fixed Prisma client drift (notes field) — build passes
 - Phase 3 complete (2026-04-08): designer & genre pages — list, detail, create/edit/delete, 165 tests
   - Gap closure plan 05: wired delete buttons on list pages, replaced window.confirm() with dialog
   - Code review: 0 critical, 4 warnings, 4 info (advisory)
@@ -19,6 +21,9 @@
 - Code quality infrastructure (Prettier, Vitest, Husky, CI)
 - PR #2 merged with full review cycle
 - Roadmap restructured to lean MVP (2026-04-07)
+- Milestone 1 audit: **gaps_found** (12/18 requirements satisfied)
+  - Phases 1-3 all verified, only Phase 4 remains (6 requirements)
+  - Report: `.planning/v1.0-MILESTONE-AUDIT.md`
 
 ### In Progress
 
