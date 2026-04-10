@@ -1,4 +1,6 @@
 import type { Chart, Project, Designer, Genre } from "@/generated/prisma/client";
+import type { DesignerWithStats, DesignerChart } from "@/types/designer";
+import type { GenreWithStats, GenreChart } from "@/types/genre";
 import { vi } from "vitest";
 
 /**
@@ -12,8 +14,37 @@ export function createMockDesigner(overrides?: Partial<Designer>): Designer {
     id: "d1",
     name: "Test Designer",
     website: null,
+    notes: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
+export function createMockDesignerWithStats(
+  overrides?: Partial<DesignerWithStats>,
+): DesignerWithStats {
+  return {
+    id: "d1",
+    name: "Test Designer",
+    website: null,
+    notes: null,
+    chartCount: 0,
+    ...overrides,
+  };
+}
+
+export function createMockDesignerChart(overrides?: Partial<DesignerChart>): DesignerChart {
+  return {
+    id: "chart-1",
+    name: "Test Chart",
+    coverThumbnailUrl: null,
+    stitchCount: 5000,
+    stitchesWide: 100,
+    stitchesHigh: 50,
+    status: null,
+    stitchesCompleted: 0,
+    genres: [],
     ...overrides,
   };
 }
@@ -24,6 +55,29 @@ export function createMockGenre(overrides?: Partial<Genre>): Genre {
     name: "Test Genre",
     createdAt: new Date(),
     updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
+export function createMockGenreWithStats(overrides?: Partial<GenreWithStats>): GenreWithStats {
+  return {
+    id: "g1",
+    name: "Test Genre",
+    chartCount: 0,
+    ...overrides,
+  };
+}
+
+export function createMockGenreChart(overrides?: Partial<GenreChart>): GenreChart {
+  return {
+    id: "chart-1",
+    name: "Test Chart",
+    coverThumbnailUrl: null,
+    stitchCount: 5000,
+    stitchesWide: 100,
+    stitchesHigh: 50,
+    status: null,
+    stitchesCompleted: 0,
     ...overrides,
   };
 }
@@ -111,11 +165,25 @@ export function createMockPrisma() {
       findMany: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),
+      updateMany: vi.fn(),
       delete: vi.fn(),
     },
     project: { findUnique: vi.fn(), update: vi.fn() },
-    designer: { create: vi.fn(), findMany: vi.fn() },
-    genre: { create: vi.fn(), findMany: vi.fn() },
+    designer: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
+    genre: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
+    $transaction: vi.fn(),
   };
 }
 

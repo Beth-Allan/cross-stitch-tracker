@@ -59,6 +59,7 @@ export type ChartFormInput = z.infer<typeof chartFormSchema>;
 export const designerSchema = z.object({
   name: z.string().trim().min(1, "Designer name is required").max(200, "Designer name too long"),
   website: z.string().url("Must be a valid URL").nullable().default(null),
+  notes: z.string().max(5000, "Notes too long").nullable().default(null),
 });
 
 export type DesignerInput = z.infer<typeof designerSchema>;

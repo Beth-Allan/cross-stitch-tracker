@@ -26,6 +26,7 @@ model Designer {
   id        String   @id @default(cuid())
   name      String   @unique
   website   String?
+  notes     String?
   charts    Chart[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

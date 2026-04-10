@@ -1,6 +1,8 @@
 import {
   LayoutDashboard,
   Scissors,
+  Paintbrush,
+  Tags,
   Package,
   Clock,
   BarChart3,
@@ -18,6 +20,8 @@ export interface NavItem {
 export const navigationItems: NavItem[] = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
   { label: "Charts", href: "/charts", icon: Scissors },
+  { label: "Designers", href: "/designers", icon: Paintbrush },
+  { label: "Genres", href: "/genres", icon: Tags },
   { label: "Supplies", href: "/supplies", icon: Package },
   { label: "Sessions", href: "/sessions", icon: Clock },
   { label: "Statistics", href: "/stats", icon: BarChart3 },

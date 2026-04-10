@@ -4,13 +4,13 @@
 
 This roadmap delivers a personal cross-stitch project management app replacing Notion. Restructured 2026-04-07 to ship a lean MVP faster: core CRUD + supplies + fabric, then deploy and iterate based on real usage. The full vision is preserved across 4 milestones.
 
-Design components from `product-plan/sections/` are imported and adapted as each phase's UI is built. Note: design sections don't map 1:1 to phases — see `.claude/rules/ui-design-reference.md` for the mapping.
+Design components from `product-plan/sections/` are imported and adapted as each phase's UI is built. Note: design sections don't map 1:1 to phases -- see `.claude/rules/ui-design-reference.md` for the mapping.
 
 ## Milestones
 
 | Milestone | Theme | Phases | Deploy? |
 |-----------|-------|--------|---------|
-| **1** | MVP — "Replace Notion" | 1-4 | Yes, after Phase 4 |
+| **1** | MVP -- "Replace Notion" | 1-4 | Yes, after Phase 4 |
 | **2** | Browse & Organize | 5-6 | Incremental |
 | **3** | Track & Measure | 7-8 | Incremental |
 | **4** | Motivation & Planning | 9-10 | Incremental |
@@ -23,14 +23,14 @@ Design components from `product-plan/sections/` are imported and adapted as each
 
 ---
 
-### Milestone 1: MVP — "Replace Notion"
+### Milestone 1: MVP -- "Replace Notion"
 
 - [x] **Phase 1: Foundation & Infrastructure** - Auth, app shell, design system, responsive layout, PWA manifest
 - [ ] **Phase 2: Core Project Management** - Chart CRUD with rich metadata, file uploads, status system, size calculation
 - [ ] **Phase 3: Designer & Genre Pages** - Dedicated management pages for designers and genres
 - [ ] **Phase 4: Supplies & Fabric** - Pre-seeded DMC catalog, bead + specialty catalogs, fabric records, project-supply linking, shopping list
 
-**>> Deploy to Vercel — start entering real data <<**
+**>> Deploy to Vercel -- start entering real data <<**
 
 ### Milestone 2: Browse & Organize
 
@@ -62,9 +62,9 @@ Design components from `product-plan/sections/` are imported and adapted as each
 **Plans:** 3 plans
 
 Plans:
-- [x] 01-01-PLAN.md — Scaffold Next.js 16, design system tokens, Prisma 7 + Neon, PWA manifest
-- [x] 01-02-PLAN.md — Auth.js v5 credentials, rate limiting, branded login page
-- [x] 01-03-PLAN.md — App shell (sidebar, TopBar, UserMenu), placeholder pages, responsive layout
+- [x] 01-01-PLAN.md -- Scaffold Next.js 16, design system tokens, Prisma 7 + Neon, PWA manifest
+- [x] 01-02-PLAN.md -- Auth.js v5 credentials, rate limiting, branded login page
+- [x] 01-03-PLAN.md -- App shell (sidebar, TopBar, UserMenu), placeholder pages, responsive layout
 **UI hint**: yes
 
 ### Phase 2: Core Project Management
@@ -80,15 +80,15 @@ Plans:
 **Plans:** 4/5 plans executed
 
 Plans:
-- [x] 02-01-PLAN.md — Prisma schema (Chart/Project/Designer/Genre), R2 client, Zod schemas, utilities, type definitions
-- [x] 02-02-PLAN.md — Server Actions (chart CRUD, file uploads, inline entity creation)
-- [x] 02-03-PLAN.md — Chart form UI (add/edit) with upload components and inline entity dialogs
-- [x] 02-04-PLAN.md — Chart detail page, charts list page, status/size badges, status control
-- [ ] 02-05-PLAN.md — Human verification of full chart lifecycle
+- [x] 02-01-PLAN.md -- Prisma schema (Chart/Project/Designer/Genre), R2 client, Zod schemas, utilities, type definitions
+- [x] 02-02-PLAN.md -- Server Actions (chart CRUD, file uploads, inline entity creation)
+- [x] 02-03-PLAN.md -- Chart form UI (add/edit) with upload components and inline entity dialogs
+- [x] 02-04-PLAN.md -- Chart detail page, charts list page, status/size badges, status control
+- [ ] 02-05-PLAN.md -- Human verification of full chart lifecycle
 **UI hint**: yes
 
 ### Phase 3: Designer & Genre Pages
-**Goal**: Users can manage designers and genres with dedicated pages — list, create, edit, delete — not just inline creation from the chart form
+**Goal**: Users can manage designers and genres with dedicated pages -- list, create, edit, delete -- not just inline creation from the chart form
 **Depends on**: Phase 2
 **Requirements**: PROJ-06, PROJ-07
 **Success Criteria** (what must be TRUE):
@@ -97,7 +97,14 @@ Plans:
   3. User can view a list of all genres with chart counts
   4. User can create, edit, and delete genres from a dedicated page
   5. Designer/genre detail views show associated charts
-**Plans**: TBD
+**Plans:** 5 plans
+
+Plans:
+- [x] 03-01-PLAN.md -- Schema migration (Designer notes), validations, types, server actions (full CRUD for designers and genres)
+- [x] 03-02-PLAN.md -- Designer list page with sortable table, search, form modal, sidebar navigation
+- [x] 03-03-PLAN.md -- Genre list page with sortable table, search, form modal
+- [x] 03-04-PLAN.md -- Designer and genre detail pages, delete confirmation dialog, human verification
+- [x] 03-05-PLAN.md -- Gap closure: wire delete into designer list, replace confirm() in genre list, fix dialog error handling
 **UI hint**: yes
 **Design refs**: `product-plan/sections/fabric-series-and-reference-data/` (DesignerPage, DesignerDetailModal, DesignerFormModal)
 
@@ -199,7 +206,7 @@ Note: Within milestones, phases with independent dependencies can run in paralle
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 3/3 | Complete | 2026-03-28 |
 | 2. Core Project Management | 4/5 | In Progress |  |
-| 3. Designer & Genre Pages | 0/TBD | Not started | - |
+| 3. Designer & Genre Pages | 4/5 | In Progress | - |
 | 4. Supplies & Fabric | 0/TBD | Not started | - |
 | 5. Gallery & Filtering | 0/TBD | Not started | - |
 | 6. Reference Data | 0/TBD | Not started | - |

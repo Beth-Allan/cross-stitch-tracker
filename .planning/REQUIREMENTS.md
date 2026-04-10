@@ -14,8 +14,8 @@
 - [x] **PROJ-03**: User can upload and store digital working copies (PDF/image) via presigned R2 URLs
 - [x] **PROJ-04**: User can set and change project status (Unstarted, Kitting, Kitted, In Progress, On Hold, Finished, FFO)
 - [x] **PROJ-05**: App auto-calculates size category (Mini/Small/Medium/Large/BAP) from stitch count
-- [ ] **PROJ-06**: User can create, edit, and delete designers and link them to projects
-- [ ] **PROJ-07**: User can create, edit, and manage genre tags and apply them to projects
+- [x] **PROJ-06**: User can create, edit, and delete designers and link them to projects
+- [x] **PROJ-07**: User can create, edit, and manage genre tags and apply them to projects
 
 #### Supplies & Fabric (Phase 4)
 
@@ -126,8 +126,8 @@ Which phases cover which requirements. Updated 2026-04-07 after MVP restructure.
 | PROJ-03 | Phase 2 | 1 (MVP) | Complete |
 | PROJ-04 | Phase 2 | 1 (MVP) | Complete |
 | PROJ-05 | Phase 2 | 1 (MVP) | Complete |
-| PROJ-06 | Phase 3 | 1 (MVP) | Pending |
-| PROJ-07 | Phase 3 | 1 (MVP) | Pending |
+| PROJ-06 | Phase 3 | 1 (MVP) | Complete |
+| PROJ-07 | Phase 3 | 1 (MVP) | Complete |
 | SUPP-01 | Phase 4 | 1 (MVP) | Pending |
 | SUPP-02 | Phase 4 | 1 (MVP) | Pending |
 | SUPP-03 | Phase 4 | 1 (MVP) | Pending |
