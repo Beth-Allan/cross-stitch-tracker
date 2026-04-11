@@ -155,7 +155,11 @@ export function SearchToAdd({
         if (result.success) {
           toast.success(`Added ${item.brand.name} ${getItemCode(item)} to project`);
           onAdded();
-          onClose();
+          // Don't close -- user may want to add more items
+          // Scroll to keep search/add controls visible
+          setTimeout(() => {
+            ref.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+          }, 100);
         } else {
           toast.error(result.error ?? "Something went wrong. Please try again.");
         }

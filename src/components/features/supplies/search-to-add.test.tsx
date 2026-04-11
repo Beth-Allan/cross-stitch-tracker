@@ -1,5 +1,5 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@/__tests__/test-utils";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, waitFor, fireEvent, act } from "@/__tests__/test-utils";
 import { createMockSupplyBrand, createMockThread } from "@/__tests__/mocks";
 import type { ThreadWithBrand } from "@/types/supply";
 import { SearchToAdd } from "./search-to-add";
@@ -181,5 +181,109 @@ describe("SearchToAdd - already-added indicator", () => {
     // Already-added item should have reduced opacity
     const alreadyAddedButton = buttons[indexA];
     expect(alreadyAddedButton.className).toContain("opacity-50");
+  });
+});
+
+describe("SearchToAdd - scrollIntoView after add", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    mockGetThreads.mockResolvedValue([threadA, threadB, threadC]);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  async function renderAndWaitForResults(props = defaultProps) {
+    render(<SearchToAdd {...props} />);
+    await vi.advanceTimersByTimeAsync(200);
+    await waitFor(
+      () => {
+        expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+        const buttons = screen.getAllByRole("button");
+        expect(buttons.length).toBeGreaterThanOrEqual(1);
+      },
+      { timeout: 2000 },
+    );
+  }
+
+  it("calls scrollIntoView after a successful add", async () => {
+    const mockScrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = mockScrollIntoView;
+
+    await renderAndWaitForResults({
+      ...defaultProps,
+      existingIds: [], // none existing so all are addable
+    });
+
+    // Click thread B (321) to add it
+    const buttons = screen.getAllByRole("button");
+    const button321 = buttons.find((btn) => btn.textContent?.includes("321"));
+    expect(button321).toBeDefined();
+
+    await act(async () => {
+      fireEvent.click(button321!);
+    });
+
+    // Wait for the success action and setTimeout
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(200);
+    });
+
+    expect(mockScrollIntoView).toHaveBeenCalled();
+  });
+
+  it("calls scrollIntoView with smooth behavior and block end", async () => {
+    const mockScrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = mockScrollIntoView;
+
+    await renderAndWaitForResults({
+      ...defaultProps,
+      existingIds: [],
+    });
+
+    const buttons = screen.getAllByRole("button");
+    const button321 = buttons.find((btn) => btn.textContent?.includes("321"));
+
+    await act(async () => {
+      fireEvent.click(button321!);
+    });
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(200);
+    });
+
+    expect(mockScrollIntoView).toHaveBeenCalledWith({
+      behavior: "smooth",
+      block: "end",
+    });
+  });
+
+  it("does NOT call scrollIntoView after a failed add", async () => {
+    const mockScrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = mockScrollIntoView;
+    mockAddThreadToProject.mockResolvedValueOnce({
+      success: false,
+      error: "Failed to add",
+    });
+
+    await renderAndWaitForResults({
+      ...defaultProps,
+      existingIds: [],
+    });
+
+    const buttons = screen.getAllByRole("button");
+    const button321 = buttons.find((btn) => btn.textContent?.includes("321"));
+
+    await act(async () => {
+      fireEvent.click(button321!);
+    });
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(200);
+    });
+
+    expect(mockScrollIntoView).not.toHaveBeenCalled();
   });
 });

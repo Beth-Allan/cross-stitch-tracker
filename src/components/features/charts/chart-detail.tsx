@@ -184,7 +184,7 @@ function CoverImage({
       <img
         src={coverImageUrl}
         alt={`Cover for ${chartName}`}
-        className="aspect-[4/3] max-h-80 w-full rounded-lg object-cover lg:w-80"
+        className="bg-muted aspect-[4/3] max-h-80 w-full rounded-lg object-contain lg:w-80"
         onError={() => setImgError(true)}
       />
     );
