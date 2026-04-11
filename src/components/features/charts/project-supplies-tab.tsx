@@ -193,6 +193,7 @@ function SupplyRow({
         onClick={onRemove}
         className="flex w-5 shrink-0 justify-center opacity-40 transition-opacity group-hover:opacity-100 focus:opacity-100"
         title="Remove from project"
+        aria-label={`Remove ${brand} ${code} from project`}
       >
         <Trash2
           className="text-muted-foreground hover:text-destructive h-3.5 w-3.5 transition-colors"
@@ -435,7 +436,7 @@ export function ProjectSuppliesTab({
           <div className="mb-3 flex items-center gap-3">
             <div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
               <div
-                className="bg-success h-full rounded-full transition-all"
+                className="bg-success h-full rounded-full transition-[width]"
                 style={{ width: `${overallPercent}%` }}
               />
             </div>

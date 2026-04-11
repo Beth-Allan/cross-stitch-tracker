@@ -44,7 +44,16 @@ function SortableHeader({
   return (
     <th
       className="cursor-pointer px-4 py-2.5 text-left select-none"
+      tabIndex={0}
+      role="columnheader"
       onClick={() => onSort(sortKey)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSort(sortKey);
+        }
+      }}
+      aria-sort={isActive ? (currentSort.dir === "asc" ? "ascending" : "descending") : "none"}
     >
       <span
         className={`inline-flex items-center gap-1 text-xs font-semibold tracking-wider uppercase transition-colors ${
@@ -301,6 +310,7 @@ export function FabricCatalog({
               {/* Desktop table */}
               <div className="border-border bg-card hidden overflow-x-auto rounded-xl border md:block">
                 <table className="w-full text-sm">
+                  <caption className="sr-only">Your fabric collection</caption>
                   <thead>
                     <tr className="border-border border-b">
                       <SortableHeader

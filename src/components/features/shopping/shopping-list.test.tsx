@@ -131,7 +131,7 @@ describe("ShoppingList", () => {
     render(<ShoppingList projects={[projectWithThreads, projectWithBeadsAndFabric]} />);
 
     // 2 threads + 1 bead + 1 specialty = 4 buttons
-    const buttons = screen.getAllByRole("button", { name: /Mark Acquired/i });
+    const buttons = screen.getAllByRole("button", { name: /mark .+ as acquired/i });
     expect(buttons).toHaveLength(4);
   });
 
@@ -157,7 +157,7 @@ describe("ShoppingList", () => {
 
     render(<ShoppingList projects={[projectWithThreads]} />);
 
-    const buttons = screen.getAllByRole("button", { name: /Mark Acquired/i });
+    const buttons = screen.getAllByRole("button", { name: /mark .+ as acquired/i });
     await user.click(buttons[0]);
 
     expect(mockMarkSupplyAcquired).toHaveBeenCalledWith("thread", "pt-1");

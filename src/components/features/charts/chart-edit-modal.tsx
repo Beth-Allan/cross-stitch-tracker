@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogHeader } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogHeader,
+} from "@/components/ui/dialog";
 import type { Designer, Genre } from "@/generated/prisma/client";
 import type { ProjectStatus } from "@/generated/prisma/client";
 import type { ChartWithProject } from "@/types/chart";
@@ -48,14 +55,23 @@ export function ChartEditModal({
     },
   });
 
+  const [discardOpen, setDiscardOpen] = useState(false);
+
   const handleClose = () => {
     if (form.isDirty) {
-      if (!window.confirm("You have unsaved changes. Discard them?")) return;
+      setDiscardOpen(true);
+      return;
     }
     onOpenChange(false);
   };
 
+  const handleDiscardConfirm = () => {
+    setDiscardOpen(false);
+    onOpenChange(false);
+  };
+
   return (
+    <>
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
       <DialogContent
         showCloseButton={false}
@@ -271,5 +287,26 @@ export function ChartEditModal({
         </form>
       </DialogContent>
     </Dialog>
+
+    {/* Discard changes confirmation */}
+    <Dialog open={discardOpen} onOpenChange={setDiscardOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Discard Changes?</DialogTitle>
+          <DialogDescription>
+            You have unsaved changes that will be lost.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setDiscardOpen(false)} autoFocus>
+            Keep Editing
+          </Button>
+          <Button variant="destructive" onClick={handleDiscardConfirm}>
+            Discard
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

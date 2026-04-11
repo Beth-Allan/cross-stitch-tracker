@@ -123,6 +123,7 @@ export function SupplyTableView({ items, columns, onEdit, onDelete }: SupplyTabl
   return (
     <div className="border-border bg-card overflow-x-auto rounded-xl border">
       <table className="w-full text-sm">
+        <caption className="sr-only">Supply catalog items</caption>
         <thead>
           <tr className="border-border border-b">
             <th className="w-12 px-4 py-2.5">

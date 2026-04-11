@@ -21,7 +21,7 @@ export function ProgressBar({ value, max, className, color = "bg-primary" }: Pro
         aria-label={`${percentage}% complete`}
       >
         <div
-          className={cn("h-full rounded-full transition-all", color)}
+          className={cn("h-full rounded-full transition-[width]", color)}
           style={{ width: `${percentage}%` }}
         />
       </div>

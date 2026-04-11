@@ -34,7 +34,16 @@ function SortableHeader({
   return (
     <th
       className="cursor-pointer px-4 py-2.5 text-left select-none"
+      tabIndex={0}
+      role="columnheader"
       onClick={() => onSort(sortKey)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSort(sortKey);
+        }
+      }}
+      aria-sort={isActive ? (currentSort.dir === "asc" ? "ascending" : "descending") : "none"}
     >
       <span
         className={`inline-flex items-center gap-1 text-xs font-semibold tracking-wider uppercase transition-colors ${
@@ -288,6 +297,7 @@ export function GenreList({ genres }: GenreListProps) {
         {filteredGenres.length > 0 ? (
           <div className="border-border bg-card overflow-hidden rounded-xl border">
             <table className="w-full">
+              <caption className="sr-only">Your genres and their chart counts</caption>
               <thead>
                 <tr className="border-border border-b">
                   <SortableHeader

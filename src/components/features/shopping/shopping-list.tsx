@@ -60,7 +60,12 @@ function SupplyRow({
       <span className="text-warning text-sm font-medium whitespace-nowrap">
         Need {need}
       </span>
-      <Button size="sm" onClick={handleMarkAcquired} disabled={isPending}>
+      <Button
+        size="sm"
+        onClick={handleMarkAcquired}
+        disabled={isPending}
+        aria-label={`Mark ${brandName} ${code} as acquired`}
+      >
         {isPending ? "Marking..." : "Mark Acquired"}
       </Button>
     </div>
