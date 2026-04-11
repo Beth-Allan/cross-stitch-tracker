@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 04-supplies-fabric
 source: [04-01-SUMMARY.md, 04-02-SUMMARY.md, 04-03-SUMMARY.md, 04-04-SUMMARY.md, 04-05-SUMMARY.md, 04-06-SUMMARY.md, 04-07-SUMMARY.md]
 started: 2026-04-12T10:00:00Z
@@ -82,25 +82,37 @@ blocked: 0
   reason: "User reported: When I refresh the page, it goes to the tile view and then switches to the list - it isn't a seamless memory. Additionally a Next.js hydration error appears."
   severity: minor
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "useState initializer in supply-catalog.tsx (lines 180-190) reads localStorage with typeof window check. Server renders DEFAULT_VIEWS, client reads saved preference during hydration, producing different HTML."
+  artifacts:
+    - path: "src/components/features/supplies/supply-catalog.tsx"
+      issue: "localStorage read in useState initializer causes SSR/client mismatch"
+  missing:
+    - "Defer localStorage read to useEffect — initialize with DEFAULT_VIEWS, update after hydration"
   debug_session: ""
 - truth: "Add Fabric modal includes a quick-add option for creating a new brand inline"
   status: failed
   reason: "User reported: There is no quick add option for Add Brand in the add fabric modal, and there should be."
   severity: minor
   test: 7
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "fabric-form-modal.tsx uses a plain <select> for brand field with no inline creation. Backend createFabricBrand action exists. GenrePicker in genre-picker.tsx is the reference pattern. Supply form modal also missing this."
+  artifacts:
+    - path: "src/components/features/fabric/fabric-form-modal.tsx"
+      issue: "Plain select for brand, no quick-add capability"
+    - path: "src/components/features/supplies/supply-form-modal.tsx"
+      issue: "Also missing quick-add brand (consistency gap)"
+  missing:
+    - "Add inline brand creation to fabric form modal following genre-picker.tsx pattern"
+    - "Add inline brand creation to supply form modal for consistency"
   debug_session: ""
 - truth: "Fabric catalog and detail pages render without hydration errors"
   status: failed
   reason: "User reported: Hydration failed because the server rendered HTML didn't match the client on the /fabric page."
   severity: minor
   test: 8
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "fabric-catalog.tsx has no direct localStorage reads. Hydration error likely from a child component (FabricFormModal, FabricBrandList) or shared layout. Needs targeted investigation of child component rendering."
+  artifacts:
+    - path: "src/components/features/fabric/fabric-catalog.tsx"
+      issue: "Hydration error from unknown child component source"
+  missing:
+    - "Identify and fix the specific child component causing hydration mismatch on /fabric"
   debug_session: ""
