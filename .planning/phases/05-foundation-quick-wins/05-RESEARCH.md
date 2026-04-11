@@ -504,17 +504,19 @@ Verified hex colors for DMC 1-35 are available from [dmc.crazyartzone.com](https
 | A2 | DMC ColorFamily assignments for 1-35 threads | DMC Catalog Completion | Low -- easy to adjust in fixture. Borderline cases: Chartreuse (GREEN?), Shrimp (ORANGE?), Apple Blossom (PURPLE vs NEUTRAL?) |
 | A3 | Variegated threads (48-125) excluded from scope | DMC Catalog Completion | Medium -- if user expects a "complete" catalog with variegated, ~18 more entries needed. But SUPP-03 says "~30 gaps" which aligns with just 1-35 + Blanc. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Thread picker scroll behavior**
+1. **Thread picker scroll behavior** -- RESOLVED in Plan 05, Task 2
    - What we know: SUPP-02 says "auto-scrolls to keep search/add controls visible when adding items." Currently `handleSelect` calls `onClose()` after adding each item.
    - What's unclear: Should the picker stay open for multi-add, or does the scroll apply to the parent container (the supply list where the "+Add more" button lives)?
    - Recommendation: The picker should stay open after adding (remove `onClose()` call). Scroll the parent supply list container to keep the "+Add more" button visible as the list grows. This matches the UX intent from backlog item 999.0.13.
+   - **Resolution:** Plan 05 Task 2 removes `onClose()` and adds `scrollIntoView({ behavior: "smooth", block: "end" })` via `setTimeout(100ms)` to allow re-render before scroll. Picker stays open for multi-add.
 
-2. **Fabric linking on chart creation vs edit**
+2. **Fabric linking on chart creation vs edit** -- RESOLVED in Plan 04, Task 1
    - What we know: Fabric has `linkedProjectId` as a one-to-one FK to Project. Linking a fabric means setting `linkedProjectId` on the Fabric record.
    - What's unclear: During chart creation, the Project doesn't exist yet. Fabric linking may need to happen after project creation, as a second step.
    - Recommendation: In `createChart` action, after creating the chart+project, update the fabric's `linkedProjectId`. In `updateChart`, handle both linking a new fabric and unlinking the old one.
+   - **Resolution:** Plan 04 Task 1 implements post-create fabric linking in `createChart` (after chart+project created, update fabric's `linkedProjectId`). For `updateChart`, handles unlink old + link new fabric.
 
 ## Validation Architecture
 
