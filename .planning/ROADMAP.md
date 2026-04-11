@@ -57,11 +57,11 @@ Full details: `milestones/v1.0-ROADMAP.md`
   5. Thread colour picker auto-scrolls to keep search/add controls visible when adding items
 **Plans:** 5 plans
 Plans:
-- [ ] 05-01-PLAN.md — Schema + types + validations + server actions + nav items
-- [ ] 05-02-PLAN.md — Storage Location management UI (shared components + list + detail)
-- [ ] 05-03-PLAN.md — Stitching App management UI (mirrors storage pattern)
-- [ ] 05-04-PLAN.md — Chart form integration (DB-backed dropdowns + fabric selector)
-- [ ] 05-05-PLAN.md — Cover image fix + thread picker scroll + DMC catalog completion
+- [x] 05-01-PLAN.md — Schema + types + validations + server actions + nav items
+- [x] 05-02-PLAN.md — Storage Location management UI (shared components + list + detail)
+- [x] 05-03-PLAN.md — Stitching App management UI (mirrors storage pattern)
+- [x] 05-04-PLAN.md — Chart form integration (DB-backed dropdowns + fabric selector)
+- [x] 05-05-PLAN.md — Cover image fix + thread picker scroll + DMC catalog completion
 **UI hint**: yes
 
 ### Phase 6: Gallery Cards & View Modes

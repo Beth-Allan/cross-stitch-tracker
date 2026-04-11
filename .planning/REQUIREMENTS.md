@@ -20,7 +20,7 @@ Requirements for Milestone 2: Browse & Organize. Each maps to roadmap phases.
 - [ ] **STOR-01**: User can create, rename, and delete storage locations
 - [ ] **STOR-02**: User can view a storage location's detail page with assigned projects
 - [ ] **STOR-03**: User can assign storage location and stitching app to a project via dropdown
-- [ ] **STOR-04**: User can create, rename, and delete stitching app entries
+- [x] **STOR-04**: User can create, rename, and delete stitching app entries
 
 ### Project Setup
 
@@ -80,7 +80,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STOR-01 | Phase 5 | Pending |
 | STOR-02 | Phase 5 | Pending |
 | STOR-03 | Phase 5 | Pending |
-| STOR-04 | Phase 5 | Pending |
+| STOR-04 | Phase 5 | Complete |
 | PROJ-01 | Phase 5 | Pending |
 | PROJ-02 | Phase 5 | Pending |
 | CALC-01 | Phase 7 | Pending |
