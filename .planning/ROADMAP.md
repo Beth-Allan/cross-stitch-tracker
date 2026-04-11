@@ -122,13 +122,13 @@ Plans:
 **Plans:** 7 plans
 
 Plans:
-- [ ] 04-01-PLAN.md -- Prisma schema (9 models + 3 junctions), types, validations, DMC seed data, fabric calculator, test factories
-- [ ] 04-02-PLAN.md -- Supply server actions (thread/bead/specialty/brand CRUD, junction CRUD, shopping list query)
-- [ ] 04-03-PLAN.md -- Fabric server actions (fabric/brand CRUD)
-- [ ] 04-04-PLAN.md -- Supply catalog UI (tabbed page, grid/table views, color swatches, brand management)
-- [ ] 04-05-PLAN.md -- Fabric catalog UI (list page, detail page, form modal, size calculator)
-- [ ] 04-06-PLAN.md -- Project supplies tab (inline search-to-add, editable quantities, kitting summary)
-- [ ] 04-07-PLAN.md -- Shopping list page, navigation updates, human verification
+- [x] 04-01-PLAN.md -- Prisma schema (9 models + 3 junctions), types, validations, DMC seed data, fabric calculator, test factories
+- [x] 04-02-PLAN.md -- Supply server actions (thread/bead/specialty/brand CRUD, junction CRUD, shopping list query)
+- [x] 04-03-PLAN.md -- Fabric server actions (fabric/brand CRUD)
+- [x] 04-04-PLAN.md -- Supply catalog UI (tabbed page, grid/table views, color swatches, brand management)
+- [x] 04-05-PLAN.md -- Fabric catalog UI (list page, detail page, form modal, size calculator)
+- [x] 04-06-PLAN.md -- Project supplies tab (inline search-to-add, editable quantities, kitting summary)
+- [x] 04-07-PLAN.md -- Shopping list page, navigation updates, human verification
 **UI hint**: yes
 **Design refs**: `product-plan/sections/supply-tracking-and-shopping/` (all components), `product-plan/sections/fabric-series-and-reference-data/` (FabricCatalog, FabricDetail, FabricFormModal)
 **Deferred to later**: Kitting auto-calculation (8 conditions), kitting progress indicators, supply statistics, advanced brand management
