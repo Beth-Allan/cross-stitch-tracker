@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -55,7 +55,7 @@ interface SpecialtyInitialData {
   hexColor: string;
 }
 
-type InitialData = ThreadInitialData | BeadInitialData | SpecialtyInitialData;
+export type InitialData = ThreadInitialData | BeadInitialData | SpecialtyInitialData;
 
 interface SupplyFormModalProps {
   open: boolean;
@@ -109,52 +109,35 @@ export function SupplyFormModal({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  // Form state
-  const [brandId, setBrandId] = useState("");
-  const [code, setCode] = useState("");
-  const [colorName, setColorName] = useState("");
-  const [hexColor, setHexColor] = useState("#666666");
-  const [colorFamily, setColorFamily] = useState<ColorFamily>("GRAY");
-  const [description, setDescription] = useState("");
+  // Form state — initialized from props; parent uses key prop to remount on edit
+  const initCode = initialData
+    ? "colorCode" in initialData
+      ? initialData.colorCode
+      : "productCode" in initialData
+        ? initialData.productCode
+        : ""
+    : "";
+  const [brandId, setBrandId] = useState(initialData?.brandId ?? brands[0]?.id ?? "");
+  const [code, setCode] = useState(initCode);
+  const [colorName, setColorName] = useState(initialData?.colorName ?? "");
+  const [hexColor, setHexColor] = useState(initialData?.hexColor ?? "#666666");
+  const [colorFamily, setColorFamily] = useState<ColorFamily>(
+    initialData && "colorFamily" in initialData ? (initialData.colorFamily as ColorFamily) : "GRAY",
+  );
+  const [description, setDescription] = useState(
+    initialData && "description" in initialData ? (initialData.description ?? "") : "",
+  );
 
   // Errors
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // Reset form when dialog opens or initialData changes
-  useEffect(() => {
-    if (open) {
-      if (initialData && mode === "edit") {
-        setBrandId(initialData.brandId);
-        if ("colorCode" in initialData) {
-          setCode(initialData.colorCode);
-        } else if ("productCode" in initialData) {
-          setCode(initialData.productCode);
-        }
-        setColorName(initialData.colorName);
-        setHexColor(initialData.hexColor);
-        if ("colorFamily" in initialData) {
-          setColorFamily(initialData.colorFamily as ColorFamily);
-        }
-        if ("description" in initialData) {
-          setDescription(initialData.description ?? "");
-        }
-      } else {
-        setBrandId(brands[0]?.id ?? "");
-        setCode("");
-        setColorName("");
-        setHexColor("#666666");
-        setColorFamily("GRAY");
-        setDescription("");
-      }
-      setErrors({});
-    }
-  }, [open, initialData, mode, brands]);
 
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
 
     if (!brandId) newErrors.brandId = "Brand is required";
-    if (!code.trim()) newErrors.code = supplyType === "thread" ? "Color code is required" : "Product code is required";
+    if (!code.trim())
+      newErrors.code =
+        supplyType === "thread" ? "Color code is required" : "Product code is required";
     if (!colorName.trim()) newErrors.colorName = "Color name is required";
     if (!/^#[0-9A-Fa-f]{6}$/.test(hexColor)) {
       newErrors.hexColor = "Must be a valid hex color (e.g., #FF5733)";
@@ -212,9 +195,7 @@ export function SupplyFormModal({
         }
 
         if (result.success) {
-          toast.success(
-            mode === "edit" ? "Supply updated" : "Supply added",
-          );
+          toast.success(mode === "edit" ? "Supply updated" : "Supply added");
           onSuccess?.();
           router.refresh();
           onOpenChange(false);
@@ -242,9 +223,7 @@ export function SupplyFormModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="font-heading text-lg font-semibold">
-            {titleLabel}
-          </DialogTitle>
+          <DialogTitle className="font-heading text-lg font-semibold">{titleLabel}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -269,7 +248,7 @@ export function SupplyFormModal({
               aria-label="Brand"
               value={brandId}
               onChange={(e) => setBrandId(e.target.value)}
-              className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+              className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               <option value="">Select brand...</option>
               {brands.map((b) => (
@@ -281,12 +260,7 @@ export function SupplyFormModal({
           </FormField>
 
           {/* Code */}
-          <FormField
-            label={codeLabel}
-            htmlFor="supply-code"
-            required
-            error={errors.code}
-          >
+          <FormField label={codeLabel} htmlFor="supply-code" required error={errors.code}>
             <Input
               id="supply-code"
               aria-label={codeLabel}
@@ -346,7 +320,7 @@ export function SupplyFormModal({
                   aria-label="Color Family"
                   value={colorFamily}
                   onChange={(e) => setColorFamily(e.target.value as ColorFamily)}
-                  className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
                   {COLOR_FAMILIES.map((f) => (
                     <option key={f} value={f}>
@@ -385,11 +359,7 @@ export function SupplyFormModal({
               Cancel
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending
-                ? mode === "edit"
-                  ? "Saving..."
-                  : "Adding..."
-                : submitLabel}
+              {isPending ? (mode === "edit" ? "Saving..." : "Adding...") : submitLabel}
             </Button>
           </DialogFooter>
         </form>

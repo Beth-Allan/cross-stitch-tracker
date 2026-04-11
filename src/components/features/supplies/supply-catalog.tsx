@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Grid3X3, List, Plus, CircleDot, Gem, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -8,19 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SupplyGridView } from "./supply-grid-view";
 import { SupplyTableView } from "./supply-table-view";
-import { SupplyFormModal } from "./supply-form-modal";
+import { SupplyFormModal, type InitialData } from "./supply-form-modal";
 import { DeleteConfirmationDialog } from "@/components/features/designers/delete-confirmation-dialog";
-import {
-  deleteThread,
-  deleteBead,
-  deleteSpecialtyItem,
-} from "@/lib/actions/supply-actions";
+import { deleteThread, deleteBead, deleteSpecialtyItem } from "@/lib/actions/supply-actions";
 import { COLOR_FAMILIES } from "@/types/supply";
-import type {
-  ThreadWithBrand,
-  BeadWithBrand,
-  SpecialtyItemWithBrand,
-} from "@/types/supply";
+import type { ThreadWithBrand, BeadWithBrand, SpecialtyItemWithBrand } from "@/types/supply";
 import type { SupplyBrand, ColorFamily } from "@/generated/prisma/client";
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */
@@ -67,55 +59,150 @@ const STORAGE_KEYS: Record<SupplyTab, string> = {
 
 /* ─── Tab Config ────────────────────────────────────────────────────────────── */
 
-const TAB_CONFIG: { key: SupplyTab; label: string; icon: typeof CircleDot; addLabel: string; supplyType: "thread" | "bead" | "specialty" }[] = [
-  { key: "threads", label: "Threads", icon: CircleDot, addLabel: "Add Thread", supplyType: "thread" },
+const TAB_CONFIG: {
+  key: SupplyTab;
+  label: string;
+  icon: typeof CircleDot;
+  addLabel: string;
+  supplyType: "thread" | "bead" | "specialty";
+}[] = [
+  {
+    key: "threads",
+    label: "Threads",
+    icon: CircleDot,
+    addLabel: "Add Thread",
+    supplyType: "thread",
+  },
   { key: "beads", label: "Beads", icon: Gem, addLabel: "Add Bead", supplyType: "bead" },
-  { key: "specialty", label: "Specialty Items", icon: Sparkles, addLabel: "Add Item", supplyType: "specialty" },
+  {
+    key: "specialty",
+    label: "Specialty Items",
+    icon: Sparkles,
+    addLabel: "Add Item",
+    supplyType: "specialty",
+  },
 ];
 
 /* ─── Thread Table Columns ──────────────────────────────────────────────────── */
 
 const THREAD_COLUMNS = [
-  { key: "code", label: "CODE", sortable: true, accessor: (item: { colorCode?: string; productCode?: string }) => item.colorCode ?? item.productCode ?? "" },
-  { key: "name", label: "NAME", sortable: true, accessor: (item: { colorName: string }) => item.colorName },
-  { key: "brand", label: "BRAND", sortable: true, accessor: (item: { brand: { name: string } }) => item.brand.name },
-  { key: "family", label: "COLOR FAMILY", sortable: true, accessor: (item: { colorFamily?: string }) => COLOR_FAMILY_DISPLAY[item.colorFamily ?? ""] ?? item.colorFamily ?? "" },
+  {
+    key: "code",
+    label: "CODE",
+    sortable: true,
+    accessor: (item: { colorCode?: string; productCode?: string }) =>
+      item.colorCode ?? item.productCode ?? "",
+  },
+  {
+    key: "name",
+    label: "NAME",
+    sortable: true,
+    accessor: (item: { colorName: string }) => item.colorName,
+  },
+  {
+    key: "brand",
+    label: "BRAND",
+    sortable: true,
+    accessor: (item: { brand: { name: string } }) => item.brand.name,
+  },
+  {
+    key: "family",
+    label: "COLOR FAMILY",
+    sortable: true,
+    accessor: (item: { colorFamily?: string }) =>
+      COLOR_FAMILY_DISPLAY[item.colorFamily ?? ""] ?? item.colorFamily ?? "",
+  },
 ];
 
 const BEAD_COLUMNS = [
-  { key: "code", label: "CODE", sortable: true, accessor: (item: { colorCode?: string; productCode?: string }) => item.colorCode ?? item.productCode ?? "" },
-  { key: "name", label: "NAME", sortable: true, accessor: (item: { colorName: string }) => item.colorName },
-  { key: "brand", label: "BRAND", sortable: true, accessor: (item: { brand: { name: string } }) => item.brand.name },
-  { key: "family", label: "COLOR FAMILY", sortable: true, accessor: (item: { colorFamily?: string }) => COLOR_FAMILY_DISPLAY[item.colorFamily ?? ""] ?? item.colorFamily ?? "" },
+  {
+    key: "code",
+    label: "CODE",
+    sortable: true,
+    accessor: (item: { colorCode?: string; productCode?: string }) =>
+      item.colorCode ?? item.productCode ?? "",
+  },
+  {
+    key: "name",
+    label: "NAME",
+    sortable: true,
+    accessor: (item: { colorName: string }) => item.colorName,
+  },
+  {
+    key: "brand",
+    label: "BRAND",
+    sortable: true,
+    accessor: (item: { brand: { name: string } }) => item.brand.name,
+  },
+  {
+    key: "family",
+    label: "COLOR FAMILY",
+    sortable: true,
+    accessor: (item: { colorFamily?: string }) =>
+      COLOR_FAMILY_DISPLAY[item.colorFamily ?? ""] ?? item.colorFamily ?? "",
+  },
 ];
 
 const SPECIALTY_COLUMNS = [
-  { key: "code", label: "CODE", sortable: true, accessor: (item: { colorCode?: string; productCode?: string }) => item.colorCode ?? item.productCode ?? "" },
-  { key: "name", label: "NAME", sortable: true, accessor: (item: { colorName: string }) => item.colorName },
-  { key: "brand", label: "BRAND", sortable: true, accessor: (item: { brand: { name: string } }) => item.brand.name },
-  { key: "description", label: "DESCRIPTION", sortable: false, accessor: (item: { description?: string }) => item.description ?? "" },
+  {
+    key: "code",
+    label: "CODE",
+    sortable: true,
+    accessor: (item: { colorCode?: string; productCode?: string }) =>
+      item.colorCode ?? item.productCode ?? "",
+  },
+  {
+    key: "name",
+    label: "NAME",
+    sortable: true,
+    accessor: (item: { colorName: string }) => item.colorName,
+  },
+  {
+    key: "brand",
+    label: "BRAND",
+    sortable: true,
+    accessor: (item: { brand: { name: string } }) => item.brand.name,
+  },
+  {
+    key: "description",
+    label: "DESCRIPTION",
+    sortable: false,
+    accessor: (item: { description?: string }) => item.description ?? "",
+  },
 ];
 
 /* ─── Component ─────────────────────────────────────────────────────────────── */
 
-export function SupplyCatalog({
-  threads,
-  beads,
-  specialtyItems,
-  brands,
-}: SupplyCatalogProps) {
+export function SupplyCatalog({ threads, beads, specialtyItems, brands }: SupplyCatalogProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<SupplyTab>("threads");
-  const [viewModes, setViewModes] = useState<Record<SupplyTab, ViewMode>>(DEFAULT_VIEWS);
+  const [activeTab, setActiveTabRaw] = useState<SupplyTab>("threads");
+  const [viewModes, setViewModes] = useState<Record<SupplyTab, ViewMode>>(() => {
+    if (typeof window === "undefined") return DEFAULT_VIEWS;
+    const restored = { ...DEFAULT_VIEWS };
+    for (const tab of TAB_CONFIG) {
+      const stored = localStorage.getItem(STORAGE_KEYS[tab.key]);
+      if (stored === "grid" || stored === "table") {
+        restored[tab.key] = stored;
+      }
+    }
+    return restored;
+  });
   const [search, setSearch] = useState("");
   const [colorFamilyFilter, setColorFamilyFilter] = useState<ColorFamily | "">("");
   const [brandFilter, setBrandFilter] = useState<string>("");
+
+  function setActiveTab(tab: SupplyTab) {
+    setActiveTabRaw(tab);
+    setSearch("");
+    setColorFamilyFilter("");
+    setBrandFilter("");
+  }
 
   // Modal state
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<{
     type: "thread" | "bead" | "specialty";
-    data: Record<string, string>;
+    data: InitialData;
   } | null>(null);
   const [deletingItem, setDeletingItem] = useState<{
     type: "thread" | "bead" | "specialty";
@@ -123,35 +210,11 @@ export function SupplyCatalog({
     label: string;
   } | null>(null);
 
-  // Restore view modes from localStorage on mount
-  useEffect(() => {
-    const restored: Partial<Record<SupplyTab, ViewMode>> = {};
-    for (const tab of TAB_CONFIG) {
-      const stored = localStorage.getItem(STORAGE_KEYS[tab.key]);
-      if (stored === "grid" || stored === "table") {
-        restored[tab.key] = stored;
-      }
-    }
-    if (Object.keys(restored).length > 0) {
-      setViewModes((prev) => ({ ...prev, ...restored }));
-    }
-  }, []);
-
   // Persist view mode to localStorage
-  const setViewMode = useCallback(
-    (tab: SupplyTab, mode: ViewMode) => {
-      setViewModes((prev) => ({ ...prev, [tab]: mode }));
-      localStorage.setItem(STORAGE_KEYS[tab], mode);
-    },
-    [],
-  );
-
-  // Clear filters on tab change
-  useEffect(() => {
-    setSearch("");
-    setColorFamilyFilter("");
-    setBrandFilter("");
-  }, [activeTab]);
+  const setViewMode = useCallback((tab: SupplyTab, mode: ViewMode) => {
+    setViewModes((prev) => ({ ...prev, [tab]: mode }));
+    localStorage.setItem(STORAGE_KEYS[tab], mode);
+  }, []);
 
   // Filtered data
   const filteredThreads = useMemo(() => {
@@ -161,9 +224,7 @@ export function SupplyCatalog({
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
-        (t) =>
-          t.colorCode.toLowerCase().includes(q) ||
-          t.colorName.toLowerCase().includes(q),
+        (t) => t.colorCode.toLowerCase().includes(q) || t.colorName.toLowerCase().includes(q),
       );
     }
     return result;
@@ -175,9 +236,7 @@ export function SupplyCatalog({
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
-        (b) =>
-          b.productCode.toLowerCase().includes(q) ||
-          b.colorName.toLowerCase().includes(q),
+        (b) => b.productCode.toLowerCase().includes(q) || b.colorName.toLowerCase().includes(q),
       );
     }
     return result;
@@ -189,9 +248,7 @@ export function SupplyCatalog({
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
-        (s) =>
-          s.productCode.toLowerCase().includes(q) ||
-          s.colorName.toLowerCase().includes(q),
+        (s) => s.productCode.toLowerCase().includes(q) || s.colorName.toLowerCase().includes(q),
       );
     }
     return result;
@@ -281,7 +338,7 @@ export function SupplyCatalog({
 
   function handleEdit(id: string) {
     const supplyType = currentTabConfig.supplyType;
-    let data: Record<string, string> = {};
+    let data: InitialData | null = null;
 
     if (supplyType === "thread") {
       const thread = threads.find((t) => t.id === id);
@@ -321,7 +378,7 @@ export function SupplyCatalog({
       }
     }
 
-    setEditingItem({ type: supplyType, data });
+    if (data) setEditingItem({ type: supplyType, data });
   }
 
   function handleDeleteClick(id: string) {
@@ -402,7 +459,8 @@ export function SupplyCatalog({
             <CircleDot className="text-muted-foreground/40 mb-3 h-12 w-12" />
             <h2 className="font-heading text-lg font-semibold">No threads in your catalog</h2>
             <p className="text-muted-foreground mt-1.5 max-w-xs text-sm">
-              Your DMC thread catalog will appear here after seeding. Run the seed script to load ~500 colors.
+              Your DMC thread catalog will appear here after seeding. Run the seed script to load
+              ~500 colors.
             </p>
           </div>
         );
@@ -471,7 +529,7 @@ export function SupplyCatalog({
         <select
           value={brandFilter}
           onChange={(e) => setBrandFilter(e.target.value)}
-          className="border-input bg-background ring-offset-background focus-visible:ring-ring rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+          className="border-input bg-background ring-offset-background focus-visible:ring-ring rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           <option value="">All Brands</option>
           {brands
@@ -492,7 +550,7 @@ export function SupplyCatalog({
           <select
             value={colorFamilyFilter}
             onChange={(e) => setColorFamilyFilter(e.target.value as ColorFamily | "")}
-            className="border-input bg-background ring-offset-background focus-visible:ring-ring rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            className="border-input bg-background ring-offset-background focus-visible:ring-ring rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             <option value="">All Colors</option>
             {COLOR_FAMILIES.map((f) => (
@@ -504,13 +562,15 @@ export function SupplyCatalog({
         )}
 
         {/* Search */}
-        <div className="relative min-w-[200px] max-w-xs flex-1">
-          <Search className="text-muted-foreground absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
+        <div className="relative max-w-xs min-w-[200px] flex-1">
+          <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
           <Input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={activeTab === "threads" ? "Search by code or name..." : "Search supplies..."}
+            placeholder={
+              activeTab === "threads" ? "Search by code or name..." : "Search supplies..."
+            }
             className="pl-9"
           />
         </div>
@@ -556,11 +616,7 @@ export function SupplyCatalog({
       {emptyState ? (
         emptyState
       ) : currentViewMode === "grid" ? (
-        <SupplyGridView
-          items={getGridItems()}
-          onEdit={handleEdit}
-          onDelete={handleDeleteClick}
-        />
+        <SupplyGridView items={getGridItems()} onEdit={handleEdit} onDelete={handleDeleteClick} />
       ) : (
         <SupplyTableView
           items={getTableItems()}
@@ -572,6 +628,7 @@ export function SupplyCatalog({
 
       {/* Create modal */}
       <SupplyFormModal
+        key={`create-${activeTab}`}
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
         mode="create"
@@ -581,6 +638,7 @@ export function SupplyCatalog({
 
       {/* Edit modal */}
       <SupplyFormModal
+        key={editingItem?.data.id ?? "edit"}
         open={!!editingItem}
         onOpenChange={(open) => {
           if (!open) setEditingItem(null);
@@ -588,7 +646,7 @@ export function SupplyCatalog({
         mode="edit"
         supplyType={editingItem?.type ?? "thread"}
         brands={brands}
-        initialData={editingItem?.data as Record<string, string> & { id: string; brandId: string }}
+        initialData={editingItem?.data}
       />
 
       {/* Delete confirmation */}
