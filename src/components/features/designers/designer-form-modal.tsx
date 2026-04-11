@@ -105,12 +105,7 @@ export function DesignerFormModal({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField
-            label="Name"
-            htmlFor="designer-name"
-            required
-            error={nameError ?? undefined}
-          >
+          <FormField label="Name" htmlFor="designer-name" required error={nameError ?? undefined}>
             <Input
               id="designer-name"
               value={name}

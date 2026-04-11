@@ -90,11 +90,7 @@ export async function deleteThread(id: string) {
   }
 }
 
-export async function getThreads(
-  brandId?: string,
-  colorFamily?: string,
-  search?: string,
-) {
+export async function getThreads(brandId?: string, colorFamily?: string, search?: string) {
   await requireAuth();
 
   const where: Record<string, unknown> = {};

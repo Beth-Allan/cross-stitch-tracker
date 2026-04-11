@@ -1,4 +1,8 @@
-import { calculateSizeCategory, getEffectiveStitchCount, SIZE_COLORS } from "@/lib/utils/size-category";
+import {
+  calculateSizeCategory,
+  getEffectiveStitchCount,
+  SIZE_COLORS,
+} from "@/lib/utils/size-category";
 
 interface SizeBadgeProps {
   stitchCount: number;

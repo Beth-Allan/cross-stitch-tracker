@@ -3,11 +3,7 @@ import { getFabric, getFabricBrands } from "@/lib/actions/fabric-actions";
 import { getCharts } from "@/lib/actions/chart-actions";
 import { FabricDetail } from "@/components/features/fabric/fabric-detail";
 
-export default async function FabricDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function FabricDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   const [fabric, fabricBrands, charts] = await Promise.all([

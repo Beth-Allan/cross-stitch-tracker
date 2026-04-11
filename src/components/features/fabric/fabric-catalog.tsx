@@ -3,15 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Search,
-  ChevronUp,
-  ChevronDown,
-  Pencil,
-  Trash2,
-  Plus,
-  PackageOpen,
-} from "lucide-react";
+import { Search, ChevronUp, ChevronDown, Pencil, Trash2, Plus, PackageOpen } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,11 +44,11 @@ function SortableHeader({
   const isActive = currentSort.key === sortKey;
   return (
     <th
-      className="cursor-pointer select-none px-4 py-2.5 text-left"
+      className="cursor-pointer px-4 py-2.5 text-left select-none"
       onClick={() => onSort(sortKey)}
     >
       <span
-        className={`inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider transition-colors ${
+        className={`inline-flex items-center gap-1 text-xs font-semibold tracking-wider uppercase transition-colors ${
           isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
         }`}
       >
@@ -270,8 +262,8 @@ export function FabricCatalog({
         <div className="space-y-4">
           {/* Search bar */}
           <div className="flex flex-wrap items-center gap-3">
-            <div className="relative min-w-[200px] max-w-xs flex-1">
-              <Search className="text-muted-foreground absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
+            <div className="relative max-w-xs min-w-[200px] flex-1">
+              <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
               <Input
                 type="text"
                 value={search}
@@ -349,7 +341,7 @@ export function FabricCatalog({
                         onSort={handleSort}
                       />
                       <th className="px-4 py-2.5 text-left">
-                        <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                        <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                           NEED TO BUY
                         </span>
                       </th>
@@ -395,9 +387,7 @@ export function FabricCatalog({
                   <div className="py-12 text-center">
                     <PackageOpen className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
                     <p className="text-muted-foreground text-sm">
-                      {hasActiveFilters
-                        ? "No fabric matches your search"
-                        : "No fabric records yet"}
+                      {hasActiveFilters ? "No fabric matches your search" : "No fabric records yet"}
                     </p>
                   </div>
                 )}
@@ -490,11 +480,11 @@ function FabricRow({
       </td>
       <td className="px-4 py-3">
         {fabric.needToBuy ? (
-          <Badge className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800">
+          <Badge className="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
             Yes
           </Badge>
         ) : (
-          <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800">
+          <Badge className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400">
             No
           </Badge>
         )}
@@ -579,7 +569,7 @@ function FabricCard({
           </span>
         )}
         {fabric.needToBuy && (
-          <Badge className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800">
+          <Badge className="border-amber-200 bg-amber-50 text-[10px] text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
             Need to buy
           </Badge>
         )}

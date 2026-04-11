@@ -104,7 +104,10 @@ describe("SupplyFormModal", () => {
 
   it("shows validation error for invalid hex color", async () => {
     const user = userEvent.setup();
-    mockCreateThread.mockResolvedValue({ success: false, error: "Must be a valid hex color (e.g., #FF5733)" });
+    mockCreateThread.mockResolvedValue({
+      success: false,
+      error: "Must be a valid hex color (e.g., #FF5733)",
+    });
 
     render(
       <SupplyFormModal

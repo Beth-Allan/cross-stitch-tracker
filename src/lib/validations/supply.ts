@@ -27,9 +27,7 @@ export const threadSchema = z.object({
   brandId: z.string().min(1, "Brand is required"),
   colorCode: z.string().trim().min(1, "Color code is required").max(50),
   colorName: z.string().trim().min(1, "Color name is required").max(200),
-  hexColor: z
-    .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color (e.g., #FF5733)"),
+  hexColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color (e.g., #FF5733)"),
   colorFamily: z.enum(COLOR_FAMILIES),
 });
 
@@ -39,9 +37,7 @@ export const beadSchema = z.object({
   brandId: z.string().min(1, "Brand is required"),
   productCode: z.string().trim().min(1, "Product code is required").max(50),
   colorName: z.string().trim().min(1, "Color name is required").max(200),
-  hexColor: z
-    .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color (e.g., #FF5733)"),
+  hexColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color (e.g., #FF5733)"),
   colorFamily: z.enum(COLOR_FAMILIES),
 });
 
@@ -52,9 +48,7 @@ export const specialtyItemSchema = z.object({
   productCode: z.string().trim().min(1, "Product code is required").max(50),
   colorName: z.string().trim().min(1, "Name is required").max(200),
   description: z.string().max(2000).default(""),
-  hexColor: z
-    .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color (e.g., #FF5733)"),
+  hexColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color (e.g., #FF5733)"),
 });
 
 export type SpecialtyItemInput = z.infer<typeof specialtyItemSchema>;

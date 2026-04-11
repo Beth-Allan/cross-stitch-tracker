@@ -59,9 +59,7 @@ export function GenreDetail({ genre }: GenreDetailProps) {
 
   function handleSort(key: ChartSortKey) {
     setChartSort((prev) =>
-      prev.key === key
-        ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
-        : { key, dir: "asc" },
+      prev.key === key ? { key, dir: prev.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" },
     );
   }
 
@@ -152,12 +150,8 @@ export function GenreDetail({ genre }: GenreDetailProps) {
       {/* Stats row -- genre only has chart count */}
       <div className="flex flex-wrap gap-6">
         <div>
-          <p className="text-muted-foreground text-xs uppercase tracking-wider">
-            Charts
-          </p>
-          <p className="text-foreground text-lg font-semibold">
-            {genre.chartCount}
-          </p>
+          <p className="text-muted-foreground text-xs tracking-wider uppercase">Charts</p>
+          <p className="text-foreground text-lg font-semibold">{genre.chartCount}</p>
         </div>
       </div>
 
@@ -165,7 +159,7 @@ export function GenreDetail({ genre }: GenreDetailProps) {
       <div>
         {/* Section header with sort pills */}
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-muted-foreground text-xs font-semibold uppercase tracking-widest">
+          <span className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
             Charts ({genre.charts.length})
           </span>
           <div className="flex items-center gap-1">
@@ -208,9 +202,7 @@ export function GenreDetail({ genre }: GenreDetailProps) {
         ) : (
           <div className="py-12 text-center">
             <FileText className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
-            <p className="text-muted-foreground text-sm">
-              No charts tagged with this genre
-            </p>
+            <p className="text-muted-foreground text-sm">No charts tagged with this genre</p>
           </div>
         )}
       </div>
@@ -276,9 +268,7 @@ function ChartRow({ chart }: { chart: GenreChart }) {
 
       {/* Info */}
       <div className="min-w-0 flex-1">
-        <p className="text-foreground truncate text-sm font-semibold">
-          {chart.name}
-        </p>
+        <p className="text-foreground truncate text-sm font-semibold">{chart.name}</p>
         <div className="text-muted-foreground flex items-center gap-2 text-xs">
           <span>{formatNumber(effectiveCount)} stitches</span>
           {effectiveCount > 0 && (
@@ -306,9 +296,7 @@ function ChartRow({ chart }: { chart: GenreChart }) {
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-muted-foreground text-xs">
-              {progressPercent}%
-            </span>
+            <span className="text-muted-foreground text-xs">{progressPercent}%</span>
           </div>
         )}
       </div>

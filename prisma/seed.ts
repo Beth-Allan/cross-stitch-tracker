@@ -72,9 +72,7 @@ async function main() {
     count++;
   }
 
-  console.log(
-    `Seeded ${count} DMC threads under brand "${dmcBrand.name}" (id: ${dmcBrand.id})`,
-  );
+  console.log(`Seeded ${count} DMC threads under brand "${dmcBrand.name}" (id: ${dmcBrand.id})`);
 }
 
 main()

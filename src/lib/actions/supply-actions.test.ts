@@ -106,17 +106,17 @@ describe("supply-actions", () => {
     it("rejects unauthenticated calls to createSupplyBrand", async () => {
       mockAuth.mockResolvedValueOnce(null);
       const { createSupplyBrand } = await import("./supply-actions");
-      await expect(
-        createSupplyBrand({ name: "DMC", supplyType: "THREAD" }),
-      ).rejects.toThrow("Unauthorized");
+      await expect(createSupplyBrand({ name: "DMC", supplyType: "THREAD" })).rejects.toThrow(
+        "Unauthorized",
+      );
     });
 
     it("rejects unauthenticated calls to addThreadToProject", async () => {
       mockAuth.mockResolvedValueOnce(null);
       const { addThreadToProject } = await import("./supply-actions");
-      await expect(
-        addThreadToProject({ projectId: "p1", threadId: "t1" }),
-      ).rejects.toThrow("Unauthorized");
+      await expect(addThreadToProject({ projectId: "p1", threadId: "t1" })).rejects.toThrow(
+        "Unauthorized",
+      );
     });
 
     it("rejects unauthenticated calls to getProjectSupplies", async () => {
@@ -174,9 +174,7 @@ describe("supply-actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe(
-          "A thread with that code already exists for this brand",
-        );
+        expect(result.error).toBe("A thread with that code already exists for this brand");
       }
     });
 
@@ -245,9 +243,7 @@ describe("supply-actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe(
-          "A thread with that code already exists for this brand",
-        );
+        expect(result.error).toBe("A thread with that code already exists for this brand");
       }
     });
   });
@@ -371,9 +367,7 @@ describe("supply-actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe(
-          "A bead with that code already exists for this brand",
-        );
+        expect(result.error).toBe("A bead with that code already exists for this brand");
       }
     });
   });
@@ -417,9 +411,7 @@ describe("supply-actions", () => {
   describe("getBeads", () => {
     it("returns array of beads with brand included", async () => {
       const brand = createMockSupplyBrand({ supplyType: "BEAD" });
-      mockPrisma.bead.findMany.mockResolvedValueOnce([
-        { ...createMockBead(), brand },
-      ]);
+      mockPrisma.bead.findMany.mockResolvedValueOnce([{ ...createMockBead(), brand }]);
       const { getBeads } = await import("./supply-actions");
 
       const result = await getBeads();
@@ -471,9 +463,7 @@ describe("supply-actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe(
-          "A specialty item with that code already exists for this brand",
-        );
+        expect(result.error).toBe("A specialty item with that code already exists for this brand");
       }
     });
   });
@@ -705,9 +695,7 @@ describe("supply-actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe(
-          "This thread is already linked to this project",
-        );
+        expect(result.error).toBe("This thread is already linked to this project");
       }
     });
   });
@@ -743,9 +731,7 @@ describe("supply-actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe(
-          "This bead is already linked to this project",
-        );
+        expect(result.error).toBe("This bead is already linked to this project");
       }
     });
   });
@@ -781,9 +767,7 @@ describe("supply-actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe(
-          "This item is already linked to this project",
-        );
+        expect(result.error).toBe("This item is already linked to this project");
       }
     });
   });

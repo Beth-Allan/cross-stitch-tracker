@@ -101,11 +101,7 @@ describe("FabricCatalog", () => {
 
   it("renders tabs: Fabrics (count) and Brands (count)", () => {
     render(
-      <FabricCatalog
-        fabrics={mockFabrics}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
+      <FabricCatalog fabrics={mockFabrics} fabricBrands={mockBrands} projects={mockProjects} />,
     );
 
     expect(screen.getByText(/Fabrics\s*\(3\)/)).toBeInTheDocument();
@@ -114,11 +110,7 @@ describe("FabricCatalog", () => {
 
   it("shows sortable table with Name, Brand, Count, Type, Colour, Dimensions columns", () => {
     render(
-      <FabricCatalog
-        fabrics={mockFabrics}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
+      <FabricCatalog fabrics={mockFabrics} fabricBrands={mockBrands} projects={mockProjects} />,
     );
 
     expect(screen.getByText("NAME")).toBeInTheDocument();
@@ -131,11 +123,7 @@ describe("FabricCatalog", () => {
 
   it("renders fabric names as links", () => {
     render(
-      <FabricCatalog
-        fabrics={mockFabrics}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
+      <FabricCatalog fabrics={mockFabrics} fabricBrands={mockBrands} projects={mockProjects} />,
     );
 
     // Both desktop table and mobile cards render links (hidden via CSS)
@@ -146,11 +134,7 @@ describe("FabricCatalog", () => {
 
   it("shows Need to Buy badges", () => {
     render(
-      <FabricCatalog
-        fabrics={mockFabrics}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
+      <FabricCatalog fabrics={mockFabrics} fabricBrands={mockBrands} projects={mockProjects} />,
     );
 
     // Driftwood Princess has needToBuy: true
@@ -164,11 +148,7 @@ describe("FabricCatalog", () => {
   it("search filters fabrics by name", async () => {
     const user = userEvent.setup();
     render(
-      <FabricCatalog
-        fabrics={mockFabrics}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
+      <FabricCatalog fabrics={mockFabrics} fabricBrands={mockBrands} projects={mockProjects} />,
     );
 
     const searchInput = screen.getByPlaceholderText("Search fabric...");
@@ -180,20 +160,14 @@ describe("FabricCatalog", () => {
   });
 
   it("shows empty state when no fabrics", () => {
-    render(
-      <FabricCatalog fabrics={[]} fabricBrands={mockBrands} projects={mockProjects} />,
-    );
+    render(<FabricCatalog fabrics={[]} fabricBrands={mockBrands} projects={mockProjects} />);
 
     expect(screen.getByText("No fabric records yet")).toBeInTheDocument();
   });
 
   it("has edit and delete action buttons with aria-labels", () => {
     render(
-      <FabricCatalog
-        fabrics={mockFabrics}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
+      <FabricCatalog fabrics={mockFabrics} fabricBrands={mockBrands} projects={mockProjects} />,
     );
 
     // Both desktop and mobile render these (hidden via CSS)
@@ -205,11 +179,7 @@ describe("FabricCatalog", () => {
 
   it("renders Add Fabric button", () => {
     render(
-      <FabricCatalog
-        fabrics={mockFabrics}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
+      <FabricCatalog fabrics={mockFabrics} fabricBrands={mockBrands} projects={mockProjects} />,
     );
 
     expect(screen.getByRole("button", { name: /Add Fabric/i })).toBeInTheDocument();
@@ -221,11 +191,7 @@ describe("FabricCatalog", () => {
     // The fabric catalog should use plain buttons for tab switching
     // instead of Base UI Tabs which generates mismatching SSR/client IDs
     render(
-      <FabricCatalog
-        fabrics={mockFabrics}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
+      <FabricCatalog fabrics={mockFabrics} fabricBrands={mockBrands} projects={mockProjects} />,
     );
 
     // Tab buttons should be type="button" elements, not [role="tab"]
@@ -238,11 +204,7 @@ describe("FabricCatalog", () => {
   it("switches between Fabrics and Brands tabs", async () => {
     const user = userEvent.setup();
     render(
-      <FabricCatalog
-        fabrics={mockFabrics}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
+      <FabricCatalog fabrics={mockFabrics} fabricBrands={mockBrands} projects={mockProjects} />,
     );
 
     // Fabrics tab should be active by default - search input should be visible
@@ -258,11 +220,7 @@ describe("FabricCatalog", () => {
 
   it("renders consistent HTML for Badge needToBuy regardless of value", () => {
     render(
-      <FabricCatalog
-        fabrics={mockFabrics}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
+      <FabricCatalog fabrics={mockFabrics} fabricBrands={mockBrands} projects={mockProjects} />,
     );
 
     // Both Yes and No badges should render (desktop table has both)

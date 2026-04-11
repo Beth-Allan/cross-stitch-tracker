@@ -202,7 +202,13 @@ describe("FabricFormModal", () => {
 
     it("submitting brand dialog calls createFabricBrand", async () => {
       const user = userEvent.setup();
-      const newBrand = { id: "fb-new", name: "Wichelt", website: null, createdAt: new Date(), updatedAt: new Date() };
+      const newBrand = {
+        id: "fb-new",
+        name: "Wichelt",
+        website: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
       mockCreateFabricBrand.mockResolvedValue({ success: true, brand: newBrand });
 
       render(

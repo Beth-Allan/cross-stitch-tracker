@@ -34,7 +34,7 @@ export function ColorSwatch({ hexColor, size = "md", className }: ColorSwatchPro
     <div
       className={cn(
         config.classes,
-        "shadow-sm shrink-0",
+        "shrink-0 shadow-sm",
         border && "ring-1 ring-stone-200 dark:ring-stone-600",
         className,
       )}

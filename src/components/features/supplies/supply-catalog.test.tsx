@@ -64,17 +64,66 @@ const kreinikBrand = createMockSupplyBrand({
 });
 
 const mockThreads: ThreadWithBrand[] = [
-  { ...createMockThread({ id: "t1", colorCode: "310", colorName: "Black", hexColor: "#000000", colorFamily: "BLACK", brandId: "brand-dmc" }), brand: dmcBrand },
-  { ...createMockThread({ id: "t2", colorCode: "321", colorName: "Red", hexColor: "#C72B3B", colorFamily: "RED", brandId: "brand-dmc" }), brand: dmcBrand },
-  { ...createMockThread({ id: "t3", colorCode: "White", colorName: "White", hexColor: "#FFFFFF", colorFamily: "WHITE", brandId: "brand-dmc" }), brand: dmcBrand },
+  {
+    ...createMockThread({
+      id: "t1",
+      colorCode: "310",
+      colorName: "Black",
+      hexColor: "#000000",
+      colorFamily: "BLACK",
+      brandId: "brand-dmc",
+    }),
+    brand: dmcBrand,
+  },
+  {
+    ...createMockThread({
+      id: "t2",
+      colorCode: "321",
+      colorName: "Red",
+      hexColor: "#C72B3B",
+      colorFamily: "RED",
+      brandId: "brand-dmc",
+    }),
+    brand: dmcBrand,
+  },
+  {
+    ...createMockThread({
+      id: "t3",
+      colorCode: "White",
+      colorName: "White",
+      hexColor: "#FFFFFF",
+      colorFamily: "WHITE",
+      brandId: "brand-dmc",
+    }),
+    brand: dmcBrand,
+  },
 ];
 
 const mockBeads: BeadWithBrand[] = [
-  { ...createMockBead({ id: "b1", productCode: "00123", colorName: "Red Bead", hexColor: "#FF0000", colorFamily: "RED", brandId: "brand-mh" }), brand: millHillBrand },
+  {
+    ...createMockBead({
+      id: "b1",
+      productCode: "00123",
+      colorName: "Red Bead",
+      hexColor: "#FF0000",
+      colorFamily: "RED",
+      brandId: "brand-mh",
+    }),
+    brand: millHillBrand,
+  },
 ];
 
 const mockSpecialty: SpecialtyItemWithBrand[] = [
-  { ...createMockSpecialtyItem({ id: "s1", productCode: "K001", colorName: "Gold Braid", hexColor: "#FFD700", brandId: "brand-kr" }), brand: kreinikBrand },
+  {
+    ...createMockSpecialtyItem({
+      id: "s1",
+      productCode: "K001",
+      colorName: "Gold Braid",
+      hexColor: "#FFD700",
+      brandId: "brand-kr",
+    }),
+    brand: kreinikBrand,
+  },
 ];
 
 const brands: SupplyBrand[] = [dmcBrand, millHillBrand, kreinikBrand];

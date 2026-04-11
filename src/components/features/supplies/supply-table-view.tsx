@@ -51,7 +51,7 @@ function SortableHeader({
   if (!sortable) {
     return (
       <th className="px-4 py-2.5 text-left">
-        <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+        <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
           {label}
         </span>
       </th>
@@ -60,12 +60,12 @@ function SortableHeader({
 
   return (
     <th
-      className="cursor-pointer select-none px-4 py-2.5 text-left"
+      className="cursor-pointer px-4 py-2.5 text-left select-none"
       onClick={() => onSort(sortKey)}
       aria-sort={isActive ? (currentSort.dir === "asc" ? "ascending" : "descending") : "none"}
     >
       <span
-        className={`inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider transition-colors ${
+        className={`inline-flex items-center gap-1 text-xs font-semibold tracking-wider uppercase transition-colors ${
           isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
         }`}
       >
@@ -135,7 +135,7 @@ export function SupplyTableView({ items, columns, onEdit, onDelete }: SupplyTabl
         </thead>
         <tbody className="divide-border/60 divide-y">
           {sortedItems.map((item) => (
-            <tr key={item.id} className="group transition-colors hover:bg-muted/50">
+            <tr key={item.id} className="group hover:bg-muted/50 transition-colors">
               <td className="px-4 py-3">
                 <ColorSwatch hexColor={item.hexColor} size="sm" />
               </td>

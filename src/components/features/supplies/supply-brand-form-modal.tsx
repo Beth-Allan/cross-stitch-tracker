@@ -13,10 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/features/charts/form-primitives/form-field";
-import {
-  createSupplyBrand,
-  updateSupplyBrand,
-} from "@/lib/actions/supply-actions";
+import { createSupplyBrand, updateSupplyBrand } from "@/lib/actions/supply-actions";
 import { SUPPLY_TYPES } from "@/types/supply";
 import type { SupplyBrandWithCounts } from "@/types/supply";
 
@@ -119,12 +116,7 @@ export function SupplyBrandFormModal({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField
-            label="Name"
-            htmlFor="brand-name"
-            required
-            error={nameError ?? undefined}
-          >
+          <FormField label="Name" htmlFor="brand-name" required error={nameError ?? undefined}>
             <Input
               id="brand-name"
               value={name}
@@ -149,7 +141,7 @@ export function SupplyBrandFormModal({
               id="brand-supply-type"
               value={supplyType}
               onChange={(e) => setSupplyType(e.target.value)}
-              className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+              className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               {SUPPLY_TYPES.map((t) => (
                 <option key={t} value={t}>

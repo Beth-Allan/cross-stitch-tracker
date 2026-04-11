@@ -3,15 +3,7 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  Search,
-  ChevronUp,
-  ChevronDown,
-  Pencil,
-  Trash2,
-  Tags,
-  Plus,
-} from "lucide-react";
+import { Search, ChevronUp, ChevronDown, Pencil, Trash2, Tags, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GenreFormModal } from "./genre-form-modal";
@@ -41,14 +33,12 @@ function SortableHeader({
   const isActive = currentSort.key === sortKey;
   return (
     <th
-      className="cursor-pointer select-none px-4 py-2.5 text-left"
+      className="cursor-pointer px-4 py-2.5 text-left select-none"
       onClick={() => onSort(sortKey)}
     >
       <span
-        className={`inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider transition-colors ${
-          isActive
-            ? "text-primary"
-            : "text-muted-foreground hover:text-foreground"
+        className={`inline-flex items-center gap-1 text-xs font-semibold tracking-wider uppercase transition-colors ${
+          isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
         }`}
       >
         {label}
@@ -75,17 +65,17 @@ function GenreRow({
   onDelete: () => void;
 }) {
   return (
-    <tr className="group border-b border-border transition-colors hover:bg-muted/50">
+    <tr className="group border-border hover:bg-muted/50 border-b transition-colors">
       <td className="px-4 py-3">
         <Link
           href={`/genres/${genre.id}`}
-          className="text-sm font-medium text-foreground transition-colors hover:text-primary"
+          className="text-foreground hover:text-primary text-sm font-medium transition-colors"
         >
           {genre.name}
         </Link>
       </td>
       <td className="px-4 py-3">
-        <span className="text-sm text-muted-foreground">{genre.chartCount}</span>
+        <span className="text-muted-foreground text-sm">{genre.chartCount}</span>
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center justify-end gap-1 opacity-40 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
@@ -93,7 +83,7 @@ function GenreRow({
             type="button"
             onClick={onEdit}
             aria-label={`Edit ${genre.name}`}
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-md p-1.5 transition-colors"
           >
             <Pencil className="h-3.5 w-3.5" />
           </button>
@@ -101,7 +91,7 @@ function GenreRow({
             type="button"
             onClick={onDelete}
             aria-label={`Delete ${genre.name}`}
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-md p-1.5 transition-colors"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -123,16 +113,16 @@ function GenreCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+    <div className="border-border bg-card rounded-xl border p-4 shadow-sm">
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1">
           <Link
             href={`/genres/${genre.id}`}
-            className="text-sm font-semibold text-foreground transition-colors hover:text-primary"
+            className="text-foreground hover:text-primary text-sm font-semibold transition-colors"
           >
             {genre.name}
           </Link>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-xs">
             {genre.chartCount} {genre.chartCount === 1 ? "chart" : "charts"}
           </p>
         </div>
@@ -141,7 +131,7 @@ function GenreCard({
             type="button"
             onClick={onEdit}
             aria-label={`Edit ${genre.name}`}
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-md p-1.5 transition-colors"
           >
             <Pencil className="h-3.5 w-3.5" />
           </button>
@@ -149,7 +139,7 @@ function GenreCard({
             type="button"
             onClick={onDelete}
             aria-label={`Delete ${genre.name}`}
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-md p-1.5 transition-colors"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -173,16 +163,9 @@ function EmptyState({
   if (hasSearch) {
     return (
       <div className="py-12 text-center">
-        <Tags className="mx-auto mb-2 h-8 w-8 text-muted-foreground/50" />
-        <p className="text-sm font-medium text-foreground">
-          No genres match your search
-        </p>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClear}
-          className="mt-2 text-xs"
-        >
+        <Tags className="text-muted-foreground/50 mx-auto mb-2 h-8 w-8" />
+        <p className="text-foreground text-sm font-medium">No genres match your search</p>
+        <Button variant="ghost" size="sm" onClick={onClear} className="mt-2 text-xs">
           Clear all
         </Button>
       </div>
@@ -191,9 +174,9 @@ function EmptyState({
 
   return (
     <div className="py-12 text-center">
-      <Tags className="mx-auto mb-3 h-10 w-10 text-muted-foreground/40" />
-      <p className="text-sm font-medium text-foreground">No genres added yet</p>
-      <p className="mt-1 text-xs text-muted-foreground">
+      <Tags className="text-muted-foreground/40 mx-auto mb-3 h-10 w-10" />
+      <p className="text-foreground text-sm font-medium">No genres added yet</p>
+      <p className="text-muted-foreground mt-1 text-xs">
         Add your first genre to start organizing your charts.
       </p>
       <Button onClick={onAdd} size="sm" className="mt-4">
@@ -223,9 +206,7 @@ export function GenreList({ genres }: GenreListProps) {
 
   function handleSort(key: SortKey) {
     setSort((prev) =>
-      prev.key === key
-        ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
-        : { key, dir: "asc" },
+      prev.key === key ? { key, dir: prev.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" },
     );
   }
 
@@ -270,9 +251,7 @@ export function GenreList({ genres }: GenreListProps) {
       {/* Header */}
       <div>
         <div className="flex items-center justify-between">
-          <h1 className="font-heading text-2xl font-semibold">
-            Genres
-          </h1>
+          <h1 className="font-heading text-2xl font-semibold">Genres</h1>
           <Button onClick={() => setCreateModalOpen(true)}>
             <Plus className="h-4 w-4" />
             Add Genre
@@ -281,8 +260,8 @@ export function GenreList({ genres }: GenreListProps) {
 
         {/* Search bar */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="relative min-w-[200px] max-w-xs flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative max-w-xs min-w-[200px] flex-1">
+            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               type="text"
               value={search}
@@ -296,7 +275,7 @@ export function GenreList({ genres }: GenreListProps) {
             <button
               type="button"
               onClick={() => setSearch("")}
-              className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground text-xs transition-colors"
             >
               Clear all
             </button>
@@ -307,10 +286,10 @@ export function GenreList({ genres }: GenreListProps) {
       {/* Desktop table */}
       <div className="hidden md:block">
         {filteredGenres.length > 0 ? (
-          <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <div className="border-border bg-card overflow-hidden rounded-xl border">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border">
+                <tr className="border-border border-b">
                   <SortableHeader
                     label="GENRE"
                     sortKey="name"
@@ -370,10 +349,7 @@ export function GenreList({ genres }: GenreListProps) {
       </div>
 
       {/* Create modal */}
-      <GenreFormModal
-        open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
-      />
+      <GenreFormModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
 
       {/* Edit modal */}
       <GenreFormModal

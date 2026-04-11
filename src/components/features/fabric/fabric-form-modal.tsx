@@ -94,9 +94,7 @@ export function FabricFormModal({
         setShortestEdgeInches(
           fabric.shortestEdgeInches > 0 ? String(fabric.shortestEdgeInches) : "",
         );
-        setLongestEdgeInches(
-          fabric.longestEdgeInches > 0 ? String(fabric.longestEdgeInches) : "",
-        );
+        setLongestEdgeInches(fabric.longestEdgeInches > 0 ? String(fabric.longestEdgeInches) : "");
         setLinkedProjectId(fabric.linkedProjectId);
         setNeedToBuy(fabric.needToBuy);
       } else {
@@ -182,12 +180,7 @@ export function FabricFormModal({
             </p>
           )}
 
-          <FormField
-            label="Name"
-            htmlFor="fabric-name"
-            required
-            error={nameError ?? undefined}
-          >
+          <FormField label="Name" htmlFor="fabric-name" required error={nameError ?? undefined}>
             <Input
               id="fabric-name"
               value={name}

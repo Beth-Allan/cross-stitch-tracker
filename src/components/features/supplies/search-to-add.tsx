@@ -11,11 +11,7 @@ import {
   getBeads,
   getSpecialtyItems,
 } from "@/lib/actions/supply-actions";
-import type {
-  ThreadWithBrand,
-  BeadWithBrand,
-  SpecialtyItemWithBrand,
-} from "@/types/supply";
+import type { ThreadWithBrand, BeadWithBrand, SpecialtyItemWithBrand } from "@/types/supply";
 
 type SupplyItem = ThreadWithBrand | BeadWithBrand | SpecialtyItemWithBrand;
 
@@ -37,8 +33,7 @@ function getItemHex(item: SupplyItem): string {
 
 function getItemCode(item: SupplyItem): string {
   if ("colorCode" in item) return (item as ThreadWithBrand).colorCode;
-  if ("productCode" in item)
-    return (item as BeadWithBrand | SpecialtyItemWithBrand).productCode;
+  if ("productCode" in item) return (item as BeadWithBrand | SpecialtyItemWithBrand).productCode;
   return "";
 }
 
@@ -127,9 +122,7 @@ export function SearchToAdd({
   }, []);
 
   const existingSet = new Set(existingIds);
-  const filtered = items
-    .filter((item) => !existingSet.has(getItemId(item)))
-    .slice(0, 8);
+  const filtered = items.filter((item) => !existingSet.has(getItemId(item))).slice(0, 8);
 
   async function handleSelect(item: SupplyItem) {
     startTransition(async () => {
@@ -158,9 +151,7 @@ export function SearchToAdd({
           });
         }
         if (result.success) {
-          toast.success(
-            `Added ${item.brand.name} ${getItemCode(item)} to project`,
-          );
+          toast.success(`Added ${item.brand.name} ${getItemCode(item)} to project`);
           onAdded();
           onClose();
         } else {
@@ -195,11 +186,11 @@ export function SearchToAdd({
   return (
     <div
       ref={ref}
-      className="absolute top-full right-0 left-0 z-20 mt-1 rounded-lg border border-border bg-card shadow-lg"
+      className="border-border bg-card absolute top-full right-0 left-0 z-20 mt-1 rounded-lg border shadow-lg"
     >
       <div className="p-2">
         <div className="relative">
-          <Search className="text-muted-foreground absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2" />
+          <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2" />
           <input
             ref={inputRef}
             type="text"
@@ -207,19 +198,15 @@ export function SearchToAdd({
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="border-border bg-card text-foreground placeholder:text-muted-foreground w-full rounded border py-1.5 pr-3 pl-8 text-sm transition-colors focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+            className="border-border bg-card text-foreground placeholder:text-muted-foreground w-full rounded border py-1.5 pr-3 pl-8 text-sm transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/40 focus:outline-none"
           />
         </div>
       </div>
-      <div className="max-h-48 overflow-y-auto border-t border-border">
+      <div className="border-border max-h-48 overflow-y-auto border-t">
         {isLoading ? (
-          <p className="text-muted-foreground px-3 py-4 text-center text-sm">
-            Searching...
-          </p>
+          <p className="text-muted-foreground px-3 py-4 text-center text-sm">Searching...</p>
         ) : filtered.length === 0 ? (
-          <p className="text-muted-foreground px-3 py-4 text-center text-sm">
-            No matches
-          </p>
+          <p className="text-muted-foreground px-3 py-4 text-center text-sm">No matches</p>
         ) : (
           filtered.map((item, index) => {
             const hex = getItemHex(item);
@@ -230,19 +217,17 @@ export function SearchToAdd({
                 key={getItemId(item)}
                 onClick={() => handleSelect(item)}
                 disabled={isPending}
-                className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-muted ${
+                className={`hover:bg-muted flex w-full items-center gap-3 px-3 py-2 text-left transition-colors ${
                   index === highlightIndex ? "bg-muted" : ""
                 }`}
               >
                 <div
                   className={`h-5 w-5 shrink-0 rounded-full shadow-sm ${
-                    needsBorder(hex)
-                      ? "ring-1 ring-stone-200 dark:ring-stone-600"
-                      : ""
+                    needsBorder(hex) ? "ring-1 ring-stone-200 dark:ring-stone-600" : ""
                   }`}
                   style={{ backgroundColor: hex }}
                 />
-                <span className="text-sm text-foreground">
+                <span className="text-foreground text-sm">
                   <span className="font-medium">
                     {item.brand.name} {code}
                   </span>{" "}

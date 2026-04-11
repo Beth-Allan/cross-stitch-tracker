@@ -52,11 +52,11 @@ function SortableHeader({
   const isActive = currentSort.key === sortKey;
   return (
     <th
-      className="cursor-pointer select-none px-4 py-2.5 text-left"
+      className="cursor-pointer px-4 py-2.5 text-left select-none"
       onClick={() => onSort(sortKey)}
     >
       <span
-        className={`inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider transition-colors ${
+        className={`inline-flex items-center gap-1 text-xs font-semibold tracking-wider uppercase transition-colors ${
           isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
         }`}
       >
@@ -149,12 +149,7 @@ function FabricBrandFormModal({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField
-            label="Name"
-            htmlFor="brand-name"
-            required
-            error={nameError ?? undefined}
-          >
+          <FormField label="Name" htmlFor="brand-name" required error={nameError ?? undefined}>
             <Input
               id="brand-name"
               value={name}
@@ -345,8 +340,8 @@ export function FabricBrandList({
     <div className="space-y-4">
       {/* Search */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-[200px] max-w-xs flex-1">
-          <Search className="text-muted-foreground absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
+        <div className="relative max-w-xs min-w-[200px] flex-1">
+          <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
           <Input
             type="text"
             value={search}
@@ -362,14 +357,9 @@ export function FabricBrandList({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-border border-b">
-              <SortableHeader
-                label="NAME"
-                sortKey="name"
-                currentSort={sort}
-                onSort={handleSort}
-              />
+              <SortableHeader label="NAME" sortKey="name" currentSort={sort} onSort={handleSort} />
               <th className="px-4 py-2.5 text-left">
-                <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                   WEBSITE
                 </span>
               </th>
@@ -443,11 +433,7 @@ export function FabricBrandList({
       </div>
 
       {/* Create modal */}
-      <FabricBrandFormModal
-        open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
-        brand={null}
-      />
+      <FabricBrandFormModal open={createModalOpen} onOpenChange={setCreateModalOpen} brand={null} />
 
       {/* Edit modal */}
       <FabricBrandFormModal

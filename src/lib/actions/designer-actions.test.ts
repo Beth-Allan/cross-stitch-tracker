@@ -62,7 +62,10 @@ describe("designer-actions", () => {
 
   describe("createDesigner", () => {
     it("creates a designer with notes field and returns success", async () => {
-      const mockDesigner = createMockDesigner({ name: "Shannon Christine", notes: "Great designs" });
+      const mockDesigner = createMockDesigner({
+        name: "Shannon Christine",
+        notes: "Great designs",
+      });
       mockPrisma.designer.create.mockResolvedValueOnce(mockDesigner);
       const { createDesigner } = await import("./designer-actions");
 

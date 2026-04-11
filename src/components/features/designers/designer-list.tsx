@@ -42,11 +42,11 @@ function SortableHeader({
   const isActive = currentSort.key === sortKey;
   return (
     <th
-      className="cursor-pointer select-none px-4 py-2.5 text-left"
+      className="cursor-pointer px-4 py-2.5 text-left select-none"
       onClick={() => onSort(sortKey)}
     >
       <span
-        className={`inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider transition-colors ${
+        className={`inline-flex items-center gap-1 text-xs font-semibold tracking-wider uppercase transition-colors ${
           isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
         }`}
       >
@@ -130,7 +130,7 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
         </div>
 
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Users className="mb-3 h-12 w-12 text-muted-foreground/40" />
+          <Users className="text-muted-foreground/40 mb-3 h-12 w-12" />
           <h2 className="font-heading text-lg font-semibold">No designers added yet</h2>
           <p className="text-muted-foreground mt-1.5 max-w-xs text-sm">
             Add your first designer to start organizing your collection.
@@ -163,8 +163,8 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
 
       {/* Search bar */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-[200px] max-w-xs flex-1">
-          <Search className="text-muted-foreground absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
+        <div className="relative max-w-xs min-w-[200px] flex-1">
+          <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
           <Input
             type="text"
             value={search}
@@ -197,7 +197,7 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
                 onSort={handleSort}
               />
               <th className="px-4 py-2.5 text-left">
-                <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                   WEB
                 </span>
               </th>
@@ -208,7 +208,7 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
                 onSort={handleSort}
               />
               <th className="px-4 py-2.5 text-left">
-                <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                   STARTED
                 </span>
               </th>
@@ -219,7 +219,7 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
                 onSort={handleSort}
               />
               <th className="px-4 py-2.5 text-left">
-                <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                   TOP GENRE
                 </span>
               </th>
@@ -272,11 +272,7 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
       </div>
 
       {/* Create modal */}
-      <DesignerFormModal
-        open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
-        designer={null}
-      />
+      <DesignerFormModal open={createModalOpen} onOpenChange={setCreateModalOpen} designer={null} />
 
       {/* Edit modal */}
       <DesignerFormModal
@@ -392,7 +388,7 @@ function DesignerCard({
         <div className="min-w-0 flex-1">
           <Link
             href={`/designers/${designer.id}`}
-            className="text-foreground hover:text-primary text-sm font-semibold truncate block transition-colors"
+            className="text-foreground hover:text-primary block truncate text-sm font-semibold transition-colors"
           >
             {designer.name}
           </Link>

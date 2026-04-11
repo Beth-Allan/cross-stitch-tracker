@@ -23,12 +23,7 @@ interface GenreFormModalProps {
   onSuccess?: () => void;
 }
 
-export function GenreFormModal({
-  open,
-  onOpenChange,
-  genre,
-  onSuccess,
-}: GenreFormModalProps) {
+export function GenreFormModal({ open, onOpenChange, genre, onSuccess }: GenreFormModalProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [name, setName] = useState("");
@@ -80,12 +75,7 @@ export function GenreFormModal({
           <DialogTitle>{isEditMode ? "Edit Genre" : "Add Genre"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField
-            label="Name"
-            htmlFor="genre-name"
-            required
-            error={error ?? undefined}
-          >
+          <FormField label="Name" htmlFor="genre-name" required error={error ?? undefined}>
             <Input
               id="genre-name"
               value={name}

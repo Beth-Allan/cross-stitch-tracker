@@ -2,7 +2,11 @@
 
 import { Input } from "@/components/ui/input";
 import { FormField } from "./form-field";
-import { calculateSizeCategory, getEffectiveStitchCount, SIZE_COLORS } from "@/lib/utils/size-category";
+import {
+  calculateSizeCategory,
+  getEffectiveStitchCount,
+  SIZE_COLORS,
+} from "@/lib/utils/size-category";
 
 interface StitchCountFieldsProps {
   stitchesWide: number;

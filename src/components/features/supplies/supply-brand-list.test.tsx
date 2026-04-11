@@ -25,7 +25,12 @@ vi.mock("sonner", () => ({
 
 const mockBrands: SupplyBrandWithCounts[] = [
   {
-    ...createMockSupplyBrand({ id: "b1", name: "DMC", website: "https://www.dmc.com", supplyType: "THREAD" }),
+    ...createMockSupplyBrand({
+      id: "b1",
+      name: "DMC",
+      website: "https://www.dmc.com",
+      supplyType: "THREAD",
+    }),
     _count: { threads: 500, beads: 0, specialtyItems: 0 },
   },
   {
@@ -33,7 +38,12 @@ const mockBrands: SupplyBrandWithCounts[] = [
     _count: { threads: 0, beads: 25, specialtyItems: 0 },
   },
   {
-    ...createMockSupplyBrand({ id: "b3", name: "Kreinik", website: "https://kreinik.com", supplyType: "SPECIALTY" }),
+    ...createMockSupplyBrand({
+      id: "b3",
+      name: "Kreinik",
+      website: "https://kreinik.com",
+      supplyType: "SPECIALTY",
+    }),
     _count: { threads: 0, beads: 0, specialtyItems: 10 },
   },
 ];

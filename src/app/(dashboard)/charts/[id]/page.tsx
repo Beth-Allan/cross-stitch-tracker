@@ -9,9 +9,7 @@ export default async function ChartDetailPage({ params }: { params: Promise<{ id
   if (!chart) notFound();
 
   // Fetch project supplies if a project exists
-  const projectSupplies = chart.project
-    ? await getProjectSupplies(chart.project.id)
-    : null;
+  const projectSupplies = chart.project ? await getProjectSupplies(chart.project.id) : null;
 
   return <ChartDetail chart={chart} projectSupplies={projectSupplies} />;
 }

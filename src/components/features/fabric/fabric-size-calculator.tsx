@@ -1,7 +1,4 @@
-import {
-  calculateRequiredFabricSize,
-  doesFabricFit,
-} from "@/lib/utils/fabric-calculator";
+import { calculateRequiredFabricSize, doesFabricFit } from "@/lib/utils/fabric-calculator";
 import { Badge } from "@/components/ui/badge";
 
 interface FabricSizeCalculatorProps {
@@ -42,7 +39,7 @@ export function FabricSizeCalculator({ fabric, project }: FabricSizeCalculatorPr
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="bg-muted/50 border-border rounded-lg border p-3">
-          <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+          <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
             Required
           </p>
           <p className="text-foreground mt-1 text-sm font-medium">
@@ -52,7 +49,7 @@ export function FabricSizeCalculator({ fabric, project }: FabricSizeCalculatorPr
         </div>
 
         <div className="bg-muted/50 border-border rounded-lg border p-3">
-          <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+          <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
             Available
           </p>
           <p className="text-foreground mt-1 text-sm font-medium">
@@ -61,7 +58,7 @@ export function FabricSizeCalculator({ fabric, project }: FabricSizeCalculatorPr
         </div>
 
         <div className="bg-muted/50 border-border rounded-lg border p-3">
-          <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+          <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
             Status
           </p>
           <div className="mt-1">
