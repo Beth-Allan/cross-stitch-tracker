@@ -251,11 +251,13 @@ export function SupplyFormModal({
               className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               <option value="">Select brand...</option>
-              {brands.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
+              {brands
+                .filter((b) => b.supplyType === supplyType.toUpperCase())
+                .map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
             </select>
           </FormField>
 

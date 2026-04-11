@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { Fragment, useTransition } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -51,20 +51,16 @@ function SupplyRow({
   return (
     <div className="flex items-center gap-3 py-2">
       {hexColor && <ColorSwatch hexColor={hexColor} size="md" />}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground">
+      <div className="min-w-0 flex-1">
+        <p className="text-foreground text-sm font-medium">
           {brandName} {code}
         </p>
-        <p className="text-sm text-muted-foreground truncate">{colorName}</p>
+        <p className="text-muted-foreground truncate text-sm">{colorName}</p>
       </div>
-      <span className="text-sm font-medium text-amber-600 dark:text-amber-500 whitespace-nowrap">
+      <span className="text-sm font-medium whitespace-nowrap text-amber-600 dark:text-amber-500">
         Need {need}
       </span>
-      <Button
-        size="sm"
-        onClick={handleMarkAcquired}
-        disabled={isPending}
-      >
+      <Button size="sm" onClick={handleMarkAcquired} disabled={isPending}>
         {isPending ? "Marking..." : "Mark Acquired"}
       </Button>
     </div>
@@ -76,15 +72,24 @@ function SupplyRow({
 function FabricRow({
   fabricNeeds,
 }: {
-  fabricNeeds: { count: number; widthInches: number; heightInches: number };
+  fabricNeeds: Array<{ label: string; count: number; widthInches: number; heightInches: number }>;
 }) {
   return (
-    <div className="flex items-center gap-3 py-2">
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-amber-600 dark:text-amber-500">
-          Needs fabric: {fabricNeeds.count}ct, {fabricNeeds.widthInches}&quot;
-          &times; {fabricNeeds.heightInches}&quot;
-        </p>
+    <div className="py-3">
+      <p className="mb-2 text-sm font-medium text-amber-600 dark:text-amber-500">
+        Needs fabric (includes 3&quot; margin per side):
+      </p>
+      <div className="grid grid-cols-3 gap-x-4 gap-y-1 text-sm">
+        <span className="text-muted-foreground text-xs font-medium">Count</span>
+        <span className="text-muted-foreground text-xs font-medium">Width</span>
+        <span className="text-muted-foreground text-xs font-medium">Height</span>
+        {fabricNeeds.map((f) => (
+          <Fragment key={f.count}>
+            <span className="text-foreground">{f.label}</span>
+            <span className="text-muted-foreground">{f.widthInches}&quot;</span>
+            <span className="text-muted-foreground">{f.heightInches}&quot;</span>
+          </Fragment>
+        ))}
       </div>
     </div>
   );
@@ -95,17 +100,17 @@ function FabricRow({
 function ProjectGroup({ project }: { project: ShoppingListProject }) {
   return (
     <Card className="p-4 md:p-6">
-      <div className="flex items-center gap-3 mb-4">
+      <div className="mb-4 flex items-center gap-3">
         <Link
-          href={`/charts/${project.projectId}`}
-          className="text-lg font-semibold font-heading text-foreground hover:text-primary transition-colors"
+          href={`/charts/${project.chartId}`}
+          className="font-heading text-foreground hover:text-primary text-lg font-semibold transition-colors"
         >
           {project.projectName}
         </Link>
         <StatusBadge status={project.projectStatus as ProjectStatus} />
       </div>
 
-      <div className="divide-y divide-border">
+      <div className="divide-border divide-y">
         {project.unfulfilledThreads.map((pt) => (
           <SupplyRow
             key={pt.id}
@@ -157,29 +162,25 @@ function ProjectGroup({ project }: { project: ShoppingListProject }) {
 function EmptyAllCaughtUp() {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="mb-4 rounded-full bg-muted p-4">
-        <PackageOpen className="h-8 w-8 text-muted-foreground" />
+      <div className="bg-muted mb-4 rounded-full p-4">
+        <PackageOpen className="text-muted-foreground h-8 w-8" />
       </div>
-      <h2 className="text-lg font-semibold font-heading text-foreground mb-2">
-        All caught up!
-      </h2>
-      <p className="text-sm text-muted-foreground max-w-md">
+      <h2 className="font-heading text-foreground mb-2 text-lg font-semibold">All caught up!</h2>
+      <p className="text-muted-foreground max-w-md text-sm">
         Every supply across all your projects is acquired. Time to stitch!
       </p>
     </div>
   );
 }
 
-function EmptyNoShoppingNeeds() {
+function _EmptyNoShoppingNeeds() {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="mb-4 rounded-full bg-muted p-4">
-        <ShoppingCart className="h-8 w-8 text-muted-foreground" />
+      <div className="bg-muted mb-4 rounded-full p-4">
+        <ShoppingCart className="text-muted-foreground h-8 w-8" />
       </div>
-      <h2 className="text-lg font-semibold font-heading text-foreground mb-2">
-        No shopping needs
-      </h2>
-      <p className="text-sm text-muted-foreground max-w-md">
+      <h2 className="font-heading text-foreground mb-2 text-lg font-semibold">No shopping needs</h2>
+      <p className="text-muted-foreground max-w-md text-sm">
         Link supplies to your projects to see what you still need to buy.
       </p>
     </div>

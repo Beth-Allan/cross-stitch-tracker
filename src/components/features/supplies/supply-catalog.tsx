@@ -2,9 +2,10 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Grid3X3, List, Plus, CircleDot, Gem, Sparkles } from "lucide-react";
+import { Search, Grid3X3, List, Plus, CircleDot, Gem, Sparkles, Tags } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/link-button";
 import { Input } from "@/components/ui/input";
 import { SupplyGridView } from "./supply-grid-view";
 import { SupplyTableView } from "./supply-table-view";
@@ -603,6 +604,12 @@ export function SupplyCatalog({ threads, beads, specialtyItems, brands }: Supply
               <List className="h-4 w-4" />
             </button>
           </div>
+
+          {/* Manage Brands */}
+          <LinkButton href="/supplies/brands" variant="outline" size="sm">
+            <Tags className="h-4 w-4" data-icon="inline-start" />
+            Manage Brands
+          </LinkButton>
 
           {/* Add button */}
           <Button onClick={() => setCreateModalOpen(true)}>

@@ -18,6 +18,7 @@ vi.mock("sonner", () => ({
 
 const projectWithThreads: ShoppingListProject = {
   projectId: "proj-1",
+  chartId: "chart-1",
   projectName: "Fairy Garden Sampler",
   projectStatus: "KITTING",
   unfulfilledThreads: [
@@ -54,6 +55,7 @@ const projectWithThreads: ShoppingListProject = {
 
 const projectWithBeadsAndFabric: ShoppingListProject = {
   projectId: "proj-2",
+  chartId: "chart-2",
   projectName: "Holiday Ornament",
   projectStatus: "UNSTARTED",
   unfulfilledThreads: [],
@@ -85,7 +87,14 @@ const projectWithBeadsAndFabric: ShoppingListProject = {
     },
   ],
   needsFabric: true,
-  fabricNeeds: { count: 14, widthInches: 100, heightInches: 80 },
+  fabricNeeds: [
+    { label: "14 / 28 over 2", count: 14, widthInches: 21, heightInches: 17 },
+    { label: "16 / 32 over 2", count: 16, widthInches: 19, heightInches: 16 },
+    { label: "18 / 36 over 2", count: 18, widthInches: 18, heightInches: 15 },
+    { label: "20 / 40 over 2", count: 20, widthInches: 16, heightInches: 14 },
+    { label: "22", count: 22, widthInches: 15, heightInches: 13 },
+    { label: "25", count: 25, widthInches: 14, heightInches: 12 },
+  ],
 };
 
 // ─── Tests ──────────────────────────────────────────────────────────────────
@@ -97,9 +106,7 @@ describe("ShoppingList", () => {
   });
 
   it("renders project groups with project name and status badge", () => {
-    render(
-      <ShoppingList projects={[projectWithThreads, projectWithBeadsAndFabric]} />,
-    );
+    render(<ShoppingList projects={[projectWithThreads, projectWithBeadsAndFabric]} />);
 
     expect(screen.getByText("Fairy Garden Sampler")).toBeInTheDocument();
     expect(screen.getByText("Holiday Ornament")).toBeInTheDocument();
@@ -121,9 +128,7 @@ describe("ShoppingList", () => {
   });
 
   it("shows Mark Acquired button for each supply", () => {
-    render(
-      <ShoppingList projects={[projectWithThreads, projectWithBeadsAndFabric]} />,
-    );
+    render(<ShoppingList projects={[projectWithThreads, projectWithBeadsAndFabric]} />);
 
     // 2 threads + 1 bead + 1 specialty = 4 buttons
     const buttons = screen.getAllByRole("button", { name: /Mark Acquired/i });
@@ -134,7 +139,8 @@ describe("ShoppingList", () => {
     render(<ShoppingList projects={[projectWithBeadsAndFabric]} />);
 
     expect(screen.getByText(/Needs fabric/)).toBeInTheDocument();
-    expect(screen.getByText(/14ct/)).toBeInTheDocument();
+    expect(screen.getByText("14 / 28 over 2")).toBeInTheDocument();
+    expect(screen.getByText("25")).toBeInTheDocument();
   });
 
   it('renders "All caught up!" empty state when no items', () => {
@@ -142,9 +148,7 @@ describe("ShoppingList", () => {
 
     expect(screen.getByText("All caught up!")).toBeInTheDocument();
     expect(
-      screen.getByText(
-        "Every supply across all your projects is acquired. Time to stitch!",
-      ),
+      screen.getByText("Every supply across all your projects is acquired. Time to stitch!"),
     ).toBeInTheDocument();
   });
 

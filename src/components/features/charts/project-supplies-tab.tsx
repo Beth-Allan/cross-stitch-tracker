@@ -57,11 +57,6 @@ function EditableNumber({
     }
   }, [editing]);
 
-  // Sync draft when value prop changes while not editing
-  useEffect(() => {
-    if (!editing) setDraft(String(value));
-  }, [value, editing]);
-
   if (editing) {
     return (
       <input
@@ -82,7 +77,7 @@ function EditableNumber({
             setEditing(false);
           }
         }}
-        className="w-12 rounded border border-emerald-500 bg-card px-1.5 py-0.5 text-center text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+        className="bg-card text-foreground w-12 rounded border border-emerald-500 px-1.5 py-0.5 text-center text-sm focus:ring-2 focus:ring-emerald-500/40 focus:outline-none"
       />
     );
   }
@@ -93,7 +88,7 @@ function EditableNumber({
         setDraft(String(value));
         setEditing(true);
       }}
-      className={`cursor-text rounded px-1.5 py-0.5 transition-colors hover:bg-muted ${className ?? ""}`}
+      className={`hover:bg-muted cursor-text rounded px-1.5 py-0.5 transition-colors ${className ?? ""}`}
       title="Click to edit"
     >
       {value}
@@ -133,7 +128,7 @@ function SupplyRow({
   const isLight = needsBorder(hex);
 
   return (
-    <div className="group flex items-center gap-3 border-b border-border py-3 last:border-b-0">
+    <div className="group border-border flex items-center gap-3 border-b py-3 last:border-b-0">
       {/* Swatch */}
       <div
         className={`h-7 w-7 shrink-0 rounded-full shadow-sm ${
@@ -144,31 +139,29 @@ function SupplyRow({
 
       {/* Code + Name */}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm text-foreground">
+        <p className="text-foreground truncate text-sm">
           <span className="font-medium">
             {brand} {code}
           </span>
           <span className="text-muted-foreground"> — {name}</span>
         </p>
         {stitchCount != null && stitchCount > 0 && (
-          <p className="text-xs text-muted-foreground">
-            {stitchCount.toLocaleString()} stitches
-          </p>
+          <p className="text-muted-foreground text-xs">{stitchCount.toLocaleString()} stitches</p>
         )}
       </div>
 
       {/* Quantities */}
       <div className="flex shrink-0 items-center gap-3 text-sm">
-        <div className="flex items-center gap-1 text-muted-foreground">
+        <div className="text-muted-foreground flex items-center gap-1">
           <span className="text-xs">Req:</span>
           <EditableNumber
             value={quantityRequired}
             onSave={onUpdateRequired}
-            className="font-medium text-foreground"
+            className="text-foreground font-medium"
           />
         </div>
-        <div className="flex items-center gap-1 text-muted-foreground">
-          <span className="text-xs">Got:</span>
+        <div className="text-muted-foreground flex items-center gap-1">
+          <span className="text-xs">Have:</span>
           <EditableNumber
             value={quantityAcquired}
             onSave={onUpdateAcquired}
@@ -189,15 +182,9 @@ function SupplyRow({
       {/* Fulfillment indicator */}
       <div className="flex w-5 shrink-0 justify-center">
         {isFulfilled ? (
-          <Check
-            className="h-4 w-4 text-emerald-500 dark:text-emerald-400"
-            strokeWidth={2}
-          />
+          <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-400" strokeWidth={2} />
         ) : (
-          <AlertTriangle
-            className="h-4 w-4 text-amber-500 dark:text-amber-400"
-            strokeWidth={1.5}
-          />
+          <AlertTriangle className="h-4 w-4 text-amber-500 dark:text-amber-400" strokeWidth={1.5} />
         )}
       </div>
 
@@ -208,7 +195,7 @@ function SupplyRow({
         title="Remove from project"
       >
         <Trash2
-          className="h-3.5 w-3.5 text-muted-foreground transition-colors hover:text-destructive"
+          className="text-muted-foreground hover:text-destructive h-3.5 w-3.5 transition-colors"
           strokeWidth={1.5}
         />
       </button>
@@ -243,28 +230,19 @@ function SupplySection({
   const allFulfilled = count > 0 && fulfilledCount === count;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card">
+    <div className="border-border bg-card overflow-hidden rounded-xl border">
       {/* Section header */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center gap-3 px-5 py-3.5 transition-colors hover:bg-muted/50"
+        className="hover:bg-muted/50 flex w-full items-center gap-3 px-5 py-3.5 transition-colors"
       >
         {isOpen ? (
-          <ChevronDown
-            className="h-4 w-4 shrink-0 text-muted-foreground"
-            strokeWidth={1.5}
-          />
+          <ChevronDown className="text-muted-foreground h-4 w-4 shrink-0" strokeWidth={1.5} />
         ) : (
-          <ChevronRight
-            className="h-4 w-4 shrink-0 text-muted-foreground"
-            strokeWidth={1.5}
-          />
+          <ChevronRight className="text-muted-foreground h-4 w-4 shrink-0" strokeWidth={1.5} />
         )}
-        <Icon
-          className="h-4 w-4 shrink-0 text-muted-foreground"
-          strokeWidth={1.5}
-        />
-        <h3 className="font-heading flex-1 text-left text-sm font-semibold text-foreground">
+        <Icon className="text-muted-foreground h-4 w-4 shrink-0" strokeWidth={1.5} />
+        <h3 className="font-heading text-foreground flex-1 text-left text-sm font-semibold">
           {title}
         </h3>
         <span className="flex items-center gap-2 text-xs">
@@ -285,12 +263,10 @@ function SupplySection({
 
       {/* Section content */}
       {isOpen && (
-        <div className="border-t border-border px-5 pb-4">
+        <div className="border-border border-t px-5 pb-4">
           {count === 0 ? (
             <div className="py-6 text-center">
-              <p className="mb-2 text-sm text-muted-foreground">
-                {emptyText}
-              </p>
+              <p className="text-muted-foreground mb-2 text-sm">{emptyText}</p>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -340,25 +316,20 @@ export function ProjectSuppliesTab({
   beads,
   specialty,
 }: ProjectSuppliesTabProps) {
-  const [addingType, setAddingType] = useState<
-    "thread" | "bead" | "specialty" | null
-  >(null);
-  const [isPending, startTransition] = useTransition();
+  const [addingType, setAddingType] = useState<"thread" | "bead" | "specialty" | null>(null);
+  const [, startTransition] = useTransition();
 
   // Kitting summary calculations
   const totalItems = threads.length + beads.length + specialty.length;
   const fulfilledThreads = threads.filter(
     (pt) => pt.quantityAcquired >= pt.quantityRequired,
   ).length;
-  const fulfilledBeads = beads.filter(
-    (pb) => pb.quantityAcquired >= pb.quantityRequired,
-  ).length;
+  const fulfilledBeads = beads.filter((pb) => pb.quantityAcquired >= pb.quantityRequired).length;
   const fulfilledSpecialty = specialty.filter(
     (ps) => ps.quantityAcquired >= ps.quantityRequired,
   ).length;
   const fulfilledTotal = fulfilledThreads + fulfilledBeads + fulfilledSpecialty;
-  const overallPercent =
-    totalItems > 0 ? Math.round((fulfilledTotal / totalItems) * 100) : 0;
+  const overallPercent = totalItems > 0 ? Math.round((fulfilledTotal / totalItems) * 100) : 0;
 
   // Needs summary
   const needsSummary: string[] = [];
@@ -366,13 +337,9 @@ export function ProjectSuppliesTab({
   const unfulfilledBeadCount = beads.length - fulfilledBeads;
   const unfulfilledSpecialtyCount = specialty.length - fulfilledSpecialty;
   if (unfulfilledThreadCount > 0)
-    needsSummary.push(
-      `${unfulfilledThreadCount} thread${unfulfilledThreadCount > 1 ? "s" : ""}`,
-    );
+    needsSummary.push(`${unfulfilledThreadCount} thread${unfulfilledThreadCount > 1 ? "s" : ""}`);
   if (unfulfilledBeadCount > 0)
-    needsSummary.push(
-      `${unfulfilledBeadCount} bead${unfulfilledBeadCount > 1 ? "s" : ""}`,
-    );
+    needsSummary.push(`${unfulfilledBeadCount} bead${unfulfilledBeadCount > 1 ? "s" : ""}`);
   if (unfulfilledSpecialtyCount > 0)
     needsSummary.push(
       `${unfulfilledSpecialtyCount} specialty item${unfulfilledSpecialtyCount > 1 ? "s" : ""}`,
@@ -383,65 +350,50 @@ export function ProjectSuppliesTab({
   const linkedBeadIds = beads.map((pb) => pb.beadId);
   const linkedSpecialtyIds = specialty.map((ps) => ps.specialtyItemId);
 
-  const handleRemoveThread = useCallback(
-    (id: string, brandCode: string) => {
-      startTransition(async () => {
-        try {
-          const result = await removeProjectThread(id);
-          if (result.success) {
-            toast.success(`Removed ${brandCode} from project`);
-          } else {
-            toast.error(
-              result.error ?? "Something went wrong. Please try again.",
-            );
-          }
-        } catch {
-          toast.error("Something went wrong. Please try again.");
+  const handleRemoveThread = useCallback((id: string, brandCode: string) => {
+    startTransition(async () => {
+      try {
+        const result = await removeProjectThread(id);
+        if (result.success) {
+          toast.success(`Removed ${brandCode} from project`);
+        } else {
+          toast.error(result.error ?? "Something went wrong. Please try again.");
         }
-      });
-    },
-    [],
-  );
+      } catch {
+        toast.error("Something went wrong. Please try again.");
+      }
+    });
+  }, []);
 
-  const handleRemoveBead = useCallback(
-    (id: string, brandCode: string) => {
-      startTransition(async () => {
-        try {
-          const result = await removeProjectBead(id);
-          if (result.success) {
-            toast.success(`Removed ${brandCode} from project`);
-          } else {
-            toast.error(
-              result.error ?? "Something went wrong. Please try again.",
-            );
-          }
-        } catch {
-          toast.error("Something went wrong. Please try again.");
+  const handleRemoveBead = useCallback((id: string, brandCode: string) => {
+    startTransition(async () => {
+      try {
+        const result = await removeProjectBead(id);
+        if (result.success) {
+          toast.success(`Removed ${brandCode} from project`);
+        } else {
+          toast.error(result.error ?? "Something went wrong. Please try again.");
         }
-      });
-    },
-    [],
-  );
+      } catch {
+        toast.error("Something went wrong. Please try again.");
+      }
+    });
+  }, []);
 
-  const handleRemoveSpecialty = useCallback(
-    (id: string, brandCode: string) => {
-      startTransition(async () => {
-        try {
-          const result = await removeProjectSpecialty(id);
-          if (result.success) {
-            toast.success(`Removed ${brandCode} from project`);
-          } else {
-            toast.error(
-              result.error ?? "Something went wrong. Please try again.",
-            );
-          }
-        } catch {
-          toast.error("Something went wrong. Please try again.");
+  const handleRemoveSpecialty = useCallback((id: string, brandCode: string) => {
+    startTransition(async () => {
+      try {
+        const result = await removeProjectSpecialty(id);
+        if (result.success) {
+          toast.success(`Removed ${brandCode} from project`);
+        } else {
+          toast.error(result.error ?? "Something went wrong. Please try again.");
         }
-      });
-    },
-    [],
-  );
+      } catch {
+        toast.error("Something went wrong. Please try again.");
+      }
+    });
+  }, []);
 
   const handleUpdateQuantity = useCallback(
     (
@@ -456,9 +408,7 @@ export function ProjectSuppliesTab({
             [field]: value,
           });
           if (!result.success) {
-            toast.error(
-              result.error ?? "Something went wrong. Please try again.",
-            );
+            toast.error(result.error ?? "Something went wrong. Please try again.");
           }
         } catch {
           toast.error("Something went wrong. Please try again.");
@@ -475,15 +425,15 @@ export function ProjectSuppliesTab({
   return (
     <div className="space-y-5">
       {/* Kitting Progress Summary */}
-      <div className="overflow-hidden rounded-xl border border-border bg-card">
+      <div className="border-border bg-card overflow-hidden rounded-xl border">
         <div className="px-5 py-4">
-          <h3 className="font-heading mb-3 text-sm font-semibold text-foreground">
+          <h3 className="font-heading text-foreground mb-3 text-sm font-semibold">
             Supply Kitting
           </h3>
 
           {/* Progress bar */}
           <div className="mb-3 flex items-center gap-3">
-            <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+            <div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
               <div
                 className="h-full rounded-full bg-emerald-500 transition-all dark:bg-emerald-400"
                 style={{ width: `${overallPercent}%` }}
@@ -512,8 +462,7 @@ export function ProjectSuppliesTab({
           ) : needsSummary.length > 0 ? (
             <div className="rounded-lg border border-amber-200/40 bg-amber-50/50 px-4 py-2.5 dark:border-amber-900/30 dark:bg-amber-950/20">
               <p className="text-sm text-amber-700 dark:text-amber-400">
-                <span className="font-medium">Still needs:</span>{" "}
-                {needsSummary.join(", ")}
+                <span className="font-medium">Still needs:</span> {needsSummary.join(", ")}
               </p>
             </div>
           ) : null}
@@ -535,10 +484,7 @@ export function ProjectSuppliesTab({
           {threads.map((pt) => {
             const thread = pt.thread;
             const isFulfilled = pt.quantityAcquired >= pt.quantityRequired;
-            const quantityNeeded = Math.max(
-              0,
-              pt.quantityRequired - pt.quantityAcquired,
-            );
+            const quantityNeeded = Math.max(0, pt.quantityRequired - pt.quantityAcquired);
             return (
               <SupplyRow
                 key={pt.id}
@@ -558,10 +504,7 @@ export function ProjectSuppliesTab({
                   handleUpdateQuantity(pt.id, "thread", "quantityAcquired", v)
                 }
                 onRemove={() =>
-                  handleRemoveThread(
-                    pt.id,
-                    `${thread.brand.name} ${thread.colorCode}`,
-                  )
+                  handleRemoveThread(pt.id, `${thread.brand.name} ${thread.colorCode}`)
                 }
               />
             );
@@ -592,10 +535,7 @@ export function ProjectSuppliesTab({
           {beads.map((pb) => {
             const bead = pb.bead;
             const isFulfilled = pb.quantityAcquired >= pb.quantityRequired;
-            const quantityNeeded = Math.max(
-              0,
-              pb.quantityRequired - pb.quantityAcquired,
-            );
+            const quantityNeeded = Math.max(0, pb.quantityRequired - pb.quantityAcquired);
             return (
               <SupplyRow
                 key={pb.id}
@@ -607,18 +547,9 @@ export function ProjectSuppliesTab({
                 quantityAcquired={pb.quantityAcquired}
                 isFulfilled={isFulfilled}
                 quantityNeeded={quantityNeeded}
-                onUpdateRequired={(v) =>
-                  handleUpdateQuantity(pb.id, "bead", "quantityRequired", v)
-                }
-                onUpdateAcquired={(v) =>
-                  handleUpdateQuantity(pb.id, "bead", "quantityAcquired", v)
-                }
-                onRemove={() =>
-                  handleRemoveBead(
-                    pb.id,
-                    `${bead.brand.name} ${bead.productCode}`,
-                  )
-                }
+                onUpdateRequired={(v) => handleUpdateQuantity(pb.id, "bead", "quantityRequired", v)}
+                onUpdateAcquired={(v) => handleUpdateQuantity(pb.id, "bead", "quantityAcquired", v)}
+                onRemove={() => handleRemoveBead(pb.id, `${bead.brand.name} ${bead.productCode}`)}
               />
             );
           })}
@@ -648,10 +579,7 @@ export function ProjectSuppliesTab({
           {specialty.map((ps) => {
             const item = ps.specialtyItem;
             const isFulfilled = ps.quantityAcquired >= ps.quantityRequired;
-            const quantityNeeded = Math.max(
-              0,
-              ps.quantityRequired - ps.quantityAcquired,
-            );
+            const quantityNeeded = Math.max(0, ps.quantityRequired - ps.quantityAcquired);
             return (
               <SupplyRow
                 key={ps.id}
@@ -664,26 +592,13 @@ export function ProjectSuppliesTab({
                 isFulfilled={isFulfilled}
                 quantityNeeded={quantityNeeded}
                 onUpdateRequired={(v) =>
-                  handleUpdateQuantity(
-                    ps.id,
-                    "specialty",
-                    "quantityRequired",
-                    v,
-                  )
+                  handleUpdateQuantity(ps.id, "specialty", "quantityRequired", v)
                 }
                 onUpdateAcquired={(v) =>
-                  handleUpdateQuantity(
-                    ps.id,
-                    "specialty",
-                    "quantityAcquired",
-                    v,
-                  )
+                  handleUpdateQuantity(ps.id, "specialty", "quantityAcquired", v)
                 }
                 onRemove={() =>
-                  handleRemoveSpecialty(
-                    ps.id,
-                    `${item.brand.name} ${item.productCode}`,
-                  )
+                  handleRemoveSpecialty(ps.id, `${item.brand.name} ${item.productCode}`)
                 }
               />
             );

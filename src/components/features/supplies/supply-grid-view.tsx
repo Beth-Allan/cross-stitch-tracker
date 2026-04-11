@@ -1,5 +1,6 @@
 "use client";
 
+import { Pencil } from "lucide-react";
 import { ColorSwatch } from "./color-swatch";
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */
@@ -31,8 +32,11 @@ export function SupplyGridView({ items, onEdit }: SupplyGridViewProps) {
             key={item.id}
             type="button"
             onClick={() => onEdit(item.id)}
-            className="bg-card border-border hover:border-primary/30 flex flex-col items-center gap-2 rounded-xl border p-4 shadow-sm transition-colors"
+            className="group bg-card border-border hover:border-primary/30 relative flex flex-col items-center gap-2 rounded-xl border p-4 shadow-sm transition-all hover:shadow-md"
           >
+            <div className="bg-primary/10 text-primary absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full opacity-0 transition-opacity group-hover:opacity-100">
+              <Pencil className="h-3 w-3" />
+            </div>
             <ColorSwatch hexColor={item.hexColor} size="lg" />
             <span className="text-foreground text-sm font-medium">{code}</span>
             <span className="text-muted-foreground line-clamp-1 text-xs">{item.colorName}</span>

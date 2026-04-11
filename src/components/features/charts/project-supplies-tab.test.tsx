@@ -20,9 +20,7 @@ import { ProjectSuppliesTab } from "./project-supplies-tab";
 const mockRemoveProjectThread = vi.fn().mockResolvedValue({ success: true });
 const mockRemoveProjectBead = vi.fn().mockResolvedValue({ success: true });
 const mockRemoveProjectSpecialty = vi.fn().mockResolvedValue({ success: true });
-const mockUpdateProjectSupplyQuantity = vi
-  .fn()
-  .mockResolvedValue({ success: true });
+const mockUpdateProjectSupplyQuantity = vi.fn().mockResolvedValue({ success: true });
 const mockAddThreadToProject = vi.fn().mockResolvedValue({ success: true });
 const mockAddBeadToProject = vi.fn().mockResolvedValue({ success: true });
 const mockAddSpecialtyToProject = vi.fn().mockResolvedValue({ success: true });
@@ -31,17 +29,13 @@ const mockGetBeads = vi.fn().mockResolvedValue([]);
 const mockGetSpecialtyItems = vi.fn().mockResolvedValue([]);
 
 vi.mock("@/lib/actions/supply-actions", () => ({
-  removeProjectThread: (...args: unknown[]) =>
-    mockRemoveProjectThread(...args),
+  removeProjectThread: (...args: unknown[]) => mockRemoveProjectThread(...args),
   removeProjectBead: (...args: unknown[]) => mockRemoveProjectBead(...args),
-  removeProjectSpecialty: (...args: unknown[]) =>
-    mockRemoveProjectSpecialty(...args),
-  updateProjectSupplyQuantity: (...args: unknown[]) =>
-    mockUpdateProjectSupplyQuantity(...args),
+  removeProjectSpecialty: (...args: unknown[]) => mockRemoveProjectSpecialty(...args),
+  updateProjectSupplyQuantity: (...args: unknown[]) => mockUpdateProjectSupplyQuantity(...args),
   addThreadToProject: (...args: unknown[]) => mockAddThreadToProject(...args),
   addBeadToProject: (...args: unknown[]) => mockAddBeadToProject(...args),
-  addSpecialtyToProject: (...args: unknown[]) =>
-    mockAddSpecialtyToProject(...args),
+  addSpecialtyToProject: (...args: unknown[]) => mockAddSpecialtyToProject(...args),
   getThreads: (...args: unknown[]) => mockGetThreads(...args),
   getBeads: (...args: unknown[]) => mockGetBeads(...args),
   getSpecialtyItems: (...args: unknown[]) => mockGetSpecialtyItems(...args),
@@ -85,9 +79,7 @@ function makeThreadWithBrand(
   } as ProjectThreadWithThread;
 }
 
-function makeBeadWithBrand(
-  overrides?: Partial<ProjectBeadWithBead>,
-): ProjectBeadWithBead {
+function _makeBeadWithBrand(overrides?: Partial<ProjectBeadWithBead>): ProjectBeadWithBead {
   const bead = createMockBead({
     id: "bead-123",
     brandId: "brand-dmc",
@@ -109,7 +101,7 @@ function makeBeadWithBrand(
   } as ProjectBeadWithBead;
 }
 
-function makeSpecialtyWithItem(
+function _makeSpecialtyWithItem(
   overrides?: Partial<ProjectSpecialtyWithItem>,
 ): ProjectSpecialtyWithItem {
   const item = createMockSpecialtyItem({
@@ -156,9 +148,7 @@ describe("ProjectSuppliesTab", () => {
 
   it("shows empty state message when no threads are linked", () => {
     render(<ProjectSuppliesTab {...defaultProps} />);
-    expect(
-      screen.getByText("No threads linked to this project"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("No threads linked to this project")).toBeInTheDocument();
   });
 
   it("shows kitting summary with percentage", () => {
@@ -184,29 +174,23 @@ describe("ProjectSuppliesTab", () => {
         },
       }),
     ];
-    render(
-      <ProjectSuppliesTab {...defaultProps} threads={threads} />,
-    );
+    render(<ProjectSuppliesTab {...defaultProps} threads={threads} />);
     expect(screen.getByText("Supply Kitting")).toBeInTheDocument();
     expect(screen.getByText("50%")).toBeInTheDocument();
   });
 
   it("renders thread row with brand code, name, and quantities", () => {
     const threads = [makeThreadWithBrand()];
-    render(
-      <ProjectSuppliesTab {...defaultProps} threads={threads} />,
-    );
+    render(<ProjectSuppliesTab {...defaultProps} threads={threads} />);
     expect(screen.getByText(/DMC 310/)).toBeInTheDocument();
     expect(screen.getByText(/Black/)).toBeInTheDocument();
     expect(screen.getByText("Req:")).toBeInTheDocument();
-    expect(screen.getByText("Got:")).toBeInTheDocument();
+    expect(screen.getByText("Have:")).toBeInTheDocument();
   });
 
   it("calls removeProjectThread when remove button is clicked", async () => {
     const threads = [makeThreadWithBrand()];
-    render(
-      <ProjectSuppliesTab {...defaultProps} threads={threads} />,
-    );
+    render(<ProjectSuppliesTab {...defaultProps} threads={threads} />);
     const removeButton = screen.getByTitle("Remove from project");
     fireEvent.click(removeButton);
 
@@ -223,9 +207,7 @@ describe("ProjectSuppliesTab", () => {
         quantityAcquired: 1,
       }),
     ];
-    render(
-      <ProjectSuppliesTab {...defaultProps} threads={threads} />,
-    );
+    render(<ProjectSuppliesTab {...defaultProps} threads={threads} />);
     expect(screen.getByText("All supplies acquired")).toBeInTheDocument();
     expect(screen.getByText("100%")).toBeInTheDocument();
   });

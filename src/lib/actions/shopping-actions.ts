@@ -8,6 +8,7 @@ import { prisma } from "@/lib/db";
 
 export type ShoppingListProject = {
   projectId: string;
+  chartId: string;
   projectName: string;
   projectStatus: string;
   unfulfilledThreads: Array<{
@@ -46,8 +47,24 @@ export type ShoppingListProject = {
     };
   }>;
   needsFabric: boolean;
-  fabricNeeds: { count: number; widthInches: number; heightInches: number } | null;
+  fabricNeeds: Array<{
+    label: string;
+    count: number;
+    widthInches: number;
+    heightInches: number;
+  }> | null;
 };
+
+// ─── Fabric Count Reference ─────────────────────────────────────────────────
+
+const FABRIC_COUNT_OPTIONS = [
+  { label: "14 / 28 over 2", count: 14 },
+  { label: "16 / 32 over 2", count: 16 },
+  { label: "18 / 36 over 2", count: 18 },
+  { label: "20 / 40 over 2", count: 20 },
+  { label: "22", count: 22 },
+  { label: "25", count: 25 },
+] as const;
 
 // ─── Shopping List Query ─────────────────────────────────────────────────────
 
@@ -91,13 +108,11 @@ export async function getShoppingList(): Promise<ShoppingListProject[]> {
       const unfulfilledSpecialty = p.projectSpecialty.filter(
         (ps) => ps.quantityAcquired < ps.quantityRequired,
       );
-      const needsFabric =
-        !p.fabric &&
-        p.chart.stitchesWide > 0 &&
-        p.chart.stitchesHigh > 0;
+      const needsFabric = !p.fabric && p.chart.stitchesWide > 0 && p.chart.stitchesHigh > 0;
 
       return {
         projectId: p.id,
+        chartId: p.chartId,
         projectName: p.chart.name,
         projectStatus: p.status,
         unfulfilledThreads,
@@ -105,11 +120,12 @@ export async function getShoppingList(): Promise<ShoppingListProject[]> {
         unfulfilledSpecialty,
         needsFabric,
         fabricNeeds: needsFabric
-          ? {
-              count: 14,
-              widthInches: p.chart.stitchesWide,
-              heightInches: p.chart.stitchesHigh,
-            }
+          ? FABRIC_COUNT_OPTIONS.map(({ label, count }) => ({
+              label,
+              count,
+              widthInches: Math.ceil(p.chart.stitchesWide / count) + 6,
+              heightInches: Math.ceil(p.chart.stitchesHigh / count) + 6,
+            }))
           : null,
       };
     })

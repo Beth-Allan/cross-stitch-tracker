@@ -45,9 +45,7 @@ describe("shopping-actions", () => {
     it("rejects unauthenticated calls to markSupplyAcquired", async () => {
       mockAuth.mockResolvedValueOnce(null);
       const { markSupplyAcquired } = await import("./shopping-actions");
-      await expect(
-        markSupplyAcquired("thread", "pt-1"),
-      ).rejects.toThrow("Unauthorized");
+      await expect(markSupplyAcquired("thread", "pt-1")).rejects.toThrow("Unauthorized");
     });
   });
 
@@ -60,6 +58,7 @@ describe("shopping-actions", () => {
       mockPrisma.project.findMany.mockResolvedValueOnce([
         {
           id: "proj-1",
+          chartId: "chart-1",
           status: "IN_PROGRESS",
           chart: { name: "Test Chart", stitchesWide: 100, stitchesHigh: 50 },
           projectThreads: [
@@ -92,6 +91,7 @@ describe("shopping-actions", () => {
       mockPrisma.project.findMany.mockResolvedValueOnce([
         {
           id: "proj-1",
+          chartId: "chart-1",
           status: "IN_PROGRESS",
           chart: { name: "Fulfilled Chart", stitchesWide: 100, stitchesHigh: 50 },
           projectThreads: [
@@ -120,6 +120,7 @@ describe("shopping-actions", () => {
       mockPrisma.project.findMany.mockResolvedValueOnce([
         {
           id: "proj-1",
+          chartId: "chart-1",
           status: "KITTING",
           chart: { name: "Needs Fabric", stitchesWide: 200, stitchesHigh: 150 },
           projectThreads: [
@@ -144,8 +145,21 @@ describe("shopping-actions", () => {
       expect(result).toHaveLength(1);
       expect(result[0].needsFabric).toBe(true);
       expect(result[0].fabricNeeds).not.toBeNull();
-      expect(result[0].fabricNeeds!.widthInches).toBe(200);
-      expect(result[0].fabricNeeds!.heightInches).toBe(150);
+      expect(result[0].fabricNeeds).toHaveLength(6);
+      // First entry is 14ct: 200/14 = ceil(14.28) + 6 = 21", 150/14 = ceil(10.71) + 6 = 17"
+      expect(result[0].fabricNeeds![0]).toEqual({
+        label: "14 / 28 over 2",
+        count: 14,
+        widthInches: 21,
+        heightInches: 17,
+      });
+      // Last entry is 25ct: 200/25 = ceil(8) + 6 = 14", 150/25 = ceil(6) + 6 = 12"
+      expect(result[0].fabricNeeds![5]).toEqual({
+        label: "25",
+        count: 25,
+        widthInches: 14,
+        heightInches: 12,
+      });
     });
 
     it("excludes projects with no supplies linked", async () => {
@@ -161,6 +175,7 @@ describe("shopping-actions", () => {
       mockPrisma.project.findMany.mockResolvedValueOnce([
         {
           id: "proj-1",
+          chartId: "chart-1",
           status: "KITTING",
           chart: { name: "Mixed Supplies", stitchesWide: 0, stitchesHigh: 0 },
           projectThreads: [],
@@ -200,6 +215,7 @@ describe("shopping-actions", () => {
       mockPrisma.project.findMany.mockResolvedValueOnce([
         {
           id: "proj-1",
+          chartId: "chart-1",
           status: "IN_PROGRESS",
           chart: { name: "No Dims", stitchesWide: 0, stitchesHigh: 0 },
           projectThreads: [
@@ -229,7 +245,7 @@ describe("shopping-actions", () => {
   // ─── markSupplyAcquired ────────────────────────────────────────────────────
 
   describe("markSupplyAcquired", () => {
-    it('updates quantityAcquired to match quantityRequired for thread', async () => {
+    it("updates quantityAcquired to match quantityRequired for thread", async () => {
       const record = createMockProjectThread({
         id: "pt-1",
         quantityRequired: 3,
@@ -251,7 +267,7 @@ describe("shopping-actions", () => {
       });
     });
 
-    it('updates quantityAcquired for bead', async () => {
+    it("updates quantityAcquired for bead", async () => {
       const record = createMockProjectBead({
         id: "pb-1",
         quantityRequired: 5,
@@ -273,7 +289,7 @@ describe("shopping-actions", () => {
       });
     });
 
-    it('updates quantityAcquired for specialty', async () => {
+    it("updates quantityAcquired for specialty", async () => {
       const record = createMockProjectSpecialty({
         id: "ps-1",
         quantityRequired: 2,
