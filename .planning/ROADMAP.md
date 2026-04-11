@@ -131,7 +131,7 @@ Plans:
 - [x] 04-07-PLAN.md -- Shopping list page, navigation updates, human verification
 - [x] 04-08-PLAN.md -- Gap closure: fix hydration errors on supply catalog and fabric catalog pages
 - [x] 04-09-PLAN.md -- Gap closure: add inline quick-add brand to fabric and supply form modals
-- [ ] 04-10-PLAN.md -- Gap closure: fix TypeScript build error and stale test assertion
+- [x] 04-10-PLAN.md -- Gap closure: fix TypeScript build error and stale test assertion
 **UI hint**: yes
 **Design refs**: `product-plan/sections/supply-tracking-and-shopping/` (all components), `product-plan/sections/fabric-series-and-reference-data/` (FabricCatalog, FabricDetail, FabricFormModal)
 **Deferred to later**: Kitting auto-calculation (8 conditions), kitting progress indicators, supply statistics, advanced brand management
