@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Grid3X3, List, Plus, CircleDot, Gem, Sparkles, Tags } from "lucide-react";
 import { toast } from "sonner";
@@ -177,17 +177,20 @@ const SPECIALTY_COLUMNS = [
 export function SupplyCatalog({ threads, beads, specialtyItems, brands }: SupplyCatalogProps) {
   const router = useRouter();
   const [activeTab, setActiveTabRaw] = useState<SupplyTab>("threads");
-  const [viewModes, setViewModes] = useState<Record<SupplyTab, ViewMode>>(() => {
-    if (typeof window === "undefined") return DEFAULT_VIEWS;
+  const [viewModes, setViewModes] = useState<Record<SupplyTab, ViewMode>>(DEFAULT_VIEWS);
+  // Restore view mode preferences from localStorage after hydration (avoids SSR/client mismatch)
+  useEffect(() => {
     const restored = { ...DEFAULT_VIEWS };
+    let changed = false;
     for (const tab of TAB_CONFIG) {
       const stored = localStorage.getItem(STORAGE_KEYS[tab.key]);
       if (stored === "grid" || stored === "table") {
         restored[tab.key] = stored;
+        changed = true;
       }
     }
-    return restored;
-  });
+    if (changed) setViewModes(restored);
+  }, []);
   const [search, setSearch] = useState("");
   const [colorFamilyFilter, setColorFamilyFilter] = useState<ColorFamily | "">("");
   const [brandFilter, setBrandFilter] = useState<string>("");
