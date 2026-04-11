@@ -131,9 +131,7 @@ function SupplyRow({
     <div className="group border-border flex items-center gap-3 border-b py-3 last:border-b-0">
       {/* Swatch */}
       <div
-        className={`h-7 w-7 shrink-0 rounded-full shadow-sm ${
-          isLight ? "ring-1 ring-stone-200 dark:ring-stone-600" : ""
-        }`}
+        className={`h-7 w-7 shrink-0 rounded-full shadow-sm ${isLight ? "ring-border ring-1" : ""}`}
         style={{ backgroundColor: hex }}
       />
 
@@ -165,15 +163,11 @@ function SupplyRow({
           <EditableNumber
             value={quantityAcquired}
             onSave={onUpdateAcquired}
-            className={`font-medium ${
-              isFulfilled
-                ? "text-emerald-600 dark:text-emerald-400"
-                : "text-amber-600 dark:text-amber-400"
-            }`}
+            className={`font-medium ${isFulfilled ? "text-success" : "text-warning"}`}
           />
         </div>
         {quantityNeeded > 0 && (
-          <span className="text-xs font-medium whitespace-nowrap text-amber-600 dark:text-amber-400">
+          <span className="text-warning text-xs font-medium whitespace-nowrap">
             Need {quantityNeeded}
           </span>
         )}
@@ -182,9 +176,9 @@ function SupplyRow({
       {/* Fulfillment indicator */}
       <div className="flex w-5 shrink-0 justify-center">
         {isFulfilled ? (
-          <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-400" strokeWidth={2} />
+          <Check className="text-success h-4 w-4" strokeWidth={2} />
         ) : (
-          <AlertTriangle className="h-4 w-4 text-amber-500 dark:text-amber-400" strokeWidth={1.5} />
+          <AlertTriangle className="text-warning h-4 w-4" strokeWidth={1.5} />
         )}
       </div>
 
@@ -193,6 +187,7 @@ function SupplyRow({
         onClick={onRemove}
         className="flex w-5 shrink-0 justify-center opacity-40 transition-opacity group-hover:opacity-100 focus:opacity-100"
         title="Remove from project"
+        aria-label={`Remove ${brand} ${code} from project`}
       >
         <Trash2
           className="text-muted-foreground hover:text-destructive h-3.5 w-3.5 transition-colors"
@@ -249,12 +244,12 @@ function SupplySection({
           {count === 0 ? (
             <span className="text-muted-foreground">None</span>
           ) : allFulfilled ? (
-            <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+            <span className="text-success flex items-center gap-1">
               <Check className="h-3.5 w-3.5" strokeWidth={2} />
               {count}/{count}
             </span>
           ) : (
-            <span className="text-amber-600 dark:text-amber-400">
+            <span className="text-warning">
               {fulfilledCount}/{count}
             </span>
           )}
@@ -273,7 +268,7 @@ function SupplySection({
                   onAddClick();
                 }}
                 type="button"
-                className="mx-auto flex items-center gap-1.5 text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                className="text-primary hover:text-primary/80 mx-auto flex items-center gap-1.5 text-sm font-medium transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
                 {addLabel}
@@ -288,7 +283,7 @@ function SupplySection({
                   onAddClick();
                 }}
                 type="button"
-                className="mt-3 flex items-center gap-1.5 text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                className="text-primary hover:text-primary/80 mt-3 flex items-center gap-1.5 text-sm font-medium transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add more
@@ -435,15 +430,13 @@ export function ProjectSuppliesTab({
           <div className="mb-3 flex items-center gap-3">
             <div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
               <div
-                className="h-full rounded-full bg-emerald-500 transition-all dark:bg-emerald-400"
+                className="bg-success h-full rounded-full transition-[width]"
                 style={{ width: `${overallPercent}%` }}
               />
             </div>
             <span
               className={`text-sm font-medium tabular-nums ${
-                overallPercent === 100
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-foreground"
+                overallPercent === 100 ? "text-success" : "text-foreground"
               }`}
               style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >
@@ -453,15 +446,15 @@ export function ProjectSuppliesTab({
 
           {/* Summary message */}
           {overallPercent === 100 && totalItems > 0 ? (
-            <div className="rounded-lg border border-emerald-200/40 bg-emerald-50/50 px-4 py-2.5 dark:border-emerald-900/30 dark:bg-emerald-950/20">
-              <p className="flex items-center gap-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+            <div className="border-success-border/40 bg-success-muted/50 rounded-lg border px-4 py-2.5">
+              <p className="text-success-muted-foreground flex items-center gap-2 text-sm font-medium">
                 <Check className="h-4 w-4" />
                 All supplies acquired
               </p>
             </div>
           ) : needsSummary.length > 0 ? (
-            <div className="rounded-lg border border-amber-200/40 bg-amber-50/50 px-4 py-2.5 dark:border-amber-900/30 dark:bg-amber-950/20">
-              <p className="text-sm text-amber-700 dark:text-amber-400">
+            <div className="border-warning-border/40 bg-warning-muted/50 rounded-lg border px-4 py-2.5">
+              <p className="text-warning-muted-foreground text-sm">
                 <span className="font-medium">Still needs:</span> {needsSummary.join(", ")}
               </p>
             </div>

@@ -33,15 +33,33 @@
   - Normalized page title sizes (supplies, shopping: text-lg → text-2xl)
   - Normalized genre list layout to match sibling pages
   - Centralized SIZE_COLORS config, removed duplicates
+- Impeccable audit (13/20) + harden/polish/optimize/adapt passes (d0e3cd5):
+  - Harden: 8 a11y fixes (ARIA roles, keyboard activation, focus-visible, required indicators)
+  - Polish: Added success/warning semantic token families; replaced 25 hard-coded colors across 9 files
+  - Optimize: Memoized supply table sort, CLS fix on chart cover, narrowed transition-all
+  - Adapt: Fixed invisible grid edit icon, upgraded 10px badges to 12px, improved touch targets
+- Re-audit scored 15/20 (Good) + harden pass 2 (e48c354):
+  - 5 SortableHeaders: added keyboard support (tabIndex, role, onKeyDown, aria-sort)
+  - 6 tables: added sr-only captions
+  - chart-edit-modal: replaced window.confirm() with styled Dialog
+  - aria-labels on supply remove + shopping mark-acquired buttons
+  - search-to-add: hard-coded emerald/stone → semantic tokens
+  - progress bars: transition-all → transition-[width]
+- Final polish pass (ee2ec9b):
+  - badge.tsx + tabs.tsx: transition-all → specific properties (perf)
+  - Top Genre badge: hard-coded amber → warning-\* semantic tokens
+  - genre-list: added header-to-search spacing, fixed search icon alignment
+- Security audit (70b0eb5): Phase 4 threat verification — 26 threats, 13 mitigated (all CLOSED), 13 accepted risks documented
+- Milestone 1 audit passed (2ab1490): 18/18 requirements, 8/8 E2E flows, 4/4 phases verified, 8 minor tech debt items
 
 ### In Progress
 
-- Nothing — ready to deploy
+- Nothing — ready for deploy
 
 ### Next Up
 
 1. Deploy MVP to Vercel
-2. Start Milestone 2 (Browse & Organize)
+2. `/gsd:complete-milestone` — archive and prep Milestone 2
 
 ### Backlog (post-MVP)
 

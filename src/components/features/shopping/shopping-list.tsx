@@ -57,10 +57,13 @@ function SupplyRow({
         </p>
         <p className="text-muted-foreground truncate text-sm">{colorName}</p>
       </div>
-      <span className="text-sm font-medium whitespace-nowrap text-amber-600 dark:text-amber-500">
-        Need {need}
-      </span>
-      <Button size="sm" onClick={handleMarkAcquired} disabled={isPending}>
+      <span className="text-warning text-sm font-medium whitespace-nowrap">Need {need}</span>
+      <Button
+        size="sm"
+        onClick={handleMarkAcquired}
+        disabled={isPending}
+        aria-label={`Mark ${brandName} ${code} as acquired`}
+      >
         {isPending ? "Marking..." : "Mark Acquired"}
       </Button>
     </div>
@@ -76,7 +79,7 @@ function FabricRow({
 }) {
   return (
     <div className="py-3">
-      <p className="mb-2 text-sm font-medium text-amber-600 dark:text-amber-500">
+      <p className="text-warning mb-2 text-sm font-medium">
         Needs fabric (includes 3&quot; margin per side):
       </p>
       <div className="grid grid-cols-3 gap-x-4 gap-y-1 text-sm">

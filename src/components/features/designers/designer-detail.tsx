@@ -178,7 +178,7 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
         <div>
           <p className="text-muted-foreground text-xs tracking-wider uppercase">Top Genre</p>
           {designer.topGenre ? (
-            <span className="mt-0.5 inline-flex rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
+            <span className="border-warning-border bg-warning-muted text-warning-muted-foreground mt-0.5 inline-flex rounded-full border px-2 py-0.5 text-xs font-semibold">
               {designer.topGenre}
             </span>
           ) : (
@@ -208,7 +208,7 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
                 onClick={() => handleSort(opt.key)}
                 className={`rounded-full px-2 py-0.5 text-xs transition-colors ${
                   chartSort.key === opt.key
-                    ? "bg-emerald-50 font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400"
+                    ? "bg-success-muted text-success-muted-foreground font-semibold"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >

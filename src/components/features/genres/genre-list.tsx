@@ -34,7 +34,16 @@ function SortableHeader({
   return (
     <th
       className="cursor-pointer px-4 py-2.5 text-left select-none"
+      tabIndex={0}
+      role="columnheader"
       onClick={() => onSort(sortKey)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSort(sortKey);
+        }
+      }}
+      aria-sort={isActive ? (currentSort.dir === "asc" ? "ascending" : "descending") : "none"}
     >
       <span
         className={`inline-flex items-center gap-1 text-xs font-semibold tracking-wider uppercase transition-colors ${
@@ -249,7 +258,7 @@ export function GenreList({ genres }: GenreListProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h1 className="font-heading text-2xl font-semibold">Genres</h1>
           <Button onClick={() => setCreateModalOpen(true)}>
@@ -261,7 +270,7 @@ export function GenreList({ genres }: GenreListProps) {
         {/* Search bar */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative max-w-xs min-w-[200px] flex-1">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+            <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
             <Input
               type="text"
               value={search}
@@ -288,6 +297,7 @@ export function GenreList({ genres }: GenreListProps) {
         {filteredGenres.length > 0 ? (
           <div className="border-border bg-card overflow-hidden rounded-xl border">
             <table className="w-full">
+              <caption className="sr-only">Your genres and their chart counts</caption>
               <thead>
                 <tr className="border-border border-b">
                   <SortableHeader

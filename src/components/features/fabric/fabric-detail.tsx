@@ -103,11 +103,11 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
           </MetadataField>
           <MetadataField label="Need to Buy">
             {fabric.needToBuy ? (
-              <Badge className="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
+              <Badge className="border-warning-border bg-warning-muted text-warning-muted-foreground">
                 Yes
               </Badge>
             ) : (
-              <Badge className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400">
+              <Badge className="border-success-border bg-success-muted text-success-muted-foreground">
                 No
               </Badge>
             )}

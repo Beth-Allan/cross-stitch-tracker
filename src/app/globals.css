@@ -29,6 +29,14 @@
   --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-muted: var(--success-muted);
+  --color-success-muted-foreground: var(--success-muted-foreground);
+  --color-success-border: var(--success-border);
+  --color-warning: var(--warning);
+  --color-warning-muted: var(--warning-muted);
+  --color-warning-muted-foreground: var(--warning-muted-foreground);
+  --color-warning-border: var(--warning-border);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -85,6 +93,18 @@
   /* Destructive */
   --destructive: oklch(0.577 0.245 27.33); /* red-600 */
   --destructive-foreground: oklch(1 0 0); /* white */
+
+  /* Feedback — Success (emerald) */
+  --success: oklch(0.596 0.145 163.23); /* emerald-600 */
+  --success-muted: oklch(0.979 0.021 166.11); /* emerald-50 */
+  --success-muted-foreground: oklch(0.508 0.118 165.61); /* emerald-700 */
+  --success-border: oklch(0.905 0.093 164.15); /* emerald-200 */
+
+  /* Feedback — Warning (amber) */
+  --warning: oklch(0.666 0.179 58.32); /* amber-600 */
+  --warning-muted: oklch(0.987 0.022 95.28); /* amber-50 */
+  --warning-muted-foreground: oklch(0.555 0.163 49); /* amber-700 */
+  --warning-border: oklch(0.913 0.105 84.09); /* amber-200 */
 
   /* Border / Input / Ring */
   --border: oklch(0.869 0.005 56.37); /* stone-300 */
@@ -156,6 +176,18 @@
   /* Destructive */
   --destructive: oklch(0.704 0.191 22.216); /* red-500 */
   --destructive-foreground: oklch(1 0 0); /* white */
+
+  /* Feedback — Success (emerald) */
+  --success: oklch(0.765 0.152 163.22); /* emerald-400 */
+  --success-muted: oklch(0.262 0.051 152.09 / 0.3); /* emerald-950/30 */
+  --success-muted-foreground: oklch(0.765 0.152 163.22); /* emerald-400 */
+  --success-border: oklch(0.432 0.095 166.91); /* emerald-800 */
+
+  /* Feedback — Warning (amber) */
+  --warning: oklch(0.82 0.171 80.36); /* amber-400 */
+  --warning-muted: oklch(0.279 0.077 45.64 / 0.3); /* amber-950/30 */
+  --warning-muted-foreground: oklch(0.82 0.171 80.36); /* amber-400 */
+  --warning-border: oklch(0.459 0.127 46.82); /* amber-800 */
 
   /* Border / Input / Ring */
   --border: oklch(0.374 0.01 67.56); /* stone-700 */

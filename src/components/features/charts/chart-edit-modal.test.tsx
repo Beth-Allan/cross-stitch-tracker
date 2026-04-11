@@ -126,4 +126,68 @@ describe("ChartEditModal", () => {
     // Chart name should still be pre-populated
     expect(screen.getByLabelText(/chart name/i)).toHaveValue("Test Chart");
   });
+
+  it("shows discard dialog when closing with unsaved changes", async () => {
+    const user = userEvent.setup();
+    renderModal();
+
+    // Make the form dirty by changing the chart name
+    const nameInput = screen.getByLabelText(/chart name/i);
+    await user.clear(nameInput);
+    await user.type(nameInput, "Modified Chart");
+
+    // Click Cancel to try to close
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
+
+    // Discard confirmation dialog should appear
+    expect(screen.getByText("Discard Changes?")).toBeInTheDocument();
+    expect(screen.getByText("You have unsaved changes that will be lost.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /keep editing/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /discard/i })).toBeInTheDocument();
+  });
+
+  it("keeps modal open when clicking Keep Editing in discard dialog", async () => {
+    const onOpenChange = vi.fn();
+    const user = userEvent.setup();
+    renderModal({ onOpenChange });
+
+    // Make form dirty
+    const nameInput = screen.getByLabelText(/chart name/i);
+    await user.clear(nameInput);
+    await user.type(nameInput, "Modified Chart");
+
+    // Trigger discard dialog
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
+    expect(screen.getByText("Discard Changes?")).toBeInTheDocument();
+
+    // Click Keep Editing
+    await user.click(screen.getByRole("button", { name: /keep editing/i }));
+
+    // Discard dialog should close, modal stays open
+    expect(screen.queryByText("Discard Changes?")).not.toBeInTheDocument();
+    expect(onOpenChange).not.toHaveBeenCalled();
+    // Form value should be preserved
+    expect(screen.getByLabelText(/chart name/i)).toHaveValue("Modified Chart");
+  });
+
+  it("closes modal when clicking Discard in discard dialog", async () => {
+    const onOpenChange = vi.fn();
+    const user = userEvent.setup();
+    renderModal({ onOpenChange });
+
+    // Make form dirty
+    const nameInput = screen.getByLabelText(/chart name/i);
+    await user.clear(nameInput);
+    await user.type(nameInput, "Modified Chart");
+
+    // Trigger discard dialog
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
+    expect(screen.getByText("Discard Changes?")).toBeInTheDocument();
+
+    // Click Discard
+    await user.click(screen.getByRole("button", { name: /discard/i }));
+
+    // Modal should close
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
 });
