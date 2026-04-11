@@ -1,12 +1,21 @@
-import { ShoppingCart } from "lucide-react";
-import { PlaceholderPage } from "@/components/placeholder-page";
+import { getShoppingList } from "@/lib/actions/shopping-actions";
+import { ShoppingList } from "@/components/features/shopping/shopping-list";
 
-export default function ShoppingPage() {
+export default async function ShoppingPage() {
+  const projects = await getShoppingList();
+
   return (
-    <PlaceholderPage
-      title="Shopping"
-      description="Smart shopping lists, built from your projects. Never buy duplicate thread again."
-      icon={ShoppingCart}
-    />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-lg font-semibold font-heading text-foreground">
+          Shopping List
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Supplies you still need, grouped by project.
+        </p>
+      </div>
+
+      <ShoppingList projects={projects} />
+    </div>
   );
 }

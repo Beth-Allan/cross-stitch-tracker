@@ -114,12 +114,9 @@ describe("ShoppingList", () => {
     // Brand + code
     expect(screen.getByText("DMC 310")).toBeInTheDocument();
     expect(screen.getByText("Black")).toBeInTheDocument();
-    // Need quantity (required - acquired): 3 - 1 = 2
-    expect(screen.getByText("Need 2")).toBeInTheDocument();
-
+    // Both threads need 2: (3-1=2) and (2-0=2)
     expect(screen.getByText("DMC 321")).toBeInTheDocument();
     expect(screen.getByText("Red")).toBeInTheDocument();
-    // Need quantity: 2 - 0 = 2
     expect(screen.getAllByText("Need 2")).toHaveLength(2);
   });
 
