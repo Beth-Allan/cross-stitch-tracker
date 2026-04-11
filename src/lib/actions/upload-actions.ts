@@ -149,6 +149,49 @@ export async function getPresignedDownloadUrl(key: string) {
 }
 
 /**
+ * Generate presigned GET URLs for multiple R2 keys in batch.
+ * Used by server pages to resolve R2 keys to displayable URLs before passing to client components.
+ * Returns a Record mapping each valid key to its presigned URL.
+ * Gracefully handles partial failures and R2-not-configured scenarios.
+ */
+export async function getPresignedImageUrls(
+  keys: (string | null | undefined)[],
+): Promise<Record<string, string>> {
+  await requireAuth();
+
+  // Filter out null/undefined/empty and deduplicate
+  const validKeys = [...new Set(keys.filter((k): k is string => !!k && k.length > 0))];
+  if (validKeys.length === 0) return {};
+
+  try {
+    const results = await Promise.allSettled(
+      validKeys.map(async (key) => {
+        const command = new GetObjectCommand({
+          Bucket: R2_BUCKET_NAME,
+          Key: key,
+        });
+        const url = await getSignedUrl(getR2Client(), command, { expiresIn: 3600 });
+        return { key, url };
+      }),
+    );
+
+    const urlMap: Record<string, string> = {};
+    for (const result of results) {
+      if (result.status === "fulfilled") {
+        urlMap[result.value.key] = result.value.url;
+      } else {
+        console.warn("Failed to generate presigned URL:", result.reason);
+      }
+    }
+    return urlMap;
+  } catch (error) {
+    // R2 not configured or other top-level error — graceful degradation
+    console.warn("getPresignedImageUrls: R2 unavailable, returning empty map:", error);
+    return {};
+  }
+}
+
+/**
  * Delete a file from R2 storage.
  */
 export async function deleteFile(key: string) {

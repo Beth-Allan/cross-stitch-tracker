@@ -1,12 +1,17 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, Upload, X } from "lucide-react";
-import { getPresignedUploadUrl } from "@/lib/actions/upload-actions";
+import { getPresignedUploadUrl, getPresignedDownloadUrl } from "@/lib/actions/upload-actions";
 import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from "@/lib/validations/upload";
 import { cn } from "@/lib/utils";
 
-type UploadState = "idle" | "uploading" | "complete" | "error";
+type UploadState = "idle" | "uploading" | "complete" | "error" | "resolving";
+
+/** Check if a URL string looks like an R2 object key (not a displayable URL). */
+function isR2Key(url: string): boolean {
+  return !url.startsWith("http") && !url.startsWith("blob:") && !url.startsWith("data:");
+}
 
 interface CoverImageUploadProps {
   chartId?: string;
@@ -21,11 +26,43 @@ export function CoverImageUpload({
   onUploadComplete,
   onRemove,
 }: CoverImageUploadProps) {
-  const [state, setState] = useState<UploadState>(currentImageUrl ? "complete" : "idle");
-  const [preview, setPreview] = useState<string | null>(currentImageUrl ?? null);
+  const needsResolving = !!currentImageUrl && isR2Key(currentImageUrl);
+  const [state, setState] = useState<UploadState>(
+    needsResolving ? "resolving" : currentImageUrl ? "complete" : "idle",
+  );
+  const [preview, setPreview] = useState<string | null>(
+    needsResolving ? null : (currentImageUrl ?? null),
+  );
   const [error, setError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Resolve R2 key to presigned URL on mount when editing an existing chart
+  useEffect(() => {
+    if (!currentImageUrl || !isR2Key(currentImageUrl)) return;
+
+    let cancelled = false;
+    async function resolve() {
+      try {
+        const result = await getPresignedDownloadUrl(currentImageUrl!);
+        if (cancelled) return;
+        if (result.success) {
+          setPreview(result.url);
+          setState("complete");
+        } else {
+          // Could not resolve -- show upload zone
+          setState("idle");
+        }
+      } catch {
+        if (!cancelled) setState("idle");
+      }
+    }
+    void resolve();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentImageUrl]);
 
   const validateFile = useCallback((file: File): string | null => {
     if (!ALLOWED_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_IMAGE_TYPES)[number])) {
@@ -151,10 +188,19 @@ export function CoverImageUpload({
         aria-hidden="true"
       />
 
-      {state === "complete" && preview ? (
+      {state === "resolving" ? (
+        <div className="border-border flex h-32 items-center justify-center rounded-lg border-2 border-dashed">
+          <Loader2 className="text-muted-foreground/50 size-6 animate-spin" />
+        </div>
+      ) : state === "complete" && preview && !imgError ? (
         <div className="border-border relative h-32 overflow-hidden rounded-lg border-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={preview} alt="Cover image preview" className="h-full w-full object-cover" />
+          <img
+            src={preview}
+            alt="Cover image preview"
+            className="h-full w-full object-cover"
+            onError={() => setImgError(true)}
+          />
           <button
             type="button"
             onClick={handleRemove}

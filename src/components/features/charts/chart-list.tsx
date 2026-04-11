@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Image as ImageIcon, Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { LinkButton } from "@/components/ui/link-button";
@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ChartEditModal } from "./chart-edit-modal";
+import { CoverThumbnail } from "./cover-thumbnail";
 import { StatusBadge } from "./status-badge";
 import { SizeBadge } from "./size-badge";
 import { getEffectiveStitchCount } from "@/lib/utils/size-category";
@@ -29,11 +30,12 @@ interface ChartListProps {
   charts: ChartWithProject[];
   designers: Designer[];
   genres: Genre[];
+  imageUrls: Record<string, string>;
 }
 
 /* ---- Main Component ---- */
 
-export function ChartList({ charts, designers, genres }: ChartListProps) {
+export function ChartList({ charts, designers, genres, imageUrls }: ChartListProps) {
   const router = useRouter();
   const [editingChart, setEditingChart] = useState<ChartWithProject | null>(null);
   const [deletingChart, setDeletingChart] = useState<ChartWithProject | null>(null);
@@ -161,6 +163,9 @@ export function ChartList({ charts, designers, genres }: ChartListProps) {
               <ChartRow
                 key={chart.id}
                 chart={chart}
+                imageUrl={
+                  chart.coverThumbnailUrl ? (imageUrls[chart.coverThumbnailUrl] ?? null) : null
+                }
                 onEdit={() => setEditingChart(chart)}
                 onDelete={() => setDeletingChart(chart)}
               />
@@ -228,10 +233,12 @@ export function ChartList({ charts, designers, genres }: ChartListProps) {
 
 function ChartRow({
   chart,
+  imageUrl,
   onEdit,
   onDelete,
 }: {
   chart: ChartWithProject;
+  imageUrl: string | null;
   onEdit: () => void;
   onDelete: () => void;
 }) {
@@ -252,7 +259,7 @@ function ChartRow({
     <tr className="group hover:bg-muted/50 transition-colors">
       <td className="px-4 py-3">
         <Link href={`/charts/${chart.id}`} className="flex items-center gap-3">
-          <CoverThumbnail url={chart.coverThumbnailUrl} name={chart.name} />
+          <CoverThumbnail url={imageUrl} name={chart.name} />
           <div className="min-w-0">
             <p className="text-foreground truncate text-sm font-semibold">{chart.name}</p>
             {stitchDisplay && <p className="text-muted-foreground/70 text-xs">{stitchDisplay}</p>}
@@ -353,27 +360,6 @@ function ChartCard({
         <StatusBadge status={status} />
         {stitchDisplay && <span>{stitchDisplay}</span>}
       </div>
-    </div>
-  );
-}
-
-/* ---- Cover Thumbnail ---- */
-
-function CoverThumbnail({ url, name }: { url: string | null; name: string }) {
-  if (url) {
-    return (
-      /* eslint-disable-next-line @next/next/no-img-element */
-      <img
-        src={url}
-        alt={`Cover for ${name}`}
-        className="h-10 w-10 shrink-0 rounded-lg object-cover"
-      />
-    );
-  }
-
-  return (
-    <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-      <ImageIcon className="text-muted-foreground/60 h-4 w-4" strokeWidth={1.5} />
     </div>
   );
 }

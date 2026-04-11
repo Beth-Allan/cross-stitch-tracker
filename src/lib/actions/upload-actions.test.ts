@@ -203,4 +203,80 @@ describe("upload-actions failure modes", () => {
       expect(result).toEqual({ success: false, error: "Failed to delete file" });
     });
   });
+
+  describe("getPresignedImageUrls", () => {
+    it("returns empty record for empty array", async () => {
+      const { getPresignedImageUrls } = await import("./upload-actions");
+
+      const result = await getPresignedImageUrls([]);
+
+      expect(result).toEqual({});
+    });
+
+    it("filters out null and undefined keys", async () => {
+      const { getPresignedImageUrls } = await import("./upload-actions");
+      const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+      vi.mocked(getSignedUrl).mockResolvedValueOnce("https://presigned.example.com/key1");
+
+      const result = await getPresignedImageUrls([null, undefined, "", "key1"]);
+
+      expect(result).toEqual({ key1: "https://presigned.example.com/key1" });
+      // getSignedUrl should only be called once (for "key1"), not for nulls/empties
+      expect(getSignedUrl).toHaveBeenCalledTimes(1);
+    });
+
+    it("returns presigned URLs for valid keys", async () => {
+      const { getPresignedImageUrls } = await import("./upload-actions");
+      const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+      vi.mocked(getSignedUrl)
+        .mockResolvedValueOnce("https://presigned.example.com/key1")
+        .mockResolvedValueOnce("https://presigned.example.com/key2");
+
+      const result = await getPresignedImageUrls(["key1", "key2"]);
+
+      expect(result).toEqual({
+        key1: "https://presigned.example.com/key1",
+        key2: "https://presigned.example.com/key2",
+      });
+    });
+
+    it("deduplicates keys", async () => {
+      const { getPresignedImageUrls } = await import("./upload-actions");
+      const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+      vi.mocked(getSignedUrl).mockResolvedValueOnce("https://presigned.example.com/key1");
+
+      const result = await getPresignedImageUrls(["key1", "key1", "key1"]);
+
+      expect(result).toEqual({ key1: "https://presigned.example.com/key1" });
+      expect(getSignedUrl).toHaveBeenCalledTimes(1);
+    });
+
+    it("handles partial failures gracefully (returns successful results only)", async () => {
+      const { getPresignedImageUrls } = await import("./upload-actions");
+      const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      vi.mocked(getSignedUrl)
+        .mockResolvedValueOnce("https://presigned.example.com/good-key")
+        .mockRejectedValueOnce(new Error("S3 error for bad-key"));
+
+      const result = await getPresignedImageUrls(["good-key", "bad-key"]);
+
+      expect(result).toEqual({ "good-key": "https://presigned.example.com/good-key" });
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    it("returns empty record when R2 is not configured (graceful degradation)", async () => {
+      const { getPresignedImageUrls } = await import("./upload-actions");
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      mockGetR2Client.mockImplementation(() => {
+        throw new Error("R2 environment variables not configured");
+      });
+
+      const result = await getPresignedImageUrls(["key1"]);
+
+      expect(result).toEqual({});
+      consoleSpy.mockRestore();
+    });
+  });
 });

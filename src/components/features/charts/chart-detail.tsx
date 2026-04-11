@@ -75,9 +75,10 @@ interface ProjectSuppliesData {
 interface ChartDetailProps {
   chart: ChartWithProject;
   projectSupplies?: ProjectSuppliesData | null;
+  imageUrls?: Record<string, string>;
 }
 
-export function ChartDetail({ chart, projectSupplies }: ChartDetailProps) {
+export function ChartDetail({ chart, projectSupplies, imageUrls = {} }: ChartDetailProps) {
   const project = chart.project;
   const status = project?.status ?? "UNSTARTED";
   const { count: effectiveStitchCount, approximate } = getEffectiveStitchCount(
@@ -102,7 +103,10 @@ export function ChartDetail({ chart, projectSupplies }: ChartDetailProps) {
       {/* Header section */}
       <div className="flex flex-col gap-6 lg:flex-row">
         {/* Cover image */}
-        <CoverImage coverImageUrl={chart.coverImageUrl} chartName={chart.name} />
+        <CoverImage
+          coverImageUrl={imageUrls[chart.coverImageUrl ?? ""] ?? null}
+          chartName={chart.name}
+        />
 
         {/* Metadata */}
         <div className="flex-1 space-y-3">
@@ -172,13 +176,16 @@ function CoverImage({
   coverImageUrl: string | null;
   chartName: string;
 }) {
-  if (coverImageUrl) {
+  const [imgError, setImgError] = useState(false);
+
+  if (coverImageUrl && !imgError) {
     return (
       /* eslint-disable-next-line @next/next/no-img-element */
       <img
         src={coverImageUrl}
         alt={`Cover for ${chartName}`}
         className="aspect-[4/3] max-h-80 w-full rounded-lg object-cover lg:w-80"
+        onError={() => setImgError(true)}
       />
     );
   }
