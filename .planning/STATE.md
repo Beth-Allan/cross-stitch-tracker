@@ -118,6 +118,7 @@ None yet.
 | 260411-j3i | Form submit idempotency — disable submit button after successful save | 2026-04-11 | 7f9a4b9 | [260411-j3i-form-submit-idempotency-disable-submit-b](./quick/260411-j3i-form-submit-idempotency-disable-submit-b/) |
 | 260411-j8v | Show "already added" indicator for project supplies | 2026-04-11 | d5d4d8e | [260411-j8v-show-already-added-indicator-for-project](./quick/260411-j8v-show-already-added-indicator-for-project/) |
 | 260411-jhw | Chart list edit/delete actions matching designer/genre pattern | 2026-04-11 | 27cd127 | [260411-jhw-chart-list-edit-delete-actions-matching-](./quick/260411-jhw-chart-list-edit-delete-actions-matching-/) |
+| 260411-js1 | Chart images not displaying — presigned R2 URLs with onError fallback | 2026-04-11 | caec7ec | [260411-js1-chart-images-not-displaying-generate-pre](./quick/260411-js1-chart-images-not-displaying-generate-pre/) |
 
 ## Session Continuity
 
