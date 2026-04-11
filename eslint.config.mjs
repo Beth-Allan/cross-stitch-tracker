@@ -20,6 +20,14 @@ const eslintConfig = defineConfig([
     // Build scripts
     "scripts/**",
   ]),
+  // Disable overly strict React compiler rule — dialog form reset via
+  // useEffect is a common, intentional pattern in this codebase
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
   // Project-specific guardrails — prevent patterns we've debugged
   {
     files: ["src/**/*.{ts,tsx}"],
