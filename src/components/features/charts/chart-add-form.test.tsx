@@ -36,13 +36,21 @@ const mockGenres = [
   createMockGenre({ id: "g2", name: "Landscape" }),
 ];
 
+const defaultFormProps = {
+  designers: mockDesigners,
+  genres: mockGenres,
+  storageLocations: [],
+  stitchingApps: [],
+  unassignedFabrics: [],
+};
+
 describe("ChartAddForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("renders all 8 form sections", () => {
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     expect(screen.getByText("Basic Info")).toBeInTheDocument();
     expect(screen.getByText("Stitch Count & Dimensions")).toBeInTheDocument();
@@ -55,14 +63,14 @@ describe("ChartAddForm", () => {
   });
 
   it("shows Add Chart submit button", () => {
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     expect(screen.getByRole("button", { name: /add chart/i })).toBeInTheDocument();
   });
 
   it("shows validation error when submitting with empty name", async () => {
     const user = userEvent.setup();
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     // Fill in stitch count to avoid that error
     const countInput = screen.getByLabelText(/total stitch count/i);
@@ -78,7 +86,7 @@ describe("ChartAddForm", () => {
 
   it("shows stitch count error when no count or dimensions provided", async () => {
     const user = userEvent.setup();
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     const nameInput = screen.getByLabelText(/chart name/i);
     await user.type(nameInput, "Test Chart");
@@ -98,7 +106,7 @@ describe("ChartAddForm", () => {
     });
 
     const user = userEvent.setup();
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     await user.type(screen.getByLabelText(/chart name/i), "My Test Chart");
     await user.type(screen.getByLabelText(/total stitch count/i), "10000");
@@ -119,7 +127,7 @@ describe("ChartAddForm", () => {
   });
 
   it("renders genre pills from provided genres", () => {
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     expect(screen.getByText("Sampler")).toBeInTheDocument();
     expect(screen.getByText("Landscape")).toBeInTheDocument();
@@ -132,7 +140,7 @@ describe("ChartAddForm", () => {
     });
 
     const user = userEvent.setup();
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     await user.type(screen.getByLabelText(/chart name/i), "Test Chart");
     await user.type(screen.getByLabelText(/total stitch count/i), "5000");
@@ -147,7 +155,7 @@ describe("ChartAddForm", () => {
     mockCreateChart.mockRejectedValue(new Error("Network failure"));
 
     const user = userEvent.setup();
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     await user.type(screen.getByLabelText(/chart name/i), "Test Chart");
     await user.type(screen.getByLabelText(/total stitch count/i), "5000");
@@ -163,7 +171,7 @@ describe("ChartAddForm", () => {
     mockCreateChart.mockReturnValue(new Promise(() => {}));
 
     const user = userEvent.setup();
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     await user.type(screen.getByLabelText(/chart name/i), "Test Chart");
     await user.type(screen.getByLabelText(/total stitch count/i), "5000");
@@ -182,7 +190,7 @@ describe("ChartAddForm", () => {
     });
 
     const user = userEvent.setup();
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     await user.type(screen.getByLabelText(/chart name/i), "My Test Chart");
     await user.type(screen.getByLabelText(/total stitch count/i), "10000");
@@ -201,7 +209,7 @@ describe("ChartAddForm", () => {
     });
 
     const user = userEvent.setup();
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     await user.type(screen.getByLabelText(/chart name/i), "Test Chart");
     await user.type(screen.getByLabelText(/total stitch count/i), "5000");
@@ -217,7 +225,7 @@ describe("ChartAddForm", () => {
     mockCreateChart.mockRejectedValue(new Error("Network failure"));
 
     const user = userEvent.setup();
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     await user.type(screen.getByLabelText(/chart name/i), "Test Chart");
     await user.type(screen.getByLabelText(/total stitch count/i), "5000");
@@ -231,7 +239,7 @@ describe("ChartAddForm", () => {
 
   it("clears validation error when field is corrected", async () => {
     const user = userEvent.setup();
-    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+    render(<ChartAddForm {...defaultFormProps} />);
 
     // Fill stitch count but leave name empty, then submit
     await user.type(screen.getByLabelText(/total stitch count/i), "5000");

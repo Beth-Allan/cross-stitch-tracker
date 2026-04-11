@@ -60,6 +60,9 @@ function renderModal(overrides?: { open?: boolean; onOpenChange?: () => void }) 
       chart={mockChart}
       designers={mockDesigners}
       genres={mockGenres}
+      storageLocations={[]}
+      stitchingApps={[]}
+      unassignedFabrics={[]}
       open={overrides?.open ?? true}
       onOpenChange={onOpenChange}
     />,

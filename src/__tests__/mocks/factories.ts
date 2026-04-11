@@ -17,6 +17,7 @@ import type {
 } from "@/generated/prisma/client";
 import type { DesignerWithStats, DesignerChart } from "@/types/designer";
 import type { GenreWithStats, GenreChart } from "@/types/genre";
+import type { ChartWithProject, ProjectWithRelations } from "@/types/chart";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { vi } from "vitest";
 
@@ -146,11 +147,14 @@ export function createMockChart(overrides?: Partial<Chart>): Chart {
   };
 }
 
-type ChartWithRelations = Chart & {
-  project: Project | null;
-  designer: Designer | null;
-  genres: Genre[];
-};
+export function createMockProjectWithRelations(overrides?: Partial<Project>): ProjectWithRelations {
+  return {
+    ...createMockProject(overrides),
+    storageLocation: null,
+    stitchingApp: null,
+    fabric: null,
+  };
+}
 
 export function createMockChartWithRelations(
   overrides?: Partial<Chart> & {
@@ -158,13 +162,14 @@ export function createMockChartWithRelations(
     designer?: Partial<Designer> | null;
     genres?: Genre[];
   },
-): ChartWithRelations {
+): ChartWithProject {
   const { project, designer, genres, ...chartOverrides } = overrides ?? {};
   const chart = createMockChart(chartOverrides);
 
   return {
     ...chart,
-    project: project === null ? null : createMockProject({ chartId: chart.id, ...project }),
+    project:
+      project === null ? null : createMockProjectWithRelations({ chartId: chart.id, ...project }),
     designer: designer === undefined || designer === null ? null : createMockDesigner(designer),
     genres: genres ?? [],
   };
@@ -303,9 +308,7 @@ export function createMockFabric(overrides?: Partial<Fabric>): Fabric {
 
 // ─── Storage & App Factories ────────────────────────────────────────────────
 
-export function createMockStorageLocation(
-  overrides?: Partial<StorageLocation>,
-): StorageLocation {
+export function createMockStorageLocation(overrides?: Partial<StorageLocation>): StorageLocation {
   return {
     id: "sl-1",
     name: "Project Bin A",
