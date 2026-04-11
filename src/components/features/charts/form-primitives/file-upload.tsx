@@ -31,7 +31,7 @@ export function FileUpload({
       return "Invalid file type. Please upload a PDF, PNG, JPG, or WebP file.";
     }
     if (file.size > MAX_FILE_SIZE) {
-      return "File is too large. Maximum size is 5MB.";
+      return "File is too large. Maximum size is 10MB.";
     }
     return null;
   }, []);

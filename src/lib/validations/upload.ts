@@ -9,7 +9,7 @@ export const ALLOWED_FILE_TYPES = [
   "application/pdf",
 ] as const;
 
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export const uploadRequestSchema = z.object({
   fileName: z.string().min(1),
@@ -18,7 +18,7 @@ export const uploadRequestSchema = z.object({
     .number()
     .int()
     .positive()
-    .max(MAX_FILE_SIZE, "File is too large. Maximum size is 5MB."),
+    .max(MAX_FILE_SIZE, "File is too large. Maximum size is 10MB."),
   category: z.enum(["covers", "files"]),
   projectId: z.string().min(1),
 });

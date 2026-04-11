@@ -32,7 +32,7 @@ export function CoverImageUpload({
       return "Invalid file type. Please upload a PNG, JPG, or WebP image.";
     }
     if (file.size > MAX_FILE_SIZE) {
-      return "File is too large. Maximum size is 5MB.";
+      return "File is too large. Maximum size is 10MB.";
     }
     return null;
   }, []);
@@ -215,7 +215,7 @@ export function CoverImageUpload({
               <span className="text-muted-foreground text-sm">
                 Drop an image here or click to upload
               </span>
-              <span className="text-muted-foreground/70 text-xs">PNG, JPG up to 5MB</span>
+              <span className="text-muted-foreground/70 text-xs">PNG, JPG up to 10MB</span>
             </>
           )}
         </div>
