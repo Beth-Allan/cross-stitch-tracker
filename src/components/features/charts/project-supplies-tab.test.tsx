@@ -3,11 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@/__tests__/test-utils";
 import {
   createMockSupplyBrand,
   createMockThread,
-  createMockBead,
-  createMockSpecialtyItem,
   createMockProjectThread,
-  createMockProjectBead,
-  createMockProjectSpecialty,
 } from "@/__tests__/mocks";
 import type {
   ProjectThreadWithThread,
@@ -77,52 +73,6 @@ function makeThreadWithBrand(
     thread: { ...thread, brand: dmcBrand },
     ...overrides,
   } as ProjectThreadWithThread;
-}
-
-function _makeBeadWithBrand(overrides?: Partial<ProjectBeadWithBead>): ProjectBeadWithBead {
-  const bead = createMockBead({
-    id: "bead-123",
-    brandId: "brand-dmc",
-    productCode: "00123",
-    colorName: "Red",
-    hexColor: "#FF0000",
-  });
-  const pb = createMockProjectBead({
-    id: "pb-1",
-    projectId: "proj-1",
-    beadId: "bead-123",
-    quantityRequired: 3,
-    quantityAcquired: 3,
-  });
-  return {
-    ...pb,
-    bead: { ...bead, brand: dmcBrand },
-    ...overrides,
-  } as ProjectBeadWithBead;
-}
-
-function _makeSpecialtyWithItem(
-  overrides?: Partial<ProjectSpecialtyWithItem>,
-): ProjectSpecialtyWithItem {
-  const item = createMockSpecialtyItem({
-    id: "spec-1",
-    brandId: "brand-dmc",
-    productCode: "K001",
-    colorName: "Gold Braid",
-    hexColor: "#FFD700",
-  });
-  const ps = createMockProjectSpecialty({
-    id: "ps-1",
-    projectId: "proj-1",
-    specialtyItemId: "spec-1",
-    quantityRequired: 1,
-    quantityAcquired: 0,
-  });
-  return {
-    ...ps,
-    specialtyItem: { ...item, brand: dmcBrand },
-    ...overrides,
-  } as ProjectSpecialtyWithItem;
 }
 
 const defaultProps = {

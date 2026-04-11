@@ -14,7 +14,6 @@ import {
   FileText,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { SizeBadge } from "@/components/features/charts/size-badge";
 import { DesignerFormModal } from "./designer-form-modal";
@@ -302,6 +301,7 @@ function ChartRow({ chart }: { chart: DesignerChart }) {
       {/* Thumbnail */}
       {chart.coverThumbnailUrl ? (
         <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={chart.coverThumbnailUrl}
             alt={chart.name}

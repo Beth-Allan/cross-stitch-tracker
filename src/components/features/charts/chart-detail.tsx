@@ -7,7 +7,7 @@ import {
   ArrowLeft,
   Calendar,
   FileText,
-  Image,
+  Image as ImageIcon,
   Pencil,
   Scissors,
   Settings,
@@ -174,6 +174,7 @@ function CoverImage({
 }) {
   if (coverImageUrl) {
     return (
+      /* eslint-disable-next-line @next/next/no-img-element */
       <img
         src={coverImageUrl}
         alt={`Cover for ${chartName}`}
@@ -185,7 +186,7 @@ function CoverImage({
   return (
     <div className="bg-muted flex max-h-80 w-full items-center justify-center rounded-lg lg:w-80">
       <div className="flex flex-col items-center gap-2 py-16">
-        <Image className="text-muted-foreground/40 h-8 w-8" strokeWidth={1.5} />
+        <ImageIcon className="text-muted-foreground/40 h-8 w-8" strokeWidth={1.5} />
         <span className="text-muted-foreground/70 text-xs">No cover image</span>
       </div>
     </div>
