@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-04-11T20:38:24.587Z",
+  "phase": "backlog",
+  "phase_name": "MVP backlog fixes",
+  "phase_dir": ".planning/quick",
+  "plan": null,
+  "task": null,
+  "total_tasks": null,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "999.0.8: Thread sort numeric ordering", "status": "done", "commit": "2c0afc6"},
+    {"id": 2, "name": "999.0.3: Form submit idempotency", "status": "done", "commit": "7f9a4b9"},
+    {"id": 3, "name": "999.0.11: Already-added supply indicator", "status": "done", "commit": "d5d4d8e"},
+    {"id": 4, "name": "999.0.5: Chart list edit/delete actions", "status": "done", "commit": "27cd127"},
+    {"id": 5, "name": "999.0.6: Chart images presigned URLs", "status": "done", "commit": "caec7ec"},
+    {"id": 6, "name": "Designer-list test fix (WEB->WEBSITE)", "status": "done", "commit": "63689b5"}
+  ],
+  "remaining_tasks": [
+    {"id": 7, "name": "999.0.6 followup: Auto-generate thumbnails on cover upload + backfill existing charts", "status": "not_started"}
+  ],
+  "blockers": [],
+  "human_actions_pending": [],
+  "decisions": [
+    {"decision": "Presigned URLs resolved server-side in page.tsx, passed as Record<string,string> to client components", "rationale": "Keeps R2 credentials server-only, avoids client waterfall", "phase": "backlog"},
+    {"decision": "CoverThumbnail extracted as separate client component with onError fallback", "rationale": "Needs useState for error tracking, reused in list and detail pages", "phase": "backlog"},
+    {"decision": "Thumbnail generation needs to be called after confirmUpload for cover images", "rationale": "generateThumbnail exists but is never invoked — coverThumbnailUrl is null for all charts", "phase": "backlog"}
+  ],
+  "uncommitted_files": [],
+  "next_action": "Wire generateThumbnail call into the cover image upload flow (after confirmUpload succeeds for coverImageUrl field), then backfill the 2 existing charts. Also use coverImageUrl as fallback when coverThumbnailUrl is null.",
+  "context_notes": "All 5 planned backlog fixes are done and pushed. During testing, discovered that chart thumbnails show placeholder icons because coverThumbnailUrl is null — generateThumbnail() exists in upload-actions.ts but is never called. The fix is to call it after confirmUpload for cover images, and add a fallback to use coverImageUrl when thumbnail is missing."
+}
