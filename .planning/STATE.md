@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
+milestone: v1.1
 milestone_name: Browse & Organize
-status: planning
-stopped_at: v1.0 milestone archived, ready for next milestone
-last_updated: "2026-04-11T21:10:00.000Z"
+status: defining-requirements
+stopped_at: Defining requirements for milestone v1.1
+last_updated: "2026-04-11T22:00:00.000Z"
 last_activity: 2026-04-11
 progress:
-  total_phases: 10
-  completed_phases: 4
-  total_plans: 23
-  completed_plans: 23
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,17 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-11)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Planning Milestone 2 — Browse & Organize
+**Current focus:** Milestone v1.1 — Browse & Organize
 
 ## Current Position
 
-Milestone: 2 (Browse & Organize)
-Phase: 5
-Plan: Not started
-Status: Planning next milestone
-Last activity: 2026-04-11 — v1.0 milestone archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-11 — Milestone v1.1 started
 
-Progress: [████░░░░░░] 40% (4/10 phases complete)
+Progress: [░░░░░░░░░░] 0%
 
 ## Milestone Structure
 
