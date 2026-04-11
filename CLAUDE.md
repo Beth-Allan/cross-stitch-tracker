@@ -45,17 +45,20 @@
   - aria-labels on supply remove + shopping mark-acquired buttons
   - search-to-add: hard-coded emerald/stone → semantic tokens
   - progress bars: transition-all → transition-[width]
+- Final polish pass (ee2ec9b):
+  - badge.tsx + tabs.tsx: transition-all → specific properties (perf)
+  - Top Genre badge: hard-coded amber → warning-* semantic tokens
+  - genre-list: added header-to-search spacing, fixed search icon alignment
 
 ### In Progress
 
-- Nothing — ready for optional polish + final audit + deploy
+- Nothing — ready for final audit + deploy
 
 ### Next Up
 
-1. `/impeccable:polish` (optional — P3 Top Genre badge)
-2. Re-run `/impeccable:audit` for final score confirmation
-3. Deploy MVP to Vercel
-4. Start Milestone 2 (Browse & Organize)
+1. Re-run `/impeccable:audit` for final score confirmation
+2. Deploy MVP to Vercel
+3. Start Milestone 2 (Browse & Organize)
 
 ### Backlog (post-MVP)
 
