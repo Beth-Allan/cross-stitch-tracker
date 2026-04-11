@@ -263,24 +263,23 @@ describe("supply-actions", () => {
   });
 
   describe("getThreads", () => {
-    it("returns array of threads with brand included", async () => {
+    it("returns threads sorted by colorCode numerically", async () => {
       const brand = createMockSupplyBrand();
+      // Mock returns alphabetical DB order: 3761 before 500
       const threads = [
-        { ...createMockThread({ id: "t1" }), brand },
-        { ...createMockThread({ id: "t2", colorCode: "321" }), brand },
+        { ...createMockThread({ id: "t1", colorCode: "3761" }), brand },
+        { ...createMockThread({ id: "t2", colorCode: "334" }), brand },
+        { ...createMockThread({ id: "t3", colorCode: "500" }), brand },
       ];
       mockPrisma.thread.findMany.mockResolvedValueOnce(threads);
       const { getThreads } = await import("./supply-actions");
 
       const result = await getThreads();
 
-      expect(result).toHaveLength(2);
-      expect(mockPrisma.thread.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          include: { brand: true },
-          orderBy: { colorCode: "asc" },
-        }),
-      );
+      expect(result).toHaveLength(3);
+      expect(result[0].colorCode).toBe("334");
+      expect(result[1].colorCode).toBe("500");
+      expect(result[2].colorCode).toBe("3761");
     });
 
     it("filters by brandId when provided", async () => {
@@ -901,6 +900,36 @@ describe("supply-actions", () => {
       expect(result.threads).toHaveLength(1);
       expect(result.beads).toHaveLength(1);
       expect(result.specialty).toHaveLength(1);
+    });
+
+    it("returns project threads sorted by colorCode numerically", async () => {
+      const brand = createMockSupplyBrand();
+      // Mock returns alphabetical DB order: 3761 before 500
+      mockPrisma.projectThread.findMany.mockResolvedValueOnce([
+        {
+          ...createMockProjectThread({ id: "pt-1" }),
+          thread: { ...createMockThread({ id: "t1", colorCode: "3761" }), brand },
+        },
+        {
+          ...createMockProjectThread({ id: "pt-2" }),
+          thread: { ...createMockThread({ id: "t2", colorCode: "334" }), brand },
+        },
+        {
+          ...createMockProjectThread({ id: "pt-3" }),
+          thread: { ...createMockThread({ id: "t3", colorCode: "500" }), brand },
+        },
+      ]);
+      mockPrisma.projectBead.findMany.mockResolvedValueOnce([]);
+      mockPrisma.projectSpecialty.findMany.mockResolvedValueOnce([]);
+
+      const { getProjectSupplies } = await import("./supply-actions");
+
+      const result = await getProjectSupplies("proj-1");
+
+      expect(result.threads).toHaveLength(3);
+      expect(result.threads[0].thread.colorCode).toBe("334");
+      expect(result.threads[1].thread.colorCode).toBe("500");
+      expect(result.threads[2].thread.colorCode).toBe("3761");
     });
   });
 });

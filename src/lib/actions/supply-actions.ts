@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { naturalSortByCode } from "@/lib/utils/natural-sort";
 import {
   threadSchema,
   beadSchema,
@@ -103,11 +104,11 @@ export async function getThreads(brandId?: string, colorFamily?: string, search?
     ];
   }
 
-  return prisma.thread.findMany({
+  const threads = await prisma.thread.findMany({
     where,
     include: { brand: true },
-    orderBy: { colorCode: "asc" },
   });
+  return threads.sort((a, b) => naturalSortByCode(a.colorCode, b.colorCode));
 }
 
 // ─── Bead CRUD ───────────────────────────────────────────────────────────────
@@ -542,7 +543,6 @@ export async function getProjectSupplies(projectId: string) {
     prisma.projectThread.findMany({
       where: { projectId },
       include: { thread: { include: { brand: true } } },
-      orderBy: { thread: { colorCode: "asc" } },
     }),
     prisma.projectBead.findMany({
       where: { projectId },
@@ -556,5 +556,9 @@ export async function getProjectSupplies(projectId: string) {
     }),
   ]);
 
-  return { threads, beads, specialty };
+  const sortedThreads = threads.sort((a, b) =>
+    naturalSortByCode(a.thread.colorCode, b.thread.colorCode),
+  );
+
+  return { threads: sortedThreads, beads, specialty };
 }
