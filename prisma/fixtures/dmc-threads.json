@@ -1,0 +1,2756 @@
+[
+  {
+    "colorCode": "B5200",
+    "colorName": "Snow White",
+    "hexColor": "#FFFFFF",
+    "colorFamily": "WHITE"
+  },
+  {
+    "colorCode": "White",
+    "colorName": "White",
+    "hexColor": "#FCFCFC",
+    "colorFamily": "WHITE"
+  },
+  {
+    "colorCode": "Ecru",
+    "colorName": "Ecru",
+    "hexColor": "#F0E6C8",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "150",
+    "colorName": "Ultra Very Dark Dusty Rose",
+    "hexColor": "#AB536B",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "151",
+    "colorName": "Very Light Dusty Rose",
+    "hexColor": "#F0C8D8",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "152",
+    "colorName": "Medium Light Shell Pink",
+    "hexColor": "#E2A0AA",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "153",
+    "colorName": "Very Light Violet",
+    "hexColor": "#E5C8D4",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "154",
+    "colorName": "Very Dark Grape",
+    "hexColor": "#572433",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "155",
+    "colorName": "Medium Dark Blue Violet",
+    "hexColor": "#9891BE",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "156",
+    "colorName": "Medium Light Blue Violet",
+    "hexColor": "#A3A4C4",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "157",
+    "colorName": "Very Light Cornflower Blue",
+    "hexColor": "#BBB7D1",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "158",
+    "colorName": "Medium Very Dark Cornflower Blue",
+    "hexColor": "#4C526E",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "159",
+    "colorName": "Light Gray Blue",
+    "hexColor": "#C8C8D9",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "160",
+    "colorName": "Medium Gray Blue",
+    "hexColor": "#9FA3BB",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "161",
+    "colorName": "Gray Blue",
+    "hexColor": "#7883A0",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "162",
+    "colorName": "Ultra Very Light Blue",
+    "hexColor": "#DBECF5",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "163",
+    "colorName": "Medium Celadon Green",
+    "hexColor": "#4DA076",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "164",
+    "colorName": "Light Forest Green",
+    "hexColor": "#C8DEB3",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "165",
+    "colorName": "Very Light Moss Green",
+    "hexColor": "#D0D94E",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "166",
+    "colorName": "Medium Light Moss Green",
+    "hexColor": "#C0C840",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "167",
+    "colorName": "Very Dark Yellow Beige",
+    "hexColor": "#A7956A",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "168",
+    "colorName": "Very Light Pewter",
+    "hexColor": "#D1D1D1",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "169",
+    "colorName": "Light Pewter",
+    "hexColor": "#898989",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "208",
+    "colorName": "Very Dark Lavender",
+    "hexColor": "#835289",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "209",
+    "colorName": "Dark Lavender",
+    "hexColor": "#A26DAA",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "210",
+    "colorName": "Medium Lavender",
+    "hexColor": "#C398C3",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "211",
+    "colorName": "Light Lavender",
+    "hexColor": "#E1C5DD",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "221",
+    "colorName": "Very Dark Shell Pink",
+    "hexColor": "#89363E",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "223",
+    "colorName": "Light Shell Pink",
+    "hexColor": "#CC8E89",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "224",
+    "colorName": "Very Light Shell Pink",
+    "hexColor": "#EBBBAE",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "225",
+    "colorName": "Ultra Very Light Shell Pink",
+    "hexColor": "#FFE0D8",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "226",
+    "colorName": "Light Carnation",
+    "hexColor": "#DC516D",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "300",
+    "colorName": "Very Dark Mahogany",
+    "hexColor": "#6C2F00",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "301",
+    "colorName": "Medium Mahogany",
+    "hexColor": "#A64400",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "302",
+    "colorName": "Very Dark Mahogany",
+    "hexColor": "#642C00",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "304",
+    "colorName": "Medium Red",
+    "hexColor": "#B71C1C",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "307",
+    "colorName": "Lemon",
+    "hexColor": "#FDED54",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "309",
+    "colorName": "Dark Rose",
+    "hexColor": "#BA3652",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "310",
+    "colorName": "Black",
+    "hexColor": "#000000",
+    "colorFamily": "BLACK"
+  },
+  {
+    "colorCode": "311",
+    "colorName": "Medium Navy Blue",
+    "hexColor": "#1C3B6E",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "312",
+    "colorName": "Very Dark Baby Blue",
+    "hexColor": "#2B547E",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "315",
+    "colorName": "Medium Dark Antique Mauve",
+    "hexColor": "#814D61",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "316",
+    "colorName": "Medium Antique Mauve",
+    "hexColor": "#B87388",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "317",
+    "colorName": "Pewter Gray",
+    "hexColor": "#6C6C6C",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "318",
+    "colorName": "Light Steel Gray",
+    "hexColor": "#A0A0A0",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "319",
+    "colorName": "Very Dark Pistachio Green",
+    "hexColor": "#205A34",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "320",
+    "colorName": "Medium Pistachio Green",
+    "hexColor": "#69965C",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "321",
+    "colorName": "Red",
+    "hexColor": "#C52C2C",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "322",
+    "colorName": "Dark Baby Blue",
+    "hexColor": "#5B8DAB",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "326",
+    "colorName": "Very Dark Rose",
+    "hexColor": "#A03050",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "327",
+    "colorName": "Dark Violet",
+    "hexColor": "#63246C",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "333",
+    "colorName": "Very Dark Blue Violet",
+    "hexColor": "#5C3F8F",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "334",
+    "colorName": "Medium Baby Blue",
+    "hexColor": "#739CBF",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "335",
+    "colorName": "Rose",
+    "hexColor": "#E06078",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "336",
+    "colorName": "Navy Blue",
+    "hexColor": "#253B73",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "340",
+    "colorName": "Medium Blue Violet",
+    "hexColor": "#ADA7D4",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "341",
+    "colorName": "Light Blue Violet",
+    "hexColor": "#B6B6D9",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "347",
+    "colorName": "Very Dark Salmon",
+    "hexColor": "#BD1F27",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "349",
+    "colorName": "Dark Coral",
+    "hexColor": "#D21035",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "350",
+    "colorName": "Medium Coral",
+    "hexColor": "#E04848",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "351",
+    "colorName": "Coral",
+    "hexColor": "#E96A67",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "352",
+    "colorName": "Light Coral",
+    "hexColor": "#F08C7D",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "353",
+    "colorName": "Peach",
+    "hexColor": "#F6AFA2",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "355",
+    "colorName": "Dark Terra Cotta",
+    "hexColor": "#984233",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "356",
+    "colorName": "Medium Terra Cotta",
+    "hexColor": "#C45C4A",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "367",
+    "colorName": "Dark Pistachio Green",
+    "hexColor": "#607B52",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "368",
+    "colorName": "Light Pistachio Green",
+    "hexColor": "#A8C890",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "369",
+    "colorName": "Very Light Pistachio Green",
+    "hexColor": "#D5F0BD",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "370",
+    "colorName": "Medium Mustard",
+    "hexColor": "#B89B68",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "371",
+    "colorName": "Mustard",
+    "hexColor": "#BFA36E",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "372",
+    "colorName": "Light Mustard",
+    "hexColor": "#CEB884",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "400",
+    "colorName": "Dark Mahogany",
+    "hexColor": "#8C4400",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "402",
+    "colorName": "Very Light Mahogany",
+    "hexColor": "#F6A465",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "407",
+    "colorName": "Dark Desert Sand",
+    "hexColor": "#B47250",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "413",
+    "colorName": "Dark Pewter Gray",
+    "hexColor": "#4D4D4D",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "414",
+    "colorName": "Dark Steel Gray",
+    "hexColor": "#8C8C8C",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "415",
+    "colorName": "Pearl Gray",
+    "hexColor": "#C8C8C8",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "420",
+    "colorName": "Dark Hazelnut Brown",
+    "hexColor": "#A07030",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "422",
+    "colorName": "Light Hazelnut Brown",
+    "hexColor": "#C6A068",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "433",
+    "colorName": "Medium Brown",
+    "hexColor": "#7A4C1C",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "434",
+    "colorName": "Light Brown",
+    "hexColor": "#985C28",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "435",
+    "colorName": "Very Light Brown",
+    "hexColor": "#B8783C",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "436",
+    "colorName": "Tan",
+    "hexColor": "#C89858",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "437",
+    "colorName": "Light Tan",
+    "hexColor": "#D8B87C",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "444",
+    "colorName": "Dark Lemon",
+    "hexColor": "#FFD700",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "445",
+    "colorName": "Light Lemon",
+    "hexColor": "#FFF482",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "451",
+    "colorName": "Dark Shell Gray",
+    "hexColor": "#908477",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "452",
+    "colorName": "Medium Shell Gray",
+    "hexColor": "#B5A89D",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "453",
+    "colorName": "Light Shell Gray",
+    "hexColor": "#CBBCB0",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "469",
+    "colorName": "Avocado Green",
+    "hexColor": "#72862A",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "470",
+    "colorName": "Light Avocado Green",
+    "hexColor": "#94A84A",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "471",
+    "colorName": "Very Light Avocado Green",
+    "hexColor": "#AEC450",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "472",
+    "colorName": "Ultra Light Avocado Green",
+    "hexColor": "#D8E66A",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "498",
+    "colorName": "Dark Red",
+    "hexColor": "#A71723",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "500",
+    "colorName": "Very Dark Blue Green",
+    "hexColor": "#044040",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "501",
+    "colorName": "Dark Blue Green",
+    "hexColor": "#386860",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "502",
+    "colorName": "Blue Green",
+    "hexColor": "#5C8878",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "503",
+    "colorName": "Medium Blue Green",
+    "hexColor": "#7CA890",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "504",
+    "colorName": "Very Light Blue Green",
+    "hexColor": "#CCDDCC",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "505",
+    "colorName": "Jade Green",
+    "hexColor": "#33B464",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "517",
+    "colorName": "Dark Wedgwood",
+    "hexColor": "#3B7CA0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "518",
+    "colorName": "Light Wedgwood",
+    "hexColor": "#5BA0C0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "519",
+    "colorName": "Sky Blue",
+    "hexColor": "#7EBCD0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "520",
+    "colorName": "Dark Fern Green",
+    "hexColor": "#667555",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "522",
+    "colorName": "Fern Green",
+    "hexColor": "#9AAA87",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "523",
+    "colorName": "Light Fern Green",
+    "hexColor": "#AAB890",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "524",
+    "colorName": "Very Light Fern Green",
+    "hexColor": "#C4C9A6",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "535",
+    "colorName": "Very Light Ash Gray",
+    "hexColor": "#636363",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "543",
+    "colorName": "Ultra Very Light Beige Brown",
+    "hexColor": "#F0DCC8",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "544",
+    "colorName": "Light Beige Brown",
+    "hexColor": "#E8D0B5",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "550",
+    "colorName": "Very Dark Violet",
+    "hexColor": "#522058",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "552",
+    "colorName": "Medium Violet",
+    "hexColor": "#803080",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "553",
+    "colorName": "Violet",
+    "hexColor": "#A060A0",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "554",
+    "colorName": "Light Violet",
+    "hexColor": "#DBA8D4",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "561",
+    "colorName": "Very Dark Jade",
+    "hexColor": "#2C6C4C",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "562",
+    "colorName": "Medium Jade",
+    "hexColor": "#538C6C",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "563",
+    "colorName": "Light Jade",
+    "hexColor": "#8BBCA0",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "564",
+    "colorName": "Very Light Jade",
+    "hexColor": "#A2CCB0",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "580",
+    "colorName": "Dark Moss Green",
+    "hexColor": "#888E24",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "581",
+    "colorName": "Moss Green",
+    "hexColor": "#A7AB2C",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "597",
+    "colorName": "Turquoise",
+    "hexColor": "#548C8C",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "598",
+    "colorName": "Light Turquoise",
+    "hexColor": "#90C8C8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "600",
+    "colorName": "Very Dark Cranberry",
+    "hexColor": "#C81858",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "601",
+    "colorName": "Dark Cranberry",
+    "hexColor": "#D02068",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "602",
+    "colorName": "Medium Cranberry",
+    "hexColor": "#E04080",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "603",
+    "colorName": "Cranberry",
+    "hexColor": "#FF7BAA",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "604",
+    "colorName": "Light Cranberry",
+    "hexColor": "#FF98B8",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "605",
+    "colorName": "Very Light Cranberry",
+    "hexColor": "#FFBAD0",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "606",
+    "colorName": "Bright Orange Red",
+    "hexColor": "#FA3000",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "608",
+    "colorName": "Bright Orange",
+    "hexColor": "#FD5D35",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "610",
+    "colorName": "Dark Drab Brown",
+    "hexColor": "#796740",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "611",
+    "colorName": "Drab Brown",
+    "hexColor": "#887450",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "612",
+    "colorName": "Light Drab Brown",
+    "hexColor": "#BC9E6A",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "613",
+    "colorName": "Very Light Drab Brown",
+    "hexColor": "#D4BC88",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "632",
+    "colorName": "Ultra Very Dark Desert Sand",
+    "hexColor": "#885040",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "640",
+    "colorName": "Very Dark Beige Gray",
+    "hexColor": "#857560",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "642",
+    "colorName": "Dark Beige Gray",
+    "hexColor": "#A89A80",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "644",
+    "colorName": "Medium Beige Gray",
+    "hexColor": "#DFD4C0",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "645",
+    "colorName": "Very Dark Beaver Gray",
+    "hexColor": "#686868",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "646",
+    "colorName": "Dark Beaver Gray",
+    "hexColor": "#888888",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "647",
+    "colorName": "Medium Beaver Gray",
+    "hexColor": "#A0A0A0",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "648",
+    "colorName": "Light Beaver Gray",
+    "hexColor": "#B8B8B8",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "666",
+    "colorName": "Bright Red",
+    "hexColor": "#E3001A",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "676",
+    "colorName": "Light Old Gold",
+    "hexColor": "#E6C660",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "677",
+    "colorName": "Very Light Old Gold",
+    "hexColor": "#F5E698",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "680",
+    "colorName": "Dark Old Gold",
+    "hexColor": "#BC8C24",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "699",
+    "colorName": "Green",
+    "hexColor": "#056E18",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "700",
+    "colorName": "Bright Green",
+    "hexColor": "#08820C",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "701",
+    "colorName": "Light Green",
+    "hexColor": "#2C9C1A",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "702",
+    "colorName": "Kelly Green",
+    "hexColor": "#47B81C",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "703",
+    "colorName": "Chartreuse",
+    "hexColor": "#7CC030",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "704",
+    "colorName": "Bright Chartreuse",
+    "hexColor": "#A4D054",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "712",
+    "colorName": "Cream",
+    "hexColor": "#FFFDE8",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "718",
+    "colorName": "Plum",
+    "hexColor": "#C8388C",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "720",
+    "colorName": "Dark Orange Spice",
+    "hexColor": "#E04928",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "721",
+    "colorName": "Medium Orange Spice",
+    "hexColor": "#F27842",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "722",
+    "colorName": "Light Orange Spice",
+    "hexColor": "#F8A870",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "725",
+    "colorName": "Medium Light Topaz",
+    "hexColor": "#FFC840",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "726",
+    "colorName": "Light Topaz",
+    "hexColor": "#FFE352",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "727",
+    "colorName": "Very Light Topaz",
+    "hexColor": "#FFF2A0",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "728",
+    "colorName": "Topaz",
+    "hexColor": "#E4BC4C",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "729",
+    "colorName": "Medium Old Gold",
+    "hexColor": "#D0A040",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "730",
+    "colorName": "Very Dark Olive Green",
+    "hexColor": "#827820",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "731",
+    "colorName": "Dark Olive Green",
+    "hexColor": "#918328",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "732",
+    "colorName": "Olive Green",
+    "hexColor": "#A89830",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "733",
+    "colorName": "Medium Olive Green",
+    "hexColor": "#BCA834",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "734",
+    "colorName": "Light Olive Green",
+    "hexColor": "#D0C458",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "738",
+    "colorName": "Very Light Tan",
+    "hexColor": "#ECDCB8",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "739",
+    "colorName": "Ultra Very Light Tan",
+    "hexColor": "#F5E8D0",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "740",
+    "colorName": "Tangerine",
+    "hexColor": "#FF8C00",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "741",
+    "colorName": "Medium Tangerine",
+    "hexColor": "#FFA420",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "742",
+    "colorName": "Light Tangerine",
+    "hexColor": "#FFC840",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "743",
+    "colorName": "Medium Yellow",
+    "hexColor": "#FFD260",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "744",
+    "colorName": "Pale Yellow",
+    "hexColor": "#FFE48C",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "745",
+    "colorName": "Light Pale Yellow",
+    "hexColor": "#FFEFAA",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "746",
+    "colorName": "Off White",
+    "hexColor": "#FFF8D8",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "747",
+    "colorName": "Very Light Sky Blue",
+    "hexColor": "#E0F0F8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "754",
+    "colorName": "Light Peach",
+    "hexColor": "#F8CCA8",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "758",
+    "colorName": "Very Light Terra Cotta",
+    "hexColor": "#EEB8A0",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "760",
+    "colorName": "Salmon",
+    "hexColor": "#F0908E",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "761",
+    "colorName": "Light Salmon",
+    "hexColor": "#FFAFAE",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "762",
+    "colorName": "Very Light Pearl Gray",
+    "hexColor": "#ECECEC",
+    "colorFamily": "WHITE"
+  },
+  {
+    "colorCode": "772",
+    "colorName": "Very Light Yellow Green",
+    "hexColor": "#E4F0C4",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "775",
+    "colorName": "Very Light Baby Blue",
+    "hexColor": "#D0E8F8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "776",
+    "colorName": "Medium Pink",
+    "hexColor": "#F0A0A8",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "778",
+    "colorName": "Very Light Antique Mauve",
+    "hexColor": "#DFA8A0",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "779",
+    "colorName": "Dark Cocoa",
+    "hexColor": "#5C3530",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "780",
+    "colorName": "Ultra Very Dark Topaz",
+    "hexColor": "#946B10",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "781",
+    "colorName": "Very Dark Topaz",
+    "hexColor": "#A57814",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "782",
+    "colorName": "Dark Topaz",
+    "hexColor": "#B88C1C",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "783",
+    "colorName": "Medium Topaz",
+    "hexColor": "#CC9C20",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "791",
+    "colorName": "Very Dark Cornflower Blue",
+    "hexColor": "#464B82",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "792",
+    "colorName": "Dark Cornflower Blue",
+    "hexColor": "#5B628E",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "793",
+    "colorName": "Medium Cornflower Blue",
+    "hexColor": "#8086B8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "794",
+    "colorName": "Light Cornflower Blue",
+    "hexColor": "#A0A8D0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "796",
+    "colorName": "Dark Royal Blue",
+    "hexColor": "#14176E",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "797",
+    "colorName": "Royal Blue",
+    "hexColor": "#1C3FA0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "798",
+    "colorName": "Dark Delft Blue",
+    "hexColor": "#4678B4",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "799",
+    "colorName": "Medium Delft Blue",
+    "hexColor": "#6498C8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "800",
+    "colorName": "Pale Delft Blue",
+    "hexColor": "#C0D8E8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "801",
+    "colorName": "Dark Coffee Brown",
+    "hexColor": "#483818",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "803",
+    "colorName": "Ultra Very Dark Baby Blue",
+    "hexColor": "#2C4078",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "806",
+    "colorName": "Dark Peacock Blue",
+    "hexColor": "#308890",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "807",
+    "colorName": "Peacock Blue",
+    "hexColor": "#64A0A0",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "809",
+    "colorName": "Delft Blue",
+    "hexColor": "#94B8D8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "813",
+    "colorName": "Light Blue",
+    "hexColor": "#A0C8E0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "814",
+    "colorName": "Dark Garnet",
+    "hexColor": "#7A0020",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "815",
+    "colorName": "Medium Garnet",
+    "hexColor": "#880028",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "816",
+    "colorName": "Garnet",
+    "hexColor": "#9C0030",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "817",
+    "colorName": "Very Dark Coral Red",
+    "hexColor": "#C41020",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "818",
+    "colorName": "Baby Pink",
+    "hexColor": "#FFDCE0",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "819",
+    "colorName": "Light Baby Pink",
+    "hexColor": "#FFEDE8",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "820",
+    "colorName": "Very Dark Royal Blue",
+    "hexColor": "#0E1070",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "822",
+    "colorName": "Light Beige Gray",
+    "hexColor": "#EEE4D0",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "823",
+    "colorName": "Dark Navy Blue",
+    "hexColor": "#1A2050",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "824",
+    "colorName": "Very Dark Blue",
+    "hexColor": "#1B4873",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "825",
+    "colorName": "Dark Blue",
+    "hexColor": "#286090",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "826",
+    "colorName": "Medium Blue",
+    "hexColor": "#3878A8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "827",
+    "colorName": "Very Light Blue",
+    "hexColor": "#B0D8F0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "828",
+    "colorName": "Ultra Very Light Blue",
+    "hexColor": "#CCE8F8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "829",
+    "colorName": "Very Dark Golden Olive",
+    "hexColor": "#7E6818",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "830",
+    "colorName": "Dark Golden Olive",
+    "hexColor": "#8C7420",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "831",
+    "colorName": "Medium Golden Olive",
+    "hexColor": "#9C8428",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "832",
+    "colorName": "Golden Olive",
+    "hexColor": "#AC9430",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "833",
+    "colorName": "Light Golden Olive",
+    "hexColor": "#C0A840",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "834",
+    "colorName": "Very Light Golden Olive",
+    "hexColor": "#D8C478",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "838",
+    "colorName": "Very Dark Beige Brown",
+    "hexColor": "#584020",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "839",
+    "colorName": "Dark Beige Brown",
+    "hexColor": "#705028",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "840",
+    "colorName": "Medium Beige Brown",
+    "hexColor": "#9A8060",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "841",
+    "colorName": "Light Beige Brown",
+    "hexColor": "#BC9E80",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "842",
+    "colorName": "Very Light Beige Brown",
+    "hexColor": "#DCCCB0",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "844",
+    "colorName": "Ultra Dark Beaver Gray",
+    "hexColor": "#545454",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "868",
+    "colorName": "Very Dark Hazelnut Brown",
+    "hexColor": "#8C5C20",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "869",
+    "colorName": "Very Dark Hazelnut Brown",
+    "hexColor": "#7C4C18",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "890",
+    "colorName": "Ultra Dark Pistachio Green",
+    "hexColor": "#184828",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "891",
+    "colorName": "Dark Carnation",
+    "hexColor": "#FF2D5E",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "892",
+    "colorName": "Medium Carnation",
+    "hexColor": "#FF5082",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "893",
+    "colorName": "Light Carnation",
+    "hexColor": "#FC758D",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "894",
+    "colorName": "Very Light Carnation",
+    "hexColor": "#FF9BB0",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "895",
+    "colorName": "Very Dark Hunter Green",
+    "hexColor": "#1B5C20",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "898",
+    "colorName": "Very Dark Coffee Brown",
+    "hexColor": "#4A2C10",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "899",
+    "colorName": "Medium Rose",
+    "hexColor": "#E04060",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "900",
+    "colorName": "Dark Burnt Orange",
+    "hexColor": "#D46216",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "902",
+    "colorName": "Very Dark Garnet",
+    "hexColor": "#680028",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "904",
+    "colorName": "Very Dark Parrot Green",
+    "hexColor": "#557A24",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "905",
+    "colorName": "Dark Parrot Green",
+    "hexColor": "#5C8428",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "906",
+    "colorName": "Medium Parrot Green",
+    "hexColor": "#7DB02C",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "907",
+    "colorName": "Light Parrot Green",
+    "hexColor": "#A0C830",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "909",
+    "colorName": "Very Dark Emerald Green",
+    "hexColor": "#107428",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "910",
+    "colorName": "Dark Emerald Green",
+    "hexColor": "#188C38",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "911",
+    "colorName": "Medium Emerald Green",
+    "hexColor": "#189848",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "912",
+    "colorName": "Light Emerald Green",
+    "hexColor": "#1BA860",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "913",
+    "colorName": "Medium Nile Green",
+    "hexColor": "#6DC08E",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "915",
+    "colorName": "Dark Plum",
+    "hexColor": "#8C0058",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "917",
+    "colorName": "Medium Plum",
+    "hexColor": "#A30068",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "918",
+    "colorName": "Dark Red Copper",
+    "hexColor": "#984020",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "919",
+    "colorName": "Red Copper",
+    "hexColor": "#A64B28",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "920",
+    "colorName": "Medium Copper",
+    "hexColor": "#AC6030",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "921",
+    "colorName": "Copper",
+    "hexColor": "#C07038",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "922",
+    "colorName": "Light Copper",
+    "hexColor": "#E08048",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "924",
+    "colorName": "Very Dark Gray Green",
+    "hexColor": "#386858",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "926",
+    "colorName": "Medium Gray Green",
+    "hexColor": "#7EA898",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "927",
+    "colorName": "Light Gray Green",
+    "hexColor": "#BDD0C8",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "928",
+    "colorName": "Very Light Gray Green",
+    "hexColor": "#DDE8E0",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "930",
+    "colorName": "Dark Antique Blue",
+    "hexColor": "#425C80",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "931",
+    "colorName": "Medium Antique Blue",
+    "hexColor": "#5C7898",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "932",
+    "colorName": "Light Antique Blue",
+    "hexColor": "#86A0B8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "934",
+    "colorName": "Black Avocado Green",
+    "hexColor": "#363E1C",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "935",
+    "colorName": "Dark Avocado Green",
+    "hexColor": "#455424",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "936",
+    "colorName": "Very Dark Avocado Green",
+    "hexColor": "#4C5C20",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "937",
+    "colorName": "Medium Avocado Green",
+    "hexColor": "#586828",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "938",
+    "colorName": "Ultra Dark Coffee Brown",
+    "hexColor": "#362810",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "939",
+    "colorName": "Very Dark Navy Blue",
+    "hexColor": "#1B2050",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "940",
+    "colorName": "Cobalt Blue",
+    "hexColor": "#0048B8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "941",
+    "colorName": "Medium Cobalt Blue",
+    "hexColor": "#0050C8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "943",
+    "colorName": "Medium Aquamarine",
+    "hexColor": "#1DB88C",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "945",
+    "colorName": "Tawny",
+    "hexColor": "#F8C8A0",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "946",
+    "colorName": "Medium Burnt Orange",
+    "hexColor": "#ED5500",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "947",
+    "colorName": "Burnt Orange",
+    "hexColor": "#FF6020",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "948",
+    "colorName": "Very Light Peach",
+    "hexColor": "#FEE8D8",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "950",
+    "colorName": "Light Desert Sand",
+    "hexColor": "#EEDCC8",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "951",
+    "colorName": "Light Tawny",
+    "hexColor": "#FFE0B8",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "954",
+    "colorName": "Nile Green",
+    "hexColor": "#88D4A0",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "955",
+    "colorName": "Light Nile Green",
+    "hexColor": "#A2E0B8",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "956",
+    "colorName": "Geranium",
+    "hexColor": "#FF6080",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "957",
+    "colorName": "Pale Geranium",
+    "hexColor": "#FD97A0",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "958",
+    "colorName": "Dark Sea Green",
+    "hexColor": "#30B4A8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "959",
+    "colorName": "Medium Sea Green",
+    "hexColor": "#59C8B8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "961",
+    "colorName": "Dark Dusty Rose",
+    "hexColor": "#CF6078",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "962",
+    "colorName": "Medium Dusty Rose",
+    "hexColor": "#E87D90",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "963",
+    "colorName": "Ultra Very Light Dusty Rose",
+    "hexColor": "#FFD0D0",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "964",
+    "colorName": "Light Sea Green",
+    "hexColor": "#A0DCD0",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "966",
+    "colorName": "Medium Light Baby Green",
+    "hexColor": "#B4E0B8",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "970",
+    "colorName": "Light Pumpkin",
+    "hexColor": "#F87808",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "971",
+    "colorName": "Pumpkin",
+    "hexColor": "#F56218",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "972",
+    "colorName": "Deep Canary",
+    "hexColor": "#FFB820",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "973",
+    "colorName": "Bright Canary",
+    "hexColor": "#FFE300",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "975",
+    "colorName": "Dark Golden Brown",
+    "hexColor": "#884C10",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "976",
+    "colorName": "Medium Golden Brown",
+    "hexColor": "#C47A1C",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "977",
+    "colorName": "Light Golden Brown",
+    "hexColor": "#DC9428",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "978",
+    "colorName": "Medium Emerald",
+    "hexColor": "#36944C",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "986",
+    "colorName": "Very Dark Forest Green",
+    "hexColor": "#285028",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "987",
+    "colorName": "Dark Forest Green",
+    "hexColor": "#386C30",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "988",
+    "colorName": "Medium Forest Green",
+    "hexColor": "#60984C",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "989",
+    "colorName": "Forest Green",
+    "hexColor": "#80B070",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "991",
+    "colorName": "Dark Aquamarine",
+    "hexColor": "#478078",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "992",
+    "colorName": "Light Aquamarine",
+    "hexColor": "#70B8B0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "993",
+    "colorName": "Very Light Aquamarine",
+    "hexColor": "#90D0C8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "995",
+    "colorName": "Dark Electric Blue",
+    "hexColor": "#2888C8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "996",
+    "colorName": "Medium Electric Blue",
+    "hexColor": "#30A8F0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3011",
+    "colorName": "Dark Khaki Green",
+    "hexColor": "#786830",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3012",
+    "colorName": "Medium Khaki Green",
+    "hexColor": "#A09048",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3013",
+    "colorName": "Light Khaki Green",
+    "hexColor": "#B8A860",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3021",
+    "colorName": "Very Dark Brown Gray",
+    "hexColor": "#584838",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "3022",
+    "colorName": "Medium Brown Gray",
+    "hexColor": "#8C8878",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "3023",
+    "colorName": "Light Brown Gray",
+    "hexColor": "#B4ACA0",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "3024",
+    "colorName": "Very Light Brown Gray",
+    "hexColor": "#C8C4BA",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "3031",
+    "colorName": "Very Dark Mocha Brown",
+    "hexColor": "#483828",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "3032",
+    "colorName": "Medium Mocha Brown",
+    "hexColor": "#B4A48C",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "3033",
+    "colorName": "Very Light Mocha Brown",
+    "hexColor": "#DCD4C4",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3041",
+    "colorName": "Medium Antique Violet",
+    "hexColor": "#967890",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "3042",
+    "colorName": "Light Antique Violet",
+    "hexColor": "#B898B0",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "3045",
+    "colorName": "Dark Yellow Beige",
+    "hexColor": "#BC9448",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3046",
+    "colorName": "Medium Yellow Beige",
+    "hexColor": "#D8B860",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3047",
+    "colorName": "Light Yellow Beige",
+    "hexColor": "#F0D480",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3051",
+    "colorName": "Dark Green Gray",
+    "hexColor": "#584E2C",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3052",
+    "colorName": "Medium Green Gray",
+    "hexColor": "#80804C",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3053",
+    "colorName": "Green Gray",
+    "hexColor": "#9CA870",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "3064",
+    "colorName": "Desert Sand",
+    "hexColor": "#C08860",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3072",
+    "colorName": "Very Light Beaver Gray",
+    "hexColor": "#E0E0D8",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "3078",
+    "colorName": "Very Light Golden Yellow",
+    "hexColor": "#FDF4C0",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3325",
+    "colorName": "Light Baby Blue",
+    "hexColor": "#B8D8F0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3326",
+    "colorName": "Light Rose",
+    "hexColor": "#FBB0BC",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3328",
+    "colorName": "Dark Salmon",
+    "hexColor": "#E36A6A",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3340",
+    "colorName": "Medium Apricot",
+    "hexColor": "#FF8060",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3341",
+    "colorName": "Apricot",
+    "hexColor": "#FCA888",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3345",
+    "colorName": "Dark Hunter Green",
+    "hexColor": "#1C5828",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3346",
+    "colorName": "Hunter Green",
+    "hexColor": "#40683C",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3347",
+    "colorName": "Medium Yellow Green",
+    "hexColor": "#718838",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3348",
+    "colorName": "Light Yellow Green",
+    "hexColor": "#C8D898",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3350",
+    "colorName": "Ultra Dark Dusty Rose",
+    "hexColor": "#BD4360",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3354",
+    "colorName": "Light Dusty Rose",
+    "hexColor": "#E8AAB0",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3362",
+    "colorName": "Dark Pine Green",
+    "hexColor": "#506840",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3363",
+    "colorName": "Medium Pine Green",
+    "hexColor": "#6C844C",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3364",
+    "colorName": "Pine Green",
+    "hexColor": "#83985C",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "3371",
+    "colorName": "Black Brown",
+    "hexColor": "#1E100C",
+    "colorFamily": "BLACK"
+  },
+  {
+    "colorCode": "3607",
+    "colorName": "Light Plum",
+    "hexColor": "#C040A0",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3608",
+    "colorName": "Very Light Plum",
+    "hexColor": "#E898C8",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3609",
+    "colorName": "Ultra Light Plum",
+    "hexColor": "#F0B8D8",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3685",
+    "colorName": "Very Dark Mauve",
+    "hexColor": "#882844",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3687",
+    "colorName": "Mauve",
+    "hexColor": "#C06080",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3688",
+    "colorName": "Medium Mauve",
+    "hexColor": "#E898B0",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3689",
+    "colorName": "Light Mauve",
+    "hexColor": "#FBC0D0",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3705",
+    "colorName": "Dark Melon",
+    "hexColor": "#FF6878",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3706",
+    "colorName": "Medium Melon",
+    "hexColor": "#FFA0A8",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3708",
+    "colorName": "Light Melon",
+    "hexColor": "#FFD0D4",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3712",
+    "colorName": "Medium Salmon",
+    "hexColor": "#F09090",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3713",
+    "colorName": "Very Light Salmon",
+    "hexColor": "#FFE0E0",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3716",
+    "colorName": "Very Light Dusty Rose",
+    "hexColor": "#FFCAD0",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3721",
+    "colorName": "Dark Shell Pink",
+    "hexColor": "#A05050",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3722",
+    "colorName": "Medium Shell Pink",
+    "hexColor": "#B86860",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3726",
+    "colorName": "Dark Antique Mauve",
+    "hexColor": "#8C5060",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3727",
+    "colorName": "Light Antique Mauve",
+    "hexColor": "#D8A0B0",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3731",
+    "colorName": "Very Dark Dusty Rose",
+    "hexColor": "#D8507C",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3733",
+    "colorName": "Dusty Rose",
+    "hexColor": "#E88098",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3740",
+    "colorName": "Dark Antique Violet",
+    "hexColor": "#786070",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "3743",
+    "colorName": "Very Light Antique Violet",
+    "hexColor": "#D4C4D0",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "3746",
+    "colorName": "Dark Blue Violet",
+    "hexColor": "#776CA0",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "3747",
+    "colorName": "Very Light Blue Violet",
+    "hexColor": "#D0D0E8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3750",
+    "colorName": "Very Dark Antique Blue",
+    "hexColor": "#386078",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3752",
+    "colorName": "Very Light Antique Blue",
+    "hexColor": "#B8C8D8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3753",
+    "colorName": "Ultra Very Light Antique Blue",
+    "hexColor": "#D0D8E8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3755",
+    "colorName": "Baby Blue",
+    "hexColor": "#88B8D8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3756",
+    "colorName": "Ultra Very Light Baby Blue",
+    "hexColor": "#EEF4F8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3760",
+    "colorName": "Medium Wedgwood",
+    "hexColor": "#3D809C",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3761",
+    "colorName": "Light Sky Blue",
+    "hexColor": "#B8DDE8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3765",
+    "colorName": "Very Dark Peacock Blue",
+    "hexColor": "#2C707C",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3766",
+    "colorName": "Light Peacock Blue",
+    "hexColor": "#64B4B8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3768",
+    "colorName": "Dark Gray Green",
+    "hexColor": "#5C7870",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "3770",
+    "colorName": "Very Light Tawny",
+    "hexColor": "#FFE8D0",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3771",
+    "colorName": "Ultra Very Light Terra Cotta",
+    "hexColor": "#F4C8B0",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3772",
+    "colorName": "Very Dark Desert Sand",
+    "hexColor": "#A06040",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "3773",
+    "colorName": "Medium Desert Sand",
+    "hexColor": "#D0907C",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3774",
+    "colorName": "Very Light Desert Sand",
+    "hexColor": "#F4D4C0",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3776",
+    "colorName": "Light Mahogany",
+    "hexColor": "#CF7840",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3777",
+    "colorName": "Very Dark Terra Cotta",
+    "hexColor": "#883830",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3778",
+    "colorName": "Light Terra Cotta",
+    "hexColor": "#D88C78",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3779",
+    "colorName": "Ultra Very Light Terra Cotta",
+    "hexColor": "#F0C0B0",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3781",
+    "colorName": "Dark Mocha Brown",
+    "hexColor": "#584430",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "3782",
+    "colorName": "Light Mocha Brown",
+    "hexColor": "#C4AC90",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3787",
+    "colorName": "Dark Brown Gray",
+    "hexColor": "#6C6458",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "3790",
+    "colorName": "Ultra Dark Beige Gray",
+    "hexColor": "#6C6050",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "3799",
+    "colorName": "Very Dark Pewter Gray",
+    "hexColor": "#414141",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "3801",
+    "colorName": "Very Dark Melon",
+    "hexColor": "#E42448",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3802",
+    "colorName": "Very Dark Antique Mauve",
+    "hexColor": "#6C3040",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3803",
+    "colorName": "Dark Mauve",
+    "hexColor": "#A83858",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3804",
+    "colorName": "Dark Cyclamen Pink",
+    "hexColor": "#D01068",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3805",
+    "colorName": "Cyclamen Pink",
+    "hexColor": "#E83880",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3806",
+    "colorName": "Light Cyclamen Pink",
+    "hexColor": "#F468A8",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3807",
+    "colorName": "Cornflower Blue",
+    "hexColor": "#5F6099",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "3808",
+    "colorName": "Ultra Very Dark Turquoise",
+    "hexColor": "#366058",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3809",
+    "colorName": "Very Dark Turquoise",
+    "hexColor": "#3C787C",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3810",
+    "colorName": "Dark Turquoise",
+    "hexColor": "#4898A0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3811",
+    "colorName": "Very Light Turquoise",
+    "hexColor": "#B0E0E0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3812",
+    "colorName": "Very Dark Sea Green",
+    "hexColor": "#26886C",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3813",
+    "colorName": "Light Blue Green",
+    "hexColor": "#B0D4C0",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3814",
+    "colorName": "Aquamarine",
+    "hexColor": "#388C78",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3815",
+    "colorName": "Dark Celadon Green",
+    "hexColor": "#3C7858",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3816",
+    "colorName": "Celadon Green",
+    "hexColor": "#6CA480",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "3817",
+    "colorName": "Light Celadon Green",
+    "hexColor": "#90C898",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3818",
+    "colorName": "Ultra Very Dark Emerald Green",
+    "hexColor": "#106830",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3819",
+    "colorName": "Light Moss Green",
+    "hexColor": "#E0E060",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3820",
+    "colorName": "Dark Straw",
+    "hexColor": "#DFBF3C",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3821",
+    "colorName": "Straw",
+    "hexColor": "#F0D04C",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3822",
+    "colorName": "Light Straw",
+    "hexColor": "#F8E870",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3823",
+    "colorName": "Ultra Pale Yellow",
+    "hexColor": "#FFFACA",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3824",
+    "colorName": "Light Apricot",
+    "hexColor": "#FECAB8",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3825",
+    "colorName": "Pale Pumpkin",
+    "hexColor": "#FFB888",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3826",
+    "colorName": "Golden Brown",
+    "hexColor": "#AD6520",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3827",
+    "colorName": "Pale Golden Brown",
+    "hexColor": "#F0B860",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3828",
+    "colorName": "Hazelnut Brown",
+    "hexColor": "#AC8048",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "3829",
+    "colorName": "Very Dark Old Gold",
+    "hexColor": "#A07C14",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3830",
+    "colorName": "Terra Cotta",
+    "hexColor": "#BC6050",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3831",
+    "colorName": "Dark Raspberry",
+    "hexColor": "#B53050",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3832",
+    "colorName": "Medium Raspberry",
+    "hexColor": "#DB5070",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3833",
+    "colorName": "Light Raspberry",
+    "hexColor": "#EA8090",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3834",
+    "colorName": "Dark Grape",
+    "hexColor": "#6C3460",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3835",
+    "colorName": "Medium Grape",
+    "hexColor": "#9468A8",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3836",
+    "colorName": "Light Grape",
+    "hexColor": "#BA96C4",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3837",
+    "colorName": "Ultra Dark Lavender",
+    "hexColor": "#6B2C7E",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "3838",
+    "colorName": "Dark Lavender Blue",
+    "hexColor": "#5C6CA8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3839",
+    "colorName": "Medium Lavender Blue",
+    "hexColor": "#8090C0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3840",
+    "colorName": "Light Lavender Blue",
+    "hexColor": "#B0BCD8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3841",
+    "colorName": "Pale Baby Blue",
+    "hexColor": "#CDDFEF",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3842",
+    "colorName": "Dark Wedgwood Blue",
+    "hexColor": "#306C90",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3843",
+    "colorName": "Electric Blue",
+    "hexColor": "#18B0D0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3844",
+    "colorName": "Dark Bright Turquoise",
+    "hexColor": "#10A0B0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3845",
+    "colorName": "Medium Bright Turquoise",
+    "hexColor": "#04BCD0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3846",
+    "colorName": "Light Bright Turquoise",
+    "hexColor": "#08D8E8",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3847",
+    "colorName": "Dark Teal Green",
+    "hexColor": "#307870",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3848",
+    "colorName": "Medium Teal Green",
+    "hexColor": "#459890",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3849",
+    "colorName": "Light Teal Green",
+    "hexColor": "#52ACA0",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "3850",
+    "colorName": "Dark Bright Green",
+    "hexColor": "#189878",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3851",
+    "colorName": "Light Bright Green",
+    "hexColor": "#49B89E",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "3852",
+    "colorName": "Very Dark Straw",
+    "hexColor": "#C6981C",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3853",
+    "colorName": "Dark Autumn Gold",
+    "hexColor": "#F09030",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3854",
+    "colorName": "Medium Autumn Gold",
+    "hexColor": "#F4B060",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3855",
+    "colorName": "Light Autumn Gold",
+    "hexColor": "#F8D898",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3856",
+    "colorName": "Ultra Very Light Mahogany",
+    "hexColor": "#FFCCAC",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3857",
+    "colorName": "Dark Rosewood",
+    "hexColor": "#7C3830",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3858",
+    "colorName": "Medium Rosewood",
+    "hexColor": "#9C5040",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3859",
+    "colorName": "Light Rosewood",
+    "hexColor": "#BA8878",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "3860",
+    "colorName": "Cocoa",
+    "hexColor": "#886860",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "3861",
+    "colorName": "Light Cocoa",
+    "hexColor": "#A88878",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "3862",
+    "colorName": "Dark Mocha Beige",
+    "hexColor": "#8C7858",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "3863",
+    "colorName": "Medium Mocha Beige",
+    "hexColor": "#AC9878",
+    "colorFamily": "NEUTRAL"
+  },
+  {
+    "colorCode": "3864",
+    "colorName": "Light Mocha Beige",
+    "hexColor": "#CBB898",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "3865",
+    "colorName": "Winter White",
+    "hexColor": "#FAF8F0",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "3866",
+    "colorName": "Ultra Very Light Mocha Brown",
+    "hexColor": "#FAF0E8",
+    "colorFamily": "ORANGE"
+  }
+]
