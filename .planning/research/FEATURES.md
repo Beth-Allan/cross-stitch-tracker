@@ -1,269 +1,236 @@
 # Feature Research
 
-**Domain:** Cross-stitch project management and craft inventory tracking
-**Researched:** 2026-03-28
-**Confidence:** MEDIUM-HIGH
-
-## Competitor Landscape Summary
-
-The cross-stitch app ecosystem is fragmented. No single app does what this project aims to do. Apps fall into distinct categories:
-
-1. **Pattern viewers / markup apps** (Pattern Keeper, Markup R-XP, Saga, MyCozyApp) -- focus on viewing charts and marking stitches on-screen while stitching. Strong at in-session use, weak at collection management.
-2. **Inventory trackers** (X-Stitch/XStitch Plus, Thread Stash, Cross Stitch Thread Organizer) -- track thread/supply collections. Pre-loaded DMC catalogs. Shopping lists. Weak at project lifecycle and statistics.
-3. **Journal/progress apps** (Cross Stitch Journal, StitchPal) -- log sessions, track progress, show statistics and streaks. Weak at supply management and collection browsing.
-4. **General craft platforms** (Ravelry for knitting/crochet) -- the gold standard for craft project management with stash tracking, project linking, community. Nothing equivalent exists for cross-stitch.
-
-**The gap this project fills:** A unified system combining collection management + supply tracking + session logging + statistics + dashboards. This is the "Ravelry for cross-stitch" but personal-first rather than community-first.
+**Domain:** Cross-stitch project management — Milestone 2: Browse & Organize
+**Researched:** 2026-04-11
+**Confidence:** HIGH (existing designs + domain research + existing codebase analysis)
 
 ## Feature Landscape
 
 ### Table Stakes (Users Expect These)
 
-Features users assume exist. Missing these = product feels incomplete or worse than existing tools.
+Features the user has already designed in DesignOS and explicitly requested. Missing any of these means the milestone feels incomplete.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Project CRUD with rich metadata | Every tracker does this; it's the core purpose | MEDIUM | ~50 fields per project is ambitious but necessary. Batch entry UX matters. |
-| Status tracking (lifecycle stages) | Cross Stitch Journal, XStitch Plus, and Notion all have this | LOW | 7 statuses (Unstarted through FFO). Must feel natural, not bureaucratic. |
-| Cover photo / project images | StitchPal, XStitch Plus (5 photos), Cross Stitch Journal all support photos | LOW | Min 1 cover photo per project. Progress photos handled via sessions. |
-| Digital file storage (PDF/chart upload) | Users store charts digitally; Markup R-XP and Pattern Keeper revolve around this | MEDIUM | Cloudflare R2 integration. Must handle PDF and image formats. |
-| Pre-seeded DMC thread catalog | XStitch Plus, X-Stitch, Thread Stash, My Cross Stitch Tracker all pre-load DMC | LOW | ~500 colors with hex swatches. Major UX win -- this is a pain point in every manual system. |
-| Thread/supply inventory per project | XStitch Plus, X-Stitch all track per-project supplies | MEDIUM | Three junction tables (thread, bead, specialty). Quantity required vs acquired. |
-| Shopping list (auto-generated) | X-Stitch, XStitch Plus, Thread Stash all offer shopping lists | MEDIUM | Grouped by project. Filter by supply type. Show what's still needed. |
-| Stitch session logging | Cross Stitch Journal, StitchPal both center on this | LOW | Date, project, count, optional photo, optional time. Must be fast (< 30 seconds). |
-| Progress tracking (% complete) | Every progress app shows this; it's the core feedback loop | LOW | Auto-calculated from sessions vs total stitch count. |
-| Basic statistics (stitches per day/week/month/year) | Cross Stitch Journal shows quarterly/semiannual stats; StitchPal tracks daily | MEDIUM | Aggregation queries. Bar charts for monthly totals. |
-| Designer tracking | Standard metadata in all chart management systems | LOW | CRUD + link to projects. Browse by designer. |
-| Gallery/list/table views | Ravelry, Airtable, Notion all offer multiple view modes | MEDIUM | Gallery cards are the primary browse mode. Table for power users. |
-| Filtering and sorting | Every database tool supports this; stitchers filter by status, size, designer | MEDIUM | Multi-dimension filter bar with dismissible chips. Must feel fast. |
-| Basic responsive design (desktop + mobile) | All competitor apps work on phones; web app must too | MEDIUM | Mac browser primary, iPhone secondary. Not a native app. |
-| PWA installable | Users expect app-like experience on phone home screen | LOW | Manifest + icons. Offline deferred to post-MVP. |
-| Authentication | Protecting personal data and uploaded files | LOW | Single-user Auth.js setup. |
+| Gallery card view with cover images | Visual browsing is the primary upgrade over Notion's flat table. 500+ charts need visual recognition. | HIGH | Three status-specific card variants (WIP/Unstarted/Finished) already fully designed in `product-plan/sections/gallery-cards-and-advanced-filtering/`. Each variant has distinct footer content: progress bars, kitting dots, celebration borders. |
+| View mode toggle (gallery/list/table) | Users need different densities for different tasks: visual browsing (gallery), scanning (list), data analysis (table). This is standard in Ravelry, Notion, and every project management tool. | MEDIUM | All three modes designed in GalleryGrid.tsx. Gallery = card grid, List = compact rows with status dots, Table = sortable columns. View mode should persist in URL params or localStorage. |
+| Table view with column sorting | Table view without sorting is useless for 500+ items. Users need to sort by name, designer, status, size, progress, stitch count, colours. | MEDIUM | Sort logic already designed (7 sort fields). Desktop table hides columns responsively (max-md, max-sm, max-lg, max-xl breakpoints). |
+| Storage location CRUD (replacing hardcoded arrays) | Currently `projectBin` is a free-text string with hardcoded defaults ["Bin A", "Bin B", "Bin C", "Bin D"]. No rename, no delete, no project count. "Add New" creates "New Location" with no way to manage it. | MEDIUM | Need new `StorageLocation` model in Prisma. Designs exist: StorageLocationList with inline add/edit/delete, StorageLocationDetail with project list. Replace hardcoded array in project-setup-section.tsx with DB-backed select. |
+| Wire fabric selector into chart form | Fabric CRUD exists (Phase 4) but the chart form shows a disabled "Phase 5" placeholder (`project-setup-section.tsx:67-74`). Users expect to assign fabric to projects. | LOW | Fetch unassigned fabrics (where `linkedProjectId` is null OR matches current project), populate SearchableSelect. Save `linkedProjectId` on Fabric model. Schema already supports this via `Fabric.linkedProjectId`. |
+| Complete DMC catalog (1-149 + Blanc) | Current seed has 459 colours starting at DMC 150. Missing ~47 colours (DMC 1-149 plus Blanc). Incomplete catalog means supply linking fails for common colours. | LOW | Need to source hex values for DMC 1-149 + Blanc. Add to `prisma/fixtures/dmc-threads.json`. Run as a data migration. Ecru already exists in the seed. |
+| Cover image aspect ratio fix | Backlog item 999.6: `h-32 + object-cover` crops tall/square images into narrow strips on the chart detail page. Users upload varied image ratios. | LOW | Use `object-contain` with a max-height or responsive aspect ratio. Affects `cover-image-upload.tsx:155` area. The gallery cards use `aspect-[4/3]` which handles this well; the fix is for the detail page and list views. |
+| Thread colour picker scroll UX fix | Backlog item 999.0.13: adding thread colours doesn't auto-scroll to keep the search box/+Add button visible. When adding from a long list, the UI jumps and the user loses context. | LOW | Add `scrollIntoView` on the SearchToAdd component or newly added supply rows. The `search-to-add.tsx` component has no scroll management currently. |
 
 ### Differentiators (Competitive Advantage)
 
-Features that set the product apart. These are where existing apps fall short and this project can win.
+Features that go beyond what Notion, spreadsheets, or printable trackers offer. Aligned with core value: "manage charts and supplies faster than Notion."
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Comprehensive statistics engine (Year in Review, streaks, records) | Cross Stitch Journal has basic streaks; no app offers the depth planned here (8 stat sections, yearly summaries, completion brackets, supply stats) | HIGH | This is the core differentiator. Stitchers love data. No competitor comes close to the planned stats depth. |
-| Auto-calculated kitting status with progress indicator | No competitor tracks kitting as a composite calculated state; they treat it as a manual status | HIGH | 8+ boolean conditions across multiple relations. "80% kitted -- needs 3 DMC colors and fabric" is unique. |
-| SAL support (multi-part charts, evolving supply needs) | Printable SAL trackers exist on Etsy; no app handles this natively. Stitch counts and supply lists grow over time. | MEDIUM | Part tracking, cumulative stitch counts, growing supply lists. Unique among apps. |
-| Series/collection management with completion tracking | No cross-stitch app tracks "4 of 12 Mini Bottles complete" -- this is a book-tracker pattern applied to crafts | LOW | Series entity with member projects. Completion percentage. |
-| Multiple dashboard contexts (Main, Pattern Dive, Project, Shopping Cart) | Competitors have one view; this project has purpose-built dashboards for different tasks | HIGH | Each dashboard is a different "lens" on the same data. Pattern Dive alone is a killer feature. |
-| Gallery cards with status-specific layouts | No competitor changes card layout based on project status (WIP shows progress, Unstarted shows kitting needs, Finished shows completion photo) | MEDIUM | Three card variants. Contextual information density. |
-| Goal tracking with rotation management | Cross Stitch Journal has basic goals; no app offers rotation systems (Focus+Rotate, Milestone, Round Robin, etc.) | HIGH | Multiple rotation styles. This is deeply niche and valuable. |
-| Achievement/trophy system | Cross Stitch Journal has streaks; no cross-stitch app has a proper achievement system with auto-tracked milestones | MEDIUM | Gamification that rewards consistent stitching. Streaks, records, milestone trophies. |
-| Fabric size calculator integrated with projects | XStitch Plus has a standalone calculator; this project integrates it with project data and fabric inventory | LOW | Given stitch dimensions and fabric count, calculate required fabric size. Match to available fabric. |
-| Draggable widget dashboards | No competitor offers customizable dashboard layouts | HIGH | dnd-kit integration. User chooses and arranges widgets. Aspirational but high-impact. |
-| Stitch calendar view | Cross Stitch Journal shows some timeline data; a proper calendar (like GitHub contribution graph) is rare | MEDIUM | Monthly grid showing daily stitching activity by project. Visual and motivating. |
+| Per-colour stitch counts with automatic skein calculator | No cross-stitch tracker (app or spreadsheet) integrates per-colour stitch counts directly into the supply linking flow. The user enters stitch count per colour and the app auto-calculates skeins needed based on fabric count, strand count, and stitch type. This replaces manual math that stitchers currently do on thread-bare.com or PC Stitch. | HIGH | Schema already has `ProjectThread.stitchCount` field (default 0). Need: (1) per-colour stitch count input in supply tab, (2) skein calculation engine, (3) auto-populate `quantityRequired` from calculation, (4) manual override toggle. Formula: `skeinsNeeded = ceil(stitchCount / stitchesPerSkein)` where `stitchesPerSkein` varies by fabric count + strand count. See "Skein Calculator" section below. |
+| Status-specific card content | Unlike generic card grids, each card variant shows contextually relevant data. WIP cards show progress bar + last stitched. Unstarted cards show kitting checklist dots + prep pipeline. Finished cards show completion stats + celebration border. This surfaces the right info without clicking through. | HIGH | Already fully designed. Three card footer components with distinct layouts. The kitting dots (fulfilled/needed/not-applicable) provide at-a-glance supply readiness that no competing tool offers in card view. |
+| Kitting checklist dots on unstarted cards | Visual dots showing fabric/thread/beads/specialty fulfillment status -- check (fulfilled), circle (needed), dash (not-applicable). Users can immediately see what a project still needs without opening it. | MEDIUM | Part of the UnstartedCardData type. Requires computing kitting status from junction tables (do required supplies exist? are quantities met?). The `KittingItemStatus` enum is already defined. |
+| "Up Next" pill badge | Kitted projects flagged with `wantToStartNext: true` get a pulsing emerald "Up next" pill on their gallery card. Surfaces the user's intent without needing a separate queue view. | LOW | Already designed. Uses existing `Project.wantToStartNext` boolean. Just needs to render on the card when conditions are met. |
+| Celebration border on finished projects | Finished cards get a violet border; FFO cards get a rose border with glow shadow. Provides emotional reward for completing projects -- important for motivation in a hobby tracker. | LOW | Already designed with exact CSS. `celebrationBorder()` and `celebrationRing()` functions in GalleryCard.tsx design. |
+| Supply entry workflow rework (insertion order preservation) | Current supply entry loses insertion order -- items appear alphabetically or by ID. Stitchers enter supplies in chart order (reading the pattern page). Maintaining insertion order during entry makes it easier to verify nothing was skipped. | MEDIUM | Backlog item 999.0.7. The detail page can sort independently. Consider a `sortOrder` field on junction tables, or use `createdAt` ordering during entry mode. A dedicated "set up project" flow that combines chart creation + supply entry is a future consideration. |
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
-Features that seem good but create problems. Deliberately NOT building these.
-
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| Pattern viewer / markup tool | "One app to rule them all" -- combines viewing with management | Markup R-XP and Pattern Keeper are excellent at this and have years of development. Building a competitor is a massive scope expansion with little ROI. Users already have preferred markup apps. | Store which app a chart is loaded into. Link to digital working copy PDF for reference. Let specialized apps do what they do best. |
-| Pattern creation / photo conversion | Stitchly and MacStitch handle this. Users might ask. | Entirely different product category. Pattern creation requires sophisticated image processing, thread color matching algorithms, and stitch type support. | Out of scope. This is a management app, not a design tool. |
-| Social media direct posting | "Share my stats to Instagram" | API integrations are fragile, platform-dependent, and require ongoing maintenance. Instagram API is particularly restrictive. | Design stats pages and Year in Review to be screenshot-friendly. Social share card generation deferred to post-MVP. |
-| Real-time multi-user collaboration | "My stitching group wants to use this" | Adds enormous complexity (real-time sync, conflict resolution, permissions). Single-user is the stated priority. | Multi-user aware architecture now. Actual multi-user deferred to post-MVP. |
-| Thread stash inventory (total owned, not per-project) | Power users want "I own 5 skeins of DMC 310 total" | Adds a second inventory dimension that complicates the supply model and UI. Per-project tracking is the core need. | Architecture supports adding this later. Explicit future extension, not MVP. |
-| Offline-first PWA with service workers | "Log stitches without internet" | Service worker complexity, sync conflict resolution, and cache invalidation are significant engineering effort | Basic PWA (installable, home screen) in MVP. Offline deferred to Phase 5+. |
-| Automated rotation schedule generator | "Tell me what to stitch next based on my goals" | Requires understanding user preferences, project priorities, and scheduling constraints. AI-level complexity for marginal value. | Manual rotation management with multiple rotation styles. User sets the plan, app tracks adherence. |
-| Import from Notion | "Migrate my existing data" | Notion export format is complex and user-specific. The user is starting fresh with 500+ charts -- data entry is inevitable regardless. | No import in MVP. User adds charts progressively. Consider import/export in post-MVP. |
-| Barcode scanning for supplies | "Scan a DMC skein to add it" | Requires camera access, barcode database, and DMC doesn't standardize barcodes across retailers | Pre-seeded catalog with search-and-select is faster than scanning for most use cases. |
+| Advanced filter bar in M2 | The AdvancedFilterBar is designed (12 filter dimensions, dismissible chips). Tempting to ship with gallery cards. | 12 filter dimensions is massive scope. Needs dropdown options populated from DB (designers, genres, series, storage locations). Series and kitting status calculations don't exist yet. Shipping half-baked filters is worse than no filters. | Defer AdvancedFilterBar to M3 (Pattern Dive). For M2, provide: text search, status filter dropdown, size filter dropdown. These three cover 80% of browsing needs with 20% of the effort. |
+| Drag-and-drop card reordering | Users may want custom sort orders. Project management tools like Trello support this. | Requires persistent sort positions per view, per user. Complex state management for no clear user request. The project plan says "ideally drag-and-drop widgets" for dashboards, not for card ordering. | Provide sort-by options (name, date added, status, size, progress). Users can already find things via sort + search. |
+| Real-time collaborative editing | Multi-user awareness is an architectural constraint, but no second user exists. | Adds WebSocket complexity, conflict resolution, optimistic UI for something that's single-user. | Keep the single-user architecture. Multi-user can be added later if needed. |
+| Inline card editing | Quick-edit fields directly on gallery cards (status change, progress update). | Cards are already information-dense. Inline editing adds hover states, click targets, and form validation to every card. Breaks the "click through to detail" mental model. | Cards link to detail page. Status changes happen on detail page where full context is available. |
+| Auto-calculated kitting status | The design includes kitting percent and status computation. Tempting to build the full 8-condition kitting assessment. | PROJECT.md explicitly defers this: "8-condition status is complex; MVP tracks supplies without auto-computing 'kitted'". The conditions include digital copy, project bag, stash check, all threads, fabric, beads, specialty items, onion skinning. | Show simple supply fulfillment dots (have/need per supply type) without computing a composite "kitting %" status. The dots give 80% of the information. Full kitting calc is a future milestone. |
+| Collapsible projects in shopping list | Backlog item 999.0.12. The shopping list gets long fast with many projects. | This is a shopping list UX improvement, not a browse & organize feature. Including it bloats M2 scope. | Defer to a quick-fix sprint. The collapsible pattern is straightforward to add later. |
+
+## Skein Calculator Reference
+
+The skein calculator is the most technically interesting feature in M2. Here is the domain knowledge for implementation.
+
+### Core Formula
+
+```
+skeinsNeeded = ceil(colourStitchCount / adjustedStitchesPerSkein)
+```
+
+### Stitches Per Skein Lookup
+
+Based on research from thread-bare.com, The Fresh Cross Stitch, and Cross Stitch Style Arte. Values assume ideal conditions (no waste):
+
+| Fabric Count | 1 Strand | 2 Strands | 3 Strands |
+|-------------|----------|-----------|-----------|
+| 11ct        | 3,600    | 1,800     | 1,200     |
+| 14ct        | 5,000    | 2,500     | 1,667     |
+| 16ct        | 5,800    | 2,900     | 1,933     |
+| 18ct        | 6,600    | 3,300     | 2,200     |
+| 22ct        | 8,000    | 4,000     | 2,667     |
+| 25ct        | 9,000    | 4,500     | 3,000     |
+| 28ct        | 10,000   | 5,000     | 3,333     |
+| 32ct        | 12,000   | 6,000     | 4,000     |
+
+**Simplified formula (from The Fresh Cross Stitch):**
+```
+stitchesPerSkein = 17 * 2.5 * fabricCount * (6 / strands)
+```
+
+**Note on evenweave/linen:** Stitched "over two threads," so 28ct linen behaves like 14ct Aida. The effective count = fabric count / 2 for these fabric types. The app should auto-detect this based on fabric type (Linen, Lugana, Evenweave = over-two; Aida, Hardanger = over-one).
+
+### Waste Factor
+
+Apply a 20% waste reduction (conservative, accounts for thread starts/stops, knots, and confetti stitching):
+```
+adjustedStitchesPerSkein = stitchesPerSkein * 0.80
+```
+
+### Data Model Impact
+
+- `ProjectThread.stitchCount` already exists (Int, default 0) -- use this for per-colour stitch counts
+- Need new fields on Project or a project-level config: `fabricCount` (from linked Fabric), `strandCount` (new field, default 2), `stitchType` (cross/backstitch/mixed -- future)
+- The `quantityRequired` can be auto-calculated from stitchCount OR manually overridden
+- Need a `quantityAutoCalculated` boolean or similar to track whether the user manually set the value
+
+### UX Flow
+
+1. User links thread colours to project (existing flow)
+2. User enters stitch count per colour (new input alongside existing quantity fields)
+3. App auto-calculates `quantityRequired` (skeins) based on project's fabric count + strand count
+4. Calculated value shown with "(auto)" label; user can click to override manually
+5. If stitch count changes, recalculate unless manually overridden
+6. Sum of per-colour stitch counts shown as project total (validates against chart's total stitch count)
 
 ## Feature Dependencies
 
 ```
-[Auth] (foundation)
-    |
-    v
-[Project CRUD] (core entity)
-    |
-    +----> [Designer CRUD] (required for project metadata)
-    +----> [Genre management] (required for project tagging)
-    +----> [Status system] (required for project lifecycle)
-    +----> [Digital file storage] (R2 integration for chart PDFs)
-    |
-    v
-[Supply databases] (thread, bead, specialty)
-    |
-    +----> [DMC catalog pre-seed] (required for usable thread database)
-    +----> [Project-supply linking] (junction tables with quantities)
-    |          |
-    |          v
-    |      [Shopping list] (auto-generated from unfulfilled supplies)
-    |      [Kitting status calculation] (composite of supply + other conditions)
-    |
-    v
-[Stitch session logging] (requires projects to exist)
-    |
-    +----> [Progress tracking] (auto-updated from sessions)
-    +----> [Statistics engine] (aggregates session data)
-    |          |
-    |          +----> [Stitch calendar] (visualizes session data by day)
-    |          +----> [Bar charts] (monthly stitch totals)
-    |          +----> [Year in Review] (yearly stat summaries)
-    |
-    v
-[Gallery cards] (requires projects with images, statuses, progress)
-    |
-    +----> [Filter bar] (reusable across all browsing contexts)
-    +----> [Multiple view modes] (gallery/list/table)
-    |
-    v
-[Dashboards] (compose gallery cards, stats, filters)
-    |
-    +----> [Main Dashboard] (recently added, currently stitching, spotlight)
-    +----> [Pattern Dive] (deep library browser)
-    +----> [Project Dashboard] (active work tracking)
-    +----> [Shopping Cart dashboard] (aggregated supply needs)
-    |
-    v
-[Fabric CRUD] (independent entity, links to projects)
-[Series management] (independent entity, groups projects)
-[Storage locations] (simple metadata on projects)
-    |
-    v
-[Goals & Plans] (requires projects, sessions, progress)
-    |
-    +----> [Rotation management] (multiple rotation styles)
-    +----> [Achievement system] (auto-tracked milestones and streaks)
-    +----> [Scheduling] (start dates, recurring days, seasonal focus)
+[Storage Location CRUD]
+    +-- enables --> [Gallery Card: storage location display]
+    +-- enables --> [View mode filter by storage location (M3)]
+
+[Wire Fabric Selector]
+    +-- enables --> [Skein Calculator: fabric count auto-detection]
+    +-- enables --> [Gallery Card: fabric needs display on Unstarted cards]
+
+[Per-Colour Stitch Counts]
+    +-- requires --> [Existing supply linking (done in v1.0)]
+    +-- enables --> [Skein Calculator auto-calculation]
+    +-- enables --> [Gallery Card: supply summary counts]
+
+[Complete DMC Catalog]
+    +-- enables --> [Per-Colour Stitch Counts: all colours available for linking]
+    +-- standalone data migration, no code dependencies
+
+[Gallery Cards]
+    +-- requires --> [Status-specific data queries]
+    +-- requires --> [Cover image URLs (done in v1.0)]
+    +-- enhanced-by --> [Storage Location CRUD]
+    +-- enhanced-by --> [Wire Fabric Selector]
+
+[View Mode Toggle]
+    +-- requires --> [Gallery Cards]
+    +-- includes --> [List view + Table view with sorting]
+
+[Cover Image Aspect Ratio Fix]
+    +-- standalone CSS fix, no dependencies
+
+[Thread Picker Scroll UX Fix]
+    +-- standalone UX fix, no dependencies
 ```
 
 ### Dependency Notes
 
-- **Project CRUD is the foundation for everything** -- nothing else works without projects. Must be solid before building supply or session features.
-- **Supply databases must exist before project-supply linking** -- DMC pre-seed is the first thing to load.
-- **Session logging requires projects** -- but not supplies. Sessions and supplies are independent feature tracks that can be built in parallel after projects exist.
-- **Statistics engine requires session data** -- needs enough sessions logged to be meaningful. Statistics queries should be performant even with years of data.
-- **Gallery cards and dashboards are presentation layers** -- they compose data from projects, supplies, sessions, and stats. They come last but deliver the most visible value.
-- **Goals/plans/rotations are the capstone** -- they require all other systems to be working. Most complex behavioral features, least critical for day-one use.
+- **Gallery Cards require status-specific data queries:** The card variants need computed fields (progress %, kitting item status, supply counts) that don't exist in current chart queries. Need new server-side data aggregation.
+- **Skein Calculator benefits from Fabric Selector:** If fabric is linked, the calculator can auto-detect fabric count. Without it, user must manually enter fabric count per project.
+- **DMC Catalog completion is independent:** Pure data task. Should be done early so per-colour stitch counts work with all colours from the start.
+- **Bug fixes are independent:** Cover image aspect ratio and thread picker scroll are isolated CSS/JS fixes that can happen anytime.
 
-## MVP Definition
+## Phase Recommendations
 
-### Launch With (v1)
+### Phase 5a: Foundation & Data (ship first)
 
-Minimum viable product -- what's needed to validate that this is better than Notion on day one.
+Build the data infrastructure that other features depend on.
 
-- [ ] Auth (single-user) -- protect the data
-- [ ] Project CRUD with full metadata -- the core entity with ~50 fields
-- [ ] Designer CRUD and linking -- essential project metadata
-- [ ] Genre management (taggable) -- essential for filtering
-- [ ] Status system (7 statuses) -- project lifecycle tracking
-- [ ] Digital file upload/storage -- chart PDFs to R2
-- [ ] Size category auto-calculation -- derived from stitch count
-- [ ] SAL support (multi-part charts) -- unique need not served elsewhere
-- [ ] Basic gallery/list/table views -- browse the collection
-- [ ] Basic filtering and sorting -- find projects quickly
-- [ ] Responsive layout (Mac + iPhone) -- usable on both devices
-- [ ] PWA installable -- home screen icon on iPhone
+- [ ] Complete DMC catalog (data migration) -- unblocks accurate supply linking
+- [ ] Storage Location CRUD (new Prisma model + pages) -- unblocks gallery card location display and replaces hacky hardcoded arrays
+- [ ] Wire fabric selector into chart form -- unblocks skein calculator auto-detection
+- [ ] Cover image aspect ratio fix -- quick win, visible improvement
+- [ ] Thread colour picker scroll UX fix -- quick win, UX improvement
 
-### Add After Validation (v1.x)
+### Phase 5b: Gallery & Views (ship second)
 
-Features to add once core project management is working and charts are being entered.
+Build the visible browsing experience that defines M2.
 
-- [ ] DMC thread catalog (pre-seeded ~500 colors) -- enables supply tracking
-- [ ] Bead and specialty item databases -- complete the supply ecosystem
-- [ ] Project-supply linking with quantities -- the supply management system
-- [ ] Auto-generated shopping list -- the #1 pain point from Notion
-- [ ] Kitting status auto-calculation -- the key composite status
-- [ ] Stitch session logging (quick-log flow) -- daily use feature
-- [ ] Progress tracking (auto-update from sessions) -- the feedback loop
-- [ ] Basic statistics (daily/weekly/monthly/yearly) -- motivational data
-- [ ] Monthly stitch bar charts -- visual statistics
-- [ ] Stitch calendar view -- daily activity visualization
-- [ ] Session history table -- raw data access
+- [ ] Gallery card components (three status-specific variants)
+- [ ] Status-specific data queries (progress %, kitting dots, supply counts)
+- [ ] Gallery grid with responsive card layout
+- [ ] List view (compact rows)
+- [ ] Table view with column sorting
+- [ ] View mode toggle with URL param persistence
+- [ ] Basic search + status/size filters (NOT the full AdvancedFilterBar)
+- [ ] Empty state for no results
 
-### Future Consideration (v2+)
+### Phase 5c: Skein Calculator & Supply Workflow (ship third)
 
-Features to defer until the core is solid and daily use is established.
+The most complex feature, depends on fabric selector being wired.
 
-- [ ] Comprehensive statistics engine (Year in Review, 8 stat sections) -- high value but high complexity
-- [ ] Fabric CRUD with brand management and size calculator -- useful but not blocking
-- [ ] Series/collection management with completion tracking -- nice organizational feature
-- [ ] Storage location management -- simple metadata, low priority
-- [ ] Full dashboard system (Main, Pattern Dive, Project, Shopping Cart) -- the vision, but needs all other systems first
-- [ ] Custom gallery cards by status (3 layouts) -- polish feature
-- [ ] Draggable widget dashboards -- aspirational, high complexity
-- [ ] Goal tracking (project-specific and global) -- capstone feature
-- [ ] Rotation management (6 styles) -- deeply niche, high value for power users
-- [ ] Achievement trophy case -- gamification layer
-- [ ] Scheduling plans -- recurring days, seasonal focus
+- [ ] Per-colour stitch count input in supply tab
+- [ ] Skein calculation engine (lookup table + waste factor)
+- [ ] Auto-populate quantityRequired from calculation
+- [ ] Manual override toggle for quantityRequired
+- [ ] Project-level strandCount field (default 2)
+- [ ] Sum validation (per-colour totals vs chart total stitch count)
+- [ ] Supply entry ordering improvements
 
 ## Feature Prioritization Matrix
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Project CRUD with rich metadata | HIGH | HIGH | P1 |
-| Status system (7 statuses) | HIGH | LOW | P1 |
-| Designer/genre management | HIGH | LOW | P1 |
-| Digital file upload (R2) | HIGH | MEDIUM | P1 |
-| Gallery/list/table views | HIGH | MEDIUM | P1 |
-| Filtering and sorting | HIGH | MEDIUM | P1 |
-| DMC catalog pre-seed | HIGH | LOW | P1 |
-| Project-supply linking | HIGH | MEDIUM | P1 |
-| Shopping list (auto-generated) | HIGH | MEDIUM | P1 |
-| Stitch session logging | HIGH | LOW | P1 |
-| Progress tracking | HIGH | LOW | P1 |
-| Kitting status calculation | HIGH | HIGH | P1 |
-| Basic statistics | HIGH | MEDIUM | P2 |
-| Monthly bar charts | MEDIUM | LOW | P2 |
-| Stitch calendar | MEDIUM | MEDIUM | P2 |
-| SAL support | MEDIUM | MEDIUM | P2 |
-| Series management | MEDIUM | LOW | P2 |
-| Fabric CRUD + calculator | MEDIUM | MEDIUM | P2 |
-| Year in Review | HIGH | HIGH | P2 |
-| Custom gallery cards | MEDIUM | MEDIUM | P2 |
-| Full dashboard system | HIGH | HIGH | P2 |
-| Storage locations | LOW | LOW | P3 |
-| Goal tracking | MEDIUM | HIGH | P3 |
-| Rotation management | MEDIUM | HIGH | P3 |
-| Achievements/trophies | MEDIUM | MEDIUM | P3 |
-| Draggable widgets | LOW | HIGH | P3 |
-| Scheduling plans | LOW | MEDIUM | P3 |
+| Gallery cards (3 variants) | HIGH | HIGH | P1 |
+| View mode toggle (gallery/list/table) | HIGH | MEDIUM | P1 |
+| Table sorting | HIGH | LOW | P1 |
+| Storage location CRUD | HIGH | MEDIUM | P1 |
+| Wire fabric selector | HIGH | LOW | P1 |
+| Complete DMC catalog | MEDIUM | LOW | P1 |
+| Per-colour stitch counts | HIGH | MEDIUM | P1 |
+| Skein calculator | HIGH | MEDIUM | P1 |
+| Cover image aspect ratio fix | MEDIUM | LOW | P1 |
+| Thread picker scroll fix | MEDIUM | LOW | P1 |
+| Supply entry order preservation | MEDIUM | MEDIUM | P2 |
+| Basic search/filters | MEDIUM | MEDIUM | P1 |
+| "Up Next" pill badge | LOW | LOW | P1 (trivial, designed) |
+| Celebration borders | LOW | LOW | P1 (trivial, designed) |
+| Advanced filter bar (12 dimensions) | MEDIUM | HIGH | P3 (defer to M3) |
+| Collapsible shopping list projects | MEDIUM | LOW | P3 (defer to quick-fix) |
 
 **Priority key:**
-- P1: Must have -- core functionality that makes the app usable and better than Notion
-- P2: Should have -- features that make the app genuinely powerful and differentiated
-- P3: Nice to have -- polish and advanced features for power-user delight
+- P1: Must have for M2 launch
+- P2: Should have, add if time allows
+- P3: Defer to later milestone or quick-fix
 
 ## Competitor Feature Analysis
 
-| Feature | Cross Stitch Journal | XStitch Plus | StitchPal | Pattern Keeper | This Project |
-|---------|---------------------|--------------|-----------|----------------|--------------|
-| Project management | Basic (5 stages) | Charts + journal | Patterns + progress | Pattern viewing only | Full lifecycle with ~50 fields, SAL, series |
-| Supply inventory | Basic supply tracking | Pre-loaded DMC, Mill Hill, linens | None | Thread list from pattern | Pre-seeded DMC, beads, specialty. Per-project quantities. |
-| Shopping list | None | Yes (limited -- no stash awareness) | None | None | Auto-generated from unfulfilled supplies across all projects |
-| Session logging | Timer + date/count/photo | Journal entries | Daily progress reports | None | Quick-log: date, project, count, photo, time |
-| Statistics | Streaks, quarterly stats, progress charts | None | Basic progress | None | Comprehensive: daily through yearly, Year in Review, supply stats, completion brackets |
-| Goals | Quarterly/semiannual goals, widget | None | None | None | Project-specific + global goals, milestone targets, frequency goals, deadlines |
-| Kitting tracking | None | Partial (inventory awareness) | None | None | Auto-calculated composite status with progress indicator |
-| Multiple views | Project list | Charts, threads, linens, embellishments | Pattern list | Pattern grid | Gallery cards (3 layouts), list, table with advanced filtering |
-| Dashboards | Stats page | None | None | None | 4 purpose-built dashboards + customizable widgets |
-| Rotation/scheduling | None | None | None | None | 6 rotation styles, scheduling, seasonal focus |
-| Achievements | Streaks only | None | None | None | Trophy case, auto-tracked milestones, streaks, records |
-| Platform | iOS only | iOS + Android | iOS + Android + Windows | Android (iOS coming) | Web (PWA) -- all platforms |
-| Pricing | Free + IAP | $9.99/yr subscription | Free + premium sync | One-time $10.50 | Self-hosted, free |
+| Feature | Notion (current system) | XStitch Plus | Ravelry | Our Approach |
+|---------|------------------------|-------------|---------|--------------|
+| Gallery cards | Basic gallery view, no status-specific content | Project thumbnails only | Pattern thumbnails with metadata | Status-specific cards with progress bars, kitting dots, celebration borders |
+| View modes | Gallery, list, table, board, calendar | Single list view | Grid + list | Gallery/list/table with toggle, URL persistence |
+| Storage location | Dropdown property (flat) | Not available | Not applicable | Dedicated CRUD with project count, detail view showing assigned projects |
+| Fabric linking | Relation property | Not available | Yarn weight filters | SearchableSelect dropdown, auto-detect fabric count for calculations |
+| Skein calculator | Manual formula in notes | Not available | Yardage calculator (yarn) | Integrated per-colour calculation with auto-populate, linked to fabric count |
+| Supply tracking | Relation + rollup properties (slow, fragile) | Floss inventory only | Stash tracking (yarn) | Three junction tables with quantities, fulfillment indicators, shopping list generation |
+| Per-colour stitch counts | Manual entry in each relation record | Not available | Not available | Inline entry in supply tab with sum validation against total |
 
 ## Sources
 
-- [Lord Libidan: 23 Best Apps for Cross Stitchers](https://lordlibidan.com/the-best-apps-for-cross-stitchers/) -- comprehensive app roundup (MEDIUM confidence)
-- [Sirious Stitches: Inventory Tracking](https://sirithre.com/inventory-tracking-cross-stitch-patterns-wips-and-materials/) -- real stitcher workflow analysis (MEDIUM confidence)
-- [Cross Stitch Journal on App Store](https://apps.apple.com/us/app/cross-stitch-journal/id6443886471) -- feature list and reviews (HIGH confidence)
-- [XStitch Plus on App Store](https://apps.apple.com/us/app/xstitch-plus/id1281394467) -- feature list (HIGH confidence)
-- [StitchPal on App Store](https://apps.apple.com/us/app/stitchpal/id1550536005) -- feature list (HIGH confidence)
-- [Thread Bare](https://thread-bare.app/) -- pattern viewer + tracker (MEDIUM confidence)
-- [Stitchly Features](https://stitchly.com/features/) -- pattern creation app (HIGH confidence)
-- [Pattern Keeper](https://patternkeeper.app/) -- markup app (HIGH confidence)
-- [MyCozyApp](https://mycozyapp.com/) -- newer entrant, early-stage (MEDIUM confidence)
-- [Ravelry Getting Started](https://www.ravelry.com/tour/getting-started) -- gold standard craft platform for knitting/crochet (HIGH confidence)
-- [The Fresh Cross Stitch: 7 Must-Have Apps](https://thefreshcrossstitch.com/blogs/tips-and-resources/7-must-have-apps-for-your-cross-stitch-and-embroidery) -- app recommendations (MEDIUM confidence)
-- [Cross Stitch Forum discussions](https://www.crossstitchforum.com/) -- community sentiment on tracking needs (LOW confidence)
+- [Thread-Bare Skein Estimator](https://www.thread-bare.com/tools/cross-stitch-skein-estimator) -- skein calculation methodology
+- [The Fresh Cross Stitch Thread Calculator](https://thefreshcrossstitch.com/blogs/tips-and-resources/thread-calculator-how-much-thread-do-i-need) -- stitches per skein formula: `17 * 2.5 * fabric_count * (6 / strands)`
+- [Cross Stitch Style Arte](https://crossstitchstylearte.com/how-to-calculate-the-exact-amount-of-thread-needed-for-any-cross-stitch-project/) -- stitches per skein by fabric count reference
+- [Lord Libidan Skein Calculator](https://lordlibidan.com/calculate-the-number-of-required-skeins/) -- empirical skein yield data
+- [Stitchmate Thread Calculator](https://stitchmate.app/tools/thread-usage-calculator) -- cross-reference on calculation approach
+- [Stash App DeepWiki](https://deepwiki.com/stashapp/stash/3.5-list-and-grid-views) -- list/grid view design patterns (URL persistence, zoom levels, selection management)
+- [Sirious Stitches Inventory Tracking](https://sirithre.com/inventory-tracking-cross-stitch-patterns-wips-and-materials/) -- cross-stitch inventory management patterns
+- Existing DesignOS designs in `product-plan/sections/gallery-cards-and-advanced-filtering/` -- authoritative UI spec
+- Existing DesignOS designs in `product-plan/sections/fabric-series-and-reference-data/` -- storage location UI spec
 
 ---
-*Feature research for: Cross-stitch project management and craft inventory tracking*
-*Researched: 2026-03-28*
+*Feature research for: Cross-stitch project management -- Milestone 2: Browse & Organize*
+*Researched: 2026-04-11*
