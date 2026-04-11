@@ -4,6 +4,7 @@ const FABRIC_TYPES = [
   "Aida",
   "Linen",
   "Lugana",
+  "Jobelan",
   "Evenweave",
   "Hardanger",
   "Congress Cloth",
