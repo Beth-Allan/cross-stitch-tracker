@@ -72,31 +72,31 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| GLRY-01 | — | Pending |
-| GLRY-02 | — | Pending |
-| GLRY-03 | — | Pending |
-| GLRY-04 | — | Pending |
-| GLRY-05 | — | Pending |
-| STOR-01 | — | Pending |
-| STOR-02 | — | Pending |
-| STOR-03 | — | Pending |
-| STOR-04 | — | Pending |
-| PROJ-01 | — | Pending |
-| PROJ-02 | — | Pending |
-| CALC-01 | — | Pending |
-| CALC-02 | — | Pending |
-| CALC-03 | — | Pending |
-| CALC-04 | — | Pending |
-| CALC-05 | — | Pending |
-| SUPP-01 | — | Pending |
-| SUPP-02 | — | Pending |
-| SUPP-03 | — | Pending |
+| GLRY-01 | Phase 6 | Pending |
+| GLRY-02 | Phase 6 | Pending |
+| GLRY-03 | Phase 6 | Pending |
+| GLRY-04 | Phase 6 | Pending |
+| GLRY-05 | Phase 6 | Pending |
+| STOR-01 | Phase 5 | Pending |
+| STOR-02 | Phase 5 | Pending |
+| STOR-03 | Phase 5 | Pending |
+| STOR-04 | Phase 5 | Pending |
+| PROJ-01 | Phase 5 | Pending |
+| PROJ-02 | Phase 5 | Pending |
+| CALC-01 | Phase 7 | Pending |
+| CALC-02 | Phase 7 | Pending |
+| CALC-03 | Phase 7 | Pending |
+| CALC-04 | Phase 7 | Pending |
+| CALC-05 | Phase 7 | Pending |
+| SUPP-01 | Phase 7 | Pending |
+| SUPP-02 | Phase 5 | Pending |
+| SUPP-03 | Phase 5 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 19 total
-- Mapped to phases: 0
-- Unmapped: 19
+- Mapped to phases: 19
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-11*
-*Last updated: 2026-04-11 after initial definition*
+*Last updated: 2026-04-11 after roadmap creation*
