@@ -144,9 +144,10 @@ describe("genre-actions", () => {
 
   describe("deleteGenre", () => {
     it("calls $transaction to disconnect charts then delete", async () => {
-      mockPrisma.genre.findUnique.mockResolvedValueOnce(
-        createMockGenre({ id: "g1", _count: { charts: 2 } } as Partial<any>),
-      );
+      mockPrisma.genre.findUnique.mockResolvedValueOnce({
+        ...createMockGenre({ id: "g1" }),
+        _count: { charts: 2 },
+      });
       mockPrisma.$transaction.mockResolvedValueOnce([{}, {}]);
       const { deleteGenre } = await import("./genre-actions");
 

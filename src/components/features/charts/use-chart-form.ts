@@ -28,7 +28,6 @@ export interface ChartFormValues {
   isSAL: boolean;
   notes: string;
   status: ProjectStatus;
-  fabricId: string | null;
   projectBin: string | null;
   ipadApp: string | null;
   needsOnionSkinning: boolean;
@@ -86,7 +85,6 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
       isSAL: false,
       notes: "",
       status: "UNSTARTED" as ProjectStatus,
-      fabricId: null,
       projectBin: null,
       ipadApp: null,
       needsOnionSkinning: false,
@@ -117,7 +115,6 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
     isSAL: data.isSAL,
     notes: data.notes ?? "",
     status: (project?.status ?? "UNSTARTED") as ProjectStatus,
-    fabricId: project?.fabricId ?? null,
     projectBin: project?.projectBin ?? null,
     ipadApp: project?.ipadApp ?? null,
     needsOnionSkinning: project?.needsOnionSkinning ?? false,
@@ -200,7 +197,6 @@ export function useChartForm({
         },
         project: {
           status: values.status,
-          fabricId: values.fabricId,
           projectBin: values.projectBin,
           ipadApp: values.ipadApp,
           needsOnionSkinning: values.needsOnionSkinning,
@@ -237,8 +233,7 @@ export function useChartForm({
           }
           onSuccess(initialData!.id);
         }
-      } catch (error) {
-        console.error("Chart form submission error:", error);
+      } catch {
         setErrors({ _form: "An unexpected error occurred" });
       } finally {
         setIsPending(false);

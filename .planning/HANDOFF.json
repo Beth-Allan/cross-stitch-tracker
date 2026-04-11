@@ -1,53 +1,55 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-07T23:10:15.608Z",
-  "phase": "02",
-  "phase_name": "core-project-management",
-  "phase_dir": ".planning/phases/02-core-project-management",
-  "plan": 5,
-  "task": 0,
-  "total_tasks": 1,
+  "timestamp": "2026-04-11T03:13:35.070Z",
+  "phase": "04",
+  "phase_name": "supplies-fabric",
+  "phase_dir": ".planning/phases/04-supplies-fabric",
+  "plan": null,
+  "task": null,
+  "total_tasks": null,
   "status": "paused",
   "completed_tasks": [
-    {"id": "02-01", "name": "Data Foundation (Prisma schema, R2 client, validations, types)", "status": "done", "commit": "a1164c4"},
-    {"id": "02-02", "name": "Server Actions (chart CRUD, uploads, designer/genre creation)", "status": "done", "commit": "70859d2"},
-    {"id": "02-03", "name": "Chart Form UI (~50 fields, uploads, inline entity creation)", "status": "done", "commit": "039840b"},
-    {"id": "02-04", "name": "Chart Detail & List Pages (badges, status control, detail/list views)", "status": "done", "commit": "0b24172"},
-    {"id": "02-05-merge", "name": "Merge PR #2 (chart form rebuild + review fixes)", "status": "done", "commit": "c30d920"},
-    {"id": "roadmap", "name": "Roadmap restructure to lean MVP (4 milestones, 10 phases)", "status": "done", "commit": "uncommitted"}
+    {"id": "04-01", "name": "Schema, types, validations, seed data", "status": "done"},
+    {"id": "04-02", "name": "Supply server actions", "status": "done"},
+    {"id": "04-03", "name": "Fabric server actions", "status": "done"},
+    {"id": "04-04", "name": "Supply catalog UI", "status": "done"},
+    {"id": "04-05", "name": "Fabric management UI", "status": "done"},
+    {"id": "04-06", "name": "Project-supply linking UI", "status": "done"},
+    {"id": "04-07", "name": "Shopping list + nav", "status": "done"},
+    {"id": "debug-1", "name": "Fix Prisma findMany crash on /supplies", "status": "done"},
+    {"id": "uat-backlog", "name": "Added 4 backlog items (detail modal, bulk editor, fabric hierarchy, supplies tab)", "status": "done"},
+    {"id": "uat-jobelan", "name": "Added Jobelan to FABRIC_TYPES dropdown", "status": "done"}
   ],
   "remaining_tasks": [
-    {"id": "cleanup", "name": "Migrate docs/conventions/ to .claude/rules/ with glob patterns", "status": "not_started"},
-    {"id": "02-05", "name": "Phase 2 human verification (test chart lifecycle in browser)", "status": "not_started"},
-    {"id": "03-discuss", "name": "Discuss + plan Phase 3 (Designer & Genre pages)", "status": "not_started"},
-    {"id": "04-discuss", "name": "Discuss + plan Phase 4 (Supplies & Fabric)", "status": "not_started"}
+    {"id": "bug-2", "name": "Add 'Manage Brands' link from /supplies page", "status": "not_started"},
+    {"id": "bug-3", "name": "Filter brand dropdown in supply form modal by active tab supply type", "status": "not_started"},
+    {"id": "bug-4", "name": "Add edit affordance (hover icon/effect) to supply grid tiles", "status": "not_started"},
+    {"id": "bug-6", "name": "Fix fabric size calculation — uses stitch counts as inches instead of dividing by fabric count", "status": "not_started"},
+    {"id": "bug-7", "name": "Fix shopping list project link 404 — projectId vs chart id mismatch", "status": "not_started"},
+    {"id": "bug-8", "name": "Change 'Got' label to 'Have' in project supplies tab", "status": "not_started"},
+    {"id": "gate-review", "name": "Code review gate (gsd:code-review)", "status": "not_started"},
+    {"id": "gate-regression", "name": "Regression gate (prior phase tests)", "status": "not_started"},
+    {"id": "gate-verification", "name": "Phase verification (gsd:verify-work)", "status": "not_started"},
+    {"id": "gate-uat", "name": "Human UAT re-test after bug fixes", "status": "not_started"}
   ],
-  "blockers": [
-    {"description": "R2 not configured — uploads degrade gracefully", "type": "external", "workaround": "Upload tests skip if R2 env vars not set"},
-    {"description": ".env.local bcrypt hashes must escape $ as \\$", "type": "technical", "workaround": "Documented in CLAUDE.md"}
-  ],
+  "blockers": [],
   "human_actions_pending": [
-    {"action": "Run Phase 2 human verification (02-05-PLAN.md)", "context": "Test full chart CRUD lifecycle in browser before marking Phase 2 complete", "blocking": true}
+    {
+      "action": "Re-test all 7 UAT areas after bug fixes are applied",
+      "context": "Initial UAT found 8 issues, 2 deferred to backlog, 6 bugs to fix",
+      "blocking": false
+    }
   ],
   "decisions": [
-    {"decision": "MVP restructure: 4 milestones, 10 phases", "rationale": "Ship lean MVP faster — CRUD + supplies + fabric, then deploy and iterate", "phase": "all"},
-    {"decision": "Designer/genre pages in MVP (Phase 3)", "rationale": "User wants proper management from the start", "phase": "03"},
-    {"decision": "Fabric bundled with supplies (Phase 4)", "rationale": "Both are stuff linked to projects; fabric needed for kitting assessment", "phase": "04"},
-    {"decision": "Pre-seeded DMC catalog in MVP", "rationale": "Search-and-select is the Notion-beater", "phase": "04"},
-    {"decision": "Sessions after browsing/dashboards", "rationale": "Collection-level stats don't need sessions; activity stats do", "phase": "08"},
-    {"decision": "Kitting auto-calc + SAL deferred", "rationale": "Complexity not needed for MVP data entry", "phase": "deferred"},
-    {"decision": "docs/conventions/ should migrate to .claude/rules/", "rationale": "Rules auto-load via globs; docs require manual dispatch table in CLAUDE.md", "phase": "cleanup"}
+    {"decision": "Cherry-picked worktree commits instead of merging branches", "rationale": "Worktree merge had fast-forward detection issues", "phase": "04"},
+    {"decision": "Fixed React 19 ESLint violations with idiomatic patterns", "rationale": "Lazy initializer for localStorage, key-based remount for form reset", "phase": "04"},
+    {"decision": "Prisma findMany crash was stale globalThis singleton, not schema drift", "rationale": "Dev server restart fixed it — no code change needed", "phase": "04"},
+    {"decision": "Supply detail modal deferred to post-MVP (backlog 999.1)", "rationale": "Edit-first is fine for MVP; detail view adds value once supplies are linked to real projects", "phase": "04"},
+    {"decision": "Bulk supply editor deferred to post-MVP (backlog 999.2)", "rationale": "One-at-a-time management works for MVP; bulk editing matters for 50+ thread kitting", "phase": "04"},
+    {"decision": "Fabric type hierarchy deferred to post-MVP (backlog 999.3)", "rationale": "Flat dropdown with Jobelan added covers MVP; hierarchy matters once collection grows", "phase": "04"},
+    {"decision": "Project supplies tab layout deferred to post-MVP (backlog 999.4)", "rationale": "Inline display works for MVP; tabs become valuable when sessions are added in Milestone 3", "phase": "04"}
   ],
-  "uncommitted_files": [
-    "CLAUDE.md",
-    ".planning/ROADMAP.md",
-    ".planning/REQUIREMENTS.md",
-    ".planning/PROJECT.md",
-    ".planning/STATE.md",
-    ".planning/DESIGN-REFERENCE.md",
-    ".claude/rules/ui-design-reference.md",
-    "docs/tech-stack.md"
-  ],
-  "next_action": "Commit roadmap restructure, then migrate docs/conventions/ to .claude/rules/, then Phase 2 human verification, then discuss Phases 3+4",
-  "context_notes": "Roadmap restructure complete but uncommitted. All 8 governing/reference files updated with new phase numbers. 40 requirement IDs verified (37 mapped, 3 deferred). Build passes. GSD plugin files also have unstaged changes from a separate update — don't mix with roadmap commit."
+  "uncommitted_files": ["src/types/fabric.ts", ".planning/backlog/", ".planning/debug/", "next-env.d.ts"],
+  "next_action": "Fix 6 UAT bugs (brand nav, brand filter, grid hover, fabric calc, project link 404, Got→Have label), then run post-execution gates (code review, verification, UAT re-test)",
+  "context_notes": "All 7 plans executed and working. First UAT pass found 8 issues: 2 deferred to backlog, 6 bugs to fix. The Prisma crash was a stale singleton (dev server restart fixed it, no code change). Bug details are well-documented in .continue-here.md with file paths and line numbers from the Explore agent investigation."
 }

@@ -62,7 +62,10 @@ describe("designer-actions", () => {
 
   describe("createDesigner", () => {
     it("creates a designer with notes field and returns success", async () => {
-      const mockDesigner = createMockDesigner({ name: "Shannon Christine", notes: "Great designs" });
+      const mockDesigner = createMockDesigner({
+        name: "Shannon Christine",
+        notes: "Great designs",
+      });
       mockPrisma.designer.create.mockResolvedValueOnce(mockDesigner);
       const { createDesigner } = await import("./designer-actions");
 
@@ -145,9 +148,10 @@ describe("designer-actions", () => {
 
   describe("deleteDesigner", () => {
     it("calls $transaction to unlink charts then delete", async () => {
-      mockPrisma.designer.findUnique.mockResolvedValueOnce(
-        createMockDesigner({ id: "d1", _count: { charts: 3 } } as Partial<any>),
-      );
+      mockPrisma.designer.findUnique.mockResolvedValueOnce({
+        ...createMockDesigner({ id: "d1" }),
+        _count: { charts: 3 },
+      });
       mockPrisma.$transaction.mockResolvedValueOnce([{}, {}]);
       const { deleteDesigner } = await import("./designer-actions");
 

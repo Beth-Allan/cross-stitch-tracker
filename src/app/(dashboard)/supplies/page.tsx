@@ -1,12 +1,43 @@
-import { Package } from "lucide-react";
-import { PlaceholderPage } from "@/components/placeholder-page";
+import {
+  getThreads,
+  getBeads,
+  getSpecialtyItems,
+  getSupplyBrands,
+} from "@/lib/actions/supply-actions";
+import { SupplyCatalog } from "@/components/features/supplies/supply-catalog";
 
-export default function SuppliesPage() {
+export default async function SuppliesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string }>;
+}) {
+  const [threads, beads, specialtyItems, brands, params] = await Promise.all([
+    getThreads(),
+    getBeads(),
+    getSpecialtyItems(),
+    getSupplyBrands(),
+    searchParams,
+  ]);
+
+  const initialView = params.view === "table" || params.view === "grid" ? params.view : undefined;
+
   return (
-    <PlaceholderPage
-      title="Supplies"
-      description="Thread, fabric, and everything in between. Keep track of what you have and what you need."
-      icon={Package}
-    />
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="font-heading text-2xl font-semibold">Supply Catalog</h1>
+        <p className="text-muted-foreground mt-1 text-sm">
+          Browse and manage your thread, bead, and specialty item collections.
+        </p>
+      </div>
+
+      <SupplyCatalog
+        threads={threads}
+        beads={beads}
+        specialtyItems={specialtyItems}
+        brands={brands}
+        initialView={initialView}
+      />
+    </div>
   );
 }

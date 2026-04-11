@@ -14,15 +14,12 @@ import {
   FileText,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { SizeBadge } from "@/components/features/charts/size-badge";
 import { DesignerFormModal } from "./designer-form-modal";
 import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
 import { deleteDesigner } from "@/lib/actions/designer-actions";
-import {
-  getEffectiveStitchCount,
-} from "@/lib/utils/size-category";
+import { getEffectiveStitchCount } from "@/lib/utils/size-category";
 import type { DesignerDetail as DesignerDetailType, DesignerChart } from "@/types/designer";
 
 /* ---- Types ---- */
@@ -63,9 +60,7 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
 
   function handleSort(key: ChartSortKey) {
     setChartSort((prev) =>
-      prev.key === key
-        ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
-        : { key, dir: "asc" },
+      prev.key === key ? { key, dir: prev.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" },
     );
   }
 
@@ -140,9 +135,7 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
               className="text-primary hover:text-primary/80 mt-1 inline-flex items-center gap-1.5 text-sm transition-colors"
               aria-label={`Visit ${designer.name} website`}
             >
-              {designer.website
-                .replace(/^https?:\/\/(www\.)?/, "")
-                .replace(/\/$/, "")}
+              {designer.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
               <ExternalLink className="h-4 w-4" />
             </a>
           )}
@@ -183,17 +176,13 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
         <StatItem label="Started" value={designer.projectsStarted} />
         <StatItem label="Finished" value={designer.projectsFinished} accent />
         <div>
-          <p className="text-muted-foreground text-xs uppercase tracking-wider">
-            Top Genre
-          </p>
+          <p className="text-muted-foreground text-xs tracking-wider uppercase">Top Genre</p>
           {designer.topGenre ? (
             <span className="mt-0.5 inline-flex rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
               {designer.topGenre}
             </span>
           ) : (
-            <p className="text-muted-foreground text-lg font-semibold">
-              &mdash;
-            </p>
+            <p className="text-muted-foreground text-lg font-semibold">&mdash;</p>
           )}
         </div>
       </div>
@@ -202,7 +191,7 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
       <div>
         {/* Section header with sort pills */}
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-muted-foreground text-xs font-semibold uppercase tracking-widest">
+          <span className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
             Charts ({designer.charts.length})
           </span>
           <div className="flex items-center gap-1">
@@ -245,9 +234,7 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
         ) : (
           <div className="py-12 text-center">
             <FileText className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
-            <p className="text-muted-foreground text-sm">
-              No charts found for this designer
-            </p>
+            <p className="text-muted-foreground text-sm">No charts found for this designer</p>
           </div>
         )}
       </div>
@@ -281,25 +268,11 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
 
 /* ---- Stat Item ---- */
 
-function StatItem({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: number;
-  accent?: boolean;
-}) {
+function StatItem({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
   return (
     <div>
-      <p className="text-muted-foreground text-xs uppercase tracking-wider">
-        {label}
-      </p>
-      <p
-        className={`text-lg font-semibold ${
-          accent ? "text-primary" : "text-foreground"
-        }`}
-      >
+      <p className="text-muted-foreground text-xs tracking-wider uppercase">{label}</p>
+      <p className={`text-lg font-semibold ${accent ? "text-primary" : "text-foreground"}`}>
         {value}
       </p>
     </div>
@@ -328,6 +301,7 @@ function ChartRow({ chart }: { chart: DesignerChart }) {
       {/* Thumbnail */}
       {chart.coverThumbnailUrl ? (
         <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={chart.coverThumbnailUrl}
             alt={chart.name}
@@ -342,9 +316,7 @@ function ChartRow({ chart }: { chart: DesignerChart }) {
 
       {/* Info */}
       <div className="min-w-0 flex-1">
-        <p className="text-foreground truncate text-sm font-semibold">
-          {chart.name}
-        </p>
+        <p className="text-foreground truncate text-sm font-semibold">{chart.name}</p>
         <div className="text-muted-foreground flex items-center gap-2 text-xs">
           <span>{formatNumber(effectiveCount)} stitches</span>
           {effectiveCount > 0 && (
@@ -372,9 +344,7 @@ function ChartRow({ chart }: { chart: DesignerChart }) {
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-muted-foreground text-xs">
-              {progressPercent}%
-            </span>
+            <span className="text-muted-foreground text-xs">{progressPercent}%</span>
           </div>
         )}
       </div>

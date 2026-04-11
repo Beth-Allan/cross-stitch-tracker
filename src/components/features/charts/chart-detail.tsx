@@ -7,7 +7,7 @@ import {
   ArrowLeft,
   Calendar,
   FileText,
-  Image,
+  Image as ImageIcon,
   Pencil,
   Scissors,
   Settings,
@@ -15,6 +15,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ChartWithProject } from "@/types/chart";
+import type {
+  ProjectThreadWithThread,
+  ProjectBeadWithBead,
+  ProjectSpecialtyWithItem,
+} from "@/types/supply";
+import { ProjectSuppliesTab } from "./project-supplies-tab";
 import { getEffectiveStitchCount, calculateSizeCategory } from "@/lib/utils/size-category";
 import { deleteChart } from "@/lib/actions/chart-actions";
 import { getPresignedDownloadUrl } from "@/lib/actions/upload-actions";
@@ -60,11 +66,18 @@ function formatDateOnly(date: Date | null | undefined): string {
   });
 }
 
-interface ChartDetailProps {
-  chart: ChartWithProject;
+interface ProjectSuppliesData {
+  threads: ProjectThreadWithThread[];
+  beads: ProjectBeadWithBead[];
+  specialty: ProjectSpecialtyWithItem[];
 }
 
-export function ChartDetail({ chart }: ChartDetailProps) {
+interface ChartDetailProps {
+  chart: ChartWithProject;
+  projectSupplies?: ProjectSuppliesData | null;
+}
+
+export function ChartDetail({ chart, projectSupplies }: ChartDetailProps) {
   const project = chart.project;
   const status = project?.status ?? "UNSTARTED";
   const { count: effectiveStitchCount, approximate } = getEffectiveStitchCount(
@@ -136,6 +149,16 @@ export function ChartDetail({ chart }: ChartDetailProps) {
 
       {/* Overview */}
       <OverviewTab chart={chart} />
+
+      {/* Supplies */}
+      {project && projectSupplies && (
+        <ProjectSuppliesTab
+          projectId={project.id}
+          threads={projectSupplies.threads}
+          beads={projectSupplies.beads}
+          specialty={projectSupplies.specialty}
+        />
+      )}
     </div>
   );
 }
@@ -151,6 +174,7 @@ function CoverImage({
 }) {
   if (coverImageUrl) {
     return (
+      /* eslint-disable-next-line @next/next/no-img-element */
       <img
         src={coverImageUrl}
         alt={`Cover for ${chartName}`}
@@ -162,7 +186,7 @@ function CoverImage({
   return (
     <div className="bg-muted flex max-h-80 w-full items-center justify-center rounded-lg lg:w-80">
       <div className="flex flex-col items-center gap-2 py-16">
-        <Image className="text-muted-foreground/40 h-8 w-8" strokeWidth={1.5} />
+        <ImageIcon className="text-muted-foreground/40 h-8 w-8" strokeWidth={1.5} />
         <span className="text-muted-foreground/70 text-xs">No cover image</span>
       </div>
     </div>
@@ -275,20 +299,15 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
       </InfoCard>
 
       {/* Project Setup — only show if any field has data */}
-      {project &&
-        (project.fabricId ||
-          project.projectBin ||
-          project.ipadApp ||
-          project.needsOnionSkinning) && (
-          <InfoCard icon={Settings} title="Project Setup" className="lg:col-span-2">
-            <div>
-              {project.fabricId && <DetailRow label="Fabric" value={project.fabricId} />}
-              {project.projectBin && <DetailRow label="Project Bin" value={project.projectBin} />}
-              {project.ipadApp && <DetailRow label="iPad App" value={project.ipadApp} />}
-              {project.needsOnionSkinning && <DetailRow label="Onion Skinning" value="Needed" />}
-            </div>
-          </InfoCard>
-        )}
+      {project && (project.projectBin || project.ipadApp || project.needsOnionSkinning) && (
+        <InfoCard icon={Settings} title="Project Setup" className="lg:col-span-2">
+          <div>
+            {project.projectBin && <DetailRow label="Project Bin" value={project.projectBin} />}
+            {project.ipadApp && <DetailRow label="iPad App" value={project.ipadApp} />}
+            {project.needsOnionSkinning && <DetailRow label="Onion Skinning" value="Needed" />}
+          </div>
+        </InfoCard>
+      )}
 
       {/* Dates — always show Added, only show others if set */}
       <InfoCard icon={Calendar} title="Dates" className="lg:col-span-2">

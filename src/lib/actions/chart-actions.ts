@@ -45,7 +45,6 @@ export async function createChart(formData: unknown) {
           create: {
             userId: user.id,
             status: project.status,
-            fabricId: project.fabricId,
             projectBin: project.projectBin,
             ipadApp: project.ipadApp,
             needsOnionSkinning: project.needsOnionSkinning,
@@ -118,7 +117,6 @@ export async function updateChart(chartId: string, formData: unknown) {
         project: {
           update: {
             status: project.status,
-            fabricId: project.fabricId,
             projectBin: project.projectBin,
             ipadApp: project.ipadApp,
             needsOnionSkinning: project.needsOnionSkinning,

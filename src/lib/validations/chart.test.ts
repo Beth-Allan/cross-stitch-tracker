@@ -19,7 +19,6 @@ const validChartBase = {
 
 const validProject = {
   status: "UNSTARTED",
-  fabricId: null,
   projectBin: null,
   ipadApp: null,
   needsOnionSkinning: false,

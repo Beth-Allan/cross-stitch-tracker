@@ -4,8 +4,8 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 3 complete, Phase 4 next
-**Last Updated:** 2026-04-10
+**Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 4 complete, polished, ready for deploy
+**Last Updated:** 2026-04-11
 **Roadmap:** Restructured to 4 milestones / 10 phases (was 9 sequential phases)
 
 ### Done
@@ -24,17 +24,32 @@
 - Milestone 1 audit: **gaps_found** (12/18 requirements satisfied)
   - Phases 1-3 all verified, only Phase 4 remains (6 requirements)
   - Report: `.planning/v1.0-MILESTONE-AUDIT.md`
+- Phase 4 all 7 plans executed: schema, supply/fabric CRUD, catalog UI, shopping list — 335 tests
+  - Prisma findMany crash resolved (stale globalThis singleton, not schema drift)
+  - First UAT complete: 2 items deferred to backlog, 6 bugs to fix
+- Phase 4 UAT bugs fixed (6/6): fabric calc multi-count table, project link 404, brand filter, brands nav, grid hover, Got→Have label
+- Design critique (29/40 Nielsen score, no AI slop) + polish pass:
+  - Fixed hover-only action buttons (opacity-0 → opacity-40) for touch/tablet accessibility (7 files)
+  - Normalized page title sizes (supplies, shopping: text-lg → text-2xl)
+  - Normalized genre list layout to match sibling pages
+  - Centralized SIZE_COLORS config, removed duplicates
 
 ### In Progress
 
-- Phase 2 PR under review (merge before Phase 4)
+- Nothing — ready to deploy
 
 ### Next Up
 
-1. Merge Phase 2 PR
-2. Discuss + plan Phase 4 (Supplies & Fabric) — `/gsd-discuss-phase 4`
-3. Execute Phase 4 — `/gsd-execute-phase 4`
-4. Deploy MVP to Vercel after Phase 4
+1. Deploy MVP to Vercel
+2. Start Milestone 2 (Browse & Organize)
+
+### Backlog (post-MVP)
+
+- 999.1: Supply detail modal (read-only view with "used in projects" list)
+- 999.2: Bulk supply editor
+- 999.3: Fabric type hierarchy (replace flat dropdown)
+- 999.4: Project supplies as separate tab
+- 999.5: Supplies page first-load view flash (URL param fixes refresh, but first navigation still shows default view briefly before localStorage kicks in — investigate SSR cookie or middleware approach)
 
 ### Blockers
 

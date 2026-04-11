@@ -49,9 +49,7 @@ describe("DeleteConfirmationDialog", () => {
   it("shows designer-specific unlink message for designer entity type", () => {
     render(<DeleteConfirmationDialog {...defaultProps} />);
 
-    expect(
-      screen.getByText(/will be unlinked from this designer/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/will be unlinked from this designer/)).toBeInTheDocument();
   });
 
   it("shows genre-specific tag message for genre entity type", () => {
@@ -65,20 +63,14 @@ describe("DeleteConfirmationDialog", () => {
       />,
     );
 
-    expect(
-      screen.getByText(/will lose this genre tag/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/will lose this genre tag/)).toBeInTheDocument();
   });
 
   it("renders Cancel and Delete buttons", () => {
     render(<DeleteConfirmationDialog {...defaultProps} />);
 
-    expect(
-      screen.getByRole("button", { name: /cancel/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /^delete$/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^delete$/i })).toBeInTheDocument();
   });
 
   it("closes dialog after successful onConfirm", async () => {
@@ -116,7 +108,7 @@ describe("DeleteConfirmationDialog", () => {
       expect(onConfirm).toHaveBeenCalledTimes(1);
     });
     // onOpenChange should NOT have been called with false
-    const closeCalls = onOpenChange.mock.calls.filter(([val]: [boolean]) => val === false);
+    const closeCalls = onOpenChange.mock.calls.filter((args: unknown[]) => args[0] === false);
     expect(closeCalls).toHaveLength(0);
   });
 });

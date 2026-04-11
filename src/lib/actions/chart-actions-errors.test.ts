@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, createMockChartWithRelations } from "@/__tests__/mocks";
+import { createMockPrisma } from "@/__tests__/mocks";
 
 // Mock auth to return authenticated session
 vi.mock("@/lib/auth", () => ({
@@ -35,7 +35,6 @@ const validFormData = {
   },
   project: {
     status: "UNSTARTED",
-    fabricId: null,
     projectBin: null,
     ipadApp: null,
     needsOnionSkinning: false,

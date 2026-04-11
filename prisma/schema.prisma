@@ -65,23 +65,182 @@ model Chart {
 }
 
 model Project {
-  id                   String        @id @default(cuid())
-  chart                Chart         @relation(fields: [chartId], references: [id], onDelete: Cascade)
-  chartId              String        @unique
-  userId               String        @default("1")
-  status               ProjectStatus @default(UNSTARTED)
+  id                   String             @id @default(cuid())
+  chart                Chart              @relation(fields: [chartId], references: [id], onDelete: Cascade)
+  chartId              String             @unique
+  userId               String             @default("1")
+  status               ProjectStatus      @default(UNSTARTED)
   startDate            DateTime?
   finishDate           DateTime?
   ffoDate              DateTime?
   finishPhotoUrl       String?
-  startingStitches     Int           @default(0)
-  stitchesCompleted    Int           @default(0)
-  fabricId             String?
+  startingStitches     Int                @default(0)
+  stitchesCompleted    Int                @default(0)
   projectBin           String?
   ipadApp              String?
-  needsOnionSkinning   Boolean       @default(false)
-  wantToStartNext      Boolean       @default(false)
+  needsOnionSkinning   Boolean            @default(false)
+  wantToStartNext      Boolean            @default(false)
   preferredStartSeason String?
-  createdAt            DateTime      @default(now())
-  updatedAt            DateTime      @updatedAt
+  projectThreads       ProjectThread[]
+  projectBeads         ProjectBead[]
+  projectSpecialty     ProjectSpecialty[]
+  fabric               Fabric?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+}
+
+// ─── Supply Enums ───────────────────────────────────────────────────────────
+
+enum SupplyType {
+  THREAD
+  BEAD
+  SPECIALTY
+}
+
+enum ColorFamily {
+  BLACK
+  WHITE
+  RED
+  ORANGE
+  YELLOW
+  GREEN
+  BLUE
+  PURPLE
+  BROWN
+  GRAY
+  NEUTRAL
+}
+
+// ─── Supply Models ──────────────────────────────────────────────────────────
+
+model SupplyBrand {
+  id             String          @id @default(cuid())
+  name           String          @unique
+  website        String?
+  supplyType     SupplyType
+  threads        Thread[]
+  beads          Bead[]
+  specialtyItems SpecialtyItem[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Thread {
+  id             String          @id @default(cuid())
+  brand          SupplyBrand     @relation(fields: [brandId], references: [id])
+  brandId        String
+  colorCode      String
+  colorName      String
+  hexColor       String
+  colorFamily    ColorFamily
+  projectThreads ProjectThread[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@unique([brandId, colorCode])
+}
+
+model Bead {
+  id           String        @id @default(cuid())
+  brand        SupplyBrand   @relation(fields: [brandId], references: [id])
+  brandId      String
+  productCode  String
+  colorName    String
+  hexColor     String
+  colorFamily  ColorFamily
+  projectBeads ProjectBead[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([brandId, productCode])
+}
+
+model SpecialtyItem {
+  id               String             @id @default(cuid())
+  brand            SupplyBrand        @relation(fields: [brandId], references: [id])
+  brandId          String
+  productCode      String
+  colorName        String
+  description      String             @default("")
+  hexColor         String
+  projectSpecialty ProjectSpecialty[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@unique([brandId, productCode])
+}
+
+// ─── Project-Supply Junction Tables ─────────────────────────────────────────
+
+model ProjectThread {
+  id               String   @id @default(cuid())
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        String
+  thread           Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  threadId         String
+  stitchCount      Int      @default(0)
+  quantityRequired Int      @default(1)
+  quantityAcquired Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([projectId, threadId])
+}
+
+model ProjectBead {
+  id               String   @id @default(cuid())
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        String
+  bead             Bead     @relation(fields: [beadId], references: [id], onDelete: Cascade)
+  beadId           String
+  quantityRequired Int      @default(1)
+  quantityAcquired Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([projectId, beadId])
+}
+
+model ProjectSpecialty {
+  id               String        @id @default(cuid())
+  project          Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        String
+  specialtyItem    SpecialtyItem @relation(fields: [specialtyItemId], references: [id], onDelete: Cascade)
+  specialtyItemId  String
+  quantityRequired Int           @default(1)
+  quantityAcquired Int           @default(0)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@unique([projectId, specialtyItemId])
+}
+
+// ─── Fabric Models ──────────────────────────────────────────────────────────
+
+model FabricBrand {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  website   String?
+  fabrics   Fabric[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Fabric {
+  id                 String       @id @default(cuid())
+  name               String
+  brand              FabricBrand  @relation(fields: [brandId], references: [id])
+  brandId            String
+  photoUrl           String?
+  count              Int
+  type               String
+  colorFamily        String
+  colorType          String
+  shortestEdgeInches Float        @default(0)
+  longestEdgeInches  Float        @default(0)
+  needToBuy          Boolean      @default(false)
+  linkedProject      Project?     @relation(fields: [linkedProjectId], references: [id])
+  linkedProjectId    String?      @unique
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
 }
