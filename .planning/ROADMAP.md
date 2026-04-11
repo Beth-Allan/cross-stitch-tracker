@@ -119,7 +119,7 @@ Plans:
   4. User can create fabric records (brand, count, type, color, dimensions) and link to projects
   5. App auto-calculates required fabric size from stitch dimensions and fabric count
   6. Shopping list view shows unfulfilled supplies grouped by project
-**Plans:** 9 plans
+**Plans:** 10 plans
 
 Plans:
 - [x] 04-01-PLAN.md -- Prisma schema (9 models + 3 junctions), types, validations, DMC seed data, fabric calculator, test factories
@@ -129,8 +129,9 @@ Plans:
 - [x] 04-05-PLAN.md -- Fabric catalog UI (list page, detail page, form modal, size calculator)
 - [x] 04-06-PLAN.md -- Project supplies tab (inline search-to-add, editable quantities, kitting summary)
 - [x] 04-07-PLAN.md -- Shopping list page, navigation updates, human verification
-- [ ] 04-08-PLAN.md -- Gap closure: fix hydration errors on supply catalog and fabric catalog pages
-- [ ] 04-09-PLAN.md -- Gap closure: add inline quick-add brand to fabric and supply form modals
+- [x] 04-08-PLAN.md -- Gap closure: fix hydration errors on supply catalog and fabric catalog pages
+- [x] 04-09-PLAN.md -- Gap closure: add inline quick-add brand to fabric and supply form modals
+- [ ] 04-10-PLAN.md -- Gap closure: fix TypeScript build error and stale test assertion
 **UI hint**: yes
 **Design refs**: `product-plan/sections/supply-tracking-and-shopping/` (all components), `product-plan/sections/fabric-series-and-reference-data/` (FabricCatalog, FabricDetail, FabricFormModal)
 **Deferred to later**: Kitting auto-calculation (8 conditions), kitting progress indicators, supply statistics, advanced brand management
@@ -218,7 +219,7 @@ Note: Within milestones, phases with independent dependencies can run in paralle
 | 1. Foundation & Infrastructure | 3/3 | Complete | 2026-03-28 |
 | 2. Core Project Management | 4/5 | In Progress |  |
 | 3. Designer & Genre Pages | 4/5 | In Progress | - |
-| 4. Supplies & Fabric | 7/9 | In Progress | - |
+| 4. Supplies & Fabric | 9/10 | In Progress | - |
 | 5. Gallery & Filtering | 0/TBD | Not started | - |
 | 6. Reference Data | 0/TBD | Not started | - |
 | 7. Basic Dashboards | 0/TBD | Not started | - |
