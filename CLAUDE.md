@@ -51,27 +51,46 @@
   - genre-list: added header-to-search spacing, fixed search icon alignment
 - Security audit (70b0eb5): Phase 4 threat verification — 26 threats, 13 mitigated (all CLOSED), 13 accepted risks documented
 - Milestone 1 audit passed (2ab1490): 18/18 requirements, 8/8 E2E flows, 4/4 phases verified, 8 minor tech debt items
+- MVP deployed to Vercel (2026-04-11): https://cross-stitch-tracker-adolwyn.vercel.app
+  - Neon prod DB migrated + DMC seeded, R2 CORS configured, auth credentials set
+  - Smoke test fixes: CSP headers for R2, prisma generate in build, upload limit 10MB, Saga/OXS/XSD file types, beforeunload suppression during server actions + form submit
+  - 15 backlog items captured from smoke test (999.0.x)
 
 ### In Progress
 
-- Nothing — ready for deploy
+- Nothing
 
 ### Next Up
 
-1. Deploy MVP to Vercel
+1. Work through high-priority backlog items (999.0.x)
 2. `/gsd:complete-milestone` — archive and prep Milestone 2
 
 ### Backlog (post-MVP)
 
+- **999.0: Multiple digital working copies per chart (HIGH PRIORITY)** — support multiple files per chart (PDF, Saga .saga/.oxs/.xsd, Pattern Keeper .pdf, etc.). Needs ChartFile table (name, type, key, chartId) to replace single digitalWorkingCopyUrl field.
+- **999.0.1: Wire fabric selector in chart form (HIGH PRIORITY)** — fabric CRUD exists (Phase 4) but chart form still shows disabled "Phase 5" placeholder. Wire dropdown to fetch unassigned fabrics, save linkedProjectId. Also update Series placeholder.
+- **999.0.2: Per-colour stitch counts & skein calculator (HIGH PRIORITY)** — when adding thread colours to a chart, allow entering stitch count per colour; auto-calculate skeins needed (based on fabric count, strand count, stitch type); sum per-colour counts for total stitch count; needs manual override for charts without per-colour data; future: track stitch types (cross, backstitch, french knots, etc.) which affect thread usage differently
+- 999.0.3: Form submit idempotency — disable submit button after successful save to prevent duplicate chart creation if navigation fails
+- 999.0.4: Duplicate chart detection — add a check (by name + designer) to warn before creating a chart that may already exist
+- 999.0.5: Chart list edit/delete — charts list page has no edit/delete actions unlike designer/genre lists; needs client component with action buttons + modals
+- 999.0.6: Chart images not displaying — coverThumbnailUrl/coverImageUrl store R2 keys, not URLs; list page, detail page, and edit modal all need presigned URL generation to display images; also add onError fallback to placeholder (DesignOS had this)
+- 999.0.7: Rework project supply entry workflow — supplies should maintain insertion order during entry (easier to verify nothing skipped); detail page can sort independently; consider a dedicated "set up project" flow that combines chart creation + supply entry in one workflow
+- 999.0.8: Thread sort is alphabetical not numeric — DMC 334, 3761, 500 instead of 334, 500, 3761; colorCode orderBy in supply-actions.ts:545 needs natural/numeric sort
+- 999.0.9: Incomplete DMC thread catalog — seed data starts at DMC 150, missing 1-149 (including Blanc, Ecru) plus any other gaps; need complete fixture file (~500+ colours)
+- 999.0.10: Quick-add missing supplies from project detail page — if a thread/bead/specialty item isn't in the catalog, allow inline creation without navigating away to the supplies page
+- 999.0.11: Show "already added" for project supplies — searching for a thread/bead/specialty already in the project returns no results; should show the item greyed out with "Already added" indicator instead of hiding it
+- 999.0.12: Collapsible projects in shopping list — list gets long fast; projects should be collapsible with collapsed as the default state
+- 999.0.13: Thread colour picker scroll UX — adding thread colours doesn't auto-scroll to keep the search box/+Add more button visible; needs scrollIntoView or similar when adding items
+- 999.0.14: Project Bin & iPad App management — "Add New" with empty search creates "New Location" with no way to rename; need proper add/edit/delete for storage locations and stitching apps (currently hardcoded arrays in project-setup-section.tsx)
 - 999.1: Supply detail modal (read-only view with "used in projects" list)
 - 999.2: Bulk supply editor
 - 999.3: Fabric type hierarchy (replace flat dropdown)
 - 999.4: Project supplies as separate tab
 - 999.5: Supplies page first-load view flash (URL param fixes refresh, but first navigation still shows default view briefly before localStorage kicks in — investigate SSR cookie or middleware approach)
+- 999.6: Cover image preview aspect ratio — h-32 + object-cover crops tall/square images into a narrow strip; use object-contain or dynamic aspect ratio (cover-image-upload.tsx:155)
 
 ### Blockers
 
-- R2 not configured — uploads degrade gracefully
 - `.env.local` bcrypt hashes must escape `$` as `\$`
 
 ---

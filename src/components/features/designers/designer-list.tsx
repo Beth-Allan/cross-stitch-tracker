@@ -208,7 +208,7 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
               />
               <th className="px-4 py-2.5 text-left">
                 <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                  WEB
+                  WEBSITE
                 </span>
               </th>
               <SortableHeader
