@@ -88,7 +88,7 @@ function GenreRow({
         <span className="text-sm text-muted-foreground">{genre.chartCount}</span>
       </td>
       <td className="px-4 py-3">
-        <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="flex items-center justify-end gap-1 opacity-40 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
           <button
             type="button"
             onClick={onEdit}
@@ -266,11 +266,11 @@ export function GenreList({ genres }: GenreListProps) {
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
-      <div className="px-6 pb-4 pt-6">
-        <div className="mb-5 flex items-center justify-between">
-          <h1 className="font-heading text-2xl font-semibold text-foreground">
+      <div>
+        <div className="flex items-center justify-between">
+          <h1 className="font-heading text-2xl font-semibold">
             Genres
           </h1>
           <Button onClick={() => setCreateModalOpen(true)}>
@@ -305,9 +305,9 @@ export function GenreList({ genres }: GenreListProps) {
       </div>
 
       {/* Desktop table */}
-      <div className="max-md:hidden">
+      <div className="hidden md:block">
         {filteredGenres.length > 0 ? (
-          <div className="mx-6 overflow-hidden rounded-xl border border-border bg-card">
+          <div className="overflow-hidden rounded-xl border border-border bg-card">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border">
@@ -339,7 +339,7 @@ export function GenreList({ genres }: GenreListProps) {
             </table>
           </div>
         ) : (
-          <div className="mx-6">
+          <div>
             <EmptyState
               hasSearch={hasSearch}
               onClear={() => setSearch("")}
@@ -350,7 +350,7 @@ export function GenreList({ genres }: GenreListProps) {
       </div>
 
       {/* Mobile cards */}
-      <div className="space-y-3 px-4 py-3 md:hidden">
+      <div className="space-y-3 md:hidden">
         {filteredGenres.length > 0 ? (
           filteredGenres.map((genre) => (
             <GenreCard

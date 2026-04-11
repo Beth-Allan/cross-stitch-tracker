@@ -25,7 +25,7 @@ export default async function SuppliesPage({
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="font-heading text-lg font-semibold">Supply Catalog</h1>
+        <h1 className="font-heading text-2xl font-semibold">Supply Catalog</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Browse and manage your thread, bead, and specialty item collections.
         </p>

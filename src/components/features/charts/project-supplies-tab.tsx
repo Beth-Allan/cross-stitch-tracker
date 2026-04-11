@@ -191,7 +191,7 @@ function SupplyRow({
       {/* Remove */}
       <button
         onClick={onRemove}
-        className="flex w-5 shrink-0 justify-center opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+        className="flex w-5 shrink-0 justify-center opacity-40 transition-opacity group-hover:opacity-100 focus:opacity-100"
         title="Remove from project"
       >
         <Trash2
