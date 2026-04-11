@@ -213,4 +213,61 @@ describe("FabricCatalog", () => {
 
     expect(screen.getByRole("button", { name: /Add Fabric/i })).toBeInTheDocument();
   });
+
+  /* ── Hydration-safe rendering ── */
+
+  it("does not use Base UI Tabs component (avoids useId hydration mismatch)", () => {
+    // The fabric catalog should use plain buttons for tab switching
+    // instead of Base UI Tabs which generates mismatching SSR/client IDs
+    render(
+      <FabricCatalog
+        fabrics={mockFabrics}
+        fabricBrands={mockBrands}
+        projects={mockProjects}
+      />,
+    );
+
+    // Tab buttons should be type="button" elements, not [role="tab"]
+    const fabricsTab = screen.getByRole("button", { name: /Fabrics\s*\(3\)/ });
+    expect(fabricsTab).toBeInTheDocument();
+    const brandsTab = screen.getByRole("button", { name: /Brands\s*\(2\)/ });
+    expect(brandsTab).toBeInTheDocument();
+  });
+
+  it("switches between Fabrics and Brands tabs", async () => {
+    const user = userEvent.setup();
+    render(
+      <FabricCatalog
+        fabrics={mockFabrics}
+        fabricBrands={mockBrands}
+        projects={mockProjects}
+      />,
+    );
+
+    // Fabrics tab should be active by default - search input should be visible
+    expect(screen.getByPlaceholderText("Search fabric...")).toBeInTheDocument();
+
+    // Click Brands tab
+    const brandsTab = screen.getByRole("button", { name: /Brands\s*\(2\)/ });
+    await user.click(brandsTab);
+
+    // Fabrics search input should no longer be visible
+    expect(screen.queryByPlaceholderText("Search fabric...")).not.toBeInTheDocument();
+  });
+
+  it("renders consistent HTML for Badge needToBuy regardless of value", () => {
+    render(
+      <FabricCatalog
+        fabrics={mockFabrics}
+        fabricBrands={mockBrands}
+        projects={mockProjects}
+      />,
+    );
+
+    // Both Yes and No badges should render (desktop table has both)
+    const yesBadges = screen.getAllByText("Yes");
+    const noBadges = screen.getAllByText("No");
+    expect(yesBadges.length).toBeGreaterThanOrEqual(1);
+    expect(noBadges.length).toBeGreaterThanOrEqual(1);
+  });
 });

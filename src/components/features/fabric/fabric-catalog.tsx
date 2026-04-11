@@ -16,7 +16,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -222,160 +221,179 @@ export function FabricCatalog({
         </Button>
       </div>
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList variant="line">
-          <TabsTrigger value="fabrics">Fabrics ({fabrics.length})</TabsTrigger>
-          <TabsTrigger value="brands">Brands ({fabricBrands.length})</TabsTrigger>
-        </TabsList>
+      {/* Tabs — plain buttons to avoid Base UI Tabs useId hydration mismatch */}
+      <div className="border-border flex items-center gap-1 border-b">
+        {(
+          [
+            { key: "fabrics", label: `Fabrics (${fabrics.length})` },
+            { key: "brands", label: `Brands (${fabricBrands.length})` },
+          ] as const
+        ).map((tab) => {
+          const isActive = activeTab === tab.key;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                isActive
+                  ? "border-primary text-primary"
+                  : "text-muted-foreground hover:text-foreground border-transparent"
+              }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
 
-        <TabsContent value="fabrics">
-          <div className="mt-4 space-y-4">
-            {/* Search bar */}
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative min-w-[200px] max-w-xs flex-1">
-                <Search className="text-muted-foreground absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
-                <Input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search fabric..."
-                  className="pl-9"
-                />
-              </div>
-
-              {hasActiveFilters && (
-                <button
-                  type="button"
-                  onClick={() => setSearch("")}
-                  className="text-muted-foreground hover:text-foreground text-xs transition-colors"
-                >
-                  Clear all
-                </button>
-              )}
+      {/* Tab content */}
+      {activeTab === "fabrics" && (
+        <div className="space-y-4">
+          {/* Search bar */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative min-w-[200px] max-w-xs flex-1">
+              <Search className="text-muted-foreground absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
+              <Input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search fabric..."
+                className="pl-9"
+              />
             </div>
 
-            {/* Table */}
-            {fabrics.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <PackageOpen className="text-muted-foreground/40 mb-3 h-12 w-12" />
-                <h2 className="font-heading text-lg font-semibold">No fabric records yet</h2>
-                <p className="text-muted-foreground mt-1.5 max-w-xs text-sm">
-                  Track your fabric stash and see which projects fit.
-                </p>
-                <Button className="mt-4" onClick={() => setCreateModalOpen(true)}>
-                  <Plus className="h-4 w-4" data-icon="inline-start" />
-                  Add Fabric
-                </Button>
-              </div>
-            ) : (
-              <>
-                {/* Desktop table */}
-                <div className="border-border bg-card hidden overflow-x-auto rounded-xl border md:block">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-border border-b">
-                        <SortableHeader
-                          label="NAME"
-                          sortKey="name"
-                          currentSort={sort}
-                          onSort={handleSort}
-                        />
-                        <SortableHeader
-                          label="BRAND"
-                          sortKey="brand"
-                          currentSort={sort}
-                          onSort={handleSort}
-                        />
-                        <SortableHeader
-                          label="COUNT"
-                          sortKey="count"
-                          currentSort={sort}
-                          onSort={handleSort}
-                        />
-                        <SortableHeader
-                          label="TYPE"
-                          sortKey="type"
-                          currentSort={sort}
-                          onSort={handleSort}
-                        />
-                        <SortableHeader
-                          label="COLOUR"
-                          sortKey="colorFamily"
-                          currentSort={sort}
-                          onSort={handleSort}
-                        />
-                        <SortableHeader
-                          label="DIMENSIONS"
-                          sortKey="dimensions"
-                          currentSort={sort}
-                          onSort={handleSort}
-                        />
-                        <th className="px-4 py-2.5 text-left">
-                          <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                            NEED TO BUY
-                          </span>
-                        </th>
-                        <th className="w-20" />
-                      </tr>
-                    </thead>
-                    <tbody className="divide-border/60 divide-y">
-                      {filteredFabrics.map((fabric) => (
-                        <FabricRow
-                          key={fabric.id}
-                          fabric={fabric}
-                          onEdit={() => setEditingFabric(fabric)}
-                          onDelete={() => setDeletingFabric(fabric)}
-                        />
-                      ))}
-                      {filteredFabrics.length === 0 && (
-                        <tr>
-                          <td colSpan={8} className="py-12 text-center">
-                            <PackageOpen className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
-                            <p className="text-muted-foreground text-sm">
-                              {hasActiveFilters
-                                ? "No fabric matches your search"
-                                : "No fabric records yet"}
-                            </p>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Mobile cards */}
-                <div className="space-y-3 md:hidden">
-                  {filteredFabrics.map((fabric) => (
-                    <FabricCard
-                      key={fabric.id}
-                      fabric={fabric}
-                      onEdit={() => setEditingFabric(fabric)}
-                      onDelete={() => setDeletingFabric(fabric)}
-                    />
-                  ))}
-                  {filteredFabrics.length === 0 && (
-                    <div className="py-12 text-center">
-                      <PackageOpen className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
-                      <p className="text-muted-foreground text-sm">
-                        {hasActiveFilters
-                          ? "No fabric matches your search"
-                          : "No fabric records yet"}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="text-muted-foreground hover:text-foreground text-xs transition-colors"
+              >
+                Clear all
+              </button>
             )}
           </div>
-        </TabsContent>
 
-        <TabsContent value="brands">
-          <div className="mt-4">
-            <FabricBrandList brands={fabricBrands} />
-          </div>
-        </TabsContent>
-      </Tabs>
+          {/* Table */}
+          {fabrics.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <PackageOpen className="text-muted-foreground/40 mb-3 h-12 w-12" />
+              <h2 className="font-heading text-lg font-semibold">No fabric records yet</h2>
+              <p className="text-muted-foreground mt-1.5 max-w-xs text-sm">
+                Track your fabric stash and see which projects fit.
+              </p>
+              <Button className="mt-4" onClick={() => setCreateModalOpen(true)}>
+                <Plus className="h-4 w-4" data-icon="inline-start" />
+                Add Fabric
+              </Button>
+            </div>
+          ) : (
+            <>
+              {/* Desktop table */}
+              <div className="border-border bg-card hidden overflow-x-auto rounded-xl border md:block">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-border border-b">
+                      <SortableHeader
+                        label="NAME"
+                        sortKey="name"
+                        currentSort={sort}
+                        onSort={handleSort}
+                      />
+                      <SortableHeader
+                        label="BRAND"
+                        sortKey="brand"
+                        currentSort={sort}
+                        onSort={handleSort}
+                      />
+                      <SortableHeader
+                        label="COUNT"
+                        sortKey="count"
+                        currentSort={sort}
+                        onSort={handleSort}
+                      />
+                      <SortableHeader
+                        label="TYPE"
+                        sortKey="type"
+                        currentSort={sort}
+                        onSort={handleSort}
+                      />
+                      <SortableHeader
+                        label="COLOUR"
+                        sortKey="colorFamily"
+                        currentSort={sort}
+                        onSort={handleSort}
+                      />
+                      <SortableHeader
+                        label="DIMENSIONS"
+                        sortKey="dimensions"
+                        currentSort={sort}
+                        onSort={handleSort}
+                      />
+                      <th className="px-4 py-2.5 text-left">
+                        <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                          NEED TO BUY
+                        </span>
+                      </th>
+                      <th className="w-20" />
+                    </tr>
+                  </thead>
+                  <tbody className="divide-border/60 divide-y">
+                    {filteredFabrics.map((fabric) => (
+                      <FabricRow
+                        key={fabric.id}
+                        fabric={fabric}
+                        onEdit={() => setEditingFabric(fabric)}
+                        onDelete={() => setDeletingFabric(fabric)}
+                      />
+                    ))}
+                    {filteredFabrics.length === 0 && (
+                      <tr>
+                        <td colSpan={8} className="py-12 text-center">
+                          <PackageOpen className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
+                          <p className="text-muted-foreground text-sm">
+                            {hasActiveFilters
+                              ? "No fabric matches your search"
+                              : "No fabric records yet"}
+                          </p>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile cards */}
+              <div className="space-y-3 md:hidden">
+                {filteredFabrics.map((fabric) => (
+                  <FabricCard
+                    key={fabric.id}
+                    fabric={fabric}
+                    onEdit={() => setEditingFabric(fabric)}
+                    onDelete={() => setDeletingFabric(fabric)}
+                  />
+                ))}
+                {filteredFabrics.length === 0 && (
+                  <div className="py-12 text-center">
+                    <PackageOpen className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
+                    <p className="text-muted-foreground text-sm">
+                      {hasActiveFilters
+                        ? "No fabric matches your search"
+                        : "No fabric records yet"}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {activeTab === "brands" && (
+        <div>
+          <FabricBrandList brands={fabricBrands} />
+        </div>
+      )}
 
       {/* Create fabric modal */}
       <FabricFormModal
