@@ -217,11 +217,13 @@ export function useChartForm({
       }
 
       setIsPending(true);
+      suppressUnloadRef.current = true;
       try {
         if (mode === "create") {
           const response = await createChart(formData);
           if (!response.success) {
             setErrors({ _form: response.error });
+            suppressUnloadRef.current = false;
             return;
           }
           onSuccess(response.chartId);
@@ -229,12 +231,14 @@ export function useChartForm({
           const response = await updateChart(initialData!.id, formData);
           if (!response.success) {
             setErrors({ _form: response.error });
+            suppressUnloadRef.current = false;
             return;
           }
           onSuccess(initialData!.id);
         }
       } catch {
         setErrors({ _form: "An unexpected error occurred" });
+        suppressUnloadRef.current = false;
       } finally {
         setIsPending(false);
       }
