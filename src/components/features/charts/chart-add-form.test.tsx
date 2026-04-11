@@ -175,6 +175,60 @@ describe("ChartAddForm", () => {
     });
   });
 
+  it("keeps submit button disabled after successful save and shows Added!", async () => {
+    mockCreateChart.mockResolvedValue({
+      success: true,
+      chartId: "new-id",
+    });
+
+    const user = userEvent.setup();
+    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "My Test Chart");
+    await user.type(screen.getByLabelText(/total stitch count/i), "10000");
+    await user.click(screen.getByRole("button", { name: /add chart/i }));
+
+    await waitFor(() => {
+      const button = screen.getByRole("button", { name: /added!/i });
+      expect(button).toBeDisabled();
+    });
+  });
+
+  it("re-enables submit button after server error", async () => {
+    mockCreateChart.mockResolvedValue({
+      success: false,
+      error: "Failed to create chart",
+    });
+
+    const user = userEvent.setup();
+    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "Test Chart");
+    await user.type(screen.getByLabelText(/total stitch count/i), "5000");
+    await user.click(screen.getByRole("button", { name: /add chart/i }));
+
+    await waitFor(() => {
+      const button = screen.getByRole("button", { name: /add chart/i });
+      expect(button).toBeEnabled();
+    });
+  });
+
+  it("re-enables submit button after network error", async () => {
+    mockCreateChart.mockRejectedValue(new Error("Network failure"));
+
+    const user = userEvent.setup();
+    render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "Test Chart");
+    await user.type(screen.getByLabelText(/total stitch count/i), "5000");
+    await user.click(screen.getByRole("button", { name: /add chart/i }));
+
+    await waitFor(() => {
+      const button = screen.getByRole("button", { name: /add chart/i });
+      expect(button).toBeEnabled();
+    });
+  });
+
   it("clears validation error when field is corrected", async () => {
     const user = userEvent.setup();
     render(<ChartAddForm designers={mockDesigners} genres={mockGenres} />);
