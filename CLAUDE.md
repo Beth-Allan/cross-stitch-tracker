@@ -4,65 +4,17 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 4 complete, polished, ready for deploy
+**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — not started
 **Last Updated:** 2026-04-11
-**Roadmap:** Restructured to 4 milestones / 10 phases (was 9 sequential phases)
+**Roadmap:** 4 milestones / 10 phases — v1.0 shipped, planning M2
 
 ### Done
 
-- Phase 1 complete: scaffold, design tokens, auth, app shell, 7 pages, PWA
-- Phase 2 complete + verified: schema, R2, validations, CRUD, forms, detail/list pages, 174 tests
-  - VERIFICATION.md created retroactively (2026-04-10), 5/5 success criteria, status human_needed
-  - Fixed Prisma client drift (notes field) — build passes
-- Phase 3 complete (2026-04-08): designer & genre pages — list, detail, create/edit/delete, 165 tests
-  - Gap closure plan 05: wired delete buttons on list pages, replaced window.confirm() with dialog
-  - Code review: 0 critical, 4 warnings, 4 info (advisory)
-  - 8 human UAT items pending (sort interaction, mobile layout, 404s, etc.)
-- Code quality infrastructure (Prettier, Vitest, Husky, CI)
-- PR #2 merged with full review cycle
-- Roadmap restructured to lean MVP (2026-04-07)
-- Milestone 1 audit: **gaps_found** (12/18 requirements satisfied)
-  - Phases 1-3 all verified, only Phase 4 remains (6 requirements)
-  - Report: `.planning/v1.0-MILESTONE-AUDIT.md`
-- Phase 4 all 7 plans executed: schema, supply/fabric CRUD, catalog UI, shopping list — 335 tests
-  - Prisma findMany crash resolved (stale globalThis singleton, not schema drift)
-  - First UAT complete: 2 items deferred to backlog, 6 bugs to fix
-- Phase 4 UAT bugs fixed (6/6): fabric calc multi-count table, project link 404, brand filter, brands nav, grid hover, Got→Have label
-- Design critique (29/40 Nielsen score, no AI slop) + polish pass:
-  - Fixed hover-only action buttons (opacity-0 → opacity-40) for touch/tablet accessibility (7 files)
-  - Normalized page title sizes (supplies, shopping: text-lg → text-2xl)
-  - Normalized genre list layout to match sibling pages
-  - Centralized SIZE_COLORS config, removed duplicates
-- Impeccable audit (13/20) + harden/polish/optimize/adapt passes (d0e3cd5):
-  - Harden: 8 a11y fixes (ARIA roles, keyboard activation, focus-visible, required indicators)
-  - Polish: Added success/warning semantic token families; replaced 25 hard-coded colors across 9 files
-  - Optimize: Memoized supply table sort, CLS fix on chart cover, narrowed transition-all
-  - Adapt: Fixed invisible grid edit icon, upgraded 10px badges to 12px, improved touch targets
-- Re-audit scored 15/20 (Good) + harden pass 2 (e48c354):
-  - 5 SortableHeaders: added keyboard support (tabIndex, role, onKeyDown, aria-sort)
-  - 6 tables: added sr-only captions
-  - chart-edit-modal: replaced window.confirm() with styled Dialog
-  - aria-labels on supply remove + shopping mark-acquired buttons
-  - search-to-add: hard-coded emerald/stone → semantic tokens
-  - progress bars: transition-all → transition-[width]
-- Final polish pass (ee2ec9b):
-  - badge.tsx + tabs.tsx: transition-all → specific properties (perf)
-  - Top Genre badge: hard-coded amber → warning-\* semantic tokens
-  - genre-list: added header-to-search spacing, fixed search icon alignment
-- Security audit (70b0eb5): Phase 4 threat verification — 26 threats, 13 mitigated (all CLOSED), 13 accepted risks documented
-- Milestone 1 audit passed (2ab1490): 18/18 requirements, 8/8 E2E flows, 4/4 phases verified, 8 minor tech debt items
-- MVP deployed to Vercel (2026-04-11): https://cross-stitch-tracker-adolwyn.vercel.app
-  - Neon prod DB migrated + DMC seeded, R2 CORS configured, auth credentials set
-  - Smoke test fixes: CSP headers for R2, prisma generate in build, upload limit 10MB, Saga/OXS/XSD file types, beforeunload suppression during server actions + form submit
-  - 15 backlog items captured from smoke test (999.0.x)
-
-- Backlog fixes (2026-04-11): 5 quick tasks completed
-  - 999.0.8: Thread sort numeric ordering (natural-sort.ts utility)
-  - 999.0.3: Form submit idempotency (isSuccess state in useChartForm)
-  - 999.0.11: "Already added" indicator in supply search-to-add
-  - 999.0.5: Chart list edit/delete actions (new chart-list.tsx client component)
-  - 999.0.6: Chart images displaying via presigned R2 URLs + onError fallback
-  - 999.0.6 followup: Auto-generate thumbnails on cover upload (wired into createChart/updateChart/confirmUpload) + coverImageUrl fallback display
+- **v1.0 MVP shipped** (2026-04-11): 4 phases, 23 plans, 48k LOC, 395 tests, tagged `v1.0`
+  - Full details: `.planning/MILESTONES.md` and `.planning/RETROSPECTIVE.md`
+  - Archived to: `.planning/milestones/v1.0-*`
+  - Live at: https://cross-stitch-tracker-adolwyn.vercel.app
+- 12 quick-fix tasks completed post-deploy (thread sort, idempotency, thumbnails, etc.)
 
 ### In Progress
 
@@ -70,7 +22,7 @@
 
 ### Next Up
 
-1. `/gsd:complete-milestone` — archive M1 and prep Milestone 2
+1. `/gsd:new-milestone` — define M2 requirements and plan phases 5-6
 
 ### Backlog (post-MVP)
 
