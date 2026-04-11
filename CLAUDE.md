@@ -47,7 +47,7 @@
   - progress bars: transition-all → transition-[width]
 - Final polish pass (ee2ec9b):
   - badge.tsx + tabs.tsx: transition-all → specific properties (perf)
-  - Top Genre badge: hard-coded amber → warning-* semantic tokens
+  - Top Genre badge: hard-coded amber → warning-\* semantic tokens
   - genre-list: added header-to-search spacing, fixed search icon alignment
 - Security audit (70b0eb5): Phase 4 threat verification — 26 threats, 13 mitigated (all CLOSED), 13 accepted risks documented
 - Milestone 1 audit passed (2ab1490): 18/18 requirements, 8/8 E2E flows, 4/4 phases verified, 8 minor tech debt items

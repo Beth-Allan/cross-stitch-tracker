@@ -10,39 +10,39 @@
 
 ### Threat Verification
 
-| Threat ID | Category | Disposition | Status | Evidence |
-|-----------|----------|-------------|--------|----------|
-| T-04-02 | Tampering | mitigate | CLOSED | `src/lib/validations/supply.ts`: `.trim().min(1).max(N)` on all string fields; hex regex `/^#[0-9A-Fa-f]{6}$/` on Thread, Bead, SpecialtyItem; enum constraints via `z.enum(SUPPLY_TYPES)` and `z.enum(COLOR_FAMILIES)` |
-| T-04-04 | Elevation of Privilege | mitigate | CLOSED | `src/lib/actions/supply-actions.ts`: `await requireAuth()` is first statement in all 24 exported functions covering CRUD for Thread, Bead, SpecialtyItem, SupplyBrand, and all junction operations |
-| T-04-05 | Tampering | mitigate | CLOSED | `src/lib/actions/supply-actions.ts`: all mutation functions call `.parse()` on the appropriate Zod schema (`threadSchema`, `beadSchema`, `specialtyItemSchema`, `supplyBrandSchema`, `projectThreadSchema`, `projectBeadSchema`, `projectSpecialtySchema`, `updateQuantitySchema`) before any Prisma operation |
-| T-04-06 | Tampering | mitigate | CLOSED | `src/lib/actions/supply-actions.ts:updateProjectSupplyQuantity`: Prisma `update({ where: { id } })` throws P2025 for nonexistent IDs, caught in error handler and returned as failure response. `markSupplyAcquired` does explicit `findUnique` before update (`shopping-actions.ts:151,160,169`) |
-| T-04-09 | Elevation of Privilege | mitigate | CLOSED | `src/lib/actions/fabric-actions.ts`: `await requireAuth()` is first statement in all 9 exported functions (createFabricBrand, updateFabricBrand, deleteFabricBrand, getFabricBrands, createFabric, updateFabric, deleteFabric, getFabric, getFabrics) |
-| T-04-10 | Tampering | mitigate | CLOSED | `src/lib/validations/fabric.ts`: `count: z.number().int().min(1)`, `type: z.enum(FABRIC_TYPES)` (8 values), `colorFamily: z.enum(FABRIC_COLOR_FAMILIES)` (12 values), `colorType: z.enum(FABRIC_COLOR_TYPES)` (9 values), `shortestEdgeInches: z.number().min(0)`, `longestEdgeInches: z.number().min(0)` |
-| T-04-13 | Tampering | mitigate | CLOSED | Hex validated by Zod regex before storage; React renders `style={{ backgroundColor: hexColor }}` as a CSS property string — browser treats this as CSS, not HTML markup. No raw HTML injection API used anywhere in `color-swatch.tsx:41`, `search-to-add.tsx:228`, `project-supplies-tab.tsx:137` |
-| T-04-14 | Spoofing | mitigate | CLOSED | `supply-form-modal.tsx` and `fabric-form-modal.tsx` submit via server actions which each call `requireAuth()` as first statement |
-| T-04-17 | Tampering | mitigate | CLOSED | `src/lib/validations/supply.ts`: `quantityAcquired: z.number().int().min(0)` and `quantityRequired: z.number().int().min(1)` in all three junction schemas and `updateQuantitySchema` |
-| T-04-19 | Elevation of Privilege | mitigate | CLOSED | `src/lib/actions/supply-actions.ts`: addThreadToProject (line 369), addBeadToProject (line 395), addSpecialtyToProject (line 422), updateProjectSupplyQuantity (line 451), removeProjectThread (line 490), removeProjectBead (line 506), removeProjectSpecialty (line 522) — all call `await requireAuth()` first |
-| T-04-20 | Elevation of Privilege | mitigate | CLOSED | `src/lib/actions/shopping-actions.ts:143`: `markSupplyAcquired` calls `await requireAuth()` first; then `findUnique` for each type with explicit `if (!record) return { success: false, error: "Record not found" }` guard before update |
-| T-04-09-01 | Spoofing | mitigate | CLOSED | `src/lib/actions/fabric-actions.ts:11`: `createFabricBrand` calls `await requireAuth()` as first statement |
-| T-04-09-02 | Tampering | mitigate | CLOSED | `src/lib/validations/fabric.ts:41-44`: `fabricBrandSchema` validates `name: z.string().trim().min(1, "Brand name is required").max(200, "Brand name too long")` |
+| Threat ID  | Category               | Disposition | Status | Evidence                                                                                                                                                                                                                                                                                                          |
+| ---------- | ---------------------- | ----------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T-04-02    | Tampering              | mitigate    | CLOSED | `src/lib/validations/supply.ts`: `.trim().min(1).max(N)` on all string fields; hex regex `/^#[0-9A-Fa-f]{6}$/` on Thread, Bead, SpecialtyItem; enum constraints via `z.enum(SUPPLY_TYPES)` and `z.enum(COLOR_FAMILIES)`                                                                                           |
+| T-04-04    | Elevation of Privilege | mitigate    | CLOSED | `src/lib/actions/supply-actions.ts`: `await requireAuth()` is first statement in all 24 exported functions covering CRUD for Thread, Bead, SpecialtyItem, SupplyBrand, and all junction operations                                                                                                                |
+| T-04-05    | Tampering              | mitigate    | CLOSED | `src/lib/actions/supply-actions.ts`: all mutation functions call `.parse()` on the appropriate Zod schema (`threadSchema`, `beadSchema`, `specialtyItemSchema`, `supplyBrandSchema`, `projectThreadSchema`, `projectBeadSchema`, `projectSpecialtySchema`, `updateQuantitySchema`) before any Prisma operation    |
+| T-04-06    | Tampering              | mitigate    | CLOSED | `src/lib/actions/supply-actions.ts:updateProjectSupplyQuantity`: Prisma `update({ where: { id } })` throws P2025 for nonexistent IDs, caught in error handler and returned as failure response. `markSupplyAcquired` does explicit `findUnique` before update (`shopping-actions.ts:151,160,169`)                 |
+| T-04-09    | Elevation of Privilege | mitigate    | CLOSED | `src/lib/actions/fabric-actions.ts`: `await requireAuth()` is first statement in all 9 exported functions (createFabricBrand, updateFabricBrand, deleteFabricBrand, getFabricBrands, createFabric, updateFabric, deleteFabric, getFabric, getFabrics)                                                             |
+| T-04-10    | Tampering              | mitigate    | CLOSED | `src/lib/validations/fabric.ts`: `count: z.number().int().min(1)`, `type: z.enum(FABRIC_TYPES)` (8 values), `colorFamily: z.enum(FABRIC_COLOR_FAMILIES)` (12 values), `colorType: z.enum(FABRIC_COLOR_TYPES)` (9 values), `shortestEdgeInches: z.number().min(0)`, `longestEdgeInches: z.number().min(0)`         |
+| T-04-13    | Tampering              | mitigate    | CLOSED | Hex validated by Zod regex before storage; React renders `style={{ backgroundColor: hexColor }}` as a CSS property string — browser treats this as CSS, not HTML markup. No raw HTML injection API used anywhere in `color-swatch.tsx:41`, `search-to-add.tsx:228`, `project-supplies-tab.tsx:137`                |
+| T-04-14    | Spoofing               | mitigate    | CLOSED | `supply-form-modal.tsx` and `fabric-form-modal.tsx` submit via server actions which each call `requireAuth()` as first statement                                                                                                                                                                                  |
+| T-04-17    | Tampering              | mitigate    | CLOSED | `src/lib/validations/supply.ts`: `quantityAcquired: z.number().int().min(0)` and `quantityRequired: z.number().int().min(1)` in all three junction schemas and `updateQuantitySchema`                                                                                                                             |
+| T-04-19    | Elevation of Privilege | mitigate    | CLOSED | `src/lib/actions/supply-actions.ts`: addThreadToProject (line 369), addBeadToProject (line 395), addSpecialtyToProject (line 422), updateProjectSupplyQuantity (line 451), removeProjectThread (line 490), removeProjectBead (line 506), removeProjectSpecialty (line 522) — all call `await requireAuth()` first |
+| T-04-20    | Elevation of Privilege | mitigate    | CLOSED | `src/lib/actions/shopping-actions.ts:143`: `markSupplyAcquired` calls `await requireAuth()` first; then `findUnique` for each type with explicit `if (!record) return { success: false, error: "Record not found" }` guard before update                                                                          |
+| T-04-09-01 | Spoofing               | mitigate    | CLOSED | `src/lib/actions/fabric-actions.ts:11`: `createFabricBrand` calls `await requireAuth()` as first statement                                                                                                                                                                                                        |
+| T-04-09-02 | Tampering              | mitigate    | CLOSED | `src/lib/validations/fabric.ts:41-44`: `fabricBrandSchema` validates `name: z.string().trim().min(1, "Brand name is required").max(200, "Brand name too long")`                                                                                                                                                   |
 
 ### Accepted Risks Log
 
-| Threat ID | Category | Rationale |
-|-----------|----------|-----------|
-| T-04-01 | Tampering | Hex color in `prisma/fixtures/dmc-threads.json` is a committed static fixture, not user input. No runtime validation required. |
-| T-04-03 | DoS | `prisma/seed.ts` is a one-time admin CLI operation, not exposed as an endpoint. |
-| T-04-07 | Info Disclosure | `getShoppingList` is single-user; no cross-user leakage possible by design. |
-| T-04-08 | DoS | `getShoppingList` queries a bounded dataset (~500 threads). No pagination required at current scale. |
-| T-04-11 | Tampering | `linkedProjectId` has `@unique` constraint in `prisma/schema.prisma:244` — database enforces one-to-one; single-user app removes cross-user risk. |
-| T-04-12 | Tampering | localStorage view mode is cosmetic only; affects no data or auth state. |
-| T-04-15 | Tampering | Fabric `[id]` URL param passed to `getFabric(id)` — Prisma returns `null` for nonexistent IDs, resulting in 404. No data leakage. |
-| T-04-16 | Info Disclosure | Fabric detail data is behind `requireAuth()`; single-user app has no cross-user exposure surface. |
-| T-04-18 | Tampering | Search input uses Prisma `contains` queries with parameterized bindings — no raw SQL; injection not possible. |
-| T-04-21 | Tampering | Junction IDs are single-user, server-rendered CUIDs; Prisma P2025 on nonexistent IDs caught and returned as failure. |
-| T-04-08-01 | Tampering | localStorage view preference in supply/fabric catalog is cosmetic only. |
-| T-04-09-03 | Info Disclosure | Error messages use generic strings ("Failed to create brand", "Failed to create fabric") — no sensitive data exposed. |
-| T-04-10-01 | N/A | No security surface identified. No verification required. |
+| Threat ID  | Category        | Rationale                                                                                                                                         |
+| ---------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T-04-01    | Tampering       | Hex color in `prisma/fixtures/dmc-threads.json` is a committed static fixture, not user input. No runtime validation required.                    |
+| T-04-03    | DoS             | `prisma/seed.ts` is a one-time admin CLI operation, not exposed as an endpoint.                                                                   |
+| T-04-07    | Info Disclosure | `getShoppingList` is single-user; no cross-user leakage possible by design.                                                                       |
+| T-04-08    | DoS             | `getShoppingList` queries a bounded dataset (~500 threads). No pagination required at current scale.                                              |
+| T-04-11    | Tampering       | `linkedProjectId` has `@unique` constraint in `prisma/schema.prisma:244` — database enforces one-to-one; single-user app removes cross-user risk. |
+| T-04-12    | Tampering       | localStorage view mode is cosmetic only; affects no data or auth state.                                                                           |
+| T-04-15    | Tampering       | Fabric `[id]` URL param passed to `getFabric(id)` — Prisma returns `null` for nonexistent IDs, resulting in 404. No data leakage.                 |
+| T-04-16    | Info Disclosure | Fabric detail data is behind `requireAuth()`; single-user app has no cross-user exposure surface.                                                 |
+| T-04-18    | Tampering       | Search input uses Prisma `contains` queries with parameterized bindings — no raw SQL; injection not possible.                                     |
+| T-04-21    | Tampering       | Junction IDs are single-user, server-rendered CUIDs; Prisma P2025 on nonexistent IDs caught and returned as failure.                              |
+| T-04-08-01 | Tampering       | localStorage view preference in supply/fabric catalog is cosmetic only.                                                                           |
+| T-04-09-03 | Info Disclosure | Error messages use generic strings ("Failed to create brand", "Failed to create fabric") — no sensitive data exposed.                             |
+| T-04-10-01 | N/A             | No security surface identified. No verification required.                                                                                         |
 
 ### Unregistered Flags
 

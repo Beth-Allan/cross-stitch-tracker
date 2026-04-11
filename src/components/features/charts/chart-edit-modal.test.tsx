@@ -141,15 +141,9 @@ describe("ChartEditModal", () => {
 
     // Discard confirmation dialog should appear
     expect(screen.getByText("Discard Changes?")).toBeInTheDocument();
-    expect(
-      screen.getByText("You have unsaved changes that will be lost."),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /keep editing/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /discard/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByText("You have unsaved changes that will be lost.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /keep editing/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /discard/i })).toBeInTheDocument();
   });
 
   it("keeps modal open when clicking Keep Editing in discard dialog", async () => {
