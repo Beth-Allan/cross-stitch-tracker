@@ -5,6 +5,7 @@ status: draft
 shadcn_initialized: true
 preset: base-nova
 created: 2026-04-11
+revised: 2026-04-11
 ---
 
 # Phase 5 — UI Design Contract
@@ -35,17 +36,19 @@ Declared values (must be multiples of 4):
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| xs | 4px (`gap-1`, `p-1`) | Icon gaps, inline padding, icon button padding |
+| xs | 4px (`gap-1`, `p-1`) | Icon gaps, inline padding, icon button padding, inline edit confirm/cancel button padding |
 | sm | 8px (`gap-2`, `p-2`) | Compact element spacing, inline edit input padding |
-| md | 16px (`gap-4`, `p-4`) | Default element spacing, list row padding, form field gaps |
+| md | 16px (`gap-4`, `p-4`) | Default element spacing, list row horizontal padding, form field gaps |
 | lg | 24px (`gap-6`, `p-6`) | Section padding, page-level `px-6 pt-6 pb-4` from design |
 | xl | 32px (`gap-8`, `p-8`) | Layout gaps between major sections |
 | 2xl | 48px (`py-12`) | Not expected in Phase 5 |
 | 3xl | 64px (`py-16`) | Empty state vertical padding only |
 
 Exceptions:
-- Touch target for inline edit confirm/cancel buttons: `p-1.5` (6px) per DesignOS design. Acceptable deviation for icon-only controls that cluster together.
-- List row padding: `px-4 py-3` (16px/12px) per DesignOS StorageLocationList design.
+
+| Value | Tailwind | Context | Justification |
+|-------|----------|---------|---------------|
+| 12px | `py-3` | List row vertical padding (`px-4 py-3`) | DesignOS `StorageLocationList.tsx` specifies this exact padding. 8px (`py-2`) is too cramped for rows containing name + count text at `text-sm`/`text-xs`. 16px (`py-4`) is visually heavy for dense lists. 12px is the established list row padding across the app's existing designer and supply list patterns. |
 
 **Source:** DesignOS `StorageLocationList.tsx` and `StorageLocationDetail.tsx` spacing values.
 
@@ -53,20 +56,25 @@ Exceptions:
 
 ## Typography
 
+Declared weights: **2** (medium 500, semibold 600).
+
 | Role | Size | Weight | Line Height | Font Family |
 |------|------|--------|-------------|-------------|
 | Page heading | 24px (`text-2xl`) | 600 (semibold) | 1.2 | Fraunces (`font-heading`) |
 | Section heading | 18px (`text-lg`) | 600 (semibold) | 1.3 | Fraunces (`font-heading`) |
 | Body / list item name | 14px (`text-sm`) | 500 (medium) | 1.5 | Source Sans 3 (`font-body`) |
-| Supporting text / meta | 12px (`text-xs`) | 400 (regular) | 1.5 | Source Sans 3 (`font-body`) |
+| Supporting text / meta | 12px (`text-xs`) | 500 (medium) | 1.5 | Source Sans 3 (`font-body`) |
+
+**Weight rationale:** The codebase uses `font-medium` (500) as the default body weight for list names, labels, tab text, button text, and meta text. `font-semibold` (600) is reserved for headings and emphasized elements. No explicit `font-normal` (400) usage exists in the codebase -- elements without a `font-*` class inherit the browser default, but this contract declares only the two intentionally applied weights. Supporting text at `text-xs` uses `font-medium` to match the established pattern (e.g., supply table column headers, fabric brand counts, shopping list labels).
 
 **Usage in Phase 5:**
 - `text-2xl font-heading font-semibold`: Page titles ("Storage Locations", "Stitching Apps") and detail page entity names.
 - `text-lg font-heading font-semibold`: Empty state headings.
 - `text-sm font-medium`: List row entity names, project names in detail pages, form labels, button text.
-- `text-xs`: Project counts ("3 projects"), status badge text, "No fabric assigned" meta, helper text below fabric selector, table column headers (uppercase tracking-wider).
+- `text-xs font-medium`: Project counts ("3 projects"), table column headers (uppercase tracking-wider), helper text below fabric selector.
+- `text-xs` (with `text-muted-foreground`, no explicit weight override): Status badge text, "No fabric assigned" meta -- inherits `font-medium` from parent or uses browser default in non-critical decorative contexts.
 
-**Source:** Established patterns from `designer-list.tsx`, DesignOS `StorageLocationList.tsx`, `design-context.md`.
+**Source:** Established patterns from `designer-list.tsx`, `fabric-catalog.tsx`, `shopping-list.tsx`, DesignOS `StorageLocationList.tsx`, `design-context.md`.
 
 ---
 
@@ -207,6 +215,26 @@ Exceptions:
 
 ---
 
+## Accessibility Contract
+
+### Icon-Only Button Labels
+
+All icon-only interactive elements must have an `aria-label` attribute for screen reader accessibility.
+
+| Icon | Context | `aria-label` |
+|------|---------|--------------|
+| `Pencil` | List row rename trigger | `"Rename {entityName}"` (dynamic, e.g. "Rename Bin A") |
+| `Pencil` | Detail page header rename trigger | `"Rename"` |
+| `Trash2` | List row delete trigger | `"Delete {entityName}"` (dynamic, e.g. "Delete Bin A") |
+| `Trash2` | Detail page header delete trigger | `"Delete"` |
+| `Check` | Inline edit confirm button | `"Save name"` |
+| `X` | Inline edit cancel button | `"Cancel editing"` |
+| `ChevronRight` | List row navigation affordance | Decorative only (`aria-hidden="true"`) -- the row itself is the click target |
+
+**Implementation:** Each icon-only `<button>` wrapping these icons must include the `aria-label` prop. The row-level `Pencil` and `Trash2` buttons receive dynamic labels with the entity name for disambiguation when multiple rows are visible. The `ChevronRight` is not interactive on its own (the entire row is clickable), so it is marked `aria-hidden`.
+
+---
+
 ## Copywriting Contract
 
 ### Storage Locations
@@ -343,6 +371,8 @@ All icons at `w-4 h-4` except:
 - Icon badges in detail headers: `w-5 h-5` inside `w-10 h-10` container
 - Empty state icons: `w-8 h-8`
 - Inline edit confirm/cancel: `w-3.5 h-3.5`
+
+**Icon-only buttons:** All icon-only `<button>` elements must include `aria-label` per the Accessibility Contract section above.
 
 ---
 
