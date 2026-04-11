@@ -314,7 +314,7 @@ export function createMockPrisma() {
       updateMany: vi.fn(),
       delete: vi.fn(),
     },
-    project: { findUnique: vi.fn(), update: vi.fn() },
+    project: { findUnique: vi.fn(), findMany: vi.fn(), update: vi.fn() },
     designer: {
       create: vi.fn(),
       findMany: vi.fn(),
