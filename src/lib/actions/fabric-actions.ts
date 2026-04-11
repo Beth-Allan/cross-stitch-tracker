@@ -87,3 +87,125 @@ export async function getFabricBrands() {
     return [];
   }
 }
+
+// ─── Fabric CRUD ────────────────────────────────────────────────────────────
+
+export async function createFabric(formData: unknown) {
+  await requireAuth();
+
+  try {
+    const validated = fabricSchema.parse(formData);
+    const fabric = await prisma.fabric.create({ data: validated });
+    revalidatePath("/fabric");
+    if (validated.linkedProjectId) {
+      revalidatePath(`/charts/${validated.linkedProjectId}`);
+    }
+    revalidatePath("/shopping");
+    return { success: true as const, fabric };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false as const, error: error.errors[0].message };
+    }
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code: string }).code === "P2002"
+    ) {
+      return {
+        success: false as const,
+        error: "This project already has fabric linked. Edit the existing fabric instead.",
+      };
+    }
+    console.error("createFabric error:", error);
+    return { success: false as const, error: "Failed to create fabric" };
+  }
+}
+
+export async function updateFabric(id: string, formData: unknown) {
+  await requireAuth();
+
+  try {
+    const validated = fabricSchema.parse(formData);
+    const fabric = await prisma.fabric.update({
+      where: { id },
+      data: validated,
+    });
+    revalidatePath("/fabric");
+    revalidatePath(`/fabric/${id}`);
+    if (validated.linkedProjectId) {
+      revalidatePath(`/charts/${validated.linkedProjectId}`);
+    }
+    revalidatePath("/shopping");
+    return { success: true as const, fabric };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false as const, error: error.errors[0].message };
+    }
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code: string }).code === "P2002"
+    ) {
+      return {
+        success: false as const,
+        error: "This project already has fabric linked. Edit the existing fabric instead.",
+      };
+    }
+    console.error("updateFabric error:", error);
+    return { success: false as const, error: "Failed to update fabric" };
+  }
+}
+
+export async function deleteFabric(id: string) {
+  await requireAuth();
+
+  try {
+    await prisma.fabric.delete({ where: { id } });
+    revalidatePath("/fabric");
+    revalidatePath("/shopping");
+    return { success: true as const };
+  } catch (error) {
+    console.error("deleteFabric error:", error);
+    return { success: false as const, error: "Failed to delete fabric" };
+  }
+}
+
+export async function getFabric(id: string) {
+  await requireAuth();
+
+  try {
+    return await prisma.fabric.findUnique({
+      where: { id },
+      include: {
+        brand: true,
+        linkedProject: {
+          include: {
+            chart: { select: { name: true, stitchesWide: true, stitchesHigh: true } },
+          },
+        },
+      },
+    });
+  } catch (error) {
+    console.error("getFabric error:", error);
+    return null;
+  }
+}
+
+export async function getFabrics() {
+  await requireAuth();
+
+  try {
+    return await prisma.fabric.findMany({
+      include: {
+        brand: true,
+        linkedProject: { include: { chart: { select: { name: true } } } },
+      },
+      orderBy: { name: "asc" },
+    });
+  } catch (error) {
+    console.error("getFabrics error:", error);
+    return [];
+  }
+}
