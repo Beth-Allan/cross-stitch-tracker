@@ -1,6 +1,8 @@
 "use client";
 
-import type { ProjectStatus } from "@/generated/prisma/client";
+import Link from "next/link";
+import type { Fabric, FabricBrand, ProjectStatus } from "@/generated/prisma/client";
+import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { SectionHeading } from "../form-primitives/section-heading";
 import { FormField } from "../form-primitives/form-field";
 import { SearchableSelect } from "../form-primitives/searchable-select";
@@ -11,10 +13,15 @@ interface ProjectSetupSectionProps {
   status: ProjectStatus;
   storageLocationId: string | null;
   stitchingAppId: string | null;
+  fabricId: string | null;
+  storageLocations: StorageLocationWithStats[];
+  stitchingApps: StitchingAppWithStats[];
+  unassignedFabrics: (Fabric & { brand: FabricBrand })[];
   needsOnionSkinning: boolean;
   onStatusChange: (value: string) => void;
   onStorageLocationChange: (value: string | null) => void;
   onStitchingAppChange: (value: string | null) => void;
+  onFabricChange: (value: string | null) => void;
   onOnionSkinningChange: (checked: boolean) => void;
   errors?: { status?: string };
 }
@@ -23,13 +30,33 @@ export function ProjectSetupSection({
   status,
   storageLocationId,
   stitchingAppId,
+  fabricId,
+  storageLocations,
+  stitchingApps,
+  unassignedFabrics,
   needsOnionSkinning,
   onStatusChange,
   onStorageLocationChange,
   onStitchingAppChange,
+  onFabricChange,
   onOnionSkinningChange,
   errors,
 }: ProjectSetupSectionProps) {
+  const fabricOptions = unassignedFabrics.map((f) => ({
+    value: f.id,
+    label: `${f.name} - ${f.count}ct ${f.type} (${f.brand.name})`,
+  }));
+
+  const storageOptions = storageLocations.map((sl) => ({
+    value: sl.id,
+    label: sl.name,
+  }));
+
+  const appOptions = stitchingApps.map((sa) => ({
+    value: sa.id,
+    label: sa.name,
+  }));
+
   return (
     <div>
       <SectionHeading title="Project Setup" />
@@ -49,34 +76,42 @@ export function ProjectSetupSection({
           </select>
         </FormField>
 
-        <FormField label="Fabric" hint="Available in Phase 5">
+        <FormField label="Fabric">
           <SearchableSelect
-            options={[]}
-            value={null}
-            onChange={() => {}}
-            placeholder="Not available yet"
-            disabled
+            options={fabricOptions}
+            value={fabricId}
+            onChange={onFabricChange}
+            placeholder={
+              unassignedFabrics.length === 0 ? "No unassigned fabrics" : "Select fabric..."
+            }
+            disabled={unassignedFabrics.length === 0}
           />
+          {unassignedFabrics.length === 0 && (
+            <p className="text-muted-foreground mt-1 text-xs">
+              <Link href="/fabric" className="text-primary hover:underline">
+                Add fabric
+              </Link>{" "}
+              to assign to this project
+            </p>
+          )}
         </FormField>
 
         <div className="grid grid-cols-2 gap-4">
-          <FormField label="Storage Location" hint="Managed in /storage">
+          <FormField label="Storage Location">
             <SearchableSelect
-              options={[]}
+              options={storageOptions}
               value={storageLocationId}
               onChange={onStorageLocationChange}
               placeholder="Select storage location..."
-              disabled
             />
           </FormField>
 
-          <FormField label="Stitching App" hint="Managed in /apps">
+          <FormField label="Stitching App">
             <SearchableSelect
-              options={[]}
+              options={appOptions}
               value={stitchingAppId}
               onChange={onStitchingAppChange}
               placeholder="Select stitching app..."
-              disabled
             />
           </FormField>
         </div>

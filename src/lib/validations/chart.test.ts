@@ -75,6 +75,85 @@ describe("chartFormSchema", () => {
     });
   });
 
+  describe("project FK fields (storageLocationId, stitchingAppId, fabricId)", () => {
+    it("accepts null storageLocationId", () => {
+      const result = chartFormSchema.safeParse({
+        chart: validChartBase,
+        project: { ...validProject, storageLocationId: null },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it("accepts a string storageLocationId", () => {
+      const result = chartFormSchema.safeParse({
+        chart: validChartBase,
+        project: { ...validProject, storageLocationId: "loc-123" },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.project.storageLocationId).toBe("loc-123");
+      }
+    });
+
+    it("accepts null stitchingAppId", () => {
+      const result = chartFormSchema.safeParse({
+        chart: validChartBase,
+        project: { ...validProject, stitchingAppId: null },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it("accepts a string stitchingAppId", () => {
+      const result = chartFormSchema.safeParse({
+        chart: validChartBase,
+        project: { ...validProject, stitchingAppId: "app-456" },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.project.stitchingAppId).toBe("app-456");
+      }
+    });
+
+    it("accepts null fabricId", () => {
+      const result = chartFormSchema.safeParse({
+        chart: validChartBase,
+        project: { ...validProject, fabricId: null },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it("accepts a string fabricId", () => {
+      const result = chartFormSchema.safeParse({
+        chart: validChartBase,
+        project: { ...validProject, fabricId: "fab-789" },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.project.fabricId).toBe("fab-789");
+      }
+    });
+
+    it("does NOT have projectBin field in project schema", () => {
+      const result = chartFormSchema.safeParse({
+        chart: validChartBase,
+        project: { ...validProject, projectBin: "Bin A" },
+      });
+      if (result.success) {
+        expect(result.data.project).not.toHaveProperty("projectBin");
+      }
+    });
+
+    it("does NOT have ipadApp field in project schema", () => {
+      const result = chartFormSchema.safeParse({
+        chart: validChartBase,
+        project: { ...validProject, ipadApp: "Saga" },
+      });
+      if (result.success) {
+        expect(result.data.project).not.toHaveProperty("ipadApp");
+      }
+    });
+  });
+
   describe("status enum derived from PROJECT_STATUSES", () => {
     it("accepts all PROJECT_STATUSES values", () => {
       for (const status of PROJECT_STATUSES) {

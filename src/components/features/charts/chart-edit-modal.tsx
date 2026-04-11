@@ -10,9 +10,10 @@ import {
   DialogTitle,
   DialogHeader,
 } from "@/components/ui/dialog";
-import type { Designer, Genre } from "@/generated/prisma/client";
+import type { Designer, Fabric, FabricBrand, Genre } from "@/generated/prisma/client";
 import type { ProjectStatus } from "@/generated/prisma/client";
 import type { ChartWithProject } from "@/types/chart";
+import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { useChartForm } from "./use-chart-form";
 import { BasicInfoSection } from "./sections/basic-info-section";
 import { StitchCountSection } from "./sections/stitch-count-section";
@@ -29,6 +30,9 @@ interface ChartEditModalProps {
   chart: ChartWithProject;
   designers: Designer[];
   genres: Genre[];
+  storageLocations: StorageLocationWithStats[];
+  stitchingApps: StitchingAppWithStats[];
+  unassignedFabrics: (Fabric & { brand: FabricBrand })[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
@@ -38,6 +42,9 @@ export function ChartEditModal({
   chart,
   designers,
   genres,
+  storageLocations,
+  stitchingApps,
+  unassignedFabrics,
   open,
   onOpenChange,
   onSuccess,
@@ -230,10 +237,15 @@ export function ChartEditModal({
                     status={form.values.status}
                     storageLocationId={form.values.storageLocationId}
                     stitchingAppId={form.values.stitchingAppId}
+                    fabricId={form.values.fabricId}
+                    storageLocations={storageLocations}
+                    stitchingApps={stitchingApps}
+                    unassignedFabrics={unassignedFabrics}
                     needsOnionSkinning={form.values.needsOnionSkinning}
                     onStatusChange={(v) => form.setField("status", v as ProjectStatus)}
                     onStorageLocationChange={(v) => form.setField("storageLocationId", v)}
                     onStitchingAppChange={(v) => form.setField("stitchingAppId", v)}
+                    onFabricChange={(v) => form.setField("fabricId", v)}
                     onOnionSkinningChange={(v) => form.setField("needsOnionSkinning", v)}
                     errors={{
                       status: form.errors["project.status"],

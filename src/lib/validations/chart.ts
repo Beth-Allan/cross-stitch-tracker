@@ -31,6 +31,7 @@ export const chartFormSchema = z.object({
       .default("UNSTARTED"),
     storageLocationId: z.string().nullable().default(null),
     stitchingAppId: z.string().nullable().default(null),
+    fabricId: z.string().nullable().default(null),
     needsOnionSkinning: z.boolean().default(false),
     startDate: z
       .string()

@@ -30,6 +30,7 @@ export interface ChartFormValues {
   status: ProjectStatus;
   storageLocationId: string | null;
   stitchingAppId: string | null;
+  fabricId: string | null;
   needsOnionSkinning: boolean;
   startDate: string;
   finishDate: string;
@@ -87,6 +88,7 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
       status: "UNSTARTED" as ProjectStatus,
       storageLocationId: null,
       stitchingAppId: null,
+      fabricId: null,
       needsOnionSkinning: false,
       startDate: "",
       finishDate: "",
@@ -117,6 +119,7 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
     status: (project?.status ?? "UNSTARTED") as ProjectStatus,
     storageLocationId: project?.storageLocationId ?? null,
     stitchingAppId: project?.stitchingAppId ?? null,
+    fabricId: project?.fabric?.id ?? null,
     needsOnionSkinning: project?.needsOnionSkinning ?? false,
     startDate: project?.startDate ? new Date(project.startDate).toISOString().split("T")[0] : "",
     finishDate: project?.finishDate ? new Date(project.finishDate).toISOString().split("T")[0] : "",
@@ -201,6 +204,7 @@ export function useChartForm({
           status: values.status,
           storageLocationId: values.storageLocationId,
           stitchingAppId: values.stitchingAppId,
+          fabricId: values.fabricId,
           needsOnionSkinning: values.needsOnionSkinning,
           startDate: values.startDate || null,
           finishDate: values.finishDate || null,

@@ -307,9 +307,18 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
 
       {/* Project Setup — only show if any field has data */}
       {project &&
-        (project.storageLocation || project.stitchingApp || project.needsOnionSkinning) && (
+        (project.storageLocation ||
+          project.stitchingApp ||
+          project.fabric ||
+          project.needsOnionSkinning) && (
           <InfoCard icon={Settings} title="Project Setup" className="lg:col-span-2">
             <div>
+              {project.fabric && (
+                <DetailRow
+                  label="Fabric"
+                  value={`${project.fabric.name} - ${project.fabric.count}ct ${project.fabric.type} (${project.fabric.brand.name})`}
+                />
+              )}
               {project.storageLocation && (
                 <DetailRow label="Storage Location" value={project.storageLocation.name} />
               )}

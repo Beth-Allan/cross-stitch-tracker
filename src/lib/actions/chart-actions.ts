@@ -61,6 +61,14 @@ export async function createChart(formData: unknown) {
       include: { project: true, designer: true, genres: true },
     });
 
+    // Link fabric to the new project if provided
+    if (project.fabricId && created.project) {
+      await prisma.fabric.update({
+        where: { id: project.fabricId },
+        data: { linkedProjectId: created.project.id },
+      });
+    }
+
     // Generate thumbnail if a cover image was uploaded
     if (chart.coverImageUrl) {
       try {
@@ -71,6 +79,7 @@ export async function createChart(formData: unknown) {
     }
 
     revalidatePath("/charts");
+    revalidatePath("/fabric");
     return { success: true as const, chartId: created.id };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -85,10 +94,10 @@ export async function updateChart(chartId: string, formData: unknown) {
   const user = await requireAuth();
 
   try {
-    // Verify ownership and fetch current cover image for change detection
+    // Verify ownership and fetch current cover image + project id for change detection
     const existing = await prisma.chart.findUnique({
       where: { id: chartId },
-      select: { coverImageUrl: true, project: { select: { userId: true } } },
+      select: { coverImageUrl: true, project: { select: { id: true, userId: true } } },
     });
     if (!existing?.project || existing.project.userId !== user.id) {
       return { success: false as const, error: "Chart not found" };
@@ -142,6 +151,28 @@ export async function updateChart(chartId: string, formData: unknown) {
       include: { project: true, designer: true, genres: true },
     });
 
+    // Handle fabric link/unlink
+    const existingProjectId = existing.project.id;
+    const currentFabric = await prisma.fabric.findUnique({
+      where: { linkedProjectId: existingProjectId },
+    });
+
+    // Unlink old fabric if changed
+    if (currentFabric && currentFabric.id !== project.fabricId) {
+      await prisma.fabric.update({
+        where: { id: currentFabric.id },
+        data: { linkedProjectId: null },
+      });
+    }
+
+    // Link new fabric if provided and different from current
+    if (project.fabricId && project.fabricId !== currentFabric?.id) {
+      await prisma.fabric.update({
+        where: { id: project.fabricId },
+        data: { linkedProjectId: existingProjectId },
+      });
+    }
+
     // Generate thumbnail if cover image changed
     if (chart.coverImageUrl && chart.coverImageUrl !== existing.coverImageUrl) {
       try {
@@ -153,6 +184,7 @@ export async function updateChart(chartId: string, formData: unknown) {
 
     revalidatePath("/charts");
     revalidatePath(`/charts/${chartId}`);
+    revalidatePath("/fabric");
     return { success: true as const };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -230,6 +262,7 @@ export async function getChart(chartId: string) {
           include: {
             storageLocation: { select: { id: true, name: true } },
             stitchingApp: { select: { id: true, name: true } },
+            fabric: { include: { brand: true } },
           },
         },
         designer: true,
@@ -258,6 +291,7 @@ export async function getCharts() {
           include: {
             storageLocation: { select: { id: true, name: true } },
             stitchingApp: { select: { id: true, name: true } },
+            fabric: { include: { brand: true } },
           },
         },
         designer: true,

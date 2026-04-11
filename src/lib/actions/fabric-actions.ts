@@ -193,6 +193,26 @@ export async function getFabric(id: string) {
   }
 }
 
+export async function getUnassignedFabrics(currentProjectId?: string) {
+  await requireAuth();
+
+  try {
+    return await prisma.fabric.findMany({
+      where: {
+        OR: [
+          { linkedProjectId: null },
+          ...(currentProjectId ? [{ linkedProjectId: currentProjectId }] : []),
+        ],
+      },
+      include: { brand: true },
+      orderBy: { name: "asc" },
+    });
+  } catch (error) {
+    console.error("getUnassignedFabrics error:", error);
+    return [];
+  }
+}
+
 export async function getFabrics() {
   await requireAuth();
 

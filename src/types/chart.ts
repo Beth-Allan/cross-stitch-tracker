@@ -2,6 +2,8 @@ import type {
   Chart,
   Project,
   Designer,
+  Fabric,
+  FabricBrand,
   Genre,
   ProjectStatus,
   StorageLocation,
@@ -12,6 +14,7 @@ import type { SizeCategory } from "@/lib/utils/size-category";
 export type ProjectWithRelations = Project & {
   storageLocation: Pick<StorageLocation, "id" | "name"> | null;
   stitchingApp: Pick<StitchingApp, "id" | "name"> | null;
+  fabric: (Fabric & { brand: FabricBrand }) | null;
 };
 
 export type ChartWithProject = Chart & {
