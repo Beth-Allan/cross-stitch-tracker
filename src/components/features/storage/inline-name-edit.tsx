@@ -8,10 +8,18 @@ interface InlineNameEditProps {
   name: string;
   onSave: (newName: string) => Promise<void>;
   variant?: "default" | "heading";
+  defaultEditing?: boolean;
+  onCancel?: () => void;
 }
 
-export function InlineNameEdit({ name, onSave, variant = "default" }: InlineNameEditProps) {
-  const [isEditing, setIsEditing] = useState(false);
+export function InlineNameEdit({
+  name,
+  onSave,
+  variant = "default",
+  defaultEditing = false,
+  onCancel: onCancelProp,
+}: InlineNameEditProps) {
+  const [isEditing, setIsEditing] = useState(defaultEditing);
   const [editValue, setEditValue] = useState(name);
   const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -41,6 +49,7 @@ export function InlineNameEdit({ name, onSave, variant = "default" }: InlineName
   function handleCancel() {
     setEditValue(name);
     setIsEditing(false);
+    onCancelProp?.();
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
