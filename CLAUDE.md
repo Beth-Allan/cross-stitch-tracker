@@ -49,16 +49,17 @@
   - badge.tsx + tabs.tsx: transition-all → specific properties (perf)
   - Top Genre badge: hard-coded amber → warning-* semantic tokens
   - genre-list: added header-to-search spacing, fixed search icon alignment
+- Security audit (70b0eb5): Phase 4 threat verification — 26 threats, 13 mitigated (all CLOSED), 13 accepted risks documented
+- Milestone 1 audit passed (2ab1490): 18/18 requirements, 8/8 E2E flows, 4/4 phases verified, 8 minor tech debt items
 
 ### In Progress
 
-- Nothing — ready for final audit + deploy
+- Nothing — ready for deploy
 
 ### Next Up
 
-1. Re-run `/impeccable:audit` for final score confirmation
-2. Deploy MVP to Vercel
-3. Start Milestone 2 (Browse & Organize)
+1. Deploy MVP to Vercel
+2. `/gsd:complete-milestone` — archive and prep Milestone 2
 
 ### Backlog (post-MVP)
 
