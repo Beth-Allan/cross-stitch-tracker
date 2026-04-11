@@ -19,12 +19,12 @@
 
 #### Supplies & Fabric (Phase 4)
 
-- [ ] **SUPP-01**: App pre-seeds full DMC thread catalog (~500 colors with hex swatches)
-- [ ] **SUPP-02**: User can browse and manage thread, bead, and specialty item databases (essentials — advanced brand management deferred)
-- [ ] **SUPP-03**: User can link supplies to projects with per-project quantities (required vs acquired)
-- [ ] **SUPP-04**: App auto-generates shopping list showing unfulfilled supplies grouped by project
-- [ ] **REF-01**: User can create, view, edit, and delete fabric records with brand, count, type, color, dimensions
-- [ ] **REF-02**: App auto-calculates required fabric size from stitch dimensions and fabric count
+- [x] **SUPP-01**: App pre-seeds full DMC thread catalog (~500 colors with hex swatches)
+- [x] **SUPP-02**: User can browse and manage thread, bead, and specialty item databases (essentials — advanced brand management deferred)
+- [x] **SUPP-03**: User can link supplies to projects with per-project quantities (required vs acquired)
+- [x] **SUPP-04**: App auto-generates shopping list showing unfulfilled supplies grouped by project
+- [x] **REF-01**: User can create, view, edit, and delete fabric records with brand, count, type, color, dimensions
+- [x] **REF-02**: App auto-calculates required fabric size from stitch dimensions and fabric count
 
 ### Post-MVP (Milestones 2-4)
 
@@ -128,12 +128,12 @@ Which phases cover which requirements. Updated 2026-04-07 after MVP restructure.
 | PROJ-05 | Phase 2 | 1 (MVP) | Complete |
 | PROJ-06 | Phase 3 | 1 (MVP) | Complete |
 | PROJ-07 | Phase 3 | 1 (MVP) | Complete |
-| SUPP-01 | Phase 4 | 1 (MVP) | Pending |
-| SUPP-02 | Phase 4 | 1 (MVP) | Pending |
-| SUPP-03 | Phase 4 | 1 (MVP) | Pending |
-| SUPP-04 | Phase 4 | 1 (MVP) | Pending |
-| REF-01 | Phase 4 | 1 (MVP) | Pending |
-| REF-02 | Phase 4 | 1 (MVP) | Pending |
+| SUPP-01 | Phase 4 | 1 (MVP) | Complete |
+| SUPP-02 | Phase 4 | 1 (MVP) | Complete |
+| SUPP-03 | Phase 4 | 1 (MVP) | Complete |
+| SUPP-04 | Phase 4 | 1 (MVP) | Complete |
+| REF-01 | Phase 4 | 1 (MVP) | Complete |
+| REF-02 | Phase 4 | 1 (MVP) | Complete |
 | VIEW-01 | Phase 5 | 2 | Pending |
 | VIEW-02 | Phase 5 | 2 | Pending |
 | PROJ-09 | Phase 5 | 2 | Pending |
