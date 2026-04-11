@@ -47,12 +47,12 @@ describe("DesignerList", () => {
     vi.clearAllMocks();
   });
 
-  it("renders table headers (DESIGNER, WEB, CHARTS, STARTED, FINISHED, TOP GENRE)", () => {
+  it("renders table headers (DESIGNER, WEBSITE, CHARTS, STARTED, FINISHED, TOP GENRE)", () => {
     render(<DesignerList designers={mockDesigners} />);
 
     // Desktop table should have all headers
     expect(screen.getByText("DESIGNER")).toBeInTheDocument();
-    expect(screen.getByText("WEB")).toBeInTheDocument();
+    expect(screen.getByText("WEBSITE")).toBeInTheDocument();
     expect(screen.getByText("CHARTS")).toBeInTheDocument();
     expect(screen.getByText("STARTED")).toBeInTheDocument();
     expect(screen.getByText("FINISHED")).toBeInTheDocument();
