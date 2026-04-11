@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Designer, Genre, ProjectStatus } from "@/generated/prisma/client";
 import type { ChartWithProject } from "@/types/chart";
 import type { SizeCategory } from "@/lib/utils/size-category";
@@ -245,35 +245,49 @@ export function useChartForm({
   // Inline entity creation
   const handleAddDesigner = useCallback(
     async (name: string, website?: string) => {
-      const result = await createDesigner({
-        name,
-        website: website ?? null,
-      });
-      if (!result.success) {
-        throw new Error(result.error);
+      suppressUnloadRef.current = true;
+      try {
+        const result = await createDesigner({
+          name,
+          website: website ?? null,
+        });
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+        setDesigners((prev) => [...prev, result.designer]);
+        setField("designerId", result.designer.id);
+      } finally {
+        suppressUnloadRef.current = false;
       }
-      setDesigners((prev) => [...prev, result.designer]);
-      setField("designerId", result.designer.id);
     },
     [setField],
   );
 
   const handleAddGenre = useCallback(async (name: string) => {
-    const result = await createGenre({ name });
-    if (!result.success) {
-      throw new Error(result.error);
+    suppressUnloadRef.current = true;
+    try {
+      const result = await createGenre({ name });
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      setGenres((prev) => [...prev, result.genre]);
+      setValues((prev) => ({
+        ...prev,
+        genreIds: [...prev.genreIds, result.genre.id],
+      }));
+    } finally {
+      suppressUnloadRef.current = false;
     }
-    setGenres((prev) => [...prev, result.genre]);
-    setValues((prev) => ({
-      ...prev,
-      genreIds: [...prev.genreIds, result.genre.id],
-    }));
   }, []);
+
+  // Suppress beforeunload during inline entity creation (server action revalidation can trigger it)
+  const suppressUnloadRef = useRef(false);
 
   // Beforeunload warning
   useEffect(() => {
     if (!isDirty) return;
     const handler = (e: BeforeUnloadEvent) => {
+      if (suppressUnloadRef.current) return;
       e.preventDefault();
     };
     window.addEventListener("beforeunload", handler);
