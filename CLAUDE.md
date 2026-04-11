@@ -4,8 +4,8 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 4 complete, ready for deploy
-**Last Updated:** 2026-04-12
+**Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 4 complete, polished, ready for deploy
+**Last Updated:** 2026-04-11
 **Roadmap:** Restructured to 4 milestones / 10 phases (was 9 sequential phases)
 
 ### Done
@@ -28,10 +28,15 @@
   - Prisma findMany crash resolved (stale globalThis singleton, not schema drift)
   - First UAT complete: 2 items deferred to backlog, 6 bugs to fix
 - Phase 4 UAT bugs fixed (6/6): fabric calc multi-count table, project link 404, brand filter, brands nav, grid hover, Got→Have label
+- Design critique (29/40 Nielsen score, no AI slop) + polish pass:
+  - Fixed hover-only action buttons (opacity-0 → opacity-40) for touch/tablet accessibility (7 files)
+  - Normalized page title sizes (supplies, shopping: text-lg → text-2xl)
+  - Normalized genre list layout to match sibling pages
+  - Centralized SIZE_COLORS config, removed duplicates
 
 ### In Progress
 
-- Phase 4 complete — all post-execution gates passed
+- Nothing — ready to deploy
 
 ### Next Up
 
