@@ -131,9 +131,7 @@ function SupplyRow({
     <div className="group border-border flex items-center gap-3 border-b py-3 last:border-b-0">
       {/* Swatch */}
       <div
-        className={`h-7 w-7 shrink-0 rounded-full shadow-sm ${
-          isLight ? "ring-1 ring-border" : ""
-        }`}
+        className={`h-7 w-7 shrink-0 rounded-full shadow-sm ${isLight ? "ring-border ring-1" : ""}`}
         style={{ backgroundColor: hex }}
       />
 
@@ -165,11 +163,7 @@ function SupplyRow({
           <EditableNumber
             value={quantityAcquired}
             onSave={onUpdateAcquired}
-            className={`font-medium ${
-              isFulfilled
-                ? "text-success"
-                : "text-warning"
-            }`}
+            className={`font-medium ${isFulfilled ? "text-success" : "text-warning"}`}
           />
         </div>
         {quantityNeeded > 0 && (
@@ -274,7 +268,7 @@ function SupplySection({
                   onAddClick();
                 }}
                 type="button"
-                className="mx-auto flex items-center gap-1.5 text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+                className="text-primary hover:text-primary/80 mx-auto flex items-center gap-1.5 text-sm font-medium transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
                 {addLabel}
@@ -289,7 +283,7 @@ function SupplySection({
                   onAddClick();
                 }}
                 type="button"
-                className="mt-3 flex items-center gap-1.5 text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+                className="text-primary hover:text-primary/80 mt-3 flex items-center gap-1.5 text-sm font-medium transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add more
@@ -442,9 +436,7 @@ export function ProjectSuppliesTab({
             </div>
             <span
               className={`text-sm font-medium tabular-nums ${
-                overallPercent === 100
-                  ? "text-success"
-                  : "text-foreground"
+                overallPercent === 100 ? "text-success" : "text-foreground"
               }`}
               style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >

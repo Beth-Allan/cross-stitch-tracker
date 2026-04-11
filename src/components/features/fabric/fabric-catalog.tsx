@@ -576,7 +576,7 @@ function FabricCard({
           <span>{`${fabric.shortestEdgeInches}" x ${fabric.longestEdgeInches}"`}</span>
         )}
         {fabric.needToBuy && (
-          <Badge className="border-warning-border bg-warning-muted text-xs text-warning-muted-foreground">
+          <Badge className="border-warning-border bg-warning-muted text-warning-muted-foreground text-xs">
             Need to buy
           </Badge>
         )}

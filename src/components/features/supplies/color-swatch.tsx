@@ -35,7 +35,7 @@ export function ColorSwatch({ hexColor, size = "md", className }: ColorSwatchPro
       className={cn(
         config.classes,
         "shrink-0 shadow-sm",
-        border && "ring-1 ring-border",
+        border && "ring-border ring-1",
         className,
       )}
       style={{ backgroundColor: hexColor }}

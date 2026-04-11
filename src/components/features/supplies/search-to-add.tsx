@@ -198,7 +198,7 @@ export function SearchToAdd({
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="border-border bg-card text-foreground placeholder:text-muted-foreground w-full rounded border py-1.5 pr-3 pl-8 text-sm transition-colors focus:border-ring focus:ring-2 focus:ring-ring/40 focus:outline-none"
+            className="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-ring/40 w-full rounded border py-1.5 pr-3 pl-8 text-sm transition-colors focus:ring-2 focus:outline-none"
           />
         </div>
       </div>
@@ -223,7 +223,7 @@ export function SearchToAdd({
               >
                 <div
                   className={`h-5 w-5 shrink-0 rounded-full shadow-sm ${
-                    needsBorder(hex) ? "ring-1 ring-border" : ""
+                    needsBorder(hex) ? "ring-border ring-1" : ""
                   }`}
                   style={{ backgroundColor: hex }}
                 />

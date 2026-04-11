@@ -26,7 +26,9 @@ export function FormField({ label, hint, error, required, htmlFor, children }: F
         {label}
         {required && (
           <>
-            <span className="text-destructive ml-0.5" aria-hidden="true">*</span>
+            <span className="text-destructive ml-0.5" aria-hidden="true">
+              *
+            </span>
             <span className="sr-only"> (required)</span>
           </>
         )}

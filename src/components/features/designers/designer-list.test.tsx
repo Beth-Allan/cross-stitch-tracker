@@ -217,4 +217,19 @@ describe("DesignerList", () => {
     const lastDataRow = rows[rows.length - 1];
     expect(lastDataRow.textContent).toContain("Artecy Cross Stitch");
   });
+
+  it("pressing Enter on CHARTS header sorts by chart count (keyboard a11y)", async () => {
+    const user = userEvent.setup();
+    render(<DesignerList designers={mockDesigners} />);
+
+    // Focus CHARTS header and press Enter
+    const chartsHeader = screen.getByText("CHARTS");
+    chartsHeader.focus();
+    await user.keyboard("{Enter}");
+
+    // Should sort ascending by chartCount: Artecy(3), Heaven(5), Nora(8)
+    const rows = screen.getAllByRole("row");
+    const firstDataRow = rows[1];
+    expect(firstDataRow.textContent).toContain("Artecy Cross Stitch");
+  });
 });

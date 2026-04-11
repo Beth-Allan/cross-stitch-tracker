@@ -57,9 +57,7 @@ function SupplyRow({
         </p>
         <p className="text-muted-foreground truncate text-sm">{colorName}</p>
       </div>
-      <span className="text-warning text-sm font-medium whitespace-nowrap">
-        Need {need}
-      </span>
+      <span className="text-warning text-sm font-medium whitespace-nowrap">Need {need}</span>
       <Button
         size="sm"
         onClick={handleMarkAcquired}

@@ -103,7 +103,7 @@
   /* Feedback — Warning (amber) */
   --warning: oklch(0.666 0.179 58.32); /* amber-600 */
   --warning-muted: oklch(0.987 0.022 95.28); /* amber-50 */
-  --warning-muted-foreground: oklch(0.555 0.163 49.0); /* amber-700 */
+  --warning-muted-foreground: oklch(0.555 0.163 49); /* amber-700 */
   --warning-border: oklch(0.913 0.105 84.09); /* amber-200 */
 
   /* Border / Input / Ring */

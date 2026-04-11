@@ -58,7 +58,7 @@ export function GenrePicker({ genres, selectedIds, onToggle, onAddGenre }: Genre
             onClick={() => onToggle(genre.id)}
             aria-pressed={selected}
             className={cn(
-              "rounded-full border px-3 py-1.5 text-xs transition-colors focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-1 outline-none",
+              "focus-visible:ring-ring rounded-full border px-3 py-1.5 text-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
               selected
                 ? "border-primary/30 bg-primary/10 text-primary"
                 : "border-border bg-muted text-muted-foreground hover:border-border/80",

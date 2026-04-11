@@ -176,7 +176,7 @@ export function GenreDetail({ genre }: GenreDetailProps) {
                 onClick={() => handleSort(opt.key)}
                 className={`rounded-full px-2 py-0.5 text-xs transition-colors ${
                   chartSort.key === opt.key
-                    ? "bg-success-muted font-semibold text-success-muted-foreground"
+                    ? "bg-success-muted text-success-muted-foreground font-semibold"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
