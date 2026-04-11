@@ -4,8 +4,8 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 3 complete, Phase 4 next
-**Last Updated:** 2026-04-10
+**Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 4 in progress (bug fixes remaining)
+**Last Updated:** 2026-04-11
 **Roadmap:** Restructured to 4 milestones / 10 phases (was 9 sequential phases)
 
 ### Done
@@ -24,17 +24,28 @@
 - Milestone 1 audit: **gaps_found** (12/18 requirements satisfied)
   - Phases 1-3 all verified, only Phase 4 remains (6 requirements)
   - Report: `.planning/v1.0-MILESTONE-AUDIT.md`
+- Phase 4 all 7 plans executed: schema, supply/fabric CRUD, catalog UI, shopping list — 335 tests
+  - Prisma findMany crash resolved (stale globalThis singleton, not schema drift)
+  - First UAT complete: 2 items deferred to backlog, 6 bugs to fix
 
 ### In Progress
 
-- Phase 2 PR under review (merge before Phase 4)
+- Phase 4 bug fixes from UAT (6 bugs: fabric calc, project link 404, brand filter, brands nav, grid hover, Got→Have label)
+- Post-execution gates pending after bug fixes (code review, verification, UAT re-test)
 
 ### Next Up
 
-1. Merge Phase 2 PR
-2. Discuss + plan Phase 4 (Supplies & Fabric) — `/gsd-discuss-phase 4`
-3. Execute Phase 4 — `/gsd-execute-phase 4`
-4. Deploy MVP to Vercel after Phase 4
+1. Fix 6 UAT bugs — `/gsd:resume-work`
+2. Run post-execution gates (code review, verification)
+3. Human UAT re-test
+4. Deploy MVP to Vercel
+
+### Backlog (post-MVP)
+
+- 999.1: Supply detail modal (read-only view with "used in projects" list)
+- 999.2: Bulk supply editor
+- 999.3: Fabric type hierarchy (replace flat dropdown)
+- 999.4: Project supplies as separate tab
 
 ### Blockers
 
