@@ -178,7 +178,7 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
         <div>
           <p className="text-muted-foreground text-xs tracking-wider uppercase">Top Genre</p>
           {designer.topGenre ? (
-            <span className="mt-0.5 inline-flex rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
+            <span className="mt-0.5 inline-flex rounded-full border border-warning-border bg-warning-muted px-2 py-0.5 text-xs font-semibold text-warning-muted-foreground">
               {designer.topGenre}
             </span>
           ) : (
