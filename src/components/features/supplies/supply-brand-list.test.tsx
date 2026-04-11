@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@/__tests__/test-utils";
+import { render, screen } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { SupplyBrandList } from "./supply-brand-list";
 import { createMockSupplyBrand } from "@/__tests__/mocks";
@@ -88,7 +88,6 @@ describe("SupplyBrandList", () => {
 
     // DMC should not be visible (only table row, not any other reference)
     // The search should filter out DMC
-    const dmcElements = screen.queryAllByText("DMC");
     // DMC may still appear in non-filtered contexts, but there should be fewer
     // The key test is that Mill Hill is still shown
     expect(millHillElements.length).toBeGreaterThanOrEqual(1);

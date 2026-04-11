@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useTransition } from "react";
-import { Search, Plus } from "lucide-react";
+import { Search } from "lucide-react";
 import { toast } from "sonner";
 import {
   addThreadToProject,

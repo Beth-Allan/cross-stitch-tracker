@@ -10,7 +10,7 @@ import { ColorSwatch } from "@/components/features/supplies/color-swatch";
 import { markSupplyAcquired } from "@/lib/actions/shopping-actions";
 import type { ShoppingListProject } from "@/lib/actions/shopping-actions";
 import type { ProjectStatus } from "@/generated/prisma/client";
-import { PackageOpen, ShoppingCart } from "lucide-react";
+import { PackageOpen } from "lucide-react";
 
 /* ─── Supply Row ─────────────────────────────────────────────────────────── */
 
@@ -168,20 +168,6 @@ function EmptyAllCaughtUp() {
       <h2 className="font-heading text-foreground mb-2 text-lg font-semibold">All caught up!</h2>
       <p className="text-muted-foreground max-w-md text-sm">
         Every supply across all your projects is acquired. Time to stitch!
-      </p>
-    </div>
-  );
-}
-
-function _EmptyNoShoppingNeeds() {
-  return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="bg-muted mb-4 rounded-full p-4">
-        <ShoppingCart className="text-muted-foreground h-8 w-8" />
-      </div>
-      <h2 className="font-heading text-foreground mb-2 text-lg font-semibold">No shopping needs</h2>
-      <p className="text-muted-foreground max-w-md text-sm">
-        Link supplies to your projects to see what you still need to buy.
       </p>
     </div>
   );

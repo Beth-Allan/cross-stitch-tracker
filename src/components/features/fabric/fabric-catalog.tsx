@@ -20,7 +20,6 @@ import { FabricFormModal } from "./fabric-form-modal";
 import { FabricBrandList } from "./fabric-brand-list";
 import { deleteFabric } from "@/lib/actions/fabric-actions";
 import type { FabricWithBrand, FabricBrandWithCounts } from "@/types/fabric";
-import type { Fabric } from "@/types/fabric";
 import { useTransition } from "react";
 
 /* ─── Types ─── */
@@ -153,7 +152,7 @@ export function FabricCatalog({
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editingFabric, setEditingFabric] = useState<FabricWithBrand | null>(null);
   const [deletingFabric, setDeletingFabric] = useState<FabricWithBrand | null>(null);
-  const [brandCreateOpen, setBrandCreateOpen] = useState(false);
+  const [, setBrandCreateOpen] = useState(false);
 
   async function handleDelete() {
     if (!deletingFabric) return;
