@@ -77,7 +77,7 @@ function EditableNumber({
             setEditing(false);
           }
         }}
-        className="bg-card text-foreground w-12 rounded border border-emerald-500 px-1.5 py-0.5 text-center text-sm focus:ring-2 focus:ring-emerald-500/40 focus:outline-none"
+        className="bg-card text-foreground border-primary focus:ring-primary/40 w-12 rounded border px-1.5 py-0.5 text-center text-sm focus:ring-2 focus:outline-none"
       />
     );
   }
