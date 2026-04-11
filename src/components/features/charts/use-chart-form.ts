@@ -138,6 +138,8 @@ export function useChartForm({
   const [values, setValues] = useState<ChartFormValues>(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPending, setIsPending] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const isSubmitDisabled = isPending || isSuccess;
   const [designers, setDesigners] = useState<Designer[]>(initialDesigners);
   const [genres, setGenres] = useState<Genre[]>(initialGenres);
 
@@ -226,6 +228,7 @@ export function useChartForm({
             suppressUnloadRef.current = false;
             return;
           }
+          setIsSuccess(true);
           onSuccess(response.chartId);
         } else {
           const response = await updateChart(initialData!.id, formData);
@@ -234,6 +237,7 @@ export function useChartForm({
             suppressUnloadRef.current = false;
             return;
           }
+          setIsSuccess(true);
           onSuccess(initialData!.id);
         }
       } catch {
@@ -306,6 +310,8 @@ export function useChartForm({
     isAutoCalculated,
     errors,
     isPending,
+    isSuccess,
+    isSubmitDisabled,
     isDirty,
     handleSubmit,
     designers,

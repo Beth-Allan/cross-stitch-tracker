@@ -170,6 +170,37 @@ describe("ChartEditModal", () => {
     expect(screen.getByLabelText(/chart name/i)).toHaveValue("Modified Chart");
   });
 
+  it("keeps submit button disabled after successful save and shows Saved!", async () => {
+    mockUpdateChart.mockResolvedValue({ success: true });
+
+    const user = userEvent.setup();
+    renderModal();
+
+    await user.click(screen.getByRole("button", { name: /save changes/i }));
+
+    await waitFor(() => {
+      const button = screen.getByRole("button", { name: /saved!/i });
+      expect(button).toBeDisabled();
+    });
+  });
+
+  it("re-enables submit button after server error on edit", async () => {
+    mockUpdateChart.mockResolvedValue({
+      success: false,
+      error: "Failed to update chart",
+    });
+
+    const user = userEvent.setup();
+    renderModal();
+
+    await user.click(screen.getByRole("button", { name: /save changes/i }));
+
+    await waitFor(() => {
+      const button = screen.getByRole("button", { name: /save changes/i });
+      expect(button).toBeEnabled();
+    });
+  });
+
   it("closes modal when clicking Discard in discard dialog", async () => {
     const onOpenChange = vi.fn();
     const user = userEvent.setup();
