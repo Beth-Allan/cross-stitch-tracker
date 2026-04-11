@@ -35,8 +35,8 @@ const validFormData = {
   },
   project: {
     status: "UNSTARTED",
-    projectBin: null,
-    ipadApp: null,
+    storageLocationId: null,
+    stitchingAppId: null,
     needsOnionSkinning: false,
     startDate: null,
     finishDate: null,

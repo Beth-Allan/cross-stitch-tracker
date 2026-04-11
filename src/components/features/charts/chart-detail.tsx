@@ -306,15 +306,20 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
       </InfoCard>
 
       {/* Project Setup — only show if any field has data */}
-      {project && (project.projectBin || project.ipadApp || project.needsOnionSkinning) && (
-        <InfoCard icon={Settings} title="Project Setup" className="lg:col-span-2">
-          <div>
-            {project.projectBin && <DetailRow label="Project Bin" value={project.projectBin} />}
-            {project.ipadApp && <DetailRow label="iPad App" value={project.ipadApp} />}
-            {project.needsOnionSkinning && <DetailRow label="Onion Skinning" value="Needed" />}
-          </div>
-        </InfoCard>
-      )}
+      {project &&
+        (project.storageLocation || project.stitchingApp || project.needsOnionSkinning) && (
+          <InfoCard icon={Settings} title="Project Setup" className="lg:col-span-2">
+            <div>
+              {project.storageLocation && (
+                <DetailRow label="Storage Location" value={project.storageLocation.name} />
+              )}
+              {project.stitchingApp && (
+                <DetailRow label="Stitching App" value={project.stitchingApp.name} />
+              )}
+              {project.needsOnionSkinning && <DetailRow label="Onion Skinning" value="Needed" />}
+            </div>
+          </InfoCard>
+        )}
 
       {/* Dates — always show Added, only show others if set */}
       <InfoCard icon={Calendar} title="Dates" className="lg:col-span-2">

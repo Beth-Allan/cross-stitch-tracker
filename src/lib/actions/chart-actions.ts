@@ -46,8 +46,8 @@ export async function createChart(formData: unknown) {
           create: {
             userId: user.id,
             status: project.status,
-            projectBin: project.projectBin,
-            ipadApp: project.ipadApp,
+            storageLocationId: project.storageLocationId,
+            stitchingAppId: project.stitchingAppId,
             needsOnionSkinning: project.needsOnionSkinning,
             startDate: project.startDate ? new Date(project.startDate) : null,
             finishDate: project.finishDate ? new Date(project.finishDate) : null,
@@ -127,8 +127,8 @@ export async function updateChart(chartId: string, formData: unknown) {
         project: {
           update: {
             status: project.status,
-            projectBin: project.projectBin,
-            ipadApp: project.ipadApp,
+            storageLocationId: project.storageLocationId,
+            stitchingAppId: project.stitchingAppId,
             needsOnionSkinning: project.needsOnionSkinning,
             startDate: project.startDate ? new Date(project.startDate) : null,
             finishDate: project.finishDate ? new Date(project.finishDate) : null,
@@ -225,7 +225,16 @@ export async function getChart(chartId: string) {
   try {
     const chart = await prisma.chart.findUnique({
       where: { id: chartId },
-      include: { project: true, designer: true, genres: true },
+      include: {
+        project: {
+          include: {
+            storageLocation: { select: { id: true, name: true } },
+            stitchingApp: { select: { id: true, name: true } },
+          },
+        },
+        designer: true,
+        genres: true,
+      },
     });
     // Only return charts owned by the current user
     if (chart && chart.project && chart.project.userId !== user.id) {
@@ -244,7 +253,16 @@ export async function getCharts() {
   try {
     return await prisma.chart.findMany({
       where: { project: { userId: user.id } },
-      include: { project: true, designer: true, genres: true },
+      include: {
+        project: {
+          include: {
+            storageLocation: { select: { id: true, name: true } },
+            stitchingApp: { select: { id: true, name: true } },
+          },
+        },
+        designer: true,
+        genres: true,
+      },
       orderBy: { dateAdded: "desc" },
     });
   } catch (error) {

@@ -76,8 +76,10 @@ model Project {
   finishPhotoUrl       String?
   startingStitches     Int                @default(0)
   stitchesCompleted    Int                @default(0)
-  projectBin           String?
-  ipadApp              String?
+  storageLocation      StorageLocation? @relation(fields: [storageLocationId], references: [id])
+  storageLocationId    String?
+  stitchingApp         StitchingApp?   @relation(fields: [stitchingAppId], references: [id])
+  stitchingAppId       String?
   needsOnionSkinning   Boolean            @default(false)
   wantToStartNext      Boolean            @default(false)
   preferredStartSeason String?
@@ -243,4 +245,26 @@ model Fabric {
   linkedProjectId    String?      @unique
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
+}
+
+// ─── Storage & App Models ───────────────────────────────────────────────────
+
+model StorageLocation {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  userId      String
+  projects    Project[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model StitchingApp {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  userId      String
+  projects    Project[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

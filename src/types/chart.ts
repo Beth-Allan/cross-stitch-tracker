@@ -1,8 +1,21 @@
-import type { Chart, Project, Designer, Genre, ProjectStatus } from "@/generated/prisma/client";
+import type {
+  Chart,
+  Project,
+  Designer,
+  Genre,
+  ProjectStatus,
+  StorageLocation,
+  StitchingApp,
+} from "@/generated/prisma/client";
 import type { SizeCategory } from "@/lib/utils/size-category";
 
+export type ProjectWithRelations = Project & {
+  storageLocation: Pick<StorageLocation, "id" | "name"> | null;
+  stitchingApp: Pick<StitchingApp, "id" | "name"> | null;
+};
+
 export type ChartWithProject = Chart & {
-  project: Project | null;
+  project: ProjectWithRelations | null;
   designer: Designer | null;
   genres: Genre[];
 };

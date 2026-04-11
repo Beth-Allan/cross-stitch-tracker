@@ -28,8 +28,8 @@ export interface ChartFormValues {
   isSAL: boolean;
   notes: string;
   status: ProjectStatus;
-  projectBin: string | null;
-  ipadApp: string | null;
+  storageLocationId: string | null;
+  stitchingAppId: string | null;
   needsOnionSkinning: boolean;
   startDate: string;
   finishDate: string;
@@ -85,8 +85,8 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
       isSAL: false,
       notes: "",
       status: "UNSTARTED" as ProjectStatus,
-      projectBin: null,
-      ipadApp: null,
+      storageLocationId: null,
+      stitchingAppId: null,
       needsOnionSkinning: false,
       startDate: "",
       finishDate: "",
@@ -115,8 +115,8 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
     isSAL: data.isSAL,
     notes: data.notes ?? "",
     status: (project?.status ?? "UNSTARTED") as ProjectStatus,
-    projectBin: project?.projectBin ?? null,
-    ipadApp: project?.ipadApp ?? null,
+    storageLocationId: project?.storageLocationId ?? null,
+    stitchingAppId: project?.stitchingAppId ?? null,
     needsOnionSkinning: project?.needsOnionSkinning ?? false,
     startDate: project?.startDate ? new Date(project.startDate).toISOString().split("T")[0] : "",
     finishDate: project?.finishDate ? new Date(project.finishDate).toISOString().split("T")[0] : "",
@@ -199,8 +199,8 @@ export function useChartForm({
         },
         project: {
           status: values.status,
-          projectBin: values.projectBin,
-          ipadApp: values.ipadApp,
+          storageLocationId: values.storageLocationId,
+          stitchingAppId: values.stitchingAppId,
           needsOnionSkinning: values.needsOnionSkinning,
           startDate: values.startDate || null,
           finishDate: values.finishDate || null,

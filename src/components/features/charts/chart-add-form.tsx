@@ -116,12 +116,12 @@ export function ChartAddForm({ designers, genres }: ChartAddFormProps) {
 
         <ProjectSetupSection
           status={form.values.status}
-          projectBin={form.values.projectBin}
-          ipadApp={form.values.ipadApp}
+          storageLocationId={form.values.storageLocationId}
+          stitchingAppId={form.values.stitchingAppId}
           needsOnionSkinning={form.values.needsOnionSkinning}
           onStatusChange={(v) => form.setField("status", v as ProjectStatus)}
-          onBinChange={(v) => form.setField("projectBin", v)}
-          onAppChange={(v) => form.setField("ipadApp", v)}
+          onStorageLocationChange={(v) => form.setField("storageLocationId", v)}
+          onStitchingAppChange={(v) => form.setField("stitchingAppId", v)}
           onOnionSkinningChange={(v) => form.setField("needsOnionSkinning", v)}
           errors={{
             status: form.errors["project.status"],

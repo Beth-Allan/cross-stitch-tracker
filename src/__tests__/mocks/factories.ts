@@ -12,9 +12,12 @@ import type {
   ProjectSpecialty,
   FabricBrand,
   Fabric,
+  StorageLocation,
+  StitchingApp,
 } from "@/generated/prisma/client";
 import type { DesignerWithStats, DesignerChart } from "@/types/designer";
 import type { GenreWithStats, GenreChart } from "@/types/genre";
+import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { vi } from "vitest";
 
 /**
@@ -106,8 +109,8 @@ export function createMockProject(overrides?: Partial<Project>): Project {
     finishDate: null,
     ffoDate: null,
     finishPhotoUrl: null,
-    projectBin: null,
-    ipadApp: null,
+    storageLocationId: null,
+    stitchingAppId: null,
     needsOnionSkinning: false,
     wantToStartNext: false,
     preferredStartSeason: null,
@@ -298,6 +301,58 @@ export function createMockFabric(overrides?: Partial<Fabric>): Fabric {
   };
 }
 
+// ─── Storage & App Factories ────────────────────────────────────────────────
+
+export function createMockStorageLocation(
+  overrides?: Partial<StorageLocation>,
+): StorageLocation {
+  return {
+    id: "sl-1",
+    name: "Project Bin A",
+    description: null,
+    userId: "user-1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
+export function createMockStorageLocationWithStats(
+  overrides?: Partial<StorageLocationWithStats>,
+): StorageLocationWithStats {
+  return {
+    id: "sl-1",
+    name: "Project Bin A",
+    description: null,
+    _count: { projects: 0 },
+    ...overrides,
+  };
+}
+
+export function createMockStitchingApp(overrides?: Partial<StitchingApp>): StitchingApp {
+  return {
+    id: "sa-1",
+    name: "Markup R-XP",
+    description: null,
+    userId: "user-1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
+export function createMockStitchingAppWithStats(
+  overrides?: Partial<StitchingAppWithStats>,
+): StitchingAppWithStats {
+  return {
+    id: "sa-1",
+    name: "Markup R-XP",
+    description: null,
+    _count: { projects: 0 },
+    ...overrides,
+  };
+}
+
 // ─── Mock Prisma Client ─────────────────────────────────────────────────────
 
 /**
@@ -314,7 +369,7 @@ export function createMockPrisma() {
       updateMany: vi.fn(),
       delete: vi.fn(),
     },
-    project: { findUnique: vi.fn(), findMany: vi.fn(), update: vi.fn() },
+    project: { findUnique: vi.fn(), findMany: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
     designer: {
       create: vi.fn(),
       findMany: vi.fn(),
@@ -400,6 +455,22 @@ export function createMockPrisma() {
       update: vi.fn(),
       delete: vi.fn(),
       upsert: vi.fn(),
+    },
+    storageLocation: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+      delete: vi.fn(),
+    },
+    stitchingApp: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+      delete: vi.fn(),
     },
     $transaction: vi.fn(),
   };

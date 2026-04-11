@@ -19,8 +19,8 @@ const validChartBase = {
 
 const validProject = {
   status: "UNSTARTED",
-  projectBin: null,
-  ipadApp: null,
+  storageLocationId: null,
+  stitchingAppId: null,
   needsOnionSkinning: false,
   startDate: null,
   finishDate: null,
