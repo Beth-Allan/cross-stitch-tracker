@@ -21,6 +21,7 @@ import {
   updateBead,
   createSpecialtyItem,
   updateSpecialtyItem,
+  createSupplyBrand,
 } from "@/lib/actions/supply-actions";
 import { ColorSwatch } from "./color-swatch";
 import type { SupplyBrand, ColorFamily } from "@/generated/prisma/client";
@@ -128,8 +129,41 @@ export function SupplyFormModal({
     initialData && "description" in initialData ? (initialData.description ?? "") : "",
   );
 
+  // Inline brand creation state
+  const [localBrands, setLocalBrands] = useState(brands);
+  const [isAddingBrand, setIsAddingBrand] = useState(false);
+  const [newBrandName, setNewBrandName] = useState("");
+  const [isCreatingBrand, setIsCreatingBrand] = useState(false);
+
   // Errors
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  async function handleAddBrand() {
+    const trimmed = newBrandName.trim();
+    if (!trimmed || isCreatingBrand) return;
+
+    setIsCreatingBrand(true);
+    try {
+      const result = await createSupplyBrand({
+        name: trimmed,
+        supplyType: supplyType.toUpperCase(),
+        website: null,
+      });
+      if (result.success && result.brand) {
+        setLocalBrands((prev) => [...prev, result.brand!]);
+        setBrandId(result.brand.id);
+        setNewBrandName("");
+        setIsAddingBrand(false);
+        toast.success(`Brand "${result.brand.name}" created`);
+      } else {
+        toast.error(result.error ?? "Failed to create brand");
+      }
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsCreatingBrand(false);
+    }
+  }
 
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
@@ -235,7 +269,7 @@ export function SupplyFormModal({
                 {code || "Code"} &mdash; {colorName || "Color Name"}
               </p>
               <p className="text-muted-foreground text-xs">
-                {brands.find((b) => b.id === brandId)?.name ?? "Brand"}{" "}
+                {localBrands.find((b) => b.id === brandId)?.name ?? "Brand"}{" "}
                 {colorFamily ? `\u00B7 ${COLOR_FAMILY_DISPLAY[colorFamily] ?? colorFamily}` : ""}
               </p>
             </div>
@@ -251,7 +285,7 @@ export function SupplyFormModal({
               className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               <option value="">Select brand...</option>
-              {brands
+              {localBrands
                 .filter((b) => b.supplyType === supplyType.toUpperCase())
                 .map((b) => (
                   <option key={b.id} value={b.id}>
@@ -259,6 +293,43 @@ export function SupplyFormModal({
                   </option>
                 ))}
             </select>
+            {isAddingBrand ? (
+              <div className="mt-2 flex items-center gap-2">
+                <Input
+                  value={newBrandName}
+                  onChange={(e) => setNewBrandName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      void handleAddBrand();
+                    }
+                    if (e.key === "Escape") {
+                      setIsAddingBrand(false);
+                      setNewBrandName("");
+                    }
+                  }}
+                  placeholder="Brand name"
+                  autoFocus
+                  disabled={isCreatingBrand}
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => void handleAddBrand()}
+                  disabled={!newBrandName.trim() || isCreatingBrand}
+                >
+                  {isCreatingBrand ? "Adding..." : "Add"}
+                </Button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsAddingBrand(true)}
+                className="text-primary mt-1 text-xs hover:underline"
+              >
+                + Add Brand
+              </button>
+            )}
           </FormField>
 
           {/* Code */}
