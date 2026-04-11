@@ -33,15 +33,22 @@
   - Normalized page title sizes (supplies, shopping: text-lg → text-2xl)
   - Normalized genre list layout to match sibling pages
   - Centralized SIZE_COLORS config, removed duplicates
+- Impeccable audit (13/20) + harden/polish/optimize/adapt passes (d0e3cd5):
+  - Harden: 8 a11y fixes (ARIA roles, keyboard activation, focus-visible, required indicators)
+  - Polish: Added success/warning semantic token families; replaced 25 hard-coded colors across 9 files
+  - Optimize: Memoized supply table sort, CLS fix on chart cover, narrowed transition-all
+  - Adapt: Fixed invisible grid edit icon, upgraded 10px badges to 12px, improved touch targets
 
 ### In Progress
 
-- Nothing — ready to deploy
+- Impeccable audit re-run (pre-deploy quality gate)
 
 ### Next Up
 
-1. Deploy MVP to Vercel
-2. Start Milestone 2 (Browse & Organize)
+1. Re-run `/impeccable:audit` to measure improvement from 13/20 baseline
+2. Fix any P0-P1 issues from re-audit
+3. Deploy MVP to Vercel
+4. Start Milestone 2 (Browse & Organize)
 
 ### Backlog (post-MVP)
 
