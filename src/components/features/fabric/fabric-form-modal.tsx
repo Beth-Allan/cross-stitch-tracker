@@ -76,9 +76,7 @@ export function FabricFormModal({
       const result = await createFabricBrand({ name: trimmed, website: null });
       if (result.success && result.brand) {
         const newBrand: FabricBrandWithCounts = {
-          id: result.brand.id,
-          name: result.brand.name,
-          website: null,
+          ...result.brand,
           _count: { fabrics: 0 },
         };
         setLocalBrands((prev) => [...prev, newBrand]);
