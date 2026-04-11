@@ -564,9 +564,7 @@ function FabricCard({
       <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-xs">
         <span>{fabric.colorFamily}</span>
         {hasDimensions && (
-          <span>
-            {fabric.shortestEdgeInches}" x {fabric.longestEdgeInches}"
-          </span>
+          <span>{`${fabric.shortestEdgeInches}" x ${fabric.longestEdgeInches}"`}</span>
         )}
         {fabric.needToBuy && (
           <Badge className="border-amber-200 bg-amber-50 text-[10px] text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
