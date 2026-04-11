@@ -182,7 +182,7 @@ export async function getFabric(id: string) {
         brand: true,
         linkedProject: {
           include: {
-            chart: { select: { name: true, stitchesWide: true, stitchesHigh: true } },
+            chart: { select: { id: true, name: true, stitchesWide: true, stitchesHigh: true } },
           },
         },
       },

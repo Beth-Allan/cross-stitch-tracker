@@ -10,7 +10,7 @@ export type FabricWithProject = Fabric & {
   brand: FabricBrand;
   linkedProject: {
     id: string;
-    chart: { name: string; stitchesWide: number; stitchesHigh: number };
+    chart: { id: string; name: string; stitchesWide: number; stitchesHigh: number };
   } | null;
 };
 

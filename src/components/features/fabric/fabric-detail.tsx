@@ -52,10 +52,7 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
     <div className="space-y-6">
       {/* Breadcrumb */}
       <nav className="text-muted-foreground flex items-center gap-1 text-sm">
-        <Link
-          href="/fabric"
-          className="hover:text-foreground transition-colors"
-        >
+        <Link href="/fabric" className="hover:text-foreground transition-colors">
           Fabric
         </Link>
         <ChevronRight className="h-3.5 w-3.5" />
@@ -118,7 +115,7 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
           <MetadataField label="Linked Project">
             {fabric.linkedProject ? (
               <Link
-                href={`/charts/${fabric.linkedProject.id}`}
+                href={`/charts/${fabric.linkedProject.chart.id}`}
                 className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
               >
                 {fabric.linkedProject.chart.name}
@@ -170,7 +167,7 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
 function MetadataField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+      <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
         {label}
       </p>
       <div className="text-foreground mt-1 text-sm">{children}</div>

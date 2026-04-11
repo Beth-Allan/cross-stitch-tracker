@@ -22,17 +22,11 @@ vi.mock("sonner", () => ({
 }));
 
 const mockBrand = createMockFabricBrand({ id: "fb-1", name: "Zweigart" });
-const mockBrands: FabricBrandWithCounts[] = [
-  { ...mockBrand, _count: { fabrics: 3 } },
-];
+const mockBrands: FabricBrandWithCounts[] = [{ ...mockBrand, _count: { fabrics: 3 } }];
 
-const mockProjects = [
-  { id: "proj-1", chartName: "Dragon Queen" },
-];
+const mockProjects = [{ id: "proj-1", chartName: "Dragon Queen" }];
 
-function makeFabricWithProject(
-  overrides?: Partial<FabricWithProject>,
-): FabricWithProject {
+function makeFabricWithProject(overrides?: Partial<FabricWithProject>): FabricWithProject {
   return {
     ...createMockFabric({
       id: "f1",
@@ -60,13 +54,7 @@ describe("FabricDetail", () => {
 
   it("renders fabric name, brand, count, type, color info", () => {
     const fabric = makeFabricWithProject();
-    render(
-      <FabricDetail
-        fabric={fabric}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
-    );
+    render(<FabricDetail fabric={fabric} fabricBrands={mockBrands} projects={mockProjects} />);
 
     // Name appears in breadcrumb + heading
     expect(screen.getAllByText("White Aida 14ct").length).toBeGreaterThanOrEqual(1);
@@ -83,29 +71,17 @@ describe("FabricDetail", () => {
       linkedProjectId: "proj-1",
       linkedProject: {
         id: "proj-1",
-        chart: { name: "Dragon Queen", stitchesWide: 200, stitchesHigh: 150 },
+        chart: { id: "chart-1", name: "Dragon Queen", stitchesWide: 200, stitchesHigh: 150 },
       },
     });
-    render(
-      <FabricDetail
-        fabric={fabric}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
-    );
+    render(<FabricDetail fabric={fabric} fabricBrands={mockBrands} projects={mockProjects} />);
 
     expect(screen.getByText("Dragon Queen")).toBeInTheDocument();
   });
 
   it("shows 'Unassigned' when no linked project", () => {
     const fabric = makeFabricWithProject({ linkedProject: null });
-    render(
-      <FabricDetail
-        fabric={fabric}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
-    );
+    render(<FabricDetail fabric={fabric} fabricBrands={mockBrands} projects={mockProjects} />);
 
     expect(screen.getByText("Unassigned")).toBeInTheDocument();
   });
@@ -117,16 +93,10 @@ describe("FabricDetail", () => {
       linkedProjectId: "proj-1",
       linkedProject: {
         id: "proj-1",
-        chart: { name: "Dragon Queen", stitchesWide: 200, stitchesHigh: 150 },
+        chart: { id: "chart-1", name: "Dragon Queen", stitchesWide: 200, stitchesHigh: 150 },
       },
     });
-    render(
-      <FabricDetail
-        fabric={fabric}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
-    );
+    render(<FabricDetail fabric={fabric} fabricBrands={mockBrands} projects={mockProjects} />);
 
     // Required: (200/14) + 6 = 20.29" x (150/14) + 6 = 16.71"
     // Available: 24" x 30" -> Fits
@@ -140,16 +110,10 @@ describe("FabricDetail", () => {
       linkedProjectId: "proj-1",
       linkedProject: {
         id: "proj-1",
-        chart: { name: "Dragon Queen", stitchesWide: 200, stitchesHigh: 150 },
+        chart: { id: "chart-1", name: "Dragon Queen", stitchesWide: 200, stitchesHigh: 150 },
       },
     });
-    render(
-      <FabricDetail
-        fabric={fabric}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
-    );
+    render(<FabricDetail fabric={fabric} fabricBrands={mockBrands} projects={mockProjects} />);
 
     // Required: 20.29" x 16.71" but only 10" x 12" available
     expect(screen.getByText("Too small")).toBeInTheDocument();
@@ -160,16 +124,10 @@ describe("FabricDetail", () => {
       linkedProjectId: "proj-1",
       linkedProject: {
         id: "proj-1",
-        chart: { name: "Dragon Queen", stitchesWide: 0, stitchesHigh: 0 },
+        chart: { id: "chart-1", name: "Dragon Queen", stitchesWide: 0, stitchesHigh: 0 },
       },
     });
-    render(
-      <FabricDetail
-        fabric={fabric}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
-    );
+    render(<FabricDetail fabric={fabric} fabricBrands={mockBrands} projects={mockProjects} />);
 
     expect(screen.queryByText("Fits")).not.toBeInTheDocument();
     expect(screen.queryByText("Too small")).not.toBeInTheDocument();
@@ -178,13 +136,7 @@ describe("FabricDetail", () => {
 
   it("shows edit and delete buttons", () => {
     const fabric = makeFabricWithProject();
-    render(
-      <FabricDetail
-        fabric={fabric}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
-    );
+    render(<FabricDetail fabric={fabric} fabricBrands={mockBrands} projects={mockProjects} />);
 
     expect(screen.getByRole("button", { name: /Edit/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Delete/i })).toBeInTheDocument();
@@ -192,13 +144,7 @@ describe("FabricDetail", () => {
 
   it("shows breadcrumb with link back to /fabric", () => {
     const fabric = makeFabricWithProject();
-    render(
-      <FabricDetail
-        fabric={fabric}
-        fabricBrands={mockBrands}
-        projects={mockProjects}
-      />,
-    );
+    render(<FabricDetail fabric={fabric} fabricBrands={mockBrands} projects={mockProjects} />);
 
     const breadcrumbLink = screen.getByRole("link", { name: "Fabric" });
     expect(breadcrumbLink).toHaveAttribute("href", "/fabric");
