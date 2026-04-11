@@ -108,6 +108,15 @@ export async function confirmUpload(input: { chartId: string; field: string; key
       data: { [input.field]: input.key },
     });
 
+    // Auto-generate thumbnail when a cover image is confirmed
+    if (input.field === "coverImageUrl") {
+      try {
+        await generateThumbnail(input.chartId, input.key);
+      } catch (err) {
+        console.warn("Thumbnail generation failed (upload confirmed without thumbnail):", err);
+      }
+    }
+
     revalidatePath(`/charts/${input.chartId}`);
     return { success: true as const };
   } catch (error) {

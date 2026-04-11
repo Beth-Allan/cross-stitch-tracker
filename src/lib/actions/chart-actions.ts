@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { generateThumbnail } from "@/lib/actions/upload-actions";
 import { chartFormSchema } from "@/lib/validations/chart";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
 
@@ -60,6 +61,15 @@ export async function createChart(formData: unknown) {
       include: { project: true, designer: true, genres: true },
     });
 
+    // Generate thumbnail if a cover image was uploaded
+    if (chart.coverImageUrl) {
+      try {
+        await generateThumbnail(created.id, chart.coverImageUrl);
+      } catch (err) {
+        console.warn("Thumbnail generation failed (chart saved without thumbnail):", err);
+      }
+    }
+
     revalidatePath("/charts");
     return { success: true as const, chartId: created.id };
   } catch (error) {
@@ -75,10 +85,10 @@ export async function updateChart(chartId: string, formData: unknown) {
   const user = await requireAuth();
 
   try {
-    // Verify ownership
+    // Verify ownership and fetch current cover image for change detection
     const existing = await prisma.chart.findUnique({
       where: { id: chartId },
-      select: { project: { select: { userId: true } } },
+      select: { coverImageUrl: true, project: { select: { userId: true } } },
     });
     if (!existing?.project || existing.project.userId !== user.id) {
       return { success: false as const, error: "Chart not found" };
@@ -131,6 +141,15 @@ export async function updateChart(chartId: string, formData: unknown) {
       },
       include: { project: true, designer: true, genres: true },
     });
+
+    // Generate thumbnail if cover image changed
+    if (chart.coverImageUrl && chart.coverImageUrl !== existing.coverImageUrl) {
+      try {
+        await generateThumbnail(chartId, chart.coverImageUrl);
+      } catch (err) {
+        console.warn("Thumbnail generation failed (chart saved without thumbnail):", err);
+      }
+    }
 
     revalidatePath("/charts");
     revalidatePath(`/charts/${chartId}`);

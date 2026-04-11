@@ -164,7 +164,8 @@ export function ChartList({ charts, designers, genres, imageUrls }: ChartListPro
                 key={chart.id}
                 chart={chart}
                 imageUrl={
-                  chart.coverThumbnailUrl ? (imageUrls[chart.coverThumbnailUrl] ?? null) : null
+                  (chart.coverThumbnailUrl ? (imageUrls[chart.coverThumbnailUrl] ?? null) : null) ??
+                  (chart.coverImageUrl ? (imageUrls[chart.coverImageUrl] ?? null) : null)
                 }
                 onEdit={() => setEditingChart(chart)}
                 onDelete={() => setDeletingChart(chart)}
