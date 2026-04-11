@@ -7,6 +7,7 @@ export const ALLOWED_FILE_TYPES = [
   "image/jpeg",
   "image/webp",
   "application/pdf",
+  "application/octet-stream", // .saga, .oxs, .xsd (cross-stitch software formats)
 ] as const;
 
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB

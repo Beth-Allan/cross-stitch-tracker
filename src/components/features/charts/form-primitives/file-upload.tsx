@@ -28,7 +28,7 @@ export function FileUpload({
 
   const validateFile = useCallback((file: File): string | null => {
     if (!ALLOWED_FILE_TYPES.includes(file.type as (typeof ALLOWED_FILE_TYPES)[number])) {
-      return "Invalid file type. Please upload a PDF, PNG, JPG, or WebP file.";
+      return "Invalid file type. Please upload a PDF, image, or cross-stitch file (.saga, .oxs, .xsd).";
     }
     if (file.size > MAX_FILE_SIZE) {
       return "File is too large. Maximum size is 10MB.";
@@ -113,7 +113,7 @@ export function FileUpload({
       <input
         ref={inputRef}
         type="file"
-        accept={ALLOWED_FILE_TYPES.join(",")}
+        accept={[...ALLOWED_FILE_TYPES, ".saga", ".oxs", ".xsd"].join(",")}
         onChange={handleFileSelect}
         className="hidden"
         aria-hidden="true"
