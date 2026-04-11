@@ -158,7 +158,7 @@ export function CoverImageUpload({
           <button
             type="button"
             onClick={handleRemove}
-            className="absolute top-2 right-2 rounded-full bg-black/50 p-1 text-white transition-colors hover:bg-black/70"
+            className="absolute top-2 right-2 rounded-full bg-black/50 p-2 text-white transition-colors hover:bg-black/70"
             aria-label="Remove cover image"
           >
             <X className="size-4" />

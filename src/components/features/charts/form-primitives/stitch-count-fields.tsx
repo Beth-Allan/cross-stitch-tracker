@@ -86,12 +86,12 @@ export function StitchCountFields({
         {effectiveCount > 0 && sizeCategory && (
           <div className="mt-2 flex items-center gap-2">
             <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${SIZE_COLORS[sizeCategory].bg} ${SIZE_COLORS[sizeCategory].text}`}
+              className={`rounded-full px-2 py-0.5 text-xs font-bold uppercase ${SIZE_COLORS[sizeCategory].bg} ${SIZE_COLORS[sizeCategory].text}`}
             >
               {sizeCategory}
             </span>
             {isAutoCalculated && (
-              <span className="bg-secondary/10 text-secondary rounded-full px-2 py-0.5 text-[10px] font-medium">
+              <span className="bg-secondary/10 text-secondary rounded-full px-2 py-0.5 text-xs font-medium">
                 Auto-calculated
               </span>
             )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ChevronUp, ChevronDown, Pencil, Trash2 } from "lucide-react";
 import { ColorSwatch } from "./color-swatch";
 
@@ -103,20 +103,22 @@ export function SupplyTableView({ items, columns, onEdit, onDelete }: SupplyTabl
     );
   }
 
-  const sortedItems = [...items].sort((a, b) => {
+  const sortedItems = useMemo(() => {
     const col = columns.find((c) => c.key === sort.key);
-    if (!col) return 0;
-    const aVal = col.accessor(a);
-    const bVal = col.accessor(b);
-    const dir = sort.dir === "asc" ? 1 : -1;
+    if (!col) return items;
+    return [...items].sort((a, b) => {
+      const aVal = col.accessor(a);
+      const bVal = col.accessor(b);
+      const dir = sort.dir === "asc" ? 1 : -1;
 
-    // Attempt numeric sort for codes
-    const aNum = parseFloat(aVal.replace(/[^0-9.]/g, ""));
-    const bNum = parseFloat(bVal.replace(/[^0-9.]/g, ""));
-    if (!isNaN(aNum) && !isNaN(bNum)) return dir * (aNum - bNum);
+      // Attempt numeric sort for codes
+      const aNum = parseFloat(aVal.replace(/[^0-9.]/g, ""));
+      const bNum = parseFloat(bVal.replace(/[^0-9.]/g, ""));
+      if (!isNaN(aNum) && !isNaN(bNum)) return dir * (aNum - bNum);
 
-    return dir * aVal.localeCompare(bVal);
-  });
+      return dir * aVal.localeCompare(bVal);
+    });
+  }, [items, sort, columns]);
 
   return (
     <div className="border-border bg-card overflow-x-auto rounded-xl border">

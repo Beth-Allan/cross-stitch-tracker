@@ -20,7 +20,7 @@ export function SizeBadge({ stitchCount, stitchesWide = 0, stitchesHigh = 0 }: S
 
   return (
     <span
-      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase ${colors.bg} ${colors.text}`}
+      className={`rounded-full px-2 py-0.5 text-xs font-semibold tracking-wider uppercase ${colors.bg} ${colors.text}`}
     >
       {category}
     </span>

@@ -33,9 +33,9 @@ export function SupplyGridView({ items, onEdit }: SupplyGridViewProps) {
             type="button"
             onClick={() => onEdit(item.id)}
             aria-label={`Edit ${code ? `${code} — ` : ""}${item.colorName}`}
-            className="group bg-card border-border hover:border-primary/30 relative flex flex-col items-center gap-2 rounded-xl border p-4 shadow-sm transition-all hover:shadow-md"
+            className="group bg-card border-border hover:border-primary/30 relative flex flex-col items-center gap-2 rounded-xl border p-4 shadow-sm transition-[shadow,border-color] hover:shadow-md"
           >
-            <div className="bg-primary/10 text-primary absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="bg-primary/10 text-primary absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full opacity-40 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
               <Pencil className="h-3 w-3" />
             </div>
             <ColorSwatch hexColor={item.hexColor} size="lg" />

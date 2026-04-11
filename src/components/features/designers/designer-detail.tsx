@@ -208,7 +208,7 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
                 onClick={() => handleSort(opt.key)}
                 className={`rounded-full px-2 py-0.5 text-xs transition-colors ${
                   chartSort.key === opt.key
-                    ? "bg-emerald-50 font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400"
+                    ? "bg-success-muted font-semibold text-success-muted-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
