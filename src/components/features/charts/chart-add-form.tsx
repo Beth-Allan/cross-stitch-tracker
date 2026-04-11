@@ -161,8 +161,8 @@ export function ChartAddForm({ designers, genres }: ChartAddFormProps) {
           <Button type="button" variant="ghost" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button type="submit" disabled={form.isSubmitDisabled}>
-            {form.isSuccess ? "Added!" : form.isPending ? "Adding..." : "Add Chart"}
+          <Button type="submit" disabled={form.isPending}>
+            {form.isPending ? "Adding..." : "Add Chart"}
           </Button>
         </div>
       </form>

@@ -280,8 +280,8 @@ export function ChartEditModal({
               <Button type="button" variant="ghost" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={form.isSubmitDisabled}>
-                {form.isSuccess ? "Saved!" : form.isPending ? "Saving..." : "Save Changes"}
+              <Button type="submit" disabled={form.isPending}>
+                {form.isPending ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </form>
