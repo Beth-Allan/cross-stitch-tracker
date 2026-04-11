@@ -1,5 +1,221 @@
 [
   {
+    "colorCode": "Blanc",
+    "colorName": "Blanc",
+    "hexColor": "#FCFBF8",
+    "colorFamily": "WHITE"
+  },
+  {
+    "colorCode": "1",
+    "colorName": "White Tin",
+    "hexColor": "#E3E3E6",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "2",
+    "colorName": "Tin",
+    "hexColor": "#D7D7D8",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "3",
+    "colorName": "Tin Medium",
+    "hexColor": "#B8B8BB",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "4",
+    "colorName": "Tin Dark",
+    "hexColor": "#AEAEB1",
+    "colorFamily": "GRAY"
+  },
+  {
+    "colorCode": "5",
+    "colorName": "Driftwood Light",
+    "hexColor": "#E3CCBE",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "6",
+    "colorName": "Driftwood Medium Light",
+    "hexColor": "#DCC6B8",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "7",
+    "colorName": "Driftwood",
+    "hexColor": "#8F7B6E",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "8",
+    "colorName": "Driftwood Dark",
+    "hexColor": "#6A5046",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "9",
+    "colorName": "Cocoa Very Dark",
+    "hexColor": "#552014",
+    "colorFamily": "BROWN"
+  },
+  {
+    "colorCode": "10",
+    "colorName": "Tender Green Very Light",
+    "hexColor": "#EDFED9",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "11",
+    "colorName": "Tender Green Light",
+    "hexColor": "#E2EDB5",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "12",
+    "colorName": "Tender Green",
+    "hexColor": "#CDD99A",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "13",
+    "colorName": "Nile Green Medium Light",
+    "hexColor": "#BFF6E0",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "14",
+    "colorName": "Apple Green Pale",
+    "hexColor": "#D0FBB2",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "15",
+    "colorName": "Apple Green",
+    "hexColor": "#D1EDA4",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "16",
+    "colorName": "Chartreuse Light",
+    "hexColor": "#C9C258",
+    "colorFamily": "GREEN"
+  },
+  {
+    "colorCode": "17",
+    "colorName": "Yellow Plum Light",
+    "hexColor": "#E5E272",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "18",
+    "colorName": "Yellow Plum",
+    "hexColor": "#D9D56D",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "19",
+    "colorName": "Autumn Gold Medium Light",
+    "hexColor": "#F7C95F",
+    "colorFamily": "YELLOW"
+  },
+  {
+    "colorCode": "20",
+    "colorName": "Shrimp",
+    "hexColor": "#F7AF93",
+    "colorFamily": "ORANGE"
+  },
+  {
+    "colorCode": "21",
+    "colorName": "Alizarin Light",
+    "hexColor": "#D79982",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "22",
+    "colorName": "Alizarin",
+    "hexColor": "#BC604E",
+    "colorFamily": "RED"
+  },
+  {
+    "colorCode": "23",
+    "colorName": "Apple Blossom",
+    "hexColor": "#EDE2ED",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "24",
+    "colorName": "White Lavender",
+    "hexColor": "#E0D7EE",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "25",
+    "colorName": "Lavender Ultra Light",
+    "hexColor": "#DAD2E9",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "26",
+    "colorName": "Lavender Pale",
+    "hexColor": "#D7CAE6",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "27",
+    "colorName": "White Violet",
+    "hexColor": "#F0EEF9",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "28",
+    "colorName": "Eggplant Medium Light",
+    "hexColor": "#9086A9",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "29",
+    "colorName": "Eggplant",
+    "hexColor": "#674076",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "30",
+    "colorName": "Blueberry Medium Light",
+    "hexColor": "#7D77A5",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "31",
+    "colorName": "Blueberry",
+    "hexColor": "#50518D",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "32",
+    "colorName": "Blueberry Dark",
+    "hexColor": "#4D2E8A",
+    "colorFamily": "BLUE"
+  },
+  {
+    "colorCode": "33",
+    "colorName": "Fuschia",
+    "hexColor": "#9C599C",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "34",
+    "colorName": "Fuschia Dark",
+    "hexColor": "#7D3064",
+    "colorFamily": "PURPLE"
+  },
+  {
+    "colorCode": "35",
+    "colorName": "Fuschia Very Dark",
+    "hexColor": "#46052D",
+    "colorFamily": "PURPLE"
+  },
+  {
     "colorCode": "B5200",
     "colorName": "Snow White",
     "hexColor": "#FFFFFF",
