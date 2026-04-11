@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FormField } from "@/components/features/charts/form-primitives/form-field";
-import { createFabric, updateFabric } from "@/lib/actions/fabric-actions";
+import { createFabric, updateFabric, createFabricBrand } from "@/lib/actions/fabric-actions";
 import {
   FABRIC_COUNTS,
   FABRIC_TYPES,
@@ -56,6 +56,46 @@ export function FabricFormModal({
   const [nameError, setNameError] = useState<string | null>(null);
   const [generalError, setGeneralError] = useState<string | null>(null);
 
+  // Inline brand creation state
+  const [localBrands, setLocalBrands] = useState(fabricBrands);
+  const [isAddingBrand, setIsAddingBrand] = useState(false);
+  const [newBrandName, setNewBrandName] = useState("");
+  const [isCreatingBrand, setIsCreatingBrand] = useState(false);
+
+  // Sync localBrands when fabricBrands prop changes (modal open/close)
+  useEffect(() => {
+    setLocalBrands(fabricBrands);
+  }, [fabricBrands]);
+
+  async function handleAddBrand() {
+    const trimmed = newBrandName.trim();
+    if (!trimmed || isCreatingBrand) return;
+
+    setIsCreatingBrand(true);
+    try {
+      const result = await createFabricBrand({ name: trimmed, website: null });
+      if (result.success && result.brand) {
+        const newBrand: FabricBrandWithCounts = {
+          id: result.brand.id,
+          name: result.brand.name,
+          website: null,
+          _count: { fabrics: 0 },
+        };
+        setLocalBrands((prev) => [...prev, newBrand]);
+        setBrandId(result.brand.id);
+        setNewBrandName("");
+        setIsAddingBrand(false);
+        toast.success(`Brand "${result.brand.name}" created`);
+      } else {
+        toast.error(result.error ?? "Failed to create brand");
+      }
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsCreatingBrand(false);
+    }
+  }
+
   useEffect(() => {
     if (open) {
       if (fabric) {
@@ -87,6 +127,8 @@ export function FabricFormModal({
       }
       setNameError(null);
       setGeneralError(null);
+      setIsAddingBrand(false);
+      setNewBrandName("");
     }
   }, [open, fabric, fabricBrands]);
 
@@ -176,12 +218,49 @@ export function FabricFormModal({
               onChange={(e) => setBrandId(e.target.value)}
               className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 flex h-8 w-full rounded-lg border px-3 text-sm transition-colors outline-none focus-visible:ring-3"
             >
-              {fabricBrands.map((b) => (
+              {localBrands.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
                 </option>
               ))}
             </select>
+            {isAddingBrand ? (
+              <div className="mt-2 flex items-center gap-2">
+                <Input
+                  value={newBrandName}
+                  onChange={(e) => setNewBrandName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      void handleAddBrand();
+                    }
+                    if (e.key === "Escape") {
+                      setIsAddingBrand(false);
+                      setNewBrandName("");
+                    }
+                  }}
+                  placeholder="Brand name"
+                  autoFocus
+                  disabled={isCreatingBrand}
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => void handleAddBrand()}
+                  disabled={!newBrandName.trim() || isCreatingBrand}
+                >
+                  {isCreatingBrand ? "Adding..." : "Add"}
+                </Button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsAddingBrand(true)}
+                className="text-primary mt-1 text-xs hover:underline"
+              >
+                + Add Brand
+              </button>
+            )}
           </FormField>
 
           <div className="grid grid-cols-2 gap-4">
