@@ -59,7 +59,7 @@ describe("FabricFormModal", () => {
     const addFabricTexts = screen.getAllByText("Add Fabric");
     expect(addFabricTexts.length).toBeGreaterThanOrEqual(1);
     expect(screen.getByLabelText(/Name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Brand/i)).toBeInTheDocument();
+    expect(screen.getByText("Brand")).toBeInTheDocument();
     expect(screen.getByLabelText(/Count/i)).toBeInTheDocument();
     expect(document.getElementById("fabric-type")).toBeInTheDocument();
     expect(screen.getByLabelText(/Colour Family/i)).toBeInTheDocument();
@@ -144,8 +144,8 @@ describe("FabricFormModal", () => {
     expect(screen.getByRole("button", { name: /Save Changes/i })).toBeInTheDocument();
   });
 
-  describe("inline brand creation", () => {
-    it("renders a '+ Add Brand' button next to the brand select", () => {
+  describe("brand selection via SearchableSelect", () => {
+    it("renders a searchable brand selector with brand options", () => {
       render(
         <FabricFormModal
           open={true}
@@ -156,10 +156,11 @@ describe("FabricFormModal", () => {
         />,
       );
 
-      expect(screen.getByRole("button", { name: /\+ Add Brand/i })).toBeInTheDocument();
+      // SearchableSelect renders as a button trigger showing the selected brand
+      expect(screen.getByText("Zweigart")).toBeInTheDocument();
     });
 
-    it("clicking '+ Add Brand' shows an inline text input and Add button", async () => {
+    it("brand selector shows Add New option in dropdown", async () => {
       const user = userEvent.setup();
       render(
         <FabricFormModal
@@ -171,13 +172,35 @@ describe("FabricFormModal", () => {
         />,
       );
 
-      await user.click(screen.getByRole("button", { name: /\+ Add Brand/i }));
+      // Click the SearchableSelect trigger to open the dropdown
+      await user.click(screen.getByText("Zweigart"));
 
-      expect(screen.getByPlaceholderText(/Brand name/i)).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /^Add$/i })).toBeInTheDocument();
+      // "Add New" should be visible in the command list
+      expect(screen.getByText("Add New")).toBeInTheDocument();
     });
 
-    it("submitting a brand name calls createFabricBrand and adds brand to select", async () => {
+    it("clicking Add New opens the brand creation dialog", async () => {
+      const user = userEvent.setup();
+      render(
+        <FabricFormModal
+          open={true}
+          onOpenChange={vi.fn()}
+          fabric={null}
+          fabricBrands={mockBrands}
+          projects={mockProjects}
+        />,
+      );
+
+      await user.click(screen.getByText("Zweigart"));
+      await user.click(screen.getByText("Add New"));
+
+      await waitFor(() => {
+        expect(screen.getByText("Add New Brand")).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/Brand name/i)).toBeInTheDocument();
+      });
+    });
+
+    it("submitting brand dialog calls createFabricBrand", async () => {
       const user = userEvent.setup();
       const newBrand = { id: "fb-new", name: "Wichelt", website: null, createdAt: new Date(), updatedAt: new Date() };
       mockCreateFabricBrand.mockResolvedValue({ success: true, brand: newBrand });
@@ -192,86 +215,21 @@ describe("FabricFormModal", () => {
         />,
       );
 
-      await user.click(screen.getByRole("button", { name: /\+ Add Brand/i }));
+      await user.click(screen.getByText("Zweigart"));
+      await user.click(screen.getByText("Add New"));
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText(/Brand name/i)).toBeInTheDocument();
+      });
+
       await user.type(screen.getByPlaceholderText(/Brand name/i), "Wichelt");
-      await user.click(screen.getByRole("button", { name: /^Add$/i }));
+      await user.click(screen.getByRole("button", { name: /Add Brand/i }));
 
       await waitFor(() => {
         expect(mockCreateFabricBrand).toHaveBeenCalledWith(
           expect.objectContaining({ name: "Wichelt" }),
         );
       });
-
-      // New brand should appear in the select dropdown
-      await waitFor(() => {
-        const brandSelect = screen.getByLabelText(/Brand/i) as HTMLSelectElement;
-        const optionNames = Array.from(brandSelect.options).map((o) => o.text);
-        expect(optionNames).toContain("Wichelt");
-      });
-    });
-
-    it("after successful brand creation, the new brand is auto-selected", async () => {
-      const user = userEvent.setup();
-      const newBrand = { id: "fb-new", name: "Wichelt", website: null, createdAt: new Date(), updatedAt: new Date() };
-      mockCreateFabricBrand.mockResolvedValue({ success: true, brand: newBrand });
-
-      render(
-        <FabricFormModal
-          open={true}
-          onOpenChange={vi.fn()}
-          fabric={null}
-          fabricBrands={mockBrands}
-          projects={mockProjects}
-        />,
-      );
-
-      await user.click(screen.getByRole("button", { name: /\+ Add Brand/i }));
-      await user.type(screen.getByPlaceholderText(/Brand name/i), "Wichelt");
-      await user.click(screen.getByRole("button", { name: /^Add$/i }));
-
-      await waitFor(() => {
-        const brandSelect = screen.getByLabelText(/Brand/i) as HTMLSelectElement;
-        expect(brandSelect.value).toBe("fb-new");
-      });
-    });
-
-    it("pressing Escape cancels inline add and returns to normal select", async () => {
-      const user = userEvent.setup();
-      render(
-        <FabricFormModal
-          open={true}
-          onOpenChange={vi.fn()}
-          fabric={null}
-          fabricBrands={mockBrands}
-          projects={mockProjects}
-        />,
-      );
-
-      await user.click(screen.getByRole("button", { name: /\+ Add Brand/i }));
-      expect(screen.getByPlaceholderText(/Brand name/i)).toBeInTheDocument();
-
-      await user.keyboard("{Escape}");
-
-      expect(screen.queryByPlaceholderText(/Brand name/i)).not.toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /\+ Add Brand/i })).toBeInTheDocument();
-    });
-
-    it("empty brand name keeps the Add button disabled", async () => {
-      const user = userEvent.setup();
-      render(
-        <FabricFormModal
-          open={true}
-          onOpenChange={vi.fn()}
-          fabric={null}
-          fabricBrands={mockBrands}
-          projects={mockProjects}
-        />,
-      );
-
-      await user.click(screen.getByRole("button", { name: /\+ Add Brand/i }));
-
-      const addBtn = screen.getByRole("button", { name: /^Add$/i });
-      expect(addBtn).toBeDisabled();
     });
   });
 });

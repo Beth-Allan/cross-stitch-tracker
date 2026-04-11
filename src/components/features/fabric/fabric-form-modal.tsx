@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { FormField } from "@/components/features/charts/form-primitives/form-field";
+import { SearchableSelect } from "@/components/features/charts/form-primitives/searchable-select";
+import { InlineBrandDialog } from "@/components/features/shared/inline-brand-dialog";
 import { createFabric, updateFabric, createFabricBrand } from "@/lib/actions/fabric-actions";
 import {
   FABRIC_COUNTS,
@@ -56,41 +57,28 @@ export function FabricFormModal({
   const [nameError, setNameError] = useState<string | null>(null);
   const [generalError, setGeneralError] = useState<string | null>(null);
 
-  // Inline brand creation state
+  // Brand state
   const [localBrands, setLocalBrands] = useState(fabricBrands);
-  const [isAddingBrand, setIsAddingBrand] = useState(false);
-  const [newBrandName, setNewBrandName] = useState("");
-  const [isCreatingBrand, setIsCreatingBrand] = useState(false);
+  const [brandDialogOpen, setBrandDialogOpen] = useState(false);
+  const [brandDialogName, setBrandDialogName] = useState("");
 
   // Sync localBrands when fabricBrands prop changes (modal open/close)
   useEffect(() => {
     setLocalBrands(fabricBrands);
   }, [fabricBrands]);
 
-  async function handleAddBrand() {
-    const trimmed = newBrandName.trim();
-    if (!trimmed || isCreatingBrand) return;
-
-    setIsCreatingBrand(true);
-    try {
-      const result = await createFabricBrand({ name: trimmed, website: null });
-      if (result.success && result.brand) {
-        const newBrand: FabricBrandWithCounts = {
-          ...result.brand,
-          _count: { fabrics: 0 },
-        };
-        setLocalBrands((prev) => [...prev, newBrand]);
-        setBrandId(result.brand.id);
-        setNewBrandName("");
-        setIsAddingBrand(false);
-        toast.success(`Brand "${result.brand.name}" created`);
-      } else {
-        toast.error(result.error ?? "Failed to create brand");
-      }
-    } catch {
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsCreatingBrand(false);
+  async function handleAddBrand(name: string, website?: string) {
+    const result = await createFabricBrand({ name, website: website ?? null });
+    if (result.success && result.brand) {
+      const newBrand: FabricBrandWithCounts = {
+        ...result.brand,
+        _count: { fabrics: 0 },
+      };
+      setLocalBrands((prev) => [...prev, newBrand]);
+      setBrandId(result.brand.id);
+      toast.success(`Brand "${result.brand.name}" created`);
+    } else {
+      throw new Error(result.error ?? "Failed to create brand");
     }
   }
 
@@ -125,8 +113,8 @@ export function FabricFormModal({
       }
       setNameError(null);
       setGeneralError(null);
-      setIsAddingBrand(false);
-      setNewBrandName("");
+      setBrandDialogOpen(false);
+      setBrandDialogName("");
     }
   }, [open, fabric, fabricBrands]);
 
@@ -210,55 +198,22 @@ export function FabricFormModal({
           </FormField>
 
           <FormField label="Brand" htmlFor="fabric-brand" required>
-            <select
-              id="fabric-brand"
-              value={brandId}
-              onChange={(e) => setBrandId(e.target.value)}
-              className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 flex h-8 w-full rounded-lg border px-3 text-sm transition-colors outline-none focus-visible:ring-3"
-            >
-              {localBrands.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-            {isAddingBrand ? (
-              <div className="mt-2 flex items-center gap-2">
-                <Input
-                  value={newBrandName}
-                  onChange={(e) => setNewBrandName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      void handleAddBrand();
-                    }
-                    if (e.key === "Escape") {
-                      setIsAddingBrand(false);
-                      setNewBrandName("");
-                    }
-                  }}
-                  placeholder="Brand name"
-                  autoFocus
-                  disabled={isCreatingBrand}
-                />
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={() => void handleAddBrand()}
-                  disabled={!newBrandName.trim() || isCreatingBrand}
-                >
-                  {isCreatingBrand ? "Adding..." : "Add"}
-                </Button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsAddingBrand(true)}
-                className="text-primary mt-1 text-xs hover:underline"
-              >
-                + Add Brand
-              </button>
-            )}
+            <SearchableSelect
+              options={localBrands.map((b) => ({ value: b.id, label: b.name }))}
+              value={brandId || null}
+              onChange={(val) => setBrandId(val ?? "")}
+              placeholder="Select brand..."
+              onAddNew={(searchTerm) => {
+                setBrandDialogName(searchTerm);
+                setBrandDialogOpen(true);
+              }}
+            />
+            <InlineBrandDialog
+              open={brandDialogOpen}
+              onOpenChange={setBrandDialogOpen}
+              initialName={brandDialogName}
+              onSubmit={handleAddBrand}
+            />
           </FormField>
 
           <div className="grid grid-cols-2 gap-4">

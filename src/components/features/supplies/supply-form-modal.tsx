@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FormField } from "@/components/features/charts/form-primitives/form-field";
+import { SearchableSelect } from "@/components/features/charts/form-primitives/searchable-select";
+import { InlineBrandDialog } from "@/components/features/shared/inline-brand-dialog";
 import {
   createThread,
   updateThread,
@@ -129,39 +131,30 @@ export function SupplyFormModal({
     initialData && "description" in initialData ? (initialData.description ?? "") : "",
   );
 
-  // Inline brand creation state
+  // Brand state
   const [localBrands, setLocalBrands] = useState(brands);
-  const [isAddingBrand, setIsAddingBrand] = useState(false);
-  const [newBrandName, setNewBrandName] = useState("");
-  const [isCreatingBrand, setIsCreatingBrand] = useState(false);
+  const [brandDialogOpen, setBrandDialogOpen] = useState(false);
+  const [brandDialogName, setBrandDialogName] = useState("");
 
   // Errors
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  async function handleAddBrand() {
-    const trimmed = newBrandName.trim();
-    if (!trimmed || isCreatingBrand) return;
+  const filteredBrandOptions = localBrands
+    .filter((b) => b.supplyType === supplyType.toUpperCase())
+    .map((b) => ({ value: b.id, label: b.name }));
 
-    setIsCreatingBrand(true);
-    try {
-      const result = await createSupplyBrand({
-        name: trimmed,
-        supplyType: supplyType.toUpperCase(),
-        website: null,
-      });
-      if (result.success && result.brand) {
-        setLocalBrands((prev) => [...prev, result.brand!]);
-        setBrandId(result.brand.id);
-        setNewBrandName("");
-        setIsAddingBrand(false);
-        toast.success(`Brand "${result.brand.name}" created`);
-      } else {
-        toast.error(result.error ?? "Failed to create brand");
-      }
-    } catch {
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsCreatingBrand(false);
+  async function handleAddBrand(name: string, website?: string) {
+    const result = await createSupplyBrand({
+      name,
+      supplyType: supplyType.toUpperCase(),
+      website: website ?? null,
+    });
+    if (result.success && result.brand) {
+      setLocalBrands((prev) => [...prev, result.brand!]);
+      setBrandId(result.brand.id);
+      toast.success(`Brand "${result.brand.name}" created`);
+    } else {
+      throw new Error(result.error ?? "Failed to create brand");
     }
   }
 
@@ -277,59 +270,22 @@ export function SupplyFormModal({
 
           {/* Brand */}
           <FormField label="Brand" htmlFor="supply-brand" required error={errors.brandId}>
-            <select
-              id="supply-brand"
-              aria-label="Brand"
-              value={brandId}
-              onChange={(e) => setBrandId(e.target.value)}
-              className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-            >
-              <option value="">Select brand...</option>
-              {localBrands
-                .filter((b) => b.supplyType === supplyType.toUpperCase())
-                .map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-            </select>
-            {isAddingBrand ? (
-              <div className="mt-2 flex items-center gap-2">
-                <Input
-                  value={newBrandName}
-                  onChange={(e) => setNewBrandName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      void handleAddBrand();
-                    }
-                    if (e.key === "Escape") {
-                      setIsAddingBrand(false);
-                      setNewBrandName("");
-                    }
-                  }}
-                  placeholder="Brand name"
-                  autoFocus
-                  disabled={isCreatingBrand}
-                />
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={() => void handleAddBrand()}
-                  disabled={!newBrandName.trim() || isCreatingBrand}
-                >
-                  {isCreatingBrand ? "Adding..." : "Add"}
-                </Button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsAddingBrand(true)}
-                className="text-primary mt-1 text-xs hover:underline"
-              >
-                + Add Brand
-              </button>
-            )}
+            <SearchableSelect
+              options={filteredBrandOptions}
+              value={brandId || null}
+              onChange={(val) => setBrandId(val ?? "")}
+              placeholder="Select brand..."
+              onAddNew={(searchTerm) => {
+                setBrandDialogName(searchTerm);
+                setBrandDialogOpen(true);
+              }}
+            />
+            <InlineBrandDialog
+              open={brandDialogOpen}
+              onOpenChange={setBrandDialogOpen}
+              initialName={brandDialogName}
+              onSubmit={handleAddBrand}
+            />
           </FormField>
 
           {/* Code */}

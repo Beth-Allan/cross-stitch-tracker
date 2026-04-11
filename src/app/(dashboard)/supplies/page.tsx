@@ -6,13 +6,20 @@ import {
 } from "@/lib/actions/supply-actions";
 import { SupplyCatalog } from "@/components/features/supplies/supply-catalog";
 
-export default async function SuppliesPage() {
-  const [threads, beads, specialtyItems, brands] = await Promise.all([
+export default async function SuppliesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string }>;
+}) {
+  const [threads, beads, specialtyItems, brands, params] = await Promise.all([
     getThreads(),
     getBeads(),
     getSpecialtyItems(),
     getSupplyBrands(),
+    searchParams,
   ]);
+
+  const initialView = params.view === "table" || params.view === "grid" ? params.view : undefined;
 
   return (
     <div className="space-y-6">
@@ -29,6 +36,7 @@ export default async function SuppliesPage() {
         beads={beads}
         specialtyItems={specialtyItems}
         brands={brands}
+        initialView={initialView}
       />
     </div>
   );

@@ -116,7 +116,7 @@ describe("DeleteConfirmationDialog", () => {
       expect(onConfirm).toHaveBeenCalledTimes(1);
     });
     // onOpenChange should NOT have been called with false
-    const closeCalls = onOpenChange.mock.calls.filter(([val]: [boolean]) => val === false);
+    const closeCalls = onOpenChange.mock.calls.filter((args: unknown[]) => args[0] === false);
     expect(closeCalls).toHaveLength(0);
   });
 });

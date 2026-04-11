@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search,
   ChevronUp,
@@ -131,13 +131,31 @@ export function FabricCatalog({
   fabrics,
   fabricBrands,
   projects,
+  initialTab = "fabrics",
 }: {
   fabrics: FabricWithBrand[];
   fabricBrands: FabricBrandWithCounts[];
   projects: Array<{ id: string; chartName: string }>;
+  initialTab?: string;
 }) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<string>("fabrics");
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTabRaw] = useState<string>(initialTab);
+
+  const setActiveTab = useCallback(
+    (tab: string) => {
+      setActiveTabRaw(tab);
+      const params = new URLSearchParams(searchParams.toString());
+      if (tab === "fabrics") {
+        params.delete("tab");
+      } else {
+        params.set("tab", tab);
+      }
+      const qs = params.toString();
+      router.replace(qs ? `?${qs}` : "/fabric", { scroll: false });
+    },
+    [router, searchParams],
+  );
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: "name", dir: "asc" });
   const [search, setSearch] = useState("");
   const [createModalOpen, setCreateModalOpen] = useState(false);

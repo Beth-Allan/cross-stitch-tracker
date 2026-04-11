@@ -55,7 +55,7 @@ describe("SupplyFormModal", () => {
     );
 
     expect(screen.getByRole("button", { name: /Add Thread/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/Brand/i)).toBeInTheDocument();
+    expect(screen.getByText("Brand")).toBeInTheDocument();
     expect(screen.getByLabelText(/Color Code/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Color Name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Hex Color/i)).toBeInTheDocument();
@@ -170,8 +170,8 @@ describe("SupplyFormModal", () => {
     expect(screen.getByRole("button", { name: /Cancel/i })).toBeInTheDocument();
   });
 
-  describe("inline brand creation", () => {
-    it("renders a '+ Add Brand' button next to the brand select", () => {
+  describe("brand selection via SearchableSelect", () => {
+    it("renders a searchable brand selector with brand options", () => {
       render(
         <SupplyFormModal
           open={true}
@@ -182,10 +182,11 @@ describe("SupplyFormModal", () => {
         />,
       );
 
-      expect(screen.getByRole("button", { name: /\+ Add Brand/i })).toBeInTheDocument();
+      // SearchableSelect renders as a button trigger showing the selected brand
+      expect(screen.getByText("DMC")).toBeInTheDocument();
     });
 
-    it("clicking '+ Add Brand' shows an inline text input and Add button", async () => {
+    it("brand selector shows Add New option in dropdown", async () => {
       const user = userEvent.setup();
       render(
         <SupplyFormModal
@@ -197,13 +198,35 @@ describe("SupplyFormModal", () => {
         />,
       );
 
-      await user.click(screen.getByRole("button", { name: /\+ Add Brand/i }));
+      // Click the SearchableSelect trigger to open the dropdown
+      await user.click(screen.getByText("DMC"));
 
-      expect(screen.getByPlaceholderText(/Brand name/i)).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /^Add$/i })).toBeInTheDocument();
+      // "Add New" should be visible in the command list
+      expect(screen.getByText("Add New")).toBeInTheDocument();
     });
 
-    it("submitting a brand name calls createSupplyBrand with correct supplyType", async () => {
+    it("clicking Add New opens the brand creation dialog", async () => {
+      const user = userEvent.setup();
+      render(
+        <SupplyFormModal
+          open={true}
+          onOpenChange={vi.fn()}
+          mode="create"
+          supplyType="thread"
+          brands={brands}
+        />,
+      );
+
+      await user.click(screen.getByText("DMC"));
+      await user.click(screen.getByText("Add New"));
+
+      await waitFor(() => {
+        expect(screen.getByText("Add New Brand")).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/Brand name/i)).toBeInTheDocument();
+      });
+    });
+
+    it("submitting brand dialog calls createSupplyBrand with correct supplyType", async () => {
       const user = userEvent.setup();
       const newBrand = createMockSupplyBrand({
         id: "brand-new",
@@ -222,9 +245,15 @@ describe("SupplyFormModal", () => {
         />,
       );
 
-      await user.click(screen.getByRole("button", { name: /\+ Add Brand/i }));
+      await user.click(screen.getByText("DMC"));
+      await user.click(screen.getByText("Add New"));
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText(/Brand name/i)).toBeInTheDocument();
+      });
+
       await user.type(screen.getByPlaceholderText(/Brand name/i), "Anchor");
-      await user.click(screen.getByRole("button", { name: /^Add$/i }));
+      await user.click(screen.getByRole("button", { name: /Add Brand/i }));
 
       await waitFor(() => {
         expect(mockCreateSupplyBrand).toHaveBeenCalledWith(
@@ -234,81 +263,6 @@ describe("SupplyFormModal", () => {
           }),
         );
       });
-
-      // New brand should appear in the select dropdown
-      await waitFor(() => {
-        const brandSelect = screen.getByLabelText(/Brand/i) as HTMLSelectElement;
-        const optionNames = Array.from(brandSelect.options).map((o) => o.text);
-        expect(optionNames).toContain("Anchor");
-      });
-    });
-
-    it("after successful brand creation, the new brand is auto-selected", async () => {
-      const user = userEvent.setup();
-      const newBrand = createMockSupplyBrand({
-        id: "brand-new",
-        name: "Anchor",
-        supplyType: "THREAD",
-      });
-      mockCreateSupplyBrand.mockResolvedValue({ success: true, brand: newBrand });
-
-      render(
-        <SupplyFormModal
-          open={true}
-          onOpenChange={vi.fn()}
-          mode="create"
-          supplyType="thread"
-          brands={brands}
-        />,
-      );
-
-      await user.click(screen.getByRole("button", { name: /\+ Add Brand/i }));
-      await user.type(screen.getByPlaceholderText(/Brand name/i), "Anchor");
-      await user.click(screen.getByRole("button", { name: /^Add$/i }));
-
-      await waitFor(() => {
-        const brandSelect = screen.getByLabelText(/Brand/i) as HTMLSelectElement;
-        expect(brandSelect.value).toBe("brand-new");
-      });
-    });
-
-    it("pressing Escape cancels inline add", async () => {
-      const user = userEvent.setup();
-      render(
-        <SupplyFormModal
-          open={true}
-          onOpenChange={vi.fn()}
-          mode="create"
-          supplyType="thread"
-          brands={brands}
-        />,
-      );
-
-      await user.click(screen.getByRole("button", { name: /\+ Add Brand/i }));
-      expect(screen.getByPlaceholderText(/Brand name/i)).toBeInTheDocument();
-
-      await user.keyboard("{Escape}");
-
-      expect(screen.queryByPlaceholderText(/Brand name/i)).not.toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /\+ Add Brand/i })).toBeInTheDocument();
-    });
-
-    it("empty brand name keeps the Add button disabled", async () => {
-      const user = userEvent.setup();
-      render(
-        <SupplyFormModal
-          open={true}
-          onOpenChange={vi.fn()}
-          mode="create"
-          supplyType="thread"
-          brands={brands}
-        />,
-      );
-
-      await user.click(screen.getByRole("button", { name: /\+ Add Brand/i }));
-
-      const addBtn = screen.getByRole("button", { name: /^Add$/i });
-      expect(addBtn).toBeDisabled();
     });
   });
 });
