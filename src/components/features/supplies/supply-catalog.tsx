@@ -665,7 +665,7 @@ export function SupplyCatalog({ threads, beads, specialtyItems, brands }: Supply
         title={`Delete ${deletingItem?.label}?`}
         entityName={deletingItem?.label ?? ""}
         chartCount={0}
-        entityType="designer"
+        entityType="supply"
         onConfirm={handleDelete}
       />
     </div>

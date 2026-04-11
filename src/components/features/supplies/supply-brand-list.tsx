@@ -49,12 +49,12 @@ function SortableHeader({
   const isActive = currentSort.key === sortKey;
   return (
     <th
-      className="cursor-pointer select-none px-4 py-2.5 text-left"
+      className="cursor-pointer px-4 py-2.5 text-left select-none"
       onClick={() => onSort(sortKey)}
       aria-sort={isActive ? (currentSort.dir === "asc" ? "ascending" : "descending") : "none"}
     >
       <span
-        className={`inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider transition-colors ${
+        className={`inline-flex items-center gap-1 text-xs font-semibold tracking-wider uppercase transition-colors ${
           isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
         }`}
       >
@@ -138,7 +138,8 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
           <Package className="text-muted-foreground/40 mb-3 h-12 w-12" />
           <h2 className="font-heading text-lg font-semibold">No supply brands yet</h2>
           <p className="text-muted-foreground mt-1.5 max-w-xs text-sm">
-            DMC will appear automatically after seeding. Add other brands like Mill Hill or Kreinik here.
+            DMC will appear automatically after seeding. Add other brands like Mill Hill or Kreinik
+            here.
           </p>
           <Button className="mt-4" onClick={() => setCreateModalOpen(true)}>
             <Plus className="h-4 w-4" data-icon="inline-start" />
@@ -168,8 +169,8 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
 
       {/* Search bar */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-[200px] max-w-xs flex-1">
-          <Search className="text-muted-foreground absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
+        <div className="relative max-w-xs min-w-[200px] flex-1">
+          <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
           <Input
             type="text"
             value={search}
@@ -195,14 +196,9 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
         <table className="w-full text-sm">
           <thead>
             <tr className="border-border border-b">
-              <SortableHeader
-                label="NAME"
-                sortKey="name"
-                currentSort={sort}
-                onSort={handleSort}
-              />
+              <SortableHeader label="NAME" sortKey="name" currentSort={sort} onSort={handleSort} />
               <th className="px-4 py-2.5 text-left">
-                <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                   WEBSITE
                 </span>
               </th>
@@ -229,9 +225,7 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
                 <td colSpan={4} className="py-12 text-center">
                   <Package className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
                   <p className="text-muted-foreground text-sm">
-                    {hasActiveFilters
-                      ? "No brands match your search"
-                      : "No supply brands yet"}
+                    {hasActiveFilters ? "No brands match your search" : "No supply brands yet"}
                   </p>
                 </td>
               </tr>
@@ -261,11 +255,7 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
       </div>
 
       {/* Create modal */}
-      <SupplyBrandFormModal
-        open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
-        brand={null}
-      />
+      <SupplyBrandFormModal open={createModalOpen} onOpenChange={setCreateModalOpen} brand={null} />
 
       {/* Edit modal */}
       <SupplyBrandFormModal
@@ -289,7 +279,7 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
           (deletingBrand?._count.beads ?? 0) +
           (deletingBrand?._count.specialtyItems ?? 0)
         }
-        entityType="designer"
+        entityType="brand"
         onConfirm={handleDelete}
       />
     </div>
@@ -308,7 +298,7 @@ function BrandRow({
   onDelete: () => void;
 }) {
   return (
-    <tr className="group transition-colors hover:bg-muted/50">
+    <tr className="group hover:bg-muted/50 transition-colors">
       <td className="px-4 py-3">
         <span className="text-foreground text-sm font-medium">{brand.name}</span>
       </td>
@@ -333,7 +323,7 @@ function BrandRow({
         </span>
       </td>
       <td className="px-4 py-3">
-        <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+        <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
           <button
             type="button"
             onClick={onEdit}
@@ -369,16 +359,13 @@ function BrandCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const totalCount =
-    brand._count.threads + brand._count.beads + brand._count.specialtyItems;
+  const totalCount = brand._count.threads + brand._count.beads + brand._count.specialtyItems;
 
   return (
     <div className="border-border bg-card rounded-xl border p-4 shadow-sm">
       <div className="mb-2 flex items-start justify-between">
         <div className="min-w-0 flex-1">
-          <span className="text-foreground block truncate text-sm font-semibold">
-            {brand.name}
-          </span>
+          <span className="text-foreground block truncate text-sm font-semibold">{brand.name}</span>
         </div>
         <div className="ml-2 flex shrink-0 items-center gap-1">
           {brand.website && (

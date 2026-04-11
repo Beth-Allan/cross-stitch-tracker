@@ -17,7 +17,7 @@ interface DeleteConfirmationDialogProps {
   title: string;
   entityName: string;
   chartCount: number;
-  entityType: "designer" | "genre";
+  entityType: "designer" | "genre" | "brand" | "supply";
   onConfirm: () => Promise<void>;
 }
 
@@ -44,18 +44,26 @@ export function DeleteConfirmationDialog({
     });
   }
 
-  const description =
-    entityType === "designer"
-      ? `This will remove "${entityName}" from your collection. ${chartCount} chart(s) will be unlinked from this designer. Charts will NOT be deleted.`
-      : `This will remove the "${entityName}" tag from your collection. ${chartCount} chart(s) will lose this genre tag. Charts will NOT be deleted.`;
+  function getDescription() {
+    switch (entityType) {
+      case "designer":
+        return `This will remove "${entityName}" from your collection. ${chartCount} chart(s) will be unlinked from this designer. Charts will NOT be deleted.`;
+      case "genre":
+        return `This will remove the "${entityName}" tag from your collection. ${chartCount} chart(s) will lose this genre tag. Charts will NOT be deleted.`;
+      case "brand":
+        return `This will remove "${entityName}" from your brands. ${chartCount} supply item(s) from this brand will also be deleted.`;
+      case "supply":
+        return `This will permanently delete "${entityName}" from your supply catalog.`;
+    }
+  }
+
+  const description = getDescription();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="font-heading text-lg font-semibold">
-            {title}
-          </DialogTitle>
+          <DialogTitle className="font-heading text-lg font-semibold">{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -67,12 +75,7 @@ export function DeleteConfirmationDialog({
           >
             Cancel
           </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={handleConfirm}
-            disabled={isPending}
-          >
+          <Button type="button" variant="destructive" onClick={handleConfirm} disabled={isPending}>
             {isPending ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
