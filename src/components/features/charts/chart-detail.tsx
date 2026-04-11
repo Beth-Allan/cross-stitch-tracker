@@ -15,6 +15,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ChartWithProject } from "@/types/chart";
+import type {
+  ProjectThreadWithThread,
+  ProjectBeadWithBead,
+  ProjectSpecialtyWithItem,
+} from "@/types/supply";
+import { ProjectSuppliesTab } from "./project-supplies-tab";
 import { getEffectiveStitchCount, calculateSizeCategory } from "@/lib/utils/size-category";
 import { deleteChart } from "@/lib/actions/chart-actions";
 import { getPresignedDownloadUrl } from "@/lib/actions/upload-actions";
@@ -60,11 +66,18 @@ function formatDateOnly(date: Date | null | undefined): string {
   });
 }
 
-interface ChartDetailProps {
-  chart: ChartWithProject;
+interface ProjectSuppliesData {
+  threads: ProjectThreadWithThread[];
+  beads: ProjectBeadWithBead[];
+  specialty: ProjectSpecialtyWithItem[];
 }
 
-export function ChartDetail({ chart }: ChartDetailProps) {
+interface ChartDetailProps {
+  chart: ChartWithProject;
+  projectSupplies?: ProjectSuppliesData | null;
+}
+
+export function ChartDetail({ chart, projectSupplies }: ChartDetailProps) {
   const project = chart.project;
   const status = project?.status ?? "UNSTARTED";
   const { count: effectiveStitchCount, approximate } = getEffectiveStitchCount(
@@ -136,6 +149,16 @@ export function ChartDetail({ chart }: ChartDetailProps) {
 
       {/* Overview */}
       <OverviewTab chart={chart} />
+
+      {/* Supplies */}
+      {project && projectSupplies && (
+        <ProjectSuppliesTab
+          projectId={project.id}
+          threads={projectSupplies.threads}
+          beads={projectSupplies.beads}
+          specialty={projectSupplies.specialty}
+        />
+      )}
     </div>
   );
 }
