@@ -62,6 +62,7 @@
   - 999.0.11: "Already added" indicator in supply search-to-add
   - 999.0.5: Chart list edit/delete actions (new chart-list.tsx client component)
   - 999.0.6: Chart images displaying via presigned R2 URLs + onError fallback
+  - 999.0.6 followup: Auto-generate thumbnails on cover upload (wired into createChart/updateChart/confirmUpload) + coverImageUrl fallback display
 
 ### In Progress
 

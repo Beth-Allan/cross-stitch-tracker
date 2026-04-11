@@ -119,9 +119,10 @@ None yet.
 | 260411-j8v | Show "already added" indicator for project supplies | 2026-04-11 | d5d4d8e | [260411-j8v-show-already-added-indicator-for-project](./quick/260411-j8v-show-already-added-indicator-for-project/) |
 | 260411-jhw | Chart list edit/delete actions matching designer/genre pattern | 2026-04-11 | 27cd127 | [260411-jhw-chart-list-edit-delete-actions-matching-](./quick/260411-jhw-chart-list-edit-delete-actions-matching-/) |
 | 260411-js1 | Chart images not displaying — presigned R2 URLs with onError fallback | 2026-04-11 | caec7ec | [260411-js1-chart-images-not-displaying-generate-pre](./quick/260411-js1-chart-images-not-displaying-generate-pre/) |
+| 260411-kip | Auto-generate thumbnails on cover upload + coverImageUrl fallback | 2026-04-11 | 6875b9c | [260411-kip-wire-generatethumbnail-into-cover-upload-and-backfi](./quick/260411-kip-wire-generatethumbnail-into-cover-upload-and-backfi/) |
 
 ## Session Continuity
 
-Last session: 2026-04-10T22:55:33.835Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-supplies-fabric/04-CONTEXT.md
+Last session: 2026-04-11
+Stopped at: All backlog fixes complete, ready for milestone completion
+Resume file: none
