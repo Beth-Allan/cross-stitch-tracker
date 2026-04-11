@@ -122,7 +122,9 @@ export function SearchToAdd({
   }, []);
 
   const existingSet = new Set(existingIds);
-  const filtered = items.filter((item) => !existingSet.has(getItemId(item))).slice(0, 8);
+  const addable = items.filter((item) => !existingSet.has(getItemId(item)));
+  const alreadyAdded = items.filter((item) => existingSet.has(getItemId(item)));
+  const displayItems = [...addable, ...alreadyAdded].slice(0, 8);
 
   async function handleSelect(item: SupplyItem) {
     startTransition(async () => {
@@ -163,16 +165,27 @@ export function SearchToAdd({
     });
   }
 
+  function findNextAddableIndex(fromIndex: number, direction: 1 | -1): number {
+    let idx = fromIndex + direction;
+    while (idx >= 0 && idx < displayItems.length) {
+      if (!existingSet.has(getItemId(displayItems[idx]))) return idx;
+      idx += direction;
+    }
+    return fromIndex; // Stay put if no addable item found
+  }
+
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setHighlightIndex((prev) => Math.min(prev + 1, filtered.length - 1));
+      setHighlightIndex((prev) => findNextAddableIndex(prev, 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setHighlightIndex((prev) => Math.max(prev - 1, 0));
-    } else if (e.key === "Enter" && filtered[highlightIndex]) {
+      setHighlightIndex((prev) => findNextAddableIndex(prev, -1));
+    } else if (e.key === "Enter" && displayItems[highlightIndex]) {
       e.preventDefault();
-      handleSelect(filtered[highlightIndex]);
+      if (!existingSet.has(getItemId(displayItems[highlightIndex]))) {
+        handleSelect(displayItems[highlightIndex]);
+      }
     }
   }
 
@@ -205,20 +218,23 @@ export function SearchToAdd({
       <div className="border-border max-h-48 overflow-y-auto border-t">
         {isLoading ? (
           <p className="text-muted-foreground px-3 py-4 text-center text-sm">Searching...</p>
-        ) : filtered.length === 0 ? (
+        ) : items.length === 0 ? (
           <p className="text-muted-foreground px-3 py-4 text-center text-sm">No matches</p>
         ) : (
-          filtered.map((item, index) => {
+          displayItems.map((item, index) => {
             const hex = getItemHex(item);
             const code = getItemCode(item);
             const name = getItemName(item);
+            const isExisting = existingSet.has(getItemId(item));
             return (
               <button
                 key={getItemId(item)}
-                onClick={() => handleSelect(item)}
-                disabled={isPending}
-                className={`hover:bg-muted flex w-full items-center gap-3 px-3 py-2 text-left transition-colors ${
-                  index === highlightIndex ? "bg-muted" : ""
+                onClick={() => !isExisting && handleSelect(item)}
+                disabled={isExisting || isPending}
+                className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-colors ${
+                  isExisting
+                    ? "cursor-default opacity-50"
+                    : `hover:bg-muted ${index === highlightIndex ? "bg-muted" : ""}`
                 }`}
               >
                 <div
@@ -227,11 +243,17 @@ export function SearchToAdd({
                   }`}
                   style={{ backgroundColor: hex }}
                 />
-                <span className="text-foreground text-sm">
+                <span
+                  className={`text-sm ${isExisting ? "text-muted-foreground" : "text-foreground"}`}
+                >
                   <span className="font-medium">
                     {item.brand.name} {code}
                   </span>{" "}
-                  — {name}
+                  {isExisting ? (
+                    <span className="text-muted-foreground text-xs italic">Already added</span>
+                  ) : (
+                    <>— {name}</>
+                  )}
                 </span>
               </button>
             );
