@@ -4,8 +4,8 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 4 in progress (bug fixes remaining)
-**Last Updated:** 2026-04-11
+**Milestone:** 1 (MVP — "Replace Notion") | **Phase:** 4 complete, ready for deploy
+**Last Updated:** 2026-04-12
 **Roadmap:** Restructured to 4 milestones / 10 phases (was 9 sequential phases)
 
 ### Done
@@ -27,18 +27,16 @@
 - Phase 4 all 7 plans executed: schema, supply/fabric CRUD, catalog UI, shopping list — 335 tests
   - Prisma findMany crash resolved (stale globalThis singleton, not schema drift)
   - First UAT complete: 2 items deferred to backlog, 6 bugs to fix
+- Phase 4 UAT bugs fixed (6/6): fabric calc multi-count table, project link 404, brand filter, brands nav, grid hover, Got→Have label
 
 ### In Progress
 
-- Phase 4 bug fixes from UAT (6 bugs: fabric calc, project link 404, brand filter, brands nav, grid hover, Got→Have label)
-- Post-execution gates pending after bug fixes (code review, verification, UAT re-test)
+- Phase 4 complete — all post-execution gates passed
 
 ### Next Up
 
-1. Fix 6 UAT bugs — `/gsd:resume-work`
-2. Run post-execution gates (code review, verification)
-3. Human UAT re-test
-4. Deploy MVP to Vercel
+1. Deploy MVP to Vercel
+2. Start Milestone 2 (Browse & Organize)
 
 ### Backlog (post-MVP)
 
@@ -46,6 +44,7 @@
 - 999.2: Bulk supply editor
 - 999.3: Fabric type hierarchy (replace flat dropdown)
 - 999.4: Project supplies as separate tab
+- 999.5: Supplies page first-load view flash (URL param fixes refresh, but first navigation still shows default view briefly before localStorage kicks in — investigate SSR cookie or middleware approach)
 
 ### Blockers
 
