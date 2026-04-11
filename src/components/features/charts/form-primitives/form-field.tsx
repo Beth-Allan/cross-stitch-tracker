@@ -24,7 +24,12 @@ export function FormField({ label, hint, error, required, htmlFor, children }: F
         )}
       >
         {label}
-        {required && <span className="sr-only"> (required)</span>}
+        {required && (
+          <>
+            <span className="text-destructive ml-0.5" aria-hidden="true">*</span>
+            <span className="sr-only"> (required)</span>
+          </>
+        )}
       </Label>
       <div className="mt-1.5">{children}</div>
       {error ? (

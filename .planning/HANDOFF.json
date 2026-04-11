@@ -1,55 +1,47 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-11T03:13:35.070Z",
-  "phase": "04",
-  "phase_name": "supplies-fabric",
-  "phase_dir": ".planning/phases/04-supplies-fabric",
+  "timestamp": "2026-04-11T15:28:17.464Z",
+  "phase": "post-phase-4",
+  "phase_name": "impeccable-audit-polish",
+  "phase_dir": ".planning",
   "plan": null,
   "task": null,
   "total_tasks": null,
   "status": "paused",
   "completed_tasks": [
-    {"id": "04-01", "name": "Schema, types, validations, seed data", "status": "done"},
-    {"id": "04-02", "name": "Supply server actions", "status": "done"},
-    {"id": "04-03", "name": "Fabric server actions", "status": "done"},
-    {"id": "04-04", "name": "Supply catalog UI", "status": "done"},
-    {"id": "04-05", "name": "Fabric management UI", "status": "done"},
-    {"id": "04-06", "name": "Project-supply linking UI", "status": "done"},
-    {"id": "04-07", "name": "Shopping list + nav", "status": "done"},
-    {"id": "debug-1", "name": "Fix Prisma findMany crash on /supplies", "status": "done"},
-    {"id": "uat-backlog", "name": "Added 4 backlog items (detail modal, bulk editor, fabric hierarchy, supplies tab)", "status": "done"},
-    {"id": "uat-jobelan", "name": "Added Jobelan to FABRIC_TYPES dropdown", "status": "done"}
+    {"id": 1, "name": "Run /impeccable:audit (5-dimension scan)", "status": "done"},
+    {"id": 2, "name": "/impeccable:harden — progress bar ARIA semantics", "status": "done"},
+    {"id": 3, "name": "/impeccable:harden — user menu aria-label", "status": "done"},
+    {"id": 4, "name": "/impeccable:harden — supply grid aria-labels", "status": "done"},
+    {"id": 5, "name": "/impeccable:harden — sortable header keyboard activation", "status": "done"},
+    {"id": 6, "name": "/impeccable:harden — visible required field indicator", "status": "done"},
+    {"id": 7, "name": "/impeccable:harden — genre picker focus-visible styles", "status": "done"},
+    {"id": 8, "name": "/impeccable:harden — charts table caption", "status": "done"},
+    {"id": 9, "name": "Build + test verification (350/350 passing)", "status": "done"}
   ],
   "remaining_tasks": [
-    {"id": "bug-2", "name": "Add 'Manage Brands' link from /supplies page", "status": "not_started"},
-    {"id": "bug-3", "name": "Filter brand dropdown in supply form modal by active tab supply type", "status": "not_started"},
-    {"id": "bug-4", "name": "Add edit affordance (hover icon/effect) to supply grid tiles", "status": "not_started"},
-    {"id": "bug-6", "name": "Fix fabric size calculation — uses stitch counts as inches instead of dividing by fabric count", "status": "not_started"},
-    {"id": "bug-7", "name": "Fix shopping list project link 404 — projectId vs chart id mismatch", "status": "not_started"},
-    {"id": "bug-8", "name": "Change 'Got' label to 'Have' in project supplies tab", "status": "not_started"},
-    {"id": "gate-review", "name": "Code review gate (gsd:code-review)", "status": "not_started"},
-    {"id": "gate-regression", "name": "Regression gate (prior phase tests)", "status": "not_started"},
-    {"id": "gate-verification", "name": "Phase verification (gsd:verify-work)", "status": "not_started"},
-    {"id": "gate-uat", "name": "Human UAT re-test after bug fixes", "status": "not_started"}
+    {"id": 10, "name": "Commit harden fixes", "status": "not_started"},
+    {"id": 11, "name": "/impeccable:polish — theming refactor (51+ hard-coded colors)", "status": "not_started"},
+    {"id": 12, "name": "/impeccable:optimize — next/image, animation fixes", "status": "not_started"},
+    {"id": 13, "name": "/impeccable:adapt — responsive tweaks", "status": "not_started"},
+    {"id": 14, "name": "Re-run /audit to confirm improvement", "status": "not_started"},
+    {"id": 15, "name": "Deploy to Vercel", "status": "not_started"}
   ],
   "blockers": [],
-  "human_actions_pending": [
-    {
-      "action": "Re-test all 7 UAT areas after bug fixes are applied",
-      "context": "Initial UAT found 8 issues, 2 deferred to backlog, 6 bugs to fix",
-      "blocking": false
-    }
-  ],
+  "human_actions_pending": [],
   "decisions": [
-    {"decision": "Cherry-picked worktree commits instead of merging branches", "rationale": "Worktree merge had fast-forward detection issues", "phase": "04"},
-    {"decision": "Fixed React 19 ESLint violations with idiomatic patterns", "rationale": "Lazy initializer for localStorage, key-based remount for form reset", "phase": "04"},
-    {"decision": "Prisma findMany crash was stale globalThis singleton, not schema drift", "rationale": "Dev server restart fixed it — no code change needed", "phase": "04"},
-    {"decision": "Supply detail modal deferred to post-MVP (backlog 999.1)", "rationale": "Edit-first is fine for MVP; detail view adds value once supplies are linked to real projects", "phase": "04"},
-    {"decision": "Bulk supply editor deferred to post-MVP (backlog 999.2)", "rationale": "One-at-a-time management works for MVP; bulk editing matters for 50+ thread kitting", "phase": "04"},
-    {"decision": "Fabric type hierarchy deferred to post-MVP (backlog 999.3)", "rationale": "Flat dropdown with Jobelan added covers MVP; hierarchy matters once collection grows", "phase": "04"},
-    {"decision": "Project supplies tab layout deferred to post-MVP (backlog 999.4)", "rationale": "Inline display works for MVP; tabs become valuable when sessions are added in Milestone 3", "phase": "04"}
+    {"decision": "Prioritized harden (a11y) before polish (theming)", "rationale": "P1 WCAG AA violations are more critical than cosmetic theming drift", "phase": "post-phase-4"},
+    {"decision": "Pause after harden to preserve context for theming refactor", "rationale": "Theming touches 15+ files and needs a fresh context window", "phase": "post-phase-4"}
   ],
-  "uncommitted_files": ["src/types/fabric.ts", ".planning/backlog/", ".planning/debug/", "next-env.d.ts"],
-  "next_action": "Fix 6 UAT bugs (brand nav, brand filter, grid hover, fabric calc, project link 404, Got→Have label), then run post-execution gates (code review, verification, UAT re-test)",
-  "context_notes": "All 7 plans executed and working. First UAT pass found 8 issues: 2 deferred to backlog, 6 bugs to fix. The Prisma crash was a stale singleton (dev server restart fixed it, no code change). Bug details are well-documented in .continue-here.md with file paths and line numbers from the Explore agent investigation."
+  "uncommitted_files": [
+    "src/app/(dashboard)/charts/page.tsx",
+    "src/components/features/charts/form-primitives/form-field.tsx",
+    "src/components/features/charts/form-primitives/genre-picker.tsx",
+    "src/components/features/charts/progress-bar.tsx",
+    "src/components/features/supplies/supply-grid-view.tsx",
+    "src/components/features/supplies/supply-table-view.tsx",
+    "src/components/shell/user-menu.tsx"
+  ],
+  "next_action": "Commit the 7 harden fixes, then run /impeccable:polish for theming refactor",
+  "context_notes": "Audit scored 13/20. Accessibility fixes done. Theming (51+ hard-coded colors) is the biggest remaining lift. Anti-patterns scored 4/4 — design is clean. After all passes, re-audit then deploy."
 }

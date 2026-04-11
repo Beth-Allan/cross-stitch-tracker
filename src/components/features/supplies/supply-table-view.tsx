@@ -61,7 +61,15 @@ function SortableHeader({
   return (
     <th
       className="cursor-pointer px-4 py-2.5 text-left select-none"
+      tabIndex={0}
+      role="columnheader"
       onClick={() => onSort(sortKey)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSort(sortKey);
+        }
+      }}
       aria-sort={isActive ? (currentSort.dir === "asc" ? "ascending" : "descending") : "none"}
     >
       <span

@@ -79,6 +79,7 @@ function ChartsList({ charts }: { charts: ChartWithRelations[] }) {
   return (
     <div className="border-border bg-card overflow-hidden rounded-xl border">
       <table className="w-full text-sm">
+        <caption className="sr-only">Your cross-stitch chart collection</caption>
         <thead>
           <tr className="border-border/60 border-b">
             <th className="text-muted-foreground px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase">

@@ -12,7 +12,14 @@ export function ProgressBar({ value, max, className, color = "bg-primary" }: Pro
 
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      <div className="bg-muted h-2 flex-1 rounded-full">
+      <div
+        className="bg-muted h-2 flex-1 rounded-full"
+        role="progressbar"
+        aria-valuenow={percentage}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`${percentage}% complete`}
+      >
         <div
           className={cn("h-full rounded-full transition-all", color)}
           style={{ width: `${percentage}%` }}
