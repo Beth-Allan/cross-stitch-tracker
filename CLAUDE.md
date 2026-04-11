@@ -38,15 +38,22 @@
   - Polish: Added success/warning semantic token families; replaced 25 hard-coded colors across 9 files
   - Optimize: Memoized supply table sort, CLS fix on chart cover, narrowed transition-all
   - Adapt: Fixed invisible grid edit icon, upgraded 10px badges to 12px, improved touch targets
+- Re-audit scored 15/20 (Good) + harden pass 2 (e48c354):
+  - 5 SortableHeaders: added keyboard support (tabIndex, role, onKeyDown, aria-sort)
+  - 6 tables: added sr-only captions
+  - chart-edit-modal: replaced window.confirm() with styled Dialog
+  - aria-labels on supply remove + shopping mark-acquired buttons
+  - search-to-add: hard-coded emerald/stone → semantic tokens
+  - progress bars: transition-all → transition-[width]
 
 ### In Progress
 
-- Impeccable audit re-run (pre-deploy quality gate)
+- Nothing — ready for optional polish + final audit + deploy
 
 ### Next Up
 
-1. Re-run `/impeccable:audit` to measure improvement from 13/20 baseline
-2. Fix any P0-P1 issues from re-audit
+1. `/impeccable:polish` (optional — P3 Top Genre badge)
+2. Re-run `/impeccable:audit` for final score confirmation
 3. Deploy MVP to Vercel
 4. Start Milestone 2 (Browse & Organize)
 
