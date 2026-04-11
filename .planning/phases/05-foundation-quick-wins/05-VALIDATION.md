@@ -17,9 +17,9 @@ created: 2026-04-11
 
 | Property | Value |
 |----------|-------|
-| **Framework** | jest 29.x (via next/jest) |
-| **Config file** | `jest.config.ts` |
-| **Quick run command** | `npm test -- --testPathPattern` |
+| **Framework** | Vitest 3.1.1 |
+| **Config file** | `vitest.config.ts` |
+| **Quick run command** | `npx vitest run --reporter=verbose` |
 | **Full suite command** | `npm test` |
 | **Estimated runtime** | ~30 seconds |
 
@@ -27,7 +27,7 @@ created: 2026-04-11
 
 ## Sampling Rate
 
-- **After every task commit:** Run `npm test -- --testPathPattern`
+- **After every task commit:** Run `npx vitest run --reporter=verbose`
 - **After every plan wave:** Run `npm test`
 - **Before `/gsd-verify-work`:** Full suite must be green
 - **Max feedback latency:** 30 seconds
@@ -38,14 +38,14 @@ created: 2026-04-11
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 5-01-01 | 01 | 1 | STOR-01 | — | N/A | unit | `npm test -- --testPathPattern storage` | ❌ W0 | ⬜ pending |
-| 5-01-02 | 01 | 1 | STOR-02 | — | N/A | unit | `npm test -- --testPathPattern storage` | ❌ W0 | ⬜ pending |
-| 5-01-03 | 01 | 1 | STOR-03 | — | N/A | unit | `npm test -- --testPathPattern app` | ❌ W0 | ⬜ pending |
-| 5-01-04 | 01 | 1 | STOR-04 | — | N/A | unit | `npm test -- --testPathPattern app` | ❌ W0 | ⬜ pending |
-| 5-02-01 | 02 | 1 | PROJ-01 | — | N/A | unit | `npm test -- --testPathPattern fabric` | ❌ W0 | ⬜ pending |
-| 5-02-02 | 02 | 1 | PROJ-02 | — | N/A | unit | `npm test -- --testPathPattern project-setup` | ❌ W0 | ⬜ pending |
-| 5-03-01 | 03 | 2 | SUPP-02 | — | N/A | unit | `npm test -- --testPathPattern search-to-add` | ❌ W0 | ⬜ pending |
-| 5-03-02 | 03 | 2 | SUPP-03 | — | N/A | unit | `npm test -- --testPathPattern cover-image` | ❌ W0 | ⬜ pending |
+| 5-01-01 | 01 | 1 | STOR-01 | — | N/A | unit | `npx vitest run src/lib/validations/storage.test.ts` | ❌ W0 | ⬜ pending |
+| 5-01-02 | 01 | 1 | STOR-02 | — | N/A | unit | `npx vitest run src/lib/actions/storage-location-actions.test.ts` | ❌ W0 | ⬜ pending |
+| 5-01-03 | 01 | 1 | STOR-03 | — | N/A | unit | `npx vitest run src/lib/actions/stitching-app-actions.test.ts` | ❌ W0 | ⬜ pending |
+| 5-01-04 | 01 | 1 | STOR-04 | — | N/A | unit | `npx vitest run src/lib/actions/stitching-app-actions.test.ts` | ❌ W0 | ⬜ pending |
+| 5-02-01 | 02 | 1 | PROJ-01 | — | N/A | unit | `npx vitest run src/components/features/fabric` | ❌ W0 | ⬜ pending |
+| 5-02-02 | 02 | 1 | PROJ-02 | — | N/A | unit | `npx vitest run src/components/features/project-setup` | ❌ W0 | ⬜ pending |
+| 5-03-01 | 03 | 2 | SUPP-02 | — | N/A | unit | `npx vitest run src/components/features/search-to-add` | ❌ W0 | ⬜ pending |
+| 5-03-02 | 03 | 2 | SUPP-03 | — | N/A | unit | `npx vitest run src/components/features/cover-image` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
