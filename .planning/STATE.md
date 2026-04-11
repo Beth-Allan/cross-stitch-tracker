@@ -29,7 +29,7 @@ Milestone: 1 (MVP — "Replace Notion")
 Phase: 5
 Plan: Not started
 Status: Executing Phase 04
-Last activity: 2026-04-11
+Last activity: 2026-04-11 - Completed quick task 260411-iwm: Fix thread sort to use numeric ordering instead of alphabetical
 
 Progress: [█░░░░░░░░░] 10% (1/10 phases complete)
 
@@ -114,6 +114,9 @@ None yet.
 | 260329-ora | Add failure-mode tests for existing code | 2026-03-29 | 062cd37 | [260329-ora-add-failure-mode-tests-for-existing-code](./quick/260329-ora-add-failure-mode-tests-for-existing-code/) |
 | 260329-p5l | Fix PR #2 review findings (8 issues: error handling, validation, logging) | 2026-03-30 | 9421f2f | [260329-p5l-fix-the-issues-identified-in-pr-2-pr-2-r](./quick/260329-p5l-fix-the-issues-identified-in-pr-2-pr-2-r/) |
 | 260407-ozt | Migrate docs/conventions/ to .claude/rules/ with glob frontmatter | 2026-04-07 | 8640161 | [260407-ozt-migrate-docs-conventions-to-claude-rules](./quick/260407-ozt-migrate-docs-conventions-to-claude-rules/) |
+| 260411-iwm | Fix thread sort to use numeric ordering instead of alphabetical | 2026-04-11 | 2c0afc6 | [260411-iwm-fix-thread-sort-to-use-numeric-ordering-](./quick/260411-iwm-fix-thread-sort-to-use-numeric-ordering-/) |
+| 260411-j3i | Form submit idempotency — disable submit button after successful save | 2026-04-11 | 7f9a4b9 | [260411-j3i-form-submit-idempotency-disable-submit-b](./quick/260411-j3i-form-submit-idempotency-disable-submit-b/) |
+| 260411-j8v | Show "already added" indicator for project supplies | 2026-04-11 | d5d4d8e | [260411-j8v-show-already-added-indicator-for-project](./quick/260411-j8v-show-already-added-indicator-for-project/) |
 
 ## Session Continuity
 
