@@ -222,14 +222,20 @@ describe("DesignerList", () => {
     const user = userEvent.setup();
     render(<DesignerList designers={mockDesigners} />);
 
-    // Focus CHARTS header and press Enter
-    const chartsHeader = screen.getByText("CHARTS");
-    chartsHeader.focus();
+    // Default sort is name asc: Artecy(3), Heaven(5), Nora(8)
+    // Click once for ascending, then keyboard Enter for descending: Nora(8), Heaven(5), Artecy(3)
+    // This proves keyboard triggers sort since descending differs from default name order
+    await user.click(screen.getByText("CHARTS"));
+
+    // Re-focus and press Enter to toggle to descending
+    screen.getByText("CHARTS").focus();
     await user.keyboard("{Enter}");
 
-    // Should sort ascending by chartCount: Artecy(3), Heaven(5), Nora(8)
     const rows = screen.getAllByRole("row");
     const firstDataRow = rows[1];
-    expect(firstDataRow.textContent).toContain("Artecy Cross Stitch");
+    expect(firstDataRow.textContent).toContain("Nora Corbett");
+
+    const lastDataRow = rows[rows.length - 1];
+    expect(lastDataRow.textContent).toContain("Artecy Cross Stitch");
   });
 });
