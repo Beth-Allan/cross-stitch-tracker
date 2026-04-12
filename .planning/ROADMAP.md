@@ -62,7 +62,7 @@ Plans:
 - [x] 05-03-PLAN.md — Stitching App management UI (mirrors storage pattern)
 - [x] 05-04-PLAN.md — Chart form integration (DB-backed dropdowns + fabric selector)
 - [x] 05-05-PLAN.md — Cover image fix + thread picker scroll + DMC catalog completion
-- [ ] 05-06-PLAN.md — Gap closure: Prisma client regeneration + inline Add New for storage/app dropdowns
+- [x] 05-06-PLAN.md — Gap closure: Prisma client regeneration + inline Add New for storage/app dropdowns
 **UI hint**: yes
 
 ### Phase 6: Gallery Cards & View Modes
