@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/__tests__/test-utils";
+import userEvent from "@testing-library/user-event";
 import { ProjectSetupSection } from "./project-setup-section";
 import {
   createMockFabric,
@@ -139,5 +140,53 @@ describe("ProjectSetupSection", () => {
     render(<ProjectSetupSection {...defaultProps} needsOnionSkinning={true} />);
 
     expect(screen.getByText("Needs Onion Skinning")).toBeInTheDocument();
+  });
+
+  it("renders Add New option for storage location when onAddStorageLocation is provided", async () => {
+    const user = userEvent.setup();
+    render(
+      <ProjectSetupSection
+        {...defaultProps}
+        onAddStorageLocation={vi.fn()}
+      />,
+    );
+
+    // Open the Storage Location popover by clicking the trigger
+    const storageTrigger = screen.getByText("Select storage location...").closest("button")!;
+    await user.click(storageTrigger);
+
+    // "Add New" should appear in the dropdown
+    expect(screen.getByText("Add New")).toBeInTheDocument();
+  });
+
+  it("renders Add New option for stitching app when onAddStitchingApp is provided", async () => {
+    const user = userEvent.setup();
+    render(
+      <ProjectSetupSection
+        {...defaultProps}
+        onAddStitchingApp={vi.fn()}
+      />,
+    );
+
+    // Open the Stitching App popover by clicking the trigger
+    const appTrigger = screen.getByText("Select stitching app...").closest("button")!;
+    await user.click(appTrigger);
+
+    // "Add New" should appear in the dropdown
+    expect(screen.getByText("Add New")).toBeInTheDocument();
+  });
+
+  it("does not render Add New for storage when onAddStorageLocation is omitted", async () => {
+    const user = userEvent.setup();
+    render(
+      <ProjectSetupSection {...defaultProps} />,
+    );
+
+    // Open the Storage Location popover
+    const storageTrigger = screen.getByText("Select storage location...").closest("button")!;
+    await user.click(storageTrigger);
+
+    // "Add New" should NOT appear since onAddStorageLocation is not provided
+    expect(screen.queryByText("Add New")).not.toBeInTheDocument();
   });
 });
