@@ -9,6 +9,9 @@ import { chartFormSchema } from "@/lib/validations/chart";
 import { createChart, updateChart } from "@/lib/actions/chart-actions";
 import { createDesigner } from "@/lib/actions/designer-actions";
 import { createGenre } from "@/lib/actions/genre-actions";
+import { createStorageLocation } from "@/lib/actions/storage-location-actions";
+import { createStitchingApp } from "@/lib/actions/stitching-app-actions";
+import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { z } from "zod";
 
 export interface ChartFormValues {
@@ -45,6 +48,8 @@ interface UseChartFormOptions {
   initialData?: ChartWithProject;
   designers: Designer[];
   genres: Genre[];
+  storageLocations?: StorageLocationWithStats[];
+  stitchingApps?: StitchingAppWithStats[];
   onSuccess: (chartId: string) => void;
 }
 
@@ -135,6 +140,8 @@ export function useChartForm({
   initialData,
   designers: initialDesigners,
   genres: initialGenres,
+  storageLocations: initialStorageLocations = [],
+  stitchingApps: initialStitchingApps = [],
   onSuccess,
 }: UseChartFormOptions) {
   const initial = useMemo(() => buildInitialValues(initialData), [initialData]);
@@ -145,6 +152,10 @@ export function useChartForm({
   const isSubmitDisabled = isPending || isSuccess;
   const [designers, setDesigners] = useState<Designer[]>(initialDesigners);
   const [genres, setGenres] = useState<Genre[]>(initialGenres);
+  const [storageLocationsList, setStorageLocationsList] =
+    useState<StorageLocationWithStats[]>(initialStorageLocations);
+  const [stitchingAppsList, setStitchingAppsList] =
+    useState<StitchingAppWithStats[]>(initialStitchingApps);
 
   // Dirty tracking
   const isDirty = useMemo(() => {
@@ -292,6 +303,48 @@ export function useChartForm({
     }
   }, []);
 
+  const handleAddStorageLocation = useCallback(
+    async (name: string) => {
+      suppressUnloadRef.current = true;
+      try {
+        const result = await createStorageLocation({ name });
+        if (!result.success) throw new Error(result.error);
+        const newItem: StorageLocationWithStats = {
+          id: result.location.id,
+          name: result.location.name,
+          description: result.location.description,
+          _count: { projects: 0 },
+        };
+        setStorageLocationsList((prev) => [...prev, newItem]);
+        setField("storageLocationId", result.location.id);
+      } finally {
+        suppressUnloadRef.current = false;
+      }
+    },
+    [setField],
+  );
+
+  const handleAddStitchingApp = useCallback(
+    async (name: string) => {
+      suppressUnloadRef.current = true;
+      try {
+        const result = await createStitchingApp({ name });
+        if (!result.success) throw new Error(result.error);
+        const newItem: StitchingAppWithStats = {
+          id: result.app.id,
+          name: result.app.name,
+          description: result.app.description,
+          _count: { projects: 0 },
+        };
+        setStitchingAppsList((prev) => [...prev, newItem]);
+        setField("stitchingAppId", result.app.id);
+      } finally {
+        suppressUnloadRef.current = false;
+      }
+    },
+    [setField],
+  );
+
   // Suppress beforeunload during inline entity creation (server action revalidation can trigger it)
   const suppressUnloadRef = useRef(false);
 
@@ -322,5 +375,9 @@ export function useChartForm({
     genres,
     handleAddDesigner,
     handleAddGenre,
+    storageLocationsList,
+    stitchingAppsList,
+    handleAddStorageLocation,
+    handleAddStitchingApp,
   };
 }

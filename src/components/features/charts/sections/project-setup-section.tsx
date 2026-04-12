@@ -23,6 +23,8 @@ interface ProjectSetupSectionProps {
   onStitchingAppChange: (value: string | null) => void;
   onFabricChange: (value: string | null) => void;
   onOnionSkinningChange: (checked: boolean) => void;
+  onAddStorageLocation?: (name: string) => void;
+  onAddStitchingApp?: (name: string) => void;
   errors?: { status?: string };
 }
 
@@ -40,6 +42,8 @@ export function ProjectSetupSection({
   onStitchingAppChange,
   onFabricChange,
   onOnionSkinningChange,
+  onAddStorageLocation,
+  onAddStitchingApp,
   errors,
 }: ProjectSetupSectionProps) {
   const fabricOptions = unassignedFabrics.map((f) => ({
@@ -102,6 +106,7 @@ export function ProjectSetupSection({
               options={storageOptions}
               value={storageLocationId}
               onChange={onStorageLocationChange}
+              onAddNew={onAddStorageLocation}
               placeholder="Select storage location..."
             />
           </FormField>
@@ -111,6 +116,7 @@ export function ProjectSetupSection({
               options={appOptions}
               value={stitchingAppId}
               onChange={onStitchingAppChange}
+              onAddNew={onAddStitchingApp}
               placeholder="Select stitching app..."
             />
           </FormField>

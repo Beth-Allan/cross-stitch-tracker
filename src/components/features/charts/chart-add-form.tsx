@@ -38,6 +38,8 @@ export function ChartAddForm({
     mode: "create",
     designers,
     genres,
+    storageLocations,
+    stitchingApps,
     onSuccess: () => {
       router.push("/charts");
     },
@@ -129,8 +131,8 @@ export function ChartAddForm({
           storageLocationId={form.values.storageLocationId}
           stitchingAppId={form.values.stitchingAppId}
           fabricId={form.values.fabricId}
-          storageLocations={storageLocations}
-          stitchingApps={stitchingApps}
+          storageLocations={form.storageLocationsList}
+          stitchingApps={form.stitchingAppsList}
           unassignedFabrics={unassignedFabrics}
           needsOnionSkinning={form.values.needsOnionSkinning}
           onStatusChange={(v) => form.setField("status", v as ProjectStatus)}
@@ -138,6 +140,8 @@ export function ChartAddForm({
           onStitchingAppChange={(v) => form.setField("stitchingAppId", v)}
           onFabricChange={(v) => form.setField("fabricId", v)}
           onOnionSkinningChange={(v) => form.setField("needsOnionSkinning", v)}
+          onAddStorageLocation={form.handleAddStorageLocation}
+          onAddStitchingApp={form.handleAddStitchingApp}
           errors={{
             status: form.errors["project.status"],
           }}
