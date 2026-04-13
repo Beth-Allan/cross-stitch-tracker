@@ -321,3 +321,34 @@ export async function getCharts() {
     orderBy: { dateAdded: "desc" },
   });
 }
+
+export async function getChartsForGallery() {
+  const user = await requireAuth();
+
+  return await prisma.chart.findMany({
+    where: { project: { userId: user.id } },
+    include: {
+      project: {
+        select: {
+          id: true,
+          status: true,
+          stitchesCompleted: true,
+          startDate: true,
+          finishDate: true,
+          ffoDate: true,
+          fabric: { select: { id: true } },
+          _count: {
+            select: {
+              projectThreads: true,
+              projectBeads: true,
+              projectSpecialty: true,
+            },
+          },
+        },
+      },
+      designer: true,
+      genres: true,
+    },
+    orderBy: { dateAdded: "desc" },
+  });
+}
