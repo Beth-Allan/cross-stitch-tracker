@@ -4,9 +4,9 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — all 7 plans complete, pending verification
-**Last Updated:** 2026-04-12
-**Roadmap:** 4 milestones / 10 phases — v1.0 shipped, M2 phase 5 complete
+**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — all 8 plans complete, awaiting human UAT (6 items)
+**Last Updated:** 2026-04-13
+**Roadmap:** 4 milestones / 10 phases — v1.0 shipped, M2 phase 5 execution complete
 
 ### Done
 
@@ -15,13 +15,14 @@
   - Archived to: `.planning/milestones/v1.0-*`
   - Live at: https://cross-stitch-tracker-adolwyn.vercel.app
 - 12 quick-fix tasks completed post-deploy (thread sort, idempotency, thumbnails, etc.)
-- **Phase 5: Foundation & Quick Wins** (2026-04-12): 7 plans, 504 tests passing
+- **Phase 5: Foundation & Quick Wins** (2026-04-12–13): 8 plans, 506 tests passing
   - Storage Location & Stitching App CRUD (data layer + UI)
   - Chart form wired to database-backed dropdowns with inline "Add New"
   - Fabric selector wired in chart form
   - Cover image aspect ratio fix, thread picker scroll fix, DMC catalog completed
   - Gap closure: Prisma client regen + onAddNew handlers
   - Gap closure: SearchableSelect "Add New" only shows with search text, thread picker stays open for multi-add
+  - Gap closure: SearchableSelect forceMount (spaces in search), thread picker viewport flip
   - **Database sync required:** `prisma db push` needed after schema changes (no migration created)
 - **Phase 5 audit + harden + polish** (2026-04-12): impeccable:audit scored 15/20, all P1-P2 fixes applied
   - Fixed blur-cancels-tab bug in InlineAddRow, added aria-labels, wired label association on SearchableSelect
@@ -30,6 +31,8 @@
   - 11 loading.tsx skeleton screens (all dashboard routes), global-error.tsx, not-found.tsx
   - Sidebar nav grouped into 4 labeled sections (Projects, Track, Reference, System) with dividers — desktop + mobile
   - Polish: transition-colors, semantic avatar tokens, max-w-7xl content constraint, font-heading consistency
+- **Phase 5 code review** (2026-04-13): 38 files reviewed, 3 critical + 3 warning + 3 info findings
+  - Critical: authz bypass in storage/stitching app actions, hardcoded `@default("1")` on Project.userId
 
 ### In Progress
 
@@ -37,8 +40,9 @@
 
 ### Next Up
 
-1. `/gsd:verify-work 5` — verify phase 5 against requirements
-2. `/gsd:ship 5` — create PR for review
+1. `/gsd:verify-work 5` — browser-test 6 human UAT items
+2. `/gsd-code-review-fix 05` — fix 3 critical code review findings
+3. `/gsd:ship 5` — create PR for review
 
 ### Backlog (post-MVP)
 

@@ -64,7 +64,7 @@ Plans:
 - [x] 05-05-PLAN.md — Cover image fix + thread picker scroll + DMC catalog completion
 - [x] 05-06-PLAN.md — Gap closure: Prisma client regeneration + inline Add New for storage/app dropdowns
 - [x] 05-07-PLAN.md — Gap closure: Fix Add New empty name bug + thread picker multi-add UX
-- [ ] 05-08-PLAN.md — Gap closure: Always-visible Add New + thread picker viewport flip
+- [x] 05-08-PLAN.md — Gap closure: Always-visible Add New + thread picker viewport flip
 **UI hint**: yes
 
 ### Phase 6: Gallery Cards & View Modes
