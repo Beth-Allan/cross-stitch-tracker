@@ -34,16 +34,13 @@ export function StitchingAppDetail({ app }: StitchingAppDetailProps) {
   }
 
   async function handleDelete() {
-    try {
-      const result = await deleteStitchingApp(app.id);
-      if (result.success) {
-        toast.success("App deleted");
-        router.push("/apps");
-      } else {
-        toast.error(result.error ?? "Failed to delete app");
-      }
-    } catch {
-      toast.error("Something went wrong. Please try again.");
+    const result = await deleteStitchingApp(app.id);
+    if (result.success) {
+      toast.success("App deleted");
+      router.push("/apps");
+    } else {
+      toast.error(result.error ?? "Failed to delete app");
+      throw new Error(result.error ?? "Delete failed");
     }
   }
 

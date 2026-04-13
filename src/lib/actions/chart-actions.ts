@@ -23,51 +23,63 @@ export async function createChart(formData: unknown) {
       effectiveApproximate = true;
     }
 
-    const created = await prisma.chart.create({
-      data: {
-        name: chart.name,
-        designerId: chart.designerId,
-        coverImageUrl: chart.coverImageUrl,
-        coverThumbnailUrl: chart.coverThumbnailUrl,
-        digitalWorkingCopyUrl: chart.digitalFileUrl,
-        stitchCount: effectiveStitchCount,
-        stitchCountApproximate: effectiveApproximate,
-        stitchesWide: chart.stitchesWide,
-        stitchesHigh: chart.stitchesHigh,
-        genres: {
-          connect: chart.genreIds.map((id) => ({ id })),
-        },
-        isPaperChart: chart.isPaperChart,
-        isFormalKit: chart.isFormalKit,
-        isSAL: chart.isSAL,
-        kitColorCount: chart.kitColorCount,
-        notes: chart.notes,
-        project: {
-          create: {
-            userId: user.id,
-            status: project.status,
-            storageLocationId: project.storageLocationId,
-            stitchingAppId: project.stitchingAppId,
-            needsOnionSkinning: project.needsOnionSkinning,
-            startDate: project.startDate ? new Date(project.startDate) : null,
-            finishDate: project.finishDate ? new Date(project.finishDate) : null,
-            ffoDate: project.ffoDate ? new Date(project.ffoDate) : null,
-            wantToStartNext: project.wantToStartNext,
-            preferredStartSeason: project.preferredStartSeason,
-            startingStitches: project.startingStitches,
+    const created = await prisma.$transaction(async (tx) => {
+      const result = await tx.chart.create({
+        data: {
+          name: chart.name,
+          designerId: chart.designerId,
+          coverImageUrl: chart.coverImageUrl,
+          coverThumbnailUrl: chart.coverThumbnailUrl,
+          digitalWorkingCopyUrl: chart.digitalFileUrl,
+          stitchCount: effectiveStitchCount,
+          stitchCountApproximate: effectiveApproximate,
+          stitchesWide: chart.stitchesWide,
+          stitchesHigh: chart.stitchesHigh,
+          genres: {
+            connect: chart.genreIds.map((id) => ({ id })),
+          },
+          isPaperChart: chart.isPaperChart,
+          isFormalKit: chart.isFormalKit,
+          isSAL: chart.isSAL,
+          kitColorCount: chart.kitColorCount,
+          notes: chart.notes,
+          project: {
+            create: {
+              userId: user.id,
+              status: project.status,
+              storageLocationId: project.storageLocationId,
+              stitchingAppId: project.stitchingAppId,
+              needsOnionSkinning: project.needsOnionSkinning,
+              startDate: project.startDate ? new Date(project.startDate) : null,
+              finishDate: project.finishDate ? new Date(project.finishDate) : null,
+              ffoDate: project.ffoDate ? new Date(project.ffoDate) : null,
+              wantToStartNext: project.wantToStartNext,
+              preferredStartSeason: project.preferredStartSeason,
+              startingStitches: project.startingStitches,
+            },
           },
         },
-      },
-      include: { project: true, designer: true, genres: true },
-    });
-
-    // Link fabric to the new project if provided
-    if (project.fabricId && created.project) {
-      await prisma.fabric.update({
-        where: { id: project.fabricId },
-        data: { linkedProjectId: created.project.id },
+        include: { project: true, designer: true, genres: true },
       });
-    }
+
+      // Link fabric to the new project if provided
+      if (project.fabricId && result.project) {
+        // Verify the fabric belongs to this user (unlinked or linked to their project)
+        const targetFabric = await tx.fabric.findUnique({
+          where: { id: project.fabricId },
+          select: { linkedProject: { select: { userId: true } } },
+        });
+        if (targetFabric?.linkedProject && targetFabric.linkedProject.userId !== user.id) {
+          throw new Error("Fabric not found");
+        }
+        await tx.fabric.update({
+          where: { id: project.fabricId },
+          data: { linkedProjectId: result.project.id },
+        });
+      }
+
+      return result;
+    });
 
     // Generate thumbnail if a cover image was uploaded
     if (chart.coverImageUrl) {
@@ -113,65 +125,76 @@ export async function updateChart(chartId: string, formData: unknown) {
       effectiveApproximate = true;
     }
 
-    await prisma.chart.update({
-      where: { id: chartId },
-      data: {
-        name: chart.name,
-        designerId: chart.designerId,
-        coverImageUrl: chart.coverImageUrl,
-        coverThumbnailUrl: chart.coverThumbnailUrl,
-        digitalWorkingCopyUrl: chart.digitalFileUrl,
-        stitchCount: effectiveStitchCount,
-        stitchCountApproximate: effectiveApproximate,
-        stitchesWide: chart.stitchesWide,
-        stitchesHigh: chart.stitchesHigh,
-        genres: {
-          set: chart.genreIds.map((id) => ({ id })),
-        },
-        isPaperChart: chart.isPaperChart,
-        isFormalKit: chart.isFormalKit,
-        isSAL: chart.isSAL,
-        kitColorCount: chart.kitColorCount,
-        notes: chart.notes,
-        project: {
-          update: {
-            status: project.status,
-            storageLocationId: project.storageLocationId,
-            stitchingAppId: project.stitchingAppId,
-            needsOnionSkinning: project.needsOnionSkinning,
-            startDate: project.startDate ? new Date(project.startDate) : null,
-            finishDate: project.finishDate ? new Date(project.finishDate) : null,
-            ffoDate: project.ffoDate ? new Date(project.ffoDate) : null,
-            wantToStartNext: project.wantToStartNext,
-            preferredStartSeason: project.preferredStartSeason,
-            startingStitches: project.startingStitches,
+    const existingProjectId = existing.project.id;
+
+    await prisma.$transaction(async (tx) => {
+      await tx.chart.update({
+        where: { id: chartId },
+        data: {
+          name: chart.name,
+          designerId: chart.designerId,
+          coverImageUrl: chart.coverImageUrl,
+          coverThumbnailUrl: chart.coverThumbnailUrl,
+          digitalWorkingCopyUrl: chart.digitalFileUrl,
+          stitchCount: effectiveStitchCount,
+          stitchCountApproximate: effectiveApproximate,
+          stitchesWide: chart.stitchesWide,
+          stitchesHigh: chart.stitchesHigh,
+          genres: {
+            set: chart.genreIds.map((id) => ({ id })),
+          },
+          isPaperChart: chart.isPaperChart,
+          isFormalKit: chart.isFormalKit,
+          isSAL: chart.isSAL,
+          kitColorCount: chart.kitColorCount,
+          notes: chart.notes,
+          project: {
+            update: {
+              status: project.status,
+              storageLocationId: project.storageLocationId,
+              stitchingAppId: project.stitchingAppId,
+              needsOnionSkinning: project.needsOnionSkinning,
+              startDate: project.startDate ? new Date(project.startDate) : null,
+              finishDate: project.finishDate ? new Date(project.finishDate) : null,
+              ffoDate: project.ffoDate ? new Date(project.ffoDate) : null,
+              wantToStartNext: project.wantToStartNext,
+              preferredStartSeason: project.preferredStartSeason,
+              startingStitches: project.startingStitches,
+            },
           },
         },
-      },
-      include: { project: true, designer: true, genres: true },
-    });
-
-    // Handle fabric link/unlink
-    const existingProjectId = existing.project.id;
-    const currentFabric = await prisma.fabric.findUnique({
-      where: { linkedProjectId: existingProjectId },
-    });
-
-    // Unlink old fabric if changed
-    if (currentFabric && currentFabric.id !== project.fabricId) {
-      await prisma.fabric.update({
-        where: { id: currentFabric.id },
-        data: { linkedProjectId: null },
+        include: { project: true, designer: true, genres: true },
       });
-    }
 
-    // Link new fabric if provided and different from current
-    if (project.fabricId && project.fabricId !== currentFabric?.id) {
-      await prisma.fabric.update({
-        where: { id: project.fabricId },
-        data: { linkedProjectId: existingProjectId },
+      // Handle fabric link/unlink
+      const currentFabric = await tx.fabric.findUnique({
+        where: { linkedProjectId: existingProjectId },
       });
-    }
+
+      // Unlink old fabric if changed
+      if (currentFabric && currentFabric.id !== project.fabricId) {
+        await tx.fabric.update({
+          where: { id: currentFabric.id },
+          data: { linkedProjectId: null },
+        });
+      }
+
+      // Link new fabric if provided and different from current
+      if (project.fabricId && project.fabricId !== currentFabric?.id) {
+        // Verify the fabric belongs to this user (unlinked or linked to their project)
+        const targetFabric = await tx.fabric.findUnique({
+          where: { id: project.fabricId },
+          select: { linkedProject: { select: { userId: true } } },
+        });
+        if (targetFabric?.linkedProject && targetFabric.linkedProject.userId !== user.id) {
+          throw new Error("Fabric not found");
+        }
+        await tx.fabric.update({
+          where: { id: project.fabricId },
+          data: { linkedProjectId: existingProjectId },
+        });
+      }
+    });
 
     // Generate thumbnail if cover image changed
     if (chart.coverImageUrl && chart.coverImageUrl !== existing.coverImageUrl) {
@@ -254,53 +277,43 @@ export async function updateChartStatus(chartId: string, status: string) {
 export async function getChart(chartId: string) {
   const user = await requireAuth();
 
-  try {
-    const chart = await prisma.chart.findUnique({
-      where: { id: chartId },
-      include: {
-        project: {
-          include: {
-            storageLocation: { select: { id: true, name: true } },
-            stitchingApp: { select: { id: true, name: true } },
-            fabric: { include: { brand: true } },
-          },
+  const chart = await prisma.chart.findUnique({
+    where: { id: chartId },
+    include: {
+      project: {
+        include: {
+          storageLocation: { select: { id: true, name: true } },
+          stitchingApp: { select: { id: true, name: true } },
+          fabric: { include: { brand: true } },
         },
-        designer: true,
-        genres: true,
       },
-    });
-    // Only return charts owned by the current user
-    if (chart && chart.project && chart.project.userId !== user.id) {
-      return null;
-    }
-    return chart;
-  } catch (error) {
-    console.error("getChart error:", error);
+      designer: true,
+      genres: true,
+    },
+  });
+  // Only return charts owned by the current user
+  if (chart && chart.project && chart.project.userId !== user.id) {
     return null;
   }
+  return chart;
 }
 
 export async function getCharts() {
   const user = await requireAuth();
 
-  try {
-    return await prisma.chart.findMany({
-      where: { project: { userId: user.id } },
-      include: {
-        project: {
-          include: {
-            storageLocation: { select: { id: true, name: true } },
-            stitchingApp: { select: { id: true, name: true } },
-            fabric: { include: { brand: true } },
-          },
+  return await prisma.chart.findMany({
+    where: { project: { userId: user.id } },
+    include: {
+      project: {
+        include: {
+          storageLocation: { select: { id: true, name: true } },
+          stitchingApp: { select: { id: true, name: true } },
+          fabric: { include: { brand: true } },
         },
-        designer: true,
-        genres: true,
       },
-      orderBy: { dateAdded: "desc" },
-    });
-  } catch (error) {
-    console.error("getCharts error:", error);
-    return [];
-  }
+      designer: true,
+      genres: true,
+    },
+    orderBy: { dateAdded: "desc" },
+  });
 }

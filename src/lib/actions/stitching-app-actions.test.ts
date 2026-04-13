@@ -36,6 +36,20 @@ describe("stitching-app-actions", () => {
 
       await expect(deleteStitchingApp("sa-1")).rejects.toThrow("Unauthorized");
     });
+
+    it("rejects unauthenticated calls to updateStitchingApp", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { updateStitchingApp } = await import("./stitching-app-actions");
+
+      await expect(updateStitchingApp("sa-1", { name: "Test" })).rejects.toThrow("Unauthorized");
+    });
+
+    it("rejects unauthenticated calls to getStitchingAppDetail", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { getStitchingAppDetail } = await import("./stitching-app-actions");
+
+      await expect(getStitchingAppDetail("sa-1")).rejects.toThrow("Unauthorized");
+    });
   });
 
   describe("createStitchingApp", () => {

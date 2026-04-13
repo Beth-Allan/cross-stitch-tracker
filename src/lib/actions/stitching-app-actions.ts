@@ -79,61 +79,51 @@ export async function deleteStitchingApp(id: string) {
 export async function getStitchingAppsWithStats(): Promise<StitchingAppWithStats[]> {
   const user = await requireAuth();
 
-  try {
-    const apps = await prisma.stitchingApp.findMany({
-      where: { userId: user.id },
-      include: { _count: { select: { projects: true } } },
-      orderBy: { name: "asc" },
-    });
-    return apps.map((a) => ({
-      id: a.id,
-      name: a.name,
-      description: a.description,
-      _count: a._count,
-    }));
-  } catch (error) {
-    console.error("getStitchingAppsWithStats error:", error);
-    return [];
-  }
+  const apps = await prisma.stitchingApp.findMany({
+    where: { userId: user.id },
+    include: { _count: { select: { projects: true } } },
+    orderBy: { name: "asc" },
+  });
+  return apps.map((a) => ({
+    id: a.id,
+    name: a.name,
+    description: a.description,
+    _count: a._count,
+  }));
 }
 
 export async function getStitchingAppDetail(id: string): Promise<StitchingAppDetail | null> {
   const user = await requireAuth();
 
-  try {
-    const app = await prisma.stitchingApp.findUnique({
-      where: { id, userId: user.id },
-      include: {
-        projects: {
-          select: {
-            id: true,
-            status: true,
-            chart: {
-              select: { id: true, name: true, coverThumbnailUrl: true },
-            },
-            fabric: {
-              select: { name: true, count: true, type: true },
-            },
+  const app = await prisma.stitchingApp.findUnique({
+    where: { id, userId: user.id },
+    include: {
+      projects: {
+        select: {
+          id: true,
+          status: true,
+          chart: {
+            select: { id: true, name: true, coverThumbnailUrl: true },
+          },
+          fabric: {
+            select: { name: true, count: true, type: true },
           },
         },
       },
-    });
+    },
+  });
 
-    if (!app) return null;
+  if (!app) return null;
 
-    return {
-      id: app.id,
-      name: app.name,
-      description: app.description,
-      projects: app.projects.map((p) => ({
-        id: p.id,
-        status: p.status,
-        chart: p.chart,
-        fabric: p.fabric,
-      })),
-    };
-  } catch (error) {
-    console.error("getStitchingAppDetail error:", error);
-    return null;
-  }
+  return {
+    id: app.id,
+    name: app.name,
+    description: app.description,
+    projects: app.projects.map((p) => ({
+      id: p.id,
+      status: p.status,
+      chart: p.chart,
+      fabric: p.fabric,
+    })),
+  };
 }

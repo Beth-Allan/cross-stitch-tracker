@@ -37,11 +37,25 @@ describe("storage-location-actions", () => {
       await expect(deleteStorageLocation("sl-1")).rejects.toThrow("Unauthorized");
     });
 
+    it("rejects unauthenticated calls to updateStorageLocation", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { updateStorageLocation } = await import("./storage-location-actions");
+
+      await expect(updateStorageLocation("sl-1", { name: "Test" })).rejects.toThrow("Unauthorized");
+    });
+
     it("rejects unauthenticated calls to getStorageLocationsWithStats", async () => {
       mockAuth.mockResolvedValueOnce(null);
       const { getStorageLocationsWithStats } = await import("./storage-location-actions");
 
       await expect(getStorageLocationsWithStats()).rejects.toThrow("Unauthorized");
+    });
+
+    it("rejects unauthenticated calls to getStorageLocationDetail", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { getStorageLocationDetail } = await import("./storage-location-actions");
+
+      await expect(getStorageLocationDetail("sl-1")).rejects.toThrow("Unauthorized");
     });
   });
 

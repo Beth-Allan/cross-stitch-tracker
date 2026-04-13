@@ -56,6 +56,12 @@ describe("chart-actions thumbnail generation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGenerateThumbnail.mockResolvedValue({ success: true, thumbnailKey: "thumb-key" });
+    // Support interactive transactions (function arg) and batch transactions (array arg)
+    mockPrisma.$transaction.mockImplementation(async (fnOrArray: unknown) => {
+      if (typeof fnOrArray === "function")
+        return (fnOrArray as (tx: typeof mockPrisma) => unknown)(mockPrisma);
+      return fnOrArray;
+    });
   });
 
   describe("createChart", () => {

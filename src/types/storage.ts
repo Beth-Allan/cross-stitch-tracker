@@ -1,3 +1,5 @@
+import type { ProjectStatus } from "@/generated/prisma/client";
+
 export interface StorageLocationWithStats {
   id: string;
   name: string;
@@ -16,7 +18,7 @@ export interface StorageLocationDetail {
       name: string;
       coverThumbnailUrl: string | null;
     };
-    status: string;
+    status: ProjectStatus;
     fabric: {
       name: string;
       count: number;
@@ -43,7 +45,7 @@ export interface StitchingAppDetail {
       name: string;
       coverThumbnailUrl: string | null;
     };
-    status: string;
+    status: ProjectStatus;
     fabric: {
       name: string;
       count: number;

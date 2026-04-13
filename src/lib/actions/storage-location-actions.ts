@@ -79,61 +79,51 @@ export async function deleteStorageLocation(id: string) {
 export async function getStorageLocationsWithStats(): Promise<StorageLocationWithStats[]> {
   const user = await requireAuth();
 
-  try {
-    const locations = await prisma.storageLocation.findMany({
-      where: { userId: user.id },
-      include: { _count: { select: { projects: true } } },
-      orderBy: { name: "asc" },
-    });
-    return locations.map((l) => ({
-      id: l.id,
-      name: l.name,
-      description: l.description,
-      _count: l._count,
-    }));
-  } catch (error) {
-    console.error("getStorageLocationsWithStats error:", error);
-    return [];
-  }
+  const locations = await prisma.storageLocation.findMany({
+    where: { userId: user.id },
+    include: { _count: { select: { projects: true } } },
+    orderBy: { name: "asc" },
+  });
+  return locations.map((l) => ({
+    id: l.id,
+    name: l.name,
+    description: l.description,
+    _count: l._count,
+  }));
 }
 
 export async function getStorageLocationDetail(id: string): Promise<StorageLocationDetail | null> {
   const user = await requireAuth();
 
-  try {
-    const location = await prisma.storageLocation.findUnique({
-      where: { id, userId: user.id },
-      include: {
-        projects: {
-          select: {
-            id: true,
-            status: true,
-            chart: {
-              select: { id: true, name: true, coverThumbnailUrl: true },
-            },
-            fabric: {
-              select: { name: true, count: true, type: true },
-            },
+  const location = await prisma.storageLocation.findUnique({
+    where: { id, userId: user.id },
+    include: {
+      projects: {
+        select: {
+          id: true,
+          status: true,
+          chart: {
+            select: { id: true, name: true, coverThumbnailUrl: true },
+          },
+          fabric: {
+            select: { name: true, count: true, type: true },
           },
         },
       },
-    });
+    },
+  });
 
-    if (!location) return null;
+  if (!location) return null;
 
-    return {
-      id: location.id,
-      name: location.name,
-      description: location.description,
-      projects: location.projects.map((p) => ({
-        id: p.id,
-        status: p.status,
-        chart: p.chart,
-        fabric: p.fabric,
-      })),
-    };
-  } catch (error) {
-    console.error("getStorageLocationDetail error:", error);
-    return null;
-  }
+  return {
+    id: location.id,
+    name: location.name,
+    description: location.description,
+    projects: location.projects.map((p) => ({
+      id: p.id,
+      status: p.status,
+      chart: p.chart,
+      fabric: p.fabric,
+    })),
+  };
 }

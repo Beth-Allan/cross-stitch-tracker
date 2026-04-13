@@ -77,15 +77,10 @@ export async function deleteFabricBrand(id: string) {
 export async function getFabricBrands() {
   await requireAuth();
 
-  try {
-    return await prisma.fabricBrand.findMany({
-      include: { _count: { select: { fabrics: true } } },
-      orderBy: { name: "asc" },
-    });
-  } catch (error) {
-    console.error("getFabricBrands error:", error);
-    return [];
-  }
+  return await prisma.fabricBrand.findMany({
+    include: { _count: { select: { fabrics: true } } },
+    orderBy: { name: "asc" },
+  });
 }
 
 // ─── Fabric CRUD ────────────────────────────────────────────────────────────
@@ -191,69 +186,54 @@ export async function deleteFabric(id: string) {
 export async function getFabric(id: string) {
   const user = await requireAuth();
 
-  try {
-    const fabric = await prisma.fabric.findUnique({
-      where: { id },
-      include: {
-        brand: true,
-        linkedProject: {
-          include: {
-            chart: { select: { id: true, name: true, stitchesWide: true, stitchesHigh: true } },
-          },
+  const fabric = await prisma.fabric.findUnique({
+    where: { id },
+    include: {
+      brand: true,
+      linkedProject: {
+        include: {
+          chart: { select: { id: true, name: true, stitchesWide: true, stitchesHigh: true } },
         },
       },
-    });
+    },
+  });
 
-    if (fabric?.linkedProject && fabric.linkedProject.userId !== user.id) {
-      return null;
-    }
-
-    return fabric;
-  } catch (error) {
-    console.error("getFabric error:", error);
+  if (fabric?.linkedProject && fabric.linkedProject.userId !== user.id) {
     return null;
   }
+
+  return fabric;
 }
 
 export async function getUnassignedFabrics(currentProjectId?: string) {
   const user = await requireAuth();
 
-  try {
-    return await prisma.fabric.findMany({
-      where: {
-        OR: [
-          { linkedProjectId: null },
-          ...(currentProjectId ? [{ linkedProjectId: currentProjectId }] : []),
-        ],
-        NOT: {
-          linkedProject: { userId: { not: user.id } },
-        },
+  return await prisma.fabric.findMany({
+    where: {
+      OR: [
+        { linkedProjectId: null },
+        ...(currentProjectId ? [{ linkedProjectId: currentProjectId }] : []),
+      ],
+      NOT: {
+        linkedProject: { userId: { not: user.id } },
       },
-      include: { brand: true },
-      orderBy: { name: "asc" },
-    });
-  } catch (error) {
-    console.error("getUnassignedFabrics error:", error);
-    return [];
-  }
+    },
+    include: { brand: true },
+    orderBy: { name: "asc" },
+  });
 }
 
 export async function getFabrics() {
   const user = await requireAuth();
 
-  try {
-    return await prisma.fabric.findMany({
-      where: {
-        OR: [{ linkedProjectId: null }, { linkedProject: { userId: user.id } }],
-      },
-      include: {
-        brand: true,
-        linkedProject: { include: { chart: { select: { name: true } } } },
-      },
-      orderBy: { name: "asc" },
-    });
-  } catch (error) {
-    console.error("getFabrics error:", error);
-    return [];
-  }
+  return await prisma.fabric.findMany({
+    where: {
+      OR: [{ linkedProjectId: null }, { linkedProject: { userId: user.id } }],
+    },
+    include: {
+      brand: true,
+      linkedProject: { include: { chart: { select: { name: true } } } },
+    },
+    orderBy: { name: "asc" },
+  });
 }

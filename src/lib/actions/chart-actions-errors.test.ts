@@ -50,6 +50,12 @@ const validFormData = {
 describe("chart-actions authenticated error paths", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Support interactive transactions (function arg) and batch transactions (array arg)
+    mockPrisma.$transaction.mockImplementation(async (fnOrArray: unknown) => {
+      if (typeof fnOrArray === "function")
+        return (fnOrArray as (tx: typeof mockPrisma) => unknown)(mockPrisma);
+      return fnOrArray;
+    });
   });
 
   it("createChart returns error on Zod validation failure (empty object)", async () => {
@@ -140,27 +146,17 @@ describe("chart-actions authenticated error paths", () => {
     expect(result).toEqual({ success: false, error: "Failed to update chart status" });
   });
 
-  it("getChart returns null and logs on Prisma error", async () => {
+  it("getChart throws on DB error (handled by error boundary)", async () => {
     const { getChart } = await import("./chart-actions");
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     mockPrisma.chart.findUnique.mockRejectedValueOnce(new Error("DB connection lost"));
 
-    const result = await getChart("chart-1");
-
-    expect(result).toBeNull();
-    expect(consoleSpy).toHaveBeenCalledWith("getChart error:", expect.any(Error));
-    consoleSpy.mockRestore();
+    await expect(getChart("chart-1")).rejects.toThrow("DB connection lost");
   });
 
-  it("getCharts returns empty array and logs on Prisma error", async () => {
+  it("getCharts throws on DB error (handled by error boundary)", async () => {
     const { getCharts } = await import("./chart-actions");
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     mockPrisma.chart.findMany.mockRejectedValueOnce(new Error("DB connection lost"));
 
-    const result = await getCharts();
-
-    expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith("getCharts error:", expect.any(Error));
-    consoleSpy.mockRestore();
+    await expect(getCharts()).rejects.toThrow("DB connection lost");
   });
 });

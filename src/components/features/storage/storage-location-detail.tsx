@@ -37,16 +37,13 @@ export function StorageLocationDetail({ location }: StorageLocationDetailProps) 
   }
 
   async function handleDelete() {
-    try {
-      const result = await deleteStorageLocation(location.id);
-      if (result.success) {
-        toast.success("Location deleted");
-        router.push("/storage");
-      } else {
-        toast.error(result.error ?? "Failed to delete location");
-      }
-    } catch {
-      toast.error("Something went wrong. Please try again.");
+    const result = await deleteStorageLocation(location.id);
+    if (result.success) {
+      toast.success("Location deleted");
+      router.push("/storage");
+    } else {
+      toast.error(result.error ?? "Failed to delete location");
+      throw new Error(result.error ?? "Delete failed");
     }
   }
 

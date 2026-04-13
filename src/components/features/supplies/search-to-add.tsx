@@ -60,6 +60,7 @@ export function SearchToAdd({
   const [search, setSearch] = useState("");
   const [items, setItems] = useState<SupplyItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [highlightIndex, setHighlightIndex] = useState(0);
   const [flipUp, setFlipUp] = useState(false);
@@ -97,6 +98,7 @@ export function SearchToAdd({
   useEffect(() => {
     let cancelled = false;
     setIsLoading(true);
+    setFetchError(false);
 
     async function fetchItems() {
       try {
@@ -114,7 +116,10 @@ export function SearchToAdd({
           setIsLoading(false);
         }
       } catch {
-        if (!cancelled) setIsLoading(false);
+        if (!cancelled) {
+          setFetchError(true);
+          setIsLoading(false);
+        }
       }
     }
 
@@ -240,6 +245,10 @@ export function SearchToAdd({
       <div className="border-border max-h-72 overflow-y-auto border-t">
         {isLoading ? (
           <p className="text-muted-foreground px-3 py-4 text-center text-sm">Searching...</p>
+        ) : fetchError ? (
+          <p className="text-destructive px-3 py-4 text-center text-sm">
+            Failed to load items. Try again.
+          </p>
         ) : items.length === 0 ? (
           <p className="text-muted-foreground px-3 py-4 text-center text-sm">No matches</p>
         ) : (
