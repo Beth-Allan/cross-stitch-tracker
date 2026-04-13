@@ -88,9 +88,7 @@ export async function getStitchingAppsWithStats(): Promise<StitchingAppWithStats
   }
 }
 
-export async function getStitchingAppDetail(
-  id: string,
-): Promise<StitchingAppDetail | null> {
+export async function getStitchingAppDetail(id: string): Promise<StitchingAppDetail | null> {
   await requireAuth();
 
   try {

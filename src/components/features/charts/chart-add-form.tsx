@@ -62,7 +62,7 @@ export function ChartAddForm({
         Charts
       </Link>
 
-      <h1 className="font-fraunces text-foreground mb-6 text-2xl font-semibold">Add New Chart</h1>
+      <h1 className="font-heading text-foreground mb-6 text-2xl font-semibold">Add New Chart</h1>
 
       <form onSubmit={form.handleSubmit} className="space-y-5">
         <BasicInfoSection

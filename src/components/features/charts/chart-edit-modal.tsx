@@ -89,7 +89,7 @@ export function ChartEditModal({
           {/* Header */}
           <DialogHeader className="px-6 pt-5">
             <div className="flex items-center justify-between">
-              <DialogTitle className="font-fraunces text-foreground text-xl font-semibold">
+              <DialogTitle className="font-heading text-foreground text-xl font-semibold">
                 Edit Chart
               </DialogTitle>
               <Button

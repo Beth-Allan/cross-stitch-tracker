@@ -32,10 +32,7 @@ describe("CoverImageUpload - cover image display fixes", () => {
   describe("resolving state container", () => {
     it("has h-48 class (not h-32)", () => {
       const { container } = render(
-        <CoverImageUpload
-          {...defaultProps}
-          currentImageUrl="covers/some-key.jpg"
-        />,
+        <CoverImageUpload {...defaultProps} currentImageUrl="covers/some-key.jpg" />,
       );
 
       // Resolving state shows a loading spinner in a dashed border container
@@ -50,10 +47,7 @@ describe("CoverImageUpload - cover image display fixes", () => {
     it("preview container has h-48 class (not h-32)", async () => {
       // Use a direct URL (not an R2 key) to skip resolving state
       render(
-        <CoverImageUpload
-          {...defaultProps}
-          currentImageUrl="https://example.com/test-image.jpg"
-        />,
+        <CoverImageUpload {...defaultProps} currentImageUrl="https://example.com/test-image.jpg" />,
       );
 
       const img = screen.getByAltText("Cover image preview");
@@ -64,10 +58,7 @@ describe("CoverImageUpload - cover image display fixes", () => {
 
     it("preview img has object-contain class (not object-cover)", async () => {
       render(
-        <CoverImageUpload
-          {...defaultProps}
-          currentImageUrl="https://example.com/test-image.jpg"
-        />,
+        <CoverImageUpload {...defaultProps} currentImageUrl="https://example.com/test-image.jpg" />,
       );
 
       const img = screen.getByAltText("Cover image preview");
@@ -77,10 +68,7 @@ describe("CoverImageUpload - cover image display fixes", () => {
 
     it("preview container has bg-muted class", async () => {
       render(
-        <CoverImageUpload
-          {...defaultProps}
-          currentImageUrl="https://example.com/test-image.jpg"
-        />,
+        <CoverImageUpload {...defaultProps} currentImageUrl="https://example.com/test-image.jpg" />,
       );
 
       const img = screen.getByAltText("Cover image preview");

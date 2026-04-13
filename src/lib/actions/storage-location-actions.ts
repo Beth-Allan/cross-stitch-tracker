@@ -88,9 +88,7 @@ export async function getStorageLocationsWithStats(): Promise<StorageLocationWit
   }
 }
 
-export async function getStorageLocationDetail(
-  id: string,
-): Promise<StorageLocationDetail | null> {
+export async function getStorageLocationDetail(id: string): Promise<StorageLocationDetail | null> {
   await requireAuth();
 
   try {

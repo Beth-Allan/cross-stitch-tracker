@@ -144,12 +144,7 @@ describe("ProjectSetupSection", () => {
 
   it("renders Add New option for storage location when onAddStorageLocation is provided", async () => {
     const user = userEvent.setup();
-    render(
-      <ProjectSetupSection
-        {...defaultProps}
-        onAddStorageLocation={vi.fn()}
-      />,
-    );
+    render(<ProjectSetupSection {...defaultProps} onAddStorageLocation={vi.fn()} />);
 
     // Open the Storage Location popover by clicking the trigger
     const storageTrigger = screen.getByText("Select storage location...").closest("button")!;
@@ -161,12 +156,7 @@ describe("ProjectSetupSection", () => {
 
   it("renders Add New option for stitching app when onAddStitchingApp is provided", async () => {
     const user = userEvent.setup();
-    render(
-      <ProjectSetupSection
-        {...defaultProps}
-        onAddStitchingApp={vi.fn()}
-      />,
-    );
+    render(<ProjectSetupSection {...defaultProps} onAddStitchingApp={vi.fn()} />);
 
     // Open the Stitching App popover by clicking the trigger
     const appTrigger = screen.getByText("Select stitching app...").closest("button")!;
@@ -178,9 +168,7 @@ describe("ProjectSetupSection", () => {
 
   it("does not render Add New for storage when onAddStorageLocation is omitted", async () => {
     const user = userEvent.setup();
-    render(
-      <ProjectSetupSection {...defaultProps} />,
-    );
+    render(<ProjectSetupSection {...defaultProps} />);
 
     // Open the Storage Location popover
     const storageTrigger = screen.getByText("Select storage location...").closest("button")!;
