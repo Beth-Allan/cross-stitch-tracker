@@ -8,6 +8,21 @@ A personal cross-stitch project management app that replaced a complex Notion sy
 
 A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
 
+## Current Milestone: v1.1 Browse & Organize
+
+**Goal:** Make the collection browsable and visually appealing, with quality-of-life improvements to project setup and supply management.
+
+**Target features:**
+- Gallery cards with status-specific layouts
+- Gallery/list/table view modes with sorting
+- Storage location management with proper CRUD
+- Wire fabric selector into chart form
+- Per-colour stitch counts & automatic skein calculator
+- Rework supply entry workflow
+- Complete DMC catalog (DMC 1-149 including Blanc, Ecru)
+- Cover image aspect ratio fix
+- Thread colour picker scroll UX fix
+
 ## Requirements
 
 ### Validated
@@ -28,13 +43,17 @@ A stitcher can manage their entire chart collection and supplies faster and more
 - ✓ Fabric CRUD with size auto-calculation — v1.0
 - ✓ Auto-generated shopping lists grouped by project with fulfillment tracking — v1.0
 
-### Active — Milestone 2: Browse & Organize
+### Active — Milestone 2: Browse & Organize (v1.1)
 
 - [ ] Gallery cards with status-specific layouts (WIP: progress, Unstarted: kitting, Finished: completion)
-- [ ] Reusable advanced filter bar with configurable dimensions and dismissible chips
 - [ ] Gallery/list/table view modes with sorting
-- [ ] Series/collection management with completion tracking
-- [ ] Storage location management
+- [ ] Storage location management with proper CRUD (replacing hardcoded arrays)
+- [ ] Wire fabric selector into chart form
+- [ ] Per-colour stitch counts & automatic skein calculator
+- [ ] Rework supply entry workflow (maintain insertion order, streamlined flow)
+- [ ] Complete DMC catalog (fill gaps: DMC 1-149 including Blanc, Ecru)
+- [ ] Cover image aspect ratio fix
+- [ ] Thread colour picker scroll UX fix
 
 ### Active — Milestone 3: Track & Measure
 
@@ -57,6 +76,8 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 ### Deferred (no phase assigned)
 
+- [ ] Reusable advanced filter bar with configurable dimensions and dismissible chips
+- [ ] Series/collection management with completion tracking
 - [ ] Auto-calculated kitted status and kitting progress indicators (8 conditions)
 - [ ] SAL support (multi-part charts, evolving stitch counts and supply needs)
 
@@ -140,4 +161,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-11 after v1.0 milestone*
+*Last updated: 2026-04-11 after milestone v1.1 started*

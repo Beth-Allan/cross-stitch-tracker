@@ -38,7 +38,7 @@ export function UserMenu({ user }: UserMenuProps) {
         className="hover:bg-accent focus-visible:ring-ring flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-2 py-1.5 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       >
         <Avatar size="sm">
-          <AvatarFallback className="bg-amber-100 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+          <AvatarFallback className="bg-primary/10 text-primary dark:bg-primary/20 text-xs font-medium">
             {initials}
           </AvatarFallback>
         </Avatar>

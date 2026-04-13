@@ -22,7 +22,8 @@ import { SizeBadge } from "./size-badge";
 import { getEffectiveStitchCount } from "@/lib/utils/size-category";
 import { deleteChart } from "@/lib/actions/chart-actions";
 import type { ChartWithProject } from "@/types/chart";
-import type { Designer, Genre } from "@/generated/prisma/client";
+import type { Designer, Fabric, FabricBrand, Genre } from "@/generated/prisma/client";
+import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 
 /* ---- Types ---- */
 
@@ -30,12 +31,23 @@ interface ChartListProps {
   charts: ChartWithProject[];
   designers: Designer[];
   genres: Genre[];
-  imageUrls: Record<string, string>;
+  imageUrls?: Record<string, string>;
+  storageLocations?: StorageLocationWithStats[];
+  stitchingApps?: StitchingAppWithStats[];
+  unassignedFabrics?: (Fabric & { brand: FabricBrand })[];
 }
 
 /* ---- Main Component ---- */
 
-export function ChartList({ charts, designers, genres, imageUrls }: ChartListProps) {
+export function ChartList({
+  charts,
+  designers,
+  genres,
+  imageUrls = {},
+  storageLocations = [],
+  stitchingApps = [],
+  unassignedFabrics = [],
+}: ChartListProps) {
   const router = useRouter();
   const [editingChart, setEditingChart] = useState<ChartWithProject | null>(null);
   const [deletingChart, setDeletingChart] = useState<ChartWithProject | null>(null);
@@ -193,6 +205,14 @@ export function ChartList({ charts, designers, genres, imageUrls }: ChartListPro
           chart={editingChart}
           designers={designers}
           genres={genres}
+          storageLocations={storageLocations}
+          stitchingApps={stitchingApps}
+          unassignedFabrics={
+            editingChart.project?.fabric &&
+            !unassignedFabrics.some((f) => f.id === editingChart.project?.fabric?.id)
+              ? [editingChart.project.fabric, ...unassignedFabrics]
+              : unassignedFabrics
+          }
           open={!!editingChart}
           onOpenChange={(open) => {
             if (!open) setEditingChart(null);

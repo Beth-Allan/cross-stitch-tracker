@@ -81,17 +81,18 @@ export function SearchableSelect({
               {onAddNew && (
                 <>
                   <CommandSeparator />
-                  <CommandGroup>
+                  <CommandGroup forceMount>
                     <CommandItem
+                      forceMount
                       onSelect={() => {
-                        onAddNew(search);
+                        onAddNew(search.trim());
                         setOpen(false);
                         setSearch("");
                       }}
                       className="text-primary"
                     >
                       <Plus className="mr-2 size-4" />
-                      Add New
+                      {search.trim() ? `Add "${search.trim()}"` : "Add New"}
                     </CommandItem>
                   </CommandGroup>
                 </>

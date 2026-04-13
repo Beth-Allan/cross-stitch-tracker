@@ -6,9 +6,13 @@ import type { ChartWithProject } from "@/types/chart";
 import type { SizeCategory } from "@/lib/utils/size-category";
 import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
 import { chartFormSchema } from "@/lib/validations/chart";
+import { toast } from "sonner";
 import { createChart, updateChart } from "@/lib/actions/chart-actions";
 import { createDesigner } from "@/lib/actions/designer-actions";
 import { createGenre } from "@/lib/actions/genre-actions";
+import { createStorageLocation } from "@/lib/actions/storage-location-actions";
+import { createStitchingApp } from "@/lib/actions/stitching-app-actions";
+import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { z } from "zod";
 
 export interface ChartFormValues {
@@ -28,8 +32,9 @@ export interface ChartFormValues {
   isSAL: boolean;
   notes: string;
   status: ProjectStatus;
-  projectBin: string | null;
-  ipadApp: string | null;
+  storageLocationId: string | null;
+  stitchingAppId: string | null;
+  fabricId: string | null;
   needsOnionSkinning: boolean;
   startDate: string;
   finishDate: string;
@@ -44,6 +49,8 @@ interface UseChartFormOptions {
   initialData?: ChartWithProject;
   designers: Designer[];
   genres: Genre[];
+  storageLocations?: StorageLocationWithStats[];
+  stitchingApps?: StitchingAppWithStats[];
   onSuccess: (chartId: string) => void;
 }
 
@@ -85,8 +92,9 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
       isSAL: false,
       notes: "",
       status: "UNSTARTED" as ProjectStatus,
-      projectBin: null,
-      ipadApp: null,
+      storageLocationId: null,
+      stitchingAppId: null,
+      fabricId: null,
       needsOnionSkinning: false,
       startDate: "",
       finishDate: "",
@@ -115,8 +123,9 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
     isSAL: data.isSAL,
     notes: data.notes ?? "",
     status: (project?.status ?? "UNSTARTED") as ProjectStatus,
-    projectBin: project?.projectBin ?? null,
-    ipadApp: project?.ipadApp ?? null,
+    storageLocationId: project?.storageLocationId ?? null,
+    stitchingAppId: project?.stitchingAppId ?? null,
+    fabricId: project?.fabric?.id ?? null,
     needsOnionSkinning: project?.needsOnionSkinning ?? false,
     startDate: project?.startDate ? new Date(project.startDate).toISOString().split("T")[0] : "",
     finishDate: project?.finishDate ? new Date(project.finishDate).toISOString().split("T")[0] : "",
@@ -132,6 +141,8 @@ export function useChartForm({
   initialData,
   designers: initialDesigners,
   genres: initialGenres,
+  storageLocations: initialStorageLocations = [],
+  stitchingApps: initialStitchingApps = [],
   onSuccess,
 }: UseChartFormOptions) {
   const initial = useMemo(() => buildInitialValues(initialData), [initialData]);
@@ -142,6 +153,10 @@ export function useChartForm({
   const isSubmitDisabled = isPending || isSuccess;
   const [designers, setDesigners] = useState<Designer[]>(initialDesigners);
   const [genres, setGenres] = useState<Genre[]>(initialGenres);
+  const [storageLocationsList, setStorageLocationsList] =
+    useState<StorageLocationWithStats[]>(initialStorageLocations);
+  const [stitchingAppsList, setStitchingAppsList] =
+    useState<StitchingAppWithStats[]>(initialStitchingApps);
 
   // Dirty tracking
   const isDirty = useMemo(() => {
@@ -199,8 +214,9 @@ export function useChartForm({
         },
         project: {
           status: values.status,
-          projectBin: values.projectBin,
-          ipadApp: values.ipadApp,
+          storageLocationId: values.storageLocationId,
+          stitchingAppId: values.stitchingAppId,
+          fabricId: values.fabricId,
           needsOnionSkinning: values.needsOnionSkinning,
           startDate: values.startDate || null,
           finishDate: values.finishDate || null,
@@ -228,6 +244,9 @@ export function useChartForm({
             suppressUnloadRef.current = false;
             return;
           }
+          if (response.warning) {
+            toast.warning(response.warning);
+          }
           setIsSuccess(true);
           onSuccess(response.chartId);
         } else {
@@ -237,10 +256,14 @@ export function useChartForm({
             suppressUnloadRef.current = false;
             return;
           }
+          if (response.warning) {
+            toast.warning(response.warning);
+          }
           setIsSuccess(true);
           onSuccess(initialData!.id);
         }
-      } catch {
+      } catch (error) {
+        console.error("Chart form submission error:", error);
         setErrors({ _form: "An unexpected error occurred" });
         suppressUnloadRef.current = false;
       } finally {
@@ -288,6 +311,50 @@ export function useChartForm({
     }
   }, []);
 
+  const handleAddStorageLocation = useCallback(
+    async (name: string) => {
+      if (!name.trim()) return;
+      suppressUnloadRef.current = true;
+      try {
+        const result = await createStorageLocation({ name: name.trim() });
+        if (!result.success) throw new Error(result.error);
+        const newItem: StorageLocationWithStats = {
+          id: result.location.id,
+          name: result.location.name,
+          description: result.location.description,
+          projectCount: 0,
+        };
+        setStorageLocationsList((prev) => [...prev, newItem]);
+        setField("storageLocationId", result.location.id);
+      } finally {
+        suppressUnloadRef.current = false;
+      }
+    },
+    [setField],
+  );
+
+  const handleAddStitchingApp = useCallback(
+    async (name: string) => {
+      if (!name.trim()) return;
+      suppressUnloadRef.current = true;
+      try {
+        const result = await createStitchingApp({ name: name.trim() });
+        if (!result.success) throw new Error(result.error);
+        const newItem: StitchingAppWithStats = {
+          id: result.app.id,
+          name: result.app.name,
+          description: result.app.description,
+          projectCount: 0,
+        };
+        setStitchingAppsList((prev) => [...prev, newItem]);
+        setField("stitchingAppId", result.app.id);
+      } finally {
+        suppressUnloadRef.current = false;
+      }
+    },
+    [setField],
+  );
+
   // Suppress beforeunload during inline entity creation (server action revalidation can trigger it)
   const suppressUnloadRef = useRef(false);
 
@@ -318,5 +385,9 @@ export function useChartForm({
     genres,
     handleAddDesigner,
     handleAddGenre,
+    storageLocationsList,
+    stitchingAppsList,
+    handleAddStorageLocation,
+    handleAddStitchingApp,
   };
 }

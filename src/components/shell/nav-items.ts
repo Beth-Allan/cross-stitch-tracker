@@ -5,6 +5,8 @@ import {
   Tags,
   Package,
   Ruler,
+  MapPin,
+  Tablet,
   Clock,
   BarChart3,
   ShoppingCart,
@@ -18,15 +20,48 @@ export interface NavItem {
   icon: LucideIcon;
 }
 
+export interface NavSection {
+  label: string;
+  items: NavItem[];
+}
+
+export const navigationSections: NavSection[] = [
+  {
+    label: "Projects",
+    items: [
+      { label: "Dashboard", href: "/", icon: LayoutDashboard },
+      { label: "Charts", href: "/charts", icon: Scissors },
+      { label: "Shopping", href: "/shopping", icon: ShoppingCart },
+    ],
+  },
+  {
+    label: "Track",
+    items: [
+      { label: "Sessions", href: "/sessions", icon: Clock },
+      { label: "Statistics", href: "/stats", icon: BarChart3 },
+    ],
+  },
+  {
+    label: "Reference",
+    items: [
+      { label: "Designers", href: "/designers", icon: Paintbrush },
+      { label: "Genres", href: "/genres", icon: Tags },
+      { label: "Supplies", href: "/supplies", icon: Package },
+      { label: "Fabric", href: "/fabric", icon: Ruler },
+      { label: "Storage", href: "/storage", icon: MapPin },
+      { label: "Apps", href: "/apps", icon: Tablet },
+    ],
+  },
+];
+
+export const settingsItem: NavItem = {
+  label: "Settings",
+  href: "/settings",
+  icon: Settings,
+};
+
+/** Flat list for backward compatibility (e.g. mobile nav) */
 export const navigationItems: NavItem[] = [
-  { label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "Charts", href: "/charts", icon: Scissors },
-  { label: "Designers", href: "/designers", icon: Paintbrush },
-  { label: "Genres", href: "/genres", icon: Tags },
-  { label: "Supplies", href: "/supplies", icon: Package },
-  { label: "Fabric", href: "/fabric", icon: Ruler },
-  { label: "Sessions", href: "/sessions", icon: Clock },
-  { label: "Statistics", href: "/stats", icon: BarChart3 },
-  { label: "Shopping", href: "/shopping", icon: ShoppingCart },
-  { label: "Settings", href: "/settings", icon: Settings },
+  ...navigationSections.flatMap((s) => s.items),
+  settingsItem,
 ];

@@ -4,7 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { navigationItems } from "./nav-items";
+import { navigationSections, settingsItem } from "./nav-items";
 import { Logo } from "./logo";
 import { NavItemLink } from "./nav-item-link";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -28,9 +28,6 @@ export function Sidebar() {
     localStorage.setItem(STORAGE_KEY, String(next));
   }
 
-  const mainItems = navigationItems.filter((item) => item.label !== "Settings");
-  const bottomItems = navigationItems.filter((item) => item.label === "Settings");
-
   return (
     <aside
       className={cn(
@@ -53,40 +50,53 @@ export function Sidebar() {
             )}
           </Link>
 
-          {/* Main nav items */}
-          <div className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
-            {mainItems.map((item) => {
-              if (collapsed) {
-                return (
-                  <Tooltip key={item.href}>
-                    <TooltipTrigger render={<div />}>
-                      <NavItemLink item={item} collapsed />
-                    </TooltipTrigger>
-                    <TooltipContent side="right">{item.label}</TooltipContent>
-                  </Tooltip>
-                );
-              }
+          {/* Grouped nav sections */}
+          <div className="flex-1 overflow-y-auto px-2 py-3">
+            {navigationSections.map((section, sectionIndex) => (
+              <div key={section.label}>
+                {/* Section divider (between sections, not before first) */}
+                {sectionIndex > 0 && <div className="border-sidebar-border mx-2 my-2 border-t" />}
 
-              return <NavItemLink key={item.href} item={item} />;
-            })}
+                {/* Section label (hidden when collapsed) */}
+                {!collapsed && (
+                  <p className="text-muted-foreground/70 mb-1 px-3 pt-1 text-[0.65rem] font-semibold tracking-wider uppercase">
+                    {section.label}
+                  </p>
+                )}
+
+                {/* Section items */}
+                <div className="space-y-0.5">
+                  {section.items.map((item) => {
+                    if (collapsed) {
+                      return (
+                        <Tooltip key={item.href}>
+                          <TooltipTrigger render={<div />}>
+                            <NavItemLink item={item} collapsed />
+                          </TooltipTrigger>
+                          <TooltipContent side="right">{item.label}</TooltipContent>
+                        </Tooltip>
+                      );
+                    }
+
+                    return <NavItemLink key={item.href} item={item} />;
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Bottom section: settings + collapse toggle */}
           <div className="border-sidebar-border space-y-0.5 border-t px-2 py-3">
-            {bottomItems.map((item) => {
-              if (collapsed) {
-                return (
-                  <Tooltip key={item.href}>
-                    <TooltipTrigger render={<div />}>
-                      <NavItemLink item={item} collapsed />
-                    </TooltipTrigger>
-                    <TooltipContent side="right">{item.label}</TooltipContent>
-                  </Tooltip>
-                );
-              }
-
-              return <NavItemLink key={item.href} item={item} />;
-            })}
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger render={<div />}>
+                  <NavItemLink item={settingsItem} collapsed />
+                </TooltipTrigger>
+                <TooltipContent side="right">{settingsItem.label}</TooltipContent>
+              </Tooltip>
+            ) : (
+              <NavItemLink item={settingsItem} />
+            )}
 
             {/* Collapse toggle */}
             <button

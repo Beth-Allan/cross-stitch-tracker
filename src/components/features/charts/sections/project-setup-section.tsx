@@ -1,49 +1,72 @@
 "use client";
 
 import { useState } from "react";
-import type { ProjectStatus } from "@/generated/prisma/client";
+import Link from "next/link";
+import type { Fabric, FabricBrand, ProjectStatus } from "@/generated/prisma/client";
+import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { SectionHeading } from "../form-primitives/section-heading";
 import { FormField } from "../form-primitives/form-field";
 import { SearchableSelect } from "../form-primitives/searchable-select";
 import { StyledCheckbox } from "../form-primitives/styled-checkbox";
+import { InlineNameDialog } from "../inline-name-dialog";
 import { PROJECT_STATUSES, STATUS_CONFIG } from "@/lib/utils/status";
-
-const DEFAULT_BIN_OPTIONS = ["Bin A", "Bin B", "Bin C", "Bin D"];
-const DEFAULT_APP_OPTIONS = ["Markup R-XP", "Saga", "MacStitch"];
 
 interface ProjectSetupSectionProps {
   status: ProjectStatus;
-  projectBin: string | null;
-  ipadApp: string | null;
+  storageLocationId: string | null;
+  stitchingAppId: string | null;
+  fabricId: string | null;
+  storageLocations: StorageLocationWithStats[];
+  stitchingApps: StitchingAppWithStats[];
+  unassignedFabrics: (Fabric & { brand: FabricBrand })[];
   needsOnionSkinning: boolean;
   onStatusChange: (value: string) => void;
-  onBinChange: (value: string | null) => void;
-  onAppChange: (value: string | null) => void;
+  onStorageLocationChange: (value: string | null) => void;
+  onStitchingAppChange: (value: string | null) => void;
+  onFabricChange: (value: string | null) => void;
   onOnionSkinningChange: (checked: boolean) => void;
+  onAddStorageLocation?: (name: string) => Promise<void>;
+  onAddStitchingApp?: (name: string) => Promise<void>;
   errors?: { status?: string };
 }
 
 export function ProjectSetupSection({
   status,
-  projectBin,
-  ipadApp,
+  storageLocationId,
+  stitchingAppId,
+  fabricId,
+  storageLocations,
+  stitchingApps,
+  unassignedFabrics,
   needsOnionSkinning,
   onStatusChange,
-  onBinChange,
-  onAppChange,
+  onStorageLocationChange,
+  onStitchingAppChange,
+  onFabricChange,
   onOnionSkinningChange,
+  onAddStorageLocation,
+  onAddStitchingApp,
   errors,
 }: ProjectSetupSectionProps) {
-  const [binOptions, setBinOptions] = useState(() => {
-    const opts = [...DEFAULT_BIN_OPTIONS];
-    if (projectBin && !opts.includes(projectBin)) opts.push(projectBin);
-    return opts;
-  });
-  const [appOptions, setAppOptions] = useState(() => {
-    const opts = [...DEFAULT_APP_OPTIONS];
-    if (ipadApp && !opts.includes(ipadApp)) opts.push(ipadApp);
-    return opts;
-  });
+  const [storageDialogOpen, setStorageDialogOpen] = useState(false);
+  const [storageDialogName, setStorageDialogName] = useState("");
+  const [appDialogOpen, setAppDialogOpen] = useState(false);
+  const [appDialogName, setAppDialogName] = useState("");
+
+  const fabricOptions = unassignedFabrics.map((f) => ({
+    value: f.id,
+    label: `${f.name} - ${f.count}ct ${f.type} (${f.brand.name})`,
+  }));
+
+  const storageOptions = storageLocations.map((sl) => ({
+    value: sl.id,
+    label: sl.name,
+  }));
+
+  const appOptions = stitchingApps.map((sa) => ({
+    value: sa.id,
+    label: sa.name,
+  }));
 
   return (
     <div>
@@ -64,47 +87,79 @@ export function ProjectSetupSection({
           </select>
         </FormField>
 
-        <FormField label="Fabric" hint="Available in Phase 5">
+        <FormField label="Fabric" htmlFor="fabric">
           <SearchableSelect
-            options={[]}
-            value={null}
-            onChange={() => {}}
-            placeholder="Not available yet"
-            disabled
+            options={fabricOptions}
+            value={fabricId}
+            onChange={onFabricChange}
+            placeholder={
+              unassignedFabrics.length === 0 ? "No unassigned fabrics" : "Select fabric..."
+            }
+            disabled={unassignedFabrics.length === 0}
           />
+          {unassignedFabrics.length === 0 && (
+            <p className="text-muted-foreground mt-1 text-xs">
+              <Link href="/fabric" className="text-primary hover:underline">
+                Add fabric
+              </Link>{" "}
+              to assign to this project
+            </p>
+          )}
         </FormField>
 
-        <div className="grid grid-cols-2 gap-4">
-          <FormField label="Project Bin">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField label="Storage Location" htmlFor="storage-location">
             <SearchableSelect
-              options={binOptions.map((b) => ({ value: b, label: b }))}
-              value={projectBin}
-              onChange={onBinChange}
+              options={storageOptions}
+              value={storageLocationId}
+              onChange={onStorageLocationChange}
+              onAddNew={
+                onAddStorageLocation
+                  ? (searchTerm) => {
+                      setStorageDialogName(searchTerm);
+                      setStorageDialogOpen(true);
+                    }
+                  : undefined
+              }
               placeholder="Select storage location..."
-              onAddNew={(searchTerm) => {
-                const name = searchTerm.trim() || "New Location";
-                if (!binOptions.includes(name)) {
-                  setBinOptions((prev) => [...prev, name]);
-                }
-                onBinChange(name);
-              }}
             />
+            {onAddStorageLocation && (
+              <InlineNameDialog
+                open={storageDialogOpen}
+                onOpenChange={setStorageDialogOpen}
+                title="Add Storage Location"
+                initialName={storageDialogName}
+                placeholder="e.g. Project Bin A"
+                onSubmit={onAddStorageLocation}
+              />
+            )}
           </FormField>
 
-          <FormField label="iPad App">
+          <FormField label="Stitching App" htmlFor="stitching-app">
             <SearchableSelect
-              options={appOptions.map((a) => ({ value: a, label: a }))}
-              value={ipadApp}
-              onChange={onAppChange}
+              options={appOptions}
+              value={stitchingAppId}
+              onChange={onStitchingAppChange}
+              onAddNew={
+                onAddStitchingApp
+                  ? (searchTerm) => {
+                      setAppDialogName(searchTerm);
+                      setAppDialogOpen(true);
+                    }
+                  : undefined
+              }
               placeholder="Select stitching app..."
-              onAddNew={(searchTerm) => {
-                const name = searchTerm.trim() || "New App";
-                if (!appOptions.includes(name)) {
-                  setAppOptions((prev) => [...prev, name]);
-                }
-                onAppChange(name);
-              }}
             />
+            {onAddStitchingApp && (
+              <InlineNameDialog
+                open={appDialogOpen}
+                onOpenChange={setAppDialogOpen}
+                title="Add Stitching App"
+                initialName={appDialogName}
+                placeholder="e.g. Pattern Keeper"
+                onSubmit={onAddStitchingApp}
+              />
+            )}
           </FormField>
         </div>
 

@@ -183,3 +183,151 @@ describe("SearchToAdd - already-added indicator", () => {
     expect(alreadyAddedButton.className).toContain("opacity-50");
   });
 });
+
+describe("SearchToAdd - results container height", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("uses max-h-72 for a taller results viewport (not max-h-48)", () => {
+    const { container } = render(
+      <SearchToAdd
+        supplyType="thread"
+        projectId="proj-1"
+        existingIds={[]}
+        onAdded={vi.fn()}
+        onClose={vi.fn()}
+      />,
+    );
+
+    const resultsContainer = container.querySelector(".overflow-y-auto");
+    expect(resultsContainer).not.toBeNull();
+    expect(resultsContainer!.className).toContain("max-h-72");
+    expect(resultsContainer!.className).not.toContain("max-h-48");
+  });
+});
+
+describe("SearchToAdd - multi-add flow", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetThreads.mockResolvedValue([threadA, threadB, threadC]);
+  });
+
+  it("does NOT call onClose after a successful add (stays open for multi-add)", async () => {
+    const onAdded = vi.fn();
+    const onClose = vi.fn();
+    render(
+      <SearchToAdd
+        supplyType="thread"
+        projectId="proj-1"
+        existingIds={[]}
+        onAdded={onAdded}
+        onClose={onClose}
+      />,
+    );
+
+    // Wait for items to render
+    await waitFor(
+      () => {
+        expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+        const buttons = screen.getAllByRole("button");
+        expect(buttons.length).toBeGreaterThanOrEqual(1);
+      },
+      { timeout: 2000 },
+    );
+
+    // Click first addable thread
+    const buttons = screen.getAllByRole("button");
+    const threadButton = buttons.find((btn) => btn.textContent?.includes("310"));
+    expect(threadButton).toBeDefined();
+    fireEvent.click(threadButton!);
+
+    // Wait for the add action to complete
+    await waitFor(() => {
+      expect(mockAddThreadToProject).toHaveBeenCalled();
+    });
+
+    // onAdded should be called (to refresh data)
+    await waitFor(() => {
+      expect(onAdded).toHaveBeenCalled();
+    });
+
+    // onClose should NOT be called — picker stays open for multi-add
+    expect(onClose).not.toHaveBeenCalled();
+  });
+});
+
+describe("SearchToAdd - viewport flip", () => {
+  let origGetBoundingClientRect: typeof HTMLElement.prototype.getBoundingClientRect;
+  let origInnerHeight: number;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetThreads.mockResolvedValue([]);
+    origGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
+    origInnerHeight = window.innerHeight;
+  });
+
+  afterEach(() => {
+    HTMLElement.prototype.getBoundingClientRect = origGetBoundingClientRect;
+    Object.defineProperty(window, "innerHeight", { value: origInnerHeight, writable: true });
+  });
+
+  it("uses top-full positioning when space below is sufficient", async () => {
+    // 1000px viewport, element bottom at 400px = 600px below (>= 300)
+    Object.defineProperty(window, "innerHeight", { value: 1000, writable: true });
+
+    // Mock getBoundingClientRect globally before rendering so the useEffect reads it
+    HTMLElement.prototype.getBoundingClientRect = function () {
+      return {
+        bottom: 400,
+        top: 350,
+        left: 0,
+        right: 300,
+        width: 300,
+        height: 50,
+        x: 0,
+        y: 350,
+        toJSON: () => ({}),
+      };
+    };
+
+    const { container } = render(<SearchToAdd {...defaultProps} />);
+
+    await waitFor(() => {
+      const outerDiv = container.firstElementChild as HTMLElement;
+      expect(outerDiv.className).toContain("top-full");
+      expect(outerDiv.className).toContain("mt-1");
+      expect(outerDiv.className).not.toContain("bottom-full");
+    });
+  });
+
+  it("uses bottom-0 positioning when near viewport bottom", async () => {
+    // 600px viewport, element bottom at 500px = 100px below (< 300)
+    Object.defineProperty(window, "innerHeight", { value: 600, writable: true });
+
+    // Mock getBoundingClientRect globally before rendering so the useEffect reads it
+    HTMLElement.prototype.getBoundingClientRect = function () {
+      return {
+        bottom: 500,
+        top: 450,
+        left: 0,
+        right: 300,
+        width: 300,
+        height: 50,
+        x: 0,
+        y: 450,
+        toJSON: () => ({}),
+      };
+    };
+
+    const { container } = render(<SearchToAdd {...defaultProps} />);
+
+    await waitFor(() => {
+      const outerDiv = container.firstElementChild as HTMLElement;
+      expect(outerDiv.className).toContain("bottom-0");
+      expect(outerDiv.className).not.toContain("top-full");
+      expect(outerDiv.className).not.toContain("bottom-full");
+    });
+  });
+});

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { LinkButton } from "@/components/ui/link-button";
 import { Sheet, SheetTrigger, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { UserMenu } from "./user-menu";
-import { navigationItems } from "./nav-items";
+import { navigationSections, settingsItem } from "./nav-items";
 import { Logo } from "./logo";
 import { NavItemLink } from "./nav-item-link";
 
@@ -18,9 +18,6 @@ interface TopBarProps {
 
 export function TopBar({ user }: TopBarProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
-
-  const mainItems = navigationItems.filter((item) => item.label !== "Settings");
-  const settingsItems = navigationItems.filter((item) => item.label === "Settings");
 
   return (
     <header className="border-border bg-card flex h-14 shrink-0 items-center gap-3 border-b px-4 pt-[env(safe-area-inset-top)]">
@@ -48,18 +45,32 @@ export function TopBar({ user }: TopBarProps) {
                 </span>
               </Link>
 
-              {/* Nav items */}
-              <div className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
-                {mainItems.map((item) => (
-                  <NavItemLink key={item.href} item={item} onClick={() => setSheetOpen(false)} />
+              {/* Grouped nav sections */}
+              <div className="flex-1 overflow-y-auto px-2 py-3">
+                {navigationSections.map((section, sectionIndex) => (
+                  <div key={section.label}>
+                    {sectionIndex > 0 && (
+                      <div className="border-sidebar-border mx-2 my-2 border-t" />
+                    )}
+                    <p className="text-muted-foreground/70 mb-1 px-3 pt-1 text-[0.65rem] font-semibold tracking-wider uppercase">
+                      {section.label}
+                    </p>
+                    <div className="space-y-0.5">
+                      {section.items.map((item) => (
+                        <NavItemLink
+                          key={item.href}
+                          item={item}
+                          onClick={() => setSheetOpen(false)}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
 
               {/* Settings at bottom */}
               <div className="border-sidebar-border border-t px-2 py-3">
-                {settingsItems.map((item) => (
-                  <NavItemLink key={item.href} item={item} onClick={() => setSheetOpen(false)} />
-                ))}
+                <NavItemLink item={settingsItem} onClick={() => setSheetOpen(false)} />
               </div>
             </nav>
           </SheetContent>

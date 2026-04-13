@@ -184,7 +184,7 @@ function CoverImage({
       <img
         src={coverImageUrl}
         alt={`Cover for ${chartName}`}
-        className="aspect-[4/3] max-h-80 w-full rounded-lg object-cover lg:w-80"
+        className="bg-muted aspect-[4/3] max-h-80 w-full rounded-lg object-contain lg:w-80"
         onError={() => setImgError(true)}
       />
     );
@@ -209,14 +209,18 @@ function DeleteChartDialog({ chartId, chartName }: { chartId: string; chartName:
 
   function handleDelete() {
     startTransition(async () => {
-      const result = await deleteChart(chartId);
-      if (result.success) {
-        toast.success("Chart deleted");
-        router.push("/charts");
-      } else {
+      try {
+        const result = await deleteChart(chartId);
+        if (result.success) {
+          toast.success("Chart deleted");
+          setOpen(false);
+          router.push("/charts");
+        } else {
+          toast.error("Something went wrong. Please try again.");
+        }
+      } catch {
         toast.error("Something went wrong. Please try again.");
       }
-      setOpen(false);
     });
   }
 
@@ -306,15 +310,29 @@ function OverviewTab({ chart }: { chart: ChartWithProject }) {
       </InfoCard>
 
       {/* Project Setup — only show if any field has data */}
-      {project && (project.projectBin || project.ipadApp || project.needsOnionSkinning) && (
-        <InfoCard icon={Settings} title="Project Setup" className="lg:col-span-2">
-          <div>
-            {project.projectBin && <DetailRow label="Project Bin" value={project.projectBin} />}
-            {project.ipadApp && <DetailRow label="iPad App" value={project.ipadApp} />}
-            {project.needsOnionSkinning && <DetailRow label="Onion Skinning" value="Needed" />}
-          </div>
-        </InfoCard>
-      )}
+      {project &&
+        (project.storageLocation ||
+          project.stitchingApp ||
+          project.fabric ||
+          project.needsOnionSkinning) && (
+          <InfoCard icon={Settings} title="Project Setup" className="lg:col-span-2">
+            <div>
+              {project.fabric && (
+                <DetailRow
+                  label="Fabric"
+                  value={`${project.fabric.name} - ${project.fabric.count}ct ${project.fabric.type} (${project.fabric.brand.name})`}
+                />
+              )}
+              {project.storageLocation && (
+                <DetailRow label="Storage Location" value={project.storageLocation.name} />
+              )}
+              {project.stitchingApp && (
+                <DetailRow label="Stitching App" value={project.stitchingApp.name} />
+              )}
+              {project.needsOnionSkinning && <DetailRow label="Onion Skinning" value="Needed" />}
+            </div>
+          </InfoCard>
+        )}
 
       {/* Dates — always show Added, only show others if set */}
       <InfoCard icon={Calendar} title="Dates" className="lg:col-span-2">

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useTransition } from "react";
 import { Search } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import {
   addThreadToProject,
   addBeadToProject,
@@ -59,20 +60,29 @@ export function SearchToAdd({
   const [search, setSearch] = useState("");
   const [items, setItems] = useState<SupplyItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [highlightIndex, setHighlightIndex] = useState(0);
+  const [flipUp, setFlipUp] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Close on click outside
+  // Close on click outside — ignore mousedown events within 200ms of mount
+  // so the opening click (and any trackpad ghost events) can't immediately
+  // close the panel. Timestamp guard is more reliable than rAF across
+  // browsers and trackpad configurations.
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    const mountedAt = Date.now();
+
+    function handleMouseDown(e: MouseEvent) {
+      if (Date.now() - mountedAt < 200) return;
       if (ref.current && !ref.current.contains(e.target as Node)) {
         onClose();
       }
     }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
   }, [onClose]);
 
   // Close on Escape
@@ -88,6 +98,7 @@ export function SearchToAdd({
   useEffect(() => {
     let cancelled = false;
     setIsLoading(true);
+    setFetchError(false);
 
     async function fetchItems() {
       try {
@@ -105,7 +116,10 @@ export function SearchToAdd({
           setIsLoading(false);
         }
       } catch {
-        if (!cancelled) setIsLoading(false);
+        if (!cancelled) {
+          setFetchError(true);
+          setIsLoading(false);
+        }
       }
     }
 
@@ -119,6 +133,16 @@ export function SearchToAdd({
   // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
+  }, []);
+
+  // Measure available space and flip upward if near viewport bottom
+  useEffect(() => {
+    if (!ref.current) return;
+    const rect = ref.current.parentElement?.getBoundingClientRect();
+    if (!rect) return;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    // max-h-72 = 288px, plus padding/border ~12px
+    setFlipUp(spaceBelow < 300);
   }, []);
 
   const existingSet = new Set(existingIds);
@@ -155,7 +179,7 @@ export function SearchToAdd({
         if (result.success) {
           toast.success(`Added ${item.brand.name} ${getItemCode(item)} to project`);
           onAdded();
-          onClose();
+          // Picker stays open for multi-add — user closes with Escape or click-outside
         } else {
           toast.error(result.error ?? "Something went wrong. Please try again.");
         }
@@ -199,7 +223,10 @@ export function SearchToAdd({
   return (
     <div
       ref={ref}
-      className="border-border bg-card absolute top-full right-0 left-0 z-20 mt-1 rounded-lg border shadow-lg"
+      className={cn(
+        "border-border bg-card absolute right-0 left-0 z-20 rounded-lg border shadow-lg",
+        flipUp ? "bottom-0" : "top-full mt-1",
+      )}
     >
       <div className="p-2">
         <div className="relative">
@@ -215,9 +242,13 @@ export function SearchToAdd({
           />
         </div>
       </div>
-      <div className="border-border max-h-48 overflow-y-auto border-t">
+      <div className="border-border max-h-72 overflow-y-auto border-t">
         {isLoading ? (
           <p className="text-muted-foreground px-3 py-4 text-center text-sm">Searching...</p>
+        ) : fetchError ? (
+          <p className="text-destructive px-3 py-4 text-center text-sm">
+            Failed to load items. Try again.
+          </p>
         ) : items.length === 0 ? (
           <p className="text-muted-foreground px-3 py-4 text-center text-sm">No matches</p>
         ) : (

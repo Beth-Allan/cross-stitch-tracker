@@ -1,281 +1,260 @@
-# Stack Research
+# Stack Research: Milestone 2 — Browse & Organize
 
-**Domain:** Cross-stitch project management application (single-user, data-rich, PWA)
-**Researched:** 2026-03-28
-**Confidence:** HIGH (stack finalized; research confirms versions and configuration best practices)
+**Domain:** Cross-stitch project management — gallery views, view modes, skein calculation, storage CRUD, DMC data, UX fixes
+**Researched:** 2026-04-11
+**Confidence:** HIGH
 
-## Recommended Stack
+## Executive Summary
 
-### Core Technologies
+Milestone 2 requires **zero new dependencies**. Every feature can be built with the existing stack. The gallery cards, view mode switching, sorting, and table views are all implemented in the DesignOS designs using plain React state + CSS Grid + Tailwind — no data table library needed. The skein calculator is pure arithmetic. Storage locations require a schema migration but no new packages. DMC catalog "completion" is a data correction, not a code change. The cover image fix and thread picker scroll UX are CSS/DOM adjustments.
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| Next.js | 16.2.x | Full-stack React framework | Active LTS (released Oct 2025). Next.js 15 is now Maintenance LTS (critical fixes only). v16 ships with React 19.2, stable Turbopack, and fully async request APIs. The project spec says "14+" but 16 is the correct choice for a greenfield project in March 2026. |
-| TypeScript | 5.7+ | Type safety | Ships with Next.js 16. Strict mode enforced via tsconfig. |
-| React | 19.2 | UI library | Ships with Next.js 16. Includes React Compiler as first-class integration. |
-| PostgreSQL | 17 | Primary database | Hosted on Neon. Superior window functions, CTEs, and aggregation for the statistics engine. |
-| Prisma | 7.4.x | ORM | Latest stable. Prisma 7 is production-recommended; "Prisma Next" (TypeScript rewrite) announced but not ready. v7.4 adds query caching, partial indexes, BigInt precision fixes. |
-| Tailwind CSS | 4.2.x | Utility-first CSS | Major upgrade from v3: CSS-native configuration (no tailwind.config.js), @theme directive, OKLCH colors, 5x faster full builds. |
-| Zod | 4.3.x | Schema validation | v4 brings 14x faster string parsing, smaller bundles, better errors. Use at all Server Action / API boundaries. |
+This is a build milestone, not an integration milestone.
 
-### Database & Infrastructure
+## Recommended Stack Changes
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| Neon | (managed) | Serverless PostgreSQL hosting | Free tier: 0.5 GB storage, 190 compute hours/month. Supports pooled + direct connections. Schema migrations now work via pooled connections (2026 improvement). |
-| @prisma/adapter-neon | latest | Neon serverless driver adapter | GA since Prisma 6.16.0. Bundles @neondatabase/serverless and ws -- do NOT install those separately. Enables connection pooling for serverless. |
-| Cloudflare R2 | (managed) | S3-compatible object storage | 10 GB free, zero egress fees. Stores cover photos, digital working copies (PDFs), progress photos. |
-| @aws-sdk/client-s3 | 3.x | R2 file operations | R2 is S3-compatible. Use AWS SDK v3 (modular). Also install @aws-sdk/s3-request-presigner for presigned upload URLs. |
-| Vercel | (managed) | Hosting & deployment | Push-to-deploy. Free Hobby tier sufficient for single-user. Purpose-built for Next.js. |
+### New Dependencies: NONE
 
-### UI Libraries
+No new packages to install. The existing stack covers all M2 needs.
 
-| Library | Version | Purpose | Why Recommended |
-|---------|---------|---------|-----------------|
-| @tanstack/react-table | 8.21.x | Data tables with sorting, filtering, pagination | Headless -- brings logic, you bring UI. v8 is stable and widely adopted (2,355+ npm dependents). Note: React Compiler compatibility may need patches in future updates. |
-| recharts | 3.8.x | Charts and graphs | Actively maintained (3.8.1 released March 2026). Built on D3. Declarative React components for bar charts, line charts, pie charts. |
-| @dnd-kit/core + @dnd-kit/sortable | 6.3.x / 9.0.x | Drag-and-drop for dashboard widgets | Use the stable @dnd-kit/core 6.x packages, NOT @dnd-kit/react 0.x (pre-1.0, only 38 npm dependents). @dnd-kit/core has 2,355 dependents and proven production stability. |
+### Schema Additions Required
 
-### Authentication
+| Change | Purpose | Why |
+|--------|---------|-----|
+| `StorageLocation` model | Replace hardcoded `DEFAULT_BIN_OPTIONS` array in `project-setup-section.tsx` | Currently project bins are ephemeral client-side strings. CRUD needs persistence. |
+| `StitchingApp` model | Replace hardcoded `DEFAULT_APP_OPTIONS` array | Same problem — apps are client-state-only, can't be managed. |
+| `ProjectThread.stitchCount` field | Already exists (`Int @default(0)`) | Schema already has this — just needs UI to expose it. |
 
-| Library | Version | Purpose | Why Recommended |
-|---------|---------|---------|-----------------|
-| next-auth | 5.0.0-beta.x (install as `next-auth@beta`) | Authentication | v5 is a major rewrite for App Router. Still technically beta but widely used in production and the only version that supports Next.js 16. v4 (4.24.13) is stable but lacks App Router integration. Install with `npm i next-auth@beta`. |
-| bcryptjs | 3.0.x | Password hashing | Pure JS implementation -- no native compilation issues on Vercel. Use for single-user credentials provider. |
+The `ProjectThread` model already has a `stitchCount` field (line 182 of schema.prisma). The per-colour stitch count feature is a UI/calculation problem, not a data model problem.
 
-### PWA
+## Feature-by-Feature Stack Analysis
 
-| Library | Version | Purpose | Why Recommended |
-|---------|---------|---------|-----------------|
-| @serwist/next | 9.5.x | Service worker generation for PWA | Successor to next-pwa (unmaintained). Recommended by Next.js official docs. Actively maintained (9.5.7 published March 2026). |
-| serwist | 9.5.x | Service worker runtime | Companion to @serwist/next. Provides defaultCache, precaching, and runtime caching strategies. |
+### 1. Gallery Cards with Status-Specific Layouts
 
-### Supporting Libraries
+**What's needed:** Three card variants (WIP, Unstarted, Finished) with cover images, progress bars, kitting dots, and celebration borders.
 
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| nanoid | 5.x | Unique ID generation | File upload keys for R2, any client-safe unique IDs |
-| date-fns | 4.x | Date manipulation | Statistics engine date calculations, session date handling |
-| sharp | 0.33.x | Image processing | Server-side image resizing for cover photos and thumbnails |
-| sonner | 2.x | Toast notifications | Lightweight, accessible toasts. shadcn/ui deprecated their toast in favor of sonner. |
-| @radix-ui/react-* | latest | Accessible UI primitives | Dialog, dropdown menu, select, popover, tooltip -- use individual packages as needed for custom design system components |
-| clsx + tailwind-merge | latest | Class name utilities | Conditional Tailwind classes without conflicts. Essential for component variants. |
-| tw-animate-css | latest | Tailwind v4 animations | Replaces deprecated tailwindcss-animate for Tailwind v4 |
+**Stack assessment:** Fully covered by existing stack.
+- CSS Grid for responsive card layout (`repeat(auto-fill, minmax(280px, 340px))` per design)
+- Tailwind for status-specific styling (already have 7 status colors in design tokens)
+- `next/image` for optimized cover photos (already used via R2 presigned URLs)
+- `sharp` already installed for thumbnail generation
+- No animation library needed — Tailwind transitions + `tw-animate-css` cover hover/pulse effects
 
-### Development Tools
+**Confidence:** HIGH — Design components in `product-plan/sections/gallery-cards-and-advanced-filtering/` are pure React + Tailwind, no external deps.
 
-| Tool | Purpose | Notes |
-|------|---------|-------|
-| ESLint 9.x | Linting | Ships with Next.js 16. Flat config format. |
-| Prettier | Code formatting | Use with prettier-plugin-tailwindcss for class sorting |
-| prettier-plugin-tailwindcss | Tailwind class ordering | Automatic class sorting in templates |
-| prisma studio | Visual database browser | `npx prisma studio` for inspecting data during development |
+### 2. Gallery / List / Table View Modes with Sorting
 
-## Installation
+**What's needed:** Three view modes (gallery grid, compact list rows, full data table) with client-side sorting.
 
-```bash
-# Core framework
-npx create-next-app@latest cross-stitch-tracker --typescript --tailwind --eslint --app --src-dir
+**Stack assessment:** Fully covered by existing stack.
+- View mode toggle: same pattern as supply catalog's existing grid/table toggle (`supply-catalog.tsx` lines 20, 610-635)
+- Table sorting: the design's `TableView` in `GalleryGrid.tsx` implements sorting with plain React state (`useState<SortField>`, `useState<SortDir>`) — does NOT use @tanstack/react-table
+- View persistence: `localStorage` + URL search params (same pattern as supplies page)
 
-# ORM + Database
-npm install prisma @prisma/client @prisma/adapter-neon
+**@tanstack/react-table: NOT needed for M2.** The design spec implements table sorting with ~30 lines of custom code. The library adds value when you need pagination, column resizing, grouping, virtual scrolling, or server-side sorting. M2's table is a simple sortable list of ~500 items rendered client-side. Adding react-table here would over-engineer the solution.
 
-# Authentication
-npm install next-auth@beta bcryptjs
-npm install -D @types/bcryptjs
+**When to add it:** Milestone 3's Pattern Dive (library browser with filtering) or if the table needs column visibility toggling, multi-column sorting, or pagination. Reassess at M3 planning.
 
-# File storage (R2)
-npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
+**Confidence:** HIGH — Existing supply catalog already demonstrates this exact pattern.
 
-# UI Libraries
-npm install @tanstack/react-table recharts
-npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
+### 3. Per-Colour Stitch Counts & Automatic Skein Calculator
 
-# PWA
-npm install @serwist/next serwist
+**What's needed:** Per-thread stitch count entry on `ProjectThread`, automatic skein calculation based on fabric count and strand count.
 
-# Validation
-npm install zod
+**Stack assessment:** Pure arithmetic — no external library needed.
 
-# Utilities
-npm install nanoid date-fns clsx tailwind-merge sonner tw-animate-css
+**Skein calculation formula (verified from multiple cross-stitch sources):**
 
-# Radix primitives (add as needed)
-npm install @radix-ui/react-dialog @radix-ui/react-dropdown-menu @radix-ui/react-select @radix-ui/react-popover @radix-ui/react-tooltip @radix-ui/react-checkbox @radix-ui/react-switch @radix-ui/react-tabs
-
-# Image processing (server-side)
-npm install sharp
-
-# Dev dependencies
-npm install -D prisma prettier prettier-plugin-tailwindcss
+```
+skeinsNeeded = ceil(stitchCountForColour / stitchesPerSkein * safetyMultiplier)
 ```
 
-## Alternatives Considered
+Where `stitchesPerSkein` is a lookup based on fabric count (using 2 strands, the standard):
 
-| Recommended | Alternative | When to Use Alternative |
-|-------------|-------------|-------------------------|
-| Next.js 16 | Next.js 15 | Never for greenfield. v15 is Maintenance LTS (ends Oct 2026). Breaking change: v16 removed sync request APIs that v15 deprecated. |
-| Prisma 7 | Drizzle ORM | If you need raw SQL control or have performance-critical queries. Prisma's readability and auto-generated types are more valuable for this project's complex relational model. |
-| @dnd-kit/core 6.x | @dnd-kit/react 0.x | When @dnd-kit/react reaches 1.0 stable. Currently pre-1.0 with minimal adoption. |
-| @dnd-kit/core 6.x | react-beautiful-dnd | Never. Deprecated and unmaintained since 2024. |
-| Serwist | next-pwa | Never. next-pwa is unmaintained (last update 2+ years ago). Serwist is its maintained successor. |
-| Serwist | Next.js built-in PWA | If you only need manifest + installability without service workers. Next.js has basic PWA support without external deps, but Serwist is needed for caching strategies and offline support (Phase 5). |
-| Recharts 3.x | Victory / Nivo | If you need more chart types. Recharts covers bar, line, pie, area -- sufficient for stitch statistics. |
-| Tailwind v4 | Tailwind v3 | Never for new projects. v4 is faster, simpler (CSS-native config), and the current version. |
-| Custom components + Radix | shadcn/ui | See detailed analysis below. |
-| bcryptjs | bcrypt (native) | If you control the server environment. bcryptjs is pure JS -- works everywhere including Vercel Edge, no native compilation issues. |
+| Fabric Count | Stitches per Skein (2 strands) | Source |
+|--------------|-------------------------------|--------|
+| 14-count | ~220 | Community consensus |
+| 16-count | ~260 | Community consensus |
+| 18-count | ~290 | Community consensus, eponases.com experiment |
+| 25-count (over 2) | ~220 | Equivalent to 12.5ct |
+| 28-count (over 2) | ~250 | Equivalent to 14ct |
+| 32-count (over 2) | ~280 | Equivalent to 16ct |
 
-## shadcn/ui vs Custom Design System: Decision
+**Safety multiplier:** 1.2 (20% — industry standard for thread tails and waste).
 
-**Recommendation: Use shadcn/ui as a foundation, customized with the project's design tokens.**
+**Implementation approach:**
+- Store a reference table of stitches-per-skein as a TypeScript constant (not a DB table — well-known reference data)
+- Formula variables: `fabricCount` (from linked Fabric), `strandCount` (default 2, could add to ProjectThread), `stitchCount` (per colour, already in schema)
+- Calculate at query time (per project convention — never store calculated values)
+- Label results as "estimated" with manual override option on `quantityRequired`
 
-The project has a complete design system (Fraunces/Source Sans 3/JetBrains Mono fonts, emerald/amber/stone palette, 7 status colors). The question is whether to build components from scratch on Radix or use shadcn/ui.
+**Schema notes:**
+- `ProjectThread.stitchCount` — already exists, `Int @default(0)`
+- May want to add `strandCount Int @default(2)` to `ProjectThread` for non-standard projects
+- Fabric `count` field already exists on `Fabric` model and links to Project via `linkedProjectId`
 
-**Use shadcn/ui because:**
-1. shadcn/ui components are copied into your project (not a dependency) -- full ownership and customization
-2. Tailwind v4 is fully supported with @theme directive for custom colors and fonts
-3. shadcn/ui uses Radix primitives underneath -- you get the same accessibility for free
-4. The theming system uses CSS variables, which map directly to custom design tokens
-5. 50+ designed components can be implemented faster by customizing shadcn/ui components than building from scratch
-6. The registry/preset system can encode the entire design system (colors, fonts, radius) in a shareable config
+**Confidence:** MEDIUM on lookup values — The stitches-per-skein values are approximate and vary by stitcher technique. Multiple sources agree within ~10%. The formula itself is definitive; the lookup values are community consensus, not manufacturer-specified.
 
-**Customization approach:**
-- Override CSS variables in `app/globals.css` with emerald/amber/stone palette in OKLCH
-- Configure custom fonts (Fraunces, Source Sans 3, JetBrains Mono) via `next/font` and @theme
-- Map the 7 status colors to CSS custom properties
-- Modify copied components as needed -- they're your code
+### 4. Storage Location Management (CRUD)
 
-**What you lose:** Nothing meaningful. shadcn/ui components are source code in your project, not an external dependency. You can modify any component freely.
+**What's needed:** Replace hardcoded arrays (`DEFAULT_BIN_OPTIONS`, `DEFAULT_APP_OPTIONS`) with proper database-backed CRUD.
 
-## What NOT to Use
+**Stack assessment:** Standard Prisma model + server actions. Identical pattern to existing Designer and Genre CRUD.
+
+**Current state (from `project-setup-section.tsx`):**
+```typescript
+const DEFAULT_BIN_OPTIONS = ["Bin A", "Bin B", "Bin C", "Bin D"];
+const DEFAULT_APP_OPTIONS = ["Markup R-XP", "Saga", "MacStitch"];
+```
+These are client-side-only. Adding "New Location" creates a state entry that doesn't persist. This is backlog item 999.0.14.
+
+**What's needed:**
+- `StorageLocation` model (id, name, createdAt, updatedAt)
+- `StitchingApp` model (id, name, createdAt, updatedAt)
+- Server actions for create/update/delete (same pattern as designers)
+- Update `Project.projectBin` from `String?` to a relation to `StorageLocation`
+- Update `Project.ipadApp` from `String?` to a relation to `StitchingApp`
+- Migration to move existing string values to new tables
+
+No new dependencies — this is the same CRUD pattern used 6+ times already in the codebase.
+
+**Confidence:** HIGH
+
+### 5. Wire Fabric Selector into Chart Form
+
+**What's needed:** Replace the disabled "Phase 5" placeholder in `project-setup-section.tsx` with a working fabric dropdown.
+
+**Stack assessment:** No new deps. The existing `SearchableSelect` component + fabric server actions already exist.
+
+**Current state:** `project-setup-section.tsx` line 67-74 has a hardcoded disabled placeholder. Fabric CRUD already works (`/fabrics` page). The `Fabric` model has `linkedProjectId` for 1:1 project linking.
+
+**What's needed:**
+- Fetch unassigned fabrics (where `linkedProjectId IS NULL` or equals current project)
+- Wire into `SearchableSelect` options
+- On selection, update `Fabric.linkedProjectId`
+- Show linked fabric details (count, type, size)
+
+**Confidence:** HIGH — All building blocks exist.
+
+### 6. Complete DMC Catalog
+
+**What's needed:** Fill gaps in the DMC thread fixture.
+
+**Critical finding: DMC standard 6-strand floss does NOT have numbers 1-149.** The backlog item "DMC 1-149 including Blanc, Ecru" is based on a misunderstanding of the DMC numbering system.
+
+**Current fixture analysis:**
+- 459 colors in `prisma/fixtures/dmc-threads.json`
+- Has: White, Ecru, B5200, and all standard colors 150-3866
+- Missing: "Blanc" (French name for White — some patterns reference "Blanc" vs "White")
+- The lowest standard DMC floss numbers are 150, 151, 152...
+- Numbers 1-35 are reserved for DMC metallic/specialty threads (Diamant), NOT standard floss
+- Numbers 36-149 do not exist in the DMC product line
+
+**What actually needs to happen:**
+1. Add "Blanc" as an entry (hex #FCFBF8, same as White) — many patterns use this name
+2. Cross-reference against the GitHub `rgb-to-dmc` dataset (447 colors) and the full DMC catalog (489-500 colors depending on region) to identify genuinely missing colors
+3. Verify the 459-color fixture against DMC's US catalog of 489 — the delta of ~30 colors may include regional exclusives or recently added colors
+4. Consider adding the 10 "missing from US site" colors reported by community: 13, 14, 15, 16, 17, 18, 677, 734, 822, 988 (these are apparently valid but hard to source)
+
+**Data source for completion:** The `rgb-to-dmc` GitHub repo (https://github.com/seanockert/rgb-to-dmc/blob/master/rgb-dmc.json) provides a verified JSON dataset. Cross-reference with the existing fixture to find genuine gaps.
+
+**No new dependencies needed** — this is a seed data file update.
+
+**Confidence:** HIGH for the finding that DMC 1-149 don't exist as standard floss. MEDIUM for the exact count of missing colors — needs a diff between our fixture and the authoritative list.
+
+### 7. Cover Image Aspect Ratio Fix
+
+**What's needed:** Fix `h-32 + object-cover` cropping tall/square images into narrow strips.
+
+**Stack assessment:** Pure CSS fix. No new deps.
+
+**Current state:** `cover-image-upload.tsx` line ~155 uses fixed height container with `object-cover`, which clips non-landscape images badly.
+
+**Design spec approach:** Gallery cards use `aspect-[4/3]` containers (GalleryCard.tsx line 473), which is better than fixed height. The detail page uses `aspect-[4/3] max-h-80` (chart-detail.tsx line 187).
+
+**Fix:** Replace fixed `h-32` with `aspect-[4/3]` or use `object-contain` with a background color. This is a Tailwind class change.
+
+**Confidence:** HIGH
+
+### 8. Thread Colour Picker Scroll UX Fix
+
+**What's needed:** Auto-scroll to keep search box/+Add button visible when adding thread colours.
+
+**Stack assessment:** Native DOM `scrollIntoView()` — no library needed.
+
+**Fix location:** `search-to-add.tsx` and/or `project-supplies-tab.tsx`. After adding an item, call `element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })` on the search input or add button.
+
+**Confidence:** HIGH
+
+### 9. Supply Entry Workflow Rework
+
+**What's needed:** Maintain insertion order during entry, streamlined project setup flow.
+
+**Stack assessment:** No new deps. This is a UX restructure of existing components.
+
+**Current state:** Supplies are added via `SearchToAdd` in `project-supplies-tab.tsx`. Order is determined by the database (createdAt). The rework needs:
+- Preserve insertion order in the UI during entry (use `createdAt` or add a `sortOrder` field)
+- Consider a dedicated "set up project" flow combining chart + supply entry
+- Detail page can sort independently of entry order
+
+**Potential schema addition:** `sortOrder Int?` on junction tables if insertion order must be explicitly tracked separate from `createdAt`. But `createdAt` sorting likely suffices.
+
+**Confidence:** HIGH — UI flow change, not a technology change.
+
+## What NOT to Add for M2
 
 | Avoid | Why | Use Instead |
 |-------|-----|-------------|
-| next-pwa | Unmaintained for 2+ years | @serwist/next 9.5.x |
-| react-beautiful-dnd | Deprecated, unmaintained since 2024 | @dnd-kit/core 6.x |
-| @dnd-kit/react 0.x | Pre-1.0, only 38 npm dependents, API still changing | @dnd-kit/core 6.x + @dnd-kit/sortable |
-| tailwindcss-animate | Deprecated for Tailwind v4 | tw-animate-css |
-| tailwind.config.js | Tailwind v4 uses CSS-native @theme directive | Configure in globals.css with @theme |
-| @neondatabase/serverless (direct) | Bundled inside @prisma/adapter-neon | Just install @prisma/adapter-neon |
-| moment.js | Bloated, legacy | date-fns (tree-shakeable, modern) |
-| Prisma's `url` in schema.prisma | Prisma 7 with adapters uses prisma.config.ts | Configure connection in prisma.config.ts |
-| next-auth v4 (stable) | Does not support Next.js 16 App Router properly | next-auth@beta (v5) |
-| Chakra UI / Material UI | Runtime CSS-in-JS, large bundle, conflicts with server components | Tailwind + Radix (via shadcn/ui) |
+| `@tanstack/react-table` | Over-engineered for M2's simple sortable table. Design spec implements sorting in ~30 lines. 500-row client-side sort is trivial. | Custom sort with `useState` + `Array.sort()` (matches design spec) |
+| `react-virtualized` / `@tanstack/virtual` | Only needed for 10k+ items. 500 charts render fine without virtualization. | Standard React rendering |
+| `framer-motion` | Gallery card hover effects are simple CSS transitions. No complex animations in M2. | Tailwind transitions + `tw-animate-css` |
+| Any chart/graph library | M2 has no charts or graphs. Progress bars are Tailwind width classes. | `w-[${percent}%]` on a div |
+| `@dnd-kit/core` | No drag-and-drop in M2 scope. | Not needed until M4 dashboard widgets |
+| `nuqs` / `next-usequerystate` | URL state management lib. Existing `useSearchParams` + `router.replace` pattern works. | Continue existing pattern from supply catalog |
+| `date-fns` | M2 date formatting is simple (`toLocaleDateString`). | Native `Intl.DateTimeFormat` (already used in chart-list.tsx) |
+| `lodash` | No complex data transforms needed. Native array methods suffice. | `Array.sort()`, `Array.filter()`, `Array.reduce()` |
 
-## Version Compatibility Matrix
+## Existing Stack Sufficiency Matrix
 
-| Package A | Compatible With | Notes |
-|-----------|-----------------|-------|
-| Next.js 16.2.x | React 19.2, Node 18.18+ | Ships React 19.2. Turbopack is default bundler. |
-| Next.js 16.2.x | Tailwind CSS 4.2.x | Native support. No PostCSS config needed in most cases. |
-| Next.js 16.2.x | next-auth@beta (v5) | v5 is designed for App Router. Single `auth()` function works in server components, route handlers, proxy (middleware), and server actions. |
-| Prisma 7.4.x | @prisma/adapter-neon | GA since v6.16.0. Connection configured in prisma.config.ts, not schema.prisma. |
-| Prisma 7.4.x | Next.js 16.2.x | Works with App Router server components and server actions. |
-| @serwist/next 9.5.x | Next.js 16.2.x | Requires --webpack flag for development PWA testing. Production builds work with Turbopack. Disable service worker in dev mode to avoid issues. |
-| @tanstack/react-table 8.x | React 19.2 | Works but may have issues with React Compiler. Monitor for updates. |
-| Recharts 3.8.x | React 19.2 | Fully compatible. Actively maintained. |
-| @dnd-kit/core 6.3.x | React 19.2 | Stable. Well-tested with React 18/19. |
-| shadcn/ui | Tailwind CSS 4.x | All components updated for Tailwind v4 and React 19. Uses tw-animate-css instead of tailwindcss-animate. |
-| Zod 4.3.x | TypeScript 5.7+ | Full compatibility. @zod/mini available for bundle-sensitive contexts. |
+| M2 Feature | Existing Tech | New Tech Needed | Confidence |
+|------------|--------------|-----------------|------------|
+| Gallery cards | React + Tailwind + CSS Grid | None | HIGH |
+| View mode switching | useState + localStorage + URL params | None | HIGH |
+| Table sorting | useState + Array.sort() | None | HIGH |
+| Skein calculator | Pure TypeScript arithmetic | None | HIGH |
+| Storage location CRUD | Prisma + server actions + Zod | Schema migration only | HIGH |
+| Fabric selector wiring | SearchableSelect + Fabric model | None | HIGH |
+| DMC catalog completion | Seed data JSON fixture | Data update only | HIGH |
+| Cover image aspect ratio | Tailwind CSS classes | None | HIGH |
+| Thread picker scroll UX | DOM scrollIntoView() | None | HIGH |
+| Supply workflow rework | React component restructure | None | HIGH |
 
-## Critical Configuration Notes
+## Version Compatibility Notes
 
-### Neon + Prisma 7 Setup
+No new packages means no new compatibility concerns. Current installed versions:
 
-Two connection strings are required in `.env`:
-```
-# Pooled connection for the application (note -pooler suffix)
-DATABASE_URL="postgresql://user:pass@ep-xxx-pooler.region.aws.neon.tech/dbname?sslmode=require"
-
-# Direct connection for Prisma CLI (migrations, introspection)
-DIRECT_URL="postgresql://user:pass@ep-xxx.region.aws.neon.tech/dbname?sslmode=require"
-```
-
-In Prisma 7 with the Neon adapter, do NOT put a `url` property in the `datasource` block of `schema.prisma`. Instead, configure the connection in `prisma.config.ts` using `@prisma/adapter-neon`.
-
-### Cloudflare R2 Setup
-
-```typescript
-// src/lib/r2.ts
-import { S3Client } from "@aws-sdk/client-s3";
-
-export const r2 = new S3Client({
-  region: "auto",
-  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-  },
-});
-```
-
-Upload pattern: Generate presigned URLs server-side via Server Action, upload directly from client to R2. Keeps large files off Vercel's serverless function payload limits.
-
-### Serwist PWA Configuration
-
-```json
-// package.json scripts
-{
-  "dev": "next dev --turbopack",
-  "build": "next build",
-  "dev:pwa": "next dev --webpack"
-}
-```
-
-Serwist requires Webpack for service worker compilation. Use `--turbopack` for normal dev (faster), `--webpack` only when testing PWA locally. Production builds work normally.
-
-For Phase 1 (basic PWA -- installable, home screen icon), you only need the manifest + metadata. Serwist becomes essential in Phase 5 for offline support and caching strategies.
-
-### Tailwind v4 Design Token Configuration
-
-```css
-/* app/globals.css */
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@theme {
-  /* Custom fonts */
-  --font-heading: "Fraunces", serif;
-  --font-body: "Source Sans 3", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
-
-  /* Emerald/amber/stone palette mapped to semantic tokens */
-  --color-primary: oklch(0.596 0.145 163.225);     /* emerald-600 */
-  --color-primary-foreground: oklch(0.985 0.014 163.225);
-  --color-accent: oklch(0.666 0.179 86.375);        /* amber-500 */
-  --color-background: oklch(0.985 0.001 106.424);   /* stone-50 */
-  /* ... map all design tokens here */
-}
-```
-
-### Next.js 16 Breaking Changes to Address
-
-1. **Async request APIs:** `cookies()`, `headers()`, `params`, `searchParams` are all async. Must `await` them.
-2. **Middleware renamed to Proxy:** File is now `proxy.ts`, not `middleware.ts`.
-3. **Turbopack default:** No config needed; it's the default. Use `--webpack` flag only when Serwist requires it.
-4. **React Compiler:** Enabled by default. May surface issues with libraries that use non-standard React patterns. Monitor @tanstack/react-table for compiler compatibility updates.
+| Package | Installed Version | M2 Notes |
+|---------|------------------|----------|
+| Next.js | 16.2.2 | No M2-specific concerns |
+| Prisma | 7.6.0 | Schema migration for StorageLocation/StitchingApp models |
+| React | 19.2.4 | No M2-specific concerns |
+| Tailwind | 4.2.2 | `aspect-[4/3]` works natively in v4, needed for gallery cards |
+| sharp | 0.33.5 | Already installed (devDep), used for thumbnail generation |
+| cmdk | 1.1.1 | Already installed, powers SearchableSelect for fabric selector |
+| lucide-react | 1.7.0 | Gallery card icons (Scissors, Clock, Calendar, Check, etc.) already available |
 
 ## Sources
 
-- [Next.js 16.2 Blog Post](https://nextjs.org/blog/next-16-2) -- version confirmation, Turbopack updates
-- [Next.js Support Policy](https://nextjs.org/support-policy) -- LTS lifecycle: v16 Active, v15 Maintenance
-- [Next.js Upgrade Guide v16](https://nextjs.org/docs/app/guides/upgrading/version-16) -- breaking changes, async APIs, proxy rename
-- [Prisma 7.4 Release](https://www.prisma.io/blog/announcing-prisma-orm-7-2-0) -- version, features
-- [Prisma Neon Integration](https://neon.com/docs/guides/prisma) -- adapter setup, pooled/direct connections
-- [Prisma Neon Docs](https://www.prisma.io/docs/orm/overview/databases/neon) -- adapter configuration for v7
-- [Auth.js v5 Migration Guide](https://authjs.dev/getting-started/migrating-to-v5) -- beta status, API changes
-- [next-auth npm](https://www.npmjs.com/package/next-auth) -- version 5.0.0-beta.x latest
-- [Tailwind CSS v4.0 Blog](https://tailwindcss.com/blog/tailwindcss-v4) -- @theme directive, CSS-native config
-- [shadcn/ui Tailwind v4](https://ui.shadcn.com/docs/tailwind-v4) -- compatibility, tw-animate-css migration
-- [Serwist Getting Started](https://serwist.pages.dev/docs/next/getting-started) -- Next.js integration, Turbopack workaround
-- [LogRocket: Next.js 16 PWA](https://blog.logrocket.com/nextjs-16-pwa-offline-support/) -- Serwist + Turbopack configuration
-- [@tanstack/react-table npm](https://www.npmjs.com/package/@tanstack/react-table) -- v8.21.x, React Compiler note
-- [Recharts npm](https://www.npmjs.com/package/recharts) -- v3.8.1, active maintenance
-- [@dnd-kit/core npm](https://www.npmjs.com/package/@dnd-kit/core) -- v6.3.1, 2,355 dependents
-- [@dnd-kit/react npm](https://www.npmjs.com/package/@dnd-kit/react) -- v0.3.2, 38 dependents (avoid for now)
-- [Zod v4 Release Notes](https://zod.dev/v4) -- performance improvements, @zod/mini
-- [R2 + Next.js Upload Guide](https://www.buildwithmatija.com/blog/how-to-upload-files-to-cloudflare-r2-nextjs) -- presigned URL pattern
+- **Skein calculation formula:** [Cross Stitch Style Arte](https://crossstitchstylearte.com/how-to-calculate-the-exact-amount-of-thread-needed-for-any-cross-stitch-project/) — stitches-per-skein lookup table by fabric count, MEDIUM confidence
+- **Skein calculation formula:** [Eponases blog](https://www.eponases.com/blog/2014/01/cross-stitch-stitches-per-skein/) — experimental measurement ~3000 stitches/skein on 18ct, MEDIUM confidence
+- **Skein calculators (formula cross-reference):** [Thread-bare estimator](https://www.thread-bare.com/tools/cross-stitch-skein-estimator), [Lord Libidan calculator](https://lordlibidan.com/calculate-the-number-of-required-skeins/), [Textile Calculator](https://textilecalculator.com/cross-stitch-skein-calculator/)
+- **DMC catalog scope:** [How many DMC threads are there](https://lordlibidan.com/how-many-dmc-threads-are-there/) — 500 solid colors, 489 available US, HIGH confidence
+- **DMC numbering:** [Maydel Craft DMC guide](https://maydel.com/2021/01/13/demystifying-dmc-part-1-6-strand-floss/) — numbering system, missing US colors list, HIGH confidence
+- **DMC catalog data:** [rgb-to-dmc GitHub](https://github.com/seanockert/rgb-to-dmc/blob/master/rgb-dmc.json) — 447-color JSON with hex codes, verified against existing fixture
+- **Design spec (gallery):** `product-plan/sections/gallery-cards-and-advanced-filtering/` — GalleryCard.tsx, GalleryGrid.tsx, AdvancedFilterBar.tsx, types.ts
+- **Existing patterns (view modes):** `src/components/features/supplies/supply-catalog.tsx` — grid/table view toggle, localStorage persistence, URL param sync
+- **Existing patterns (chart list):** `src/components/features/charts/chart-list.tsx` — current table/card layout being replaced
+- **Schema reference:** `prisma/schema.prisma` — ProjectThread.stitchCount already exists (line 182), Fabric.linkedProjectId for selector (line 243)
 
 ---
-*Stack research for: Cross-stitch project management app*
-*Researched: 2026-03-28*
+*Stack research for: Milestone 2 — Browse & Organize*
+*Researched: 2026-04-11*

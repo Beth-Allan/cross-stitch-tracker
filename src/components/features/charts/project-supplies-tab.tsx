@@ -414,6 +414,12 @@ export function ProjectSuppliesTab({
   );
 
   const handleAdded = useCallback(() => {
+    // Intentionally empty — picker stays open for multi-add.
+    // Data refreshes via server action revalidation.
+    // User closes picker with Escape or click-outside.
+  }, []);
+
+  const handleCloseSearch = useCallback(() => {
     setAddingType(null);
   }, []);
 
@@ -509,7 +515,7 @@ export function ProjectSuppliesTab({
             projectId={projectId}
             existingIds={linkedThreadIds}
             onAdded={handleAdded}
-            onClose={() => setAddingType(null)}
+            onClose={handleCloseSearch}
           />
         )}
       </div>
@@ -553,7 +559,7 @@ export function ProjectSuppliesTab({
             projectId={projectId}
             existingIds={linkedBeadIds}
             onAdded={handleAdded}
-            onClose={() => setAddingType(null)}
+            onClose={handleCloseSearch}
           />
         )}
       </div>
@@ -603,7 +609,7 @@ export function ProjectSuppliesTab({
             projectId={projectId}
             existingIds={linkedSpecialtyIds}
             onAdded={handleAdded}
-            onClose={() => setAddingType(null)}
+            onClose={handleCloseSearch}
           />
         )}
       </div>

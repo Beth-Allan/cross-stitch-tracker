@@ -93,74 +93,59 @@ export async function deleteGenre(id: string) {
 export async function getGenre(id: string): Promise<GenreDetail | null> {
   await requireAuth();
 
-  try {
-    const genre = await prisma.genre.findUnique({
-      where: { id },
-      include: {
-        _count: { select: { charts: true } },
-        charts: {
-          select: {
-            id: true,
-            name: true,
-            coverThumbnailUrl: true,
-            stitchCount: true,
-            stitchesWide: true,
-            stitchesHigh: true,
-            project: { select: { status: true, stitchesCompleted: true } },
-          },
+  const genre = await prisma.genre.findUnique({
+    where: { id },
+    include: {
+      _count: { select: { charts: true } },
+      charts: {
+        select: {
+          id: true,
+          name: true,
+          coverThumbnailUrl: true,
+          stitchCount: true,
+          stitchesWide: true,
+          stitchesHigh: true,
+          project: { select: { status: true, stitchesCompleted: true } },
         },
       },
-    });
+    },
+  });
 
-    if (!genre) return null;
+  if (!genre) return null;
 
-    return {
-      id: genre.id,
-      name: genre.name,
-      chartCount: genre._count.charts,
-      charts: genre.charts.map((c) => ({
-        id: c.id,
-        name: c.name,
-        coverThumbnailUrl: c.coverThumbnailUrl,
-        stitchCount: c.stitchCount,
-        stitchesWide: c.stitchesWide,
-        stitchesHigh: c.stitchesHigh,
-        status: c.project?.status ?? null,
-        stitchesCompleted: c.project?.stitchesCompleted ?? 0,
-      })),
-    };
-  } catch (error) {
-    console.error("getGenre error:", error);
-    return null;
-  }
+  return {
+    id: genre.id,
+    name: genre.name,
+    chartCount: genre._count.charts,
+    charts: genre.charts.map((c) => ({
+      id: c.id,
+      name: c.name,
+      coverThumbnailUrl: c.coverThumbnailUrl,
+      stitchCount: c.stitchCount,
+      stitchesWide: c.stitchesWide,
+      stitchesHigh: c.stitchesHigh,
+      status: c.project?.status ?? null,
+      stitchesCompleted: c.project?.stitchesCompleted ?? 0,
+    })),
+  };
 }
 
 export async function getGenresWithStats(): Promise<GenreWithStats[]> {
   await requireAuth();
 
-  try {
-    const genres = await prisma.genre.findMany({
-      include: { _count: { select: { charts: true } } },
-      orderBy: { name: "asc" },
-    });
-    return genres.map((g) => ({
-      id: g.id,
-      name: g.name,
-      chartCount: g._count.charts,
-    }));
-  } catch (error) {
-    console.error("getGenresWithStats error:", error);
-    return [];
-  }
+  const genres = await prisma.genre.findMany({
+    include: { _count: { select: { charts: true } } },
+    orderBy: { name: "asc" },
+  });
+  return genres.map((g) => ({
+    id: g.id,
+    name: g.name,
+    chartCount: g._count.charts,
+  }));
 }
 
 export async function getGenres() {
   await requireAuth();
 
-  try {
-    return await prisma.genre.findMany({ orderBy: { name: "asc" } });
-  } catch (error) {
-    console.error("getGenres error:", error);
-    return [];
-  }
+  return await prisma.genre.findMany({ orderBy: { name: "asc" } });
 }

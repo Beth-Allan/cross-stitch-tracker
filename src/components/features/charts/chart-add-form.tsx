@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Designer, Genre } from "@/generated/prisma/client";
+import type { Designer, Fabric, FabricBrand, Genre } from "@/generated/prisma/client";
 import type { ProjectStatus } from "@/generated/prisma/client";
+import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { useChartForm } from "./use-chart-form";
 import { BasicInfoSection } from "./sections/basic-info-section";
 import { StitchCountSection } from "./sections/stitch-count-section";
@@ -19,15 +20,26 @@ import { NotesSection } from "./sections/notes-section";
 interface ChartAddFormProps {
   designers: Designer[];
   genres: Genre[];
+  storageLocations: StorageLocationWithStats[];
+  stitchingApps: StitchingAppWithStats[];
+  unassignedFabrics: (Fabric & { brand: FabricBrand })[];
 }
 
-export function ChartAddForm({ designers, genres }: ChartAddFormProps) {
+export function ChartAddForm({
+  designers,
+  genres,
+  storageLocations,
+  stitchingApps,
+  unassignedFabrics,
+}: ChartAddFormProps) {
   const router = useRouter();
 
   const form = useChartForm({
     mode: "create",
     designers,
     genres,
+    storageLocations,
+    stitchingApps,
     onSuccess: () => {
       router.push("/charts");
     },
@@ -50,7 +62,7 @@ export function ChartAddForm({ designers, genres }: ChartAddFormProps) {
         Charts
       </Link>
 
-      <h1 className="font-fraunces text-foreground mb-6 text-2xl font-semibold">Add New Chart</h1>
+      <h1 className="font-heading text-foreground mb-6 text-2xl font-semibold">Add New Chart</h1>
 
       <form onSubmit={form.handleSubmit} className="space-y-5">
         <BasicInfoSection
@@ -116,13 +128,20 @@ export function ChartAddForm({ designers, genres }: ChartAddFormProps) {
 
         <ProjectSetupSection
           status={form.values.status}
-          projectBin={form.values.projectBin}
-          ipadApp={form.values.ipadApp}
+          storageLocationId={form.values.storageLocationId}
+          stitchingAppId={form.values.stitchingAppId}
+          fabricId={form.values.fabricId}
+          storageLocations={form.storageLocationsList}
+          stitchingApps={form.stitchingAppsList}
+          unassignedFabrics={unassignedFabrics}
           needsOnionSkinning={form.values.needsOnionSkinning}
           onStatusChange={(v) => form.setField("status", v as ProjectStatus)}
-          onBinChange={(v) => form.setField("projectBin", v)}
-          onAppChange={(v) => form.setField("ipadApp", v)}
+          onStorageLocationChange={(v) => form.setField("storageLocationId", v)}
+          onStitchingAppChange={(v) => form.setField("stitchingAppId", v)}
+          onFabricChange={(v) => form.setField("fabricId", v)}
           onOnionSkinningChange={(v) => form.setField("needsOnionSkinning", v)}
+          onAddStorageLocation={form.handleAddStorageLocation}
+          onAddStitchingApp={form.handleAddStitchingApp}
           errors={{
             status: form.errors["project.status"],
           }}

@@ -77,24 +77,34 @@ export async function deleteFabricBrand(id: string) {
 export async function getFabricBrands() {
   await requireAuth();
 
-  try {
-    return await prisma.fabricBrand.findMany({
-      include: { _count: { select: { fabrics: true } } },
-      orderBy: { name: "asc" },
-    });
-  } catch (error) {
-    console.error("getFabricBrands error:", error);
-    return [];
-  }
+  return await prisma.fabricBrand.findMany({
+    include: { _count: { select: { fabrics: true } } },
+    orderBy: { name: "asc" },
+  });
 }
 
 // ─── Fabric CRUD ────────────────────────────────────────────────────────────
+// Fabric has no direct userId — ownership is inferred through linkedProject.userId.
+// Unlinked fabrics (linkedProjectId=null) are accessible to all authenticated users.
+// Mutations on linked fabrics verify the linked project belongs to the current user.
+// Note: chart-actions.ts also performs fabric ownership checks when linking/unlinking in transactions.
 
 export async function createFabric(formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validated = fabricSchema.parse(formData);
+
+    if (validated.linkedProjectId) {
+      const project = await prisma.project.findUnique({
+        where: { id: validated.linkedProjectId },
+        select: { userId: true },
+      });
+      if (!project || project.userId !== user.id) {
+        return { success: false as const, error: "Project not found" };
+      }
+    }
+
     const fabric = await prisma.fabric.create({ data: validated });
     revalidatePath("/fabric");
     if (validated.linkedProjectId) {
@@ -123,9 +133,17 @@ export async function createFabric(formData: unknown) {
 }
 
 export async function updateFabric(id: string, formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    const existing = await prisma.fabric.findUnique({
+      where: { id },
+      select: { linkedProject: { select: { userId: true } } },
+    });
+    if (existing?.linkedProject && existing.linkedProject.userId !== user.id) {
+      return { success: false as const, error: "Fabric not found" };
+    }
+
     const validated = fabricSchema.parse(formData);
     const fabric = await prisma.fabric.update({
       where: { id },
@@ -159,9 +177,17 @@ export async function updateFabric(id: string, formData: unknown) {
 }
 
 export async function deleteFabric(id: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    const existing = await prisma.fabric.findUnique({
+      where: { id },
+      select: { linkedProject: { select: { userId: true } } },
+    });
+    if (existing?.linkedProject && existing.linkedProject.userId !== user.id) {
+      return { success: false as const, error: "Fabric not found" };
+    }
+
     await prisma.fabric.delete({ where: { id } });
     revalidatePath("/fabric");
     revalidatePath("/shopping");
@@ -173,39 +199,56 @@ export async function deleteFabric(id: string) {
 }
 
 export async function getFabric(id: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
-  try {
-    return await prisma.fabric.findUnique({
-      where: { id },
-      include: {
-        brand: true,
-        linkedProject: {
-          include: {
-            chart: { select: { id: true, name: true, stitchesWide: true, stitchesHigh: true } },
-          },
+  const fabric = await prisma.fabric.findUnique({
+    where: { id },
+    include: {
+      brand: true,
+      linkedProject: {
+        include: {
+          chart: { select: { id: true, name: true, stitchesWide: true, stitchesHigh: true } },
         },
       },
-    });
-  } catch (error) {
-    console.error("getFabric error:", error);
+    },
+  });
+
+  if (fabric?.linkedProject && fabric.linkedProject.userId !== user.id) {
     return null;
   }
+
+  return fabric;
+}
+
+export async function getUnassignedFabrics(currentProjectId?: string) {
+  const user = await requireAuth();
+
+  return await prisma.fabric.findMany({
+    where: {
+      OR: [
+        { linkedProjectId: null },
+        ...(currentProjectId ? [{ linkedProjectId: currentProjectId }] : []),
+      ],
+      NOT: {
+        linkedProject: { userId: { not: user.id } },
+      },
+    },
+    include: { brand: true },
+    orderBy: { name: "asc" },
+  });
 }
 
 export async function getFabrics() {
-  await requireAuth();
+  const user = await requireAuth();
 
-  try {
-    return await prisma.fabric.findMany({
-      include: {
-        brand: true,
-        linkedProject: { include: { chart: { select: { name: true } } } },
-      },
-      orderBy: { name: "asc" },
-    });
-  } catch (error) {
-    console.error("getFabrics error:", error);
-    return [];
-  }
+  return await prisma.fabric.findMany({
+    where: {
+      OR: [{ linkedProjectId: null }, { linkedProject: { userId: user.id } }],
+    },
+    include: {
+      brand: true,
+      linkedProject: { include: { chart: { select: { name: true } } } },
+    },
+    orderBy: { name: "asc" },
+  });
 }

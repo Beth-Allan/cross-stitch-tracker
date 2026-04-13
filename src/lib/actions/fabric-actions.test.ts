@@ -227,15 +227,11 @@ describe("fabric-actions", () => {
       });
     });
 
-    it("returns empty array on error", async () => {
+    it("throws on DB error (handled by error boundary)", async () => {
       mockPrisma.fabricBrand.findMany.mockRejectedValueOnce(new Error("DB error"));
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       const { getFabricBrands } = await import("./fabric-actions");
 
-      const result = await getFabricBrands();
-
-      expect(result).toEqual([]);
-      consoleSpy.mockRestore();
+      await expect(getFabricBrands()).rejects.toThrow("DB error");
     });
   });
 
@@ -294,6 +290,13 @@ describe("fabric-actions", () => {
 
       await expect(getFabrics()).rejects.toThrow("Unauthorized");
     });
+
+    it("rejects unauthenticated calls to getUnassignedFabrics", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { getUnassignedFabrics } = await import("./fabric-actions");
+
+      await expect(getUnassignedFabrics()).rejects.toThrow("Unauthorized");
+    });
   });
 
   // ─── createFabric ─────────────────────────────────────────────────────────
@@ -342,6 +345,7 @@ describe("fabric-actions", () => {
     it("revalidates linked project path when linkedProjectId is set", async () => {
       const { revalidatePath } = await import("next/cache");
       const dataWithProject = { ...validFabricData, linkedProjectId: "proj-1" };
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       mockPrisma.fabric.create.mockResolvedValueOnce(
         createMockFabric({ linkedProjectId: "proj-1" }),
       );
@@ -354,6 +358,7 @@ describe("fabric-actions", () => {
 
     it("returns P2002 error for duplicate linkedProjectId", async () => {
       const p2002Error = Object.assign(new Error("Unique constraint"), { code: "P2002" });
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       mockPrisma.fabric.create.mockRejectedValueOnce(p2002Error);
       const { createFabric } = await import("./fabric-actions");
 
@@ -396,6 +401,45 @@ describe("fabric-actions", () => {
       const result = await createFabric({ ...validFabricData, type: "InvalidType" });
 
       expect(result.success).toBe(false);
+    });
+
+    it("rejects create when linkedProjectId belongs to another user", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { createFabric } = await import("./fabric-actions");
+
+      const result = await createFabric({ ...validFabricData, linkedProjectId: "proj-1" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Project not found");
+      }
+      expect(mockPrisma.fabric.create).not.toHaveBeenCalled();
+    });
+
+    it("rejects create when linkedProjectId does not exist", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce(null);
+      const { createFabric } = await import("./fabric-actions");
+
+      const result = await createFabric({ ...validFabricData, linkedProjectId: "nonexistent" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Project not found");
+      }
+      expect(mockPrisma.fabric.create).not.toHaveBeenCalled();
+    });
+
+    it("allows create when linkedProjectId belongs to authenticated user", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      mockPrisma.fabric.create.mockResolvedValueOnce(
+        createMockFabric({ name: "Test", linkedProjectId: "proj-1" }),
+      );
+      const { createFabric } = await import("./fabric-actions");
+
+      const result = await createFabric({ ...validFabricData, linkedProjectId: "proj-1" });
+
+      expect(result.success).toBe(true);
+      expect(mockPrisma.fabric.create).toHaveBeenCalled();
     });
   });
 
@@ -474,6 +518,21 @@ describe("fabric-actions", () => {
         expect(result.error).toBe("Name is required");
       }
     });
+
+    it("rejects update when fabric is linked to another user's project", async () => {
+      mockPrisma.fabric.findUnique.mockResolvedValueOnce({
+        linkedProject: { userId: "other-user" },
+      });
+      const { updateFabric } = await import("./fabric-actions");
+
+      const result = await updateFabric("fabric-1", validUpdateData);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Fabric not found");
+      }
+      expect(mockPrisma.fabric.update).not.toHaveBeenCalled();
+    });
   });
 
   // ─── deleteFabric ─────────────────────────────────────────────────────────
@@ -513,6 +572,21 @@ describe("fabric-actions", () => {
       }
       consoleSpy.mockRestore();
     });
+
+    it("rejects delete when fabric is linked to another user's project", async () => {
+      mockPrisma.fabric.findUnique.mockResolvedValueOnce({
+        linkedProject: { userId: "other-user" },
+      });
+      const { deleteFabric } = await import("./fabric-actions");
+
+      const result = await deleteFabric("fabric-1");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Fabric not found");
+      }
+      expect(mockPrisma.fabric.delete).not.toHaveBeenCalled();
+    });
   });
 
   // ─── getFabric ────────────────────────────────────────────────────────────
@@ -524,6 +598,7 @@ describe("fabric-actions", () => {
         brand: createMockFabricBrand({ id: "fb-1", name: "Zweigart" }),
         linkedProject: {
           id: "proj-1",
+          userId: "user-1",
           chart: { name: "Test Chart", stitchesWide: 100, stitchesHigh: 50 },
         },
       };
@@ -549,6 +624,24 @@ describe("fabric-actions", () => {
       });
     });
 
+    it("returns null when linked project belongs to another user", async () => {
+      const fabricWithRelations = {
+        ...createMockFabric({ id: "fabric-1", linkedProjectId: "proj-1" }),
+        brand: createMockFabricBrand({ id: "fb-1", name: "Zweigart" }),
+        linkedProject: {
+          id: "proj-1",
+          userId: "other-user",
+          chart: { name: "Test Chart", stitchesWide: 100, stitchesHigh: 50 },
+        },
+      };
+      mockPrisma.fabric.findUnique.mockResolvedValueOnce(fabricWithRelations);
+      const { getFabric } = await import("./fabric-actions");
+
+      const result = await getFabric("fabric-1");
+
+      expect(result).toBeNull();
+    });
+
     it("returns null for non-existent fabric", async () => {
       mockPrisma.fabric.findUnique.mockResolvedValueOnce(null);
       const { getFabric } = await import("./fabric-actions");
@@ -558,15 +651,11 @@ describe("fabric-actions", () => {
       expect(result).toBeNull();
     });
 
-    it("returns null on error", async () => {
+    it("throws on DB error (handled by error boundary)", async () => {
       mockPrisma.fabric.findUnique.mockRejectedValueOnce(new Error("DB error"));
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       const { getFabric } = await import("./fabric-actions");
 
-      const result = await getFabric("fabric-1");
-
-      expect(result).toBeNull();
-      consoleSpy.mockRestore();
+      await expect(getFabric("fabric-1")).rejects.toThrow("DB error");
     });
   });
 
@@ -593,6 +682,9 @@ describe("fabric-actions", () => {
       expect(result).toHaveLength(2);
       expect(result[0].name).toBe("Cream Linen 28ct");
       expect(mockPrisma.fabric.findMany).toHaveBeenCalledWith({
+        where: {
+          OR: [{ linkedProjectId: null }, { linkedProject: { userId: "user-1" } }],
+        },
         include: {
           brand: true,
           linkedProject: { include: { chart: { select: { name: true } } } },
@@ -601,15 +693,78 @@ describe("fabric-actions", () => {
       });
     });
 
-    it("returns empty array on error", async () => {
+    it("throws on DB error (handled by error boundary)", async () => {
       mockPrisma.fabric.findMany.mockRejectedValueOnce(new Error("DB error"));
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       const { getFabrics } = await import("./fabric-actions");
 
-      const result = await getFabrics();
+      await expect(getFabrics()).rejects.toThrow("DB error");
+    });
+  });
 
-      expect(result).toEqual([]);
-      consoleSpy.mockRestore();
+  // ─── getUnassignedFabrics ────────────────────────────────────────────────
+
+  describe("getUnassignedFabrics", () => {
+    it("returns unassigned fabrics with brand included", async () => {
+      mockPrisma.fabric.findMany.mockResolvedValueOnce([
+        {
+          ...createMockFabric({ id: "fabric-1", name: "Unlinked Aida" }),
+          brand: createMockFabricBrand({ name: "Zweigart" }),
+        },
+      ]);
+      const { getUnassignedFabrics } = await import("./fabric-actions");
+
+      const result = await getUnassignedFabrics();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].name).toBe("Unlinked Aida");
+      expect(mockPrisma.fabric.findMany).toHaveBeenCalledWith({
+        where: {
+          OR: [{ linkedProjectId: null }],
+          NOT: { linkedProject: { userId: { not: "user-1" } } },
+        },
+        include: { brand: true },
+        orderBy: { name: "asc" },
+      });
+    });
+
+    it("includes currentProjectId fabric in results", async () => {
+      mockPrisma.fabric.findMany.mockResolvedValueOnce([
+        {
+          ...createMockFabric({ id: "fabric-1", linkedProjectId: "proj-1" }),
+          brand: createMockFabricBrand({ name: "Zweigart" }),
+        },
+      ]);
+      const { getUnassignedFabrics } = await import("./fabric-actions");
+
+      await getUnassignedFabrics("proj-1");
+
+      expect(mockPrisma.fabric.findMany).toHaveBeenCalledWith({
+        where: {
+          OR: [{ linkedProjectId: null }, { linkedProjectId: "proj-1" }],
+          NOT: { linkedProject: { userId: { not: "user-1" } } },
+        },
+        include: { brand: true },
+        orderBy: { name: "asc" },
+      });
+    });
+
+    it("excludes fabrics linked to other users via NOT clause", async () => {
+      mockPrisma.fabric.findMany.mockResolvedValueOnce([]);
+      const { getUnassignedFabrics } = await import("./fabric-actions");
+
+      await getUnassignedFabrics();
+
+      const call = mockPrisma.fabric.findMany.mock.calls[0][0];
+      expect(call.where.NOT).toEqual({
+        linkedProject: { userId: { not: "user-1" } },
+      });
+    });
+
+    it("throws on DB error (handled by error boundary)", async () => {
+      mockPrisma.fabric.findMany.mockRejectedValueOnce(new Error("DB error"));
+      const { getUnassignedFabrics } = await import("./fabric-actions");
+
+      await expect(getUnassignedFabrics()).rejects.toThrow("DB error");
     });
   });
 });

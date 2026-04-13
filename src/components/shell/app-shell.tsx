@@ -22,7 +22,7 @@ export function AppShell({ children, user }: AppShellProps) {
           id="main-content"
           className="flex-1 overflow-y-auto p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
         >
-          {children}
+          <div className="mx-auto max-w-7xl">{children}</div>
         </main>
       </div>
     </div>

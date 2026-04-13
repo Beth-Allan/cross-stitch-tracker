@@ -51,11 +51,14 @@ export function CoverImageUpload({
           setPreview(result.url);
           setState("complete");
         } else {
-          // Could not resolve -- show upload zone
+          setError("Could not load cover image");
           setState("idle");
         }
       } catch {
-        if (!cancelled) setState("idle");
+        if (!cancelled) {
+          setError("Could not load cover image");
+          setState("idle");
+        }
       }
     }
     void resolve();
@@ -189,16 +192,16 @@ export function CoverImageUpload({
       />
 
       {state === "resolving" ? (
-        <div className="border-border flex h-32 items-center justify-center rounded-lg border-2 border-dashed">
+        <div className="border-border flex h-48 items-center justify-center rounded-lg border-2 border-dashed">
           <Loader2 className="text-muted-foreground/50 size-6 animate-spin" />
         </div>
       ) : state === "complete" && preview && !imgError ? (
-        <div className="border-border relative h-32 overflow-hidden rounded-lg border-2">
+        <div className="border-border bg-muted relative h-48 overflow-hidden rounded-lg border-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={preview}
             alt="Cover image preview"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain"
             onError={() => setImgError(true)}
           />
           <button
@@ -228,7 +231,7 @@ export function CoverImageUpload({
           onDragLeave={() => setIsDragOver(false)}
           onDrop={handleDrop}
           className={cn(
-            "flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors",
+            "flex h-48 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors",
             isDragOver
               ? "border-primary bg-primary/10"
               : "border-border hover:border-primary/50 hover:bg-primary/5",

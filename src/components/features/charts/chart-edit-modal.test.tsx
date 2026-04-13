@@ -27,6 +27,14 @@ vi.mock("@/lib/actions/genre-actions", () => ({
   createGenre: vi.fn(),
 }));
 
+vi.mock("@/lib/actions/storage-location-actions", () => ({
+  createStorageLocation: vi.fn(),
+}));
+
+vi.mock("@/lib/actions/stitching-app-actions", () => ({
+  createStitchingApp: vi.fn(),
+}));
+
 vi.mock("@/lib/actions/upload-actions", () => ({
   getPresignedUploadUrl: vi.fn(),
 }));
@@ -60,6 +68,9 @@ function renderModal(overrides?: { open?: boolean; onOpenChange?: () => void }) 
       chart={mockChart}
       designers={mockDesigners}
       genres={mockGenres}
+      storageLocations={[]}
+      stitchingApps={[]}
+      unassignedFabrics={[]}
       open={overrides?.open ?? true}
       onOpenChange={onOpenChange}
     />,

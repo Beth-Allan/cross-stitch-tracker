@@ -12,9 +12,13 @@ import type {
   ProjectSpecialty,
   FabricBrand,
   Fabric,
+  StorageLocation,
+  StitchingApp,
 } from "@/generated/prisma/client";
 import type { DesignerWithStats, DesignerChart } from "@/types/designer";
 import type { GenreWithStats, GenreChart } from "@/types/genre";
+import type { ChartWithProject, ProjectWithRelations } from "@/types/chart";
+import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { vi } from "vitest";
 
 /**
@@ -106,8 +110,8 @@ export function createMockProject(overrides?: Partial<Project>): Project {
     finishDate: null,
     ffoDate: null,
     finishPhotoUrl: null,
-    projectBin: null,
-    ipadApp: null,
+    storageLocationId: null,
+    stitchingAppId: null,
     needsOnionSkinning: false,
     wantToStartNext: false,
     preferredStartSeason: null,
@@ -143,11 +147,14 @@ export function createMockChart(overrides?: Partial<Chart>): Chart {
   };
 }
 
-type ChartWithRelations = Chart & {
-  project: Project | null;
-  designer: Designer | null;
-  genres: Genre[];
-};
+export function createMockProjectWithRelations(overrides?: Partial<Project>): ProjectWithRelations {
+  return {
+    ...createMockProject(overrides),
+    storageLocation: null,
+    stitchingApp: null,
+    fabric: null,
+  };
+}
 
 export function createMockChartWithRelations(
   overrides?: Partial<Chart> & {
@@ -155,13 +162,14 @@ export function createMockChartWithRelations(
     designer?: Partial<Designer> | null;
     genres?: Genre[];
   },
-): ChartWithRelations {
+): ChartWithProject {
   const { project, designer, genres, ...chartOverrides } = overrides ?? {};
   const chart = createMockChart(chartOverrides);
 
   return {
     ...chart,
-    project: project === null ? null : createMockProject({ chartId: chart.id, ...project }),
+    project:
+      project === null ? null : createMockProjectWithRelations({ chartId: chart.id, ...project }),
     designer: designer === undefined || designer === null ? null : createMockDesigner(designer),
     genres: genres ?? [],
   };
@@ -298,6 +306,56 @@ export function createMockFabric(overrides?: Partial<Fabric>): Fabric {
   };
 }
 
+// ─── Storage & App Factories ────────────────────────────────────────────────
+
+export function createMockStorageLocation(overrides?: Partial<StorageLocation>): StorageLocation {
+  return {
+    id: "sl-1",
+    name: "Project Bin A",
+    description: null,
+    userId: "user-1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
+export function createMockStorageLocationWithStats(
+  overrides?: Partial<StorageLocationWithStats>,
+): StorageLocationWithStats {
+  return {
+    id: "sl-1",
+    name: "Project Bin A",
+    description: null,
+    projectCount: 0,
+    ...overrides,
+  };
+}
+
+export function createMockStitchingApp(overrides?: Partial<StitchingApp>): StitchingApp {
+  return {
+    id: "sa-1",
+    name: "Markup R-XP",
+    description: null,
+    userId: "user-1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
+export function createMockStitchingAppWithStats(
+  overrides?: Partial<StitchingAppWithStats>,
+): StitchingAppWithStats {
+  return {
+    id: "sa-1",
+    name: "Markup R-XP",
+    description: null,
+    projectCount: 0,
+    ...overrides,
+  };
+}
+
 // ─── Mock Prisma Client ─────────────────────────────────────────────────────
 
 /**
@@ -314,7 +372,7 @@ export function createMockPrisma() {
       updateMany: vi.fn(),
       delete: vi.fn(),
     },
-    project: { findUnique: vi.fn(), findMany: vi.fn(), update: vi.fn() },
+    project: { findUnique: vi.fn(), findMany: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
     designer: {
       create: vi.fn(),
       findMany: vi.fn(),
@@ -400,6 +458,22 @@ export function createMockPrisma() {
       update: vi.fn(),
       delete: vi.fn(),
       upsert: vi.fn(),
+    },
+    storageLocation: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+      delete: vi.fn(),
+    },
+    stitchingApp: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+      delete: vi.fn(),
     },
     $transaction: vi.fn(),
   };

@@ -175,7 +175,7 @@ describe("FabricFormModal", () => {
       // Click the SearchableSelect trigger to open the dropdown
       await user.click(screen.getByText("Zweigart"));
 
-      // "Add New" should be visible in the command list
+      // "Add New" should be visible immediately (no typing required)
       expect(screen.getByText("Add New")).toBeInTheDocument();
     });
 
@@ -228,7 +228,9 @@ describe("FabricFormModal", () => {
         expect(screen.getByPlaceholderText(/Brand name/i)).toBeInTheDocument();
       });
 
-      await user.type(screen.getByPlaceholderText(/Brand name/i), "Wichelt");
+      // Brand name field starts empty — type the name and submit
+      const brandNameInput = screen.getByPlaceholderText(/Brand name/i);
+      await user.type(brandNameInput, "Wichelt");
       await user.click(screen.getByRole("button", { name: /Add Brand/i }));
 
       await waitFor(() => {
