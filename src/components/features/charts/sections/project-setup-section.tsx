@@ -82,7 +82,6 @@ export function ProjectSetupSection({
 
         <FormField label="Fabric" htmlFor="fabric">
           <SearchableSelect
-            id="fabric"
             options={fabricOptions}
             value={fabricId}
             onChange={onFabricChange}
@@ -104,7 +103,6 @@ export function ProjectSetupSection({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField label="Storage Location" htmlFor="storage-location">
             <SearchableSelect
-              id="storage-location"
               options={storageOptions}
               value={storageLocationId}
               onChange={onStorageLocationChange}
@@ -115,7 +113,6 @@ export function ProjectSetupSection({
 
           <FormField label="Stitching App" htmlFor="stitching-app">
             <SearchableSelect
-              id="stitching-app"
               options={appOptions}
               value={stitchingAppId}
               onChange={onStitchingAppChange}

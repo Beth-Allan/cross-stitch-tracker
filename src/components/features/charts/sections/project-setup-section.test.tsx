@@ -150,8 +150,12 @@ describe("ProjectSetupSection", () => {
     const storageTrigger = screen.getByText("Select storage location...").closest("button")!;
     await user.click(storageTrigger);
 
-    // "Add New" should appear in the dropdown
-    expect(screen.getByText("Add New")).toBeInTheDocument();
+    // Type a search term — "Add New" only appears when search has text
+    const searchInput = screen.getByPlaceholderText("Search...");
+    await user.type(searchInput, "Shelf");
+
+    // "Add" option should appear with the typed text
+    expect(screen.getByText(/Add "Shelf"/)).toBeInTheDocument();
   });
 
   it("renders Add New option for stitching app when onAddStitchingApp is provided", async () => {
@@ -162,8 +166,12 @@ describe("ProjectSetupSection", () => {
     const appTrigger = screen.getByText("Select stitching app...").closest("button")!;
     await user.click(appTrigger);
 
-    // "Add New" should appear in the dropdown
-    expect(screen.getByText("Add New")).toBeInTheDocument();
+    // Type a search term — "Add New" only appears when search has text
+    const searchInput = screen.getByPlaceholderText("Search...");
+    await user.type(searchInput, "Saga");
+
+    // "Add" option should appear with the typed text
+    expect(screen.getByText(/Add "Saga"/)).toBeInTheDocument();
   });
 
   it("does not render Add New for storage when onAddStorageLocation is omitted", async () => {

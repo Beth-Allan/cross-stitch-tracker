@@ -26,7 +26,6 @@ interface SearchableSelectProps {
   onAddNew?: (searchTerm: string) => void;
   placeholder?: string;
   disabled?: boolean;
-  id?: string;
 }
 
 export function SearchableSelect({
@@ -36,7 +35,6 @@ export function SearchableSelect({
   onAddNew,
   placeholder = "Select...",
   disabled,
-  id,
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -47,7 +45,6 @@ export function SearchableSelect({
     <div className="flex items-center gap-1.5">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
-          id={id}
           disabled={disabled}
           className={cn(
             "border-border bg-background flex h-9 w-full items-center justify-between rounded-lg border px-3 text-sm transition-colors",
@@ -81,7 +78,7 @@ export function SearchableSelect({
                   </CommandItem>
                 ))}
               </CommandGroup>
-              {onAddNew && (
+              {onAddNew && search.trim() && (
                 <>
                   <CommandSeparator />
                   <CommandGroup>
@@ -94,7 +91,7 @@ export function SearchableSelect({
                       className="text-primary"
                     >
                       <Plus className="mr-2 size-4" />
-                      Add New
+                      Add &quot;{search.trim()}&quot;
                     </CommandItem>
                   </CommandGroup>
                 </>

@@ -414,7 +414,9 @@ export function ProjectSuppliesTab({
   );
 
   const handleAdded = useCallback(() => {
-    setAddingType(null);
+    // Intentionally empty — picker stays open for multi-add.
+    // Data refreshes via server action revalidation.
+    // User closes picker with Escape or click-outside.
   }, []);
 
   return (

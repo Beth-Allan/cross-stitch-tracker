@@ -305,6 +305,7 @@ export function useChartForm({
 
   const handleAddStorageLocation = useCallback(
     async (name: string) => {
+      if (!name.trim()) return;
       suppressUnloadRef.current = true;
       try {
         const result = await createStorageLocation({ name });
@@ -326,6 +327,7 @@ export function useChartForm({
 
   const handleAddStitchingApp = useCallback(
     async (name: string) => {
+      if (!name.trim()) return;
       suppressUnloadRef.current = true;
       try {
         const result = await createStitchingApp({ name });

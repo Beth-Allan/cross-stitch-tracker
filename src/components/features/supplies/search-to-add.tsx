@@ -155,11 +155,7 @@ export function SearchToAdd({
         if (result.success) {
           toast.success(`Added ${item.brand.name} ${getItemCode(item)} to project`);
           onAdded();
-          // Don't close -- user may want to add more items
-          // Scroll to keep search/add controls visible
-          setTimeout(() => {
-            ref.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-          }, 100);
+          // Picker stays open for multi-add — user closes with Escape or click-outside
         } else {
           toast.error(result.error ?? "Something went wrong. Please try again.");
         }
@@ -219,7 +215,7 @@ export function SearchToAdd({
           />
         </div>
       </div>
-      <div className="border-border max-h-48 overflow-y-auto border-t">
+      <div className="border-border max-h-72 overflow-y-auto border-t">
         {isLoading ? (
           <p className="text-muted-foreground px-3 py-4 text-center text-sm">Searching...</p>
         ) : items.length === 0 ? (
