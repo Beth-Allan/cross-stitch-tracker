@@ -4,9 +4,9 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — not started
-**Last Updated:** 2026-04-11
-**Roadmap:** 4 milestones / 10 phases — v1.0 shipped, planning M2
+**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — executed, pending verification
+**Last Updated:** 2026-04-12
+**Roadmap:** 4 milestones / 10 phases — v1.0 shipped, M2 phase 5 complete
 
 ### Done
 
@@ -15,6 +15,13 @@
   - Archived to: `.planning/milestones/v1.0-*`
   - Live at: https://cross-stitch-tracker-adolwyn.vercel.app
 - 12 quick-fix tasks completed post-deploy (thread sort, idempotency, thumbnails, etc.)
+- **Phase 5: Foundation & Quick Wins** (2026-04-12): 6 plans, 498 tests passing
+  - Storage Location & Stitching App CRUD (data layer + UI)
+  - Chart form wired to database-backed dropdowns with inline "Add New"
+  - Fabric selector wired in chart form
+  - Cover image aspect ratio fix, thread picker scroll fix, DMC catalog completed
+  - Gap closure: Prisma client regen + onAddNew handlers
+  - **Database sync required:** `prisma db push` needed after schema changes (no migration created)
 
 ### In Progress
 
@@ -22,7 +29,9 @@
 
 ### Next Up
 
-1. `/gsd:new-milestone` — define M2 requirements and plan phases 5-6
+1. `/impeccable:audit` — phase-level visual audit (quality gate)
+2. `/gsd:verify-work 5` — verify phase 5 against requirements
+3. `/gsd:ship 5` — create PR for review
 
 ### Backlog (post-MVP)
 
@@ -106,7 +115,7 @@ Conventions auto-load via `.claude/rules/` glob patterns when touching relevant 
 
 - **Server Components by default** — "use client" only for interactivity
 - **Zod validation at boundaries** — server actions, API routes
-- **Prisma schema is source of truth** — run `prisma generate` after changes
+- **Prisma schema is source of truth** — run `prisma db push` then `prisma generate` after schema changes
 - **Three junction tables for supplies** — not polymorphic
 - **Calculated fields at query time** — never stored in DB
 - **Colocated tests** — `foo.test.tsx` next to `foo.tsx`
