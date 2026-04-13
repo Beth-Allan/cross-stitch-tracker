@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen } from "@/__tests__/test-utils";
+import { render, screen, waitFor } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { InlineNameEdit } from "./inline-name-edit";
 
@@ -80,13 +80,17 @@ describe("InlineNameEdit", () => {
     await user.click(screen.getByRole("button", { name: /edit name/i }));
     expect(screen.getByRole("textbox")).toBeInTheDocument();
 
-    // Tab away to trigger blur
-    await user.tab();
-    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    // Tab past Save, Cancel, then to the external "other" button to leave the row
+    await user.tab(); // Save button
+    await user.tab(); // Cancel button
+    await user.tab(); // "other" button — outside the row
+    await waitFor(() => {
+      expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    });
     expect(screen.getByText("Bin A")).toBeInTheDocument();
   });
 
-  it("confirm button uses onMouseDown to fire before blur and saves", async () => {
+  it("confirm button saves on click", async () => {
     const user = userEvent.setup();
     render(<InlineNameEdit {...defaultProps} />);
 
@@ -101,7 +105,7 @@ describe("InlineNameEdit", () => {
     expect(defaultProps.onSave).toHaveBeenCalledWith("Updated");
   });
 
-  it("cancel button uses onMouseDown to fire before blur and cancels", async () => {
+  it("cancel button cancels on click", async () => {
     const user = userEvent.setup();
     render(<InlineNameEdit {...defaultProps} />);
 

@@ -207,7 +207,12 @@ export function ChartList({
           genres={genres}
           storageLocations={storageLocations}
           stitchingApps={stitchingApps}
-          unassignedFabrics={unassignedFabrics}
+          unassignedFabrics={
+            editingChart.project?.fabric &&
+            !unassignedFabrics.some((f) => f.id === editingChart.project?.fabric?.id)
+              ? [editingChart.project.fabric, ...unassignedFabrics]
+              : unassignedFabrics
+          }
           open={!!editingChart}
           onOpenChange={(open) => {
             if (!open) setEditingChart(null);

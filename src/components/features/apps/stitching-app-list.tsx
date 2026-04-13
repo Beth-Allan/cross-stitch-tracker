@@ -186,8 +186,8 @@ function InlineAddRow({
       />
       <button
         type="button"
-        onMouseDown={(e) => {
-          e.preventDefault();
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => {
           if (name.trim()) onAdd(name.trim());
         }}
         disabled={!name.trim()}
@@ -236,6 +236,7 @@ function AppRow({
       onClick={onNavigate}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
+          if (e.target instanceof HTMLElement && e.target.closest("button")) return;
           e.preventDefault();
           onNavigate();
         }

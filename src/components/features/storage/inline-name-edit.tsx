@@ -23,6 +23,7 @@ export function InlineNameEdit({
   const [editValue, setEditValue] = useState(name);
   const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isEditing) {
@@ -67,14 +68,20 @@ export function InlineNameEdit({
 
   if (isEditing) {
     return (
-      <div className="flex items-center gap-2">
+      <div ref={rowRef} className="flex items-center gap-2">
         <input
           ref={inputRef}
           type="text"
           value={editValue}
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          onBlur={handleCancel}
+          onBlur={() => {
+            requestAnimationFrame(() => {
+              if (!rowRef.current?.contains(document.activeElement)) {
+                handleCancel();
+              }
+            });
+          }}
           disabled={isPending}
           className={cn(
             "border-border bg-background text-foreground focus:ring-primary/40 rounded-md border focus:ring-2 focus:outline-none",
@@ -85,10 +92,8 @@ export function InlineNameEdit({
         />
         <button
           type="button"
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleSave();
-          }}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={handleSave}
           disabled={isPending}
           className="text-primary hover:bg-primary/10 rounded p-1 transition-colors"
           aria-label="Save name"
@@ -97,10 +102,8 @@ export function InlineNameEdit({
         </button>
         <button
           type="button"
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleCancel();
-          }}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={handleCancel}
           disabled={isPending}
           className="text-muted-foreground hover:text-foreground hover:bg-muted rounded p-1 transition-colors"
           aria-label="Cancel editing"
@@ -123,7 +126,7 @@ export function InlineNameEdit({
       <button
         type="button"
         onClick={handleStartEdit}
-        className="text-muted-foreground hover:text-foreground hover:bg-muted rounded p-1 opacity-0 transition-colors group-hover/edit:opacity-100"
+        className="text-muted-foreground hover:text-foreground hover:bg-muted rounded p-1 opacity-0 transition-colors group-hover/edit:opacity-100 focus-visible:opacity-100"
         aria-label="Edit name"
       >
         <Pencil className="h-3.5 w-3.5" />

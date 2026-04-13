@@ -46,7 +46,7 @@ vi.mock("@/components/ui/command", () => ({
     value?: string;
     className?: string;
   }) => (
-    <div role="option" onClick={onSelect} {...props}>
+    <div role="option" aria-selected={false} onClick={onSelect} {...props}>
       {children}
     </div>
   ),

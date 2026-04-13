@@ -296,7 +296,7 @@ export async function getChart(chartId: string) {
     },
   });
   // Only return charts owned by the current user
-  if (chart && chart.project && chart.project.userId !== user.id) {
+  if (!chart || !chart.project || chart.project.userId !== user.id) {
     return null;
   }
   return chart;
