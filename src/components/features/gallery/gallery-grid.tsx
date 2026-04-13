@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Scissors, ChevronUp, ChevronDown, Check, CircleDot, Circle, Minus } from "lucide-react";
+import { Scissors, ChevronUp, ChevronDown } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { LinkButton } from "@/components/ui/link-button";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { STATUS_CONFIG } from "@/lib/utils/status";
 import { STATUS_GRADIENT_CLASSES } from "./gallery-utils";
+import { KittingDotIcon, getKittingTooltipText } from "./kitting-dots";
 import { GalleryCard } from "./gallery-card";
-import { formatNumber, formatDate } from "./gallery-format";
+import { formatNumber, formatDate, SIZE_TOOLTIP_TEXT } from "./gallery-format";
 import type {
   GalleryCardData,
   ViewMode,
@@ -26,6 +28,7 @@ interface GalleryGridProps {
   dir: SortDir;
   onSortChange: (field: SortField) => void;
   hasProjects: boolean;
+  onClearFilters?: () => void;
 }
 
 // ─── Small Thumbnail ────────────────────────────────────────────────────────
@@ -58,11 +61,21 @@ function SmallThumbnail({ card }: { card: GalleryCardData }) {
 
 // ─── Empty States ───────────────────────────────────────────────────────────
 
-function EmptyFilterState() {
+function EmptyFilterState({ onClearFilters }: { onClearFilters?: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
       <Scissors className="text-muted-foreground/30 h-10 w-10" />
       <p className="text-muted-foreground mt-4 text-sm">No projects match your filters</p>
+      <p className="text-muted-foreground/60 mt-1 text-xs">Try adjusting your search or filters</p>
+      {onClearFilters && (
+        <button
+          type="button"
+          onClick={onClearFilters}
+          className="mt-4 text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+        >
+          Clear all filters
+        </button>
+      )}
     </div>
   );
 }
@@ -144,35 +157,22 @@ function ListKittingIcons({ card }: { card: GalleryCardData }) {
     { label: "Specialty", status: card.specialtyStatus },
   ];
 
-  const tooltipText = (label: string, status: KittingItemStatus) => {
-    switch (status) {
-      case "fulfilled":
-        return `${label}: Ready`;
-      case "partial":
-        return `${label}: In progress`;
-      case "needed":
-        return `${label}: Needed`;
-      case "not-applicable":
-        return `${label}: N/A`;
-    }
-  };
-
   return (
-    <div className="flex items-center gap-1">
-      {items.map((item) => (
-        <span key={item.label} title={tooltipText(item.label, item.status)}>
-          {item.status === "fulfilled" ? (
-            <Check className="h-3 w-3 text-emerald-500 dark:text-emerald-400" strokeWidth={2.5} />
-          ) : item.status === "partial" ? (
-            <CircleDot className="h-3 w-3 text-amber-500 dark:text-amber-400" strokeWidth={2} />
-          ) : item.status === "not-applicable" ? (
-            <Minus className="text-muted-foreground/30 h-3 w-3" strokeWidth={2} />
-          ) : (
-            <Circle className="h-3 w-3 text-stone-400 dark:text-stone-500" strokeWidth={2} />
-          )}
-        </span>
-      ))}
-    </div>
+    <TooltipProvider>
+      <div className="flex items-center gap-1">
+        {items.map((item) => {
+          const text = getKittingTooltipText(item.label, item.status);
+          return (
+            <Tooltip key={item.label}>
+              <TooltipTrigger render={<span />} aria-label={text} className="cursor-default">
+                <KittingDotIcon status={item.status} />
+              </TooltipTrigger>
+              <TooltipContent>{text}</TooltipContent>
+            </Tooltip>
+          );
+        })}
+      </div>
+    </TooltipProvider>
   );
 }
 
@@ -213,10 +213,11 @@ function ListProgressCell({ card }: { card: GalleryCardData }) {
 
 function ListView({ cards }: { cards: GalleryCardData[] }) {
   return (
-    <div className="border-border overflow-hidden rounded-xl border">
+    <div role="list" className="border-border overflow-hidden rounded-xl border">
       {cards.map((card) => (
         <div
           key={card.chartId}
+          role="listitem"
           className="bg-card border-border hover:bg-muted/50 grid grid-cols-[40px_8px_1fr] items-center gap-x-4 border-b px-4 py-2 transition-colors sm:grid-cols-[40px_8px_minmax(180px,2fr)_minmax(120px,1fr)_minmax(100px,120px)_64px_56px]"
         >
           {/* 1. Thumbnail */}
@@ -252,9 +253,17 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
           </span>
 
           {/* 7. Size badge */}
-          <span className="bg-muted text-muted-foreground hidden rounded-full px-2 py-0.5 text-center text-[10px] font-bold tracking-widest uppercase sm:block">
-            {card.sizeCategory}
-          </span>
+          <div className="hidden sm:block">
+            <Tooltip>
+              <TooltipTrigger
+                render={<span />}
+                className="bg-muted text-muted-foreground cursor-default rounded-full px-2 py-0.5 text-center text-[10px] font-bold tracking-widest uppercase"
+              >
+                {card.sizeCategory}
+              </TooltipTrigger>
+              <TooltipContent>{SIZE_TOOLTIP_TEXT[card.sizeCategory]}</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
       ))}
     </div>
@@ -275,7 +284,7 @@ const TABLE_COLUMNS: TableColumn[] = [
   { label: "Status", sortField: "status" },
   { label: "Designer", sortField: "designer", hideClass: "max-md:hidden" },
   { label: "Size", sortField: "size", hideClass: "max-sm:hidden" },
-  { label: "Progress", sortField: "stitchCount", hideClass: "max-sm:hidden" },
+  { label: "Progress", sortField: "progress", hideClass: "max-sm:hidden" },
   {
     label: "Stitches",
     sortField: "stitchCount",
@@ -381,7 +390,15 @@ function TableView({
               </td>
               {/* Size */}
               <td className="px-4 py-2.5 max-sm:hidden">
-                <span className="text-muted-foreground text-xs">{card.sizeCategory}</span>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={<span />}
+                    className="text-muted-foreground cursor-default text-xs"
+                  >
+                    {card.sizeCategory}
+                  </TooltipTrigger>
+                  <TooltipContent>{SIZE_TOOLTIP_TEXT[card.sizeCategory]}</TooltipContent>
+                </Tooltip>
               </td>
               {/* Progress */}
               <td className="px-4 py-2.5 max-sm:hidden">
@@ -440,9 +457,14 @@ export function GalleryGrid({
   dir,
   onSortChange,
   hasProjects,
+  onClearFilters,
 }: GalleryGridProps) {
   if (cards.length === 0) {
-    return hasProjects ? <EmptyFilterState /> : <EmptyProjectState />;
+    return hasProjects ? (
+      <EmptyFilterState onClearFilters={onClearFilters} />
+    ) : (
+      <EmptyProjectState />
+    );
   }
 
   switch (view) {

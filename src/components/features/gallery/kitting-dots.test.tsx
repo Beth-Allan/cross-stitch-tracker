@@ -18,7 +18,7 @@ describe("KittingDots", () => {
     expect(screen.getByText("Specialty")).toBeInTheDocument();
   });
 
-  it("shows 'Ready' tooltip for fulfilled items", () => {
+  it("shows 'Ready' aria-label for fulfilled items", () => {
     render(
       <KittingDots
         fabricStatus="fulfilled"
@@ -27,13 +27,13 @@ describe("KittingDots", () => {
         specialtyStatus="fulfilled"
       />,
     );
-    expect(screen.getByTitle("Fabric: Ready")).toBeInTheDocument();
-    expect(screen.getByTitle("Thread: Ready")).toBeInTheDocument();
-    expect(screen.getByTitle("Beads: Ready")).toBeInTheDocument();
-    expect(screen.getByTitle("Specialty: Ready")).toBeInTheDocument();
+    expect(screen.getByLabelText("Fabric: Ready")).toBeInTheDocument();
+    expect(screen.getByLabelText("Thread: Ready")).toBeInTheDocument();
+    expect(screen.getByLabelText("Beads: Ready")).toBeInTheDocument();
+    expect(screen.getByLabelText("Specialty: Ready")).toBeInTheDocument();
   });
 
-  it("shows 'Still needed' tooltip for needed items", () => {
+  it("shows 'Still needed' aria-label for needed items", () => {
     render(
       <KittingDots
         fabricStatus="needed"
@@ -42,11 +42,11 @@ describe("KittingDots", () => {
         specialtyStatus="needed"
       />,
     );
-    expect(screen.getByTitle("Fabric: Still needed")).toBeInTheDocument();
-    expect(screen.getByTitle("Thread: Still needed")).toBeInTheDocument();
+    expect(screen.getByLabelText("Fabric: Still needed")).toBeInTheDocument();
+    expect(screen.getByLabelText("Thread: Still needed")).toBeInTheDocument();
   });
 
-  it("shows 'In progress' tooltip for partial items", () => {
+  it("shows 'In progress' aria-label for partial items", () => {
     render(
       <KittingDots
         fabricStatus="fulfilled"
@@ -55,10 +55,10 @@ describe("KittingDots", () => {
         specialtyStatus="not-applicable"
       />,
     );
-    expect(screen.getByTitle("Thread: In progress")).toBeInTheDocument();
+    expect(screen.getByLabelText("Thread: In progress")).toBeInTheDocument();
   });
 
-  it("shows 'Not needed for this project' tooltip for not-applicable items", () => {
+  it("shows 'Not needed for this project' aria-label for not-applicable items", () => {
     render(
       <KittingDots
         fabricStatus="fulfilled"
@@ -67,8 +67,8 @@ describe("KittingDots", () => {
         specialtyStatus="not-applicable"
       />,
     );
-    expect(screen.getByTitle("Beads: Not needed for this project")).toBeInTheDocument();
-    expect(screen.getByTitle("Specialty: Not needed for this project")).toBeInTheDocument();
+    expect(screen.getByLabelText("Beads: Not needed for this project")).toBeInTheDocument();
+    expect(screen.getByLabelText("Specialty: Not needed for this project")).toBeInTheDocument();
   });
 
   it("renders line-through class for not-applicable labels", () => {
@@ -151,8 +151,8 @@ describe("KittingDots", () => {
     expect(svgs[0].getAttribute("class")).toContain("emerald");
     // Second (thread) should have amber (partial)
     expect(svgs[1].getAttribute("class")).toContain("amber");
-    // Third (beads) should have stone-300 (not-applicable)
-    expect(svgs[2].getAttribute("class")).toContain("stone-300");
+    // Third (beads) should have muted-foreground (not-applicable)
+    expect(svgs[2].getAttribute("class")).toContain("muted-foreground");
     // Fourth (specialty) should have emerald
     expect(svgs[3].getAttribute("class")).toContain("emerald");
   });

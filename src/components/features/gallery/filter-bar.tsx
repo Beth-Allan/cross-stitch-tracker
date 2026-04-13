@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { MultiSelectDropdown } from "./multi-select-dropdown";
 import { STATUS_CONFIG, PROJECT_STATUSES } from "@/lib/utils/status";
 
@@ -45,8 +45,18 @@ export function FilterBar({
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search projects..."
           aria-label="Search projects"
-          className="border-border bg-card placeholder:text-muted-foreground w-full rounded-lg border py-2 pr-3 pl-9 text-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 focus:outline-none"
+          className="border-border bg-card placeholder:text-muted-foreground w-full rounded-lg border py-2 pr-8 pl-9 text-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 focus:outline-none"
         />
+        {search.length > 0 && (
+          <button
+            type="button"
+            onClick={() => onSearchChange("")}
+            aria-label="Clear search"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2.5 -translate-y-1/2 transition-colors"
+          >
+            <X className="h-3.5 w-3.5" strokeWidth={2} />
+          </button>
+        )}
       </div>
 
       {/* Status multi-select */}

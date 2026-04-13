@@ -14,6 +14,7 @@ const DEFAULT_DIR: Record<SortField, SortDir> = {
   status: "asc",
   size: "asc",
   stitchCount: "desc",
+  progress: "desc",
 };
 
 export function useGalleryFilters(cards: GalleryCardData[]) {
@@ -60,9 +61,7 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
     (s: string) => {
       void setStatusFilter((prev) => {
         const current = prev ?? [];
-        return current.includes(s)
-          ? current.filter((v) => v !== s)
-          : [...current, s];
+        return current.includes(s) ? current.filter((v) => v !== s) : [...current, s];
       });
     },
     [setStatusFilter],
@@ -72,9 +71,7 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
     (s: string) => {
       void setSizeFilter((prev) => {
         const current = prev ?? [];
-        return current.includes(s)
-          ? current.filter((v) => v !== s)
-          : [...current, s];
+        return current.includes(s) ? current.filter((v) => v !== s) : [...current, s];
       });
     },
     [setSizeFilter],
@@ -100,9 +97,7 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
   );
 
   const hasActiveFilters =
-    search !== "" ||
-    (statusFilter ?? []).length > 0 ||
-    (sizeFilter ?? []).length > 0;
+    search !== "" || (statusFilter ?? []).length > 0 || (sizeFilter ?? []).length > 0;
 
   return {
     // URL state

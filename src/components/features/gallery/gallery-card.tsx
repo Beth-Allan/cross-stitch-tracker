@@ -3,10 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { CoverPlaceholder } from "./cover-placeholder";
 import { KittingDots } from "./kitting-dots";
 import { getCelebrationClasses } from "./gallery-utils";
+import { SIZE_TOOLTIP_TEXT } from "./gallery-format";
 import { formatNumber, formatDate } from "./gallery-format";
 import type { GalleryCardData } from "./gallery-types";
 
@@ -143,7 +145,7 @@ export function GalleryCard({ card }: GalleryCardProps) {
 
   return (
     <div
-      className={`group bg-card hover:shadow-foreground/8 flex flex-col overflow-hidden rounded-xl transition-shadow transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg ${
+      className={`group bg-card hover:shadow-foreground/8 flex flex-col overflow-hidden rounded-xl transition-[box-shadow,transform] duration-200 hover:-translate-y-1 hover:shadow-lg ${
         celebrationClasses ?? "border-border border"
       }`}
     >
@@ -174,9 +176,15 @@ export function GalleryCard({ card }: GalleryCardProps) {
 
         {/* Size badge -- top right */}
         <div className="absolute top-3 right-3">
-          <span className="bg-background/90 text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-widest uppercase">
-            {card.sizeCategory}
-          </span>
+          <Tooltip>
+            <TooltipTrigger
+              render={<span />}
+              className="bg-background/90 text-muted-foreground cursor-default rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-widest uppercase"
+            >
+              {card.sizeCategory}
+            </TooltipTrigger>
+            <TooltipContent>{SIZE_TOOLTIP_TEXT[card.sizeCategory]}</TooltipContent>
+          </Tooltip>
         </div>
       </div>
 

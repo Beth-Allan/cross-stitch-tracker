@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ChevronDown, ChevronUp, Check, ArrowUpDown } from "lucide-react";
+import { ChevronDown, ChevronUp, Check, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SortField, SortDir } from "./gallery-types";
 
@@ -18,6 +18,7 @@ const SORT_LABELS: Record<SortField, string> = {
   status: "Status",
   size: "Size",
   stitchCount: "Stitch Count",
+  progress: "Progress",
 };
 
 const SORT_FIELD_ORDER: SortField[] = [
@@ -27,6 +28,7 @@ const SORT_FIELD_ORDER: SortField[] = [
   "status",
   "size",
   "stitchCount",
+  "progress",
 ];
 
 export function SortDropdown({ sort, dir, onSortChange }: SortDropdownProps) {
@@ -134,7 +136,11 @@ export function SortDropdown({ sort, dir, onSortChange }: SortDropdownProps) {
         aria-label={`Sort by ${SORT_LABELS[sort]}, ${directionLabel}`}
         className="border-border text-muted-foreground hover:border-foreground/25 flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm whitespace-nowrap transition-colors"
       >
-        <ArrowUpDown className="h-3.5 w-3.5" strokeWidth={1.5} />
+        {dir === "asc" ? (
+          <ArrowUp className="h-3.5 w-3.5" strokeWidth={1.5} />
+        ) : (
+          <ArrowDown className="h-3.5 w-3.5" strokeWidth={1.5} />
+        )}
         <span>{SORT_LABELS[sort]}</span>
         <ChevronDown
           className={cn("h-3.5 w-3.5 transition-transform", isOpen && "rotate-180")}

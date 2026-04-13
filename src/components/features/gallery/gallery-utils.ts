@@ -205,6 +205,9 @@ export function compareFn(
       case "stitchCount":
         result = a.stitchCount - b.stitchCount;
         break;
+      case "progress":
+        result = a.progressPercent - b.progressPercent;
+        break;
       case "dateAdded":
         result = a.dateAdded.getTime() - b.dateAdded.getTime();
         break;

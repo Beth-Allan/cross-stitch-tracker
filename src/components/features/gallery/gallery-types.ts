@@ -28,6 +28,7 @@ export const SORT_FIELDS = [
   "status",
   "size",
   "stitchCount",
+  "progress",
 ] as const;
 export type SortField = (typeof SORT_FIELDS)[number];
 

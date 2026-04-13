@@ -86,8 +86,9 @@ describe("MultiSelectDropdown", () => {
     const alphaOption = screen.getByText("Alpha").closest('[role="option"]');
     expect(alphaOption).toBeInTheDocument();
     expect(alphaOption).toHaveAttribute("aria-selected", "true");
-    // Check that the checkbox has aria-checked
-    const checkbox = alphaOption!.querySelector('[aria-checked="true"]');
-    expect(checkbox).toBeInTheDocument();
+    // Visual checkbox is decorative (aria-hidden) — selection state
+    // is communicated via aria-selected on the option
+    const decorativeCheckbox = alphaOption!.querySelector('[aria-hidden="true"]');
+    expect(decorativeCheckbox).toBeInTheDocument();
   });
 });

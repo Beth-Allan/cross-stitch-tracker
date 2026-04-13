@@ -1,4 +1,7 @@
+"use client";
+
 import { Check, CircleDot, Circle, Minus } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import type { KittingItemStatus } from "./gallery-types";
 
 interface KittingDotsProps {
@@ -8,20 +11,20 @@ interface KittingDotsProps {
   specialtyStatus: KittingItemStatus;
 }
 
-function KittingDotIcon({ status }: { status: KittingItemStatus }) {
+export function KittingDotIcon({ status }: { status: KittingItemStatus }) {
   switch (status) {
     case "fulfilled":
       return <Check className="h-3 w-3 text-emerald-500 dark:text-emerald-400" strokeWidth={2.5} />;
     case "partial":
       return <CircleDot className="h-3 w-3 text-amber-500 dark:text-amber-400" strokeWidth={2} />;
     case "needed":
-      return <Circle className="h-3 w-3 text-stone-400 dark:text-stone-500" strokeWidth={2} />;
+      return <Circle className="text-muted-foreground h-3 w-3" strokeWidth={2} />;
     case "not-applicable":
-      return <Minus className="h-3 w-3 text-stone-300 dark:text-stone-600" strokeWidth={2} />;
+      return <Minus className="text-muted-foreground/30 h-3 w-3" strokeWidth={2} />;
   }
 }
 
-function getTooltipText(label: string, status: KittingItemStatus): string {
+export function getKittingTooltipText(label: string, status: KittingItemStatus): string {
   switch (status) {
     case "fulfilled":
       return `${label}: Ready`;
@@ -48,29 +51,29 @@ export function KittingDots({
   ];
 
   return (
-    <div className="flex items-center gap-2.5">
-      {items.map((item) => {
-        const tooltip = getTooltipText(item.label, item.status);
-        return (
-          <div
-            key={item.label}
-            className="flex items-center gap-1"
-            title={tooltip}
-            aria-label={tooltip}
-          >
-            <KittingDotIcon status={item.status} />
-            <span
-              className={`text-[10px] ${
-                item.status === "not-applicable"
-                  ? "text-muted-foreground/30 line-through"
-                  : "text-muted-foreground"
-              }`}
-            >
-              {item.label}
-            </span>
-          </div>
-        );
-      })}
-    </div>
+    <TooltipProvider>
+      <div className="flex items-center gap-2.5">
+        {items.map((item) => {
+          const tooltipText = getKittingTooltipText(item.label, item.status);
+          return (
+            <Tooltip key={item.label}>
+              <TooltipTrigger className="flex items-center gap-1" aria-label={tooltipText}>
+                <KittingDotIcon status={item.status} />
+                <span
+                  className={`text-[10px] ${
+                    item.status === "not-applicable"
+                      ? "text-muted-foreground/30 line-through"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {item.label}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>{tooltipText}</TooltipContent>
+            </Tooltip>
+          );
+        })}
+      </div>
+    </TooltipProvider>
   );
 }

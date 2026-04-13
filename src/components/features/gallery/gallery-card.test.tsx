@@ -233,12 +233,11 @@ describe("GalleryCard", () => {
       expect(screen.getByText("BAP")).toBeInTheDocument();
     });
 
-    it("uses transition-shadow and transition-transform (not transition-all)", () => {
+    it("uses combined transition for shadow and transform (not transition-all)", () => {
       const card = createMockGalleryCard();
       const { container } = render(<GalleryCard card={card} />);
       const cardEl = container.firstChild as HTMLElement;
-      expect(cardEl.className).toContain("transition-shadow");
-      expect(cardEl.className).toContain("transition-transform");
+      expect(cardEl.className).toContain("transition-[box-shadow,transform]");
       expect(cardEl.className).not.toContain("transition-all");
     });
 

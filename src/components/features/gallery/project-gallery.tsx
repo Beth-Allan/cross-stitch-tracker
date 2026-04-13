@@ -105,6 +105,7 @@ export function ProjectGallery({ charts, imageUrls }: ProjectGalleryProps) {
         dir={dir}
         onSortChange={setSort}
         hasProjects={totalCount > 0}
+        onClearFilters={clearFilters}
       />
     </div>
   );

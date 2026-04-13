@@ -164,8 +164,7 @@ export function MultiSelectDropdown({
                 )}
               >
                 <span
-                  role="checkbox"
-                  aria-checked={isSelected}
+                  aria-hidden="true"
                   className={cn(
                     "flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border",
                     isSelected ? "border-emerald-500 bg-emerald-500 text-white" : "border-border",
