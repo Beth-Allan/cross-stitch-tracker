@@ -27,12 +27,12 @@ export async function createStorageLocation(formData: unknown) {
 }
 
 export async function updateStorageLocation(id: string, formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validated = storageLocationSchema.parse(formData);
     const location = await prisma.storageLocation.update({
-      where: { id },
+      where: { id, userId: user.id },
       data: validated,
     });
     revalidatePath("/storage");
@@ -48,9 +48,17 @@ export async function updateStorageLocation(id: string, formData: unknown) {
 }
 
 export async function deleteStorageLocation(id: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    const existing = await prisma.storageLocation.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+    if (!existing || existing.userId !== user.id) {
+      return { success: false as const, error: "Location not found" };
+    }
+
     await prisma.$transaction([
       prisma.project.updateMany({
         where: { storageLocationId: id },
@@ -89,11 +97,11 @@ export async function getStorageLocationsWithStats(): Promise<StorageLocationWit
 }
 
 export async function getStorageLocationDetail(id: string): Promise<StorageLocationDetail | null> {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const location = await prisma.storageLocation.findUnique({
-      where: { id },
+      where: { id, userId: user.id },
       include: {
         projects: {
           select: {
