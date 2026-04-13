@@ -4,8 +4,8 @@ import {
   computeKittingDots,
   transformToGalleryCard,
   compareFn,
-  STATUS_GRADIENTS,
-  getCelebrationStyles,
+  STATUS_GRADIENT_CLASSES,
+  getCelebrationClasses,
   STATUS_SORT_ORDER,
   SIZE_SORT_ORDER,
 } from "./gallery-utils";
@@ -400,40 +400,38 @@ describe("compareFn", () => {
   });
 });
 
-// ─── getCelebrationStyles ───────────────────────────────────────────────────
+// ─── getCelebrationClasses ──────────────────────────────────────────────────
 
-describe("getCelebrationStyles", () => {
-  it("returns violet border for FINISHED", () => {
-    const styles = getCelebrationStyles("FINISHED");
-    expect(styles).not.toBeNull();
-    expect(styles!.border).toBe("2px solid rgb(139 92 246)");
-    expect(styles!.boxShadow).toContain("rgb(139 92 246");
+describe("getCelebrationClasses", () => {
+  it("returns violet classes for FINISHED", () => {
+    const classes = getCelebrationClasses("FINISHED");
+    expect(classes).not.toBeNull();
+    expect(classes).toContain("border-violet-500");
   });
 
-  it("returns rose border for FFO", () => {
-    const styles = getCelebrationStyles("FFO");
-    expect(styles).not.toBeNull();
-    expect(styles!.border).toBe("2px solid rgb(244 63 94)");
-    expect(styles!.boxShadow).toContain("rgb(244 63 94");
+  it("returns rose classes for FFO", () => {
+    const classes = getCelebrationClasses("FFO");
+    expect(classes).not.toBeNull();
+    expect(classes).toContain("border-rose-500");
   });
 
   it("returns null for IN_PROGRESS", () => {
-    expect(getCelebrationStyles("IN_PROGRESS")).toBeNull();
+    expect(getCelebrationClasses("IN_PROGRESS")).toBeNull();
   });
 
   it("returns null for UNSTARTED", () => {
-    expect(getCelebrationStyles("UNSTARTED")).toBeNull();
+    expect(getCelebrationClasses("UNSTARTED")).toBeNull();
   });
 });
 
-// ─── STATUS_GRADIENTS ───────────────────────────────────────────────────────
+// ─── STATUS_GRADIENT_CLASSES ────────────────────────────────────────────────
 
-describe("STATUS_GRADIENTS", () => {
+describe("STATUS_GRADIENT_CLASSES", () => {
   it("has 7 entries, one per ProjectStatus", () => {
-    expect(Object.keys(STATUS_GRADIENTS)).toHaveLength(7);
+    expect(Object.keys(STATUS_GRADIENT_CLASSES)).toHaveLength(7);
   });
 
-  it("has entries for all ProjectStatus values", () => {
+  it("has Tailwind gradient classes for all ProjectStatus values", () => {
     const statuses = [
       "UNSTARTED",
       "KITTING",
@@ -444,10 +442,10 @@ describe("STATUS_GRADIENTS", () => {
       "FFO",
     ];
     for (const status of statuses) {
-      expect(STATUS_GRADIENTS).toHaveProperty(status);
-      const [from, to] = STATUS_GRADIENTS[status as keyof typeof STATUS_GRADIENTS];
-      expect(from).toMatch(/^#[0-9a-f]{6}$/i);
-      expect(to).toMatch(/^#[0-9a-f]{6}$/i);
+      expect(STATUS_GRADIENT_CLASSES).toHaveProperty(status);
+      const classes = STATUS_GRADIENT_CLASSES[status as keyof typeof STATUS_GRADIENT_CLASSES];
+      expect(classes).toContain("bg-gradient-to-br");
+      expect(classes).toContain("dark:");
     }
   });
 });

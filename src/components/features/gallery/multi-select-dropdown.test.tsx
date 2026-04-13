@@ -10,12 +10,7 @@ const options = [
 describe("MultiSelectDropdown", () => {
   it("renders label on trigger when nothing selected", () => {
     render(
-      <MultiSelectDropdown
-        label="Status"
-        options={options}
-        selected={[]}
-        onToggle={vi.fn()}
-      />,
+      <MultiSelectDropdown label="Status" options={options} selected={[]} onToggle={vi.fn()} />,
     );
     expect(screen.getByRole("button", { name: /status/i })).toBeInTheDocument();
     expect(screen.queryByText("0")).not.toBeInTheDocument();
@@ -35,12 +30,7 @@ describe("MultiSelectDropdown", () => {
 
   it("opens dropdown on click and shows options", () => {
     render(
-      <MultiSelectDropdown
-        label="Status"
-        options={options}
-        selected={[]}
-        onToggle={vi.fn()}
-      />,
+      <MultiSelectDropdown label="Status" options={options} selected={[]} onToggle={vi.fn()} />,
     );
     // Options not visible initially
     expect(screen.queryByText("Alpha")).not.toBeInTheDocument();
@@ -56,12 +46,7 @@ describe("MultiSelectDropdown", () => {
   it("calls onToggle with correct value when option clicked", () => {
     const onToggle = vi.fn();
     render(
-      <MultiSelectDropdown
-        label="Status"
-        options={options}
-        selected={[]}
-        onToggle={onToggle}
-      />,
+      <MultiSelectDropdown label="Status" options={options} selected={[]} onToggle={onToggle} />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: /status/i }));
@@ -72,29 +57,20 @@ describe("MultiSelectDropdown", () => {
 
   it("closes on Escape key", () => {
     render(
-      <MultiSelectDropdown
-        label="Status"
-        options={options}
-        selected={[]}
-        onToggle={vi.fn()}
-      />,
+      <MultiSelectDropdown label="Status" options={options} selected={[]} onToggle={vi.fn()} />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: /status/i }));
     expect(screen.getByText("Alpha")).toBeInTheDocument();
 
-    fireEvent.keyDown(document, { key: "Escape" });
+    const listbox = screen.getByRole("listbox");
+    fireEvent.keyDown(listbox, { key: "Escape" });
     expect(screen.queryByText("Alpha")).not.toBeInTheDocument();
   });
 
   it("applies active styling (emerald border) when items selected", () => {
     const { container } = render(
-      <MultiSelectDropdown
-        label="Status"
-        options={options}
-        selected={["A"]}
-        onToggle={vi.fn()}
-      />,
+      <MultiSelectDropdown label="Status" options={options} selected={["A"]} onToggle={vi.fn()} />,
     );
     const trigger = screen.getByRole("button", { name: /status/i });
     expect(trigger.className).toContain("border-emerald-300");
@@ -102,20 +78,16 @@ describe("MultiSelectDropdown", () => {
 
   it("shows checked checkbox for selected options", () => {
     render(
-      <MultiSelectDropdown
-        label="Status"
-        options={options}
-        selected={["A"]}
-        onToggle={vi.fn()}
-      />,
+      <MultiSelectDropdown label="Status" options={options} selected={["A"]} onToggle={vi.fn()} />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: /status/i }));
     // The "Alpha" option should have a checked checkbox visual
-    const alphaButton = screen.getByText("Alpha").closest("button");
-    expect(alphaButton).toBeInTheDocument();
-    // Check that the checkbox container has emerald-500 bg
-    const checkbox = alphaButton!.querySelector("[data-checked]");
+    const alphaOption = screen.getByText("Alpha").closest('[role="option"]');
+    expect(alphaOption).toBeInTheDocument();
+    expect(alphaOption).toHaveAttribute("aria-selected", "true");
+    // Check that the checkbox has aria-checked
+    const checkbox = alphaOption!.querySelector('[aria-checked="true"]');
     expect(checkbox).toBeInTheDocument();
   });
 });

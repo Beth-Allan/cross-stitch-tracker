@@ -30,18 +30,18 @@ export function FilterChips({
   onRemoveSize,
   onClearAll,
 }: FilterChipsProps) {
-  const hasFilters =
-    search.length > 0 || statusFilter.length > 0 || sizeFilter.length > 0;
+  const hasFilters = search.length > 0 || statusFilter.length > 0 || sizeFilter.length > 0;
 
   if (!hasFilters) return null;
 
   const chips: Chip[] = [];
 
   if (search) {
+    const truncatedSearch = search.length > 30 ? search.slice(0, 30) + "\u2026" : search;
     chips.push({
       key: "search",
-      label: `Search: ${search}`,
-      ariaLabel: "Remove search filter",
+      label: `Search: ${truncatedSearch}`,
+      ariaLabel: `Remove search filter: ${search}`,
       onRemove: onRemoveSearch,
     });
   }
@@ -71,23 +71,23 @@ export function FilterChips({
       {chips.map((chip) => (
         <span
           key={chip.key}
-          className="inline-flex items-center gap-1 rounded-full border border-stone-200 dark:border-stone-700 bg-stone-100 dark:bg-stone-800 px-2 py-1 text-xs text-stone-700 dark:text-stone-300"
+          className="border-border bg-muted text-foreground inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs"
         >
           {chip.label}
           <button
             type="button"
             aria-label={chip.ariaLabel}
             onClick={() => chip.onRemove()}
-            className="hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
+            className="hover:text-foreground hover:bg-foreground/10 -mr-0.5 rounded-full p-1 transition-colors"
           >
-            <X className="w-3 h-3" />
+            <X className="h-3 w-3" />
           </button>
         </span>
       ))}
       <button
         type="button"
         onClick={onClearAll}
-        className="text-xs text-stone-500 hover:text-stone-700 dark:hover:text-stone-400 dark:text-stone-500"
+        className="text-muted-foreground hover:text-foreground text-xs transition-colors"
       >
         Clear all
       </button>

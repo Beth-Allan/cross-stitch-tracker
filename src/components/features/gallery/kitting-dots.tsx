@@ -62,8 +62,8 @@ export function KittingDots({
             <span
               className={`text-[10px] ${
                 item.status === "not-applicable"
-                  ? "text-stone-300 line-through dark:text-stone-600"
-                  : "text-stone-500 dark:text-stone-400"
+                  ? "text-muted-foreground/30 line-through"
+                  : "text-muted-foreground"
               }`}
             >
               {item.label}

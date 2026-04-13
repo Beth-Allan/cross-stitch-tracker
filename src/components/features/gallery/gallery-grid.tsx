@@ -6,8 +6,9 @@ import { Scissors, ChevronUp, ChevronDown, Check, CircleDot, Circle, Minus } fro
 import { LinkButton } from "@/components/ui/link-button";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { STATUS_CONFIG } from "@/lib/utils/status";
-import { STATUS_GRADIENTS } from "./gallery-utils";
+import { STATUS_GRADIENT_CLASSES } from "./gallery-utils";
 import { GalleryCard } from "./gallery-card";
+import { formatNumber, formatDate } from "./gallery-format";
 import type {
   GalleryCardData,
   ViewMode,
@@ -27,20 +28,6 @@ interface GalleryGridProps {
   hasProjects: boolean;
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-function formatNumber(n: number): string {
-  return new Intl.NumberFormat("en-US").format(n);
-}
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
 // ─── Small Thumbnail ────────────────────────────────────────────────────────
 
 function SmallThumbnail({ card }: { card: GalleryCardData }) {
@@ -52,19 +39,19 @@ function SmallThumbnail({ card }: { card: GalleryCardData }) {
       <img
         src={url}
         alt=""
+        loading="lazy"
+        decoding="async"
         className="h-10 w-10 rounded-md object-cover"
         onError={() => setImgFailed(true)}
       />
     );
   }
 
-  const [from, to] = STATUS_GRADIENTS[card.status];
   return (
     <div
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md"
-      style={{ background: `linear-gradient(160deg, ${from} 0%, ${to} 100%)` }}
+      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md ${STATUS_GRADIENT_CLASSES[card.status]}`}
     >
-      <Scissors className="h-4 w-4 text-stone-400/25" strokeWidth={1} />
+      <Scissors className="text-muted-foreground/15 h-4 w-4" strokeWidth={1} />
     </div>
   );
 }
@@ -74,7 +61,7 @@ function SmallThumbnail({ card }: { card: GalleryCardData }) {
 function EmptyFilterState() {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <Scissors className="h-10 w-10 text-stone-300 dark:text-stone-600" />
+      <Scissors className="text-muted-foreground/30 h-10 w-10" />
       <p className="text-muted-foreground mt-4 text-sm">No projects match your filters</p>
     </div>
   );
@@ -83,7 +70,7 @@ function EmptyFilterState() {
 function EmptyProjectState() {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <Scissors className="h-10 w-10 text-stone-300 dark:text-stone-600" />
+      <Scissors className="text-muted-foreground/30 h-10 w-10" />
       <h2 className="font-heading text-foreground mt-4 text-lg font-semibold">No projects yet</h2>
       <p className="text-muted-foreground mt-1.5 max-w-xs text-sm">
         Add your first cross stitch project to start building your collection.
@@ -179,7 +166,7 @@ function ListKittingIcons({ card }: { card: GalleryCardData }) {
           ) : item.status === "partial" ? (
             <CircleDot className="h-3 w-3 text-amber-500 dark:text-amber-400" strokeWidth={2} />
           ) : item.status === "not-applicable" ? (
-            <Minus className="h-3 w-3 text-stone-300 dark:text-stone-600" strokeWidth={2} />
+            <Minus className="text-muted-foreground/30 h-3 w-3" strokeWidth={2} />
           ) : (
             <Circle className="h-3 w-3 text-stone-400 dark:text-stone-500" strokeWidth={2} />
           )}
@@ -193,7 +180,7 @@ function ListProgressCell({ card }: { card: GalleryCardData }) {
   if (card.statusGroup === "wip") {
     return (
       <div className="flex items-center gap-2">
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
+        <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
           <div
             className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400"
             style={{ width: `${card.progressPercent}%` }}
@@ -230,11 +217,7 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
       {cards.map((card) => (
         <div
           key={card.chartId}
-          className="bg-card border-border hover:bg-muted/50 grid items-center gap-x-4 border-b px-4 py-2 transition-colors"
-          style={{
-            gridTemplateColumns:
-              "40px 8px minmax(180px, 2fr) minmax(120px, 1fr) minmax(100px, 120px) 64px 56px",
-          }}
+          className="bg-card border-border hover:bg-muted/50 grid grid-cols-[40px_8px_1fr] items-center gap-x-4 border-b px-4 py-2 transition-colors sm:grid-cols-[40px_8px_minmax(180px,2fr)_minmax(120px,1fr)_minmax(100px,120px)_64px_56px]"
         >
           {/* 1. Thumbnail */}
           <SmallThumbnail card={card} />
@@ -246,7 +229,7 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
           <div className="min-w-0">
             <Link
               href={`/charts/${card.chartId}`}
-              className="font-heading text-foreground block truncate text-sm font-semibold underline decoration-stone-300 underline-offset-2 transition-colors hover:text-emerald-700 hover:decoration-emerald-500 dark:decoration-stone-600 dark:hover:text-emerald-400"
+              className="font-heading text-foreground decoration-border block truncate text-sm font-semibold underline underline-offset-2 transition-colors hover:text-emerald-700 hover:decoration-emerald-500 dark:hover:text-emerald-400"
             >
               {card.name}
             </Link>
@@ -378,7 +361,7 @@ function TableView({
                   <div className="min-w-0">
                     <Link
                       href={`/charts/${card.chartId}`}
-                      className="font-heading text-foreground block truncate text-sm font-semibold underline decoration-stone-300 underline-offset-2 transition-colors hover:text-emerald-700 hover:decoration-emerald-500 dark:decoration-stone-600 dark:hover:text-emerald-400"
+                      className="font-heading text-foreground decoration-border block truncate text-sm font-semibold underline underline-offset-2 transition-colors hover:text-emerald-700 hover:decoration-emerald-500 dark:hover:text-emerald-400"
                     >
                       {card.name}
                     </Link>
@@ -404,7 +387,7 @@ function TableView({
               <td className="px-4 py-2.5 max-sm:hidden">
                 {card.statusGroup === "wip" ? (
                   <div className="flex max-w-[100px] items-center gap-2">
-                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
+                    <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
                       <div
                         className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400"
                         style={{ width: `${card.progressPercent}%` }}

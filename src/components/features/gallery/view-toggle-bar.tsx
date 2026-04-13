@@ -55,10 +55,8 @@ export function ViewToggleBar({
   return (
     <div className="flex items-center justify-between">
       {/* Left side: project count */}
-      <p className="text-xs text-muted-foreground">
-        {hasActiveFilters
-          ? `${filteredCount} of ${totalCount} projects`
-          : `${totalCount} projects`}
+      <p className="text-muted-foreground text-xs">
+        {hasActiveFilters ? `${filteredCount} of ${totalCount} projects` : `${totalCount} projects`}
       </p>
 
       {/* Right side: sort + view toggle */}
@@ -66,7 +64,7 @@ export function ViewToggleBar({
         <SortDropdown sort={sort} dir={dir} onSortChange={onSortChange} />
 
         {/* Segmented view toggle */}
-        <div className="inline-flex items-center rounded-lg bg-stone-100 dark:bg-stone-800 p-0.5">
+        <div className="bg-muted inline-flex items-center rounded-lg p-0.5">
           {VIEW_MODE_CONFIG.map(({ mode, icon: Icon, label, tooltip }) => (
             <button
               key={mode}
@@ -74,10 +72,10 @@ export function ViewToggleBar({
               onClick={() => onViewChange(mode)}
               title={tooltip}
               className={cn(
-                "inline-flex items-center justify-center rounded-md px-2.5 py-1.5 transition-colors",
+                "inline-flex items-center justify-center rounded-md px-2.5 py-2 transition-colors",
                 view === mode
-                  ? "bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm"
-                  : "text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-400",
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground/60 hover:text-muted-foreground",
               )}
             >
               <Icon className="h-4 w-4" />

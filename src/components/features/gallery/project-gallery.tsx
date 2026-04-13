@@ -21,9 +21,7 @@ export function ProjectGallery({ charts, imageUrls }: ProjectGalleryProps) {
   // Transform server data to gallery card shape
   const cards = useMemo(
     () =>
-      charts.map((c) =>
-        transformToGalleryCard(c as unknown as GalleryChartWithProject, imageUrls),
-      ),
+      charts.map((c) => transformToGalleryCard(c as unknown as GalleryChartWithProject, imageUrls)),
     [charts, imageUrls],
   );
 
@@ -50,16 +48,14 @@ export function ProjectGallery({ charts, imageUrls }: ProjectGalleryProps) {
   return (
     <div className="space-y-6">
       {/* Page header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-heading text-2xl font-semibold">
-            Project Gallery
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="font-heading text-2xl font-semibold">Project Gallery</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
             Browse and filter all your cross stitch projects
           </p>
         </div>
-        <LinkButton href="/charts/new">
+        <LinkButton href="/charts/new" className="self-start sm:self-auto">
           <Plus className="size-4" />
           Add Project
         </LinkButton>
@@ -87,7 +83,7 @@ export function ProjectGallery({ charts, imageUrls }: ProjectGalleryProps) {
       />
 
       {/* Separator */}
-      <div className="border-b border-border" />
+      <div className="border-border border-b" />
 
       {/* Toggle bar: count + sort + view */}
       <ViewToggleBar

@@ -1,5 +1,5 @@
 import { Scissors } from "lucide-react";
-import { STATUS_GRADIENTS } from "./gallery-utils";
+import { STATUS_GRADIENT_CLASSES } from "./gallery-utils";
 import type { ProjectStatus } from "@/generated/prisma/client";
 
 interface CoverPlaceholderProps {
@@ -7,15 +7,11 @@ interface CoverPlaceholderProps {
 }
 
 export function CoverPlaceholder({ status }: CoverPlaceholderProps) {
-  const [from, to] = STATUS_GRADIENTS[status];
   return (
     <div
-      className="flex h-full w-full items-center justify-center"
-      style={{
-        background: `linear-gradient(160deg, ${from} 0%, ${to} 100%)`,
-      }}
+      className={`flex h-full w-full items-center justify-center ${STATUS_GRADIENT_CLASSES[status]}`}
     >
-      <Scissors className="h-8 w-8 text-stone-400/25" strokeWidth={1} />
+      <Scissors className="text-muted-foreground/15 h-8 w-8" strokeWidth={1} />
     </div>
   );
 }

@@ -10,43 +10,43 @@ describe("CoverPlaceholder", () => {
     expect(svg).toBeInTheDocument();
   });
 
-  it("renders gradient for UNSTARTED status", () => {
+  it("renders gradient classes for UNSTARTED status", () => {
     const { container } = render(<CoverPlaceholder status="UNSTARTED" />);
     const div = container.firstChild as HTMLElement;
-    expect(div.style.background).toContain("160deg");
-    expect(div.style.background).toContain("linear-gradient");
+    expect(div.className).toContain("bg-gradient-to-br");
+    expect(div.className).toContain("from-stone-200");
   });
 
-  it("renders gradient for IN_PROGRESS status", () => {
+  it("renders gradient classes for IN_PROGRESS status", () => {
     const { container } = render(<CoverPlaceholder status="IN_PROGRESS" />);
     const div = container.firstChild as HTMLElement;
-    expect(div.style.background).toContain("160deg");
-    expect(div.style.background).toContain("linear-gradient");
+    expect(div.className).toContain("bg-gradient-to-br");
+    expect(div.className).toContain("from-sky-100");
   });
 
-  it("renders gradient for FINISHED status", () => {
+  it("renders gradient classes for FINISHED status", () => {
     const { container } = render(<CoverPlaceholder status="FINISHED" />);
     const div = container.firstChild as HTMLElement;
-    expect(div.style.background).toContain("160deg");
-    expect(div.style.background).toContain("linear-gradient");
+    expect(div.className).toContain("bg-gradient-to-br");
+    expect(div.className).toContain("from-violet-100");
   });
 
-  it("renders gradient for FFO status", () => {
+  it("renders gradient classes for FFO status", () => {
     const { container } = render(<CoverPlaceholder status="FFO" />);
     const div = container.firstChild as HTMLElement;
-    expect(div.style.background).toContain("160deg");
-    expect(div.style.background).toContain("linear-gradient");
+    expect(div.className).toContain("bg-gradient-to-br");
+    expect(div.className).toContain("from-rose-100");
   });
 
-  it("renders different gradients per status", () => {
+  it("renders different gradient classes per status", () => {
     const { container: c1 } = render(<CoverPlaceholder status="UNSTARTED" />);
     const { container: c2 } = render(<CoverPlaceholder status="FFO" />);
-    const bg1 = (c1.firstChild as HTMLElement).style.background;
-    const bg2 = (c2.firstChild as HTMLElement).style.background;
-    expect(bg1).not.toEqual(bg2);
+    const cls1 = (c1.firstChild as HTMLElement).className;
+    const cls2 = (c2.firstChild as HTMLElement).className;
+    expect(cls1).not.toEqual(cls2);
   });
 
-  it("renders correct gradient for all 7 statuses", () => {
+  it("renders gradient classes for all 7 statuses", () => {
     const statuses: ProjectStatus[] = [
       "UNSTARTED",
       "KITTING",
@@ -56,15 +56,15 @@ describe("CoverPlaceholder", () => {
       "FINISHED",
       "FFO",
     ];
-    const backgrounds = new Set<string>();
+    const classNames = new Set<string>();
     for (const status of statuses) {
       const { container } = render(<CoverPlaceholder status={status} />);
       const div = container.firstChild as HTMLElement;
-      expect(div.style.background).toContain("160deg");
-      backgrounds.add(div.style.background);
+      expect(div.className).toContain("bg-gradient-to-br");
+      classNames.add(div.className);
     }
-    // All 7 statuses should produce different gradients
-    expect(backgrounds.size).toBe(7);
+    // All 7 statuses should produce different gradient classes
+    expect(classNames.size).toBe(7);
   });
 
   it("contains flex centering classes", () => {

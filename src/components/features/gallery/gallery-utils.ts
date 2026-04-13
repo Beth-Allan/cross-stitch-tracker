@@ -125,34 +125,29 @@ export function transformToGalleryCard(
   };
 }
 
-// ─── Status Gradients ───────────────────────────────────────────────────────
+// ─── Status Gradient Classes (dark-mode aware) ─────────────────────────────
 
-export const STATUS_GRADIENTS: Record<ProjectStatus, [string, string]> = {
-  UNSTARTED: ["#e7e5e4", "#d6d3d1"],
-  KITTING: ["#fef3c7", "#fde68a"],
-  KITTED: ["#d1fae5", "#a7f3d0"],
-  IN_PROGRESS: ["#e0f2fe", "#bae6fd"],
-  ON_HOLD: ["#ffedd5", "#fed7aa"],
-  FINISHED: ["#ede9fe", "#ddd6fe"],
-  FFO: ["#ffe4e6", "#fecdd3"],
+export const STATUS_GRADIENT_CLASSES: Record<ProjectStatus, string> = {
+  UNSTARTED: "bg-gradient-to-br from-stone-200 to-stone-300 dark:from-stone-800 dark:to-stone-700",
+  KITTING: "bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900 dark:to-amber-800",
+  KITTED:
+    "bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900 dark:to-emerald-800",
+  IN_PROGRESS: "bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900 dark:to-sky-800",
+  ON_HOLD:
+    "bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900 dark:to-orange-800",
+  FINISHED:
+    "bg-gradient-to-br from-violet-100 to-violet-200 dark:from-violet-900 dark:to-violet-800",
+  FFO: "bg-gradient-to-br from-rose-100 to-rose-200 dark:from-rose-900 dark:to-rose-800",
 };
 
-// ─── Celebration Styles ─────────────────────────────────────────────────────
+// ─── Celebration Classes (dark-mode aware) ──────────────────────────────────
 
-export function getCelebrationStyles(
-  status: ProjectStatus,
-): { border: string; boxShadow: string } | null {
+export function getCelebrationClasses(status: ProjectStatus): string | null {
   if (status === "FINISHED") {
-    return {
-      border: "2px solid rgb(139 92 246)",
-      boxShadow: "0 0 0 1px rgb(139 92 246 / 0.15), 0 0 12px rgb(139 92 246 / 0.08)",
-    };
+    return "border-2 border-violet-500 shadow-[0_0_0_1px_rgb(139_92_246/0.15),0_0_12px_rgb(139_92_246/0.08)] dark:shadow-[0_0_0_1px_rgb(139_92_246/0.25),0_0_12px_rgb(139_92_246/0.2)]";
   }
   if (status === "FFO") {
-    return {
-      border: "2px solid rgb(244 63 94)",
-      boxShadow: "0 0 0 1px rgb(244 63 94 / 0.15), 0 0 12px rgb(244 63 94 / 0.08)",
-    };
+    return "border-2 border-rose-500 shadow-[0_0_0_1px_rgb(244_63_94/0.15),0_0_12px_rgb(244_63_94/0.08)] dark:shadow-[0_0_0_1px_rgb(244_63_94/0.25),0_0_12px_rgb(244_63_94/0.2)]";
   }
   return null;
 }

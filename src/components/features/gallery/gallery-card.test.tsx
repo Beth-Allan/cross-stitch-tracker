@@ -120,8 +120,7 @@ describe("GalleryCard", () => {
       });
       const { container } = render(<GalleryCard card={card} />);
       const cardEl = container.firstChild as HTMLElement;
-      // jsdom normalizes CSS rgb values with commas
-      expect(cardEl.style.border).toContain("rgb(139, 92, 246)");
+      expect(cardEl.className).toContain("border-violet-500");
     });
 
     it("renders 100% progress bar", () => {
@@ -159,8 +158,7 @@ describe("GalleryCard", () => {
       });
       const { container } = render(<GalleryCard card={card} />);
       const cardEl = container.firstChild as HTMLElement;
-      // jsdom normalizes CSS rgb values with commas
-      expect(cardEl.style.border).toContain("rgb(244, 63, 94)");
+      expect(cardEl.className).toContain("border-rose-500");
     });
 
     it("renders FFO date label", () => {

@@ -50,7 +50,8 @@ describe("SortDropdown", () => {
     fireEvent.click(screen.getByRole("button", { name: /sort by/i }));
     expect(screen.getByText("Name")).toBeInTheDocument();
 
-    fireEvent.keyDown(document, { key: "Escape" });
+    const listbox = screen.getByRole("listbox");
+    fireEvent.keyDown(listbox, { key: "Escape" });
     // Options within the dropdown panel should be gone
     // Note: "Date Added" still appears in the trigger, so check for a non-trigger option
     expect(screen.queryByText("Designer")).not.toBeInTheDocument();
