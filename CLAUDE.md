@@ -45,16 +45,26 @@
   - WR-02: userId filter on storage location and stitching app list queries
   - WR-03: userId scoping to fabric actions via linked project ownership
 - **Phase 5 shipped** (2026-04-13): PR #7 — 74 commits, 126 files, 535 tests, 8 REQ-IDs
-- **PR review fixes** (2026-04-13): all 5 critical + 6 important findings addressed
+- **PR review round 1 fixes** (2026-04-13): all 5 critical + 6 important findings addressed
   - C1-C2: Removed try/catch from 12 read-only actions (error boundaries handle DB failures)
   - C3: Wrapped chart+fabric operations in `$transaction`
   - C4-C5: Added fabric ownership rejection + getUnassignedFabrics tests
   - I1-I6: ProjectStatus type, SearchToAdd error state, fabric ownership check, delete dialog retry, auth guard tests, form error logging
   - 546 tests passing, build clean
+- **PR review round 2 fixes** (2026-04-12): all 3 critical + 8 important + 9 suggestions addressed
+  - C1: createFabric ownership check on linkedProjectId
+  - C2: Removed error-swallowing try/catch from 6 read-only designer/genre actions
+  - C3: InlineNameEdit stays in edit mode on save failure (callers re-throw)
+  - I1-I2: Happy-path tests for createChart + updateChart fabric link/unlink logic
+  - I3: try/catch on handleDelete in 4 components, I4: semantic tokens in global-error
+  - I8: Thumbnail failure → console.error + warning field + client toast
+  - S1-S2: Flattened \_count.projects → projectCount, extracted EntityProject type
+  - S5: Removed dead ChartListItem/ChartDetail types, S8: stale Prisma comment
+  - 567 tests passing, TypeScript clean
 
 ### In Progress
 
-- Phase 5 PR #7 — review fixes pushed, ready for re-review and merge
+- Phase 5 PR #7 — round 2 review fixes pushed, ready for re-review and merge
 
 ### Next Up
 
