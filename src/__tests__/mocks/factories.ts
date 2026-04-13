@@ -356,6 +356,40 @@ export function createMockStitchingAppWithStats(
   };
 }
 
+// ─── Gallery Card Factory ───────────────────────────────────────────────────
+
+import type { GalleryCardData } from "@/components/features/gallery/gallery-types";
+
+export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): GalleryCardData {
+  return {
+    chartId: "chart-1",
+    projectId: "proj-1",
+    name: "Test Project",
+    designerName: "Test Designer",
+    coverImageUrl: null,
+    coverThumbnailUrl: null,
+    status: "UNSTARTED",
+    statusGroup: "unstarted",
+    genres: [],
+    sizeCategory: "Medium",
+    stitchCount: 10000,
+    stitchCountApproximate: false,
+    stitchesCompleted: 0,
+    progressPercent: 0,
+    fabricStatus: "needed",
+    threadStatus: "needed",
+    beadsStatus: "needed",
+    specialtyStatus: "needed",
+    threadColourCount: 0,
+    beadTypeCount: 0,
+    specialtyItemCount: 0,
+    finishDate: null,
+    ffoDate: null,
+    dateAdded: new Date("2026-01-15"),
+    ...overrides,
+  };
+}
+
 // ─── Mock Prisma Client ─────────────────────────────────────────────────────
 
 /**
