@@ -88,16 +88,16 @@
     - 1x P3: loading skeleton doesn't match gallery card grid layout
     - Minor: duplicate kitting icon code, hardcoded stone colors, dual transition utilities
     - Full report: `.planning/phases/06-gallery-cards-view-modes/CRITIQUE.md`
-  - **Post-execution gates remaining:** critique fixes → code review → phase verification → roadmap update
+  - **Critique fixes** (2026-04-13): all P2/P3 findings + minor items addressed
+    - `/harden` pass 1: Removed invalid role="checkbox" in role="option", added role="list"/role="listitem" to ListView
+    - `/harden` pass 2: Search clear button, directional sort arrow, new "progress" sort field (Progress/Stitches now sort independently)
+    - `/harden` pass 3: Styled Base UI tooltips on kitting dots + size badges (all 3 views), shared KittingDotIcon export, stone-\* → semantic tokens
+    - `/polish`: Loading skeleton matches gallery card grid, fixed dual transition override, empty filter state has suggestion text + "Clear all filters" button
+  - **Post-execution gates remaining:** critique re-run → code review → phase verification → roadmap update
 
 ### Next Up
 
-1. **Critique fixes** — follow fix order in CRITIQUE.md:
-   - `/harden` pass 1: ARIA fixes (checkbox role, list semantics)
-   - `/harden` pass 2: UX discoverability (search clear, sort direction, progress sort field)
-   - `/harden` pass 3: styled tooltips for kitting dots + size categories
-   - `/polish`: loading skeleton, duplicate kitting icons, hardcoded stone colors
-   - `/critique` re-run to verify score improvement
+1. **Critique re-run** — verify score improvement
 2. Code review + phase verification
 3. Phase 6 ship (PR + review)
 
