@@ -68,20 +68,23 @@ export function InlineNameEdit({
 
   if (isEditing) {
     return (
-      <div ref={rowRef} className="flex items-center gap-2">
+      <div
+        ref={rowRef}
+        className="flex items-center gap-2"
+        onBlur={() => {
+          requestAnimationFrame(() => {
+            if (!rowRef.current?.contains(document.activeElement)) {
+              handleCancel();
+            }
+          });
+        }}
+      >
         <input
           ref={inputRef}
           type="text"
           value={editValue}
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          onBlur={() => {
-            requestAnimationFrame(() => {
-              if (!rowRef.current?.contains(document.activeElement)) {
-                handleCancel();
-              }
-            });
-          }}
           disabled={isPending}
           className={cn(
             "border-border bg-background text-foreground focus:ring-primary/40 rounded-md border focus:ring-2 focus:outline-none",
