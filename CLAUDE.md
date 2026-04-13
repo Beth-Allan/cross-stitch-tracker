@@ -22,6 +22,9 @@
   - Cover image aspect ratio fix, thread picker scroll fix, DMC catalog completed
   - Gap closure: Prisma client regen + onAddNew handlers
   - **Database sync required:** `prisma db push` needed after schema changes (no migration created)
+- **Phase 5 audit + harden + polish** (2026-04-12): impeccable:audit scored 15/20, all P1-P2 fixes applied
+  - Fixed blur-cancels-tab bug in InlineAddRow, added aria-labels, wired label association on SearchableSelect
+  - Replaced transition-all, added responsive breakpoint, removed dead code — score now 17/20
 
 ### In Progress
 
@@ -29,9 +32,8 @@
 
 ### Next Up
 
-1. `/impeccable:audit` — phase-level visual audit (quality gate)
-2. `/gsd:verify-work 5` — verify phase 5 against requirements
-3. `/gsd:ship 5` — create PR for review
+1. `/gsd:verify-work 5` — verify phase 5 against requirements
+2. `/gsd:ship 5` — create PR for review
 
 ### Backlog (post-MVP)
 
