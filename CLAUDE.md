@@ -71,12 +71,35 @@
 
 ### In Progress
 
-- Phase 5 PR #7 — round 3 review fixes pushed, ready for merge
+- **Phase 6: Gallery Cards & View Modes** — all 4 plans executed + visual verification + audit fixes applied
+  - 06-01: Data layer, types, URL state hook, server action (66 tests)
+  - 06-02: GalleryCard with 3 status-specific footers (37 tests)
+  - 06-03: FilterBar, FilterChips, MultiSelectDropdown, SortDropdown, ViewToggleBar (31 tests)
+  - 06-04: GalleryGrid, ProjectGallery orchestrator, /charts page wiring, sidebar rename
+  - **Visual verification fixes** (2026-04-13): back link Charts→Projects, thumbnails in list/table views, table bg-card + underline links, kitting dots reworked to data-driven (quantityAcquired vs quantityRequired) with new "partial" amber state
+  - **Impeccable audit** (2026-04-13): scored 14/20 — all P1/P2 findings addressed across 4 skills:
+    - `/harden`: ARIA on dropdowns (aria-expanded, listbox/option roles, keyboard nav), search aria-label, 44px touch targets, chip hit areas, header wrapping, search chip truncation
+    - `/optimize`: lazy loading + decoding=async on all images, removed backdrop-blur GPU cost, cached Intl.NumberFormat
+    - `/adapt`: ListView grid collapses to 3 columns on mobile (was 7-column inline grid)
+    - `/polish`: extracted shared formatters, STATUS_GRADIENTS → Tailwind classes with dark: variants, celebration styles → class-based with boosted dark shadow opacity, ~30 stone-\* neutrals → semantic tokens
+  - **Impeccable critique** (2026-04-13): scored 26/40 on Nielsen's heuristics, AI slop PASS
+    - 4x P2 findings: ARIA violation (role="checkbox" in role="option"), search clear button, sort direction visibility, Progress/Stitches shared sort field
+    - 2x P2 additions: ListView missing role="list", styled tooltips for kitting dots + size categories
+    - 1x P3: loading skeleton doesn't match gallery card grid layout
+    - Minor: duplicate kitting icon code, hardcoded stone colors, dual transition utilities
+    - Full report: `.planning/phases/06-gallery-cards-view-modes/CRITIQUE.md`
+  - **Post-execution gates remaining:** critique fixes → code review → phase verification → roadmap update
 
 ### Next Up
 
-1. Re-review PR #7 and merge
-2. `/gsd:discuss-phase 6` — Gallery Cards & View Modes
+1. **Critique fixes** — follow fix order in CRITIQUE.md:
+   - `/harden` pass 1: ARIA fixes (checkbox role, list semantics)
+   - `/harden` pass 2: UX discoverability (search clear, sort direction, progress sort field)
+   - `/harden` pass 3: styled tooltips for kitting dots + size categories
+   - `/polish`: loading skeleton, duplicate kitting icons, hardcoded stone colors
+   - `/critique` re-run to verify score improvement
+2. Code review + phase verification
+3. Phase 6 ship (PR + review)
 
 ### Backlog (post-MVP)
 
