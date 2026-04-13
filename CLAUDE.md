@@ -61,10 +61,17 @@
   - S1-S2: Flattened \_count.projects → projectCount, extracted EntityProject type
   - S5: Removed dead ChartListItem/ChartDetail types, S8: stale Prisma comment
   - 567 tests passing, TypeScript clean
+- **PR review round 3 fixes** (2026-04-12): 2 critical + 6 important findings addressed
+  - C1: updateChart now returns thumbnail warning (mirrors createChart)
+  - C2: Series hint changed from stale "Phase 5" to "Coming soon"
+  - I1: DeleteChartDialog stays open on failure, I2-I3: console.error in empty catches
+  - I4: Cover image shows error on presigned URL failure
+  - I5: createChart fabric ownership rejection test, I6: expanded fabric ownership comment
+  - 568 tests passing, TypeScript clean
 
 ### In Progress
 
-- Phase 5 PR #7 — round 2 review fixes pushed, ready for re-review and merge
+- Phase 5 PR #7 — round 3 review fixes pushed, ready for merge
 
 ### Next Up
 
