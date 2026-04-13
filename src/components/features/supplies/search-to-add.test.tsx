@@ -256,3 +256,78 @@ describe("SearchToAdd - multi-add flow", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 });
+
+describe("SearchToAdd - viewport flip", () => {
+  let origGetBoundingClientRect: typeof HTMLElement.prototype.getBoundingClientRect;
+  let origInnerHeight: number;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetThreads.mockResolvedValue([]);
+    origGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
+    origInnerHeight = window.innerHeight;
+  });
+
+  afterEach(() => {
+    HTMLElement.prototype.getBoundingClientRect = origGetBoundingClientRect;
+    Object.defineProperty(window, "innerHeight", { value: origInnerHeight, writable: true });
+  });
+
+  it("uses top-full positioning when space below is sufficient", async () => {
+    // 1000px viewport, element bottom at 400px = 600px below (>= 300)
+    Object.defineProperty(window, "innerHeight", { value: 1000, writable: true });
+
+    // Mock getBoundingClientRect globally before rendering so the useEffect reads it
+    HTMLElement.prototype.getBoundingClientRect = function () {
+      return {
+        bottom: 400,
+        top: 350,
+        left: 0,
+        right: 300,
+        width: 300,
+        height: 50,
+        x: 0,
+        y: 350,
+        toJSON: () => ({}),
+      };
+    };
+
+    const { container } = render(<SearchToAdd {...defaultProps} />);
+
+    await waitFor(() => {
+      const outerDiv = container.firstElementChild as HTMLElement;
+      expect(outerDiv.className).toContain("top-full");
+      expect(outerDiv.className).toContain("mt-1");
+      expect(outerDiv.className).not.toContain("bottom-full");
+    });
+  });
+
+  it("uses bottom-full positioning when near viewport bottom", async () => {
+    // 600px viewport, element bottom at 500px = 100px below (< 300)
+    Object.defineProperty(window, "innerHeight", { value: 600, writable: true });
+
+    // Mock getBoundingClientRect globally before rendering so the useEffect reads it
+    HTMLElement.prototype.getBoundingClientRect = function () {
+      return {
+        bottom: 500,
+        top: 450,
+        left: 0,
+        right: 300,
+        width: 300,
+        height: 50,
+        x: 0,
+        y: 450,
+        toJSON: () => ({}),
+      };
+    };
+
+    const { container } = render(<SearchToAdd {...defaultProps} />);
+
+    await waitFor(() => {
+      const outerDiv = container.firstElementChild as HTMLElement;
+      expect(outerDiv.className).toContain("bottom-full");
+      expect(outerDiv.className).toContain("mb-1");
+      expect(outerDiv.className).not.toContain("top-full");
+    });
+  });
+});

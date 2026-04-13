@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useTransition } from "react";
 import { Search } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import {
   addThreadToProject,
   addBeadToProject,
@@ -61,6 +62,7 @@ export function SearchToAdd({
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [highlightIndex, setHighlightIndex] = useState(0);
+  const [flipUp, setFlipUp] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -119,6 +121,16 @@ export function SearchToAdd({
   // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
+  }, []);
+
+  // Measure available space and flip upward if near viewport bottom
+  useEffect(() => {
+    if (!ref.current) return;
+    const rect = ref.current.parentElement?.getBoundingClientRect();
+    if (!rect) return;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    // max-h-72 = 288px, plus padding/border ~12px
+    setFlipUp(spaceBelow < 300);
   }, []);
 
   const existingSet = new Set(existingIds);
@@ -199,7 +211,10 @@ export function SearchToAdd({
   return (
     <div
       ref={ref}
-      className="border-border bg-card absolute top-full right-0 left-0 z-20 mt-1 rounded-lg border shadow-lg"
+      className={cn(
+        "border-border bg-card absolute right-0 left-0 z-20 rounded-lg border shadow-lg",
+        flipUp ? "bottom-full mb-1" : "top-full mt-1"
+      )}
     >
       <div className="p-2">
         <div className="relative">
