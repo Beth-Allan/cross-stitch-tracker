@@ -77,10 +77,11 @@ export async function deleteStorageLocation(id: string) {
 }
 
 export async function getStorageLocationsWithStats(): Promise<StorageLocationWithStats[]> {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const locations = await prisma.storageLocation.findMany({
+      where: { userId: user.id },
       include: { _count: { select: { projects: true } } },
       orderBy: { name: "asc" },
     });

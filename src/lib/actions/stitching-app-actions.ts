@@ -77,10 +77,11 @@ export async function deleteStitchingApp(id: string) {
 }
 
 export async function getStitchingAppsWithStats(): Promise<StitchingAppWithStats[]> {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const apps = await prisma.stitchingApp.findMany({
+      where: { userId: user.id },
       include: { _count: { select: { projects: true } } },
       orderBy: { name: "asc" },
     });
