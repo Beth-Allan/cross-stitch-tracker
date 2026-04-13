@@ -4,7 +4,7 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — executed, pending verification
+**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — all 7 plans complete, pending verification
 **Last Updated:** 2026-04-12
 **Roadmap:** 4 milestones / 10 phases — v1.0 shipped, M2 phase 5 complete
 
@@ -15,12 +15,13 @@
   - Archived to: `.planning/milestones/v1.0-*`
   - Live at: https://cross-stitch-tracker-adolwyn.vercel.app
 - 12 quick-fix tasks completed post-deploy (thread sort, idempotency, thumbnails, etc.)
-- **Phase 5: Foundation & Quick Wins** (2026-04-12): 6 plans, 498 tests passing
+- **Phase 5: Foundation & Quick Wins** (2026-04-12): 7 plans, 504 tests passing
   - Storage Location & Stitching App CRUD (data layer + UI)
   - Chart form wired to database-backed dropdowns with inline "Add New"
   - Fabric selector wired in chart form
   - Cover image aspect ratio fix, thread picker scroll fix, DMC catalog completed
   - Gap closure: Prisma client regen + onAddNew handlers
+  - Gap closure: SearchableSelect "Add New" only shows with search text, thread picker stays open for multi-add
   - **Database sync required:** `prisma db push` needed after schema changes (no migration created)
 - **Phase 5 audit + harden + polish** (2026-04-12): impeccable:audit scored 15/20, all P1-P2 fixes applied
   - Fixed blur-cancels-tab bug in InlineAddRow, added aria-labels, wired label association on SearchableSelect
