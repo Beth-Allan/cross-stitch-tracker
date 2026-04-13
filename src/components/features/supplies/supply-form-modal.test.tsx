@@ -204,12 +204,8 @@ describe("SupplyFormModal", () => {
       // Click the SearchableSelect trigger to open the dropdown
       await user.click(screen.getByText("DMC"));
 
-      // Type a search term — "Add" only appears when search has text
-      const searchInput = screen.getByPlaceholderText("Search...");
-      await user.type(searchInput, "Anchor");
-
-      // "Add" option should appear with the typed text
-      expect(screen.getByText(/Add "Anchor"/)).toBeInTheDocument();
+      // "+ Add New" should be visible immediately (no typing required)
+      expect(screen.getByText("+ Add New")).toBeInTheDocument();
     });
 
     it("clicking Add New opens the brand creation dialog", async () => {
@@ -225,9 +221,7 @@ describe("SupplyFormModal", () => {
       );
 
       await user.click(screen.getByText("DMC"));
-      const searchInput = screen.getByPlaceholderText("Search...");
-      await user.type(searchInput, "Anchor");
-      await user.click(screen.getByText(/Add "Anchor"/));
+      await user.click(screen.getByText("+ Add New"));
 
       await waitFor(() => {
         expect(screen.getByText("Add New Brand")).toBeInTheDocument();
@@ -255,16 +249,15 @@ describe("SupplyFormModal", () => {
       );
 
       await user.click(screen.getByText("DMC"));
-      const searchInput = screen.getByPlaceholderText("Search...");
-      await user.type(searchInput, "Anchor");
-      await user.click(screen.getByText(/Add "Anchor"/));
+      await user.click(screen.getByText("+ Add New"));
 
       await waitFor(() => {
         expect(screen.getByPlaceholderText(/Brand name/i)).toBeInTheDocument();
       });
 
-      // Brand name is pre-filled from search term — just click submit
-      expect(screen.getByPlaceholderText(/Brand name/i)).toHaveValue("Anchor");
+      // Brand name field starts empty — type the name and submit
+      const brandNameInput = screen.getByPlaceholderText(/Brand name/i);
+      await user.type(brandNameInput, "Anchor");
       await user.click(screen.getByRole("button", { name: /Add Brand/i }));
 
       await waitFor(() => {

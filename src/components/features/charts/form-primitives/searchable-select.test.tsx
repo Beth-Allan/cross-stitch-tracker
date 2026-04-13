@@ -26,14 +26,23 @@ vi.mock("@/components/ui/command", () => ({
   ),
   CommandList: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   CommandEmpty: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CommandGroup: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  CommandGroup: ({
+    children,
+    forceMount: _fm,
+    ...props
+  }: {
+    children: React.ReactNode;
+    forceMount?: boolean;
+  }) => <div {...props}>{children}</div>,
   CommandItem: ({
     children,
     onSelect,
+    forceMount: _fm,
     ...props
   }: {
     children: React.ReactNode;
     onSelect?: () => void;
+    forceMount?: boolean;
     value?: string;
     className?: string;
   }) => (
@@ -78,7 +87,7 @@ describe("SearchableSelect", () => {
   });
 
   describe("Add New button visibility", () => {
-    it("does NOT render Add New when search input is empty", () => {
+    it("shows + Add New immediately when onAddNew is provided (no search needed)", () => {
       render(
         <SearchableSelect
           options={defaultOptions}
@@ -88,11 +97,11 @@ describe("SearchableSelect", () => {
         />,
       );
 
-      // With empty search, "Add" text should not appear
-      expect(screen.queryByText(/Add /)).toBeNull();
+      // "+ Add New" should be visible without typing anything
+      expect(screen.getByText("+ Add New")).toBeDefined();
     });
 
-    it("does NOT render Add New when search is whitespace-only", async () => {
+    it("shows + Add New even when search contains spaces", async () => {
       const user = userEvent.setup();
       render(
         <SearchableSelect
@@ -104,37 +113,20 @@ describe("SearchableSelect", () => {
       );
 
       const input = screen.getByTestId("command-input");
-      await user.type(input, "   ");
+      await user.type(input, "Bin A");
 
-      expect(screen.queryByText(/Add /)).toBeNull();
+      expect(screen.getByText("+ Add New")).toBeDefined();
     });
 
-    it("renders Add New with search text when search has non-empty trimmed text", async () => {
-      const user = userEvent.setup();
-      render(
-        <SearchableSelect
-          options={defaultOptions}
-          value={null}
-          onChange={mockOnChange}
-          onAddNew={mockOnAddNew}
-        />,
-      );
-
-      const input = screen.getByTestId("command-input");
-      await user.type(input, "Custom Bin");
-
-      expect(screen.getByText(/Add "Custom Bin"/)).toBeDefined();
-    });
-
-    it("does NOT render Add section when onAddNew prop is not provided", () => {
+    it("does NOT render + Add New when onAddNew prop is omitted", () => {
       render(<SearchableSelect options={defaultOptions} value={null} onChange={mockOnChange} />);
 
-      expect(screen.queryByText(/Add /)).toBeNull();
+      expect(screen.queryByText("+ Add New")).toBeNull();
     });
   });
 
   describe("Add New interaction", () => {
-    it("calls onAddNew with the current search text when clicked", async () => {
+    it("calls onAddNew with current search text when clicked", async () => {
       const user = userEvent.setup();
       render(
         <SearchableSelect
@@ -146,15 +138,32 @@ describe("SearchableSelect", () => {
       );
 
       const input = screen.getByTestId("command-input");
-      await user.type(input, "My New Item");
+      await user.type(input, "My Item");
 
-      const addButton = screen.getByText(/Add "My New Item"/);
+      const addButton = screen.getByText("+ Add New");
       await user.click(addButton);
 
-      expect(mockOnAddNew).toHaveBeenCalledWith("My New Item");
+      expect(mockOnAddNew).toHaveBeenCalledWith("My Item");
     });
 
-    it("resets search after clicking Add New", async () => {
+    it("calls onAddNew with empty string when clicked without typing", async () => {
+      const user = userEvent.setup();
+      render(
+        <SearchableSelect
+          options={defaultOptions}
+          value={null}
+          onChange={mockOnChange}
+          onAddNew={mockOnAddNew}
+        />,
+      );
+
+      const addButton = screen.getByText("+ Add New");
+      await user.click(addButton);
+
+      expect(mockOnAddNew).toHaveBeenCalledWith("");
+    });
+
+    it("resets search after clicking + Add New", async () => {
       const user = userEvent.setup();
       render(
         <SearchableSelect
@@ -168,12 +177,12 @@ describe("SearchableSelect", () => {
       const input = screen.getByTestId("command-input");
       await user.type(input, "Test");
 
-      const addButton = screen.getByText(/Add "Test"/);
+      const addButton = screen.getByText("+ Add New");
       await user.click(addButton);
 
-      // After clicking, search should reset — "Add" option should disappear
+      // After clicking, search input should be cleared
       await waitFor(() => {
-        expect(screen.queryByText(/Add "/)).toBeNull();
+        expect((screen.getByTestId("command-input") as HTMLInputElement).value).toBe("");
       });
     });
   });

@@ -175,12 +175,8 @@ describe("FabricFormModal", () => {
       // Click the SearchableSelect trigger to open the dropdown
       await user.click(screen.getByText("Zweigart"));
 
-      // Type a search term — "Add" only appears when search has text
-      const searchInput = screen.getByPlaceholderText("Search...");
-      await user.type(searchInput, "Wichelt");
-
-      // "Add" option should appear with the typed text
-      expect(screen.getByText(/Add "Wichelt"/)).toBeInTheDocument();
+      // "+ Add New" should be visible immediately (no typing required)
+      expect(screen.getByText("+ Add New")).toBeInTheDocument();
     });
 
     it("clicking Add New opens the brand creation dialog", async () => {
@@ -196,9 +192,7 @@ describe("FabricFormModal", () => {
       );
 
       await user.click(screen.getByText("Zweigart"));
-      const searchInput = screen.getByPlaceholderText("Search...");
-      await user.type(searchInput, "Wichelt");
-      await user.click(screen.getByText(/Add "Wichelt"/));
+      await user.click(screen.getByText("+ Add New"));
 
       await waitFor(() => {
         expect(screen.getByText("Add New Brand")).toBeInTheDocument();
@@ -228,16 +222,15 @@ describe("FabricFormModal", () => {
       );
 
       await user.click(screen.getByText("Zweigart"));
-      const searchInput = screen.getByPlaceholderText("Search...");
-      await user.type(searchInput, "Wichelt");
-      await user.click(screen.getByText(/Add "Wichelt"/));
+      await user.click(screen.getByText("+ Add New"));
 
       await waitFor(() => {
         expect(screen.getByPlaceholderText(/Brand name/i)).toBeInTheDocument();
       });
 
-      // Brand name is pre-filled from search term — just verify and submit
-      expect(screen.getByPlaceholderText(/Brand name/i)).toHaveValue("Wichelt");
+      // Brand name field starts empty — type the name and submit
+      const brandNameInput = screen.getByPlaceholderText(/Brand name/i);
+      await user.type(brandNameInput, "Wichelt");
       await user.click(screen.getByRole("button", { name: /Add Brand/i }));
 
       await waitFor(() => {
