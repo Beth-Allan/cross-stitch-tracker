@@ -76,7 +76,12 @@ Plans:
   2. User can switch between gallery, list, and table view modes with state persisted in URL params
   3. User can sort charts by name, designer, status, size, stitch count, and date added
   4. User can search charts by name and filter by status and size category
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 06-01-PLAN.md — Types, utilities, URL state hook, server action, nuqs setup
+- [ ] 06-02-PLAN.md — Gallery card with WIP/Unstarted/Finished footers
+- [ ] 06-03-PLAN.md — Filter bar, filter chips, sort dropdown, view toggle
+- [ ] 06-04-PLAN.md — Gallery/List/Table grid views, page wiring, "Projects" rename
 **UI hint**: yes
 
 ### Phase 7: Skein Calculator & Supply Workflow
@@ -149,7 +154,7 @@ Plans:
 | 3. Designer & Genre Pages | v1.0 | 5/5 | Complete | 2026-04-08 |
 | 4. Supplies & Fabric | v1.0 | 10/10 | Complete | 2026-04-10 |
 | 5. Foundation & Quick Wins | v1.1 | 7/8 | In progress | - |
-| 6. Gallery Cards & View Modes | v1.1 | 0/TBD | Not started | - |
+| 6. Gallery Cards & View Modes | v1.1 | 0/4 | Not started | - |
 | 7. Skein Calculator & Supply Workflow | v1.1 | 0/TBD | Not started | - |
 | 8. Dashboards & Collection Views | v1.2 | 0/TBD | Not started | - |
 | 9. Session Logging & Activity Stats | v1.2 | 0/TBD | Not started | - |
