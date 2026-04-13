@@ -27,12 +27,12 @@ export async function createStitchingApp(formData: unknown) {
 }
 
 export async function updateStitchingApp(id: string, formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validated = stitchingAppSchema.parse(formData);
     const app = await prisma.stitchingApp.update({
-      where: { id },
+      where: { id, userId: user.id },
       data: validated,
     });
     revalidatePath("/apps");
@@ -48,9 +48,17 @@ export async function updateStitchingApp(id: string, formData: unknown) {
 }
 
 export async function deleteStitchingApp(id: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    const existing = await prisma.stitchingApp.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+    if (!existing || existing.userId !== user.id) {
+      return { success: false as const, error: "App not found" };
+    }
+
     await prisma.$transaction([
       prisma.project.updateMany({
         where: { stitchingAppId: id },
@@ -89,11 +97,11 @@ export async function getStitchingAppsWithStats(): Promise<StitchingAppWithStats
 }
 
 export async function getStitchingAppDetail(id: string): Promise<StitchingAppDetail | null> {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const app = await prisma.stitchingApp.findUnique({
-      where: { id },
+      where: { id, userId: user.id },
       include: {
         projects: {
           select: {
