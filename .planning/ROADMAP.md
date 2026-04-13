@@ -55,7 +55,7 @@ Full details: `milestones/v1.0-ROADMAP.md`
   3. User can link an unassigned fabric to a project from the project form (replacing the disabled placeholder)
   4. DMC thread catalog includes all standard colours (Blanc and ~30 missing entries filled) and cover images display without cropping distortion
   5. Thread colour picker auto-scrolls to keep search/add controls visible when adding items
-**Plans:** 6 plans
+**Plans:** 7 plans
 Plans:
 - [x] 05-01-PLAN.md — Schema + types + validations + server actions + nav items
 - [x] 05-02-PLAN.md — Storage Location management UI (shared components + list + detail)
@@ -63,6 +63,7 @@ Plans:
 - [x] 05-04-PLAN.md — Chart form integration (DB-backed dropdowns + fabric selector)
 - [x] 05-05-PLAN.md — Cover image fix + thread picker scroll + DMC catalog completion
 - [x] 05-06-PLAN.md — Gap closure: Prisma client regeneration + inline Add New for storage/app dropdowns
+- [ ] 05-07-PLAN.md — Gap closure: Fix Add New empty name bug + thread picker multi-add UX
 **UI hint**: yes
 
 ### Phase 6: Gallery Cards & View Modes
@@ -146,7 +147,7 @@ Plans:
 | 2. Core Project Management | v1.0 | 5/5 | Complete | 2026-04-06 |
 | 3. Designer & Genre Pages | v1.0 | 5/5 | Complete | 2026-04-08 |
 | 4. Supplies & Fabric | v1.0 | 10/10 | Complete | 2026-04-10 |
-| 5. Foundation & Quick Wins | v1.1 | 5/6 | In progress | - |
+| 5. Foundation & Quick Wins | v1.1 | 6/7 | In progress | - |
 | 6. Gallery Cards & View Modes | v1.1 | 0/TBD | Not started | - |
 | 7. Skein Calculator & Supply Workflow | v1.1 | 0/TBD | Not started | - |
 | 8. Dashboards & Collection Views | v1.2 | 0/TBD | Not started | - |
