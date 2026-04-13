@@ -33,20 +33,14 @@ Declared values (must be multiples of 4):
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| xs | 4px | Icon-text gap inside badges, kitting dot icon-label gap |
-| sm | 8px | Filter bar gap between dropdowns, inline element spacing |
+| xs | 4px | Icon-text gap inside badges, kitting dot icon-label gap, filter chip gap |
+| sm | 8px | Filter bar gap between dropdowns, inline element spacing, list row vertical padding, kitting dot group gap |
 | md | 16px | Card body padding, list row horizontal padding, table cell padding |
-| lg | 20px | Gallery grid gap between cards |
-| xl | 24px | Section spacing between filter bar / toggle bar / grid |
-| 2xl | 32px | Page header to filter bar spacing |
-| 3xl | 64px | Empty state vertical padding |
+| lg | 24px | Section spacing between filter bar / toggle bar / grid, gallery grid gap between cards |
+| xl | 32px | Page header to filter bar spacing |
+| 2xl | 64px | Empty state vertical padding |
 
-Exceptions:
-- Card body uses 16px padding (from design: `padding: '16px'`)
-- Gallery grid gap is 20px (from design: `gap: '20px'`)
-- List row vertical padding is 10px (from design: `padding: '10px 16px'`)
-- Filter chip gap is 6px (from design: `gap: '6px'`)
-- Kitting dot group gap is 10px (from design: `gap: '10px'`)
+Exceptions: none
 
 ---
 
@@ -54,23 +48,16 @@ Exceptions:
 
 | Role | Font | Size | Weight | Line Height | Usage |
 |------|------|------|--------|-------------|-------|
-| Page heading | Fraunces | 24px (text-2xl) | 700 (bold) | 1.2 | "Project Gallery" heading |
-| Page subtitle | Source Sans 3 | 14px (text-sm) | 400 (regular) | 1.5 | "Browse and filter all your cross stitch projects" |
-| Card title | Fraunces | 15px | 600 (semibold) | 1.375 (leading-snug) | Project name on gallery cards, line-clamp-2 |
-| Card designer | Source Sans 3 | 13px | 400 (regular) | 1.5 | Designer name, truncated |
-| Card stat | Source Sans 3 | 11px | 400 (regular) | 1.5 | Stitch counts, supply summaries, dates, kitting dot labels |
-| Progress percent | JetBrains Mono | 12px (text-xs) | 500 (medium) | 1.0 | "42%" next to progress bar, tabular-nums |
-| Badge | Source Sans 3 | 12px (text-xs) | 500 (medium) | 1.0 | Status badge label |
-| Size badge | System | 10px | 700 (bold) | 1.0 | "BAP", "MINI", uppercase tracking-widest |
-| Genre tag | Source Sans 3 | 11px | 400 (regular) | 1.0 | Genre pill labels |
-| Filter label | Source Sans 3 | 14px (text-sm) | 400 (regular) | 1.5 | Dropdown trigger labels |
-| Filter chip | Source Sans 3 | 12px (text-xs) | 400 (regular) | 1.0 | Active filter chip labels |
-| Count label | Source Sans 3 | 12px (text-xs) | 400 (regular) | 1.5 | "N projects" / "N of M projects" |
-| View toggle label | Source Sans 3 | 12px (text-xs) | 500 (medium) | 1.0 | "Cards" / "List" / "Table" |
-| List row name | Fraunces | 14px (text-sm) | 500 (medium) | 1.375 | Project name in list/table view, truncated |
-| Table header | Source Sans 3 | 12px (text-xs) | 500 (medium) | 1.0 | Sortable column headers |
-| Table cell | Source Sans 3 | 14px (text-sm) / 12px (text-xs) | 400 (regular) | 1.5 | Table row data |
-| Empty state body | Source Sans 3 | 14px (text-sm) | 400 (regular) | 1.5 | "No projects match your filters" |
+| Heading | Fraunces | 24px (text-2xl) | 600 (semibold) | 1.2 | "Project Gallery" page heading |
+| Body | Source Sans 3 | 14px (text-sm) | 400 (regular) | 1.5 | Page subtitle, card designer name, filter labels, empty state body, table cell data |
+| Small | Source Sans 3 | 12px (text-xs) | 400 (regular) | 1.5 | Card stats, progress percent, badge labels, genre tags, filter chips, count labels, view toggle labels, table headers, kitting dot labels |
+| Micro | Source Sans 3 | 10px | 600 (semibold) | 1.0 | Size badge ("BAP", "MINI"), uppercase tracking-widest |
+
+Card title uses Fraunces at 14px (Body size) weight 600 (semibold), line-clamp-2.
+List row name uses Fraunces at 14px (Body size) weight 600 (semibold), truncated.
+Progress percent uses JetBrains Mono at 12px (Small size) weight 400 (regular), tabular-nums.
+
+Only two weights are used across the entire phase: 400 (regular) and 600 (semibold).
 
 ---
 
@@ -149,6 +136,12 @@ Gradient direction: 160deg, rendered via inline `style={{ background }}`.
 
 ---
 
+## Visual Focal Point
+
+The primary visual anchor on gallery cards is the **cover image** (or status-colored gradient placeholder) combined with the **status badge overlay** positioned at top-left. These two elements establish the card's identity and state at a glance. The **project name link** is the primary interaction target -- it is the only clickable element on the card and draws the eye through its Fraunces heading font and emerald hover underline.
+
+---
+
 ## Component Inventory
 
 ### New Components (Phase 6)
@@ -193,7 +186,7 @@ Gradient direction: 160deg, rendered via inline `style={{ background }}`.
 
 ```
 grid-template-columns: repeat(auto-fill, minmax(280px, 340px))
-gap: 20px
+gap: 24px
 ```
 
 Responsive behavior: auto-fill naturally reduces columns as viewport shrinks.
@@ -211,8 +204,8 @@ Responsive behavior: auto-fill naturally reduces columns as viewport shrinks.
     [StatusBadge: absolute top-3 left-3]
     [Size badge: absolute top-3 right-3]
   [Card body: p-4, flex-col, gap-1.5, flex-1]
-    [Project name: Fraunces 15px semibold, line-clamp-2, hover:emerald]
-    [Designer: Source Sans 13px, truncate]
+    [Project name: Fraunces 14px semibold, line-clamp-2, hover:emerald]
+    [Designer: Source Sans 14px regular, truncate]
     [Stitch count (non-WIP only): Source Sans 12px]
     [Genre tags: max 3 + overflow pill]
     [Spacer: flex-1 min-h-1]
@@ -224,7 +217,7 @@ Responsive behavior: auto-fill naturally reduces columns as viewport shrinks.
 ```
 grid-template-columns: 8px minmax(180px, 2fr) minmax(120px, 1fr) minmax(100px, 120px) 64px 56px
 gap: 0 16px
-padding: 10px 16px
+padding: 8px 16px
 align-items: center
 ```
 
@@ -504,7 +497,7 @@ No third-party registries. All gallery components are custom-built following Des
 | D-11 | Sort dropdown on all views, table also has clickable column headers, sort state shared | CONTEXT.md |
 | D-12 | All view state in URL search params (view, sort, dir, search, filters) | CONTEXT.md |
 | D-13 | Default sort: date added, newest first | CONTEXT.md |
-| UI-01 | Card grid: `minmax(280px, 340px)` auto-fill | DesignOS GalleryGrid.tsx |
+| UI-01 | Card grid: `minmax(280px, 340px)` auto-fill, gap 24px | DesignOS GalleryGrid.tsx |
 | UI-02 | Cover image: `aspect-[4/3]` with `object-cover` (visual impact over full visibility) | CONTEXT.md specifics |
 | UI-03 | Card hover: shadow-lg + translate-y-1 + cover scale 1.03 | DesignOS GalleryCard.tsx |
 | UI-04 | Project name as underlined link with Fraunces, emerald hover | DesignOS GalleryCard.tsx |
