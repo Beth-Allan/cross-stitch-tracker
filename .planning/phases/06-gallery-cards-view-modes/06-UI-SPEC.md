@@ -34,8 +34,8 @@ Declared values (must be multiples of 4):
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px | Icon-text gap inside badges, kitting dot icon-label gap, filter chip gap |
-| sm | 8px | Filter bar gap between dropdowns, inline element spacing, list row vertical padding, kitting dot group gap |
-| md | 16px | Card body padding, list row horizontal padding, table cell padding |
+| sm | 8px | Filter bar gap between dropdowns, inline element spacing, list row vertical padding, kitting dot group gap, filter chip horizontal padding, filter chip vertical padding |
+| md | 16px | Card body padding, list row horizontal padding, table cell padding, filter bar internal row spacing |
 | lg | 24px | Section spacing between filter bar / toggle bar / grid, gallery grid gap between cards |
 | xl | 32px | Page header to filter bar spacing |
 | 2xl | 64px | Empty state vertical padding |
@@ -249,7 +249,7 @@ Row 3: ["{N} projects" label] ... [Sort dropdown] [Cards|List|Table toggle]
 [Page header: "Project Gallery" heading + subtitle]
   gap: 8px (heading to subtitle)
 [Filter bar]
-  gap: 12px (internal between rows)
+  gap: 16px (internal between rows)
 [Separator: border-border]
 [Toggle bar: count + sort + view mode]
   gap: 24px (filter bar to toggle bar)
@@ -280,6 +280,7 @@ Row 3: ["{N} projects" label] ... [Sort dropdown] [Cards|List|Table toggle]
 - Inactive state: `text-stone-400 dark:text-stone-500 hover:text-stone-600`
 - Container: `bg-stone-100 dark:bg-stone-800 rounded-lg p-0.5`
 - Each button has a tooltip on hover describing the view
+- Each button includes `<span className="sr-only">{mode} view</span>` for screen readers (e.g. "Cards view", "List view", "Table view")
 
 ### Sort Dropdown
 
@@ -300,7 +301,7 @@ Row 3: ["{N} projects" label] ... [Sort dropdown] [Cards|List|Table toggle]
 ### Filter Chips
 
 - Appear below filter bar when any filter is active per D-03
-- Each chip: `bg-stone-100 text-stone-700 border border-stone-200 rounded-full px-2.5 py-0.5`
+- Each chip: `bg-stone-100 text-stone-700 border border-stone-200 rounded-full px-2 py-1`
 - Dismiss (X): 3x3 icon, hover brightens text
 - "Clear all" link at end: `text-stone-500 hover:text-stone-700`
 
@@ -343,6 +344,7 @@ Refresh-safe, back-button friendly. Default when no params: `view=gallery&sort=d
 | Sort dropdown label | "Sort by" |
 | Clear all filters | "Clear all" |
 | View toggle tooltips | Cards: "Visual cards with cover images and status details" / List: "Compact rows with key project info" / Table: "Full data table with sortable columns" |
+| View toggle sr-only labels | Cards: "Cards view" / List: "List view" / Table: "Table view" |
 | Kitting dot tooltips | Fulfilled: "{Label}: Ready" / Needed: "{Label}: Still needed" / N/A: "{Label}: Not needed for this project" |
 | Supply summary | "{N} colours" / "{N} colours . {N} bead types" / "{N} colours . {N} bead types . {N} specialty" |
 | WIP stitch fraction | "{completed} / {total} stitches" |
@@ -421,7 +423,7 @@ Supply counts are computed from junction table `_count` in the extended query:
 
 - Status badges include text labels (not color-only)
 - Kitting dots have `title` tooltips for hover AND `aria-label` for screen readers
-- View mode buttons have `aria-pressed` or equivalent active indication
+- View mode buttons have `aria-pressed` or equivalent active indication AND `<span className="sr-only">{mode} view</span>` text (e.g. "Cards view", "List view", "Table view")
 - Filter count announces total and filtered count
 - Sort direction announced in button label (e.g. "Sort by name, ascending")
 - Gallery grid uses `role="list"` with cards as `role="listitem"` (gallery view)
