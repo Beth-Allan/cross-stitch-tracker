@@ -209,11 +209,15 @@ function DeleteChartDialog({ chartId, chartName }: { chartId: string; chartName:
 
   function handleDelete() {
     startTransition(async () => {
-      const result = await deleteChart(chartId);
-      if (result.success) {
-        toast.success("Chart deleted");
-        router.push("/charts");
-      } else {
+      try {
+        const result = await deleteChart(chartId);
+        if (result.success) {
+          toast.success("Chart deleted");
+          router.push("/charts");
+        } else {
+          toast.error("Something went wrong. Please try again.");
+        }
+      } catch {
         toast.error("Something went wrong. Please try again.");
       }
       setOpen(false);
