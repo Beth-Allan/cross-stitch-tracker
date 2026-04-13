@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 05-foundation-quick-wins
 source: [05-01-SUMMARY.md, 05-02-SUMMARY.md, 05-03-SUMMARY.md, 05-04-SUMMARY.md, 05-05-SUMMARY.md, 05-06-SUMMARY.md]
 started: 2026-04-12T12:00:00Z
@@ -58,9 +58,16 @@ blocked: 1
   reason: "User reported: Adding a new location from the chart details/edit page gives an error and doesn't add: Name is required is the error. Trying to quick add a stitching app does the same. Otherwise all looks good"
   severity: major
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "SearchableSelect's onAddNew passes `search` state which is empty string when user clicks 'Add New' without typing. Empty string fails Zod validation (trim + min(1)). Fix: only show 'Add New' when search.trim() is non-empty, and add guard in useChartForm handlers."
+  artifacts:
+    - path: "src/components/features/charts/form-primitives/searchable-select.tsx"
+      issue: "Line 89: onAddNew(search) passes empty string when user hasn't typed"
+    - path: "src/components/features/charts/use-chart-form.ts"
+      issue: "Lines 307,328: handleAddStorageLocation/handleAddStitchingApp don't guard against empty names"
+  missing:
+    - "Only render 'Add New' option when search.trim() is non-empty"
+    - "Change label from 'Add New' to 'Add \"{search}\"' for clarity"
+    - "Add guard in handlers: if (!name.trim()) return"
   debug_session: ""
 
 - truth: "Thread picker multi-add has usable viewport — search input and results remain comfortably accessible while adding multiple threads"
@@ -68,7 +75,14 @@ blocked: 1
   reason: "User reported: It isn't great - it's so far down the page, only about three colours show up before scrolling off the page. Yes, it scrolls to keep those three lines on the page, but it's very tight and not user friendly still."
   severity: minor
   test: 5
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Three compounding issues: (1) max-h-48 caps results to ~4 rows (192px). (2) Absolute positioning (top-full) places picker below already-deep page content. (3) Parent's handleAdded closes picker after every add (setAddingType(null)) despite search-to-add intending to stay open."
+  artifacts:
+    - path: "src/components/features/supplies/search-to-add.tsx"
+      issue: "Line 222: max-h-48 too small; Line 206: absolute top-full position; Line 161: scrollIntoView block:end over-scrolls"
+    - path: "src/components/features/charts/project-supplies-tab.tsx"
+      issue: "Lines 416-418: handleAdded unmounts picker after every add, defeating multi-add UX"
+  missing:
+    - "Stop closing picker on add (handleAdded should refresh data, not unmount)"
+    - "Increase max-h-48 to max-h-72 or max-h-80"
+    - "Change scrollIntoView to block: nearest"
   debug_session: ""
