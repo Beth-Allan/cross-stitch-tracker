@@ -48,13 +48,17 @@
 
 ### In Progress
 
-- Phase 5 PR #7 open — awaiting review/merge
+- Phase 5 PR #7 — multi-agent review complete, 5 critical + 6 important findings
 
 ### Next Up
 
-1. Review + merge PR #7
-2. `/gsd:discuss-phase 6` — Gallery Cards & View Modes
-3. `/gsd:plan-phase 6` — plan phase 6
+1. Fix PR review findings — see `.planning/phases/05-foundation-quick-wins/05-PR-REVIEW.md`
+   - C1-C2: Remove try/catch from read-only actions (let error boundaries handle)
+   - C3: Wrap fabric link/unlink in `$transaction` in chart-actions.ts
+   - C4-C5: Add missing fabric action tests (ownership rejection + getUnassignedFabrics)
+   - I1-I6: Type fix, SearchToAdd error state, auth guard tests, etc.
+2. Push fixes, re-review, merge PR #7
+3. `/gsd:discuss-phase 6` — Gallery Cards & View Modes
 
 ### Backlog (post-MVP)
 
