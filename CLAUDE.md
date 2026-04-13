@@ -4,9 +4,9 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — human UAT 4/6 passed, 1 blocked, 1 issue remaining
+**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — shipped, PR #7 open
 **Last Updated:** 2026-04-13
-**Roadmap:** 4 milestones / 10 phases — v1.0 shipped, M2 phase 5 UAT in progress
+**Roadmap:** 4 milestones / 10 phases — v1.0 shipped, M2 phase 5 PR open
 
 ### Done
 
@@ -40,15 +40,21 @@
   - Fixed: Click-outside handler timing — replaced rAF with 200ms timestamp guard
   - Passed: Storage CRUD, Stitching App, Add New dialog, Fabric selector, Thread picker multi-add
   - Blocked: Cover image (no local file storage configured)
+- **Code review fixes** (2026-04-13): 3 critical findings fixed
+  - WR-01: try/catch around deleteChart in startTransition
+  - WR-02: userId filter on storage location and stitching app list queries
+  - WR-03: userId scoping to fabric actions via linked project ownership
+- **Phase 5 shipped** (2026-04-13): PR #7 — 74 commits, 126 files, 535 tests, 8 REQ-IDs
 
 ### In Progress
 
-- Phase 5 wrap-up — UAT complete, code review fixes + ship remaining
+- Phase 5 PR #7 open — awaiting review/merge
 
 ### Next Up
 
-1. `/gsd:code-review-fix 05` — fix 3 critical code review findings
-2. `/gsd:ship 5` — create PR for review
+1. Review + merge PR #7
+2. `/gsd:discuss-phase 6` — Gallery Cards & View Modes
+3. `/gsd:plan-phase 6` — plan phase 6
 
 ### Backlog (post-MVP)
 
