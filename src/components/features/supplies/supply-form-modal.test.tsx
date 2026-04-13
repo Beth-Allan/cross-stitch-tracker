@@ -204,8 +204,8 @@ describe("SupplyFormModal", () => {
       // Click the SearchableSelect trigger to open the dropdown
       await user.click(screen.getByText("DMC"));
 
-      // "+ Add New" should be visible immediately (no typing required)
-      expect(screen.getByText("+ Add New")).toBeInTheDocument();
+      // "Add New" should be visible immediately (no typing required)
+      expect(screen.getByText("Add New")).toBeInTheDocument();
     });
 
     it("clicking Add New opens the brand creation dialog", async () => {
@@ -221,7 +221,7 @@ describe("SupplyFormModal", () => {
       );
 
       await user.click(screen.getByText("DMC"));
-      await user.click(screen.getByText("+ Add New"));
+      await user.click(screen.getByText("Add New"));
 
       await waitFor(() => {
         expect(screen.getByText("Add New Brand")).toBeInTheDocument();
@@ -249,7 +249,7 @@ describe("SupplyFormModal", () => {
       );
 
       await user.click(screen.getByText("DMC"));
-      await user.click(screen.getByText("+ Add New"));
+      await user.click(screen.getByText("Add New"));
 
       await waitFor(() => {
         expect(screen.getByPlaceholderText(/Brand name/i)).toBeInTheDocument();

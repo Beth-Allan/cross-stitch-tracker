@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import type { Fabric, FabricBrand, ProjectStatus } from "@/generated/prisma/client";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
@@ -7,6 +8,7 @@ import { SectionHeading } from "../form-primitives/section-heading";
 import { FormField } from "../form-primitives/form-field";
 import { SearchableSelect } from "../form-primitives/searchable-select";
 import { StyledCheckbox } from "../form-primitives/styled-checkbox";
+import { InlineNameDialog } from "../inline-name-dialog";
 import { PROJECT_STATUSES, STATUS_CONFIG } from "@/lib/utils/status";
 
 interface ProjectSetupSectionProps {
@@ -23,8 +25,8 @@ interface ProjectSetupSectionProps {
   onStitchingAppChange: (value: string | null) => void;
   onFabricChange: (value: string | null) => void;
   onOnionSkinningChange: (checked: boolean) => void;
-  onAddStorageLocation?: (name: string) => void;
-  onAddStitchingApp?: (name: string) => void;
+  onAddStorageLocation?: (name: string) => Promise<void>;
+  onAddStitchingApp?: (name: string) => Promise<void>;
   errors?: { status?: string };
 }
 
@@ -46,6 +48,11 @@ export function ProjectSetupSection({
   onAddStitchingApp,
   errors,
 }: ProjectSetupSectionProps) {
+  const [storageDialogOpen, setStorageDialogOpen] = useState(false);
+  const [storageDialogName, setStorageDialogName] = useState("");
+  const [appDialogOpen, setAppDialogOpen] = useState(false);
+  const [appDialogName, setAppDialogName] = useState("");
+
   const fabricOptions = unassignedFabrics.map((f) => ({
     value: f.id,
     label: `${f.name} - ${f.count}ct ${f.type} (${f.brand.name})`,
@@ -106,9 +113,26 @@ export function ProjectSetupSection({
               options={storageOptions}
               value={storageLocationId}
               onChange={onStorageLocationChange}
-              onAddNew={onAddStorageLocation}
+              onAddNew={
+                onAddStorageLocation
+                  ? (searchTerm) => {
+                      setStorageDialogName(searchTerm);
+                      setStorageDialogOpen(true);
+                    }
+                  : undefined
+              }
               placeholder="Select storage location..."
             />
+            {onAddStorageLocation && (
+              <InlineNameDialog
+                open={storageDialogOpen}
+                onOpenChange={setStorageDialogOpen}
+                title="Add Storage Location"
+                initialName={storageDialogName}
+                placeholder="e.g. Project Bin A"
+                onSubmit={onAddStorageLocation}
+              />
+            )}
           </FormField>
 
           <FormField label="Stitching App" htmlFor="stitching-app">
@@ -116,9 +140,26 @@ export function ProjectSetupSection({
               options={appOptions}
               value={stitchingAppId}
               onChange={onStitchingAppChange}
-              onAddNew={onAddStitchingApp}
+              onAddNew={
+                onAddStitchingApp
+                  ? (searchTerm) => {
+                      setAppDialogName(searchTerm);
+                      setAppDialogOpen(true);
+                    }
+                  : undefined
+              }
               placeholder="Select stitching app..."
             />
+            {onAddStitchingApp && (
+              <InlineNameDialog
+                open={appDialogOpen}
+                onOpenChange={setAppDialogOpen}
+                title="Add Stitching App"
+                initialName={appDialogName}
+                placeholder="e.g. Pattern Keeper"
+                onSubmit={onAddStitchingApp}
+              />
+            )}
           </FormField>
         </div>
 

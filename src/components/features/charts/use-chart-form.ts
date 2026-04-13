@@ -308,7 +308,7 @@ export function useChartForm({
       if (!name.trim()) return;
       suppressUnloadRef.current = true;
       try {
-        const result = await createStorageLocation({ name });
+        const result = await createStorageLocation({ name: name.trim() });
         if (!result.success) throw new Error(result.error);
         const newItem: StorageLocationWithStats = {
           id: result.location.id,
@@ -330,7 +330,7 @@ export function useChartForm({
       if (!name.trim()) return;
       suppressUnloadRef.current = true;
       try {
-        const result = await createStitchingApp({ name });
+        const result = await createStitchingApp({ name: name.trim() });
         if (!result.success) throw new Error(result.error);
         const newItem: StitchingAppWithStats = {
           id: result.app.id,
