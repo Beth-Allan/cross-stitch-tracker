@@ -4,9 +4,9 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — all 8 plans complete, awaiting human UAT (6 items)
+**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — human UAT 4/6 passed, 1 blocked, 1 issue remaining
 **Last Updated:** 2026-04-13
-**Roadmap:** 4 milestones / 10 phases — v1.0 shipped, M2 phase 5 execution complete
+**Roadmap:** 4 milestones / 10 phases — v1.0 shipped, M2 phase 5 UAT in progress
 
 ### Done
 
@@ -33,16 +33,23 @@
   - Polish: transition-colors, semantic avatar tokens, max-w-7xl content constraint, font-heading consistency
 - **Phase 5 code review** (2026-04-13): 38 files reviewed, 3 critical + 3 warning + 3 info findings
   - Critical: authz bypass in storage/stitching app actions, hardcoded `@default("1")` on Project.userId
+- **Human UAT session** (2026-04-13): 4 passed, 1 blocked, 1 issue
+  - Fixed: SearchableSelect "Add New" now opens InlineNameDialog (matches designer pattern) instead of silent no-op
+  - Added: InlineNameDialog component, use-chart-form handler tests, integration tests with real cmdk
+  - Passed: Storage CRUD, Stitching App, Add New dialog, Fabric selector
+  - Blocked: Cover image (no local file storage configured)
+  - Issue: Thread picker opens then auto-closes — needs `/gsd-debug`
 
 ### In Progress
 
-- Nothing
+- Human UAT for phase 5 — 1 issue remaining (thread picker auto-close)
 
 ### Next Up
 
-1. `/gsd:verify-work 5` — browser-test 6 human UAT items
-2. `/gsd-code-review-fix 05` — fix 3 critical code review findings
-3. `/gsd:ship 5` — create PR for review
+1. `/gsd-debug` — fix thread picker auto-close (`search-to-add.tsx` / `project-supplies-tab.tsx`)
+2. Re-test UAT item 6 (thread picker multi-add UX)
+3. `/gsd-code-review-fix 05` — fix 3 critical code review findings
+4. `/gsd:ship 5` — create PR for review
 
 ### Backlog (post-MVP)
 
