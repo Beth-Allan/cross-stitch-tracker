@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@/__tests__/test-utils";
+import userEvent from "@testing-library/user-event";
 import {
   createMockSupplyBrand,
   createMockThread,
@@ -187,5 +188,78 @@ describe("ProjectSuppliesTab", () => {
     // verifying the picker doesn't close is the test.
     // For now, we verify the picker stays mounted by checking the input is still there
     expect(screen.getByRole("textbox")).toBeInTheDocument();
+  });
+
+  it("BUG REPRO: SearchToAdd stays open after clicking Add more (mousedown sequence)", async () => {
+    // This test simulates the full mousedown -> mouseup -> click sequence
+    // that a real browser produces, to check if the click-outside handler
+    // incorrectly fires during the opening interaction.
+    const threads = [makeThreadWithBrand()];
+    render(<ProjectSuppliesTab {...defaultProps} threads={threads} />);
+
+    const addMoreButton = screen.getByText("Add more");
+
+    // Simulate real browser event sequence: mousedown, mouseup, click
+    fireEvent.mouseDown(addMoreButton);
+    fireEvent.mouseUp(addMoreButton);
+    fireEvent.click(addMoreButton);
+
+    // Picker should be visible and STAY visible
+    await waitFor(() => {
+      expect(screen.getByRole("textbox")).toBeInTheDocument();
+    });
+
+    // Wait a tick to allow any async close handlers to fire
+    await new Promise((r) => setTimeout(r, 50));
+
+    // Picker should STILL be visible — not auto-closed
+    expect(screen.queryByRole("textbox")).toBeInTheDocument();
+  });
+
+  it("BUG REPRO: SearchToAdd stays open with userEvent.click (full browser simulation)", async () => {
+    // userEvent.click simulates the full pointer + mouse event sequence
+    // including pointerdown, mousedown, pointerup, mouseup, click, focus, etc.
+    const user = userEvent.setup();
+    const threads = [makeThreadWithBrand()];
+    render(<ProjectSuppliesTab {...defaultProps} threads={threads} />);
+
+    const addMoreButton = screen.getByText("Add more");
+    await user.click(addMoreButton);
+
+    // Picker should be visible and STAY visible
+    await waitFor(() => {
+      expect(screen.getByRole("textbox")).toBeInTheDocument();
+    });
+
+    // Wait to allow any async close to fire
+    await new Promise((r) => setTimeout(r, 100));
+
+    // Picker should STILL be visible
+    expect(screen.queryByRole("textbox")).toBeInTheDocument();
+  });
+
+  it("BUG REPRO: clicking outside SearchToAdd after it opens does close it", async () => {
+    // Verify that a SUBSEQUENT mousedown outside does correctly close the picker
+    const threads = [makeThreadWithBrand()];
+    render(<ProjectSuppliesTab {...defaultProps} threads={threads} />);
+
+    const addMoreButton = screen.getByText("Add more");
+    fireEvent.click(addMoreButton);
+
+    // Picker should be visible
+    await waitFor(() => {
+      expect(screen.getByRole("textbox")).toBeInTheDocument();
+    });
+
+    // Wait past the 200ms mount guard before the click-outside handler activates
+    await new Promise((r) => setTimeout(r, 250));
+
+    // Click outside the picker (on document body)
+    fireEvent.mouseDown(document.body);
+
+    // Picker should close
+    await waitFor(() => {
+      expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    });
   });
 });

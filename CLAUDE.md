@@ -33,23 +33,22 @@
   - Polish: transition-colors, semantic avatar tokens, max-w-7xl content constraint, font-heading consistency
 - **Phase 5 code review** (2026-04-13): 38 files reviewed, 3 critical + 3 warning + 3 info findings
   - Critical: authz bypass in storage/stitching app actions, hardcoded `@default("1")` on Project.userId
-- **Human UAT session** (2026-04-13): 4 passed, 1 blocked, 1 issue
+- **Human UAT session** (2026-04-13): 5 passed, 1 blocked
   - Fixed: SearchableSelect "Add New" now opens InlineNameDialog (matches designer pattern) instead of silent no-op
   - Added: InlineNameDialog component, use-chart-form handler tests, integration tests with real cmdk
-  - Passed: Storage CRUD, Stitching App, Add New dialog, Fabric selector
+  - Fixed: Thread picker flipUp positioning — `bottom-full` sent panel off-screen on long lists, changed to `bottom-0`
+  - Fixed: Click-outside handler timing — replaced rAF with 200ms timestamp guard
+  - Passed: Storage CRUD, Stitching App, Add New dialog, Fabric selector, Thread picker multi-add
   - Blocked: Cover image (no local file storage configured)
-  - Issue: Thread picker opens then auto-closes — needs `/gsd-debug`
 
 ### In Progress
 
-- Human UAT for phase 5 — 1 issue remaining (thread picker auto-close)
+- Phase 5 wrap-up — UAT complete, code review fixes + ship remaining
 
 ### Next Up
 
-1. `/gsd-debug` — fix thread picker auto-close (`search-to-add.tsx` / `project-supplies-tab.tsx`)
-2. Re-test UAT item 6 (thread picker multi-add UX)
-3. `/gsd-code-review-fix 05` — fix 3 critical code review findings
-4. `/gsd:ship 5` — create PR for review
+1. `/gsd:code-review-fix 05` — fix 3 critical code review findings
+2. `/gsd:ship 5` — create PR for review
 
 ### Backlog (post-MVP)
 
@@ -62,6 +61,8 @@
 - 999.0.10: Quick-add missing supplies from project detail page — if a thread/bead/specialty item isn't in the catalog, allow inline creation without navigating away to the supplies page
 - 999.0.12: Collapsible projects in shopping list — list gets long fast; projects should be collapsible with collapsed as the default state
 - 999.0.13: Thread colour picker scroll UX — adding thread colours doesn't auto-scroll to keep the search box/+Add more button visible; needs scrollIntoView or similar when adding items
+- 999.0.15: SearchToAdd panel positioning for long lists — when flipUp activates, panel overlays existing thread rows (bottom-0); ideally should use a portal or anchor to the "+ Add more" button so it opens adjacent without covering content
+- 999.0.16: SearchToAdd highlight conflict — first item starts with bg-muted highlight (highlightIndex=0) which clashes with hover:bg-muted on other items; should only show keyboard highlight after arrow key use, not on initial render
 - 999.0.14: Project Bin & iPad App management — "Add New" with empty search creates "New Location" with no way to rename; need proper add/edit/delete for storage locations and stitching apps (currently hardcoded arrays in project-setup-section.tsx)
 - 999.1: Supply detail modal (read-only view with "used in projects" list)
 - 999.2: Bulk supply editor

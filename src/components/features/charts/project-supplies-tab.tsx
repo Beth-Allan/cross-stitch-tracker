@@ -419,6 +419,10 @@ export function ProjectSuppliesTab({
     // User closes picker with Escape or click-outside.
   }, []);
 
+  const handleCloseSearch = useCallback(() => {
+    setAddingType(null);
+  }, []);
+
   return (
     <div className="space-y-5">
       {/* Kitting Progress Summary */}
@@ -511,7 +515,7 @@ export function ProjectSuppliesTab({
             projectId={projectId}
             existingIds={linkedThreadIds}
             onAdded={handleAdded}
-            onClose={() => setAddingType(null)}
+            onClose={handleCloseSearch}
           />
         )}
       </div>
@@ -555,7 +559,7 @@ export function ProjectSuppliesTab({
             projectId={projectId}
             existingIds={linkedBeadIds}
             onAdded={handleAdded}
-            onClose={() => setAddingType(null)}
+            onClose={handleCloseSearch}
           />
         )}
       </div>
@@ -605,7 +609,7 @@ export function ProjectSuppliesTab({
             projectId={projectId}
             existingIds={linkedSpecialtyIds}
             onAdded={handleAdded}
-            onClose={() => setAddingType(null)}
+            onClose={handleCloseSearch}
           />
         )}
       </div>

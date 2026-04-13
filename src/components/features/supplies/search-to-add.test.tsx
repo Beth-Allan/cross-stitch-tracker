@@ -302,7 +302,7 @@ describe("SearchToAdd - viewport flip", () => {
     });
   });
 
-  it("uses bottom-full positioning when near viewport bottom", async () => {
+  it("uses bottom-0 positioning when near viewport bottom", async () => {
     // 600px viewport, element bottom at 500px = 100px below (< 300)
     Object.defineProperty(window, "innerHeight", { value: 600, writable: true });
 
@@ -325,9 +325,9 @@ describe("SearchToAdd - viewport flip", () => {
 
     await waitFor(() => {
       const outerDiv = container.firstElementChild as HTMLElement;
-      expect(outerDiv.className).toContain("bottom-full");
-      expect(outerDiv.className).toContain("mb-1");
+      expect(outerDiv.className).toContain("bottom-0");
       expect(outerDiv.className).not.toContain("top-full");
+      expect(outerDiv.className).not.toContain("bottom-full");
     });
   });
 });

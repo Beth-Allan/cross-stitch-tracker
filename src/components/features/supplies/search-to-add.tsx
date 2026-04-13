@@ -66,15 +66,22 @@ export function SearchToAdd({
   const ref = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Close on click outside
+  // Close on click outside — ignore mousedown events within 200ms of mount
+  // so the opening click (and any trackpad ghost events) can't immediately
+  // close the panel. Timestamp guard is more reliable than rAF across
+  // browsers and trackpad configurations.
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    const mountedAt = Date.now();
+
+    function handleMouseDown(e: MouseEvent) {
+      if (Date.now() - mountedAt < 200) return;
       if (ref.current && !ref.current.contains(e.target as Node)) {
         onClose();
       }
     }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
   }, [onClose]);
 
   // Close on Escape
@@ -213,7 +220,7 @@ export function SearchToAdd({
       ref={ref}
       className={cn(
         "border-border bg-card absolute right-0 left-0 z-20 rounded-lg border shadow-lg",
-        flipUp ? "bottom-full mb-1" : "top-full mt-1"
+        flipUp ? "bottom-0" : "top-full mt-1",
       )}
     >
       <div className="p-2">
