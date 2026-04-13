@@ -25,6 +25,10 @@
 - **Phase 5 audit + harden + polish** (2026-04-12): impeccable:audit scored 15/20, all P1-P2 fixes applied
   - Fixed blur-cancels-tab bug in InlineAddRow, added aria-labels, wired label association on SearchableSelect
   - Replaced transition-all, added responsive breakpoint, removed dead code — score now 17/20
+- **Critique report infrastructure fixes** (2026-04-12): addressed P3/P4 from critique (scored 24/40)
+  - 11 loading.tsx skeleton screens (all dashboard routes), global-error.tsx, not-found.tsx
+  - Sidebar nav grouped into 4 labeled sections (Projects, Track, Reference, System) with dividers — desktop + mobile
+  - Polish: transition-colors, semantic avatar tokens, max-w-7xl content constraint, font-heading consistency
 
 ### In Progress
 
