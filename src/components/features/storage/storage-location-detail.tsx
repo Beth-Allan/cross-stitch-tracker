@@ -97,7 +97,7 @@ export function StorageLocationDetail({ location }: StorageLocationDetailProps) 
           <Link
             key={project.id}
             href={`/charts/${project.chart.id}`}
-            className="group border-border bg-card flex items-center gap-4 rounded-xl border px-4 py-3 shadow-sm transition-all hover:shadow-md"
+            className="group border-border bg-card flex items-center gap-4 rounded-xl border px-4 py-3 shadow-sm transition-shadow hover:shadow-md"
           >
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{project.chart.name}</p>

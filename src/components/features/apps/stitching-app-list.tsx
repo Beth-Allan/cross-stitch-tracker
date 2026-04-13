@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useTransition } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Tablet, Pencil, Trash2, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
@@ -27,8 +27,6 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
     name: string;
     projectCount: number;
   } | null>(null);
-  const [, startTransition] = useTransition();
-
   async function handleCreate(name: string) {
     try {
       const result = await createStitchingApp({ name });
@@ -147,6 +145,7 @@ function InlineAddRow({
 }) {
   const [name, setName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -160,8 +159,17 @@ function InlineAddRow({
     }
   }
 
+  function handleBlur(e: React.FocusEvent) {
+    // Don't cancel if focus moved to another element within this row (e.g. the Add button)
+    if (rowRef.current?.contains(e.relatedTarget as Node)) return;
+    onCancel();
+  }
+
   return (
-    <div className="border-primary/20 bg-primary/5 flex items-center gap-3 rounded-xl border px-4 py-3">
+    <div
+      ref={rowRef}
+      className="border-primary/20 bg-primary/5 flex items-center gap-3 rounded-xl border px-4 py-3"
+    >
       <Tablet className="text-primary h-4 w-4 shrink-0" />
       <input
         ref={inputRef}
@@ -169,7 +177,8 @@ function InlineAddRow({
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={handleKeyDown}
-        onBlur={onCancel}
+        onBlur={handleBlur}
+        aria-label="New app name"
         placeholder="App name, e.g. Markup R-XP, Pattern Keeper..."
         className="placeholder:text-muted-foreground flex-1 bg-transparent text-sm focus:outline-none"
       />
@@ -229,7 +238,7 @@ function AppRow({
           onNavigate();
         }
       }}
-      className="group border-border bg-card hover:border-border/80 flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 shadow-sm transition-all hover:shadow-md"
+      className="group border-border bg-card hover:border-border/80 flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 shadow-sm transition-[box-shadow,border-color] hover:shadow-md"
     >
       {/* Icon badge */}
       <div className="bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
