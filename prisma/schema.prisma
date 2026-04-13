@@ -68,7 +68,7 @@ model Project {
   id                   String             @id @default(cuid())
   chart                Chart              @relation(fields: [chartId], references: [id], onDelete: Cascade)
   chartId              String             @unique
-  userId               String             @default("1")
+  userId               String
   status               ProjectStatus      @default(UNSTARTED)
   startDate            DateTime?
   finishDate           DateTime?
@@ -76,9 +76,9 @@ model Project {
   finishPhotoUrl       String?
   startingStitches     Int                @default(0)
   stitchesCompleted    Int                @default(0)
-  storageLocation      StorageLocation? @relation(fields: [storageLocationId], references: [id])
+  storageLocation      StorageLocation?   @relation(fields: [storageLocationId], references: [id])
   storageLocationId    String?
-  stitchingApp         StitchingApp?   @relation(fields: [stitchingAppId], references: [id])
+  stitchingApp         StitchingApp?      @relation(fields: [stitchingAppId], references: [id])
   stitchingAppId       String?
   needsOnionSkinning   Boolean            @default(false)
   wantToStartNext      Boolean            @default(false)
@@ -229,22 +229,22 @@ model FabricBrand {
 }
 
 model Fabric {
-  id                 String       @id @default(cuid())
+  id                 String      @id @default(cuid())
   name               String
-  brand              FabricBrand  @relation(fields: [brandId], references: [id])
+  brand              FabricBrand @relation(fields: [brandId], references: [id])
   brandId            String
   photoUrl           String?
   count              Int
   type               String
   colorFamily        String
   colorType          String
-  shortestEdgeInches Float        @default(0)
-  longestEdgeInches  Float        @default(0)
-  needToBuy          Boolean      @default(false)
-  linkedProject      Project?     @relation(fields: [linkedProjectId], references: [id])
-  linkedProjectId    String?      @unique
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
+  shortestEdgeInches Float       @default(0)
+  longestEdgeInches  Float       @default(0)
+  needToBuy          Boolean     @default(false)
+  linkedProject      Project?    @relation(fields: [linkedProjectId], references: [id])
+  linkedProjectId    String?     @unique
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
 }
 
 // ─── Storage & App Models ───────────────────────────────────────────────────
