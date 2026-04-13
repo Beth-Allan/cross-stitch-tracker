@@ -45,20 +45,21 @@
   - WR-02: userId filter on storage location and stitching app list queries
   - WR-03: userId scoping to fabric actions via linked project ownership
 - **Phase 5 shipped** (2026-04-13): PR #7 — 74 commits, 126 files, 535 tests, 8 REQ-IDs
+- **PR review fixes** (2026-04-13): all 5 critical + 6 important findings addressed
+  - C1-C2: Removed try/catch from 12 read-only actions (error boundaries handle DB failures)
+  - C3: Wrapped chart+fabric operations in `$transaction`
+  - C4-C5: Added fabric ownership rejection + getUnassignedFabrics tests
+  - I1-I6: ProjectStatus type, SearchToAdd error state, fabric ownership check, delete dialog retry, auth guard tests, form error logging
+  - 546 tests passing, build clean
 
 ### In Progress
 
-- Phase 5 PR #7 — multi-agent review complete, 5 critical + 6 important findings
+- Phase 5 PR #7 — review fixes pushed, ready for re-review and merge
 
 ### Next Up
 
-1. Fix PR review findings — see `.planning/phases/05-foundation-quick-wins/05-PR-REVIEW.md`
-   - C1-C2: Remove try/catch from read-only actions (let error boundaries handle)
-   - C3: Wrap fabric link/unlink in `$transaction` in chart-actions.ts
-   - C4-C5: Add missing fabric action tests (ownership rejection + getUnassignedFabrics)
-   - I1-I6: Type fix, SearchToAdd error state, auth guard tests, etc.
-2. Push fixes, re-review, merge PR #7
-3. `/gsd:discuss-phase 6` — Gallery Cards & View Modes
+1. Re-review PR #7 and merge
+2. `/gsd:discuss-phase 6` — Gallery Cards & View Modes
 
 ### Backlog (post-MVP)
 
