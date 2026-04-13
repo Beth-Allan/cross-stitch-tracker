@@ -1,6 +1,6 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
 import type { SizeCategory } from "@/lib/utils/size-category";
-import type { ProjectWithRelations, ChartWithProject } from "@/types/chart";
+import type { ProjectWithRelations, ChartWithProject, SupplyQuantity } from "@/types/chart";
 
 // Re-export for convenience
 export type { ProjectStatus } from "@/generated/prisma/client";
@@ -12,7 +12,7 @@ export type StatusGroup = "wip" | "unstarted" | "finished";
 
 // ─── Kitting ────────────────────────────────────────────────────────────────
 
-export type KittingItemStatus = "fulfilled" | "needed" | "not-applicable";
+export type KittingItemStatus = "fulfilled" | "partial" | "needed" | "not-applicable";
 
 // ─── View Modes ─────────────────────────────────────────────────────────────
 
@@ -21,7 +21,14 @@ export type ViewMode = (typeof VIEW_MODES)[number];
 
 // ─── Sort ───────────────────────────────────────────────────────────────────
 
-export const SORT_FIELDS = ["dateAdded", "name", "designer", "status", "size", "stitchCount"] as const;
+export const SORT_FIELDS = [
+  "dateAdded",
+  "name",
+  "designer",
+  "status",
+  "size",
+  "stitchCount",
+] as const;
 export type SortField = (typeof SORT_FIELDS)[number];
 
 export const SORT_DIRS = ["asc", "desc"] as const;
@@ -59,11 +66,9 @@ export interface GalleryCardData {
 // ─── Extended Prisma Query Types ────────────────────────────────────────────
 
 export type GalleryProjectWithRelations = ProjectWithRelations & {
-  _count: {
-    projectThreads: number;
-    projectBeads: number;
-    projectSpecialty: number;
-  };
+  projectThreads: SupplyQuantity[];
+  projectBeads: SupplyQuantity[];
+  projectSpecialty: SupplyQuantity[];
 };
 
 export type GalleryChartWithProject = Omit<ChartWithProject, "project"> & {

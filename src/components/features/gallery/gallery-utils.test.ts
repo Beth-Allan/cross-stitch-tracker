@@ -47,11 +47,14 @@ describe("getStatusGroup", () => {
 // ─── computeKittingDots ─────────────────────────────────────────────────────
 
 describe("computeKittingDots", () => {
+  const noSupplies = { projectThreads: [], projectBeads: [], projectSpecialty: [] };
+  const acquired = { quantityRequired: 1, quantityAcquired: 1 };
+  const unacquired = { quantityRequired: 1, quantityAcquired: 0 };
+
   it("returns fulfilled for fabric when project has fabric", () => {
     const result = computeKittingDots({
       fabric: { id: "f1" },
-      _count: { projectThreads: 0, projectBeads: 0, projectSpecialty: 0 },
-      status: "UNSTARTED",
+      ...noSupplies,
     });
     expect(result.fabricStatus).toBe("fulfilled");
   });
@@ -59,80 +62,91 @@ describe("computeKittingDots", () => {
   it("returns needed for fabric when project has no fabric", () => {
     const result = computeKittingDots({
       fabric: null,
-      _count: { projectThreads: 0, projectBeads: 0, projectSpecialty: 0 },
-      status: "UNSTARTED",
+      ...noSupplies,
     });
     expect(result.fabricStatus).toBe("needed");
   });
 
-  it("returns fulfilled for threads when count > 0", () => {
+  it("returns not-applicable for threads when none linked", () => {
     const result = computeKittingDots({
       fabric: null,
-      _count: { projectThreads: 5, projectBeads: 0, projectSpecialty: 0 },
-      status: "UNSTARTED",
+      ...noSupplies,
+    });
+    expect(result.threadStatus).toBe("not-applicable");
+  });
+
+  it("returns partial for threads when some are not acquired", () => {
+    const result = computeKittingDots({
+      fabric: null,
+      projectThreads: [acquired, unacquired, acquired],
+      projectBeads: [],
+      projectSpecialty: [],
+    });
+    expect(result.threadStatus).toBe("partial");
+  });
+
+  it("returns fulfilled for threads when all are acquired", () => {
+    const result = computeKittingDots({
+      fabric: null,
+      projectThreads: [acquired, acquired, acquired],
+      projectBeads: [],
+      projectSpecialty: [],
     });
     expect(result.threadStatus).toBe("fulfilled");
   });
 
-  it("returns needed for threads when count is 0", () => {
+  it("returns partial for threads when none are acquired yet", () => {
     const result = computeKittingDots({
       fabric: null,
-      _count: { projectThreads: 0, projectBeads: 0, projectSpecialty: 0 },
-      status: "UNSTARTED",
+      projectThreads: [unacquired, unacquired],
+      projectBeads: [],
+      projectSpecialty: [],
     });
-    expect(result.threadStatus).toBe("needed");
+    expect(result.threadStatus).toBe("partial");
   });
 
-  it("returns not-applicable for beads when KITTED+ with 0 beads", () => {
+  it("returns not-applicable for beads when none linked", () => {
     const result = computeKittingDots({
       fabric: null,
-      _count: { projectThreads: 0, projectBeads: 0, projectSpecialty: 0 },
-      status: "KITTED",
+      ...noSupplies,
     });
     expect(result.beadsStatus).toBe("not-applicable");
   });
 
-  it("returns needed for beads when UNSTARTED with 0 beads", () => {
+  it("returns fulfilled for beads when all acquired", () => {
     const result = computeKittingDots({
       fabric: null,
-      _count: { projectThreads: 0, projectBeads: 0, projectSpecialty: 0 },
-      status: "UNSTARTED",
-    });
-    expect(result.beadsStatus).toBe("needed");
-  });
-
-  it("returns fulfilled for beads when count > 0", () => {
-    const result = computeKittingDots({
-      fabric: null,
-      _count: { projectThreads: 0, projectBeads: 3, projectSpecialty: 0 },
-      status: "UNSTARTED",
+      projectThreads: [],
+      projectBeads: [acquired, acquired],
+      projectSpecialty: [],
     });
     expect(result.beadsStatus).toBe("fulfilled");
   });
 
-  it("returns not-applicable for specialty when KITTED+ with 0 specialty", () => {
+  it("returns partial for beads when some not acquired", () => {
     const result = computeKittingDots({
       fabric: null,
-      _count: { projectThreads: 0, projectBeads: 0, projectSpecialty: 0 },
-      status: "IN_PROGRESS",
+      projectThreads: [],
+      projectBeads: [acquired, unacquired],
+      projectSpecialty: [],
+    });
+    expect(result.beadsStatus).toBe("partial");
+  });
+
+  it("returns not-applicable for specialty when none linked", () => {
+    const result = computeKittingDots({
+      fabric: null,
+      ...noSupplies,
     });
     expect(result.specialtyStatus).toBe("not-applicable");
   });
 
-  it("returns needed for specialty when KITTING with 0 specialty", () => {
+  it("returns fulfilled for specialty when all acquired", () => {
     const result = computeKittingDots({
       fabric: null,
-      _count: { projectThreads: 0, projectBeads: 0, projectSpecialty: 0 },
-      status: "KITTING",
-    });
-    expect(result.specialtyStatus).toBe("needed");
-  });
-
-  it("returns fulfilled for specialty when count > 0", () => {
-    const result = computeKittingDots({
-      fabric: null,
-      _count: { projectThreads: 0, projectBeads: 0, projectSpecialty: 2 },
-      status: "KITTING",
+      projectThreads: [],
+      projectBeads: [],
+      projectSpecialty: [acquired],
     });
     expect(result.specialtyStatus).toBe("fulfilled");
   });
@@ -160,7 +174,14 @@ describe("transformToGalleryCard", () => {
     notes: null,
     createdAt: new Date(),
     updatedAt: new Date(),
-    designer: { id: "d1", name: "Jane Doe", website: null, notes: null, createdAt: new Date(), updatedAt: new Date() },
+    designer: {
+      id: "d1",
+      name: "Jane Doe",
+      website: null,
+      notes: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
     genres: [
       { id: "g1", name: "Sampler", createdAt: new Date(), updatedAt: new Date() },
       { id: "g2", name: "Floral", createdAt: new Date(), updatedAt: new Date() },
@@ -185,8 +206,35 @@ describe("transformToGalleryCard", () => {
       updatedAt: new Date(),
       storageLocation: null,
       stitchingApp: null,
-      fabric: { id: "f1", name: "Aida 14ct", brandId: "fb-1", photoUrl: null, count: 14, type: "Aida", colorFamily: "White", colorType: "White", shortestEdgeInches: 18, longestEdgeInches: 24, needToBuy: false, linkedProjectId: "proj-1", createdAt: new Date(), updatedAt: new Date(), brand: { id: "fb-1", name: "Zweigart", website: null, createdAt: new Date(), updatedAt: new Date() } },
-      _count: { projectThreads: 12, projectBeads: 0, projectSpecialty: 1 },
+      fabric: {
+        id: "f1",
+        name: "Aida 14ct",
+        brandId: "fb-1",
+        photoUrl: null,
+        count: 14,
+        type: "Aida",
+        colorFamily: "White",
+        colorType: "White",
+        shortestEdgeInches: 18,
+        longestEdgeInches: 24,
+        needToBuy: false,
+        linkedProjectId: "proj-1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        brand: {
+          id: "fb-1",
+          name: "Zweigart",
+          website: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      },
+      projectThreads: Array.from({ length: 12 }, () => ({
+        quantityRequired: 1,
+        quantityAcquired: 1,
+      })),
+      projectBeads: [],
+      projectSpecialty: [{ quantityRequired: 1, quantityAcquired: 1 }],
     },
   };
 
@@ -227,7 +275,7 @@ describe("transformToGalleryCard", () => {
     expect(card.specialtyStatus).toBe("fulfilled");
   });
 
-  it("maps supply counts from project._count", () => {
+  it("maps supply counts from project supply arrays", () => {
     const card = transformToGalleryCard(baseChart, imageUrls);
     expect(card.threadColourCount).toBe(12);
     expect(card.beadTypeCount).toBe(0);
@@ -248,9 +296,9 @@ describe("transformToGalleryCard", () => {
     expect(card.stitchesCompleted).toBe(0);
     expect(card.progressPercent).toBe(0);
     expect(card.fabricStatus).toBe("needed");
-    expect(card.threadStatus).toBe("needed");
-    expect(card.beadsStatus).toBe("needed");
-    expect(card.specialtyStatus).toBe("needed");
+    expect(card.threadStatus).toBe("not-applicable");
+    expect(card.beadsStatus).toBe("not-applicable");
+    expect(card.specialtyStatus).toBe("not-applicable");
     expect(card.threadColourCount).toBe(0);
     expect(card.beadTypeCount).toBe(0);
     expect(card.specialtyItemCount).toBe(0);
@@ -386,7 +434,15 @@ describe("STATUS_GRADIENTS", () => {
   });
 
   it("has entries for all ProjectStatus values", () => {
-    const statuses = ["UNSTARTED", "KITTING", "KITTED", "IN_PROGRESS", "ON_HOLD", "FINISHED", "FFO"];
+    const statuses = [
+      "UNSTARTED",
+      "KITTING",
+      "KITTED",
+      "IN_PROGRESS",
+      "ON_HOLD",
+      "FINISHED",
+      "FFO",
+    ];
     for (const status of statuses) {
       expect(STATUS_GRADIENTS).toHaveProperty(status);
       const [from, to] = STATUS_GRADIENTS[status as keyof typeof STATUS_GRADIENTS];

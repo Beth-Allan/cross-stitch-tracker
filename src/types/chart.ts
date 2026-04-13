@@ -24,6 +24,11 @@ export type ChartWithProject = Chart & {
 
 // ─── Gallery Query Types ────────────────────────────────────────────────────
 
+export type SupplyQuantity = {
+  quantityRequired: number;
+  quantityAcquired: number;
+};
+
 export type GalleryProjectData = {
   id: string;
   status: ProjectStatus;
@@ -32,11 +37,9 @@ export type GalleryProjectData = {
   finishDate: Date | null;
   ffoDate: Date | null;
   fabric: { id: string } | null;
-  _count: {
-    projectThreads: number;
-    projectBeads: number;
-    projectSpecialty: number;
-  };
+  projectThreads: SupplyQuantity[];
+  projectBeads: SupplyQuantity[];
+  projectSpecialty: SupplyQuantity[];
 };
 
 export type GalleryChartData = Chart & {

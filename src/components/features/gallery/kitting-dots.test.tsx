@@ -46,6 +46,18 @@ describe("KittingDots", () => {
     expect(screen.getByTitle("Thread: Still needed")).toBeInTheDocument();
   });
 
+  it("shows 'In progress' tooltip for partial items", () => {
+    render(
+      <KittingDots
+        fabricStatus="fulfilled"
+        threadStatus="partial"
+        beadsStatus="not-applicable"
+        specialtyStatus="not-applicable"
+      />,
+    );
+    expect(screen.getByTitle("Thread: In progress")).toBeInTheDocument();
+  });
+
   it("shows 'Not needed for this project' tooltip for not-applicable items", () => {
     render(
       <KittingDots
@@ -55,12 +67,8 @@ describe("KittingDots", () => {
         specialtyStatus="not-applicable"
       />,
     );
-    expect(
-      screen.getByTitle("Beads: Not needed for this project"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByTitle("Specialty: Not needed for this project"),
-    ).toBeInTheDocument();
+    expect(screen.getByTitle("Beads: Not needed for this project")).toBeInTheDocument();
+    expect(screen.getByTitle("Specialty: Not needed for this project")).toBeInTheDocument();
   });
 
   it("renders line-through class for not-applicable labels", () => {
@@ -78,12 +86,12 @@ describe("KittingDots", () => {
     expect(specialtyLabel.className).toContain("line-through");
   });
 
-  it("does not render line-through for fulfilled or needed labels", () => {
+  it("does not render line-through for fulfilled, partial, or needed labels", () => {
     render(
       <KittingDots
         fabricStatus="fulfilled"
-        threadStatus="needed"
-        beadsStatus="not-applicable"
+        threadStatus="partial"
+        beadsStatus="needed"
         specialtyStatus="not-applicable"
       />,
     );
@@ -91,6 +99,8 @@ describe("KittingDots", () => {
     expect(fabricLabel.className).not.toContain("line-through");
     const threadLabel = screen.getByText("Thread");
     expect(threadLabel.className).not.toContain("line-through");
+    const beadsLabel = screen.getByText("Beads");
+    expect(beadsLabel.className).not.toContain("line-through");
   });
 
   it("renders aria-labels on each dot item", () => {
@@ -104,9 +114,7 @@ describe("KittingDots", () => {
     );
     expect(screen.getByLabelText("Fabric: Ready")).toBeInTheDocument();
     expect(screen.getByLabelText("Thread: Still needed")).toBeInTheDocument();
-    expect(
-      screen.getByLabelText("Beads: Not needed for this project"),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Beads: Not needed for this project")).toBeInTheDocument();
     expect(screen.getByLabelText("Specialty: Ready")).toBeInTheDocument();
   });
 
@@ -132,18 +140,18 @@ describe("KittingDots", () => {
     const { container } = render(
       <KittingDots
         fabricStatus="fulfilled"
-        threadStatus="needed"
+        threadStatus="partial"
         beadsStatus="not-applicable"
         specialtyStatus="fulfilled"
       />,
     );
     const svgs = container.querySelectorAll("svg");
     expect(svgs).toHaveLength(4);
-    // First (fabric) and fourth (specialty) should have emerald
+    // First (fabric) should have emerald
     expect(svgs[0].getAttribute("class")).toContain("emerald");
-    // Second (thread) should have stone-400
-    expect(svgs[1].getAttribute("class")).toContain("stone-400");
-    // Third (beads) should have stone-300
+    // Second (thread) should have amber (partial)
+    expect(svgs[1].getAttribute("class")).toContain("amber");
+    // Third (beads) should have stone-300 (not-applicable)
     expect(svgs[2].getAttribute("class")).toContain("stone-300");
     // Fourth (specialty) should have emerald
     expect(svgs[3].getAttribute("class")).toContain("emerald");

@@ -337,12 +337,14 @@ export async function getChartsForGallery() {
           finishDate: true,
           ffoDate: true,
           fabric: { select: { id: true } },
-          _count: {
-            select: {
-              projectThreads: true,
-              projectBeads: true,
-              projectSpecialty: true,
-            },
+          projectThreads: {
+            select: { quantityRequired: true, quantityAcquired: true },
+          },
+          projectBeads: {
+            select: { quantityRequired: true, quantityAcquired: true },
+          },
+          projectSpecialty: {
+            select: { quantityRequired: true, quantityAcquired: true },
           },
         },
       },

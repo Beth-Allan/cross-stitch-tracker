@@ -48,13 +48,9 @@ vi.mock("./view-toggle-bar", () => ({
 }));
 
 vi.mock("@/components/ui/link-button", () => ({
-  LinkButton: ({
-    href,
-    children,
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => <a href={href}>{children}</a>,
+  LinkButton: ({ href, children }: { href: string; children: React.ReactNode }) => (
+    <a href={href}>{children}</a>
+  ),
 }));
 
 // Dynamic import after mocks are set up
@@ -88,9 +84,18 @@ function createMockGalleryChartData(overrides?: Partial<GalleryChartData>): Gall
       finishDate: null,
       ffoDate: null,
       fabric: null,
-      _count: { projectThreads: 0, projectBeads: 0, projectSpecialty: 0 },
+      projectThreads: [],
+      projectBeads: [],
+      projectSpecialty: [],
     },
-    designer: { id: "d1", name: "Test Designer", website: null, notes: null, createdAt: new Date(), updatedAt: new Date() },
+    designer: {
+      id: "d1",
+      name: "Test Designer",
+      website: null,
+      notes: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
     genres: [],
     ...overrides,
   };
@@ -102,9 +107,7 @@ describe("ProjectGallery", () => {
 
   it("renders 'Project Gallery' heading", () => {
     render(<ProjectGallery charts={mockCharts} imageUrls={mockImageUrls} />);
-    expect(
-      screen.getByRole("heading", { name: /Project Gallery/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Project Gallery/i })).toBeInTheDocument();
   });
 
   it("renders 'Add Project' link button", () => {

@@ -44,7 +44,7 @@ describe("getChartsForGallery", () => {
     );
   });
 
-  it("includes project supply counts via _count select", async () => {
+  it("includes project supply quantities for kitting dot computation", async () => {
     mockPrisma.chart.findMany.mockResolvedValueOnce([]);
     const { getChartsForGallery } = await import("./chart-actions");
 
@@ -52,19 +52,17 @@ describe("getChartsForGallery", () => {
 
     const call = mockPrisma.chart.findMany.mock.calls[0][0];
 
-    // The project select/include should contain _count with supply tables
     const projectConfig = call.include?.project ?? call.select?.project;
     expect(projectConfig).toBeDefined();
 
-    // Check that _count is requested for supply junction tables
     const selectOrInclude = projectConfig.select ?? projectConfig.include ?? projectConfig;
-    const countConfig = selectOrInclude._count;
-    expect(countConfig).toBeDefined();
 
-    const countSelect = countConfig.select ?? countConfig;
-    expect(countSelect.projectThreads).toBe(true);
-    expect(countSelect.projectBeads).toBe(true);
-    expect(countSelect.projectSpecialty).toBe(true);
+    // Supply relations should be selected with quantity fields
+    for (const relation of ["projectThreads", "projectBeads", "projectSpecialty"]) {
+      expect(selectOrInclude[relation]).toBeDefined();
+      expect(selectOrInclude[relation].select.quantityRequired).toBe(true);
+      expect(selectOrInclude[relation].select.quantityAcquired).toBe(true);
+    }
   });
 
   it("includes designer and genres", async () => {

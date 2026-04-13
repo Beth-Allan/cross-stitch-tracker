@@ -1,4 +1,4 @@
-import { Check, Circle, Minus } from "lucide-react";
+import { Check, CircleDot, Circle, Minus } from "lucide-react";
 import type { KittingItemStatus } from "./gallery-types";
 
 interface KittingDotsProps {
@@ -11,26 +11,13 @@ interface KittingDotsProps {
 function KittingDotIcon({ status }: { status: KittingItemStatus }) {
   switch (status) {
     case "fulfilled":
-      return (
-        <Check
-          className="h-3 w-3 text-emerald-500 dark:text-emerald-400"
-          strokeWidth={2.5}
-        />
-      );
+      return <Check className="h-3 w-3 text-emerald-500 dark:text-emerald-400" strokeWidth={2.5} />;
+    case "partial":
+      return <CircleDot className="h-3 w-3 text-amber-500 dark:text-amber-400" strokeWidth={2} />;
     case "needed":
-      return (
-        <Circle
-          className="h-3 w-3 text-stone-400 dark:text-stone-500"
-          strokeWidth={2}
-        />
-      );
+      return <Circle className="h-3 w-3 text-stone-400 dark:text-stone-500" strokeWidth={2} />;
     case "not-applicable":
-      return (
-        <Minus
-          className="h-3 w-3 text-stone-300 dark:text-stone-600"
-          strokeWidth={2}
-        />
-      );
+      return <Minus className="h-3 w-3 text-stone-300 dark:text-stone-600" strokeWidth={2} />;
   }
 }
 
@@ -38,6 +25,8 @@ function getTooltipText(label: string, status: KittingItemStatus): string {
   switch (status) {
     case "fulfilled":
       return `${label}: Ready`;
+    case "partial":
+      return `${label}: In progress`;
     case "needed":
       return `${label}: Still needed`;
     case "not-applicable":

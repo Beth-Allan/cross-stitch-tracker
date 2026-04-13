@@ -1,9 +1,6 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
 import type { SizeCategory } from "@/lib/utils/size-category";
-import {
-  calculateSizeCategory,
-  getEffectiveStitchCount,
-} from "@/lib/utils/size-category";
+import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
 import type {
   GalleryCardData,
   GalleryChartWithProject,
@@ -32,45 +29,31 @@ export function getStatusGroup(status: ProjectStatus): StatusGroup {
 
 // ─── Kitting Dot Computation ────────────────────────────────────────────────
 
-const KITTED_OR_BEYOND: ProjectStatus[] = [
-  "KITTED",
-  "IN_PROGRESS",
-  "ON_HOLD",
-  "FINISHED",
-  "FFO",
-];
+type SupplyItem = { quantityRequired: number; quantityAcquired: number };
+
+function computeSupplyStatus(items: SupplyItem[]): KittingItemStatus {
+  if (items.length === 0) return "not-applicable";
+  const allAcquired = items.every((i) => i.quantityAcquired >= i.quantityRequired);
+  if (allAcquired) return "fulfilled";
+  return "partial";
+}
 
 export function computeKittingDots(project: {
   fabric: { id: string } | null;
-  _count: {
-    projectThreads: number;
-    projectBeads: number;
-    projectSpecialty: number;
-  };
-  status: ProjectStatus;
+  projectThreads: SupplyItem[];
+  projectBeads: SupplyItem[];
+  projectSpecialty: SupplyItem[];
 }): {
   fabricStatus: KittingItemStatus;
   threadStatus: KittingItemStatus;
   beadsStatus: KittingItemStatus;
   specialtyStatus: KittingItemStatus;
 } {
-  const isKittedOrBeyond = KITTED_OR_BEYOND.includes(project.status);
-
   return {
     fabricStatus: project.fabric ? "fulfilled" : "needed",
-    threadStatus: project._count.projectThreads > 0 ? "fulfilled" : "needed",
-    beadsStatus:
-      project._count.projectBeads > 0
-        ? "fulfilled"
-        : isKittedOrBeyond
-          ? "not-applicable"
-          : "needed",
-    specialtyStatus:
-      project._count.projectSpecialty > 0
-        ? "fulfilled"
-        : isKittedOrBeyond
-          ? "not-applicable"
-          : "needed",
+    threadStatus: computeSupplyStatus(project.projectThreads),
+    beadsStatus: computeSupplyStatus(project.projectBeads),
+    specialtyStatus: computeSupplyStatus(project.projectSpecialty),
   };
 }
 
@@ -83,29 +66,28 @@ export function transformToGalleryCard(
   const status: ProjectStatus = chart.project?.status ?? "UNSTARTED";
   const statusGroup = getStatusGroup(status);
 
-  const { count: stitchCount, approximate: stitchCountApproximate } =
-    getEffectiveStitchCount(
-      chart.stitchCount,
-      chart.stitchesWide,
-      chart.stitchesHigh,
-    );
+  const { count: stitchCount, approximate: stitchCountApproximate } = getEffectiveStitchCount(
+    chart.stitchCount,
+    chart.stitchesWide,
+    chart.stitchesHigh,
+  );
   const sizeCategory = calculateSizeCategory(stitchCount);
 
   const stitchesCompleted = chart.project?.stitchesCompleted ?? 0;
-  const progressPercent =
-    stitchCount > 0 ? Math.round((stitchesCompleted / stitchCount) * 100) : 0;
+  const progressPercent = stitchCount > 0 ? Math.round((stitchesCompleted / stitchCount) * 100) : 0;
 
-  // Kitting dots
+  // Kitting dots — default to not-applicable when no project (no supplies linked)
   let fabricStatus: KittingItemStatus = "needed";
-  let threadStatus: KittingItemStatus = "needed";
-  let beadsStatus: KittingItemStatus = "needed";
-  let specialtyStatus: KittingItemStatus = "needed";
+  let threadStatus: KittingItemStatus = "not-applicable";
+  let beadsStatus: KittingItemStatus = "not-applicable";
+  let specialtyStatus: KittingItemStatus = "not-applicable";
 
   if (chart.project) {
     const dots = computeKittingDots({
       fabric: chart.project.fabric ? { id: chart.project.fabric.id } : null,
-      _count: chart.project._count,
-      status: chart.project.status,
+      projectThreads: chart.project.projectThreads,
+      projectBeads: chart.project.projectBeads,
+      projectSpecialty: chart.project.projectSpecialty,
     });
     fabricStatus = dots.fabricStatus;
     threadStatus = dots.threadStatus;
@@ -118,9 +100,7 @@ export function transformToGalleryCard(
     projectId: chart.project?.id ?? null,
     name: chart.name,
     designerName: chart.designer?.name ?? "Unknown",
-    coverImageUrl: chart.coverImageUrl
-      ? (imageUrls[chart.coverImageUrl] ?? null)
-      : null,
+    coverImageUrl: chart.coverImageUrl ? (imageUrls[chart.coverImageUrl] ?? null) : null,
     coverThumbnailUrl: chart.coverThumbnailUrl
       ? (imageUrls[chart.coverThumbnailUrl] ?? null)
       : null,
@@ -136,9 +116,9 @@ export function transformToGalleryCard(
     threadStatus,
     beadsStatus,
     specialtyStatus,
-    threadColourCount: chart.project?._count.projectThreads ?? 0,
-    beadTypeCount: chart.project?._count.projectBeads ?? 0,
-    specialtyItemCount: chart.project?._count.projectSpecialty ?? 0,
+    threadColourCount: chart.project?.projectThreads.length ?? 0,
+    beadTypeCount: chart.project?.projectBeads.length ?? 0,
+    specialtyItemCount: chart.project?.projectSpecialty.length ?? 0,
     finishDate: chart.project?.finishDate ?? null,
     ffoDate: chart.project?.ffoDate ?? null,
     dateAdded: chart.dateAdded,
@@ -165,15 +145,13 @@ export function getCelebrationStyles(
   if (status === "FINISHED") {
     return {
       border: "2px solid rgb(139 92 246)",
-      boxShadow:
-        "0 0 0 1px rgb(139 92 246 / 0.15), 0 0 12px rgb(139 92 246 / 0.08)",
+      boxShadow: "0 0 0 1px rgb(139 92 246 / 0.15), 0 0 12px rgb(139 92 246 / 0.08)",
     };
   }
   if (status === "FFO") {
     return {
       border: "2px solid rgb(244 63 94)",
-      boxShadow:
-        "0 0 0 1px rgb(244 63 94 / 0.15), 0 0 12px rgb(244 63 94 / 0.08)",
+      boxShadow: "0 0 0 1px rgb(244 63 94 / 0.15), 0 0 12px rgb(244 63 94 / 0.08)",
     };
   }
   return null;
