@@ -11,28 +11,26 @@ export default function GlobalError({
     <html lang="en">
       <body className="bg-background text-foreground font-body antialiased">
         <div className="flex min-h-screen items-center justify-center px-4">
-          <div className="w-full max-w-md rounded-xl border border-neutral-200 bg-white p-8 text-center shadow-sm dark:border-neutral-800 dark:bg-neutral-950">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
-              <span className="text-xl text-red-600 dark:text-red-400" aria-hidden="true">
+          <div className="border-border bg-card w-full max-w-md rounded-xl border p-8 text-center shadow-sm">
+            <div className="bg-destructive/10 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
+              <span className="text-destructive text-xl" aria-hidden="true">
                 !
               </span>
             </div>
 
             <h2 className="text-lg font-semibold">Something went wrong</h2>
 
-            <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+            <p className="text-muted-foreground mt-2 text-sm">
               An unexpected error occurred. Please try again or refresh the page.
             </p>
 
             {error.digest && (
-              <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
-                Error ID: {error.digest}
-              </p>
+              <p className="text-muted-foreground/70 mt-1 text-xs">Error ID: {error.digest}</p>
             )}
 
             <button
               onClick={reset}
-              className="mt-6 inline-flex h-9 items-center justify-center rounded-lg bg-neutral-900 px-4 text-sm font-medium text-white transition-colors hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 mt-6 inline-flex h-9 items-center justify-center rounded-lg px-4 text-sm font-medium transition-colors"
             >
               Try again
             </button>

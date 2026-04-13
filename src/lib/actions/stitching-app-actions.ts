@@ -88,7 +88,7 @@ export async function getStitchingAppsWithStats(): Promise<StitchingAppWithStats
     id: a.id,
     name: a.name,
     description: a.description,
-    _count: a._count,
+    projectCount: a._count.projects,
   }));
 }
 

@@ -223,4 +223,40 @@ describe("SearchableSelect", () => {
       expect(mockOnAddNew).toHaveBeenCalledWith("Project Bin A");
     });
   });
+
+  describe("Clear button", () => {
+    it("shows clear button when a value is selected", () => {
+      render(<SearchableSelect options={defaultOptions} value="opt-1" onChange={mockOnChange} />);
+
+      expect(screen.getByRole("button", { name: /clear selection/i })).toBeDefined();
+    });
+
+    it("calls onChange(null) when clear button is clicked", async () => {
+      const user = userEvent.setup();
+      render(<SearchableSelect options={defaultOptions} value="opt-1" onChange={mockOnChange} />);
+
+      await user.click(screen.getByRole("button", { name: /clear selection/i }));
+
+      expect(mockOnChange).toHaveBeenCalledWith(null);
+    });
+
+    it("does not show clear button when no value is selected", () => {
+      render(<SearchableSelect options={defaultOptions} value={null} onChange={mockOnChange} />);
+
+      expect(screen.queryByRole("button", { name: /clear selection/i })).toBeNull();
+    });
+
+    it("does not show clear button when disabled", () => {
+      render(
+        <SearchableSelect
+          options={defaultOptions}
+          value="opt-1"
+          onChange={mockOnChange}
+          disabled
+        />,
+      );
+
+      expect(screen.queryByRole("button", { name: /clear selection/i })).toBeNull();
+    });
+  });
 });

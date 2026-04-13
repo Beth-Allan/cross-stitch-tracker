@@ -10,7 +10,6 @@ import { InlineNameEdit } from "@/components/features/storage/inline-name-edit";
 import { DeleteEntityDialog } from "@/components/features/storage/delete-entity-dialog";
 import { updateStitchingApp, deleteStitchingApp } from "@/lib/actions/stitching-app-actions";
 import type { StitchingAppDetail as StitchingAppDetailType } from "@/types/storage";
-import type { ProjectStatus } from "@/generated/prisma/client";
 
 interface StitchingAppDetailProps {
   app: StitchingAppDetailType;
@@ -25,23 +24,28 @@ export function StitchingAppDetail({ app }: StitchingAppDetailProps) {
       const result = await updateStitchingApp(app.id, { name: newName });
       if (result.success) {
         router.refresh();
-      } else {
-        toast.error(result.error ?? "Failed to rename app");
+        return;
       }
+      toast.error(result.error ?? "Failed to rename app");
     } catch {
       toast.error("Something went wrong. Please try again.");
     }
+    throw new Error("Rename failed");
   }
 
   async function handleDelete() {
-    const result = await deleteStitchingApp(app.id);
-    if (result.success) {
-      toast.success("App deleted");
-      router.push("/apps");
-    } else {
+    try {
+      const result = await deleteStitchingApp(app.id);
+      if (result.success) {
+        toast.success("App deleted");
+        router.push("/apps");
+        return;
+      }
       toast.error(result.error ?? "Failed to delete app");
-      throw new Error(result.error ?? "Delete failed");
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     }
+    throw new Error("Delete failed");
   }
 
   return (
@@ -104,7 +108,7 @@ export function StitchingAppDetail({ app }: StitchingAppDetailProps) {
               )}
             </div>
 
-            <StatusBadge status={project.status as ProjectStatus} />
+            <StatusBadge status={project.status} />
 
             <ChevronRight className="text-muted-foreground/40 h-4 w-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
           </Link>

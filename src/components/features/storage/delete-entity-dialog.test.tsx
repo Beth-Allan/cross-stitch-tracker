@@ -87,4 +87,28 @@ describe("DeleteEntityDialog", () => {
     await user.click(screen.getByRole("button", { name: /cancel/i }));
     expect(defaultProps.onOpenChange).toHaveBeenCalledWith(false);
   });
+
+  it("keeps dialog open when onConfirm throws (does not call onOpenChange)", async () => {
+    const user = userEvent.setup();
+    const failingConfirm = vi.fn().mockRejectedValue(new Error("Delete failed"));
+    const onOpenChange = vi.fn();
+    render(
+      <DeleteEntityDialog
+        {...defaultProps}
+        onConfirm={failingConfirm}
+        onOpenChange={onOpenChange}
+      />,
+    );
+
+    const deleteButton = screen.getByRole("button", { name: /^delete$/i });
+    await user.click(deleteButton);
+
+    // Wait for the transition to settle
+    await vi.waitFor(() => {
+      expect(failingConfirm).toHaveBeenCalledTimes(1);
+    });
+
+    // Dialog should NOT have been closed — catch block keeps it open
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
+  });
 });

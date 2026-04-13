@@ -40,8 +40,12 @@ export function InlineNameEdit({
     const trimmed = editValue.trim();
     if (trimmed.length > 0) {
       startTransition(async () => {
-        await onSave(trimmed);
-        setIsEditing(false);
+        try {
+          await onSave(trimmed);
+          setIsEditing(false);
+        } catch {
+          // Stay in edit mode so the user can retry
+        }
       });
     }
   }

@@ -165,9 +165,9 @@ describe("storage-location-actions", () => {
         id: "sl-1",
         name: "Bin A",
         description: null,
-        _count: { projects: 3 },
+        projectCount: 3,
       });
-      expect(result[1]._count.projects).toBe(0);
+      expect(result[1].projectCount).toBe(0);
     });
   });
 

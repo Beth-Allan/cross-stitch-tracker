@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, MapPin, Pencil, Trash2, ChevronRight } from "lucide-react";
+import { ArrowLeft, MapPin, Trash2, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { InlineNameEdit } from "./inline-name-edit";
@@ -13,7 +13,6 @@ import {
   deleteStorageLocation,
 } from "@/lib/actions/storage-location-actions";
 import type { StorageLocationDetail as StorageLocationDetailType } from "@/types/storage";
-import type { ProjectStatus } from "@/generated/prisma/client";
 
 interface StorageLocationDetailProps {
   location: StorageLocationDetailType;
@@ -28,23 +27,28 @@ export function StorageLocationDetail({ location }: StorageLocationDetailProps) 
       const result = await updateStorageLocation(location.id, { name: newName });
       if (result.success) {
         router.refresh();
-      } else {
-        toast.error(result.error ?? "Failed to rename location");
+        return;
       }
+      toast.error(result.error ?? "Failed to rename location");
     } catch {
       toast.error("Something went wrong. Please try again.");
     }
+    throw new Error("Rename failed");
   }
 
   async function handleDelete() {
-    const result = await deleteStorageLocation(location.id);
-    if (result.success) {
-      toast.success("Location deleted");
-      router.push("/storage");
-    } else {
+    try {
+      const result = await deleteStorageLocation(location.id);
+      if (result.success) {
+        toast.success("Location deleted");
+        router.push("/storage");
+        return;
+      }
       toast.error(result.error ?? "Failed to delete location");
-      throw new Error(result.error ?? "Delete failed");
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     }
+    throw new Error("Delete failed");
   }
 
   return (
@@ -107,7 +111,7 @@ export function StorageLocationDetail({ location }: StorageLocationDetailProps) 
               )}
             </div>
 
-            <StatusBadge status={project.status as ProjectStatus} />
+            <StatusBadge status={project.status} />
 
             <ChevronRight className="text-muted-foreground/40 h-4 w-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
           </Link>

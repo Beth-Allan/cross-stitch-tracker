@@ -88,11 +88,11 @@ describe("chart-actions thumbnail generation", () => {
       expect(mockGenerateThumbnail).not.toHaveBeenCalled();
     });
 
-    it("succeeds even when generateThumbnail fails", async () => {
+    it("succeeds with warning when generateThumbnail fails", async () => {
       const { createChart } = await import("./chart-actions");
       mockPrisma.chart.create.mockResolvedValueOnce({ id: "new-chart-id" });
       mockGenerateThumbnail.mockRejectedValueOnce(new Error("R2 down"));
-      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const formData = {
         ...validFormData,
@@ -102,7 +102,27 @@ describe("chart-actions thumbnail generation", () => {
       const result = await createChart(formData);
 
       expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.warning).toBe("Thumbnail could not be generated");
+      }
       consoleSpy.mockRestore();
+    });
+
+    it("returns no warning when thumbnail succeeds", async () => {
+      const { createChart } = await import("./chart-actions");
+      mockPrisma.chart.create.mockResolvedValueOnce({ id: "new-chart-id" });
+
+      const formData = {
+        ...validFormData,
+        chart: { ...validFormData.chart, coverImageUrl: "covers/p1/abc.png" },
+      };
+
+      const result = await createChart(formData);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.warning).toBeUndefined();
+      }
     });
   });
 

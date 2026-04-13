@@ -93,114 +93,99 @@ export async function deleteDesigner(id: string) {
 export async function getDesigner(id: string): Promise<DesignerDetail | null> {
   await requireAuth();
 
-  try {
-    const designer = await prisma.designer.findUnique({
-      where: { id },
-      include: {
-        charts: {
-          select: {
-            id: true,
-            name: true,
-            coverThumbnailUrl: true,
-            stitchCount: true,
-            stitchesWide: true,
-            stitchesHigh: true,
-            project: { select: { status: true, stitchesCompleted: true } },
-            genres: { select: { name: true } },
-          },
+  const designer = await prisma.designer.findUnique({
+    where: { id },
+    include: {
+      charts: {
+        select: {
+          id: true,
+          name: true,
+          coverThumbnailUrl: true,
+          stitchCount: true,
+          stitchesWide: true,
+          stitchesHigh: true,
+          project: { select: { status: true, stitchesCompleted: true } },
+          genres: { select: { name: true } },
         },
       },
-    });
+    },
+  });
 
-    if (!designer) return null;
+  if (!designer) return null;
 
-    const charts = designer.charts.map((c) => ({
-      id: c.id,
-      name: c.name,
-      coverThumbnailUrl: c.coverThumbnailUrl,
-      stitchCount: c.stitchCount,
-      stitchesWide: c.stitchesWide,
-      stitchesHigh: c.stitchesHigh,
-      status: c.project?.status ?? null,
-      stitchesCompleted: c.project?.stitchesCompleted ?? 0,
-      genres: c.genres,
-    }));
+  const charts = designer.charts.map((c) => ({
+    id: c.id,
+    name: c.name,
+    coverThumbnailUrl: c.coverThumbnailUrl,
+    stitchCount: c.stitchCount,
+    stitchesWide: c.stitchesWide,
+    stitchesHigh: c.stitchesHigh,
+    status: c.project?.status ?? null,
+    stitchesCompleted: c.project?.stitchesCompleted ?? 0,
+    genres: c.genres,
+  }));
 
-    // Compute stats
-    const chartCount = charts.length;
+  // Compute stats
+  const chartCount = charts.length;
 
-    // "Started" means has a project and status is not UNSTARTED, KITTING, or KITTED
-    const NOT_STARTED_STATUSES = new Set(["UNSTARTED", "KITTING", "KITTED"]);
-    const projectsStarted = charts.filter(
-      (c) => c.status !== null && !NOT_STARTED_STATUSES.has(c.status),
-    ).length;
+  // "Started" means has a project and status is not UNSTARTED, KITTING, or KITTED
+  const NOT_STARTED_STATUSES = new Set(["UNSTARTED", "KITTING", "KITTED"]);
+  const projectsStarted = charts.filter(
+    (c) => c.status !== null && !NOT_STARTED_STATUSES.has(c.status),
+  ).length;
 
-    const FINISHED_STATUSES = new Set(["FINISHED", "FFO"]);
-    const projectsFinished = charts.filter(
-      (c) => c.status !== null && FINISHED_STATUSES.has(c.status),
-    ).length;
+  const FINISHED_STATUSES = new Set(["FINISHED", "FFO"]);
+  const projectsFinished = charts.filter(
+    (c) => c.status !== null && FINISHED_STATUSES.has(c.status),
+  ).length;
 
-    // Top genre: most frequent genre name across all charts
-    const genreCounts = new Map<string, number>();
-    for (const chart of charts) {
-      for (const genre of chart.genres) {
-        genreCounts.set(genre.name, (genreCounts.get(genre.name) ?? 0) + 1);
-      }
+  // Top genre: most frequent genre name across all charts
+  const genreCounts = new Map<string, number>();
+  for (const chart of charts) {
+    for (const genre of chart.genres) {
+      genreCounts.set(genre.name, (genreCounts.get(genre.name) ?? 0) + 1);
     }
-    let topGenre: string | null = null;
-    let maxCount = 0;
-    for (const [name, count] of genreCounts) {
-      if (count > maxCount) {
-        maxCount = count;
-        topGenre = name;
-      }
-    }
-
-    return {
-      id: designer.id,
-      name: designer.name,
-      website: designer.website,
-      notes: designer.notes,
-      chartCount,
-      projectsStarted,
-      projectsFinished,
-      topGenre,
-      charts,
-    };
-  } catch (error) {
-    console.error("getDesigner error:", error);
-    return null;
   }
+  let topGenre: string | null = null;
+  let maxCount = 0;
+  for (const [name, count] of genreCounts) {
+    if (count > maxCount) {
+      maxCount = count;
+      topGenre = name;
+    }
+  }
+
+  return {
+    id: designer.id,
+    name: designer.name,
+    website: designer.website,
+    notes: designer.notes,
+    chartCount,
+    projectsStarted,
+    projectsFinished,
+    topGenre,
+    charts,
+  };
 }
 
 export async function getDesignersWithStats(): Promise<DesignerWithStats[]> {
   await requireAuth();
 
-  try {
-    const designers = await prisma.designer.findMany({
-      include: { _count: { select: { charts: true } } },
-      orderBy: { name: "asc" },
-    });
-    return designers.map((d) => ({
-      id: d.id,
-      name: d.name,
-      website: d.website,
-      notes: d.notes,
-      chartCount: d._count.charts,
-    }));
-  } catch (error) {
-    console.error("getDesignersWithStats error:", error);
-    return [];
-  }
+  const designers = await prisma.designer.findMany({
+    include: { _count: { select: { charts: true } } },
+    orderBy: { name: "asc" },
+  });
+  return designers.map((d) => ({
+    id: d.id,
+    name: d.name,
+    website: d.website,
+    notes: d.notes,
+    chartCount: d._count.charts,
+  }));
 }
 
 export async function getDesigners() {
   await requireAuth();
 
-  try {
-    return await prisma.designer.findMany({ orderBy: { name: "asc" } });
-  } catch (error) {
-    console.error("getDesigners error:", error);
-    return [];
-  }
+  return await prisma.designer.findMany({ orderBy: { name: "asc" } });
 }

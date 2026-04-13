@@ -84,12 +84,26 @@ export async function getFabricBrands() {
 }
 
 // ─── Fabric CRUD ────────────────────────────────────────────────────────────
+// Fabric has no direct userId — ownership is inferred through linkedProject.userId.
+// Unlinked fabrics have no owner and are accessible to all authenticated users.
+// Mutations verify ownership when a linkedProjectId is provided.
 
 export async function createFabric(formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validated = fabricSchema.parse(formData);
+
+    if (validated.linkedProjectId) {
+      const project = await prisma.project.findUnique({
+        where: { id: validated.linkedProjectId },
+        select: { userId: true },
+      });
+      if (!project || project.userId !== user.id) {
+        return { success: false as const, error: "Project not found" };
+      }
+    }
+
     const fabric = await prisma.fabric.create({ data: validated });
     revalidatePath("/fabric");
     if (validated.linkedProjectId) {

@@ -6,6 +6,7 @@ import type { ChartWithProject } from "@/types/chart";
 import type { SizeCategory } from "@/lib/utils/size-category";
 import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
 import { chartFormSchema } from "@/lib/validations/chart";
+import { toast } from "sonner";
 import { createChart, updateChart } from "@/lib/actions/chart-actions";
 import { createDesigner } from "@/lib/actions/designer-actions";
 import { createGenre } from "@/lib/actions/genre-actions";
@@ -243,6 +244,9 @@ export function useChartForm({
             suppressUnloadRef.current = false;
             return;
           }
+          if (response.warning) {
+            toast.warning(response.warning);
+          }
           setIsSuccess(true);
           onSuccess(response.chartId);
         } else {
@@ -315,7 +319,7 @@ export function useChartForm({
           id: result.location.id,
           name: result.location.name,
           description: result.location.description,
-          _count: { projects: 0 },
+          projectCount: 0,
         };
         setStorageLocationsList((prev) => [...prev, newItem]);
         setField("storageLocationId", result.location.id);
@@ -337,7 +341,7 @@ export function useChartForm({
           id: result.app.id,
           name: result.app.name,
           description: result.app.description,
-          _count: { projects: 0 },
+          projectCount: 0,
         };
         setStitchingAppsList((prev) => [...prev, newItem]);
         setField("stitchingAppId", result.app.id);

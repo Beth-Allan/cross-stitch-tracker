@@ -258,17 +258,30 @@ describe("genre-actions", () => {
     });
   });
 
-  describe("getGenres (existing - error handling)", () => {
-    it("returns empty array and logs on Prisma error", async () => {
-      const { getGenres } = await import("./genre-actions");
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  describe("getGenre (error handling)", () => {
+    it("throws on DB error (handled by error boundary)", async () => {
+      mockPrisma.genre.findUnique.mockRejectedValueOnce(new Error("DB error"));
+      const { getGenre } = await import("./genre-actions");
+
+      await expect(getGenre("g1")).rejects.toThrow("DB error");
+    });
+  });
+
+  describe("getGenresWithStats (error handling)", () => {
+    it("throws on DB error (handled by error boundary)", async () => {
+      mockPrisma.genre.findMany.mockRejectedValueOnce(new Error("DB error"));
+      const { getGenresWithStats } = await import("./genre-actions");
+
+      await expect(getGenresWithStats()).rejects.toThrow("DB error");
+    });
+  });
+
+  describe("getGenres (error handling)", () => {
+    it("throws on DB error (handled by error boundary)", async () => {
       mockPrisma.genre.findMany.mockRejectedValueOnce(new Error("DB connection lost"));
+      const { getGenres } = await import("./genre-actions");
 
-      const result = await getGenres();
-
-      expect(result).toEqual([]);
-      expect(consoleSpy).toHaveBeenCalledWith("getGenres error:", expect.any(Error));
-      consoleSpy.mockRestore();
+      await expect(getGenres()).rejects.toThrow("DB connection lost");
     });
   });
 });

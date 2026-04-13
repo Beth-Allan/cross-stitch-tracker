@@ -88,7 +88,7 @@ export async function getStorageLocationsWithStats(): Promise<StorageLocationWit
     id: l.id,
     name: l.name,
     description: l.description,
-    _count: l._count,
+    projectCount: l._count.projects,
   }));
 }
 

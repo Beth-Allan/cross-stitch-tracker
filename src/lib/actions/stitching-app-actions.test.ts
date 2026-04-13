@@ -50,6 +50,13 @@ describe("stitching-app-actions", () => {
 
       await expect(getStitchingAppDetail("sa-1")).rejects.toThrow("Unauthorized");
     });
+
+    it("rejects unauthenticated calls to getStitchingAppsWithStats", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { getStitchingAppsWithStats } = await import("./stitching-app-actions");
+
+      await expect(getStitchingAppsWithStats()).rejects.toThrow("Unauthorized");
+    });
   });
 
   describe("createStitchingApp", () => {
@@ -152,9 +159,9 @@ describe("stitching-app-actions", () => {
         id: "sa-1",
         name: "Markup R-XP",
         description: null,
-        _count: { projects: 5 },
+        projectCount: 5,
       });
-      expect(result[1]._count.projects).toBe(2);
+      expect(result[1].projectCount).toBe(2);
     });
   });
 

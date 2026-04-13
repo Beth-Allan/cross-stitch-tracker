@@ -26,8 +26,8 @@ vi.mock("sonner", () => ({
 }));
 
 const mockApps: StitchingAppWithStats[] = [
-  { id: "app-1", name: "Markup R-XP", description: null, _count: { projects: 5 } },
-  { id: "app-2", name: "Pattern Keeper", description: null, _count: { projects: 0 } },
+  { id: "app-1", name: "Markup R-XP", description: null, projectCount: 5 },
+  { id: "app-2", name: "Pattern Keeper", description: null, projectCount: 0 },
 ];
 
 describe("StitchingAppList", () => {

@@ -345,6 +345,7 @@ describe("fabric-actions", () => {
     it("revalidates linked project path when linkedProjectId is set", async () => {
       const { revalidatePath } = await import("next/cache");
       const dataWithProject = { ...validFabricData, linkedProjectId: "proj-1" };
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       mockPrisma.fabric.create.mockResolvedValueOnce(
         createMockFabric({ linkedProjectId: "proj-1" }),
       );
@@ -357,6 +358,7 @@ describe("fabric-actions", () => {
 
     it("returns P2002 error for duplicate linkedProjectId", async () => {
       const p2002Error = Object.assign(new Error("Unique constraint"), { code: "P2002" });
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       mockPrisma.fabric.create.mockRejectedValueOnce(p2002Error);
       const { createFabric } = await import("./fabric-actions");
 
@@ -399,6 +401,45 @@ describe("fabric-actions", () => {
       const result = await createFabric({ ...validFabricData, type: "InvalidType" });
 
       expect(result.success).toBe(false);
+    });
+
+    it("rejects create when linkedProjectId belongs to another user", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { createFabric } = await import("./fabric-actions");
+
+      const result = await createFabric({ ...validFabricData, linkedProjectId: "proj-1" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Project not found");
+      }
+      expect(mockPrisma.fabric.create).not.toHaveBeenCalled();
+    });
+
+    it("rejects create when linkedProjectId does not exist", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce(null);
+      const { createFabric } = await import("./fabric-actions");
+
+      const result = await createFabric({ ...validFabricData, linkedProjectId: "nonexistent" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Project not found");
+      }
+      expect(mockPrisma.fabric.create).not.toHaveBeenCalled();
+    });
+
+    it("allows create when linkedProjectId belongs to authenticated user", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      mockPrisma.fabric.create.mockResolvedValueOnce(
+        createMockFabric({ name: "Test", linkedProjectId: "proj-1" }),
+      );
+      const { createFabric } = await import("./fabric-actions");
+
+      const result = await createFabric({ ...validFabricData, linkedProjectId: "proj-1" });
+
+      expect(result.success).toBe(true);
+      expect(mockPrisma.fabric.create).toHaveBeenCalled();
     });
   });
 

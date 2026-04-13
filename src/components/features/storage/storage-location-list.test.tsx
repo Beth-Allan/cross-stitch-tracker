@@ -26,8 +26,8 @@ vi.mock("sonner", () => ({
 }));
 
 const mockLocations: StorageLocationWithStats[] = [
-  { id: "loc-1", name: "Bin A", description: null, _count: { projects: 3 } },
-  { id: "loc-2", name: "Bin B", description: null, _count: { projects: 0 } },
+  { id: "loc-1", name: "Bin A", description: null, projectCount: 3 },
+  { id: "loc-2", name: "Bin B", description: null, projectCount: 0 },
 ];
 
 describe("StorageLocationList", () => {

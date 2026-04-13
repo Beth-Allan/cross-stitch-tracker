@@ -124,4 +124,20 @@ describe("InlineNameEdit", () => {
     expect(nameElement.className).toMatch(/text-2xl/);
     expect(nameElement.className).toMatch(/font-heading/);
   });
+
+  it("stays in edit mode when onSave throws an error", async () => {
+    const user = userEvent.setup();
+    const failingOnSave = vi.fn().mockRejectedValue(new Error("Save failed"));
+    render(<InlineNameEdit name="Bin A" onSave={failingOnSave} />);
+
+    await user.click(screen.getByRole("button", { name: /edit name/i }));
+    const input = screen.getByRole("textbox");
+    await user.clear(input);
+    await user.type(input, "New Name");
+    await user.keyboard("{Enter}");
+
+    // Should still be in edit mode — input remains visible
+    expect(screen.getByRole("textbox")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveValue("New Name");
+  });
 });

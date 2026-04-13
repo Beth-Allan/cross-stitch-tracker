@@ -82,17 +82,19 @@ export async function createChart(formData: unknown) {
     });
 
     // Generate thumbnail if a cover image was uploaded
+    let thumbnailWarning: string | undefined;
     if (chart.coverImageUrl) {
       try {
         await generateThumbnail(created.id, chart.coverImageUrl);
       } catch (err) {
-        console.warn("Thumbnail generation failed (chart saved without thumbnail):", err);
+        console.error("Thumbnail generation failed (chart saved without thumbnail):", err);
+        thumbnailWarning = "Thumbnail could not be generated";
       }
     }
 
     revalidatePath("/charts");
     revalidatePath("/fabric");
-    return { success: true as const, chartId: created.id };
+    return { success: true as const, chartId: created.id, warning: thumbnailWarning };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };
@@ -201,7 +203,7 @@ export async function updateChart(chartId: string, formData: unknown) {
       try {
         await generateThumbnail(chartId, chart.coverImageUrl);
       } catch (err) {
-        console.warn("Thumbnail generation failed (chart saved without thumbnail):", err);
+        console.error("Thumbnail generation failed (chart saved without thumbnail):", err);
       }
     }
 

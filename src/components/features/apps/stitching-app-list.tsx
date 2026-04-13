@@ -48,24 +48,29 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
       if (result.success) {
         setEditingId(null);
         router.refresh();
-      } else {
-        toast.error(result.error ?? "Failed to rename app");
+        return;
       }
+      toast.error(result.error ?? "Failed to rename app");
     } catch {
       toast.error("Something went wrong. Please try again.");
     }
+    throw new Error("Rename failed");
   }
 
   async function handleDelete() {
     if (!deleteTarget) return;
-    const result = await deleteStitchingApp(deleteTarget.id);
-    if (result.success) {
-      toast.success("App deleted");
-      router.refresh();
-    } else {
+    try {
+      const result = await deleteStitchingApp(deleteTarget.id);
+      if (result.success) {
+        toast.success("App deleted");
+        router.refresh();
+        return;
+      }
       toast.error(result.error ?? "Failed to delete app");
-      throw new Error(result.error ?? "Delete failed");
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     }
+    throw new Error("Delete failed");
   }
 
   return (
@@ -97,7 +102,7 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
               setDeleteTarget({
                 id: app.id,
                 name: app.name,
-                projectCount: app._count.projects,
+                projectCount: app.projectCount,
               })
             }
             onNavigate={() => router.push(`/apps/${app.id}`)}
@@ -213,7 +218,7 @@ function AppRow({
   onDelete: () => void;
   onNavigate: () => void;
 }) {
-  const projectCount = app._count.projects;
+  const projectCount = app.projectCount;
 
   if (isEditing) {
     return (

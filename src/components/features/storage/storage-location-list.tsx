@@ -48,24 +48,29 @@ export function StorageLocationList({ locations }: StorageLocationListProps) {
       if (result.success) {
         setEditingId(null);
         router.refresh();
-      } else {
-        toast.error(result.error ?? "Failed to rename location");
+        return;
       }
+      toast.error(result.error ?? "Failed to rename location");
     } catch {
       toast.error("Something went wrong. Please try again.");
     }
+    throw new Error("Rename failed");
   }
 
   async function handleDelete() {
     if (!deleteTarget) return;
-    const result = await deleteStorageLocation(deleteTarget.id);
-    if (result.success) {
-      toast.success("Location deleted");
-      router.refresh();
-    } else {
+    try {
+      const result = await deleteStorageLocation(deleteTarget.id);
+      if (result.success) {
+        toast.success("Location deleted");
+        router.refresh();
+        return;
+      }
       toast.error(result.error ?? "Failed to delete location");
-      throw new Error(result.error ?? "Delete failed");
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     }
+    throw new Error("Delete failed");
   }
 
   return (
@@ -97,7 +102,7 @@ export function StorageLocationList({ locations }: StorageLocationListProps) {
               setDeleteTarget({
                 id: location.id,
                 name: location.name,
-                projectCount: location._count.projects,
+                projectCount: location.projectCount,
               })
             }
             onNavigate={() => router.push(`/storage/${location.id}`)}
@@ -213,7 +218,7 @@ function LocationRow({
   onDelete: () => void;
   onNavigate: () => void;
 }) {
-  const projectCount = location._count.projects;
+  const projectCount = location.projectCount;
 
   if (isEditing) {
     return (

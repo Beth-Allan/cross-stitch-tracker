@@ -284,17 +284,30 @@ describe("designer-actions", () => {
     });
   });
 
-  describe("getDesigners (existing - error handling)", () => {
-    it("returns empty array and logs on Prisma error", async () => {
-      const { getDesigners } = await import("./designer-actions");
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  describe("getDesigner (error handling)", () => {
+    it("throws on DB error (handled by error boundary)", async () => {
+      mockPrisma.designer.findUnique.mockRejectedValueOnce(new Error("DB error"));
+      const { getDesigner } = await import("./designer-actions");
+
+      await expect(getDesigner("d1")).rejects.toThrow("DB error");
+    });
+  });
+
+  describe("getDesignersWithStats (error handling)", () => {
+    it("throws on DB error (handled by error boundary)", async () => {
+      mockPrisma.designer.findMany.mockRejectedValueOnce(new Error("DB error"));
+      const { getDesignersWithStats } = await import("./designer-actions");
+
+      await expect(getDesignersWithStats()).rejects.toThrow("DB error");
+    });
+  });
+
+  describe("getDesigners (error handling)", () => {
+    it("throws on DB error (handled by error boundary)", async () => {
       mockPrisma.designer.findMany.mockRejectedValueOnce(new Error("DB connection lost"));
+      const { getDesigners } = await import("./designer-actions");
 
-      const result = await getDesigners();
-
-      expect(result).toEqual([]);
-      expect(consoleSpy).toHaveBeenCalledWith("getDesigners error:", expect.any(Error));
-      consoleSpy.mockRestore();
+      await expect(getDesigners()).rejects.toThrow("DB connection lost");
     });
   });
 });

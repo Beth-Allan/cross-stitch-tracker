@@ -327,7 +327,7 @@ export function createMockStorageLocationWithStats(
     id: "sl-1",
     name: "Project Bin A",
     description: null,
-    _count: { projects: 0 },
+    projectCount: 0,
     ...overrides,
   };
 }
@@ -351,7 +351,7 @@ export function createMockStitchingAppWithStats(
     id: "sa-1",
     name: "Markup R-XP",
     description: null,
-    _count: { projects: 0 },
+    projectCount: 0,
     ...overrides,
   };
 }
