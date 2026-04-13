@@ -84,7 +84,7 @@ describe("storage-location-actions", () => {
 
       expect(result.success).toBe(true);
       expect(mockPrisma.storageLocation.update).toHaveBeenCalledWith({
-        where: { id: "sl-1" },
+        where: { id: "sl-1", userId: "user-1" },
         data: { name: "Updated Bin", description: null },
       });
     });
@@ -103,12 +103,17 @@ describe("storage-location-actions", () => {
 
   describe("deleteStorageLocation", () => {
     it("unlinks associated projects then deletes", async () => {
+      mockPrisma.storageLocation.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       mockPrisma.$transaction.mockResolvedValueOnce([{}, {}]);
       const { deleteStorageLocation } = await import("./storage-location-actions");
 
       const result = await deleteStorageLocation("sl-1");
 
       expect(result.success).toBe(true);
+      expect(mockPrisma.storageLocation.findUnique).toHaveBeenCalledWith({
+        where: { id: "sl-1" },
+        select: { userId: true },
+      });
       expect(mockPrisma.$transaction).toHaveBeenCalledWith([
         mockPrisma.project.updateMany({
           where: { storageLocationId: "sl-1" },
@@ -116,6 +121,18 @@ describe("storage-location-actions", () => {
         }),
         mockPrisma.storageLocation.delete({ where: { id: "sl-1" } }),
       ]);
+    });
+
+    it("returns error when location belongs to another user", async () => {
+      mockPrisma.storageLocation.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { deleteStorageLocation } = await import("./storage-location-actions");
+
+      const result = await deleteStorageLocation("sl-1");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Location not found");
+      }
     });
   });
 

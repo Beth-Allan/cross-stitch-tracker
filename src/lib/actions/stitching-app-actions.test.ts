@@ -77,7 +77,7 @@ describe("stitching-app-actions", () => {
 
       expect(result.success).toBe(true);
       expect(mockPrisma.stitchingApp.update).toHaveBeenCalledWith({
-        where: { id: "sa-1" },
+        where: { id: "sa-1", userId: "user-1" },
         data: { name: "Saga", description: null },
       });
     });
@@ -85,12 +85,17 @@ describe("stitching-app-actions", () => {
 
   describe("deleteStitchingApp", () => {
     it("unlinks associated projects then deletes", async () => {
+      mockPrisma.stitchingApp.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       mockPrisma.$transaction.mockResolvedValueOnce([{}, {}]);
       const { deleteStitchingApp } = await import("./stitching-app-actions");
 
       const result = await deleteStitchingApp("sa-1");
 
       expect(result.success).toBe(true);
+      expect(mockPrisma.stitchingApp.findUnique).toHaveBeenCalledWith({
+        where: { id: "sa-1" },
+        select: { userId: true },
+      });
       expect(mockPrisma.$transaction).toHaveBeenCalledWith([
         mockPrisma.project.updateMany({
           where: { stitchingAppId: "sa-1" },
@@ -98,6 +103,18 @@ describe("stitching-app-actions", () => {
         }),
         mockPrisma.stitchingApp.delete({ where: { id: "sa-1" } }),
       ]);
+    });
+
+    it("returns error when app belongs to another user", async () => {
+      mockPrisma.stitchingApp.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { deleteStitchingApp } = await import("./stitching-app-actions");
+
+      const result = await deleteStitchingApp("sa-1");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("App not found");
+      }
     });
   });
 

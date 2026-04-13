@@ -524,6 +524,7 @@ describe("fabric-actions", () => {
         brand: createMockFabricBrand({ id: "fb-1", name: "Zweigart" }),
         linkedProject: {
           id: "proj-1",
+          userId: "user-1",
           chart: { name: "Test Chart", stitchesWide: 100, stitchesHigh: 50 },
         },
       };
@@ -547,6 +548,24 @@ describe("fabric-actions", () => {
           },
         },
       });
+    });
+
+    it("returns null when linked project belongs to another user", async () => {
+      const fabricWithRelations = {
+        ...createMockFabric({ id: "fabric-1", linkedProjectId: "proj-1" }),
+        brand: createMockFabricBrand({ id: "fb-1", name: "Zweigart" }),
+        linkedProject: {
+          id: "proj-1",
+          userId: "other-user",
+          chart: { name: "Test Chart", stitchesWide: 100, stitchesHigh: 50 },
+        },
+      };
+      mockPrisma.fabric.findUnique.mockResolvedValueOnce(fabricWithRelations);
+      const { getFabric } = await import("./fabric-actions");
+
+      const result = await getFabric("fabric-1");
+
+      expect(result).toBeNull();
     });
 
     it("returns null for non-existent fabric", async () => {
@@ -593,6 +612,9 @@ describe("fabric-actions", () => {
       expect(result).toHaveLength(2);
       expect(result[0].name).toBe("Cream Linen 28ct");
       expect(mockPrisma.fabric.findMany).toHaveBeenCalledWith({
+        where: {
+          OR: [{ linkedProjectId: null }, { linkedProject: { userId: "user-1" } }],
+        },
         include: {
           brand: true,
           linkedProject: { include: { chart: { select: { name: true } } } },
