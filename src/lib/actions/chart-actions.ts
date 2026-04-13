@@ -199,18 +199,20 @@ export async function updateChart(chartId: string, formData: unknown) {
     });
 
     // Generate thumbnail if cover image changed
+    let thumbnailWarning: string | undefined;
     if (chart.coverImageUrl && chart.coverImageUrl !== existing.coverImageUrl) {
       try {
         await generateThumbnail(chartId, chart.coverImageUrl);
       } catch (err) {
         console.error("Thumbnail generation failed (chart saved without thumbnail):", err);
+        thumbnailWarning = "Thumbnail could not be generated";
       }
     }
 
     revalidatePath("/charts");
     revalidatePath(`/charts/${chartId}`);
     revalidatePath("/fabric");
-    return { success: true as const };
+    return { success: true as const, warning: thumbnailWarning };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };

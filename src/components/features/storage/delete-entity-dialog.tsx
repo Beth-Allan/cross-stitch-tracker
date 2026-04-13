@@ -35,9 +35,10 @@ export function DeleteEntityDialog({
       try {
         await onConfirm();
         onOpenChange(false);
-      } catch {
+      } catch (err) {
         // onConfirm caller handles error reporting (toast);
         // dialog stays open so user can retry
+        console.error("DeleteEntityDialog confirm failed:", err);
       }
     });
   }

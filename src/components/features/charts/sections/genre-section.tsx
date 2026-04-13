@@ -22,7 +22,7 @@ export function GenreSection({ genres, selectedIds, onToggle, onAddGenre }: Genr
           onToggle={onToggle}
           onAddGenre={onAddGenre}
         />
-        <FormField label="Series" hint="Available in Phase 5">
+        <FormField label="Series" hint="Coming soon">
           <SearchableSelect
             options={[]}
             value={null}

@@ -51,11 +51,14 @@ export function CoverImageUpload({
           setPreview(result.url);
           setState("complete");
         } else {
-          // Could not resolve -- show upload zone
+          setError("Could not load cover image");
           setState("idle");
         }
       } catch {
-        if (!cancelled) setState("idle");
+        if (!cancelled) {
+          setError("Could not load cover image");
+          setState("idle");
+        }
       }
     }
     void resolve();

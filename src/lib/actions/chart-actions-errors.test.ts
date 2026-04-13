@@ -234,6 +234,34 @@ describe("createChart happy path", () => {
   });
 });
 
+describe("createChart fabric ownership", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockPrisma.$transaction.mockImplementation(async (fnOrArray: unknown) => {
+      if (typeof fnOrArray === "function")
+        return (fnOrArray as (tx: typeof mockPrisma) => unknown)(mockPrisma);
+      return fnOrArray;
+    });
+  });
+
+  it("rejects fabric belonging to another user", async () => {
+    const { createChart } = await import("./chart-actions");
+    mockPrisma.chart.create.mockResolvedValueOnce({ id: "new-chart-1", project: { id: "proj-1" } });
+    // Fabric is linked to another user's project
+    mockPrisma.fabric.findUnique.mockResolvedValueOnce({
+      linkedProject: { userId: "other-user" },
+    });
+
+    const formData = {
+      ...validFormData,
+      project: { ...validFormData.project, fabricId: "fabric-stolen" },
+    };
+    const result = await createChart(formData);
+
+    expect(result).toEqual({ success: false, error: "Failed to create chart" });
+  });
+});
+
 describe("updateChart fabric link/unlink", () => {
   beforeEach(() => {
     vi.clearAllMocks();

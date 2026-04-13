@@ -43,8 +43,9 @@ export function InlineNameEdit({
         try {
           await onSave(trimmed);
           setIsEditing(false);
-        } catch {
+        } catch (err) {
           // Stay in edit mode so the user can retry
+          console.error("InlineNameEdit save failed:", err);
         }
       });
     }

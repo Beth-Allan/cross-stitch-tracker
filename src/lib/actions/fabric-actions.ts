@@ -85,8 +85,9 @@ export async function getFabricBrands() {
 
 // ─── Fabric CRUD ────────────────────────────────────────────────────────────
 // Fabric has no direct userId — ownership is inferred through linkedProject.userId.
-// Unlinked fabrics have no owner and are accessible to all authenticated users.
-// Mutations verify ownership when a linkedProjectId is provided.
+// Unlinked fabrics (linkedProjectId=null) are accessible to all authenticated users.
+// Mutations on linked fabrics verify the linked project belongs to the current user.
+// Note: chart-actions.ts also performs fabric ownership checks when linking/unlinking in transactions.
 
 export async function createFabric(formData: unknown) {
   const user = await requireAuth();

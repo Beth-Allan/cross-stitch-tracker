@@ -256,6 +256,9 @@ export function useChartForm({
             suppressUnloadRef.current = false;
             return;
           }
+          if (response.warning) {
+            toast.warning(response.warning);
+          }
           setIsSuccess(true);
           onSuccess(initialData!.id);
         }

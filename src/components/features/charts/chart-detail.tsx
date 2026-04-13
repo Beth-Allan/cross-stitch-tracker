@@ -213,6 +213,7 @@ function DeleteChartDialog({ chartId, chartName }: { chartId: string; chartName:
         const result = await deleteChart(chartId);
         if (result.success) {
           toast.success("Chart deleted");
+          setOpen(false);
           router.push("/charts");
         } else {
           toast.error("Something went wrong. Please try again.");
@@ -220,7 +221,6 @@ function DeleteChartDialog({ chartId, chartName }: { chartId: string; chartName:
       } catch {
         toast.error("Something went wrong. Please try again.");
       }
-      setOpen(false);
     });
   }
 
