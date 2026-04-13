@@ -123,9 +123,17 @@ export async function createFabric(formData: unknown) {
 }
 
 export async function updateFabric(id: string, formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    const existing = await prisma.fabric.findUnique({
+      where: { id },
+      select: { linkedProject: { select: { userId: true } } },
+    });
+    if (existing?.linkedProject && existing.linkedProject.userId !== user.id) {
+      return { success: false as const, error: "Fabric not found" };
+    }
+
     const validated = fabricSchema.parse(formData);
     const fabric = await prisma.fabric.update({
       where: { id },
@@ -159,9 +167,17 @@ export async function updateFabric(id: string, formData: unknown) {
 }
 
 export async function deleteFabric(id: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    const existing = await prisma.fabric.findUnique({
+      where: { id },
+      select: { linkedProject: { select: { userId: true } } },
+    });
+    if (existing?.linkedProject && existing.linkedProject.userId !== user.id) {
+      return { success: false as const, error: "Fabric not found" };
+    }
+
     await prisma.fabric.delete({ where: { id } });
     revalidatePath("/fabric");
     revalidatePath("/shopping");
@@ -173,10 +189,10 @@ export async function deleteFabric(id: string) {
 }
 
 export async function getFabric(id: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
-    return await prisma.fabric.findUnique({
+    const fabric = await prisma.fabric.findUnique({
       where: { id },
       include: {
         brand: true,
@@ -187,6 +203,12 @@ export async function getFabric(id: string) {
         },
       },
     });
+
+    if (fabric?.linkedProject && fabric.linkedProject.userId !== user.id) {
+      return null;
+    }
+
+    return fabric;
   } catch (error) {
     console.error("getFabric error:", error);
     return null;
@@ -194,7 +216,7 @@ export async function getFabric(id: string) {
 }
 
 export async function getUnassignedFabrics(currentProjectId?: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     return await prisma.fabric.findMany({
@@ -203,6 +225,9 @@ export async function getUnassignedFabrics(currentProjectId?: string) {
           { linkedProjectId: null },
           ...(currentProjectId ? [{ linkedProjectId: currentProjectId }] : []),
         ],
+        NOT: {
+          linkedProject: { userId: { not: user.id } },
+        },
       },
       include: { brand: true },
       orderBy: { name: "asc" },
@@ -214,10 +239,13 @@ export async function getUnassignedFabrics(currentProjectId?: string) {
 }
 
 export async function getFabrics() {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     return await prisma.fabric.findMany({
+      where: {
+        OR: [{ linkedProjectId: null }, { linkedProject: { userId: user.id } }],
+      },
       include: {
         brand: true,
         linkedProject: { include: { chart: { select: { name: true } } } },
