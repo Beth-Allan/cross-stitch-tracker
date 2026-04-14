@@ -9,56 +9,157 @@ import { createMockGalleryCard } from "@/__tests__/mocks/factories";
 
 describe("filterAndSort", () => {
   const cards = [
-    createMockGalleryCard({ name: "Alpha Stitch", status: "IN_PROGRESS", sizeCategory: "Large", stitchCount: 30000, dateAdded: new Date("2026-01-01") }),
-    createMockGalleryCard({ name: "Beta Cross", status: "UNSTARTED", sizeCategory: "Mini", stitchCount: 500, dateAdded: new Date("2026-03-01") }),
-    createMockGalleryCard({ name: "Gamma Thread", status: "FINISHED", sizeCategory: "BAP", stitchCount: 60000, dateAdded: new Date("2026-02-01") }),
-    createMockGalleryCard({ name: "Delta Pattern", status: "IN_PROGRESS", sizeCategory: "Medium", stitchCount: 10000, dateAdded: new Date("2026-04-01") }),
+    createMockGalleryCard({
+      name: "Alpha Stitch",
+      status: "IN_PROGRESS",
+      sizeCategory: "Large",
+      stitchCount: 30000,
+      dateAdded: new Date("2026-01-01"),
+    }),
+    createMockGalleryCard({
+      name: "Beta Cross",
+      status: "UNSTARTED",
+      sizeCategory: "Mini",
+      stitchCount: 500,
+      dateAdded: new Date("2026-03-01"),
+    }),
+    createMockGalleryCard({
+      name: "Gamma Thread",
+      status: "FINISHED",
+      sizeCategory: "BAP",
+      stitchCount: 60000,
+      dateAdded: new Date("2026-02-01"),
+    }),
+    createMockGalleryCard({
+      name: "Delta Pattern",
+      status: "IN_PROGRESS",
+      sizeCategory: "Medium",
+      stitchCount: 10000,
+      dateAdded: new Date("2026-04-01"),
+    }),
   ];
 
   it("returns all cards when no filters active", () => {
-    const result = filterAndSort(cards, { search: "", statusFilter: [], sizeFilter: [], sort: "dateAdded", dir: "desc" });
+    const result = filterAndSort(cards, {
+      search: "",
+      statusFilter: [],
+      sizeFilter: [],
+      sort: "dateAdded",
+      dir: "desc",
+    });
     expect(result).toHaveLength(4);
   });
 
-  it("filters by search text (case-insensitive)", () => {
-    const result = filterAndSort(cards, { search: "stitch", statusFilter: [], sizeFilter: [], sort: "dateAdded", dir: "desc" });
+  it("filters by search text matching name (case-insensitive)", () => {
+    const result = filterAndSort(cards, {
+      search: "stitch",
+      statusFilter: [],
+      sizeFilter: [],
+      sort: "dateAdded",
+      dir: "desc",
+    });
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe("Alpha Stitch");
   });
 
+  it("filters by search text matching designer name", () => {
+    const cardsWithDesigner = [
+      createMockGalleryCard({
+        name: "Woodland Sampler",
+        designerName: "Mirabilia Designs",
+        dateAdded: new Date("2026-01-01"),
+      }),
+      createMockGalleryCard({
+        name: "Ocean Dreams",
+        designerName: "Ink Circles",
+        dateAdded: new Date("2026-02-01"),
+      }),
+      createMockGalleryCard({
+        name: "Mirabilia Garden",
+        designerName: "Other Designer",
+        dateAdded: new Date("2026-03-01"),
+      }),
+    ];
+    const result = filterAndSort(cardsWithDesigner, {
+      search: "mirabilia",
+      statusFilter: [],
+      sizeFilter: [],
+      sort: "dateAdded",
+      dir: "desc",
+    });
+    expect(result).toHaveLength(2);
+    expect(result.map((c) => c.name).sort()).toEqual(["Mirabilia Garden", "Woodland Sampler"]);
+  });
+
   it("filters by status array", () => {
-    const result = filterAndSort(cards, { search: "", statusFilter: ["IN_PROGRESS"], sizeFilter: [], sort: "dateAdded", dir: "desc" });
+    const result = filterAndSort(cards, {
+      search: "",
+      statusFilter: ["IN_PROGRESS"],
+      sizeFilter: [],
+      sort: "dateAdded",
+      dir: "desc",
+    });
     expect(result).toHaveLength(2);
     expect(result.every((c) => c.status === "IN_PROGRESS")).toBe(true);
   });
 
   it("filters by size array", () => {
-    const result = filterAndSort(cards, { search: "", statusFilter: [], sizeFilter: ["BAP"], sort: "dateAdded", dir: "desc" });
+    const result = filterAndSort(cards, {
+      search: "",
+      statusFilter: [],
+      sizeFilter: ["BAP"],
+      sort: "dateAdded",
+      dir: "desc",
+    });
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe("Gamma Thread");
   });
 
   it("combines all filters with AND logic", () => {
-    const result = filterAndSort(cards, { search: "pattern", statusFilter: ["IN_PROGRESS"], sizeFilter: ["Medium"], sort: "dateAdded", dir: "desc" });
+    const result = filterAndSort(cards, {
+      search: "pattern",
+      statusFilter: ["IN_PROGRESS"],
+      sizeFilter: ["Medium"],
+      sort: "dateAdded",
+      dir: "desc",
+    });
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe("Delta Pattern");
   });
 
   it("applies sort after filtering", () => {
-    const result = filterAndSort(cards, { search: "", statusFilter: ["IN_PROGRESS"], sizeFilter: [], sort: "name", dir: "asc" });
+    const result = filterAndSort(cards, {
+      search: "",
+      statusFilter: ["IN_PROGRESS"],
+      sizeFilter: [],
+      sort: "name",
+      dir: "asc",
+    });
     expect(result).toHaveLength(2);
     expect(result[0].name).toBe("Alpha Stitch");
     expect(result[1].name).toBe("Delta Pattern");
   });
 
   it("sorts by dateAdded descending (newest first)", () => {
-    const result = filterAndSort(cards, { search: "", statusFilter: [], sizeFilter: [], sort: "dateAdded", dir: "desc" });
+    const result = filterAndSort(cards, {
+      search: "",
+      statusFilter: [],
+      sizeFilter: [],
+      sort: "dateAdded",
+      dir: "desc",
+    });
     expect(result[0].name).toBe("Delta Pattern"); // April
     expect(result[3].name).toBe("Alpha Stitch"); // January
   });
 
   it("returns empty array when no cards match", () => {
-    const result = filterAndSort(cards, { search: "nonexistent", statusFilter: [], sizeFilter: [], sort: "name", dir: "asc" });
+    const result = filterAndSort(cards, {
+      search: "nonexistent",
+      statusFilter: [],
+      sizeFilter: [],
+      sort: "name",
+      dir: "asc",
+    });
     expect(result).toHaveLength(0);
   });
 });
@@ -67,9 +168,27 @@ describe("filterAndSort", () => {
 
 describe("useGalleryFilters", () => {
   const cards = [
-    createMockGalleryCard({ chartId: "c1", name: "Alpha", status: "IN_PROGRESS", sizeCategory: "Large", dateAdded: new Date("2026-01-01") }),
-    createMockGalleryCard({ chartId: "c2", name: "Beta", status: "UNSTARTED", sizeCategory: "Mini", dateAdded: new Date("2026-03-01") }),
-    createMockGalleryCard({ chartId: "c3", name: "Gamma", status: "FINISHED", sizeCategory: "BAP", dateAdded: new Date("2026-02-01") }),
+    createMockGalleryCard({
+      chartId: "c1",
+      name: "Alpha",
+      status: "IN_PROGRESS",
+      sizeCategory: "Large",
+      dateAdded: new Date("2026-01-01"),
+    }),
+    createMockGalleryCard({
+      chartId: "c2",
+      name: "Beta",
+      status: "UNSTARTED",
+      sizeCategory: "Mini",
+      dateAdded: new Date("2026-03-01"),
+    }),
+    createMockGalleryCard({
+      chartId: "c3",
+      name: "Gamma",
+      status: "FINISHED",
+      sizeCategory: "BAP",
+      dateAdded: new Date("2026-02-01"),
+    }),
   ];
 
   it("returns default state values", () => {

@@ -2,6 +2,7 @@
 
 import { LayoutGrid, List, Table2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { SortDropdown } from "./sort-dropdown";
 import type { ViewMode, SortField, SortDir } from "./gallery-types";
 
@@ -64,25 +65,27 @@ export function ViewToggleBar({
         <SortDropdown sort={sort} dir={dir} onSortChange={onSortChange} />
 
         {/* Segmented view toggle */}
-        <div className="bg-muted inline-flex items-center rounded-lg p-0.5">
-          {VIEW_MODE_CONFIG.map(({ mode, icon: Icon, label, tooltip }) => (
-            <button
-              key={mode}
-              type="button"
-              onClick={() => onViewChange(mode)}
-              title={tooltip}
-              className={cn(
-                "inline-flex items-center justify-center rounded-md px-2.5 py-2 transition-colors",
-                view === mode
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground/60 hover:text-muted-foreground",
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              <span className="sr-only">{label}</span>
-            </button>
-          ))}
-        </div>
+        <TooltipProvider>
+          <div className="bg-muted inline-flex items-center rounded-lg p-0.5">
+            {VIEW_MODE_CONFIG.map(({ mode, icon: Icon, label, tooltip }) => (
+              <Tooltip key={mode}>
+                <TooltipTrigger
+                  className={cn(
+                    "inline-flex items-center justify-center rounded-md px-2.5 py-2 transition-colors",
+                    view === mode
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground/60 hover:text-muted-foreground",
+                  )}
+                  onClick={() => onViewChange(mode)}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="sr-only">{label}</span>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">{tooltip}</TooltipContent>
+              </Tooltip>
+            ))}
+          </div>
+        </TooltipProvider>
       </div>
     </div>
   );

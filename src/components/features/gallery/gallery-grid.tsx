@@ -101,7 +101,7 @@ function GalleryView({ cards }: { cards: GalleryCardData[] }) {
   return (
     <div
       role="list"
-      className="grid gap-6"
+      className="grid justify-center gap-6"
       style={{
         gridTemplateColumns: "repeat(auto-fill, minmax(280px, 340px))",
       }}
@@ -211,6 +211,28 @@ function ListProgressCell({ card }: { card: GalleryCardData }) {
   );
 }
 
+function ListMobileStat({ card }: { card: GalleryCardData }) {
+  if (card.statusGroup === "wip") {
+    return (
+      <span className="text-muted-foreground text-[11px] sm:hidden">
+        {card.progressPercent}% &middot; {formatNumber(card.stitchCount)} stitches
+      </span>
+    );
+  }
+  if (card.statusGroup === "finished" && card.finishDate) {
+    return (
+      <span className="text-muted-foreground text-[11px] sm:hidden">
+        Finished {formatDate(card.finishDate)}
+      </span>
+    );
+  }
+  return (
+    <span className="text-muted-foreground text-[11px] sm:hidden">
+      {formatNumber(card.stitchCount)} stitches &middot; {card.threadColourCount} colours
+    </span>
+  );
+}
+
 function ListView({ cards }: { cards: GalleryCardData[] }) {
   return (
     <div role="list" className="border-border overflow-hidden rounded-xl border">
@@ -218,7 +240,7 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
         <div
           key={card.chartId}
           role="listitem"
-          className="bg-card border-border hover:bg-muted/50 grid grid-cols-[40px_8px_1fr] items-center gap-x-4 border-b px-4 py-2 transition-colors sm:grid-cols-[40px_8px_minmax(180px,2fr)_minmax(120px,1fr)_minmax(100px,120px)_64px_56px]"
+          className="bg-card border-border hover:bg-muted/50 grid grid-cols-[40px_8px_1fr_auto] items-center gap-x-4 border-b px-4 py-2 transition-colors sm:grid-cols-[40px_8px_minmax(180px,2fr)_minmax(120px,1fr)_minmax(100px,120px)_64px_56px]"
         >
           {/* 1. Thumbnail */}
           <SmallThumbnail card={card} />
@@ -226,7 +248,7 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
           {/* 2. Status dot */}
           <span className={`h-2 w-2 rounded-full ${STATUS_CONFIG[card.status].dotClass}`} />
 
-          {/* 3. Name + designer */}
+          {/* 3. Name + designer (+ compact stat line on mobile) */}
           <div className="min-w-0">
             <Link
               href={`/charts/${card.chartId}`}
@@ -235,9 +257,13 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
               {card.name}
             </Link>
             <p className="text-muted-foreground truncate text-xs">{card.designerName}</p>
+            <ListMobileStat card={card} />
           </div>
 
-          {/* 4. Context stats */}
+          {/* 4. Status badge (always visible) / Context stats (desktop) */}
+          <div className="sm:hidden">
+            <StatusBadge status={card.status} />
+          </div>
           <div className="hidden min-w-0 sm:block">
             <ListContextStats card={card} />
           </div>

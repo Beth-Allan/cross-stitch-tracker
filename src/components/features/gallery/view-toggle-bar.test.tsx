@@ -20,13 +20,7 @@ describe("ViewToggleBar", () => {
   });
 
   it("shows filtered of total when filters active", () => {
-    render(
-      <ViewToggleBar
-        {...defaultProps}
-        filteredCount={15}
-        hasActiveFilters={true}
-      />,
-    );
+    render(<ViewToggleBar {...defaultProps} filteredCount={15} hasActiveFilters={true} />);
     expect(screen.getByText("15 of 42 projects")).toBeInTheDocument();
   });
 
@@ -47,9 +41,7 @@ describe("ViewToggleBar", () => {
 
   it("calls onViewChange with correct mode when button clicked", () => {
     const onViewChange = vi.fn();
-    render(
-      <ViewToggleBar {...defaultProps} onViewChange={onViewChange} />,
-    );
+    render(<ViewToggleBar {...defaultProps} onViewChange={onViewChange} />);
 
     const listButton = screen.getByText("List view").closest("button");
     fireEvent.click(listButton!);
@@ -60,18 +52,15 @@ describe("ViewToggleBar", () => {
   it("renders SortDropdown", () => {
     render(<ViewToggleBar {...defaultProps} />);
     // SortDropdown renders a button with "Sort by" in its aria-label
-    expect(
-      screen.getByRole("button", { name: /sort by/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /sort by/i })).toBeInTheDocument();
   });
 
-  it("includes tooltip strings for view modes", () => {
+  it("renders accessible tooltip triggers for view modes", () => {
     render(<ViewToggleBar {...defaultProps} />);
-    // Tooltips are on the buttons via title attribute
+    // Tooltips use Base UI Tooltip component (not title attribute)
+    // Each view button is a TooltipTrigger wrapping the icon + sr-only label
     const cardsButton = screen.getByText("Cards view").closest("button");
-    expect(cardsButton).toHaveAttribute(
-      "title",
-      "Visual cards with cover images and status details",
-    );
+    expect(cardsButton).toBeInTheDocument();
+    expect(cardsButton).not.toHaveAttribute("title");
   });
 });

@@ -233,10 +233,12 @@ export function filterAndSort(
 ): GalleryCardData[] {
   let result = cards;
 
-  // Search filter (case-insensitive name match)
+  // Search filter (case-insensitive name + designer match)
   if (options.search) {
     const q = options.search.toLowerCase();
-    result = result.filter((c) => c.name.toLowerCase().includes(q));
+    result = result.filter(
+      (c) => c.name.toLowerCase().includes(q) || c.designerName.toLowerCase().includes(q),
+    );
   }
 
   // Status filter
