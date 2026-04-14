@@ -76,7 +76,8 @@ export function transformToGalleryCard(
   const sizeCategory = calculateSizeCategory(stitchCount);
 
   const stitchesCompleted = chart.project?.stitchesCompleted ?? 0;
-  const progressPercent = stitchCount > 0 ? Math.round((stitchesCompleted / stitchCount) * 100) : 0;
+  const progressPercent =
+    stitchCount > 0 ? Math.min(100, Math.round((stitchesCompleted / stitchCount) * 100)) : 0;
 
   // Kitting dots — default to not-applicable when no project (no supplies linked)
   let fabricStatus: KittingItemStatus = "needed";
