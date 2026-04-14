@@ -35,7 +35,9 @@ function computeSupplyStatus(items: SupplyItem[]): KittingItemStatus {
   if (items.length === 0) return "not-applicable";
   const allAcquired = items.every((i) => i.quantityAcquired >= i.quantityRequired);
   if (allAcquired) return "fulfilled";
-  return "partial";
+  const anyAcquired = items.some((i) => i.quantityAcquired > 0);
+  if (anyAcquired) return "partial";
+  return "needed";
 }
 
 export function computeKittingDots(project: {

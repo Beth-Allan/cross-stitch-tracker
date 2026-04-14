@@ -95,14 +95,14 @@ describe("computeKittingDots", () => {
     expect(result.threadStatus).toBe("fulfilled");
   });
 
-  it("returns partial for threads when none are acquired yet", () => {
+  it("returns needed for threads when none are acquired yet", () => {
     const result = computeKittingDots({
       fabric: null,
       projectThreads: [unacquired, unacquired],
       projectBeads: [],
       projectSpecialty: [],
     });
-    expect(result.threadStatus).toBe("partial");
+    expect(result.threadStatus).toBe("needed");
   });
 
   it("returns not-applicable for beads when none linked", () => {
