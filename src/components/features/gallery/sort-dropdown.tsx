@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useId } from "react";
 import { ChevronDown, ChevronUp, Check, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SortField, SortDir } from "./gallery-types";
@@ -32,6 +32,7 @@ const SORT_FIELD_ORDER: SortField[] = [
 ];
 
 export function SortDropdown({ sort, dir, onSortChange }: SortDropdownProps) {
+  const listboxId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [highlightIndex, setHighlightIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -132,7 +133,7 @@ export function SortDropdown({ sort, dir, onSortChange }: SortDropdownProps) {
         onKeyDown={handleTriggerKeyDown}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        aria-controls={isOpen ? "sort-listbox" : undefined}
+        aria-controls={isOpen ? listboxId : undefined}
         aria-label={`Sort by ${SORT_LABELS[sort]}, ${directionLabel}`}
         className="border-border text-muted-foreground hover:border-foreground/25 flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm whitespace-nowrap transition-colors"
       >
@@ -151,7 +152,7 @@ export function SortDropdown({ sort, dir, onSortChange }: SortDropdownProps) {
       {isOpen && (
         <div
           ref={listRef}
-          id="sort-listbox"
+          id={listboxId}
           role="listbox"
           aria-label="Sort options"
           tabIndex={0}
