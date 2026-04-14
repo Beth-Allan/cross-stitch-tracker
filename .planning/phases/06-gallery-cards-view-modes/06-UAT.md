@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 06-gallery-cards-view-modes
 source: [06-01-SUMMARY.md, 06-02-SUMMARY.md, 06-03-SUMMARY.md, 06-04-SUMMARY.md]
 started: 2026-04-13T21:00:00Z
-updated: 2026-04-13T21:15:00Z
+updated: 2026-04-13T21:20:00Z
 ---
 
 ## Current Test
@@ -29,6 +29,7 @@ expected: Switch to List view. The URL updates with a view parameter. Reload the
 result: issue
 reported: "Yes, BUT a next.js error showed up: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client."
 severity: major
+diagnosis: dev-only — Turbopack SSR cache stale after commit eeb7aaa (ListView 3-col→4-col change). Client bundle updated via HMR but server kept serving old HTML. Production build unaffected. Fix: restart dev server.
 
 ### 5. Sort Charts
 expected: Sort dropdown shows current sort field (default: Date Added). Click it to see 6 options: Date Added, Name, Designer, Status, Size, Stitch Count. Select a different field — charts reorder. Direction arrow toggles asc/desc.
@@ -70,7 +71,10 @@ blocked: 0
   reason: "User reported: Yes, BUT a next.js error showed up: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client."
   severity: major
   test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Turbopack SSR cache stale after commit eeb7aaa — ListView grid changed from 3-col to 4-col + added ListMobileStat. HMR updated client bundle but server kept serving old HTML. Dev-only issue, production build unaffected."
+  artifacts:
+    - path: "src/components/features/gallery/gallery-grid.tsx"
+      issue: "ListView grid template mismatch between stale SSR cache and current client bundle"
+  missing:
+    - "Restart dev server to clear Turbopack SSR cache (rm -rf .next && npm run dev)"
+  debug_session: ".planning/debug/hydration-mismatch-charts.md"
