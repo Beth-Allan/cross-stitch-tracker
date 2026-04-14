@@ -10,7 +10,6 @@ import { GalleryGrid } from "./gallery-grid";
 import { useGalleryFilters } from "./use-gallery-filters";
 import { transformToGalleryCard } from "./gallery-utils";
 import type { GalleryChartData } from "@/types/chart";
-import type { GalleryChartWithProject } from "./gallery-types";
 
 interface ProjectGalleryProps {
   charts: GalleryChartData[];
@@ -20,8 +19,7 @@ interface ProjectGalleryProps {
 export function ProjectGallery({ charts, imageUrls }: ProjectGalleryProps) {
   // Transform server data to gallery card shape
   const cards = useMemo(
-    () =>
-      charts.map((c) => transformToGalleryCard(c as unknown as GalleryChartWithProject, imageUrls)),
+    () => charts.map((c) => transformToGalleryCard(c, imageUrls)),
     [charts, imageUrls],
   );
 

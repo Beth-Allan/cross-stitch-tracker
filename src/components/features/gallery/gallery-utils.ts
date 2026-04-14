@@ -1,9 +1,9 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
 import type { SizeCategory } from "@/lib/utils/size-category";
 import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
+import type { GalleryChartData } from "@/types/chart";
 import type {
   GalleryCardData,
-  GalleryChartWithProject,
   KittingItemStatus,
   StatusGroup,
   SortField,
@@ -60,7 +60,7 @@ export function computeKittingDots(project: {
 // ─── Data Transformation ────────────────────────────────────────────────────
 
 export function transformToGalleryCard(
-  chart: GalleryChartWithProject,
+  chart: GalleryChartData,
   imageUrls: Record<string, string>,
 ): GalleryCardData {
   const status: ProjectStatus = chart.project?.status ?? "UNSTARTED";

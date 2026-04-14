@@ -9,7 +9,7 @@ import {
   STATUS_SORT_ORDER,
   SIZE_SORT_ORDER,
 } from "./gallery-utils";
-import type { GalleryChartWithProject } from "./gallery-types";
+import type { GalleryChartData } from "@/types/chart";
 import { createMockGalleryCard } from "@/__tests__/mocks/factories";
 
 // ─── getStatusGroup ─────────────────────────────────────────────────────────
@@ -155,7 +155,7 @@ describe("computeKittingDots", () => {
 // ─── transformToGalleryCard ─────────────────────────────────────────────────
 
 describe("transformToGalleryCard", () => {
-  const baseChart: GalleryChartWithProject = {
+  const baseChart: GalleryChartData = {
     id: "chart-1",
     name: "My Cross Stitch",
     designerId: "d1",
@@ -188,47 +188,12 @@ describe("transformToGalleryCard", () => {
     ],
     project: {
       id: "proj-1",
-      chartId: "chart-1",
-      userId: "user-1",
       status: "IN_PROGRESS",
+      stitchesCompleted: 2500,
       startDate: new Date("2026-02-01"),
       finishDate: null,
       ffoDate: null,
-      finishPhotoUrl: null,
-      storageLocationId: null,
-      stitchingAppId: null,
-      needsOnionSkinning: false,
-      wantToStartNext: false,
-      preferredStartSeason: null,
-      startingStitches: 0,
-      stitchesCompleted: 2500,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      storageLocation: null,
-      stitchingApp: null,
-      fabric: {
-        id: "f1",
-        name: "Aida 14ct",
-        brandId: "fb-1",
-        photoUrl: null,
-        count: 14,
-        type: "Aida",
-        colorFamily: "White",
-        colorType: "White",
-        shortestEdgeInches: 18,
-        longestEdgeInches: 24,
-        needToBuy: false,
-        linkedProjectId: "proj-1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        brand: {
-          id: "fb-1",
-          name: "Zweigart",
-          website: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      },
+      fabric: { id: "f1" },
       projectThreads: Array.from({ length: 12 }, () => ({
         quantityRequired: 1,
         quantityAcquired: 1,
@@ -283,7 +248,7 @@ describe("transformToGalleryCard", () => {
   });
 
   it("handles chart with no project (defaults to UNSTARTED)", () => {
-    const chartNoProject: GalleryChartWithProject = {
+    const chartNoProject: GalleryChartData = {
       ...baseChart,
       project: null,
       designer: null,
@@ -305,7 +270,7 @@ describe("transformToGalleryCard", () => {
   });
 
   it("handles missing cover image URLs gracefully", () => {
-    const chartNoCover: GalleryChartWithProject = {
+    const chartNoCover: GalleryChartData = {
       ...baseChart,
       coverImageUrl: null,
       coverThumbnailUrl: null,
@@ -316,7 +281,7 @@ describe("transformToGalleryCard", () => {
   });
 
   it("computes stitch count from dimensions when stitchCount is 0", () => {
-    const chartDimensions: GalleryChartWithProject = {
+    const chartDimensions: GalleryChartData = {
       ...baseChart,
       stitchCount: 0,
       stitchesWide: 200,
@@ -329,7 +294,7 @@ describe("transformToGalleryCard", () => {
   });
 
   it("returns 0 progressPercent when stitchCount is 0", () => {
-    const chartZero: GalleryChartWithProject = {
+    const chartZero: GalleryChartData = {
       ...baseChart,
       stitchCount: 0,
       stitchesWide: 0,
