@@ -1,148 +1,143 @@
 ---
 phase: 06-gallery-cards-view-modes
-reviewed: 2026-04-14T01:42:26Z
+reviewed: 2026-04-15T01:06:09Z
 depth: standard
-files_reviewed: 33
+files_reviewed: 35
 files_reviewed_list:
-  - src/components/features/gallery/cover-placeholder.tsx
-  - src/components/features/gallery/cover-placeholder.test.tsx
-  - src/components/features/gallery/filter-bar.tsx
-  - src/components/features/gallery/filter-bar.test.tsx
-  - src/components/features/gallery/filter-chips.tsx
-  - src/components/features/gallery/filter-chips.test.tsx
-  - src/components/features/gallery/gallery-card.tsx
-  - src/components/features/gallery/gallery-card.test.tsx
-  - src/components/features/gallery/gallery-grid.tsx
-  - src/components/features/gallery/gallery-grid.test.tsx
-  - src/components/features/gallery/gallery-types.ts
-  - src/components/features/gallery/gallery-utils.ts
-  - src/components/features/gallery/gallery-utils.test.ts
-  - src/components/features/gallery/gallery-format.ts
-  - src/components/features/gallery/kitting-dots.tsx
-  - src/components/features/gallery/kitting-dots.test.tsx
-  - src/components/features/gallery/multi-select-dropdown.tsx
-  - src/components/features/gallery/multi-select-dropdown.test.tsx
-  - src/components/features/gallery/project-gallery.tsx
-  - src/components/features/gallery/project-gallery.test.tsx
-  - src/components/features/gallery/sort-dropdown.tsx
-  - src/components/features/gallery/sort-dropdown.test.tsx
-  - src/components/features/gallery/use-gallery-filters.ts
-  - src/components/features/gallery/use-gallery-filters.test.ts
-  - src/components/features/gallery/view-toggle-bar.tsx
-  - src/components/features/gallery/view-toggle-bar.test.tsx
-  - src/lib/actions/chart-actions.ts
-  - src/lib/actions/chart-actions-gallery.test.ts
-  - src/types/chart.ts
-  - src/components/shell/nav-items.ts
+  - src/__tests__/mocks/factories.ts
+  - src/app/(dashboard)/charts/loading.tsx
   - src/app/(dashboard)/charts/page.tsx
   - src/app/layout.tsx
-  - src/__tests__/mocks/factories.ts
+  - src/components/features/charts/chart-detail.tsx
+  - src/components/features/gallery/cover-placeholder.test.tsx
+  - src/components/features/gallery/cover-placeholder.tsx
+  - src/components/features/gallery/filter-bar.test.tsx
+  - src/components/features/gallery/filter-bar.tsx
+  - src/components/features/gallery/filter-chips.test.tsx
+  - src/components/features/gallery/filter-chips.tsx
+  - src/components/features/gallery/gallery-card.test.tsx
+  - src/components/features/gallery/gallery-card.tsx
+  - src/components/features/gallery/gallery-format.ts
+  - src/components/features/gallery/gallery-grid.test.tsx
+  - src/components/features/gallery/gallery-grid.tsx
+  - src/components/features/gallery/gallery-types.ts
+  - src/components/features/gallery/gallery-utils.test.ts
+  - src/components/features/gallery/gallery-utils.ts
+  - src/components/features/gallery/kitting-dots.test.tsx
+  - src/components/features/gallery/kitting-dots.tsx
+  - src/components/features/gallery/multi-select-dropdown.test.tsx
+  - src/components/features/gallery/multi-select-dropdown.tsx
+  - src/components/features/gallery/project-gallery.test.tsx
+  - src/components/features/gallery/project-gallery.tsx
+  - src/components/features/gallery/sort-dropdown.test.tsx
+  - src/components/features/gallery/sort-dropdown.tsx
+  - src/components/features/gallery/use-gallery-filters.test.ts
+  - src/components/features/gallery/use-gallery-filters.ts
+  - src/components/features/gallery/view-toggle-bar.test.tsx
+  - src/components/features/gallery/view-toggle-bar.tsx
+  - src/components/shell/nav-items.ts
+  - src/lib/actions/chart-actions-gallery.test.ts
+  - src/lib/actions/chart-actions.ts
+  - src/types/chart.ts
 findings:
-  critical: 1
-  warning: 3
-  info: 3
-  total: 7
+  critical: 0
+  warning: 2
+  info: 4
+  total: 6
 status: issues_found
 ---
 
 # Phase 6: Code Review Report
 
-**Reviewed:** 2026-04-14T01:42:26Z
+**Reviewed:** 2026-04-15T01:06:09Z
 **Depth:** standard
-**Files Reviewed:** 33
+**Files Reviewed:** 35
 **Status:** issues_found
 
 ## Summary
 
-Phase 6 adds a gallery view to the /charts page with three view modes (gallery cards, list, table), filtering by status/designer/genre, sorting with URL-based state via nuqs, and kitting dot status indicators. The code is well-structured with clean separation of concerns: types in `gallery-types.ts`, pure utility logic in `gallery-utils.ts`, formatting in `gallery-format.ts`, URL state in `use-gallery-filters.ts`, and presentation in component files. Test coverage is thorough (148 gallery tests reported). Auth patterns and server action conventions are followed correctly. The `getChartsForGallery` action uses `requireAuth()` and scopes queries to `userId`.
+Phase 6 introduces gallery cards and view modes (gallery/list/table) for the /charts page with filtering, sorting, and URL-synced state via nuqs. This is a re-review after the round 1 fix report addressed all 4 prior findings (CR-01 unsafe type cast, WR-01 kitting dot logic, WR-02 progress clamping, WR-03 hardcoded listbox ID). All prior fixes are confirmed in the current code.
 
-Key concerns: a logic bug in kitting dot computation that conflates "none acquired" with "partially acquired", an unsafe type cast that bypasses TypeScript's safety, and an unbounded progress percentage that can exceed 100%.
+The implementation is well-structured with clean separation of concerns: types in `gallery-types.ts`, pure utility functions in `gallery-utils.ts`, URL state management in `use-gallery-filters.ts`, and presentational components composed in `project-gallery.tsx`.
 
-## Critical Issues
+Key positives:
+- Server action `getChartsForGallery` correctly calls `requireAuth()` and scopes the query to `userId` -- no authorization gaps
+- Data transformation via `transformToGalleryCard` now accepts the correct `GalleryChartData` type with no unsafe casts
+- `progressPercent` is correctly clamped with `Math.min(100, ...)`
+- `computeSupplyStatus` correctly distinguishes "needed" (zero acquired) from "partial" (some acquired)
+- `SortDropdown` uses `useId()` for unique listbox IDs
+- Tests are thorough with good coverage of filter/sort logic, hook integration with nuqs adapter, and component rendering
+- Semantic tokens used consistently across most components
+- Proper `"use client"` usage -- only components with hooks/interactivity are client components
 
-### CR-01: Unsafe `as unknown as` type cast hides type mismatch between GalleryChartData and GalleryChartWithProject
-
-**File:** `src/components/features/gallery/project-gallery.tsx:24`
-**Issue:** The cast `c as unknown as GalleryChartWithProject` bypasses TypeScript entirely. `GalleryChartData` (from `src/types/chart.ts`) has a slim `project` type with only selected fields (`id`, `status`, `stitchesCompleted`, etc.), while `GalleryChartWithProject` expects a full `Project` type (with `userId`, `chartId`, `startingStitches`, `needsOnionSkinning`, etc. plus `storageLocation` and `stitchingApp` relations). Today `transformToGalleryCard` only accesses fields present on both types, so it works at runtime. But any future change to `transformToGalleryCard` that accesses a `Project` field not in `GalleryProjectData` would silently read `undefined` at runtime with no compiler warning.
-**Fix:** Make `transformToGalleryCard` accept `GalleryChartData` directly, or create a shared input type that both types satisfy. The simplest fix is to update the function signature:
-```typescript
-// gallery-utils.ts
-import type { GalleryChartData } from "@/types/chart";
-
-export function transformToGalleryCard(
-  chart: GalleryChartData,
-  imageUrls: Record<string, string>,
-): GalleryCardData {
-  // ... implementation unchanged, it only uses fields present on GalleryChartData
-}
-```
-Then in `project-gallery.tsx`, remove the cast:
-```typescript
-charts.map((c) => transformToGalleryCard(c, imageUrls))
-```
+Two warnings found (duplicate DOM IDs risk, hardcoded focus ring color) and four informational items. No critical issues.
 
 ## Warnings
 
-### WR-01: computeSupplyStatus never returns "needed" -- conflates zero-acquired with partially-acquired
+### WR-01: MultiSelectDropdown generates listboxId from label text -- duplicate IDs if same label used twice
 
-**File:** `src/components/features/gallery/gallery-utils.ts:34-38`
-**Issue:** The function returns `"not-applicable"` (no items), `"fulfilled"` (all acquired), or `"partial"` (some not acquired). It never returns `"needed"`, which is one of the four `KittingItemStatus` values. When a user has linked supplies but has acquired 0 of them, the UI shows an amber circle-dot icon ("partial") instead of an empty circle icon ("needed"). The `KittingDotIcon` component renders distinct icons for "needed" vs "partial", and the tooltip text differs ("Still needed" vs "In progress"), so this is a meaningful UX distinction.
-**Fix:**
-```typescript
-function computeSupplyStatus(items: SupplyItem[]): KittingItemStatus {
-  if (items.length === 0) return "not-applicable";
-  const allAcquired = items.every((i) => i.quantityAcquired >= i.quantityRequired);
-  if (allAcquired) return "fulfilled";
-  const anyAcquired = items.some((i) => i.quantityAcquired > 0);
-  if (anyAcquired) return "partial";
-  return "needed";
-}
-```
+**File:** `src/components/features/gallery/multi-select-dropdown.tsx:28`
+**Issue:** The `listboxId` is derived from the `label` prop: `` `${label.toLowerCase().replace(/\s+/g, "-")}-listbox` ``. If two `MultiSelectDropdown` instances share the same label, they produce duplicate DOM IDs, which is an HTML spec violation and breaks `aria-controls` associations. Currently the two instances in `filter-bar.tsx` use different labels ("Status" and "Size"), so this is not triggered in practice. However, the component is a reusable primitive and this is a latent bug. Note that `SortDropdown` already uses `useId()` correctly (fixed in the prior review round).
+**Fix:** Use React's `useId()` hook for consistency with `SortDropdown`:
+```tsx
+import { useId } from "react";
 
-### WR-02: progressPercent can exceed 100% when stitchesCompleted > stitchCount
-
-**File:** `src/components/features/gallery/gallery-utils.ts:77`
-**Issue:** `Math.round((stitchesCompleted / stitchCount) * 100)` has no upper bound. If a user enters stitchesCompleted > stitchCount (common when stitch count is approximate), the progress bar text will show values like "105%". The bar itself is visually clamped by `overflow-hidden`, but the percentage label in `WIPFooter` and the table view will display the unclamped value.
-**Fix:**
-```typescript
-const progressPercent = stitchCount > 0
-  ? Math.min(100, Math.round((stitchesCompleted / stitchCount) * 100))
-  : 0;
-```
-
-### WR-03: SortDropdown uses hardcoded `id="sort-listbox"` -- would conflict if rendered twice
-
-**File:** `src/components/features/gallery/sort-dropdown.tsx:153`
-**Issue:** The listbox element uses a static `id="sort-listbox"` rather than a generated ID. While currently only one instance exists, this violates ARIA requirements (IDs must be unique in a document) and would break `aria-controls` if a second instance were added. The `MultiSelectDropdown` correctly generates dynamic IDs from its label prop.
-**Fix:** Use `useId()` from React or derive from the label/props:
-```typescript
+// Replace line 28:
+// const listboxId = `${label.toLowerCase().replace(/\s+/g, "-")}-listbox`;
 const listboxId = useId();
-// ...
-<div id={listboxId} role="listbox" ...>
+```
+
+### WR-02: Search input focus ring uses hardcoded emerald color instead of theme ring token
+
+**File:** `src/components/features/gallery/filter-bar.tsx:48`
+**Issue:** The search input uses `focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400` -- hardcoded color values rather than the theme's focus ring token. Per `base-ui-patterns.md`, semantic design tokens are preferred over hardcoded color scales. The emerald accent is used as a brand color throughout the gallery for selected/interactive states, but focus rings should use `ring-ring` for consistency with the rest of the app's form inputs and correct dark mode contrast. The current hardcoded `emerald-400` may not provide sufficient contrast against all dark mode backgrounds.
+**Fix:** Use the theme ring token:
+```tsx
+className="... focus:border-ring focus:ring-1 focus:ring-ring focus:outline-none"
 ```
 
 ## Info
 
-### IN-01: STATUS_GRADIENT_CLASSES uses hardcoded color scales (stone-*, amber-*, etc.) instead of semantic tokens
+### IN-01: "use client" directive in test file is dead code
 
-**File:** `src/components/features/gallery/gallery-utils.ts:130-141`
-**Issue:** Project conventions prefer semantic tokens (`bg-card`, `text-muted-foreground`) over hardcoded color scales. The gradient map uses raw Tailwind colors like `stone-200`, `amber-100`, `sky-100`, etc. This is a deliberate design choice for status-specific gradients that don't have semantic equivalents, and each entry includes dark-mode variants. Documenting as info rather than warning since these are visual status indicators with no semantic token equivalent.
-**Fix:** Consider adding a code comment explaining why raw colors are used here, e.g. `// Status gradients use raw colors intentionally -- no semantic equivalents exist for these status-specific visual treatments`.
+**File:** `src/components/features/gallery/gallery-card.test.tsx:1`
+**Issue:** The test file starts with `"use client";`. Test files run in Vitest (Node.js), not in Next.js, so the directive is meaningless and ignored. It is harmless but could confuse future contributors about whether test files need this directive.
+**Fix:** Remove line 1 (`"use client";`).
 
-### IN-02: GalleryChartWithProject type in gallery-types.ts is unused at runtime -- only needed due to CR-01 cast
+### IN-02: Sort dropdown test description says "6 options" but there are 7 sort fields
+
+**File:** `src/components/features/gallery/sort-dropdown.test.tsx:19`
+**Issue:** The test is titled `"opens dropdown showing 6 options"` but `SORT_FIELD_ORDER` has 7 entries (dateAdded, name, designer, status, size, stitchCount, progress). The test verifies 6 specific labels but never checks for "Progress". The test passes because it only asserts presence of specific elements rather than a count. The description is misleading and the "Progress" option is not verified.
+**Fix:** Update the test title and add the missing assertion:
+```tsx
+it("opens dropdown showing 7 options", () => {
+  render(<SortDropdown {...defaultProps} />);
+  fireEvent.click(screen.getByRole("button", { name: /sort by/i }));
+
+  expect(screen.getAllByText("Date Added")).toHaveLength(2);
+  expect(screen.getByText("Name")).toBeInTheDocument();
+  expect(screen.getByText("Designer")).toBeInTheDocument();
+  expect(screen.getByText("Status")).toBeInTheDocument();
+  expect(screen.getByText("Size")).toBeInTheDocument();
+  expect(screen.getByText("Stitch Count")).toBeInTheDocument();
+  expect(screen.getByText("Progress")).toBeInTheDocument();
+});
+```
+
+### IN-03: STATUS_GRADIENT_CLASSES and celebration styles use hardcoded color scales
+
+**File:** `src/components/features/gallery/gallery-utils.ts:133-156`
+**Issue:** The `STATUS_GRADIENT_CLASSES` record and `getCelebrationClasses` function use hardcoded Tailwind color scales (e.g., `from-stone-200`, `border-violet-500`) rather than semantic tokens. Per CLAUDE.md conventions, semantic tokens are preferred. However, these are intentionally status-specific decorative elements (cover placeholders, celebration borders) that require distinct hues per status -- there are no semantic token equivalents. This was already acknowledged in the impeccable audit. Both include proper dark mode variants.
+**Fix:** No action required. Consider adding a brief comment explaining the intentional deviation if desired.
+
+### IN-04: GalleryChartWithProject and GalleryProjectWithRelations types in gallery-types.ts are now unused
 
 **File:** `src/components/features/gallery/gallery-types.ts:69-77`
-**Issue:** The `GalleryChartWithProject` and `GalleryProjectWithRelations` types exist primarily to type the `transformToGalleryCard` function, but the actual data flowing through is `GalleryChartData` from `src/types/chart.ts`. If CR-01 is fixed (making `transformToGalleryCard` accept `GalleryChartData`), these types become dead code and should be removed.
-**Fix:** Remove after fixing CR-01, along with the `ChartWithProject` and `ProjectWithRelations` imports.
-
-### IN-03: Test file cover-placeholder.test.tsx asserts raw color classes (from-stone-200) that are implementation details
-
-**File:** `src/components/features/gallery/cover-placeholder.test.tsx:17`
-**Issue:** Test asserts `expect(div.className).toContain("from-stone-200")` which couples the test to specific Tailwind class names. If the gradient colors change, the test breaks even though the behavior (rendering a gradient) is unchanged. This is a minor coupling concern.
-**Fix:** Consider testing for the presence of `bg-gradient-to-br` only (which is stable), or test that different statuses produce different classes (which is already covered in the "7 statuses" test).
+**Issue:** After the CR-01 fix from the prior review (changing `transformToGalleryCard` to accept `GalleryChartData`), the `GalleryChartWithProject` and `GalleryProjectWithRelations` types are no longer referenced by any source file. They are dead code.
+**Fix:** Remove the unused types and their imports (`ProjectWithRelations`, `ChartWithProject`, `SupplyQuantity` from `@/types/chart`) from `gallery-types.ts`. Verify no other files import them first.
 
 ---
 
-_Reviewed: 2026-04-14T01:42:26Z_
+_Reviewed: 2026-04-15T01:06:09Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
