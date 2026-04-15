@@ -1032,4 +1032,188 @@ describe("supply-actions", () => {
       }
     });
   });
+
+  // ─── createAndAddBead ──────────────────────────────────────────────────────
+
+  describe("createAndAddBead", () => {
+    it("requires auth", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { createAndAddBead } = await import("./supply-actions");
+      await expect(
+        createAndAddBead({ projectId: "p1", name: "Custom Bead", brandId: "brand-1" }),
+      ).rejects.toThrow("Unauthorized");
+    });
+
+    it("validates name with trim and min(1)", async () => {
+      const { createAndAddBead } = await import("./supply-actions");
+
+      const result = await createAndAddBead({
+        projectId: "p1",
+        name: "   ",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Name is required");
+      }
+    });
+
+    it("checks project ownership before creating", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { createAndAddBead } = await import("./supply-actions");
+
+      const result = await createAndAddBead({
+        projectId: "p1",
+        name: "Custom Bead",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Project not found");
+      }
+    });
+
+    it("creates bead and links to project in a transaction", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const mockBead = createMockBead({ id: "new-bead" });
+      const mockLink = createMockProjectBead({ id: "new-pb", beadId: "new-bead" });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          bead: { create: vi.fn().mockResolvedValue(mockBead) },
+          projectBead: { create: vi.fn().mockResolvedValue(mockLink) },
+        });
+      });
+
+      const { createAndAddBead } = await import("./supply-actions");
+
+      const result = await createAndAddBead({
+        projectId: "p1",
+        name: "Custom Bead",
+        brandId: "brand-1",
+        code: "CB01",
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
+    });
+
+    it("returns success with the created record", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const mockBead = createMockBead({ id: "new-bead", colorName: "Custom Bead" });
+      const mockLink = createMockProjectBead({ id: "new-pb", beadId: "new-bead" });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          bead: { create: vi.fn().mockResolvedValue(mockBead) },
+          projectBead: { create: vi.fn().mockResolvedValue(mockLink) },
+        });
+      });
+
+      const { createAndAddBead } = await import("./supply-actions");
+
+      const result = await createAndAddBead({
+        projectId: "p1",
+        name: "Custom Bead",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.record).toBeDefined();
+      }
+    });
+  });
+
+  // ─── createAndAddSpecialty ─────────────────────────────────────────────────
+
+  describe("createAndAddSpecialty", () => {
+    it("requires auth", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { createAndAddSpecialty } = await import("./supply-actions");
+      await expect(
+        createAndAddSpecialty({ projectId: "p1", name: "Custom Item", brandId: "brand-1" }),
+      ).rejects.toThrow("Unauthorized");
+    });
+
+    it("validates name with trim and min(1)", async () => {
+      const { createAndAddSpecialty } = await import("./supply-actions");
+
+      const result = await createAndAddSpecialty({
+        projectId: "p1",
+        name: "   ",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Name is required");
+      }
+    });
+
+    it("checks project ownership before creating", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { createAndAddSpecialty } = await import("./supply-actions");
+
+      const result = await createAndAddSpecialty({
+        projectId: "p1",
+        name: "Custom Item",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Project not found");
+      }
+    });
+
+    it("creates specialty item and links to project in a transaction", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const mockItem = createMockSpecialtyItem({ id: "new-item" });
+      const mockLink = createMockProjectSpecialty({ id: "new-ps", specialtyItemId: "new-item" });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          specialtyItem: { create: vi.fn().mockResolvedValue(mockItem) },
+          projectSpecialty: { create: vi.fn().mockResolvedValue(mockLink) },
+        });
+      });
+
+      const { createAndAddSpecialty } = await import("./supply-actions");
+
+      const result = await createAndAddSpecialty({
+        projectId: "p1",
+        name: "Custom Item",
+        brandId: "brand-1",
+        code: "CI01",
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
+    });
+
+    it("returns success with the created record", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const mockItem = createMockSpecialtyItem({ id: "new-item", colorName: "Custom Item" });
+      const mockLink = createMockProjectSpecialty({ id: "new-ps", specialtyItemId: "new-item" });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          specialtyItem: { create: vi.fn().mockResolvedValue(mockItem) },
+          projectSpecialty: { create: vi.fn().mockResolvedValue(mockLink) },
+        });
+      });
+
+      const { createAndAddSpecialty } = await import("./supply-actions");
+
+      const result = await createAndAddSpecialty({
+        projectId: "p1",
+        name: "Custom Item",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.record).toBeDefined();
+      }
+    });
+  });
 });

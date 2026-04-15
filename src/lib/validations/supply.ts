@@ -112,3 +112,21 @@ export const createAndAddThreadSchema = z.object({
 });
 
 export type CreateAndAddThreadInput = z.infer<typeof createAndAddThreadSchema>;
+
+export const createAndAddBeadSchema = z.object({
+  projectId: z.string().min(1),
+  name: z.string().trim().min(1, "Name is required").max(200),
+  code: z.string().trim().max(20).optional().default(""),
+  brandId: z.string().min(1, "Brand is required"),
+});
+
+export type CreateAndAddBeadInput = z.infer<typeof createAndAddBeadSchema>;
+
+export const createAndAddSpecialtySchema = z.object({
+  projectId: z.string().min(1),
+  name: z.string().trim().min(1, "Name is required").max(200),
+  code: z.string().trim().max(20).optional().default(""),
+  brandId: z.string().min(1, "Brand is required"),
+});
+
+export type CreateAndAddSpecialtyInput = z.infer<typeof createAndAddSpecialtySchema>;

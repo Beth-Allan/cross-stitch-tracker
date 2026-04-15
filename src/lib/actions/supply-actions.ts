@@ -15,6 +15,8 @@ import {
   projectSpecialtySchema,
   updateQuantitySchema,
   createAndAddThreadSchema,
+  createAndAddBeadSchema,
+  createAndAddSpecialtySchema,
 } from "@/lib/validations/supply";
 
 // ─── Helper ──────────────────────────────────────────────────────────────────
@@ -607,5 +609,100 @@ export async function createAndAddThread(formData: unknown) {
     }
     console.error("createAndAddThread error:", error);
     return { success: false as const, error: "Failed to create and add thread" };
+  }
+}
+
+export async function createAndAddBead(formData: unknown) {
+  const user = await requireAuth();
+
+  try {
+    const validated = createAndAddBeadSchema.parse(formData);
+
+    // Verify project ownership
+    const project = await prisma.project.findUnique({
+      where: { id: validated.projectId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const bead = await tx.bead.create({
+        data: {
+          productCode: validated.code || "CUSTOM",
+          colorName: validated.name,
+          hexColor: "#808080",
+          brandId: validated.brandId,
+          colorFamily: "NEUTRAL",
+        },
+      });
+      const link = await tx.projectBead.create({
+        data: {
+          projectId: validated.projectId,
+          beadId: bead.id,
+          quantityRequired: 1,
+          quantityAcquired: 0,
+        },
+      });
+      return { bead, link };
+    });
+
+    revalidatePath("/charts");
+    revalidatePath("/shopping");
+    return { success: true as const, record: result };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false as const, error: error.errors[0].message };
+    }
+    console.error("createAndAddBead error:", error);
+    return { success: false as const, error: "Failed to create and add bead" };
+  }
+}
+
+export async function createAndAddSpecialty(formData: unknown) {
+  const user = await requireAuth();
+
+  try {
+    const validated = createAndAddSpecialtySchema.parse(formData);
+
+    // Verify project ownership
+    const project = await prisma.project.findUnique({
+      where: { id: validated.projectId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const item = await tx.specialtyItem.create({
+        data: {
+          productCode: validated.code || "CUSTOM",
+          colorName: validated.name,
+          hexColor: "#808080",
+          brandId: validated.brandId,
+        },
+      });
+      const link = await tx.projectSpecialty.create({
+        data: {
+          projectId: validated.projectId,
+          specialtyItemId: item.id,
+          quantityRequired: 1,
+          quantityAcquired: 0,
+        },
+      });
+      return { item, link };
+    });
+
+    revalidatePath("/charts");
+    revalidatePath("/shopping");
+    return { success: true as const, record: result };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false as const, error: error.errors[0].message };
+    }
+    console.error("createAndAddSpecialty error:", error);
+    return { success: false as const, error: "Failed to create and add specialty item" };
   }
 }
