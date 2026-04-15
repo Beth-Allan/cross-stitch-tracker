@@ -1,53 +1,41 @@
 ---
 phase: 06-gallery-cards-view-modes
-fixed_at: 2026-04-14T01:55:00Z
+fixed_at: 2026-04-15T01:15:00Z
 review_path: .planning/phases/06-gallery-cards-view-modes/06-REVIEW.md
 iteration: 1
-findings_in_scope: 4
-fixed: 4
+findings_in_scope: 2
+fixed: 2
 skipped: 0
 status: all_fixed
 ---
 
 # Phase 6: Code Review Fix Report
 
-**Fixed at:** 2026-04-14T01:55:00Z
+**Fixed at:** 2026-04-15T01:15:00Z
 **Source review:** .planning/phases/06-gallery-cards-view-modes/06-REVIEW.md
 **Iteration:** 1
 
 **Summary:**
-- Findings in scope: 4
-- Fixed: 4
+- Findings in scope: 2
+- Fixed: 2
 - Skipped: 0
 
 ## Fixed Issues
 
-### CR-01: Unsafe `as unknown as` type cast hides type mismatch
+### WR-01: MultiSelectDropdown generates listboxId from label text -- duplicate IDs if same label used twice
 
-**Files modified:** `src/components/features/gallery/gallery-utils.ts`, `src/components/features/gallery/project-gallery.tsx`, `src/components/features/gallery/gallery-utils.test.ts`
-**Commit:** 9e6f369
-**Applied fix:** Changed `transformToGalleryCard` to accept `GalleryChartData` (the slim query type from `src/types/chart.ts`) instead of `GalleryChartWithProject` (the full Prisma model type). Removed the `as unknown as GalleryChartWithProject` cast in `project-gallery.tsx` and the unused `GalleryChartWithProject` import. Updated test mock `baseChart` from full `Project` shape to slim `GalleryProjectData` shape (removed `userId`, `chartId`, `startingStitches`, `storageLocation`, `stitchingApp`, full `fabric` object, etc. -- kept only the fields `transformToGalleryCard` actually accesses). TypeScript now enforces that the function only uses fields present in the query result.
+**Files modified:** `src/components/features/gallery/multi-select-dropdown.tsx`
+**Commit:** a12a6a2
+**Applied fix:** Replaced the label-derived `listboxId` (`` `${label.toLowerCase().replace(/\s+/g, "-")}-listbox` ``) with React's `useId()` hook, matching the pattern already used in `SortDropdown`. Added `useId` to the existing React import. This eliminates the latent duplicate DOM ID bug if two instances share the same label prop.
 
-### WR-01: computeSupplyStatus never returns "needed"
+### WR-02: Search input focus ring uses hardcoded emerald color instead of theme ring token
 
-**Files modified:** `src/components/features/gallery/gallery-utils.ts`, `src/components/features/gallery/gallery-utils.test.ts`
-**Commit:** 27ba6f9
-**Applied fix:** Added `anyAcquired` check in `computeSupplyStatus`: when items exist but none have `quantityAcquired > 0`, now returns `"needed"` instead of `"partial"`. This gives correct kitting dot icons -- empty circle for "Still needed" (zero acquired) vs amber circle-dot for "In progress" (some acquired). Updated test expectation from `"partial"` to `"needed"` for the zero-acquired case.
-
-### WR-02: progressPercent can exceed 100%
-
-**Files modified:** `src/components/features/gallery/gallery-utils.ts`
-**Commit:** 6be5f71
-**Applied fix:** Wrapped the progress calculation with `Math.min(100, ...)` so `progressPercent` is clamped to 100% maximum. Handles the common case where `stitchesCompleted` exceeds `stitchCount` (approximate stitch counts).
-
-### WR-03: SortDropdown uses hardcoded `id="sort-listbox"`
-
-**Files modified:** `src/components/features/gallery/sort-dropdown.tsx`
-**Commit:** a6cf249
-**Applied fix:** Replaced hardcoded `id="sort-listbox"` with React `useId()` hook. The generated ID is used on the listbox element and in the trigger's `aria-controls` attribute. This ensures unique IDs per ARIA spec and avoids conflicts if multiple instances are rendered.
+**Files modified:** `src/components/features/gallery/filter-bar.tsx`
+**Commit:** 30c7bab
+**Applied fix:** Replaced `focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400` with `focus:border-ring focus:ring-1 focus:ring-ring` on the search input. This uses the semantic `ring` token which adapts correctly to dark mode and stays consistent with all other form inputs in the app.
 
 ---
 
-_Fixed: 2026-04-14T01:55:00Z_
+_Fixed: 2026-04-15T01:15:00Z_
 _Fixer: Claude (gsd-code-fixer)_
 _Iteration: 1_
