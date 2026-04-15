@@ -108,10 +108,15 @@
     - Removed stray "use client" from test, defensive Date coercion in formatDate, dead types removed, progress sort tests added, exhaustive never check in compareFn
     - 150 gallery tests passing, TypeScript clean, build passing
 
+- **Quick fix: gallery view mode persistence** (2026-04-15): localStorage persistence for view mode, back link preserves view param, loading skeleton replaced with themed stitch animation
+  - localStorage write on setView, mount-time restore when no URL param present
+  - BackToGalleryLink client component reads localStorage for back navigation
+  - Loading skeleton now view-agnostic (4x4 animated stitch grid instead of gallery card wireframes)
+  - 9 new tests (4 hook persistence, 5 back link), all passing
+
 ### Next Up
 
-1. Merge PR #15 when CI passes
-2. `/gsd-discuss-phase 7` — Skein Calculator & Supply Workflow
+1. `/gsd-discuss-phase 7` — Skein Calculator & Supply Workflow
 
 ### Backlog (post-MVP)
 
