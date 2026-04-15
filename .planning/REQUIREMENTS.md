@@ -29,15 +29,15 @@ Requirements for Milestone 2: Browse & Organize. Each maps to roadmap phases.
 
 ### Stitch Tracking
 
-- [ ] **CALC-01**: User can enter stitch count per colour when linking threads to a project
-- [ ] **CALC-02**: App auto-calculates skeins needed from fabric count, strand count, and 20% waste factor
-- [ ] **CALC-03**: User can manually override auto-calculated skein quantities
-- [ ] **CALC-04**: Per-colour stitch counts sum to display project total stitch count
-- [ ] **CALC-05**: User can set strand count per project (default: 2)
+- [x] **CALC-01**: User can enter stitch count per colour when linking threads to a project
+- [x] **CALC-02**: App auto-calculates skeins needed from fabric count, strand count, and 20% waste factor
+- [x] **CALC-03**: User can manually override auto-calculated skein quantities
+- [x] **CALC-04**: Per-colour stitch counts sum to display project total stitch count
+- [x] **CALC-05**: User can set strand count per project (default: 2)
 
 ### Supply Management
 
-- [ ] **SUPP-01**: Supply entries maintain insertion order during data entry
+- [x] **SUPP-01**: Supply entries maintain insertion order during data entry
 - [ ] **SUPP-02**: Thread colour picker auto-scrolls to keep search/add controls visible
 - [ ] **SUPP-03**: DMC thread catalog includes all standard colours (filling ~30 gaps plus Blanc)
 
@@ -83,12 +83,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STOR-04 | Phase 5 | Complete |
 | PROJ-01 | Phase 5 | Pending |
 | PROJ-02 | Phase 5 | Pending |
-| CALC-01 | Phase 7 | Pending |
-| CALC-02 | Phase 7 | Pending |
-| CALC-03 | Phase 7 | Pending |
-| CALC-04 | Phase 7 | Pending |
-| CALC-05 | Phase 7 | Pending |
-| SUPP-01 | Phase 7 | Pending |
+| CALC-01 | Phase 7 | Complete |
+| CALC-02 | Phase 7 | Complete |
+| CALC-03 | Phase 7 | Complete |
+| CALC-04 | Phase 7 | Complete |
+| CALC-05 | Phase 7 | Complete |
+| SUPP-01 | Phase 7 | Complete |
 | SUPP-02 | Phase 5 | Pending |
 | SUPP-03 | Phase 5 | Pending |
 
