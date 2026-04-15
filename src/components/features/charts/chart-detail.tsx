@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft,
   Calendar,
   FileText,
   Image as ImageIcon,
@@ -24,6 +23,7 @@ import { ProjectSuppliesTab } from "./project-supplies-tab";
 import { getEffectiveStitchCount, calculateSizeCategory } from "@/lib/utils/size-category";
 import { deleteChart } from "@/lib/actions/chart-actions";
 import { getPresignedDownloadUrl } from "@/lib/actions/upload-actions";
+import { BackToGalleryLink } from "./back-to-gallery-link";
 import { StatusBadge } from "./status-badge";
 import { SizeBadge } from "./size-badge";
 import { StatusControl } from "./status-control";
@@ -92,13 +92,7 @@ export function ChartDetail({ chart, projectSupplies, imageUrls = {} }: ChartDet
   return (
     <div className="space-y-6">
       {/* Back link */}
-      <Link
-        href="/charts"
-        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
-        Projects
-      </Link>
+      <BackToGalleryLink />
 
       {/* Header section */}
       <div className="flex flex-col gap-6 lg:flex-row">
