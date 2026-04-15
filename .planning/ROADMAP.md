@@ -31,7 +31,7 @@ Full details: `milestones/v1.0-ROADMAP.md`
 
 - [x] **Phase 5: Foundation & Quick Wins** - Storage/app CRUD, fabric selector, DMC catalog, UX fixes
 - [x] **Phase 6: Gallery Cards & View Modes** - Status-specific gallery cards, view mode toggle, sorting, search/filter
-- [ ] **Phase 7: Skein Calculator & Supply Workflow** - Per-colour stitch counts, auto skein calculation, supply entry ordering
+- [ ] **Phase 7: Project Detail Experience** - Hero cover image, tabbed layout, inline skein calculator, supply redesign
 
 ### 📋 v1.2 Track & Measure
 
@@ -84,8 +84,8 @@ Plans:
 - [x] 06-04-PLAN.md — Gallery/List/Table grid views, page wiring, "Projects" rename
 **UI hint**: yes
 
-### Phase 7: Skein Calculator & Supply Workflow
-**Goal**: Users can enter per-colour stitch counts when linking threads, see auto-calculated skein estimates, and enjoy a streamlined supply entry experience
+### Phase 7: Project Detail Experience
+**Goal**: Users can view their project through a rich detail page with hero cover image, tabbed layout (Overview + Supplies), enter per-colour stitch counts, see auto-calculated skein estimates, and enjoy a streamlined supply entry experience
 **Depends on**: Phase 5 (fabric selector provides fabric count for calculation)
 **Requirements**: CALC-01, CALC-02, CALC-03, CALC-04, CALC-05, SUPP-01
 **Success Criteria** (what must be TRUE):
@@ -93,7 +93,15 @@ Plans:
   2. App auto-calculates skeins needed from fabric count, strand count, and 20% waste factor, with sensible defaults when no fabric is linked
   3. User can manually override auto-calculated skein quantities and set strand count per project
   4. Supply entries maintain insertion order during data entry so users can verify nothing was skipped
-**Plans**: TBD
+**Plans:** 6 plans
+Plans:
+- [ ] 07-01-PLAN.md — Data layer: schema, calculator formula, types, validations, server actions
+- [ ] 07-02-PLAN.md — Hero: cover banner with blur bg, status badge, kebab menu, metadata
+- [ ] 07-03-PLAN.md — Tabs with URL state + status-aware Overview tab
+- [ ] 07-04-PLAN.md — Supplies tab: settings bar, two-line supply rows, calculator integration, totals
+- [ ] 07-05-PLAN.md — SearchToAdd enhancements: inline create, scroll/positioning/highlight fixes
+- [ ] 07-06-PLAN.md — Page wiring, schema push, visual verification checkpoint
+**UI hint**: yes
 
 ### Phase 8: Dashboards & Collection Views
 **Goal**: Users have a main dashboard and collection-level statistics that don't depend on session logging
@@ -155,7 +163,7 @@ Plans:
 | 4. Supplies & Fabric | v1.0 | 10/10 | Complete | 2026-04-10 |
 | 5. Foundation & Quick Wins | v1.1 | 8/8 | Complete | 2026-04-13 |
 | 6. Gallery Cards & View Modes | v1.1 | 4/4 | Complete | 2026-04-15 |
-| 7. Skein Calculator & Supply Workflow | v1.1 | 0/TBD | Not started | - |
+| 7. Project Detail Experience | v1.1 | 0/6 | Planning complete | - |
 | 8. Dashboards & Collection Views | v1.2 | 0/TBD | Not started | - |
 | 9. Session Logging & Activity Stats | v1.2 | 0/TBD | Not started | - |
 | 10. Advanced Stats | v1.3 | 0/TBD | Not started | - |
