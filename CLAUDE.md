@@ -4,7 +4,7 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 2 (Browse & Organize) | **Phase:** 6 — verified & complete
+**Milestone:** 2 (Browse & Organize) | **Phase:** 7 — planned, ready to execute
 **Last Updated:** 2026-04-15
 **Roadmap:** 4 milestones / 11 phases — v1.0 shipped, M2 phases 5-6 complete, phase 7 next
 
@@ -114,9 +114,15 @@
   - Loading skeleton now view-agnostic (4x4 animated stitch grid instead of gallery card wireframes)
   - 9 new tests (4 hook persistence, 5 back link), all passing
 
+- **Phase 7: Project Detail Experience** — planned (2026-04-15)
+  - 6 plans in 4 waves: data layer + hero → tabs + supplies tab → SearchToAdd enhancements → page wiring + schema push
+  - Research, pattern mapping, validation strategy all complete
+  - Checker passed after 1 revision (2 blockers fixed: SearchToAdd wiring gap, Plan 03 dependency race)
+  - Covers CALC-01–05, SUPP-01 + backlog items 999.0.2, 999.0.10, 999.0.13, 999.0.15, 999.0.16
+
 ### Next Up
 
-1. `/gsd-discuss-phase 7` — Project Detail Experience (reimagined from Skein Calculator — see `.planning/notes/phase-7-reimagined.md`)
+1. `/gsd-execute-phase 7` — execute all 6 plans for Project Detail Experience
 
 ### Backlog (post-MVP)
 
