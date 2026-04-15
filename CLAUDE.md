@@ -114,15 +114,20 @@
   - Loading skeleton now view-agnostic (4x4 animated stitch grid instead of gallery card wireframes)
   - 9 new tests (4 hook persistence, 5 back link), all passing
 
-- **Phase 7: Project Detail Experience** — planned (2026-04-15)
+- **Phase 7: Project Detail Experience** — executed, pending review fixes + verification (2026-04-15)
   - 6 plans in 4 waves: data layer + hero → tabs + supplies tab → SearchToAdd enhancements → page wiring + schema push
-  - Research, pattern mapping, validation strategy all complete
-  - Checker passed after 1 revision (2 blockers fixed: SearchToAdd wiring gap, Plan 03 dependency race)
-  - Covers CALC-01–05, SUPP-01 + backlog items 999.0.2, 999.0.10, 999.0.13, 999.0.15, 999.0.16
+  - All plans executed: 864 tests passing, schema pushed, checkpoint feedback applied
+  - Checkpoint fixes: removed mono font, added "Designer:"/"Stitch Count:" labels, exact/estimated indicator, "187w × 248h" dimensions, designer linked to /designers/[id], empty state supplies add buttons
+  - **Code review** (2026-04-15): 38 files, 3 critical + 3 warning + 3 info findings
+    - CR-01–03: Auth bypass in supply remove/update/add actions (no ownership check)
+    - WR-01: Hardcoded brandId in InlineSupplyCreate, WR-02: missing router.refresh on remove, WR-03: no fabricCount=0 guard
+  - User feedback to discuss: genre pills on hero, clickable genres/designers, project setup content, kitting checklist (onion skin, stitching app), storage location, edit modal redesign
 
 ### Next Up
 
-1. `/gsd-execute-phase 7` — execute all 6 plans for Project Detail Experience
+1. `/gsd-code-review-fix 7` — fix 3 critical auth bypasses + 3 warnings
+2. Phase verification → ship
+3. `/gsd-explore` — discuss user feedback items (genre pills, project setup, kitting, edit modal) before deciding scope
 
 ### Backlog (post-MVP)
 
