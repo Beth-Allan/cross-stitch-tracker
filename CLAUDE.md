@@ -104,10 +104,13 @@
     - 148 gallery tests passing, TypeScript clean
   - **UAT verified** (2026-04-15): 9/10 passed, 1 dev-only hydration issue (Turbopack cache staleness — not a code bug)
   - **Phase 6 complete** (2026-04-15): marked complete in ROADMAP + STATE, transitioned to Phase 7
+  - **Phase 6 shipped** (2026-04-14): PR #15 created, multi-agent review (4 agents), 4 important + 1 suggestion fixed
+    - Removed stray "use client" from test, defensive Date coercion in formatDate, dead types removed, progress sort tests added, exhaustive never check in compareFn
+    - 150 gallery tests passing, TypeScript clean, build passing
 
 ### Next Up
 
-1. Phase 6 ship (PR + review)
+1. Merge PR #15 when CI passes
 2. `/gsd-discuss-phase 7` — Skein Calculator & Supply Workflow
 
 ### Backlog (post-MVP)
