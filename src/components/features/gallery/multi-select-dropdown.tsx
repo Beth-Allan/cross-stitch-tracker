@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useId } from "react";
 import { ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +24,7 @@ export function MultiSelectDropdown({
   const listRef = useRef<HTMLDivElement>(null);
 
   const hasSelection = selected.length > 0;
-  const listboxId = `${label.toLowerCase().replace(/\s+/g, "-")}-listbox`;
+  const listboxId = useId();
 
   const close = useCallback(() => {
     setIsOpen(false);
