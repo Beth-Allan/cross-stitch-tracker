@@ -97,7 +97,7 @@ export function ChartDetail({ chart, projectSupplies, imageUrls = {} }: ChartDet
         className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
       >
         <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
-        Charts
+        Projects
       </Link>
 
       {/* Header section */}

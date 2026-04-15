@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Source_Sans_3, JetBrains_Mono } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -46,7 +47,7 @@ export default function RootLayout({
       className={`${fraunces.variable} ${sourceSans.variable} ${jetbrainsMono.variable} h-full`}
     >
       <body className="font-body flex min-h-full flex-col antialiased">
-        {children}
+        <NuqsAdapter>{children}</NuqsAdapter>
         <Toaster richColors position="bottom-right" />
       </body>
     </html>

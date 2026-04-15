@@ -4,9 +4,9 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — shipped, PR #7 open
-**Last Updated:** 2026-04-13
-**Roadmap:** 4 milestones / 10 phases — v1.0 shipped, M2 phase 5 PR open
+**Milestone:** 2 (Browse & Organize) | **Phase:** 6 — verified & complete
+**Last Updated:** 2026-04-15
+**Roadmap:** 4 milestones / 11 phases — v1.0 shipped, M2 phases 5-6 complete, phase 7 next
 
 ### Done
 
@@ -71,12 +71,47 @@
 
 ### In Progress
 
-- Phase 5 PR #7 — round 3 review fixes pushed, ready for merge
+- **Phase 6: Gallery Cards & View Modes** — all 4 plans executed + visual verification + audit fixes applied
+  - 06-01: Data layer, types, URL state hook, server action (66 tests)
+  - 06-02: GalleryCard with 3 status-specific footers (37 tests)
+  - 06-03: FilterBar, FilterChips, MultiSelectDropdown, SortDropdown, ViewToggleBar (31 tests)
+  - 06-04: GalleryGrid, ProjectGallery orchestrator, /charts page wiring, sidebar rename
+  - **Visual verification fixes** (2026-04-13): back link Charts→Projects, thumbnails in list/table views, table bg-card + underline links, kitting dots reworked to data-driven (quantityAcquired vs quantityRequired) with new "partial" amber state
+  - **Impeccable audit** (2026-04-13): scored 14/20 — all P1/P2 findings addressed across 4 skills:
+    - `/harden`: ARIA on dropdowns (aria-expanded, listbox/option roles, keyboard nav), search aria-label, 44px touch targets, chip hit areas, header wrapping, search chip truncation
+    - `/optimize`: lazy loading + decoding=async on all images, removed backdrop-blur GPU cost, cached Intl.NumberFormat
+    - `/adapt`: ListView grid collapses to 3 columns on mobile (was 7-column inline grid)
+    - `/polish`: extracted shared formatters, STATUS_GRADIENTS → Tailwind classes with dark: variants, celebration styles → class-based with boosted dark shadow opacity, ~30 stone-\* neutrals → semantic tokens
+  - **Impeccable critique** (2026-04-13): scored 26/40 on Nielsen's heuristics, AI slop PASS
+    - 4x P2 findings: ARIA violation (role="checkbox" in role="option"), search clear button, sort direction visibility, Progress/Stitches shared sort field
+    - 2x P2 additions: ListView missing role="list", styled tooltips for kitting dots + size categories
+    - 1x P3: loading skeleton doesn't match gallery card grid layout
+    - Minor: duplicate kitting icon code, hardcoded stone colors, dual transition utilities
+    - Full report: `.planning/phases/06-gallery-cards-view-modes/CRITIQUE.md`
+  - **Critique fixes** (2026-04-13): all P2/P3 findings + minor items addressed
+    - `/harden` pass 1: Removed invalid role="checkbox" in role="option", added role="list"/role="listitem" to ListView
+    - `/harden` pass 2: Search clear button, directional sort arrow, new "progress" sort field (Progress/Stitches now sort independently)
+    - `/harden` pass 3: Styled Base UI tooltips on kitting dots + size badges (all 3 views), shared KittingDotIcon export, stone-\* → semantic tokens
+    - `/polish`: Loading skeleton matches gallery card grid, fixed dual transition override, empty filter state has suggestion text + "Clear all filters" button
+  - **Critique re-run** (2026-04-13): scored 28/40 on Nielsen's heuristics, AI slop PASS (2 false positives)
+    - 3x P2 findings: search only matches project name (not designer), view toggle title tooltips invisible on touch, list view mobile too sparse
+    - 2x P3 findings: gallery grid not center-justified, loading skeleton missing page header
+  - **Critique re-run fixes** (2026-04-13): all P2/P3 findings addressed
+    - `/harden`: Search matches designer name + project name; view toggle uses Base UI Tooltip (touch-accessible)
+    - `/adapt`: List view mobile 4-column grid with StatusBadge + compact stat line (ListMobileStat)
+    - `/layout`: Gallery grid centered with justify-center
+    - `/polish`: Loading skeleton restructured to match real page layout (header + separator + toggle bar)
+    - 148 gallery tests passing, TypeScript clean
+  - **UAT verified** (2026-04-15): 9/10 passed, 1 dev-only hydration issue (Turbopack cache staleness — not a code bug)
+  - **Phase 6 complete** (2026-04-15): marked complete in ROADMAP + STATE, transitioned to Phase 7
+  - **Phase 6 shipped** (2026-04-14): PR #15 created, multi-agent review (4 agents), 4 important + 1 suggestion fixed
+    - Removed stray "use client" from test, defensive Date coercion in formatDate, dead types removed, progress sort tests added, exhaustive never check in compareFn
+    - 150 gallery tests passing, TypeScript clean, build passing
 
 ### Next Up
 
-1. Re-review PR #7 and merge
-2. `/gsd:discuss-phase 6` — Gallery Cards & View Modes
+1. Merge PR #15 when CI passes
+2. `/gsd-discuss-phase 7` — Skein Calculator & Supply Workflow
 
 ### Backlog (post-MVP)
 

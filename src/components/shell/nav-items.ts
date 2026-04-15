@@ -30,7 +30,7 @@ export const navigationSections: NavSection[] = [
     label: "Projects",
     items: [
       { label: "Dashboard", href: "/", icon: LayoutDashboard },
-      { label: "Charts", href: "/charts", icon: Scissors },
+      { label: "Projects", href: "/charts", icon: Scissors },
       { label: "Shopping", href: "/shopping", icon: ShoppingCart },
     ],
   },
