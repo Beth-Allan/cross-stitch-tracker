@@ -1,10 +1,13 @@
 "use client";
 
 import { useQueryState, parseAsString, parseAsStringLiteral, parseAsArrayOf } from "nuqs";
-import { useMemo, useDeferredValue, useCallback } from "react";
+import React, { useMemo, useDeferredValue, useCallback, useEffect } from "react";
 import type { GalleryCardData, ViewMode, SortField, SortDir } from "./gallery-types";
 import { VIEW_MODES, SORT_FIELDS, SORT_DIRS } from "./gallery-types";
 import { filterAndSort } from "./gallery-utils";
+
+const VIEW_STORAGE_KEY = "gallery-view-mode";
+const VALID_VIEWS = new Set<string>(VIEW_MODES);
 
 // Default direction per sort field
 const DEFAULT_DIR: Record<SortField, SortDir> = {
@@ -19,10 +22,43 @@ const DEFAULT_DIR: Record<SortField, SortDir> = {
 
 export function useGalleryFilters(cards: GalleryCardData[]) {
   // ─── URL State ──────────────────────────────────────────────────────────
-  const [view, setView] = useQueryState(
+  const [view, setViewRaw] = useQueryState(
     "view",
     parseAsStringLiteral([...VIEW_MODES]).withDefault("gallery"),
   );
+
+  // Persist view mode to localStorage when changed
+  const setView = useCallback(
+    (v: ViewMode) => {
+      void setViewRaw(v);
+      try {
+        localStorage.setItem(VIEW_STORAGE_KEY, v);
+      } catch {
+        // localStorage may be unavailable (SSR, private browsing quota)
+      }
+    },
+    [setViewRaw],
+  );
+
+  // On mount, restore view from localStorage when no URL param is present.
+  // We use a ref to capture the initial nuqs value (before any effect runs).
+  // If the URL had ?view=X, nuqs will have parsed it to X (non-default).
+  // We only restore from localStorage when the initial value is the default.
+  const initialViewRef = React.useRef(view);
+  useEffect(() => {
+    if (initialViewRef.current !== "gallery") return; // URL param already set a non-default view
+
+    try {
+      const stored = localStorage.getItem(VIEW_STORAGE_KEY);
+      if (stored && VALID_VIEWS.has(stored) && stored !== "gallery") {
+        void setViewRaw(stored as ViewMode, { history: "replace" });
+      }
+    } catch {
+      // localStorage unavailable
+    }
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [sort, setRawSort] = useQueryState(
     "sort",
     parseAsStringLiteral([...SORT_FIELDS]).withDefault("dateAdded"),
@@ -109,7 +145,7 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
     sizeFilter: sizeFilter ?? [],
 
     // Setters
-    setView: (v: ViewMode) => void setView(v),
+    setView,
     setSort,
     setDir: (d: SortDir) => void setDir(d),
     setSearch: (s: string) => void setSearch(s),
