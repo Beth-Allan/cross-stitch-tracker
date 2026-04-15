@@ -116,7 +116,7 @@
 
 ### Next Up
 
-1. `/gsd-discuss-phase 7` — Skein Calculator & Supply Workflow
+1. `/gsd-discuss-phase 7` — Project Detail Experience (reimagined from Skein Calculator — see `.planning/notes/phase-7-reimagined.md`)
 
 ### Backlog (post-MVP)
 
