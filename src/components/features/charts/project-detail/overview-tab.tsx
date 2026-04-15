@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Scissors,
   BookOpen,
@@ -38,13 +39,11 @@ export function OverviewTab({ chart, supplies }: OverviewTabProps) {
 
   if (!project) {
     return (
-      <div className="text-muted-foreground py-8 text-center">
-        No project linked to this chart.
-      </div>
+      <div className="text-muted-foreground py-8 text-center">No project linked to this chart.</div>
     );
   }
 
-  const { count: effectiveStitchCount } = getEffectiveStitchCount(
+  const { count: effectiveStitchCount, approximate } = getEffectiveStitchCount(
     chart.stitchCount ?? 0,
     chart.stitchesWide ?? 0,
     chart.stitchesHigh ?? 0,
@@ -74,10 +73,7 @@ export function OverviewTab({ chart, supplies }: OverviewTabProps) {
             value={`${formatNumber(Math.max(0, effectiveStitchCount - project.stitchesCompleted))} stitches`}
           />
           {project.startingStitches > 0 && (
-            <DetailRow
-              label="Starting Stitches"
-              value={formatNumber(project.startingStitches)}
-            />
+            <DetailRow label="Starting Stitches" value={formatNumber(project.startingStitches)} />
           )}
         </div>
       </InfoCard>
@@ -123,9 +119,7 @@ export function OverviewTab({ chart, supplies }: OverviewTabProps) {
           {project.finishDate && (
             <DetailRow label="Finished" value={formatDateOnly(project.finishDate)} />
           )}
-          {project.ffoDate && (
-            <DetailRow label="FFO" value={formatDateOnly(project.ffoDate)} />
-          )}
+          {project.ffoDate && <DetailRow label="FFO" value={formatDateOnly(project.ffoDate)} />}
           {project.startDate && project.finishDate && (
             <DetailRow
               label="Duration"
@@ -142,23 +136,30 @@ export function OverviewTab({ chart, supplies }: OverviewTabProps) {
           {effectiveStitchCount > 0 && (
             <DetailRow
               label="Stitch Count"
-              value={formatNumber(effectiveStitchCount)}
+              value={`${approximate ? "~" : ""}${formatNumber(effectiveStitchCount)}${approximate ? " (est.)" : ""}`}
             />
           )}
           {chart.stitchesWide && chart.stitchesHigh && (
             <DetailRow
               label="Dimensions"
-              value={`${chart.stitchesWide} \u00D7 ${chart.stitchesHigh}`}
+              value={`${chart.stitchesWide}w \u00D7 ${chart.stitchesHigh}h`}
             />
           )}
           {chart.designer && (
-            <DetailRow label="Designer" value={chart.designer.name} />
+            <DetailRow
+              label="Designer"
+              value={
+                <Link
+                  href={`/designers/${chart.designer.id}`}
+                  className="text-primary hover:underline"
+                >
+                  {chart.designer.name}
+                </Link>
+              }
+            />
           )}
           {chart.genres.length > 0 && (
-            <DetailRow
-              label="Genres"
-              value={chart.genres.map((g) => g.name).join(", ")}
-            />
+            <DetailRow label="Genres" value={chart.genres.map((g) => g.name).join(", ")} />
           )}
         </div>
       </InfoCard>
@@ -174,9 +175,7 @@ export function OverviewTab({ chart, supplies }: OverviewTabProps) {
           {project.finishDate && (
             <DetailRow label="Finished" value={formatDateOnly(project.finishDate)} />
           )}
-          {project.ffoDate && (
-            <DetailRow label="FFO" value={formatDateOnly(project.ffoDate)} />
-          )}
+          {project.ffoDate && <DetailRow label="FFO" value={formatDateOnly(project.ffoDate)} />}
         </div>
       </InfoCard>
     ),
@@ -210,19 +209,11 @@ export function OverviewTab({ chart, supplies }: OverviewTabProps) {
 
 // ─── Helper Components ─────────────────────────────────────────────────────
 
-function KittingItem({
-  label,
-  ready,
-  detail,
-}: {
-  label: string;
-  ready: boolean;
-  detail: string;
-}) {
+function KittingItem({ label, ready, detail }: { label: string; ready: boolean; detail: string }) {
   return (
     <div className="flex items-center gap-2">
       {ready ? (
-        <Check className="h-4 w-4 text-success" />
+        <Check className="text-success h-4 w-4" />
       ) : (
         <X className="text-muted-foreground h-4 w-4" />
       )}
@@ -235,9 +226,7 @@ function KittingItem({
 function formatDuration(start: Date, end: Date): string {
   const startDate = start instanceof Date ? start : new Date(start);
   const endDate = end instanceof Date ? end : new Date(end);
-  const days = Math.round(
-    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
-  );
+  const days = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   if (days < 30) return `${days} day${days !== 1 ? "s" : ""}`;
   const months = Math.round(days / 30);
   return `${months} month${months !== 1 ? "s" : ""}`;

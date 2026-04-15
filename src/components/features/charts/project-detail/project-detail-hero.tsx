@@ -15,12 +15,7 @@ import type { ChartWithProject } from "@/types/chart";
 const numberFormatter = new Intl.NumberFormat();
 
 /** Statuses that show a progress percentage in the hero metadata */
-const PROGRESS_STATUSES = new Set<ProjectStatus>([
-  "IN_PROGRESS",
-  "ON_HOLD",
-  "FINISHED",
-  "FFO",
-]);
+const PROGRESS_STATUSES = new Set<ProjectStatus>(["IN_PROGRESS", "ON_HOLD", "FINISHED", "FFO"]);
 
 /** Celebration ring classes per status */
 function getCelebrationClasses(status: ProjectStatus): string {
@@ -45,11 +40,7 @@ interface ProjectDetailHeroProps {
  * Composes cover banner, metadata, interactive status badge, edit button, and kebab menu.
  * Celebrates FINISHED/FFO with ring accents per UI-SPEC.
  */
-export function ProjectDetailHero({
-  chart,
-  imageUrls,
-  onStatusChange,
-}: ProjectDetailHeroProps) {
+export function ProjectDetailHero({ chart, imageUrls, onStatusChange }: ProjectDetailHeroProps) {
   const project = chart.project;
   const status = project?.status ?? "UNSTARTED";
   const { count: effectiveStitchCount, approximate } = getEffectiveStitchCount(
@@ -67,12 +58,7 @@ export function ProjectDetailHero({
       : null;
 
   return (
-    <div
-      className={cn(
-        "space-y-4 rounded-lg",
-        getCelebrationClasses(status),
-      )}
-    >
+    <div className={cn("space-y-4 rounded-lg", getCelebrationClasses(status))}>
       {/* Cover image banner */}
       <HeroCoverBanner imageUrl={coverImageUrl} chartName={chart.name} />
 
@@ -80,11 +66,7 @@ export function ProjectDetailHero({
       <div className="flex items-center justify-between">
         <BackToGalleryLink />
         <div className="flex items-center gap-2">
-          <LinkButton
-            href={`/charts/${chart.id}/edit`}
-            variant="outline"
-            size="sm"
-          >
+          <LinkButton href={`/charts/${chart.id}/edit`} variant="outline" size="sm">
             <Pencil className="size-4" data-icon="inline-start" />
             Edit
           </LinkButton>
@@ -99,9 +81,7 @@ export function ProjectDetailHero({
 
       {/* Designer name */}
       {chart.designer && (
-        <p className="text-muted-foreground text-base">
-          {chart.designer.name}
-        </p>
+        <p className="text-muted-foreground text-base">Designer: {chart.designer.name}</p>
       )}
 
       {/* Metadata row: status badge | stitch count | size badge | progress % */}
@@ -115,9 +95,10 @@ export function ProjectDetailHero({
         )}
 
         {effectiveStitchCount > 0 && (
-          <span className="text-muted-foreground text-sm font-mono tabular-nums">
-            {approximate && "~"}
-            {numberFormatter.format(effectiveStitchCount)} stitches
+          <span className="text-muted-foreground text-sm">
+            Stitch Count: {approximate && "~"}
+            {numberFormatter.format(effectiveStitchCount)}
+            {approximate && " (est.)"}
           </span>
         )}
 
@@ -130,9 +111,7 @@ export function ProjectDetailHero({
         )}
 
         {progressPercent !== null && (
-          <span className="text-muted-foreground text-sm font-mono tabular-nums">
-            {progressPercent}%
-          </span>
+          <span className="text-muted-foreground text-sm">{progressPercent}%</span>
         )}
       </div>
     </div>

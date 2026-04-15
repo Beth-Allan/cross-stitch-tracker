@@ -127,7 +127,7 @@ describe("OverviewTab", () => {
       const chart = makeChart({ chart: { stitchesWide: 300, stitchesHigh: 150 } });
       render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
 
-      expect(screen.getByText(/300\s*[x\u00D7]\s*150/)).toBeInTheDocument();
+      expect(screen.getByText(/300w\s*[x\u00D7]\s*150h/)).toBeInTheDocument();
     });
 
     it("shows designer name", () => {

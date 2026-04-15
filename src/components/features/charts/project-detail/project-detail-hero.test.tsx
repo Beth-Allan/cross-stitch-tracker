@@ -32,14 +32,12 @@ describe("ProjectDetailHero", () => {
 
   it("renders chart name as heading", () => {
     render(<ProjectDetailHero chart={defaultChart} imageUrls={{}} />);
-    expect(
-      screen.getByRole("heading", { name: "Autumn Meadow" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Autumn Meadow" })).toBeInTheDocument();
   });
 
   it("renders designer name when present", () => {
     render(<ProjectDetailHero chart={defaultChart} imageUrls={{}} />);
-    expect(screen.getByText("Jane Doe")).toBeInTheDocument();
+    expect(screen.getByText(/Designer: Jane Doe/)).toBeInTheDocument();
   });
 
   it("renders stitch count formatted with commas", () => {
@@ -65,9 +63,7 @@ describe("ProjectDetailHero", () => {
       coverImageUrl: null,
       project: { status: "UNSTARTED" },
     });
-    const { container } = render(
-      <ProjectDetailHero chart={chartNoImage} imageUrls={{}} />,
-    );
+    const { container } = render(<ProjectDetailHero chart={chartNoImage} imageUrls={{}} />);
     // No img tag with alt containing "Cover for" should exist
     expect(container.querySelector('img[alt*="Cover for"]')).toBeNull();
   });
@@ -77,9 +73,7 @@ describe("ProjectDetailHero", () => {
       name: "Finished Project",
       project: { status: "FINISHED", stitchesCompleted: 5000 },
     });
-    const { container } = render(
-      <ProjectDetailHero chart={finishedChart} imageUrls={{}} />,
-    );
+    const { container } = render(<ProjectDetailHero chart={finishedChart} imageUrls={{}} />);
     const heroContainer = container.firstElementChild;
     expect(heroContainer?.className).toContain("ring-violet-200");
   });
@@ -89,9 +83,7 @@ describe("ProjectDetailHero", () => {
       name: "FFO Project",
       project: { status: "FFO", stitchesCompleted: 5000 },
     });
-    const { container } = render(
-      <ProjectDetailHero chart={ffoChart} imageUrls={{}} />,
-    );
+    const { container } = render(<ProjectDetailHero chart={ffoChart} imageUrls={{}} />);
     const heroContainer = container.firstElementChild;
     expect(heroContainer?.className).toContain("ring-rose-200");
   });

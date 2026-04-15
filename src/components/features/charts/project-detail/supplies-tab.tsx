@@ -275,11 +275,54 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
 
   if (totalItems === 0) {
     return (
-      <div className="py-12 text-center">
-        <h3 className="font-heading text-xl font-semibold">No supplies added yet</h3>
-        <p className="text-muted-foreground mt-2 text-sm">
-          Add thread colours, beads, or specialty items to track what you need for this project.
-        </p>
+      <div className="space-y-6">
+        <div className="py-8 text-center">
+          <h3 className="font-heading text-xl font-semibold">No supplies added yet</h3>
+          <p className="text-muted-foreground mt-2 text-sm">
+            Add thread colours, beads, or specialty items to track what you need for this project.
+          </p>
+        </div>
+        {sections.map((section) => {
+          const sectionType = section.type as "thread" | "bead" | "specialty";
+          const linkedIds =
+            sectionType === "thread"
+              ? supplies.threads.map((t) => t.threadId)
+              : sectionType === "bead"
+                ? supplies.beads.map((b) => b.beadId)
+                : supplies.specialty.map((s) => s.specialtyItemId);
+
+          return (
+            <div key={section.type}>
+              <SupplySection
+                data={section}
+                settings={settings}
+                onRemove={handleRemove}
+                onAdd={() => handleOpenSearch(sectionType)}
+                onStitchCountChange={handleStitchCountChange}
+                addComponent={
+                  openSearchType === sectionType ? (
+                    <SearchToAdd
+                      supplyType={sectionType}
+                      projectId={project.id}
+                      existingIds={linkedIds}
+                      onAdded={handleSupplyAdded}
+                      onClose={() => setOpenSearchType(null)}
+                      onCreateNew={(text) => handleCreateNew(sectionType, text)}
+                    />
+                  ) : undefined
+                }
+              />
+            </div>
+          );
+        })}
+        <InlineSupplyCreate
+          open={createDialogOpen}
+          onOpenChange={setCreateDialogOpen}
+          type={createDialogType}
+          projectId={project.id}
+          searchText={createDialogSearchText}
+          onCreated={handleCreated}
+        />
       </div>
     );
   }

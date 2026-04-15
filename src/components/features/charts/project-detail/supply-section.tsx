@@ -52,7 +52,7 @@ export function SupplySection({
           </span>
         </h3>
         {hasItems && data.type === "thread" && data.totalStitchCount > 0 && (
-          <span className="text-muted-foreground font-mono text-sm tabular-nums">
+          <span className="text-muted-foreground text-sm tabular-nums">
             {numberFormatter.format(data.totalStitchCount)} stitches total
           </span>
         )}
