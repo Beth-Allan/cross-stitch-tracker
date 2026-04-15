@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Browse & Organize
 status: executing
-stopped_at: Completed 07-04-PLAN.md
-last_updated: "2026-04-15T05:43:24.254Z"
+stopped_at: Completed 07-05-PLAN.md
+last_updated: "2026-04-15T05:56:13.143Z"
 last_activity: 2026-04-15
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 18
-  completed_plans: 16
-  percent: 89
+  completed_plans: 17
+  percent: 94
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-11)
 ## Current Position
 
 Phase: 07 (project-detail-experience) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-04-15
 
@@ -59,6 +59,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 
 - [Phase 07]: EditableNumber gets formatDisplay prop for locale-formatted stitch counts
 - [Phase 07]: TooltipTrigger used without asChild to avoid nested button hydration issues with Base UI
+- [Phase 07]: InlineSupplyCreate uses Dialog pattern with type-specific titles, SearchToAdd inline create as button in empty results
 
 ### Pending Todos
 
@@ -77,9 +78,10 @@ None.
 |---|-------------|------|--------|-----------|
 | 260414-s7s | Fix gallery view mode persistence — back link loses view param, refresh flashes gallery default | 2026-04-15 | 755e3e4 | [260414-s7s-fix-gallery-view-mode-persistence-back-l](./quick/260414-s7s-fix-gallery-view-mode-persistence-back-l/) |
 | Phase 07 P04 | 12m | 2 tasks | 10 files |
+| Phase 07 P05 | 8m | 2 tasks | 10 files |
 
 ## Session Continuity
 
-Last session: 2026-04-15T05:43:24.251Z
-Stopped at: Completed 07-04-PLAN.md
+Last session: 2026-04-15T05:56:13.141Z
+Stopped at: Completed 07-05-PLAN.md
 Resume file: None

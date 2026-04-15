@@ -99,7 +99,7 @@ Plans:
 - [x] 07-02-PLAN.md — Hero: cover banner with blur bg, status badge, kebab menu, metadata
 - [x] 07-03-PLAN.md — Tabs with URL state + status-aware Overview tab
 - [x] 07-04-PLAN.md — Supplies tab: settings bar, two-line supply rows, calculator integration, totals
-- [ ] 07-05-PLAN.md — SearchToAdd enhancements: inline create, scroll/positioning/highlight fixes
+- [x] 07-05-PLAN.md — SearchToAdd enhancements: inline create, scroll/positioning/highlight fixes
 - [ ] 07-06-PLAN.md — Page wiring, schema push, visual verification checkpoint
 **UI hint**: yes
 
