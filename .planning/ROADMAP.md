@@ -95,8 +95,8 @@ Plans:
   4. Supply entries maintain insertion order during data entry so users can verify nothing was skipped
 **Plans:** 6 plans
 Plans:
-- [ ] 07-01-PLAN.md — Data layer: schema, calculator formula, types, validations, server actions
-- [ ] 07-02-PLAN.md — Hero: cover banner with blur bg, status badge, kebab menu, metadata
+- [x] 07-01-PLAN.md — Data layer: schema, calculator formula, types, validations, server actions
+- [x] 07-02-PLAN.md — Hero: cover banner with blur bg, status badge, kebab menu, metadata
 - [ ] 07-03-PLAN.md — Tabs with URL state + status-aware Overview tab
 - [ ] 07-04-PLAN.md — Supplies tab: settings bar, two-line supply rows, calculator integration, totals
 - [ ] 07-05-PLAN.md — SearchToAdd enhancements: inline create, scroll/positioning/highlight fixes
