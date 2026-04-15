@@ -100,7 +100,7 @@ Plans:
 - [x] 07-03-PLAN.md — Tabs with URL state + status-aware Overview tab
 - [x] 07-04-PLAN.md — Supplies tab: settings bar, two-line supply rows, calculator integration, totals
 - [x] 07-05-PLAN.md — SearchToAdd enhancements: inline create, scroll/positioning/highlight fixes
-- [ ] 07-06-PLAN.md — Page wiring, schema push, visual verification checkpoint
+- [x] 07-06-PLAN.md — Page wiring, schema push, visual verification checkpoint
 **UI hint**: yes
 
 ### Phase 8: Dashboards & Collection Views
