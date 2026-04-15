@@ -38,16 +38,16 @@ created: 2026-04-15
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 07-01-01 | 01 | 1 | CALC-02 | T-07-01 | Zod validates strandCount, overCount, wastePercent ranges | unit | `npx vitest run src/lib/utils/skein-calculator.test.ts` | ❌ W0 | ⬜ pending |
-| 07-01-02 | 01 | 1 | CALC-01 | — | N/A | unit | `npx vitest run src/lib/actions/supply-actions.test.ts -t "stitch count"` | ❌ W0 | ⬜ pending |
-| 07-02-01 | 02 | 1 | — | T-07-02 | requireAuth + ownership on updateProjectSettings | unit + integration | `npx vitest run src/components/features/charts/project-detail/project-detail-hero.test.tsx` | ❌ W0 | ⬜ pending |
-| 07-03-01 | 03 | 2 | CALC-01, CALC-03 | T-07-03 | IDOR check on supply mutation | unit + integration | `npx vitest run src/components/features/charts/project-detail/supply-row.test.tsx` | ❌ W0 | ⬜ pending |
-| 07-03-02 | 03 | 2 | CALC-04 | — | N/A | unit | `npx vitest run src/components/features/charts/project-detail/supplies-tab.test.tsx -t "total"` | ❌ W0 | ⬜ pending |
-| 07-03-03 | 03 | 2 | CALC-05 | — | N/A | unit + integration | `npx vitest run src/components/features/charts/project-detail/calculator-settings-bar.test.tsx` | ❌ W0 | ⬜ pending |
-| 07-04-01 | 04 | 2 | SUPP-01 | — | N/A | unit | `npx vitest run src/lib/actions/supply-actions.test.ts -t "insertion order"` | ❌ W0 | ⬜ pending |
-| 07-04-02 | 04 | 2 | — | T-07-04 | Zod trim+min on inline create names, XSS prevention | unit | `npx vitest run src/components/features/supplies/search-to-add.test.tsx -t "create"` | ❌ W0 | ⬜ pending |
+| 07-01-01 | 01 | 1 | CALC-02 | T-07-01 | Zod validates strandCount, overCount, wastePercent ranges | unit | `npx vitest run src/lib/utils/skein-calculator.test.ts` | no W0 | pending |
+| 07-01-02 | 01 | 1 | CALC-01 | — | N/A | unit | `npx vitest run src/lib/actions/supply-actions.test.ts -t "stitch count"` | no W0 | pending |
+| 07-02-01 | 02 | 1 | — | T-07-02 | requireAuth + ownership on updateProjectSettings | unit + integration | `npx vitest run src/components/features/charts/project-detail/project-detail-hero.test.tsx` | no W0 | pending |
+| 07-04-01 | 04 | 2 | CALC-01, CALC-03 | T-07-03 | IDOR check on supply mutation | unit + integration | `npx vitest run src/components/features/charts/project-detail/supply-row.test.tsx` | no W0 | pending |
+| 07-04-02 | 04 | 2 | CALC-04 | — | N/A | unit | `npx vitest run src/components/features/charts/project-detail/supplies-tab.test.tsx -t "total"` | no W0 | pending |
+| 07-04-03 | 04 | 2 | CALC-05 | — | N/A | unit + integration | `npx vitest run src/components/features/charts/project-detail/calculator-settings-bar.test.tsx` | no W0 | pending |
+| 07-05-01 | 05 | 2 | SUPP-01 | — | N/A | unit | `npx vitest run src/lib/actions/supply-actions.test.ts -t "insertion order"` | no W0 | pending |
+| 07-05-02 | 05 | 2 | — | T-07-04 | Zod trim+min on inline create names, XSS prevention | unit | `npx vitest run src/components/features/supplies/search-to-add.test.tsx -t "create"` | no W0 | pending |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: pending / green / red / flaky*
 
 ---
 
