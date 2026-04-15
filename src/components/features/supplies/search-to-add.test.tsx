@@ -146,7 +146,8 @@ describe("SearchToAdd - already-added indicator", () => {
   it("keyboard ArrowDown skips already-added items", async () => {
     // existingIds = ["t-2"] means thread B (middle item) is disabled
     // With addable-first sort: display order = [threadA, threadC, threadB]
-    // Highlight starts at 0 (threadA). ArrowDown should go to 1 (threadC), skipping threadB at index 2
+    // Highlight starts at -1 (no highlight). First ArrowDown goes to 0 (threadA).
+    // Second ArrowDown goes to 1 (threadC), skipping threadB at index 2.
     await renderAndWaitForResults({
       ...defaultProps,
       existingIds: ["t-2"],
@@ -154,7 +155,9 @@ describe("SearchToAdd - already-added indicator", () => {
 
     const input = screen.getByRole("textbox");
 
-    // Press ArrowDown to move from item 0 to item 1
+    // First ArrowDown: moves from -1 to 0 (threadA, first addable)
+    fireEvent.keyDown(input, { key: "ArrowDown" });
+    // Second ArrowDown: moves from 0 to 1 (threadC), skipping threadB (already-added)
     fireEvent.keyDown(input, { key: "ArrowDown" });
 
     // The highlighted item should be threadC (index 1)
@@ -257,6 +260,120 @@ describe("SearchToAdd - multi-add flow", () => {
   });
 });
 
+describe("SearchToAdd - inline create option", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetThreads.mockResolvedValue([]);
+  });
+
+  it('renders "+ Create" option when search has no results and onCreateNew is provided', async () => {
+    const onCreateNew = vi.fn();
+    render(<SearchToAdd {...defaultProps} onCreateNew={onCreateNew} />);
+
+    // Wait for loading to finish
+    await waitFor(
+      () => {
+        expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+      },
+      { timeout: 2000 },
+    );
+
+    // Type a search term
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "Custom Red" } });
+
+    // Wait for debounced fetch and re-render
+    await waitFor(
+      () => {
+        expect(screen.getByText(/\+ Create/)).toBeInTheDocument();
+      },
+      { timeout: 2000 },
+    );
+
+    expect(screen.getByText(/Custom Red/)).toBeInTheDocument();
+  });
+
+  it('does NOT render "+ Create" when onCreateNew is not provided', async () => {
+    render(<SearchToAdd {...defaultProps} />);
+
+    await waitFor(
+      () => {
+        expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+      },
+      { timeout: 2000 },
+    );
+
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "Custom Red" } });
+
+    await waitFor(
+      () => {
+        expect(screen.getByText("No matches")).toBeInTheDocument();
+      },
+      { timeout: 2000 },
+    );
+
+    expect(screen.queryByText(/\+ Create/)).not.toBeInTheDocument();
+  });
+
+  it("calls onCreateNew with trimmed search text when create option is clicked", async () => {
+    const onCreateNew = vi.fn();
+    render(<SearchToAdd {...defaultProps} onCreateNew={onCreateNew} />);
+
+    await waitFor(
+      () => {
+        expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+      },
+      { timeout: 2000 },
+    );
+
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "  Custom Red  " } });
+
+    await waitFor(
+      () => {
+        expect(screen.getByText(/\+ Create/)).toBeInTheDocument();
+      },
+      { timeout: 2000 },
+    );
+
+    const createButton = screen.getByText(/\+ Create/).closest("button")!;
+    fireEvent.click(createButton);
+
+    expect(onCreateNew).toHaveBeenCalledWith("Custom Red");
+  });
+});
+
+describe("SearchToAdd - highlight index starts at -1", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetThreads.mockResolvedValue([threadA, threadB, threadC]);
+  });
+
+  it("no item has keyboard highlight (bg-muted without hover: prefix) on initial render", async () => {
+    render(<SearchToAdd {...defaultProps} existingIds={[]} />);
+
+    await waitFor(
+      () => {
+        expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+        const buttons = screen.getAllByRole("button");
+        expect(buttons.length).toBeGreaterThanOrEqual(1);
+      },
+      { timeout: 2000 },
+    );
+
+    // Check that no item has the keyboard highlight class applied
+    // Items have "hover:bg-muted" (for hover) but should NOT have standalone "bg-muted"
+    // when highlightIndex is -1. We check by splitting className into individual classes.
+    const buttons = screen.getAllByRole("button");
+    const highlightedButtons = buttons.filter((btn) => {
+      const classes = btn.className.split(/\s+/);
+      return classes.includes("bg-muted");
+    });
+    expect(highlightedButtons).toHaveLength(0);
+  });
+});
+
 describe("SearchToAdd - viewport flip", () => {
   let origGetBoundingClientRect: typeof HTMLElement.prototype.getBoundingClientRect;
   let origInnerHeight: number;
@@ -302,7 +419,7 @@ describe("SearchToAdd - viewport flip", () => {
     });
   });
 
-  it("uses bottom-0 positioning when near viewport bottom", async () => {
+  it("uses bottom-full positioning when near viewport bottom", async () => {
     // 600px viewport, element bottom at 500px = 100px below (< 300)
     Object.defineProperty(window, "innerHeight", { value: 600, writable: true });
 
@@ -325,9 +442,9 @@ describe("SearchToAdd - viewport flip", () => {
 
     await waitFor(() => {
       const outerDiv = container.firstElementChild as HTMLElement;
-      expect(outerDiv.className).toContain("bottom-0");
+      expect(outerDiv.className).toContain("bottom-full");
+      expect(outerDiv.className).toContain("mb-1");
       expect(outerDiv.className).not.toContain("top-full");
-      expect(outerDiv.className).not.toContain("bottom-full");
     });
   });
 });

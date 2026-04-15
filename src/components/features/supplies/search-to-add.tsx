@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useTransition } from "react";
-import { Search } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
@@ -48,6 +48,7 @@ interface SearchToAddProps {
   existingIds: string[];
   onAdded: () => void;
   onClose: () => void;
+  onCreateNew?: (searchText: string) => void;
 }
 
 export function SearchToAdd({
@@ -56,13 +57,14 @@ export function SearchToAdd({
   existingIds,
   onAdded,
   onClose,
+  onCreateNew,
 }: SearchToAddProps) {
   const [search, setSearch] = useState("");
   const [items, setItems] = useState<SupplyItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [highlightIndex, setHighlightIndex] = useState(0);
+  const [highlightIndex, setHighlightIndex] = useState(-1);
   const [flipUp, setFlipUp] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -112,7 +114,7 @@ export function SearchToAdd({
         }
         if (!cancelled) {
           setItems(results);
-          setHighlightIndex(0);
+          setHighlightIndex(-1);
           setIsLoading(false);
         }
       } catch {
@@ -179,6 +181,8 @@ export function SearchToAdd({
         if (result.success) {
           toast.success(`Added ${item.brand.name} ${getItemCode(item)} to project`);
           onAdded();
+          // Scroll search input into view after adding (999.0.13 fix)
+          inputRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
           // Picker stays open for multi-add — user closes with Escape or click-outside
         } else {
           toast.error(result.error ?? "Something went wrong. Please try again.");
@@ -201,11 +205,24 @@ export function SearchToAdd({
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setHighlightIndex((prev) => findNextAddableIndex(prev, 1));
+      setHighlightIndex((prev) => {
+        // First arrow key press: start at 0 (first addable item)
+        if (prev < 0) {
+          // Find the first addable item
+          for (let i = 0; i < displayItems.length; i++) {
+            if (!existingSet.has(getItemId(displayItems[i]))) return i;
+          }
+          return 0;
+        }
+        return findNextAddableIndex(prev, 1);
+      });
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setHighlightIndex((prev) => findNextAddableIndex(prev, -1));
-    } else if (e.key === "Enter" && displayItems[highlightIndex]) {
+      setHighlightIndex((prev) => {
+        if (prev < 0) return prev; // No highlight yet, stay at -1
+        return findNextAddableIndex(prev, -1);
+      });
+    } else if (e.key === "Enter" && highlightIndex >= 0 && displayItems[highlightIndex]) {
       e.preventDefault();
       if (!existingSet.has(getItemId(displayItems[highlightIndex]))) {
         handleSelect(displayItems[highlightIndex]);
@@ -225,7 +242,7 @@ export function SearchToAdd({
       ref={ref}
       className={cn(
         "border-border bg-card absolute right-0 left-0 z-20 rounded-lg border shadow-lg",
-        flipUp ? "bottom-0" : "top-full mt-1",
+        flipUp ? "bottom-full mb-1" : "top-full mt-1",
       )}
     >
       <div className="p-2">
@@ -250,7 +267,17 @@ export function SearchToAdd({
             Failed to load items. Try again.
           </p>
         ) : items.length === 0 ? (
-          <p className="text-muted-foreground px-3 py-4 text-center text-sm">No matches</p>
+          <>
+            <p className="text-muted-foreground px-3 py-4 text-center text-sm">No matches</p>
+            {search.trim() && onCreateNew && (
+              <button
+                onClick={() => onCreateNew(search.trim())}
+                className="text-primary hover:bg-muted flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium transition-colors"
+              >
+                <Plus className="size-4" />+ Create &quot;{search.trim()}&quot;
+              </button>
+            )}
+          </>
         ) : (
           displayItems.map((item, index) => {
             const hex = getItemHex(item);
@@ -265,7 +292,7 @@ export function SearchToAdd({
                 className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-colors ${
                   isExisting
                     ? "cursor-default opacity-50"
-                    : `hover:bg-muted ${index === highlightIndex ? "bg-muted" : ""}`
+                    : `hover:bg-muted ${highlightIndex >= 0 && index === highlightIndex ? "bg-muted" : ""}`
                 }`}
               >
                 <div

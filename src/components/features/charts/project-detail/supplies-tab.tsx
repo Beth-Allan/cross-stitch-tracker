@@ -1,10 +1,14 @@
 "use client";
 
 import { useState, useMemo, useCallback, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { CalculatorSettingsBar } from "./calculator-settings-bar";
 import { SupplySection } from "./supply-section";
 import { SupplyFooterTotals } from "./supply-footer-totals";
+import { InlineSupplyCreate } from "./inline-supply-create";
+import { SearchToAdd } from "@/components/features/supplies/search-to-add";
 import { calculateSkeins } from "@/lib/utils/skein-calculator";
 import {
   removeProjectThread,
@@ -103,7 +107,20 @@ function sortItems(items: SupplyRowData[], sortOption: SupplySortOption): Supply
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
+  const router = useRouter();
   const [, startTransition] = useTransition();
+
+  // SearchToAdd open state per section type
+  const [openSearchType, setOpenSearchType] = useState<"thread" | "bead" | "specialty" | null>(
+    null,
+  );
+
+  // InlineSupplyCreate dialog state
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [createDialogType, setCreateDialogType] = useState<"thread" | "bead" | "specialty">(
+    "thread",
+  );
+  const [createDialogSearchText, setCreateDialogSearchText] = useState("");
   const [sortOption, setSortOption] = useState<SupplySortOption>("added");
   const [settings, setSettings] = useState<CalculatorSettings>({
     strandCount: project.strandCount,
@@ -225,10 +242,32 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
     [sections],
   );
 
-  // Add handler placeholder (SearchToAdd wired in Plan 05)
-  const handleAdd = useCallback(() => {
-    // Will be wired to SearchToAdd in Plan 05
+  // Open SearchToAdd for a specific supply type
+  const handleOpenSearch = useCallback((type: "thread" | "bead" | "specialty") => {
+    setOpenSearchType(type);
   }, []);
+
+  // Handler for SearchToAdd onCreateNew — opens InlineSupplyCreate dialog
+  const handleCreateNew = useCallback(
+    (type: "thread" | "bead" | "specialty", searchText: string) => {
+      setCreateDialogType(type);
+      setCreateDialogSearchText(searchText);
+      setCreateDialogOpen(true);
+      setOpenSearchType(null); // Close the search panel
+    },
+    [],
+  );
+
+  // Handler for SearchToAdd onAdded — refresh data
+  const handleSupplyAdded = useCallback(() => {
+    router.refresh();
+  }, [router]);
+
+  // Handler for InlineSupplyCreate onCreated — refresh data
+  const handleCreated = useCallback(() => {
+    setCreateDialogOpen(false);
+    router.refresh();
+  }, [router]);
 
   // ─── Empty State ──────────────────────────────────────────────────────────
 
@@ -284,17 +323,50 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
       />
 
       {/* Supply sections */}
-      {sections.map((section) => (
-        <div key={section.type}>
-          <SupplySection
-            data={section}
-            settings={settings}
-            onRemove={handleRemove}
-            onAdd={handleAdd}
-            onStitchCountChange={handleStitchCountChange}
-          />
-        </div>
-      ))}
+      {sections.map((section) => {
+        const sectionType = section.type as "thread" | "bead" | "specialty";
+        const linkedIds =
+          sectionType === "thread"
+            ? supplies.threads.map((t) => t.threadId)
+            : sectionType === "bead"
+              ? supplies.beads.map((b) => b.beadId)
+              : supplies.specialty.map((s) => s.specialtyItemId);
+
+        return (
+          <div key={section.type}>
+            <SupplySection
+              data={section}
+              settings={settings}
+              onRemove={handleRemove}
+              onAdd={() => handleOpenSearch(sectionType)}
+              onStitchCountChange={handleStitchCountChange}
+              addComponent={
+                openSearchType === sectionType ? (
+                  <SearchToAdd
+                    supplyType={sectionType}
+                    projectId={project.id}
+                    existingIds={linkedIds}
+                    onAdded={handleSupplyAdded}
+                    onClose={() => setOpenSearchType(null)}
+                    onCreateNew={(text) => handleCreateNew(sectionType, text)}
+                  />
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenSearch(sectionType);
+                    }}
+                    type="button"
+                    className="text-primary hover:text-primary/80 flex items-center gap-1.5 text-sm font-medium transition-colors"
+                  >
+                    <Plus className="size-3.5" />+ Add {section.label.toLowerCase()}
+                  </button>
+                )
+              }
+            />
+          </div>
+        );
+      })}
 
       {/* Footer totals (threads only) */}
       {sections[0].items.length > 0 && (
@@ -304,6 +376,16 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
           totalAcquired={totals.totalAcquired}
         />
       )}
+
+      {/* InlineSupplyCreate dialog for creating missing catalog items */}
+      <InlineSupplyCreate
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        type={createDialogType}
+        projectId={project.id}
+        searchText={createDialogSearchText}
+        onCreated={handleCreated}
+      />
     </div>
   );
 }

@@ -17,6 +17,7 @@ interface SupplySectionProps {
   onRemove: (id: string) => void;
   onAdd: () => void;
   onStitchCountChange: (id: string, newCount: number) => void;
+  addComponent?: React.ReactNode;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -27,6 +28,7 @@ export function SupplySection({
   onRemove,
   onAdd,
   onStitchCountChange,
+  addComponent,
 }: SupplySectionProps) {
   const [isOpen, setIsOpen] = useState(data.items.length > 0);
   const hasItems = data.items.length > 0;
@@ -73,32 +75,40 @@ export function SupplySection({
                   </div>
                 ))}
               </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAdd();
-                }}
-                type="button"
-                className="text-primary hover:text-primary/80 mt-3 flex items-center gap-1.5 text-sm font-medium transition-colors"
-              >
-                <Plus className="size-3.5" />+ Add {data.label.toLowerCase()}
-              </button>
+              <div className="relative mt-3">
+                {addComponent ?? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAdd();
+                    }}
+                    type="button"
+                    className="text-primary hover:text-primary/80 flex items-center gap-1.5 text-sm font-medium transition-colors"
+                  >
+                    <Plus className="size-3.5" />+ Add {data.label.toLowerCase()}
+                  </button>
+                )}
+              </div>
             </>
           ) : (
             <div className="py-6 text-center">
               <p className="text-muted-foreground mb-2 text-sm">
                 No {data.label.toLowerCase()} linked to this project
               </p>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAdd();
-                }}
-                type="button"
-                className="text-primary hover:text-primary/80 mx-auto flex items-center gap-1.5 text-sm font-medium transition-colors"
-              >
-                <Plus className="size-3.5" />+ Add {data.label.toLowerCase()}
-              </button>
+              <div className="relative flex justify-center">
+                {addComponent ?? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAdd();
+                    }}
+                    type="button"
+                    className="text-primary hover:text-primary/80 flex items-center gap-1.5 text-sm font-medium transition-colors"
+                  >
+                    <Plus className="size-3.5" />+ Add {data.label.toLowerCase()}
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>

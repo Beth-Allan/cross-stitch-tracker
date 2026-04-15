@@ -15,10 +15,37 @@ vi.mock("@/lib/actions/supply-actions", () => ({
   removeProjectThread: vi.fn(() => Promise.resolve({ success: true })),
   removeProjectBead: vi.fn(() => Promise.resolve({ success: true })),
   removeProjectSpecialty: vi.fn(() => Promise.resolve({ success: true })),
+  getThreads: vi.fn(() => Promise.resolve([])),
+  getBeads: vi.fn(() => Promise.resolve([])),
+  getSpecialtyItems: vi.fn(() => Promise.resolve([])),
+  addThreadToProject: vi.fn(() => Promise.resolve({ success: true })),
+  addBeadToProject: vi.fn(() => Promise.resolve({ success: true })),
+  addSpecialtyToProject: vi.fn(() => Promise.resolve({ success: true })),
+  createAndAddThread: vi.fn(() => Promise.resolve({ success: true })),
+  createAndAddBead: vi.fn(() => Promise.resolve({ success: true })),
+  createAndAddSpecialty: vi.fn(() => Promise.resolve({ success: true })),
 }));
 
 vi.mock("@/lib/actions/chart-actions", () => ({
   updateProjectSettings: vi.fn(() => Promise.resolve({ success: true })),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    refresh: vi.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    prefetch: vi.fn(),
+  }),
 }));
 
 const mockBrand = createMockSupplyBrand({ id: "brand-1", name: "DMC" });
