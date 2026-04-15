@@ -6,10 +6,12 @@ import type { ProjectDetailProps } from "./types";
 type ChartProp = ProjectDetailProps["chart"];
 type SuppliesProp = ProjectDetailProps["supplies"];
 
-function makeChart(overrides: {
-  project?: Partial<NonNullable<ChartProp["project"]>>;
-  chart?: Partial<ChartProp>;
-} = {}): ChartProp {
+function makeChart(
+  overrides: {
+    project?: Partial<NonNullable<ChartProp["project"]>>;
+    chart?: Partial<ChartProp>;
+  } = {},
+): ChartProp {
   return {
     id: "chart-1",
     name: "Test Pattern",
@@ -19,7 +21,6 @@ function makeChart(overrides: {
     coverImageUrl: null,
     coverThumbnailUrl: null,
     digitalWorkingCopyUrl: null,
-    digitalWorkingCopyName: null,
     notes: null,
     dateAdded: new Date("2025-01-01"),
     designer: { id: "d-1", name: "Test Designer" },
@@ -137,7 +138,14 @@ describe("OverviewTab", () => {
     });
 
     it("shows genre names", () => {
-      const chart = makeChart({ chart: { genres: [{ id: "g-1", name: "Sampler" }, { id: "g-2", name: "Animals" }] } });
+      const chart = makeChart({
+        chart: {
+          genres: [
+            { id: "g-1", name: "Sampler" },
+            { id: "g-2", name: "Animals" },
+          ],
+        },
+      });
       render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
 
       expect(screen.getByText(/Sampler/)).toBeInTheDocument();
@@ -163,7 +171,11 @@ describe("OverviewTab", () => {
 
     it("shows finish date for completed projects", () => {
       const chart = makeChart({
-        project: { status: "FINISHED", finishDate: new Date("2025-06-01"), stitchesCompleted: 45000 },
+        project: {
+          status: "FINISHED",
+          finishDate: new Date("2025-06-01"),
+          stitchesCompleted: 45000,
+        },
       });
       render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
 
@@ -238,7 +250,11 @@ describe("OverviewTab", () => {
   describe("Completion section", () => {
     it("shows finish date for FINISHED status", () => {
       const chart = makeChart({
-        project: { status: "FINISHED", finishDate: new Date("2025-06-15"), stitchesCompleted: 45000 },
+        project: {
+          status: "FINISHED",
+          finishDate: new Date("2025-06-15"),
+          stitchesCompleted: 45000,
+        },
       });
       render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
 

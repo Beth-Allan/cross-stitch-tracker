@@ -62,7 +62,6 @@ export interface ProjectDetailProps {
     coverImageUrl: string | null;
     coverThumbnailUrl: string | null;
     digitalWorkingCopyUrl: string | null;
-    digitalWorkingCopyName: string | null;
     notes: string | null;
     dateAdded: Date;
     designer: { id: string; name: string } | null;

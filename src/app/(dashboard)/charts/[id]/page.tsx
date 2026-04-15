@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getChart } from "@/lib/actions/chart-actions";
 import { getPresignedImageUrls } from "@/lib/actions/upload-actions";
 import { getProjectSupplies } from "@/lib/actions/supply-actions";
-import { ChartDetail } from "@/components/features/charts/chart-detail";
+import { ProjectDetailPage } from "@/components/features/charts/project-detail/project-detail-page";
 
 export default async function ChartDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -15,5 +15,5 @@ export default async function ChartDetailPage({ params }: { params: Promise<{ id
     getPresignedImageUrls([chart.coverImageUrl, chart.coverThumbnailUrl]),
   ]);
 
-  return <ChartDetail chart={chart} projectSupplies={projectSupplies} imageUrls={imageUrls} />;
+  return <ProjectDetailPage chart={chart} imageUrls={imageUrls} supplies={projectSupplies} />;
 }
