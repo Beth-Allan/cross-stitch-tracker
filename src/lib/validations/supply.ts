@@ -85,6 +85,30 @@ export const updateQuantitySchema = z.object({
   quantityRequired: z.number().int().min(1).optional(),
   quantityAcquired: z.number().int().min(0).optional(),
   stitchCount: z.number().int().min(0).optional(),
+  isNeedOverridden: z.boolean().optional(),
 });
 
 export type UpdateQuantityInput = z.infer<typeof updateQuantitySchema>;
+
+export const updateProjectSettingsSchema = z.object({
+  strandCount: z.number().int().min(1).max(6).optional(),
+  overCount: z.union([z.literal(1), z.literal(2)]).optional(),
+  wastePercent: z.number().int().min(0).max(50).optional(),
+});
+
+export type UpdateProjectSettingsInput = z.infer<typeof updateProjectSettingsSchema>;
+
+export const createAndAddThreadSchema = z.object({
+  projectId: z.string().min(1),
+  name: z.string().trim().min(1, "Name is required").max(200),
+  colorCode: z.string().trim().max(20).optional().default(""),
+  hexColor: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/)
+    .optional()
+    .default("#808080"),
+  brandId: z.string().min(1, "Brand is required"),
+  colorFamily: z.enum(COLOR_FAMILIES).optional().default("NEUTRAL"),
+});
+
+export type CreateAndAddThreadInput = z.infer<typeof createAndAddThreadSchema>;
