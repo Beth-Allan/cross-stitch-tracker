@@ -13,9 +13,7 @@ describe("FilterBar", () => {
 
   it("renders search input with placeholder", () => {
     render(<FilterBar {...defaultProps} />);
-    expect(
-      screen.getByPlaceholderText("Search projects..."),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Search projects...")).toBeInTheDocument();
   });
 
   it("calls onSearchChange when typing in search input", () => {
@@ -43,9 +41,7 @@ describe("FilterBar", () => {
 
   it("shows search value in the input", () => {
     render(<FilterBar {...defaultProps} search="dragon" />);
-    const input = screen.getByPlaceholderText(
-      "Search projects...",
-    ) as HTMLInputElement;
+    const input = screen.getByPlaceholderText("Search projects...") as HTMLInputElement;
     expect(input.value).toBe("dragon");
   });
 });

@@ -6,10 +6,7 @@ export default async function ChartsPage() {
   const charts = await getChartsForGallery();
 
   // Resolve R2 keys to presigned URLs (both full and thumbnail)
-  const imageKeys = charts.flatMap((c) => [
-    c.coverImageUrl,
-    c.coverThumbnailUrl,
-  ]);
+  const imageKeys = charts.flatMap((c) => [c.coverImageUrl, c.coverThumbnailUrl]);
   const imageUrls = await getPresignedImageUrls(imageKeys);
 
   return <ProjectGallery charts={charts} imageUrls={imageUrls} />;

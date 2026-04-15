@@ -23,9 +23,7 @@ describe("FilterChips", () => {
   });
 
   it("renders status chip with display label", () => {
-    render(
-      <FilterChips {...defaultProps} statusFilter={["IN_PROGRESS"]} />,
-    );
+    render(<FilterChips {...defaultProps} statusFilter={["IN_PROGRESS"]} />);
     // Should show "Status: Stitching" (from STATUS_CONFIG), not "Status: IN_PROGRESS"
     expect(screen.getByText(/status: stitching/i)).toBeInTheDocument();
   });
@@ -38,11 +36,7 @@ describe("FilterChips", () => {
   it("calls onRemoveStatus when X clicked on status chip", () => {
     const onRemoveStatus = vi.fn();
     render(
-      <FilterChips
-        {...defaultProps}
-        statusFilter={["FINISHED"]}
-        onRemoveStatus={onRemoveStatus}
-      />,
+      <FilterChips {...defaultProps} statusFilter={["FINISHED"]} onRemoveStatus={onRemoveStatus} />,
     );
 
     const removeButton = screen.getByRole("button", {
@@ -54,13 +48,7 @@ describe("FilterChips", () => {
 
   it("calls onRemoveSearch when X clicked on search chip", () => {
     const onRemoveSearch = vi.fn();
-    render(
-      <FilterChips
-        {...defaultProps}
-        search="test"
-        onRemoveSearch={onRemoveSearch}
-      />,
-    );
+    render(<FilterChips {...defaultProps} search="test" onRemoveSearch={onRemoveSearch} />);
 
     const removeButton = screen.getByRole("button", {
       name: /remove.*search/i,
@@ -71,13 +59,7 @@ describe("FilterChips", () => {
 
   it("renders Clear all link that calls onClearAll", () => {
     const onClearAll = vi.fn();
-    render(
-      <FilterChips
-        {...defaultProps}
-        search="something"
-        onClearAll={onClearAll}
-      />,
-    );
+    render(<FilterChips {...defaultProps} search="something" onClearAll={onClearAll} />);
     const clearAll = screen.getByText("Clear all");
     fireEvent.click(clearAll);
     expect(onClearAll).toHaveBeenCalled();

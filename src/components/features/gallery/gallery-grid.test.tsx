@@ -13,13 +13,9 @@ vi.mock("./gallery-card", () => ({
 
 // Mock LinkButton for empty state CTA
 vi.mock("@/components/ui/link-button", () => ({
-  LinkButton: ({
-    href,
-    children,
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => <a href={href}>{children}</a>,
+  LinkButton: ({ href, children }: { href: string; children: React.ReactNode }) => (
+    <a href={href}>{children}</a>
+  ),
 }));
 
 const defaultProps = {
@@ -45,12 +41,8 @@ describe("GalleryGrid", () => {
 
     it("renders each card via GalleryCard component", () => {
       render(<GalleryGrid {...defaultProps} />);
-      expect(screen.getByTestId("gallery-card-c1")).toHaveTextContent(
-        "Project Alpha",
-      );
-      expect(screen.getByTestId("gallery-card-c2")).toHaveTextContent(
-        "Project Beta",
-      );
+      expect(screen.getByTestId("gallery-card-c1")).toHaveTextContent("Project Alpha");
+      expect(screen.getByTestId("gallery-card-c2")).toHaveTextContent("Project Beta");
     });
   });
 
@@ -88,21 +80,15 @@ describe("GalleryGrid", () => {
 
     it("calls onSortChange when a column header is clicked", () => {
       const onSortChange = vi.fn();
-      render(
-        <GalleryGrid {...defaultProps} view="table" onSortChange={onSortChange} />,
-      );
+      render(<GalleryGrid {...defaultProps} view="table" onSortChange={onSortChange} />);
       const statusButton = screen.getByRole("button", { name: /Status/i });
       statusButton.click();
       expect(onSortChange).toHaveBeenCalledWith("status");
     });
 
     it("shows aria-sort on active sort column", () => {
-      render(
-        <GalleryGrid {...defaultProps} view="table" sort="name" dir="asc" />,
-      );
-      const projectHeader = screen
-        .getByRole("button", { name: /Project/i })
-        .closest("th");
+      render(<GalleryGrid {...defaultProps} view="table" sort="name" dir="asc" />);
+      const projectHeader = screen.getByRole("button", { name: /Project/i }).closest("th");
       expect(projectHeader).toHaveAttribute("aria-sort", "ascending");
     });
 
@@ -115,26 +101,12 @@ describe("GalleryGrid", () => {
 
   describe("Empty states", () => {
     it("shows 'No projects match your filters' when cards empty and hasProjects is true", () => {
-      render(
-        <GalleryGrid
-          {...defaultProps}
-          cards={[]}
-          hasProjects={true}
-        />,
-      );
-      expect(
-        screen.getByText("No projects match your filters"),
-      ).toBeInTheDocument();
+      render(<GalleryGrid {...defaultProps} cards={[]} hasProjects={true} />);
+      expect(screen.getByText("No projects match your filters")).toBeInTheDocument();
     });
 
     it("shows 'No projects yet' with Add Project link when hasProjects is false", () => {
-      render(
-        <GalleryGrid
-          {...defaultProps}
-          cards={[]}
-          hasProjects={false}
-        />,
-      );
+      render(<GalleryGrid {...defaultProps} cards={[]} hasProjects={false} />);
       expect(screen.getByText("No projects yet")).toBeInTheDocument();
       const addLink = screen.getByRole("link", { name: /Add Project/i });
       expect(addLink).toHaveAttribute("href", "/charts/new");
