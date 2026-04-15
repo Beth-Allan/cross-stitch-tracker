@@ -45,7 +45,7 @@ export function FilterBar({
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search projects..."
           aria-label="Search projects"
-          className="border-border bg-card placeholder:text-muted-foreground w-full rounded-lg border py-2 pr-8 pl-9 text-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 focus:outline-none"
+          className="border-border bg-card placeholder:text-muted-foreground focus:border-ring focus:ring-ring w-full rounded-lg border py-2 pr-8 pl-9 text-sm focus:ring-1 focus:outline-none"
         />
         {search.length > 0 && (
           <button
