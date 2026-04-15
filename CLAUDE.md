@@ -4,9 +4,9 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 2 (Browse & Organize) | **Phase:** 5 — shipped, PR #7 open
-**Last Updated:** 2026-04-13
-**Roadmap:** 4 milestones / 10 phases — v1.0 shipped, M2 phase 5 PR open
+**Milestone:** 2 (Browse & Organize) | **Phase:** 6 — verified & complete
+**Last Updated:** 2026-04-15
+**Roadmap:** 4 milestones / 11 phases — v1.0 shipped, M2 phases 5-6 complete, phase 7 next
 
 ### Done
 
@@ -93,13 +93,22 @@
     - `/harden` pass 2: Search clear button, directional sort arrow, new "progress" sort field (Progress/Stitches now sort independently)
     - `/harden` pass 3: Styled Base UI tooltips on kitting dots + size badges (all 3 views), shared KittingDotIcon export, stone-\* → semantic tokens
     - `/polish`: Loading skeleton matches gallery card grid, fixed dual transition override, empty filter state has suggestion text + "Clear all filters" button
-  - **Post-execution gates remaining:** critique re-run → code review → phase verification → roadmap update
+  - **Critique re-run** (2026-04-13): scored 28/40 on Nielsen's heuristics, AI slop PASS (2 false positives)
+    - 3x P2 findings: search only matches project name (not designer), view toggle title tooltips invisible on touch, list view mobile too sparse
+    - 2x P3 findings: gallery grid not center-justified, loading skeleton missing page header
+  - **Critique re-run fixes** (2026-04-13): all P2/P3 findings addressed
+    - `/harden`: Search matches designer name + project name; view toggle uses Base UI Tooltip (touch-accessible)
+    - `/adapt`: List view mobile 4-column grid with StatusBadge + compact stat line (ListMobileStat)
+    - `/layout`: Gallery grid centered with justify-center
+    - `/polish`: Loading skeleton restructured to match real page layout (header + separator + toggle bar)
+    - 148 gallery tests passing, TypeScript clean
+  - **UAT verified** (2026-04-15): 9/10 passed, 1 dev-only hydration issue (Turbopack cache staleness — not a code bug)
+  - **Phase 6 complete** (2026-04-15): marked complete in ROADMAP + STATE, transitioned to Phase 7
 
 ### Next Up
 
-1. **Critique re-run** — verify score improvement
-2. Code review + phase verification
-3. Phase 6 ship (PR + review)
+1. Phase 6 ship (PR + review)
+2. `/gsd-discuss-phase 7` — Skein Calculator & Supply Workflow
 
 ### Backlog (post-MVP)
 
