@@ -1,4 +1,6 @@
 export default function ChartsLoading() {
+  const stitches = Array.from({ length: 16 }, (_, i) => i);
+
   return (
     <div className="space-y-6">
       {/* Page header skeleton — matches ProjectGallery heading + button */}
@@ -29,28 +31,31 @@ export default function ChartsLoading() {
         </div>
       </div>
 
-      {/* Gallery card grid skeleton — matches default gallery view */}
-      <div
-        className="grid justify-center gap-6"
-        style={{
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 340px))",
-        }}
-      >
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="border-border bg-card overflow-hidden rounded-xl border">
-            {/* Cover image area */}
-            <div className="bg-muted animate-skeleton-pulse aspect-[4/3]" />
-            {/* Card body */}
-            <div className="space-y-2.5 p-4">
-              <div className="bg-muted animate-skeleton-pulse h-4 w-3/4 rounded" />
-              <div className="bg-muted animate-skeleton-pulse h-3.5 w-1/2 rounded" />
-              <div className="bg-muted animate-skeleton-pulse h-3 w-1/3 rounded" />
-              <div className="pt-2">
-                <div className="bg-muted animate-skeleton-pulse h-1.5 w-full rounded-full" />
-              </div>
-            </div>
-          </div>
-        ))}
+      {/* Cross-stitch loading animation — squares fill in like stitches */}
+      <div className="flex flex-col items-center justify-center gap-4 py-20">
+        <style>{`
+          @keyframes stitch-fill {
+            0% { opacity: 0.08; transform: scale(0.5); }
+            12% { opacity: 0.5; transform: scale(1); }
+            65% { opacity: 0.5; transform: scale(1); }
+            80% { opacity: 0.08; transform: scale(0.5); }
+            100% { opacity: 0.08; transform: scale(0.5); }
+          }
+        `}</style>
+        <div className="grid grid-cols-4 gap-1.5">
+          {stitches.map((i) => (
+            <div
+              key={i}
+              className="bg-muted-foreground size-3 rounded-sm"
+              style={{
+                animation: "stitch-fill 3.5s ease-in-out infinite",
+                animationDelay: `${i * 0.12}s`,
+                opacity: 0.08,
+              }}
+            />
+          ))}
+        </div>
+        <p className="text-muted-foreground/50 text-sm">Loading your projects&hellip;</p>
       </div>
     </div>
   );
