@@ -14,6 +14,7 @@ import {
   projectBeadSchema,
   projectSpecialtySchema,
   updateQuantitySchema,
+  createAndAddThreadSchema,
 } from "@/lib/validations/supply";
 
 // ─── Helper ──────────────────────────────────────────────────────────────────
@@ -543,22 +544,68 @@ export async function getProjectSupplies(projectId: string) {
     prisma.projectThread.findMany({
       where: { projectId },
       include: { thread: { include: { brand: true } } },
+      orderBy: { createdAt: "asc" },
     }),
     prisma.projectBead.findMany({
       where: { projectId },
       include: { bead: { include: { brand: true } } },
-      orderBy: { bead: { productCode: "asc" } },
+      orderBy: { createdAt: "asc" },
     }),
     prisma.projectSpecialty.findMany({
       where: { projectId },
       include: { specialtyItem: { include: { brand: true } } },
-      orderBy: { specialtyItem: { productCode: "asc" } },
+      orderBy: { createdAt: "asc" },
     }),
   ]);
 
-  const sortedThreads = threads.sort((a, b) =>
-    naturalSortByCode(a.thread.colorCode, b.thread.colorCode),
-  );
+  return { threads, beads, specialty };
+}
 
-  return { threads: sortedThreads, beads, specialty };
+export async function createAndAddThread(formData: unknown) {
+  const user = await requireAuth();
+
+  try {
+    const validated = createAndAddThreadSchema.parse(formData);
+
+    // Verify project ownership
+    const project = await prisma.project.findUnique({
+      where: { id: validated.projectId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const thread = await tx.thread.create({
+        data: {
+          colorCode: validated.colorCode || "CUSTOM",
+          colorName: validated.name,
+          hexColor: validated.hexColor,
+          brandId: validated.brandId,
+          colorFamily: validated.colorFamily,
+        },
+      });
+      const link = await tx.projectThread.create({
+        data: {
+          projectId: validated.projectId,
+          threadId: thread.id,
+          stitchCount: 0,
+          quantityRequired: 1,
+          quantityAcquired: 0,
+        },
+      });
+      return { thread, link };
+    });
+
+    revalidatePath("/charts");
+    revalidatePath("/shopping");
+    return { success: true as const, record: result };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false as const, error: error.errors[0].message };
+    }
+    console.error("createAndAddThread error:", error);
+    return { success: false as const, error: "Failed to create and add thread" };
+  }
 }

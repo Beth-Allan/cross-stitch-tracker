@@ -902,23 +902,22 @@ describe("supply-actions", () => {
       expect(result.specialty).toHaveLength(1);
     });
 
-    it("returns project threads sorted by colorCode numerically", async () => {
+    it("returns threads ordered by createdAt ascending (insertion order)", async () => {
       const brand = createMockSupplyBrand();
-      // Mock returns alphabetical DB order: 3761 before 500
-      mockPrisma.projectThread.findMany.mockResolvedValueOnce([
-        {
-          ...createMockProjectThread({ id: "pt-1" }),
-          thread: { ...createMockThread({ id: "t1", colorCode: "3761" }), brand },
-        },
-        {
-          ...createMockProjectThread({ id: "pt-2" }),
-          thread: { ...createMockThread({ id: "t2", colorCode: "334" }), brand },
-        },
-        {
-          ...createMockProjectThread({ id: "pt-3" }),
-          thread: { ...createMockThread({ id: "t3", colorCode: "500" }), brand },
-        },
-      ]);
+      // Threads returned in insertion order (createdAt ascending) from DB
+      const thread1 = {
+        ...createMockProjectThread({ id: "pt-1", createdAt: new Date("2026-01-01") }),
+        thread: { ...createMockThread({ id: "t1", colorCode: "3761" }), brand },
+      };
+      const thread2 = {
+        ...createMockProjectThread({ id: "pt-2", createdAt: new Date("2026-01-02") }),
+        thread: { ...createMockThread({ id: "t2", colorCode: "334" }), brand },
+      };
+      const thread3 = {
+        ...createMockProjectThread({ id: "pt-3", createdAt: new Date("2026-01-03") }),
+        thread: { ...createMockThread({ id: "t3", colorCode: "500" }), brand },
+      };
+      mockPrisma.projectThread.findMany.mockResolvedValueOnce([thread1, thread2, thread3]);
       mockPrisma.projectBead.findMany.mockResolvedValueOnce([]);
       mockPrisma.projectSpecialty.findMany.mockResolvedValueOnce([]);
 
@@ -927,9 +926,110 @@ describe("supply-actions", () => {
       const result = await getProjectSupplies("proj-1");
 
       expect(result.threads).toHaveLength(3);
-      expect(result.threads[0].thread.colorCode).toBe("334");
-      expect(result.threads[1].thread.colorCode).toBe("500");
-      expect(result.threads[2].thread.colorCode).toBe("3761");
+      // Preserved insertion order (not re-sorted by colorCode)
+      expect(result.threads[0].id).toBe("pt-1");
+      expect(result.threads[1].id).toBe("pt-2");
+      expect(result.threads[2].id).toBe("pt-3");
+
+      // Verify DB query uses createdAt ascending ordering
+      expect(mockPrisma.projectThread.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { createdAt: "asc" },
+        }),
+      );
+    });
+  });
+
+  // ─── createAndAddThread ─────────────────────────────────────────────────────
+
+  describe("createAndAddThread", () => {
+    it("requires auth", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { createAndAddThread } = await import("./supply-actions");
+      await expect(
+        createAndAddThread({ projectId: "p1", name: "Custom Red", brandId: "brand-1" }),
+      ).rejects.toThrow("Unauthorized");
+    });
+
+    it("validates name with trim and min(1)", async () => {
+      const { createAndAddThread } = await import("./supply-actions");
+
+      const result = await createAndAddThread({
+        projectId: "p1",
+        name: "   ",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Name is required");
+      }
+    });
+
+    it("checks project ownership before creating", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { createAndAddThread } = await import("./supply-actions");
+
+      const result = await createAndAddThread({
+        projectId: "p1",
+        name: "Custom Red",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Project not found");
+      }
+    });
+
+    it("creates thread and links to project in a transaction", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const mockThread = createMockThread({ id: "new-thread" });
+      const mockLink = createMockProjectThread({ id: "new-pt", threadId: "new-thread" });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          thread: { create: vi.fn().mockResolvedValue(mockThread) },
+          projectThread: { create: vi.fn().mockResolvedValue(mockLink) },
+        });
+      });
+
+      const { createAndAddThread } = await import("./supply-actions");
+
+      const result = await createAndAddThread({
+        projectId: "p1",
+        name: "Custom Red",
+        brandId: "brand-1",
+        colorCode: "CUS1",
+        hexColor: "#FF0000",
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
+    });
+
+    it("returns success with the created record", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const mockThread = createMockThread({ id: "new-thread", colorName: "Custom Red" });
+      const mockLink = createMockProjectThread({ id: "new-pt", threadId: "new-thread" });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          thread: { create: vi.fn().mockResolvedValue(mockThread) },
+          projectThread: { create: vi.fn().mockResolvedValue(mockLink) },
+        });
+      });
+
+      const { createAndAddThread } = await import("./supply-actions");
+
+      const result = await createAndAddThread({
+        projectId: "p1",
+        name: "Custom Red",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.record).toBeDefined();
+      }
     });
   });
 });

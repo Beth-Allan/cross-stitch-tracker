@@ -6,6 +6,7 @@ import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { generateThumbnail } from "@/lib/actions/upload-actions";
 import { chartFormSchema } from "@/lib/validations/chart";
+import { updateProjectSettingsSchema } from "@/lib/validations/supply";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
 
 export async function createChart(formData: unknown) {
@@ -353,4 +354,34 @@ export async function getChartsForGallery() {
     },
     orderBy: { dateAdded: "desc" },
   });
+}
+
+export async function updateProjectSettings(chartId: string, formData: unknown) {
+  const user = await requireAuth();
+
+  try {
+    const validated = updateProjectSettingsSchema.parse(formData);
+
+    const project = await prisma.project.findUnique({
+      where: { chartId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
+    await prisma.project.update({
+      where: { chartId },
+      data: validated,
+    });
+
+    revalidatePath(`/charts/${chartId}`);
+    return { success: true as const };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false as const, error: error.errors[0].message };
+    }
+    console.error("updateProjectSettings error:", error);
+    return { success: false as const, error: "Failed to update project settings" };
+  }
 }
