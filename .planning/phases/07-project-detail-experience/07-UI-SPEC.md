@@ -43,7 +43,7 @@ Declared values (multiples of 4):
 
 Exceptions:
 - **44px minimum touch targets** on: status badge dropdown trigger, kebab menu trigger, tab triggers, editable number click areas, supply row action buttons
-- **12px** (`gap-3`) for tight inline metadata groups (stitch count + size badge + progress)
+- **12px** (`gap-3`) for tight inline metadata groups (stitch count + size badge + progress) -- approved exception to 8-point scale for visual density in metadata rows
 
 ---
 
@@ -51,16 +51,16 @@ Exceptions:
 
 | Role | Size | Weight | Line Height | Font | Usage |
 |------|------|--------|-------------|------|-------|
-| Display | 28px (text-2xl / text-3xl) | 700 (bold) | 1.2 | Fraunces | Chart name in hero |
+| Display | 28px (text-2xl / text-3xl) | 600 (semibold) | 1.2 | Fraunces | Chart name in hero |
 | Heading | 20px (text-xl) | 600 (semibold) | 1.3 | Fraunces | Section headings (Overview, supply section titles) |
 | Body | 16px (text-base) | 400 (regular) | 1.5 | Source Sans 3 | Default body text, supply names, detail values |
-| Label | 14px (text-sm) | 500 (medium) | 1.5 | Source Sans 3 | Supply row metadata, settings bar labels, tab triggers, detail row labels |
-| Mono | 14px (text-sm) | 400 (regular) | 1.5 | System mono | Stitch counts, skein quantities, calculated values (tabular-nums) |
+| Label / Mono | 14px (text-sm) | 400 (regular) | 1.5 | Source Sans 3 / System mono | Supply row metadata, settings bar labels, tab triggers, detail row labels, stitch counts, skein quantities |
 
 Notes:
 - Chart name in hero uses `font-heading` (Fraunces). Designer name below uses body font at 16px, `text-muted-foreground`.
-- Settings bar labels use 11px uppercase tracking-wider for the compact spreadsheet-toolbar feel (matching DesignOS HeroStats pattern).
-- All numeric values in supply rows and totals use `tabular-nums` for column alignment.
+- Settings bar labels ("Strands", "Over", "Fabric", "Waste") use 14px (text-sm) with `uppercase tracking-wider font-semibold` for the compact spreadsheet-toolbar feel. The visual distinction comes from the uppercase + tracking treatment, not from a smaller point size.
+- Mono values (stitch counts, skeins, quantities) use 14px with `font-mono tabular-nums` for column alignment.
+- Only two weights are used across the entire phase: 400 (regular) for body text, labels, and mono values; 600 (semibold) for display headings, section headings, color codes in supply rows, and settings bar labels.
 
 ---
 
@@ -157,7 +157,7 @@ These are NOT accent colors -- they are semantic status indicators used consiste
 | `Select` | `@/components/ui/select` | Status dropdown in hero badge |
 | `Button` | `@/components/ui/button` | Edit button, save/cancel in inline editing |
 | `Input` | `@/components/ui/input` | Stitch count, quantity fields |
-| `Tooltip` | `@/components/ui/tooltip` | "Calc suggests X" indicator, settings help text |
+| `Tooltip` | `@/components/ui/tooltip` | "Calc suggests X" indicator, settings help text, trash icon label |
 | `Separator` | `@/components/ui/separator` | Section dividers within tabs |
 
 ---
@@ -174,7 +174,7 @@ These are NOT accent colors -- they are semantic status indicators used consiste
 |   +------------------------------------------+                   |
 +------------------------------------------------------------------+
 | Back to Gallery                                    [Edit] [...]  |
-| Chart Name (Display, Fraunces, bold)                             |
+| Chart Name (Display, Fraunces, semibold)                         |
 | Designer Name (Body, muted-foreground)                           |
 | [StatusBadge v] | 45,000 stitches | Large | 68%                 |
 +------------------------------------------------------------------+
@@ -223,7 +223,7 @@ Each section uses `InfoCard` wrapper. Section heading uses `text-xl font-heading
 +------------------------------------------------------------------+
 | Calculator Settings Bar (contextual -- hidden until first         |
 | stitch count entered)                                            |
-| Strands: [2]  |  Over: [2]  |  Fabric: [14ct]  |  Waste: [20%] |
+| STRANDS: [2]  |  OVER: [2]  |  FABRIC: [14ct]  |  WASTE: [20%] |
 +------------------------------------------------------------------+
 | Threads (24 colours)                    12,450 stitches total    |
 |   [supply row]                                                   |
@@ -249,7 +249,7 @@ Line 1: [swatch 20x20] DMC 310 - Black                    [trash]
 Line 2: 1,250 stitches -> 3 skeins | Need: [3] | Have: [2] | [partial]
 ```
 
-- **Line 1:** Color swatch (20x20px rounded-sm, 1px border for light colors) + color code (mono, semibold) + color name (body). Trash icon right-aligned, 44px touch target, `text-muted-foreground hover:text-destructive`.
+- **Line 1:** Color swatch (20x20px rounded-sm, 1px border for light colors) + color code (mono, semibold) + color name (body). Trash icon right-aligned, 44px touch target, `text-muted-foreground hover:text-destructive`. Trash icon wrapped in Tooltip: "Remove [color name]".
 - **Line 2:** Stitch count (mono, tabular-nums) + arrow indicator + calculated skeins + divider + Need (EditableNumber) + Have (EditableNumber) + fulfillment status icon.
 - **Fulfillment status:** Check icon (`text-success`) when have >= need. Warning icon (`text-warning`) when partial. No icon when have = 0.
 - **Auto-calculated indicator:** When skeins are auto-calculated, show a small `Calculator` icon (12px, `text-muted-foreground`) next to the Need value. Tooltip: "Auto-calculated from stitch count".
@@ -270,7 +270,7 @@ Line 2: 1,250 stitches -> 3 skeins | Need: [3] | Have: [2] | [partial]
   - **Over:** Toggle "1" or "2", default 2
   - **Fabric count:** Number showing linked fabric count or "14ct (default)". If no fabric linked, shows hint text.
   - **Waste factor:** Percentage, default 20%, range 0-50%
-- Labels use 11px uppercase tracking-wider style (compact, informational)
+- Labels use `text-sm uppercase tracking-wider font-semibold` (14px, compact and informational -- visual distinction from body text comes from uppercase + tracking, not a smaller size)
 - Each field uses inline editing (click to edit, Enter to save, Escape to cancel)
 - On mobile: wraps to 2x2 grid
 
@@ -325,10 +325,11 @@ Line 2: 1,250 stitches -> 3 skeins | Need: [3] | Have: [2] | [partial]
 
 ### Supply Deletion
 
-1. User clicks trash icon on supply row
-2. Confirm with toast or immediate deletion (low-stakes -- single row, not project)
-3. Row removed optimistically
-4. On failure: row reappears, error toast
+1. User hovers trash icon -- Tooltip shows "Remove [color name]"
+2. User clicks trash icon on supply row
+3. Confirm with toast or immediate deletion (low-stakes -- single row, not project)
+4. Row removed optimistically
+5. On failure: row reappears, error toast
 
 ### Project Deletion (from Kebab)
 
@@ -365,8 +366,9 @@ Line 2: 1,250 stitches -> 3 skeins | Need: [3] | Have: [2] | [partial]
 | Empty state heading (supplies) | "No supplies added yet" |
 | Empty state body (supplies) | "Add thread colours, beads, or specialty items to track what you need for this project." |
 | Empty state heading (overview, no data) | Not applicable -- overview always shows available metadata |
-| Error state (supply mutation) | "Something went wrong. Please try again." |
-| Error state (status change) | "Something went wrong. Please try again." |
+| Error state (supply save) | "Couldn't save supply changes. Please try again." |
+| Error state (supply delete) | "Couldn't remove this supply. Please try again." |
+| Error state (status change) | "Couldn't update project status. Please try again." |
 | Error state (page load) | "Could not load project details. Please refresh or try again later." |
 | Settings bar default fabric hint | "14ct (default) -- link a fabric for accuracy" |
 | Calculator indicator tooltip | "Auto-calculated from stitch count" |
@@ -385,6 +387,7 @@ Line 2: 1,250 stitches -> 3 skeins | Need: [3] | Have: [2] | [partial]
 | Settings bar labels | "Strands" / "Over" / "Fabric" / "Waste" |
 | Fulfilled indicator (tooltip) | "All acquired" |
 | Partial indicator (tooltip) | "X of Y acquired" |
+| Trash icon tooltip | "Remove [color name]" |
 
 ---
 
@@ -403,6 +406,7 @@ Line 2: 1,250 stitches -> 3 skeins | Need: [3] | Have: [2] | [partial]
 | Delete dialog | Focus trapped, ESC to close (existing Dialog behavior) |
 | All buttons | 44px minimum touch target |
 | Color swatches | Decorative (`aria-hidden="true"`) since color code + name provide text alternative |
+| Trash icon | Wrapped in Tooltip with accessible label "Remove [color name]" |
 
 ---
 
