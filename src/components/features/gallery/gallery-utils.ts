@@ -214,8 +214,10 @@ export function compareFn(
       case "dateAdded":
         result = a.dateAdded.getTime() - b.dateAdded.getTime();
         break;
-      default:
-        result = 0;
+      default: {
+        const _exhaustive: never = field;
+        result = _exhaustive;
+      }
     }
 
     return result * multiplier;

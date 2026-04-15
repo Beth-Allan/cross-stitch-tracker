@@ -1,5 +1,3 @@
-"use client";
-
 import { render, screen } from "@/__tests__/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { GalleryCard } from "./gallery-card";

@@ -350,6 +350,20 @@ describe("compareFn", () => {
     expect(sorter(large, small)).toBeLessThan(0);
   });
 
+  it("sorts by progress ascending (least complete first)", () => {
+    const low = createMockGalleryCard({ progressPercent: 10 });
+    const high = createMockGalleryCard({ progressPercent: 80 });
+    const sorter = compareFn("progress", "asc");
+    expect(sorter(low, high)).toBeLessThan(0);
+  });
+
+  it("sorts by progress descending (most complete first)", () => {
+    const low = createMockGalleryCard({ progressPercent: 10 });
+    const high = createMockGalleryCard({ progressPercent: 80 });
+    const sorter = compareFn("progress", "desc");
+    expect(sorter(high, low)).toBeLessThan(0);
+  });
+
   it("sorts by size descending (BAP > Large > Medium > Small > Mini)", () => {
     const mini = createMockGalleryCard({ sizeCategory: "Mini" });
     const bap = createMockGalleryCard({ sizeCategory: "BAP" });

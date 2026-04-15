@@ -1,6 +1,5 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
 import type { SizeCategory } from "@/lib/utils/size-category";
-import type { ProjectWithRelations, ChartWithProject, SupplyQuantity } from "@/types/chart";
 
 // Re-export for convenience
 export type { ProjectStatus } from "@/generated/prisma/client";
@@ -63,15 +62,3 @@ export interface GalleryCardData {
   ffoDate: Date | null;
   dateAdded: Date;
 }
-
-// ─── Extended Prisma Query Types ────────────────────────────────────────────
-
-export type GalleryProjectWithRelations = ProjectWithRelations & {
-  projectThreads: SupplyQuantity[];
-  projectBeads: SupplyQuantity[];
-  projectSpecialty: SupplyQuantity[];
-};
-
-export type GalleryChartWithProject = Omit<ChartWithProject, "project"> & {
-  project: GalleryProjectWithRelations | null;
-};

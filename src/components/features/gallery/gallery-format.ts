@@ -14,8 +14,9 @@ export function formatNumber(n: number): string {
   return numberFormatter.format(n);
 }
 
-export function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", {
+export function formatDate(date: Date | string): string {
+  const d = date instanceof Date ? date : new Date(date);
+  return d.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
