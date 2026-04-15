@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-11)
 Phase: 07 (skein-calculator-supply-workflow) — Ready to plan
 Plan: Not started
 Status: Phase 06 complete, ready to plan Phase 07
-Last activity: 2026-04-14
+Last activity: 2026-04-15 - Completed quick task 260414-s7s: Fix gallery view mode persistence
 
 Progress: [████████░░] 80%
 
@@ -70,7 +70,9 @@ None.
 
 ### Quick Tasks Completed
 
-See v1.0 quick tasks in `milestones/` archive. New quick tasks will be logged here.
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260414-s7s | Fix gallery view mode persistence — back link loses view param, refresh flashes gallery default | 2026-04-15 | 755e3e4 | [260414-s7s-fix-gallery-view-mode-persistence-back-l](./quick/260414-s7s-fix-gallery-view-mode-persistence-back-l/) |
 
 ## Session Continuity
 
