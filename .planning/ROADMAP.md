@@ -93,7 +93,7 @@ Plans:
   2. App auto-calculates skeins needed from fabric count, strand count, and 20% waste factor, with sensible defaults when no fabric is linked
   3. User can manually override auto-calculated skein quantities and set strand count per project
   4. Supply entries maintain insertion order during data entry so users can verify nothing was skipped
-**Plans:** 6 plans
+**Plans:** 8 plans
 Plans:
 - [x] 07-01-PLAN.md — Data layer: schema, calculator formula, types, validations, server actions
 - [x] 07-02-PLAN.md — Hero: cover banner with blur bg, status badge, kebab menu, metadata
@@ -101,6 +101,8 @@ Plans:
 - [x] 07-04-PLAN.md — Supplies tab: settings bar, two-line supply rows, calculator integration, totals
 - [x] 07-05-PLAN.md — SearchToAdd enhancements: inline create, scroll/positioning/highlight fixes
 - [x] 07-06-PLAN.md — Page wiring, schema push, visual verification checkpoint
+- [ ] 07-07-PLAN.md — Gap closure: Fix section ordering, skein formula, supply button bugs
+- [ ] 07-08-PLAN.md — Gap closure: Supplies tab visual consistency, SearchToAdd color filter
 **UI hint**: yes
 
 ### Phase 8: Dashboards & Collection Views
@@ -163,7 +165,7 @@ Plans:
 | 4. Supplies & Fabric | v1.0 | 10/10 | Complete | 2026-04-10 |
 | 5. Foundation & Quick Wins | v1.1 | 8/8 | Complete | 2026-04-13 |
 | 6. Gallery Cards & View Modes | v1.1 | 4/4 | Complete | 2026-04-15 |
-| 7. Project Detail Experience | v1.1 | 0/6 | Planning complete | - |
+| 7. Project Detail Experience | v1.1 | 6/8 | Gap closure | - |
 | 8. Dashboards & Collection Views | v1.2 | 0/TBD | Not started | - |
 | 9. Session Logging & Activity Stats | v1.2 | 0/TBD | Not started | - |
 | 10. Advanced Stats | v1.3 | 0/TBD | Not started | - |
