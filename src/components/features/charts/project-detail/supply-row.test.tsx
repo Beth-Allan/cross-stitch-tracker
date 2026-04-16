@@ -95,21 +95,21 @@ describe("SupplyRow", () => {
 
   it('shows "Calc: X" text when isNeedOverridden=true and calculatedNeed !== quantityRequired', () => {
     // With 1000 stitches, 2 strands, 14ct, over 2, 20% waste:
-    // calculateSkeins returns 9 (from the formula)
-    // quantityRequired is 10 (manually set, differs from 9), so "Calc: 9" should show
+    // calculateSkeins returns 2 (empirical constant 1.3: 1000 * 2*1.3/7 * 1.2 / 255 = 1.75 -> ceil 2)
+    // quantityRequired is 10 (manually set, differs from 2), so "Calc: 2" should show
     render(
       <SupplyRow
         data={makeThreadRow({
           stitchCount: 1000,
           quantityRequired: 10,
           isNeedOverridden: true,
-          calculatedNeed: 9,
+          calculatedNeed: 2,
         })}
         settings={defaultSettings}
         onRemove={vi.fn()}
       />,
     );
-    expect(screen.getByText(/Calc: 9/)).toBeInTheDocument();
+    expect(screen.getByText(/Calc: 2/)).toBeInTheDocument();
   });
 
   it('does NOT show "Calc: X" when isNeedOverridden=false', () => {
