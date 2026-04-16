@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
+import { Plus, Palette, CircleDot, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { CalculatorSettingsBar } from "./calculator-settings-bar";
 import { SupplySection } from "./supply-section";
@@ -27,6 +27,14 @@ import type {
   ProjectBeadWithBead,
   ProjectSpecialtyWithItem,
 } from "@/types/supply";
+
+// ─── Section Icons ────────────────────────────────────────────────────────────
+
+const SECTION_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  thread: Palette,
+  bead: CircleDot,
+  specialty: Sparkles,
+};
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -302,6 +310,7 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
               <SupplySection
                 data={section}
                 settings={settings}
+                icon={SECTION_ICONS[section.type]}
                 onRemove={handleRemove}
                 onAdd={() => handleOpenSearch(sectionType)}
                 onStitchCountChange={handleStitchCountChange}
@@ -386,6 +395,7 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
             <SupplySection
               data={section}
               settings={settings}
+              icon={SECTION_ICONS[section.type]}
               onRemove={handleRemove}
               onAdd={() => handleOpenSearch(sectionType)}
               onStitchCountChange={handleStitchCountChange}

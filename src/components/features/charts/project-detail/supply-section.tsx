@@ -14,6 +14,7 @@ const numberFormatter = new Intl.NumberFormat();
 interface SupplySectionProps {
   data: SupplySectionData;
   settings: CalculatorSettings;
+  icon: React.ComponentType<{ className?: string }>;
   onRemove: (id: string) => void;
   onAdd: () => void;
   onStitchCountChange: (id: string, newCount: number) => void;
@@ -25,6 +26,7 @@ interface SupplySectionProps {
 export function SupplySection({
   data,
   settings,
+  icon: Icon,
   onRemove,
   onAdd,
   onStitchCountChange,
@@ -45,7 +47,8 @@ export function SupplySection({
         ) : (
           <ChevronRight className="text-muted-foreground size-4 shrink-0" />
         )}
-        <h3 className="font-heading flex-1 text-left text-xl font-semibold">
+        <Icon className="text-muted-foreground size-4 shrink-0" />
+        <h3 className="font-heading flex-1 text-left text-base font-semibold">
           {data.label}
           <span className="text-muted-foreground ml-2 text-sm font-normal">
             ({data.items.length} {data.items.length === 1 ? "colour" : "colours"})
