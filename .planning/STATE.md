@@ -1,36 +1,34 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Browse & Organize
-status: shipped
-stopped_at: Milestone v1.1 complete
-last_updated: "2026-04-16T02:50:00.000Z"
-last_activity: 2026-04-16
+milestone: v1.2
+milestone_name: Track & Measure
+status: defining-requirements
+stopped_at: Defining requirements for v1.2
+last_updated: "2026-04-15T00:00:00.000Z"
+last_activity: 2026-04-15
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 20
-  completed_plans: 20
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-16)
+See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Planning next milestone (v1.2 Track & Measure)
+**Current focus:** Defining requirements for v1.2 Track & Measure
 
 ## Current Position
 
-Phase: Complete (v1.1 shipped)
-Plan: N/A
-Status: Milestone closed
-Last activity: 2026-04-16
-
-Progress: [██████████] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-15 — Milestone v1.2 started
 
 ## Milestone Structure
 
@@ -38,8 +36,8 @@ Progress: [██████████] 100%
 |-----------|-------|--------|--------|
 | v1.0 | MVP — "Replace Notion" | 1-4 | Shipped 2026-04-11 |
 | v1.1 | Browse & Organize | 5-7 | Shipped 2026-04-16 |
-| v1.2 | Track & Measure | 8-9 | Not started |
-| v1.3 | Motivation & Planning | 10-11 | Not started |
+| v1.2 | Track & Measure | TBD | Defining requirements |
+| v1.3 | Motivation & Planning | TBD | Not started |
 
 ## Performance Metrics
 
@@ -68,10 +66,12 @@ None.
 ### Blockers/Concerns
 
 - `.env.local` bcrypt hashes must escape `$` as `\$`
-- Research flags Phase 9 (sessions/statistics) for TypedSQL/CTE research before planning
+- Pattern Dive Browse tab reuses existing gallery infrastructure — minimize duplication
+- Main Dashboard Goals Summary section depends on v1.3 goals — omit or stub
+- What's Next tab priorityRanking depends on v1.3 goals — use simpler heuristics (kitting readiness, size, date)
 
 ## Session Continuity
 
-Last session: 2026-04-16
-Stopped at: Milestone v1.1 complete
+Last session: 2026-04-15
+Stopped at: Defining requirements for v1.2
 Resume file: None
