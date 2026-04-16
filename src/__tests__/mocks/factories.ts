@@ -394,6 +394,33 @@ export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): Gal
   };
 }
 
+// ─── Session Factory ──────────────────────────────────────────────────────
+
+export function createMockStitchSession(
+  overrides?: Partial<{
+    id: string;
+    projectId: string;
+    date: Date;
+    stitchCount: number;
+    timeSpentMinutes: number | null;
+    photoKey: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }>,
+) {
+  return {
+    id: "session-1",
+    projectId: "project-1",
+    date: new Date("2026-04-10"),
+    stitchCount: 150,
+    timeSpentMinutes: 60,
+    photoKey: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
 // ─── Mock Prisma Client ─────────────────────────────────────────────────────
 
 /**
@@ -512,6 +539,15 @@ export function createMockPrisma() {
       update: vi.fn(),
       updateMany: vi.fn(),
       delete: vi.fn(),
+    },
+    stitchSession: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      aggregate: vi.fn(),
+      count: vi.fn(),
     },
     $transaction: vi.fn(),
   };
