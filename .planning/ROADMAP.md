@@ -102,7 +102,7 @@ Plans:
 - [x] 07-05-PLAN.md — SearchToAdd enhancements: inline create, scroll/positioning/highlight fixes
 - [x] 07-06-PLAN.md — Page wiring, schema push, visual verification checkpoint
 - [x] 07-07-PLAN.md — Gap closure: Fix section ordering, skein formula, supply button bugs
-- [ ] 07-08-PLAN.md — Gap closure: Supplies tab visual consistency, SearchToAdd color filter
+- [x] 07-08-PLAN.md — Gap closure: Supplies tab visual consistency, SearchToAdd color filter
 **UI hint**: yes
 
 ### Phase 8: Dashboards & Collection Views
