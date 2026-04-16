@@ -1,260 +1,187 @@
-# Stack Research: Milestone 2 — Browse & Organize
+# Stack Research: Milestone 3 -- Track & Measure (v1.2)
 
-**Domain:** Cross-stitch project management — gallery views, view modes, skein calculation, storage CRUD, DMC data, UX fixes
-**Researched:** 2026-04-11
+**Domain:** Dashboards with aggregated queries, session logging with photo uploads, progress tracking
+**Researched:** 2026-04-16
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Milestone 2 requires **zero new dependencies**. Every feature can be built with the existing stack. The gallery cards, view mode switching, sorting, and table views are all implemented in the DesignOS designs using plain React state + CSS Grid + Tailwind — no data table library needed. The skein calculator is pure arithmetic. Storage locations require a schema migration but no new packages. DMC catalog "completion" is a data correction, not a code change. The cover image fix and thread picker scroll UX are CSS/DOM adjustments.
+v1.2 requires **one new schema model** (StitchSession) and **zero new npm dependencies**. The original project plan listed Recharts, TanStack Table, and dnd-kit as future dependencies, but after reviewing the actual DesignOS components for v1.2 and v1.3, none of these are needed yet:
 
-This is a build milestone, not an integration milestone.
+- **Bar charts (v1.3 only):** The MonthlyChart design is a custom CSS bar chart built with divs, inline styles, and state -- not a charting library. This is a v1.3 feature anyway.
+- **Calendar view (v1.3 only):** The StitchingCalendar design is a custom CSS Grid calendar component. Also v1.3.
+- **Dashboard widgets:** The MainDashboard, ProjectDashboard, and ShoppingCart designs use static sections, not draggable widgets. dnd-kit is not needed.
+- **Table views:** Already built with custom components in v1.1. TanStack Table was never adopted.
+
+The actual v1.2 work involves: Prisma aggregation queries (using existing `aggregate()`, `groupBy()`, and `_count` APIs), a new StitchSession model, reuse of the existing R2 upload pattern for session photos, and building dashboard pages as Server Components with data-fetching.
 
 ## Recommended Stack Changes
 
 ### New Dependencies: NONE
 
-No new packages to install. The existing stack covers all M2 needs.
+No new npm packages required. Every v1.2 feature builds on the existing stack.
 
-### Schema Additions Required
+### Schema Addition: StitchSession Model
 
-| Change | Purpose | Why |
-|--------|---------|-----|
-| `StorageLocation` model | Replace hardcoded `DEFAULT_BIN_OPTIONS` array in `project-setup-section.tsx` | Currently project bins are ephemeral client-side strings. CRUD needs persistence. |
-| `StitchingApp` model | Replace hardcoded `DEFAULT_APP_OPTIONS` array | Same problem — apps are client-state-only, can't be managed. |
-| `ProjectThread.stitchCount` field | Already exists (`Int @default(0)`) | Schema already has this — just needs UI to expose it. |
+The only infrastructure change is a new Prisma model:
 
-The `ProjectThread` model already has a `stitchCount` field (line 182 of schema.prisma). The per-colour stitch count feature is a UI/calculation problem, not a data model problem.
-
-## Feature-by-Feature Stack Analysis
-
-### 1. Gallery Cards with Status-Specific Layouts
-
-**What's needed:** Three card variants (WIP, Unstarted, Finished) with cover images, progress bars, kitting dots, and celebration borders.
-
-**Stack assessment:** Fully covered by existing stack.
-- CSS Grid for responsive card layout (`repeat(auto-fill, minmax(280px, 340px))` per design)
-- Tailwind for status-specific styling (already have 7 status colors in design tokens)
-- `next/image` for optimized cover photos (already used via R2 presigned URLs)
-- `sharp` already installed for thumbnail generation
-- No animation library needed — Tailwind transitions + `tw-animate-css` cover hover/pulse effects
-
-**Confidence:** HIGH — Design components in `product-plan/sections/gallery-cards-and-advanced-filtering/` are pure React + Tailwind, no external deps.
-
-### 2. Gallery / List / Table View Modes with Sorting
-
-**What's needed:** Three view modes (gallery grid, compact list rows, full data table) with client-side sorting.
-
-**Stack assessment:** Fully covered by existing stack.
-- View mode toggle: same pattern as supply catalog's existing grid/table toggle (`supply-catalog.tsx` lines 20, 610-635)
-- Table sorting: the design's `TableView` in `GalleryGrid.tsx` implements sorting with plain React state (`useState<SortField>`, `useState<SortDir>`) — does NOT use @tanstack/react-table
-- View persistence: `localStorage` + URL search params (same pattern as supplies page)
-
-**@tanstack/react-table: NOT needed for M2.** The design spec implements table sorting with ~30 lines of custom code. The library adds value when you need pagination, column resizing, grouping, virtual scrolling, or server-side sorting. M2's table is a simple sortable list of ~500 items rendered client-side. Adding react-table here would over-engineer the solution.
-
-**When to add it:** Milestone 3's Pattern Dive (library browser with filtering) or if the table needs column visibility toggling, multi-column sorting, or pagination. Reassess at M3 planning.
-
-**Confidence:** HIGH — Existing supply catalog already demonstrates this exact pattern.
-
-### 3. Per-Colour Stitch Counts & Automatic Skein Calculator
-
-**What's needed:** Per-thread stitch count entry on `ProjectThread`, automatic skein calculation based on fabric count and strand count.
-
-**Stack assessment:** Pure arithmetic — no external library needed.
-
-**Skein calculation formula (verified from multiple cross-stitch sources):**
-
-```
-skeinsNeeded = ceil(stitchCountForColour / stitchesPerSkein * safetyMultiplier)
+```prisma
+model StitchSession {
+  id               String   @id @default(cuid())
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        String
+  date             DateTime @db.Date
+  stitchCount      Int
+  timeSpentMinutes Int?
+  photoUrl         String?
+  photoThumbnailUrl String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
 ```
 
-Where `stitchesPerSkein` is a lookup based on fabric count (using 2 strands, the standard):
+This requires adding `sessions StitchSession[]` to the Project model and running `prisma db push` + `prisma generate`.
 
-| Fabric Count | Stitches per Skein (2 strands) | Source |
-|--------------|-------------------------------|--------|
-| 14-count | ~220 | Community consensus |
-| 16-count | ~260 | Community consensus |
-| 18-count | ~290 | Community consensus, eponases.com experiment |
-| 25-count (over 2) | ~220 | Equivalent to 12.5ct |
-| 28-count (over 2) | ~250 | Equivalent to 14ct |
-| 32-count (over 2) | ~280 | Equivalent to 16ct |
+## Technology Decisions
 
-**Safety multiplier:** 1.2 (20% — industry standard for thread tails and waste).
+### Charting: Do NOT add Recharts for v1.2
 
-**Implementation approach:**
-- Store a reference table of stitches-per-skein as a TypeScript constant (not a DB table — well-known reference data)
-- Formula variables: `fabricCount` (from linked Fabric), `strandCount` (default 2, could add to ProjectThread), `stitchCount` (per colour, already in schema)
-- Calculate at query time (per project convention — never store calculated values)
-- Label results as "estimated" with manual override option on `quantityRequired`
+| Decision | Rationale |
+|----------|-----------|
+| No charting library in v1.2 | v1.2 has no chart/graph features. MonthlyChart and StitchingCalendar are v1.3 (Motivation & Planning). |
+| When v1.3 arrives, evaluate CSS-only vs Recharts | The DesignOS MonthlyChart is a custom div-based bar chart (~200 lines). Building it as CSS/React is cleaner than introducing a 50KB dependency for one simple bar chart. |
+| If Recharts is ever added, pin `3.8.1` | Current version, React 19 compatible. Use `next/dynamic` to lazy-load on chart pages only. |
 
-**Schema notes:**
-- `ProjectThread.stitchCount` — already exists, `Int @default(0)`
-- May want to add `strandCount Int @default(2)` to `ProjectThread` for non-standard projects
-- Fabric `count` field already exists on `Fabric` model and links to Project via `linkedProjectId`
+**Confidence:** HIGH -- verified by reading DesignOS components and the PROJECT.md milestone scoping.
 
-**Confidence:** MEDIUM on lookup values — The stitches-per-skein values are approximate and vary by stitcher technique. Multiple sources agree within ~10%. The formula itself is definitive; the lookup values are community consensus, not manufacturer-specified.
+### Calendar: Do NOT add a calendar/date-picker library
 
-### 4. Storage Location Management (CRUD)
+| Decision | Rationale |
+|----------|-----------|
+| Use native `<input type="date">` for session logging | The LogSessionModal design uses `type="date"` directly. Works on all target platforms (Mac Safari, Chrome, iOS Safari). |
+| Build custom calendar grid for v1.3 | The StitchingCalendar design is a CSS Grid component, not a date-picker widget. It displays session data on a monthly grid, not select dates. |
 
-**What's needed:** Replace hardcoded arrays (`DEFAULT_BIN_OPTIONS`, `DEFAULT_APP_OPTIONS`) with proper database-backed CRUD.
+**Confidence:** HIGH -- verified against LogSessionModal.tsx and StitchingCalendar.tsx designs.
 
-**Stack assessment:** Standard Prisma model + server actions. Identical pattern to existing Designer and Genre CRUD.
+### Dashboard Queries: Prisma aggregation (existing API)
 
-**Current state (from `project-setup-section.tsx`):**
+| Pattern | When to Use | Example |
+|---------|-------------|---------|
+| `findMany` with `_count` | Counting related records (status breakdowns, supply counts) | Already used throughout (designer chartCount, storage projectCount) |
+| `aggregate` with `_sum`, `_avg`, `_count` | Single-model totals (total stitches completed, avg per session) | `prisma.stitchSession.aggregate({ _sum: { stitchCount: true }, _count: { _all: true } })` |
+| `groupBy` with aggregation | Monthly totals, per-project breakdowns, progress buckets | `prisma.stitchSession.groupBy({ by: ['projectId'], _sum: { stitchCount: true } })` |
+| `$queryRaw<T>` | Complex multi-table aggregation if Prisma API is awkward | Typed raw SQL with manual type annotation. Reserve for "collection stats" if Prisma DSL produces too many queries. |
+
+**Key pattern: Prefer Prisma API, fall back to $queryRaw only when measured.**
+
+For v1.2's ~500 records, Prisma's built-in aggregation is more than sufficient. No need for raw SQL, CTEs, or window functions at this scale. The single-user architecture means concurrent load is never a concern.
+
+**Confidence:** HIGH -- Prisma 7 `aggregate()` and `groupBy()` verified via Context7. Already have `_count` usage across 8+ action files.
+
+### Session Photo Uploads: Reuse existing R2 pattern
+
+The upload infrastructure is already built and battle-tested:
+
+| Component | Exists | Reuse Strategy |
+|-----------|--------|---------------|
+| `getPresignedUploadUrl()` | Yes (upload-actions.ts) | Extend to accept `"sessionPhotoUrl"` field type |
+| `sharp` thumbnail generation | Yes (upload-actions.ts) | Same pattern for session photo thumbnails |
+| `nanoid` key generation | Yes | Same `sessions/{nanoid}` key pattern |
+| R2 client singleton | Yes (lib/r2.ts) | No changes needed |
+| Client-side upload flow | Yes (components/features/) | Adapt existing upload button pattern |
+
+No new infrastructure. The only work is extending the existing upload action to handle a new entity type (StitchSession instead of Chart).
+
+**Confidence:** HIGH -- existing code reviewed.
+
+### Auto-updating Progress: Server action pattern
+
+When a session is logged, `stitchesCompleted` on the Project must update. This follows the existing server action pattern:
+
 ```typescript
-const DEFAULT_BIN_OPTIONS = ["Bin A", "Bin B", "Bin C", "Bin D"];
-const DEFAULT_APP_OPTIONS = ["Markup R-XP", "Saga", "MacStitch"];
+// In session-actions.ts (new file)
+await prisma.$transaction(async (tx) => {
+  // 1. Create the session
+  const session = await tx.stitchSession.create({ data: { ... } });
+  // 2. Recalculate project progress from all sessions
+  const total = await tx.stitchSession.aggregate({
+    where: { projectId },
+    _sum: { stitchCount: true },
+  });
+  // 3. Update project
+  await tx.project.update({
+    where: { id: projectId },
+    data: { stitchesCompleted: project.startingStitches + (total._sum.stitchCount ?? 0) },
+  });
+  return session;
+});
 ```
-These are client-side-only. Adding "New Location" creates a state entry that doesn't persist. This is backlog item 999.0.14.
 
-**What's needed:**
-- `StorageLocation` model (id, name, createdAt, updatedAt)
-- `StitchingApp` model (id, name, createdAt, updatedAt)
-- Server actions for create/update/delete (same pattern as designers)
-- Update `Project.projectBin` from `String?` to a relation to `StorageLocation`
-- Update `Project.ipadApp` from `String?` to a relation to `StitchingApp`
-- Migration to move existing string values to new tables
+Uses `$transaction` (already used for supply actions), `aggregate` for summing, and `revalidatePath` for cache invalidation.
 
-No new dependencies — this is the same CRUD pattern used 6+ times already in the codebase.
+**Confidence:** HIGH -- follows established patterns.
 
-**Confidence:** HIGH
+### Dashboard Data Fetching: Server Components
 
-### 5. Wire Fabric Selector into Chart Form
+v1.2 dashboards are read-heavy pages with aggregated data. The established pattern is:
 
-**What's needed:** Replace the disabled "Phase 5" placeholder in `project-setup-section.tsx` with a working fabric dropdown.
+| Pattern | Used For |
+|---------|----------|
+| Server Component page fetches data | All dashboard pages (MainDashboard, ProjectDashboard, PatternDive, ShoppingCart) |
+| Server actions for aggregation queries | `getCollectionStats()`, `getProgressBuckets()`, `getCurrentlyStitching()` etc. |
+| Client Components only for interactivity | Tab switching, sort dropdowns, expand/collapse, modal triggers |
+| `nuqs` for URL tab state | Pattern Dive tabs, Project Dashboard tabs -- already used for project detail tabs |
 
-**Stack assessment:** No new deps. The existing `SearchableSelect` component + fabric server actions already exist.
+No data-fetching library (SWR, React Query) needed. Single-user app with server-side data loading.
 
-**Current state:** `project-setup-section.tsx` line 67-74 has a hardcoded disabled placeholder. Fabric CRUD already works (`/fabrics` page). The `Fabric` model has `linkedProjectId` for 1:1 project linking.
+**Confidence:** HIGH -- follows v1.1 patterns (gallery, project detail).
 
-**What's needed:**
-- Fetch unassigned fabrics (where `linkedProjectId IS NULL` or equals current project)
-- Wire into `SearchableSelect` options
-- On selection, update `Fabric.linkedProjectId`
-- Show linked fabric details (count, type, size)
+## Alternatives Considered
 
-**Confidence:** HIGH — All building blocks exist.
+| Category | Recommended | Alternative | Why Not |
+|----------|-------------|-------------|---------|
+| Charting | CSS bar chart (v1.3) | Recharts 3.8.1 | 50KB bundle for one simple bar chart. DesignOS already designs it as custom divs. Revisit if v1.3 needs complex charts beyond bar. |
+| Calendar | Custom CSS Grid (v1.3) | react-day-picker | The calendar shows session data in a grid, not a date-picker. Different component entirely. |
+| Date input | Native `<input type="date">` | @base-ui/react date-picker | Base UI doesn't have a date picker. Native input works on all target platforms and matches the DesignOS design. |
+| Dashboard aggregation | Prisma `aggregate`/`groupBy` | Raw SQL | Unnecessary at single-user scale (~500 projects, ~10k sessions max). If performance issues arise, add raw SQL for specific queries. |
+| TypedSQL | Not yet | Prisma TypedSQL (preview) | Still a preview feature in Prisma 7. Risk of breaking changes. `$queryRaw<T>` with manual types is safer if raw SQL is needed. |
+| Data fetching | Server Components | SWR / React Query | Single-user, no real-time needs, no cache invalidation complexity. Server Components + revalidatePath is sufficient. |
+| Drag-and-drop widgets | Not in v1.2 | dnd-kit | DesignOS designs have static section layouts, not draggable widgets. Deferred indefinitely per current designs. |
+| Data tables | Custom table components | TanStack Table | Already built custom tables in v1.1 that work well. No need to introduce a new dependency. |
 
-### 6. Complete DMC Catalog
+## Existing Stack Reuse Map
 
-**What's needed:** Fill gaps in the DMC thread fixture.
+| v1.2 Feature | Existing Stack Component | Notes |
+|-------------|------------------------|-------|
+| Main Dashboard | Server Components, `findMany` with includes | Aggregation queries for stats sidebar |
+| Collection Stats | `prisma.project.count()` + `groupBy` on status | Simple counts, no joins needed |
+| Currently Stitching | `findMany` with `where: { status: "IN_PROGRESS" }` | Reuses gallery card data shape |
+| Buried Treasures | `findMany` + `orderBy: { chart: { dateAdded: "asc" } }` | Oldest unstarted, limit 5 |
+| Spotlight | `findMany` + random offset | Single random project |
+| Pattern Dive tabs | `nuqs` URL state, existing gallery components | What's Next, Fabric Req, Storage View |
+| Project Dashboard | `groupBy` on progress buckets, `findMany` for finished | Progress % calculated at query time |
+| Shopping Cart upgrade | Existing shopping-actions.ts + new filters | Per-project selection, tabbed supply types |
+| Session logging | New `StitchSession` model + server action | Modal pattern matches existing modals |
+| Session photo upload | Existing R2 presigned URL pattern | Same as cover image uploads |
+| Auto-updating progress | `$transaction` + `aggregate` | Same transaction pattern as supply actions |
+| Project Sessions tab | New tab on existing project detail | `nuqs` tab state already in place |
 
-**Critical finding: DMC standard 6-strand floss does NOT have numbers 1-149.** The backlog item "DMC 1-149 including Blanc, Ecru" is based on a misunderstanding of the DMC numbering system.
+## Installation
 
-**Current fixture analysis:**
-- 459 colors in `prisma/fixtures/dmc-threads.json`
-- Has: White, Ecru, B5200, and all standard colors 150-3866
-- Missing: "Blanc" (French name for White — some patterns reference "Blanc" vs "White")
-- The lowest standard DMC floss numbers are 150, 151, 152...
-- Numbers 1-35 are reserved for DMC metallic/specialty threads (Diamant), NOT standard floss
-- Numbers 36-149 do not exist in the DMC product line
+No new packages to install. Schema migration only:
 
-**What actually needs to happen:**
-1. Add "Blanc" as an entry (hex #FCFBF8, same as White) — many patterns use this name
-2. Cross-reference against the GitHub `rgb-to-dmc` dataset (447 colors) and the full DMC catalog (489-500 colors depending on region) to identify genuinely missing colors
-3. Verify the 459-color fixture against DMC's US catalog of 489 — the delta of ~30 colors may include regional exclusives or recently added colors
-4. Consider adding the 10 "missing from US site" colors reported by community: 13, 14, 15, 16, 17, 18, 677, 734, 822, 988 (these are apparently valid but hard to source)
-
-**Data source for completion:** The `rgb-to-dmc` GitHub repo (https://github.com/seanockert/rgb-to-dmc/blob/master/rgb-dmc.json) provides a verified JSON dataset. Cross-reference with the existing fixture to find genuine gaps.
-
-**No new dependencies needed** — this is a seed data file update.
-
-**Confidence:** HIGH for the finding that DMC 1-149 don't exist as standard floss. MEDIUM for the exact count of missing colors — needs a diff between our fixture and the authoritative list.
-
-### 7. Cover Image Aspect Ratio Fix
-
-**What's needed:** Fix `h-32 + object-cover` cropping tall/square images into narrow strips.
-
-**Stack assessment:** Pure CSS fix. No new deps.
-
-**Current state:** `cover-image-upload.tsx` line ~155 uses fixed height container with `object-cover`, which clips non-landscape images badly.
-
-**Design spec approach:** Gallery cards use `aspect-[4/3]` containers (GalleryCard.tsx line 473), which is better than fixed height. The detail page uses `aspect-[4/3] max-h-80` (chart-detail.tsx line 187).
-
-**Fix:** Replace fixed `h-32` with `aspect-[4/3]` or use `object-contain` with a background color. This is a Tailwind class change.
-
-**Confidence:** HIGH
-
-### 8. Thread Colour Picker Scroll UX Fix
-
-**What's needed:** Auto-scroll to keep search box/+Add button visible when adding thread colours.
-
-**Stack assessment:** Native DOM `scrollIntoView()` — no library needed.
-
-**Fix location:** `search-to-add.tsx` and/or `project-supplies-tab.tsx`. After adding an item, call `element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })` on the search input or add button.
-
-**Confidence:** HIGH
-
-### 9. Supply Entry Workflow Rework
-
-**What's needed:** Maintain insertion order during entry, streamlined project setup flow.
-
-**Stack assessment:** No new deps. This is a UX restructure of existing components.
-
-**Current state:** Supplies are added via `SearchToAdd` in `project-supplies-tab.tsx`. Order is determined by the database (createdAt). The rework needs:
-- Preserve insertion order in the UI during entry (use `createdAt` or add a `sortOrder` field)
-- Consider a dedicated "set up project" flow combining chart + supply entry
-- Detail page can sort independently of entry order
-
-**Potential schema addition:** `sortOrder Int?` on junction tables if insertion order must be explicitly tracked separate from `createdAt`. But `createdAt` sorting likely suffices.
-
-**Confidence:** HIGH — UI flow change, not a technology change.
-
-## What NOT to Add for M2
-
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| `@tanstack/react-table` | Over-engineered for M2's simple sortable table. Design spec implements sorting in ~30 lines. 500-row client-side sort is trivial. | Custom sort with `useState` + `Array.sort()` (matches design spec) |
-| `react-virtualized` / `@tanstack/virtual` | Only needed for 10k+ items. 500 charts render fine without virtualization. | Standard React rendering |
-| `framer-motion` | Gallery card hover effects are simple CSS transitions. No complex animations in M2. | Tailwind transitions + `tw-animate-css` |
-| Any chart/graph library | M2 has no charts or graphs. Progress bars are Tailwind width classes. | `w-[${percent}%]` on a div |
-| `@dnd-kit/core` | No drag-and-drop in M2 scope. | Not needed until M4 dashboard widgets |
-| `nuqs` / `next-usequerystate` | URL state management lib. Existing `useSearchParams` + `router.replace` pattern works. | Continue existing pattern from supply catalog |
-| `date-fns` | M2 date formatting is simple (`toLocaleDateString`). | Native `Intl.DateTimeFormat` (already used in chart-list.tsx) |
-| `lodash` | No complex data transforms needed. Native array methods suffice. | `Array.sort()`, `Array.filter()`, `Array.reduce()` |
-
-## Existing Stack Sufficiency Matrix
-
-| M2 Feature | Existing Tech | New Tech Needed | Confidence |
-|------------|--------------|-----------------|------------|
-| Gallery cards | React + Tailwind + CSS Grid | None | HIGH |
-| View mode switching | useState + localStorage + URL params | None | HIGH |
-| Table sorting | useState + Array.sort() | None | HIGH |
-| Skein calculator | Pure TypeScript arithmetic | None | HIGH |
-| Storage location CRUD | Prisma + server actions + Zod | Schema migration only | HIGH |
-| Fabric selector wiring | SearchableSelect + Fabric model | None | HIGH |
-| DMC catalog completion | Seed data JSON fixture | Data update only | HIGH |
-| Cover image aspect ratio | Tailwind CSS classes | None | HIGH |
-| Thread picker scroll UX | DOM scrollIntoView() | None | HIGH |
-| Supply workflow rework | React component restructure | None | HIGH |
-
-## Version Compatibility Notes
-
-No new packages means no new compatibility concerns. Current installed versions:
-
-| Package | Installed Version | M2 Notes |
-|---------|------------------|----------|
-| Next.js | 16.2.2 | No M2-specific concerns |
-| Prisma | 7.6.0 | Schema migration for StorageLocation/StitchingApp models |
-| React | 19.2.4 | No M2-specific concerns |
-| Tailwind | 4.2.2 | `aspect-[4/3]` works natively in v4, needed for gallery cards |
-| sharp | 0.33.5 | Already installed (devDep), used for thumbnail generation |
-| cmdk | 1.1.1 | Already installed, powers SearchableSelect for fabric selector |
-| lucide-react | 1.7.0 | Gallery card icons (Scissors, Clock, Calendar, Check, etc.) already available |
+```bash
+# Add StitchSession model to prisma/schema.prisma
+npx prisma db push
+npx prisma generate
+```
 
 ## Sources
 
-- **Skein calculation formula:** [Cross Stitch Style Arte](https://crossstitchstylearte.com/how-to-calculate-the-exact-amount-of-thread-needed-for-any-cross-stitch-project/) — stitches-per-skein lookup table by fabric count, MEDIUM confidence
-- **Skein calculation formula:** [Eponases blog](https://www.eponases.com/blog/2014/01/cross-stitch-stitches-per-skein/) — experimental measurement ~3000 stitches/skein on 18ct, MEDIUM confidence
-- **Skein calculators (formula cross-reference):** [Thread-bare estimator](https://www.thread-bare.com/tools/cross-stitch-skein-estimator), [Lord Libidan calculator](https://lordlibidan.com/calculate-the-number-of-required-skeins/), [Textile Calculator](https://textilecalculator.com/cross-stitch-skein-calculator/)
-- **DMC catalog scope:** [How many DMC threads are there](https://lordlibidan.com/how-many-dmc-threads-are-there/) — 500 solid colors, 489 available US, HIGH confidence
-- **DMC numbering:** [Maydel Craft DMC guide](https://maydel.com/2021/01/13/demystifying-dmc-part-1-6-strand-floss/) — numbering system, missing US colors list, HIGH confidence
-- **DMC catalog data:** [rgb-to-dmc GitHub](https://github.com/seanockert/rgb-to-dmc/blob/master/rgb-dmc.json) — 447-color JSON with hex codes, verified against existing fixture
-- **Design spec (gallery):** `product-plan/sections/gallery-cards-and-advanced-filtering/` — GalleryCard.tsx, GalleryGrid.tsx, AdvancedFilterBar.tsx, types.ts
-- **Existing patterns (view modes):** `src/components/features/supplies/supply-catalog.tsx` — grid/table view toggle, localStorage persistence, URL param sync
-- **Existing patterns (chart list):** `src/components/features/charts/chart-list.tsx` — current table/card layout being replaced
-- **Schema reference:** `prisma/schema.prisma` — ProjectThread.stitchCount already exists (line 182), Fabric.linkedProjectId for selector (line 243)
-
----
-*Stack research for: Milestone 2 — Browse & Organize*
-*Researched: 2026-04-11*
+- Prisma aggregation API: Context7 `/prisma/skills` -- `aggregate()`, `groupBy()`, `$queryRaw` (HIGH confidence)
+- Prisma raw SQL: Context7 `/prisma/skills` -- `$queryRaw<T>` with typed results (HIGH confidence)
+- Recharts 3.8.1: npm registry, Bundlephobia (~50KB gzipped) (MEDIUM confidence -- version current as of 2026-03-25)
+- TypedSQL status: Prisma docs -- still preview feature in Prisma 7 (MEDIUM confidence -- may have stabilized since last check)
+- DesignOS components: Local files in `product-plan/sections/` (HIGH confidence -- these are the source of truth)
+- Existing upload pattern: `src/lib/actions/upload-actions.ts` (HIGH confidence -- reviewed directly)
+- Existing aggregation patterns: `_count` in 8+ action files (HIGH confidence -- reviewed directly)

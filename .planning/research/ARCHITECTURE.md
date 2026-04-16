@@ -1,548 +1,660 @@
 # Architecture Research
 
-**Domain:** Cross-stitch project management — Milestone 2 (Browse & Organize)
-**Researched:** 2026-04-11
+**Domain:** Cross-stitch project management -- Milestone 3 (Track & Measure)
+**Researched:** 2026-04-16
 **Confidence:** HIGH
 
 ## System Overview
 
-Milestone 2 adds gallery browsing, storage location management, and supply entry improvements to an existing Next.js 16 App Router codebase. The architecture extends existing patterns rather than introducing new ones.
+Milestone 3 adds session logging, dashboards, and progress tracking to the existing codebase. This is the first milestone that introduces a **write-heavy interactive model** (StitchSession) alongside **aggregation-heavy read pages** (dashboards). The architecture must handle:
+
+1. A new Prisma model (StitchSession) with CRUD + aggregation queries
+2. A global-access modal (Log Session) triggered from multiple locations
+3. Three new dashboard pages with complex multi-table read queries
+4. Auto-updating progress on Project when sessions are logged
+5. Pattern Dive: evolving the existing Charts page with additional tabs
 
 ```
-┌���──────────────────────────��─────────────────────────────────────────┐
-│                        Route Layer (App Router)                      │
-├───────────────────────────────────���─────────────────────────────────┤
-│  ┌───────────┐  ┌────��───────┐  ┌──────────┐  ┌─���───────────────┐  │
-│  │ /charts   │  │ /charts/   │  │ /settings │  │ /settings/      │  │
-│  │ page.tsx  │  │ [id]/      │  │ /storage  │  │ /storage/[id]   │  │
-│  │ (MODIFY)  │  │ page.tsx   │  │ (NEW)     │  │ (NEW)           │  │
-│  └─────┬─────┘  └─────┬──────┘  └──���──┬─────┘  └────────┬────────┘  │
-│        │              │              │               │              │
-├────────┴──────────────┴���─────────────┴───────────────┴──────────────┤
-│                     Feature Components                               │
-├────────��──────────────────────────��─────────────────────────────────┤
-│  ┌─────────────┐ ┌──────��─────┐ ┌──────────────┐ ┌──────────────┐  │
-│  │ GalleryGrid │ │ GalleryCard│ │ StorageLoc   │ │ SkeinCalc    ���  │
-│  │ (NEW)       │ │ (NEW)      │ │ List/Detail  │ │ (NEW util)   │  │
-│  │ "use client"�� │ "use client│ │ (NEW)        │ │ server-side  │  │
-│  └──────┬──────┘ └──────┬─────┘ └──────┬───────┘ └──────┬───────┘  │
-│         │              │              │               │              │
-│  ┌──────────────┐ ┌��───────────┐ ┌────���─────────┐                   │
-│  │ ViewMode     │ │ Supply     │ │ FabricSelect │                   │
-���  │ Switcher     │ │ Entry      │ │ (MODIFY)     │                   │
-│  ��� (NEW)        │ │ (MODIFY)   │ │              │                   │
-│  └──────────────┘ └────────────┘ └────��─────────┘                   │
-├────────��────────────────────────────────────────────────────────────┤
-│                     Server Actions                                   │
-│  ┌──────────────┐ ┌───────��──────┐ ┌──────────────┐                 │
-│  │ chart-actions│ │ storage-     │ │ supply-      │                 │
-│  │ (MODIFY)     │ │ actions (NEW)│ │ actions      │                 │
-│  │ gallery query│ │ CRUD         │ │ (MODIFY)     │                 │
-│  └──────────────┘ └──────────────┘ └──────────────┘                 ���
-├─────────���────────────────────────────────────��──────────────────────┤
-│                     Database (Prisma 7 / Neon)                       │
-│  ┌───────────┐  ┌───────────────┐  ┌──────────────────────────┐     │
-│  │ Chart     │  │ StorageLoc    │  │ ProjectThread            │     │
-│  │ Project   │  │ (NEW model)   │  │ (stitchCount field       │     │
-│  �� (existing)│  │               │  │  already exists)         │     │
-│  └───────���───┘  └────────���──────┘  └─���────────────────────────┘     │
-└─────────────────────────────────────────────────────────────────��───┘
++------------------------------------------------------------------------+
+|                        Route Layer (App Router)                         |
++------------------------------------------------------------------------+
+| +-------------+ +----------+ +----------+ +----------+ +-------------+ |
+| | / (home)    | | /charts  | | /charts/ | | /projects| | /shopping   | |
+| | page.tsx    | | page.tsx | | [id]     | | page.tsx | | page.tsx    | |
+| | REPLACE:    | | RENAME:  | | MODIFY:  | | NEW:     | | MODIFY:     | |
+| | MainDash    | | Pattern  | | Sessions | | Project  | | Shopping    | |
+| |             | | Dive     | | tab      | | Dash     | | Cart v2     | |
+| +------+------+ +-----+----+ +----+-----+ +----+-----+ +------+------+ |
+|        |              |            |            |              |        |
++--------+--------------+------------+------------+--------------+--------+
+|                   Feature Components Layer                              |
++------------------------------------------------------------------------+
+| NEW:                          | MODIFIED:         | REUSED:             |
+| +------------------+          | +-----------+     | +---------------+   |
+| | MainDashboard    |          | | project-  |     | | GalleryGrid   |   |
+| | (Server+Client)  |          | | detail    |     | | GalleryCard   |   |
+| +------------------+          | | page.tsx  |     | | FilterBar     |   |
+| | PatternDiveTabs  |          | +-----------+     | | ViewToggle    |   |
+| | (Client)         |          | | project-  |     | | gallery-utils |   |
+| +------------------+          | | gallery   |     | +---------------+   |
+| | ProjectDashboard |          | | .tsx      |     |                     |
+| | (Server+Client)  |          | +-----------+     |                     |
+| +------------------+          | | shopping- |     |                     |
+| | LogSessionModal  |          | | list.tsx  |     |                     |
+| | (Client, global) |          | +-----------+     |                     |
+| +------------------+          |                   |                     |
+| | SessionsTab      |          |                   |                     |
+| | (Client)         |          |                   |                     |
+| +------------------+          |                   |                     |
+| | WhatsNextTab     |          |                   |                     |
+| | FabricReqTab     |          |                   |                     |
+| | StorageViewTab   |          |                   |                     |
+| +------------------+          |                   |                     |
++------------------------------------------------------------------------+
+|                   Server Actions Layer                                  |
++------------------------------------------------------------------------+
+| NEW:                          | MODIFIED:                              |
+| +------------------+          | +-----------------+                    |
+| | session-actions  |          | | chart-actions   |                    |
+| | .ts (CRUD +      |          | | .ts (progress   |                    |
+| | aggregation)     |          | | update, new     |                    |
+| +------------------+          | | query fns)      |                    |
+| | dashboard-       |          | +-----------------+                    |
+| | queries.ts       |          | | shopping-       |                    |
+| | (read-only       |          | | actions.ts      |                    |
+| | aggregations)    |          | | (upgrade)       |                    |
+| +------------------+          | +-----------------+                    |
++------------------------------------------------------------------------+
+|                   Database (Prisma 7 / Neon)                           |
++------------------------------------------------------------------------+
+| NEW:                          | MODIFIED:                              |
+| +------------------+          | +------------------+                   |
+| | StitchSession    |          | | Project          |                   |
+| | (write-heavy)    |          | | (stitchesComp-   |                   |
+| +------------------+          | |  leted updated   |                   |
+|                               | |  by session sum) |                   |
+|                               | +------------------+                   |
++------------------------------------------------------------------------+
 ```
 
 ### Component Responsibilities
 
 | Component | Responsibility | New vs Modified |
 |-----------|----------------|-----------------|
-| `/charts/page.tsx` | Server Component: fetches gallery data, resolves images, passes to GalleryGrid | **MODIFY** -- replace ChartList with GalleryGrid |
-| `GalleryGrid` | Client Component: renders gallery/list/table views, manages sort state | **NEW** |
-| `GalleryCard` | Client Component: status-specific card layouts (WIP/Unstarted/Finished) | **NEW** |
-| `ViewModeSwitcher` | Client Component: gallery/list/table toggle, persists to localStorage | **NEW** |
-| `/settings/storage/` | Server Component: fetches storage locations | **NEW route** |
-| `StorageLocationList` | Client Component: inline CRUD for storage locations | **NEW** |
-| `StorageLocationDetail` | Client Component: shows projects in a location | **NEW** |
-| `storage-actions.ts` | Server Actions: StorageLocation CRUD | **NEW** |
-| `skein-calculator.ts` | Pure utility: calculates skeins from stitch count + fabric count | **NEW** |
-| `ProjectSuppliesTab` | Client Component: supply entry with per-colour stitch counts | **MODIFY** |
-| `SearchToAdd` | Client Component: thread picker with scroll fix | **MODIFY** |
-| `ProjectSetupSection` | Client Component: fabric selector + storage location dropdown | **MODIFY** |
-| `cover-image-upload.tsx` | Client Component: fix aspect ratio preview | **MODIFY** |
+| `/ (dashboard page)` | Server Component: fetch dashboard data, render MainDashboard | **REPLACE** placeholder |
+| `/charts` (Pattern Dive) | Server Component: fetch gallery + tab-specific data; rename route display | **MODIFY** heavily |
+| `/projects` (Project Dashboard) | Server Component: fetch hero stats + progress buckets + finished | **NEW route** |
+| `/charts/[id]` Sessions tab | Client Component: session table + mini stats inside project tabs | **MODIFY** add tab |
+| `/shopping` | Server Component: upgrade to ShoppingCart v2 with tabs | **MODIFY** |
+| `LogSessionModal` | Client Component: global modal accessible from header, FAB, project detail | **NEW** (global) |
+| `session-actions.ts` | Server Actions: create/update/delete session + progress recalculation | **NEW** |
+| `dashboard-queries.ts` | Read-only query functions: collection stats, progress buckets, etc. | **NEW** |
+| `MainDashboard` | Client Component: Currently Stitching, Start Next, Buried Treasures, Spotlight | **NEW** |
+| `PatternDiveTabs` | Client Component: Browse (existing gallery), What's Next, Fabric Reqs, Storage | **NEW** wrapping existing |
+| `ProjectDashboard` | Client Component: hero stats, progress breakdown, finished tab | **NEW** |
+| `WhatsNextTab` | Client Component: pre-filtered project list for kitted/flagged projects | **NEW** |
+| `FabricRequirementsTab` | Client Component: fabric size calculator per project | **NEW** |
+| `StorageViewTab` | Client Component: projects grouped by storage location | **NEW** |
+| `SessionsTab` | Client Component: per-project session history with mini stats | **NEW** |
 
 ## Data Model Changes
 
-### New Model: StorageLocation
-
-The `projectBin` field on `Project` is currently a free-text `String?` with hardcoded dropdown options in `project-setup-section.tsx`. This needs to become a proper entity to support CRUD management.
+### New Model: StitchSession
 
 ```prisma
-model StorageLocation {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  projects  Project[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+model StitchSession {
+  id               String   @id @default(cuid())
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        String
+  date             DateTime
+  stitchCount      Int
+  photoUrl         String?
+  timeSpentMinutes Int?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([projectId, date])
 }
 ```
 
-**Migration strategy:** Add `StorageLocation` model, add optional `storageLocationId` to `Project`, write a data migration script that creates `StorageLocation` rows from existing distinct `projectBin` values and links projects, then drop the `projectBin` column.
+**Key decisions:**
+
+- **`date` as DateTime (not String):** Prisma/Postgres date comparisons and groupBy work natively. The design shows `date` as a date-only string in the UI, but we store as `DateTime` with time zeroed for aggregation performance. Alternatively, store as `@db.Date` if Prisma 7 supports it (needs verification) -- otherwise `DateTime` with midnight convention works.
+- **`@@index([projectId, date])`:** Every dashboard query either filters by projectId or groups by date. This compound index covers the two hottest access patterns.
+- **`onDelete: Cascade`:** When a project is deleted, its sessions should go too.
+- **No `userId` on StitchSession:** The project already has `userId`. Sessions are scoped through the project's ownership. All session queries should join through Project for auth.
+- **`photoUrl` is R2 key:** Same pattern as cover images -- presigned URLs resolved server-side.
+
+### Modified Model: Project
 
 ```prisma
 model Project {
   // ... existing fields ...
-  // projectBin           String?            // REMOVE after migration
-  storageLocation      StorageLocation?   @relation(fields: [storageLocationId], references: [id], onDelete: SetNull)
-  storageLocationId    String?
-  // ... rest of fields ...
+  sessions StitchSession[]  // NEW relation
+  // stitchesCompleted remains Int @default(0) -- updated when sessions change
 }
 ```
 
-**Why `onDelete: SetNull`:** Deleting a storage location should not cascade-delete projects. The location reference simply becomes null, matching the design spec ("Projects in this location won't be deleted").
+**Progress update strategy:** `stitchesCompleted` on Project is recalculated as `startingStitches + SUM(sessions.stitchCount)` after every session create/update/delete. This keeps the "calculated at query time" principle while avoiding expensive aggregation in every gallery card render. The recalculation happens inside the session server action's transaction.
 
-### No New Fields for Per-Colour Stitch Counts
+## Integration Patterns
 
-`ProjectThread` already has `stitchCount Int @default(0)` at line 181 of `schema.prisma`. The field exists but the UI does not expose it for editing beyond display. This is a UI-only change -- wire up inline editing of `stitchCount` in the `SupplyRow` component within `project-supplies-tab.tsx`.
+### 1. Log Session Modal -- Global State Access
 
-### No New Fields for Skein Calculator
+The LogSessionModal needs to be accessible from 3+ locations:
+- TopBar "Log Stitches" button (already exists as toast placeholder)
+- FAB (floating action button) on mobile
+- Project detail page Sessions tab
 
-Skein calculation is a **pure function** computed at render time from: `stitchCount` (per-colour on ProjectThread), `fabric.count` (from linked Fabric), and strand count (default 2 for cross stitch). This follows the existing "calculated fields at query time, never stored" convention.
-
-### DMC Catalog Completion
-
-No schema changes. The seed fixture `prisma/fixtures/dmc-threads.json` currently has 459 entries starting at DMC 150 (confirmed: first entry is `B5200`, first numeric is `150`). Needs approximately 149 additional entries (DMC 1-149 plus Blanc). A re-seed with the upsert-based `seed.ts` handles this idempotently.
-
-### Fabric Selector Wiring
-
-No schema changes. `Fabric` already has `linkedProjectId String? @unique` relating it to a `Project`. The chart form's `ProjectSetupSection` currently shows a disabled placeholder with text "Phase 5" -- this needs to be wired to a `SearchableSelect` that queries unassigned fabrics (using existing `SearchableSelect` component from `form-primitives/`).
-
-## Recommended Project Structure
-
-Changes within existing structure (no new top-level folders):
+**Implementation approach: Context provider at dashboard layout level.**
 
 ```
-src/
-├── app/(dashboard)/
-│   ├── charts/
-│   │   └── page.tsx                    # MODIFY: swap ChartList for GalleryGrid
-│   └── settings/
-│       ├── page.tsx                    # MODIFY: add link to storage locations
-│       └── storage/
-│           ├── page.tsx                # NEW: storage location list
-│           └── [id]/
-│               └── page.tsx            # NEW: storage location detail
-├── components/features/
-│   ├── charts/
-│   │   ├── gallery-grid.tsx            # NEW: main gallery view switcher
-│   │   ├── gallery-card.tsx            # NEW: status-specific card component
-��   │   ├── view-mode-switcher.tsx      # NEW: gallery/list/table toggle
-│   │   ├── chart-list.tsx              # KEEP: repurpose as table/list view within gallery-grid
-│   │   ├── project-supplies-tab.tsx    # MODIFY: add stitch count editing + skein display
-│   │   ├── form-primitives/
-│   │   │   ├── cover-image-upload.tsx  # MODIFY: fix aspect ratio
-│   │   │   └── fabric-select.tsx       # NEW: fabric picker for chart form
-│   │   └── sections/
-│   │       └── project-setup-section.tsx # MODIFY: wire fabric + storage location selectors
-│   ├── storage/
-│   │   ├── storage-location-list.tsx   # NEW
-│   │   └─�� storage-location-detail.tsx # NEW
-│   └── supplies/
-│       └── search-to-add.tsx           # MODIFY: scroll UX fix
-├── lib/
-│   ├─��� actions/
-│   │   ├── chart-actions.ts            # MODIFY: add gallery data query
-��   │   ├── storage-actions.ts          # NEW: StorageLocation CRUD
-│   │   ├── supply-actions.ts           # MODIFY: stitch count update in updateProjectSupplyQuantity
-│   │   └── fabric-actions.ts           # MODIFY: add getUnassignedFabrics query
-│   ├── utils/
-│   │   └── skein-calculator.ts         # NEW: pure calculation function
-│   └── validations/
-│       └── storage.ts                  # NEW: Zod schemas for storage
-├── types/
-│   ├── gallery.ts                      # NEW: GalleryCardData discriminated union types
-│   └── storage.ts                      # NEW: StorageLocation types
-└── prisma/
-    ��── schema.prisma                   # MODIFY: add StorageLocation, update Project
-    ├── fixtures/
-    │   └── dmc-threads.json            # MODIFY: add DMC 1-149 + Blanc
-    └── migrations/
-        └── YYYYMMDD_add_storage/       # NEW: migration for StorageLocation
+src/app/(dashboard)/layout.tsx
+  -> <SessionModalProvider>     // NEW context provider
+       <AppShell>
+         {children}
+       </AppShell>
+     </SessionModalProvider>
 ```
 
-### Structure Rationale
+The `SessionModalProvider` manages:
+- `isOpen` state
+- `preselectedProjectId` (when opened from project detail)
+- `activeProjects` list (fetched once, passed down)
+- `openModal(projectId?: string)` function exposed via context
 
-- **`components/features/storage/`**: New feature folder following existing pattern (`features/charts/`, `features/designers/`, `features/fabric/`, etc.)
-- **`settings/storage/` route**: Storage locations are "reference data management" -- settings page is the right home, matching how the DesignOS design shows it alongside other reference data management
-- **Gallery types in `types/gallery.ts`**: The DesignOS types file (`product-plan/sections/gallery-cards-and-advanced-filtering/types.ts`) defines rich discriminated unions (WIPCardData, UnstartedCardData, FinishedCardData) that need project-specific adaptations for the real data model
-- **`skein-calculator.ts` as utility**: Pure function with no DB dependency, easily testable, follows existing `size-category.ts` and `fabric-calculator.ts` patterns in `lib/utils/`
+**Why context over URL state:** The modal is an overlay, not a route. URL state (nuqs) would pollute the URL and cause unnecessary page transitions. Context is the correct pattern for transient UI state that doesn't need to survive page reloads.
 
-## Architectural Patterns
+**Why not a global store (zustand/jotai):** Single-user app with one modal. React context is sufficient and avoids a new dependency.
 
-### Pattern 1: Gallery Data Aggregation Query
-
-**What:** A single server-side query that joins Chart + Project + Designer + Genre + supply counts + Fabric to produce gallery card data, avoiding N+1 queries.
-**When to use:** The charts page needs to display rich card data for 500+ charts. Each card needs status, designer name, genre names, supply counts, fabric status, and for WIP cards even progress data.
-**Trade-offs:** One complex Prisma include vs multiple simple queries. At 500 charts, the single query wins because it avoids 500+ round trips. The data transformation from Prisma result to `GalleryCardData` discriminated union happens in the Server Component before passing to the client.
-
-**Example:**
 ```typescript
-// In chart-actions.ts -- new gallery query
-export async function getGalleryData() {
-  const user = await requireAuth();
+// src/components/features/sessions/session-modal-context.tsx
+"use client";
 
-  const charts = await prisma.chart.findMany({
-    where: { project: { userId: user.id } },
+const SessionModalContext = createContext<{
+  openLogSession: (projectId?: string) => void;
+} | null>(null);
+
+export function useLogSession() {
+  const ctx = useContext(SessionModalContext);
+  if (!ctx) throw new Error("useLogSession must be used within SessionModalProvider");
+  return ctx;
+}
+```
+
+The TopBar and FAB call `openLogSession()`. The project detail Sessions tab calls `openLogSession(projectId)`.
+
+### 2. Session Create Flow -- Data Flow
+
+```
+User fills LogSessionModal
+  -> Client calls createSession(formData) server action
+  -> Server action:
+     1. requireAuth()
+     2. Validate with Zod (projectId, date, stitchCount, optional time/photo)
+     3. Verify project ownership (project.userId === user.id)
+     4. prisma.$transaction:
+        a. Create StitchSession record
+        b. Recalculate stitchesCompleted:
+           SUM = await prisma.stitchSession.aggregate({
+             _sum: { stitchCount: true },
+             where: { projectId }
+           })
+           await prisma.project.update({
+             where: { id: projectId },
+             data: { stitchesCompleted: startingStitches + sum }
+           })
+     5. revalidatePath("/charts/[chartId]")
+     6. revalidatePath("/")  // dashboard
+     7. revalidatePath("/projects")  // project dashboard
+     8. Return { success: true }
+  -> Client: close modal, toast success
+```
+
+**Why transaction:** The session creation and progress recalculation must be atomic. If the sum update fails, the session shouldn't exist.
+
+**Why revalidatePath over revalidateTag:** The existing codebase uses `revalidatePath` consistently. Switching to tags would require refactoring all existing actions. Stay consistent.
+
+### 3. Pattern Dive -- Evolving the Charts Page
+
+The existing `/charts/page.tsx` renders `ProjectGallery` with gallery/list/table views. Pattern Dive adds 3 new tabs (What's Next, Fabric Requirements, Storage View) while keeping Browse as the default tab.
+
+**Route structure stays the same:** `/charts` is the route. The page title and subtitle change to "Pattern Dive". The existing `ProjectGallery` becomes the Browse tab content.
+
+**Tab implementation:**
+```
+/charts/page.tsx (Server Component)
+  -> Fetch gallery data (existing getChartsForGallery)
+  -> Fetch What's Next data (new query)
+  -> Fetch Fabric Requirements data (new query)
+  -> Fetch Storage View data (new query)
+  -> Pass all data to PatternDiveClient
+
+PatternDiveClient (Client Component)
+  -> URL-persisted tab state via nuqs: ?tab=browse|whats-next|fabric|storage
+  -> Browse tab renders existing ProjectGallery internals
+  -> Other tabs render new components
+```
+
+**Reuse strategy:**
+- `GalleryCard`, `GalleryGrid`, `ViewToggleBar`, `FilterBar`, `FilterChips` -- reused directly for Browse tab
+- `gallery-utils.ts` (`transformToGalleryCard`, `SIZE_CATEGORIES`, etc.) -- reused
+- `use-gallery-filters.ts` -- reused within Browse tab
+- `gallery-types.ts` (`GalleryCardData`, `ViewMode`, `SortField`) -- reused
+
+**New components needed:**
+- `PatternDiveClient` -- tab container with nuqs-driven tab state
+- `WhatsNextTab` -- filtered/sorted list of kitted + flagged projects
+- `FabricRequirementsTab` -- fabric calculator per project with stash matching
+- `StorageViewTab` -- collapsible groups by storage location
+
+### 4. Dashboard Pages -- Query Strategy for Neon Free Tier
+
+**Constraint:** Neon free tier has 0.25 vCPU, 512MB RAM, and cold starts after 5 minutes of inactivity. Dashboard queries must be efficient.
+
+**Strategy: Fetch-and-compute in Server Components.**
+
+All dashboard data is derived from existing tables (Chart, Project, Fabric, StorageLocation) plus the new StitchSession table. Rather than running many small queries, use a small number of comprehensive queries and compute derived values in TypeScript.
+
+#### Main Dashboard Query Plan
+
+```typescript
+// dashboard-queries.ts
+
+export async function getMainDashboardData(userId: string) {
+  // Query 1: All projects with chart info (single query, ~20 entities for 500 charts)
+  const projects = await prisma.project.findMany({
+    where: { userId },
     include: {
-      designer: true,
-      genres: true,
-      project: {
+      chart: {
+        select: {
+          id: true, name: true, stitchCount: true,
+          coverImageUrl: true, coverThumbnailUrl: true,
+          designerId: true, designer: { select: { name: true } },
+          genres: { select: { name: true } },
+          dateAdded: true, stitchesWide: true, stitchesHigh: true,
+        },
+      },
+      storageLocation: { select: { name: true } },
+      fabric: { select: { id: true } },
+      projectThreads: { select: { quantityRequired: true, quantityAcquired: true } },
+      projectBeads: { select: { quantityRequired: true, quantityAcquired: true } },
+      projectSpecialty: { select: { quantityRequired: true, quantityAcquired: true } },
+    },
+  });
+
+  // Compute all dashboard sections from the single result set:
+  // - currentlyStitching: status === IN_PROGRESS
+  // - startNext: wantToStartNext === true
+  // - buriedTreasures: status === UNSTARTED, ordered by dateAdded ASC, limit 5
+  // - spotlight: random from collection (Math.random() on the array)
+  // - collectionStats: counts by status, SUM of stitchesCompleted
+  // - recentCharts: ordered by dateAdded DESC, limit 8
+
+  return { currentlyStitching, startNext, buriedTreasures, ... };
+}
+```
+
+**Why one big query:** For 500 charts, this is ~500 rows with joins. PostgreSQL handles this in <100ms. Multiple small queries (one per section) would cause 6+ round trips to Neon, which is expensive after cold start (~100ms per query). Single query + JS computation is faster and uses fewer connection pool slots.
+
+**Caveat:** The `getChartsForGallery` query already fetches similar data. For Pattern Dive, we can reuse or extend it. For Main Dashboard, we need slightly different includes (genres for buried treasures, dateAdded for recently added).
+
+#### Project Dashboard Query Plan
+
+```typescript
+export async function getProjectDashboardData(userId: string) {
+  // Query 1: All projects with progress data
+  const projects = await prisma.project.findMany({
+    where: { userId },
+    include: {
+      chart: {
+        select: {
+          name: true, stitchCount: true, coverImageUrl: true, coverThumbnailUrl: true,
+          designer: { select: { name: true } },
+          genres: { select: { name: true } },
+        },
+      },
+      fabric: { select: { name: true, brand: { select: { name: true } }, count: true } },
+    },
+  });
+
+  // Query 2: Session aggregates per project (for stitching days, last stitched date)
+  const sessionStats = await prisma.stitchSession.groupBy({
+    by: ["projectId"],
+    _count: { id: true },            // stitching days (approximate)
+    _sum: { stitchCount: true },
+    _max: { date: true },            // last stitched date
+  });
+
+  // Merge and compute:
+  // - heroStats (totalWIPs, averageProgress, closestToCompletion, etc.)
+  // - progressBuckets (0%, 0-25%, 25-50%, 50-75%, 75-100%, finished)
+  // - finishedProjects with expanded stats
+}
+```
+
+**Why groupBy for sessions:** `groupBy` pushes aggregation to PostgreSQL. Fetching all sessions and computing in JS would be wasteful (could be thousands of rows over time). The `groupBy` returns one row per project.
+
+**Note on "stitching days":** The `_count` on sessions gives session count, not unique days. For accurate "stitching days," we'd need `SELECT COUNT(DISTINCT date) FROM StitchSession WHERE projectId = ?`. Prisma doesn't support `COUNT(DISTINCT)` in `groupBy`. Options:
+1. Use raw SQL: `prisma.$queryRaw` for this specific metric
+2. Approximate with session count (good enough for v1.2, refine in v1.3 stats engine)
+3. Add a computed `uniqueDays` in application code after fetching sessions
+
+**Recommendation:** Use session count as "stitching sessions" for v1.2. Reserve accurate "stitching days" for v1.3 when the full statistics engine is built. This avoids raw SQL in v1.2.
+
+#### Pattern Dive Tab Queries
+
+```typescript
+// What's Next: reuses the main project query, filters to kitting/kitted/flagged
+// Fabric Requirements: projects + fabric stash
+export async function getFabricRequirements(userId: string) {
+  const [projects, fabrics] = await Promise.all([
+    prisma.project.findMany({
+      where: { userId, chart: { stitchesWide: { gt: 0 }, stitchesHigh: { gt: 0 } } },
+      include: {
+        chart: { select: { name: true, stitchesWide: true, stitchesHigh: true } },
+        fabric: { select: { id: true } },
+      },
+    }),
+    prisma.fabric.findMany({
+      where: { linkedProjectId: null },  // unlinked fabric = available stash
+      include: { brand: true },
+    }),
+  ]);
+  // Compute matches in JS (fabric size >= required size for each count)
+}
+
+// Storage View: projects + fabrics grouped by storage location
+export async function getStorageGroups(userId: string) {
+  return prisma.storageLocation.findMany({
+    where: { userId },
+    include: {
+      projects: {
         include: {
-          fabric: { select: { count: true, type: true, name: true } },
-          storageLocation: { select: { id: true, name: true } },
-          _count: {
-            select: {
-              projectThreads: true,
-              projectBeads: true,
-              projectSpecialty: true,
-            },
-          },
+          chart: { select: { name: true, coverThumbnailUrl: true } },
+          fabric: { select: { name: true } },
         },
       },
     },
-    orderBy: { dateAdded: "desc" },
   });
-
-  return charts.map(transformToGalleryCard);
-}
-
-// Transform Prisma row to discriminated union
-function transformToGalleryCard(chart: ChartWithFullIncludes): GalleryCardData {
-  const status = chart.project?.status ?? "UNSTARTED";
-  const statusGroup = getStatusGroup(status); // maps to 'wip' | 'unstarted' | 'finished'
-
-  const base = {
-    projectId: chart.project?.id ?? chart.id,
-    chartId: chart.id,
-    projectName: chart.name,
-    designerName: chart.designer?.name ?? "Unknown",
-    coverImageUrl: chart.coverThumbnailUrl ?? chart.coverImageUrl,
-    status: formatStatus(status),
-    genres: chart.genres.map(g => g.name),
-    sizeCategory: calculateSizeCategory(getEffectiveStitchCount(...).count),
-    stitchCount: getEffectiveStitchCount(chart.stitchCount, chart.stitchesWide, chart.stitchesHigh).count,
-    threadColourCount: chart.project?._count.projectThreads ?? 0,
-    beadTypeCount: chart.project?._count.projectBeads ?? 0,
-    specialtyItemCount: chart.project?._count.projectSpecialty ?? 0,
-  };
-
-  // Return status-group-specific shape
-  switch (statusGroup) {
-    case 'wip': return { ...base, statusGroup: 'wip', progressPercent: ..., ... } as WIPCardData;
-    case 'unstarted': return { ...base, statusGroup: 'unstarted', fabricStatus: ..., ... } as UnstartedCardData;
-    case 'finished': return { ...base, statusGroup: 'finished', finishDate: ..., ... } as FinishedCardData;
-  }
 }
 ```
 
-### Pattern 2: View Mode Persistence via localStorage
+### 5. Progress Auto-Update Strategy
 
-**What:** Store the selected view mode (gallery/list/table) in localStorage so it persists across page navigations and refreshes.
-**When to use:** User preference that doesn't need server-side persistence for a single-user app. Avoids a DB column for a UI preference.
-**Trade-offs:** First-load flash is possible (SSR renders default view, client hydrates with stored preference). Mitigation: render skeleton/default view during the first render pass, apply stored preference in useEffect. The backlog item 999.5 already documents this exact pattern issue for the supplies page.
+When a session is created/updated/deleted, `Project.stitchesCompleted` must be recalculated.
 
-**Example:**
+**Formula:** `stitchesCompleted = startingStitches + SUM(all sessions' stitchCount)`
+
+**Implementation in session-actions.ts:**
+
 ```typescript
-// In view-mode-switcher.tsx
-function useViewMode(defaultMode: ViewMode = "gallery"): [ViewMode, (mode: ViewMode) => void] {
-  const [mode, setMode] = useState<ViewMode>(defaultMode);
-  const [hydrated, setHydrated] = useState(false);
+async function recalculateProgress(tx: PrismaClient, projectId: string) {
+  const { _sum } = await tx.stitchSession.aggregate({
+    _sum: { stitchCount: true },
+    where: { projectId },
+  });
+  const project = await tx.project.findUnique({
+    where: { id: projectId },
+    select: { startingStitches: true },
+  });
+  await tx.project.update({
+    where: { id: projectId },
+    data: {
+      stitchesCompleted: (project?.startingStitches ?? 0) + (_sum.stitchCount ?? 0),
+    },
+  });
+}
+```
 
-  useEffect(() => {
-    const stored = localStorage.getItem("charts-view-mode") as ViewMode | null;
-    if (stored && ["gallery", "list", "table"].includes(stored)) {
-      setMode(stored);
+This runs inside the same `$transaction` as the session create/update/delete, ensuring consistency.
+
+**What about gallery cards?** Gallery cards show `stitchesCompleted` and calculate progress percentage client-side. Since `stitchesCompleted` is always up-to-date after session mutations, gallery cards automatically reflect the latest progress after revalidation.
+
+### 6. Shopping Cart Upgrade
+
+The existing shopping page fetches unfulfilled supplies grouped by project. The v1.2 upgrade adds:
+- Project selection sidebar
+- Tabbed supply types (threads, beads, specialty, fabric)
+- Fabric-to-stash matching
+
+**Architectural change:** The existing `getShoppingList()` returns project-grouped data. The new ShoppingCart design wants supply-type-grouped data with cross-project aggregation.
+
+**New query approach:**
+
+```typescript
+export async function getShoppingCartData(userId: string) {
+  // Reuse existing getShoppingList() for the project list
+  // Add: aggregate by supply across projects for the supply-type tabs
+  const [threads, beads, specialty] = await Promise.all([
+    prisma.projectThread.findMany({
+      where: {
+        project: { userId },
+        quantityAcquired: { lt: prisma.projectThread.fields.quantityRequired },
+      },
+      include: {
+        thread: { include: { brand: true } },
+        project: { select: { chart: { select: { name: true } } } },
+      },
+    }),
+    // Similar for beads and specialty
+  ]);
+
+  // Group threads by threadId, aggregate quantities across projects
+}
+```
+
+**Note:** The `quantityAcquired < quantityRequired` filter is not directly supported in Prisma `where` as a field comparison. The existing approach fetches all and filters in JS. This is fine for the data volumes (hundreds of supply links, not thousands).
+
+## New File Organization
+
+```
+src/
+  app/(dashboard)/
+    page.tsx                           # REPLACE: Main Dashboard (was placeholder)
+    charts/
+      page.tsx                         # MODIFY: Pattern Dive (was ProjectGallery)
+    projects/
+      page.tsx                         # NEW: Project Dashboard
+      loading.tsx                      # NEW: skeleton
+    shopping/
+      page.tsx                         # MODIFY: Shopping Cart v2
+    sessions/
+      page.tsx                         # KEEP: placeholder for now (full stats in v1.3)
+  components/features/
+    dashboard/
+      main-dashboard.tsx               # NEW: Main Dashboard page component
+      currently-stitching-card.tsx      # NEW: WIP card for dashboard
+      buried-treasures-section.tsx      # NEW: longest-waiting unstarted
+      spotlight-card.tsx               # NEW: random project spotlight
+      collection-stats-sidebar.tsx     # NEW: stat summary
+      scrollable-row.tsx               # NEW: horizontal scroll with arrows
+      quick-add-menu.tsx               # NEW: dropdown for quick actions
+    pattern-dive/
+      pattern-dive-client.tsx          # NEW: tab container
+      whats-next-tab.tsx               # NEW
+      fabric-requirements-tab.tsx      # NEW
+      storage-view-tab.tsx             # NEW
+    project-dashboard/
+      project-dashboard.tsx            # NEW: page component
+      hero-stats.tsx                   # NEW: stat cards row
+      progress-breakdown-tab.tsx       # NEW: buckets
+      finished-tab.tsx                 # NEW: completed projects
+    sessions/
+      session-modal-context.tsx        # NEW: React context provider
+      log-session-modal.tsx            # NEW: modal component
+      sessions-tab.tsx                 # NEW: project detail tab
+    shopping/
+      shopping-cart.tsx                # NEW: upgraded shopping page (replaces shopping-list.tsx)
+  lib/actions/
+    session-actions.ts                 # NEW: StitchSession CRUD
+    dashboard-queries.ts              # NEW: read-only aggregation functions
+```
+
+## Patterns to Follow
+
+### Pattern 1: Server Component Page + Client Feature Component
+
+The v1.1 pattern that works well: Server Component page fetches data, passes as props to a Client Component that handles interactivity.
+
+```typescript
+// page.tsx (Server Component)
+export default async function DashboardPage() {
+  const data = await getMainDashboardData();
+  const imageUrls = await getPresignedImageUrls(imageKeys);
+  return <MainDashboard {...data} imageUrls={imageUrls} />;
+}
+
+// main-dashboard.tsx (Client Component)
+"use client";
+export function MainDashboard({ ... }: MainDashboardProps) {
+  // All interactivity here
+}
+```
+
+### Pattern 2: Optimistic Update for Session Logging
+
+Session logging should feel instant. Use `useTransition` + optimistic state:
+
+```typescript
+const [isPending, startTransition] = useTransition();
+
+function handleSave(session: SessionFormData) {
+  startTransition(async () => {
+    try {
+      const result = await createSession(session);
+      if (result.success) {
+        toast.success("Session logged!");
+        closeModal();
+      } else {
+        toast.error(result.error);
+      }
+    } catch {
+      toast.error("Something went wrong.");
     }
-    setHydrated(true);
-  }, []);
-
-  const updateMode = useCallback((newMode: ViewMode) => {
-    setMode(newMode);
-    localStorage.setItem("charts-view-mode", newMode);
-  }, []);
-
-  return [mode, updateMode, hydrated]; // hydrated flag for skeleton control
+  });
 }
 ```
 
-### Pattern 3: Inline CRUD for Reference Data (StorageLocation)
+### Pattern 3: Shared Image Resolution
 
-**What:** Storage locations use inline editing (add/rename/delete directly in the list) rather than modal forms, matching the DesignOS design.
-**When to use:** Simple entities with 1-2 fields. Storage locations have only a `name`. No need for a modal form when inline editing is faster.
-**Trade-offs:** Inline editing requires careful focus management and keyboard handling (Enter to save, Escape to cancel, blur to cancel). The DesignOS designs (`StorageLocationList.tsx`, `StorageLocationDetail.tsx`) already spec this pattern with `InlineNameEdit`. More complex than a modal but better UX for single-field entities.
+Cover images need presigned URLs. Dashboard queries fetch image keys; the page.tsx resolves them before passing to components. Same pattern as `/charts/page.tsx`:
 
-**Data flow:**
-```
-User clicks "Add Location"
-  -> AddLocationInline renders (focus on input)
-  -> User types name + Enter
-  -> Client calls createStorageLocation server action
-  -> Server validates with Zod (.trim().min(1)), creates in DB
-  -> revalidatePath("/settings/storage")
-  -> List re-renders with new location
-```
-
-### Pattern 4: Skein Calculator as Pure Computed Utility
-
-**What:** A pure function that takes `(stitchCount, fabricCount, strandCount)` and returns `{ skeinsNeeded: number }`. Displayed alongside per-colour stitch counts in the supply tab.
-**When to use:** Any time per-colour stitch count and fabric count are known. The calculation is deterministic and cheap -- no reason to store the result.
-**Trade-offs:** Requires fabric to be linked to the project for accurate fabric count. Without a linked fabric, fall back to 14-count (most common). User can see the assumption and it changes once fabric is linked.
-
-**Formula (from cross-stitch community data):**
 ```typescript
-// Stitches per 8m DMC skein at different fabric counts (average efficiency, 2 strands)
-// Source: Lord Libidan community test data
-const STITCHES_PER_SKEIN: Record<number, number> = {
-  10: 1250, 11: 1375, 12: 1500, 14: 1750,
-  16: 1950, 18: 2250, 20: 2500, 22: 2750,
-  25: 3000, 28: 3250, 32: 3500, 36: 3750, 40: 4000,
-};
-
-export function calculateSkeinsNeeded(
-  stitchCount: number,
-  fabricCount: number = 14,
-  strandCount: number = 2,
-): number {
-  if (stitchCount <= 0) return 0;
-  const baseStitches = STITCHES_PER_SKEIN[fabricCount]
-    ?? STITCHES_PER_SKEIN[14]; // fallback
-  // Base data assumes 2 strands; adjust proportionally
-  const adjustedStitches = baseStitches * (2 / strandCount);
-  return Math.ceil(stitchCount / adjustedStitches);
-}
+const imageKeys = projects.flatMap(p => [
+  p.chart.coverImageUrl,
+  p.chart.coverThumbnailUrl,
+]);
+const imageUrls = await getPresignedImageUrls(imageKeys);
 ```
 
-## Data Flow
+### Pattern 4: Tab State via nuqs
 
-### Gallery Cards Data Flow
+Pattern Dive uses URL-persisted tab state (consistent with project detail tabs):
 
-```
-ChartsPage (Server Component)
-    |
-    +-- getGalleryData() --- Prisma query with deep includes ---> PostgreSQL
-    |   |
-    |   +-- transformToGalleryCard() -- maps DB rows to discriminated union types
-    |       +-- WIPCardData (In Progress, On Hold)
-    |       +-- UnstartedCardData (Unstarted, Kitting, Kitted)
-    |       +-- FinishedCardData (Finished, FFO)
-    |
-    +-- getPresignedImageUrls() -- batch resolve R2 keys ---> R2
-    |
-    +-- <GalleryGrid cards={...} imageUrls={...} />
-            |
-            +-- ViewModeSwitcher -- localStorage for persistence
-            |
-            +-- ViewMode switch:
-                +-- "gallery" -> GalleryCard grid (status-specific footers)
-                +-- "list"    -> Compact rows with context line
-                +-- "table"   -> Sortable table with column headers
+```typescript
+import { useQueryState } from "nuqs";
+
+const [tab, setTab] = useQueryState("tab", {
+  defaultValue: "browse",
+  parse: (v) => ["browse", "whats-next", "fabric", "storage"].includes(v) ? v : "browse",
+});
 ```
 
-**Key difference from current architecture:** The existing `ChartsPage` fetches charts and passes to `ChartList` which renders a table-only view. The new flow adds the gallery data transformation layer and the view mode switcher.
+## Anti-Patterns to Avoid
 
-### Storage Location CRUD Flow
+### Anti-Pattern 1: Client-Side Aggregation for Dashboard Stats
 
-```
-/settings/storage (Server Component)
-    |
-    +-- getStorageLocations() --- Prisma query with _count ---> PostgreSQL
-    |
-    +-- <StorageLocationList locations={...} />  ("use client")
-            |
-            +-- Add: createStorageLocation(name) -> revalidatePath
-            +-- Rename: updateStorageLocation(id, name) -> revalidatePath
-            +-- Delete: deleteStorageLocation(id) -> revalidatePath
-                        (sets Project.storageLocationId to null via onDelete: SetNull)
+**What:** Fetching all sessions client-side and computing stats in the browser.
+**Why bad:** Session count grows unboundedly. With daily logging for 2+ years, that's 700+ sessions. Sending all of them to the client wastes bandwidth and battery.
+**Instead:** Compute aggregates server-side with Prisma `aggregate`/`groupBy`, send only the results.
 
-/settings/storage/[id] (Server Component)
-    |
-    +-- getStorageLocationDetail(id) --- Prisma query ---> PostgreSQL
-    |   +-- includes projects with status + fabric info
-    |
-    +-- <StorageLocationDetail detail={...} />
-```
+### Anti-Pattern 2: Separate Prisma Queries per Dashboard Section
 
-### Per-Colour Stitch Count + Skein Display Flow
+**What:** Running 6+ individual `findMany` calls for each dashboard section.
+**Why bad:** Each query is a round trip to Neon. After cold start (5min idle), that's 6x100ms+ = 600ms+ before any rendering.
+**Instead:** Fetch the full project dataset once, compute sections in TypeScript. One round trip.
 
-```
-ChartDetail page (existing)
-    |
-    +-- fetches project supplies (existing)
-    +-- fetches linked fabric (NEW: include in query)
-    |
-    +-- ProjectSuppliesTab (existing, MODIFY)
-            |
-            +-- SupplyRow (existing, MODIFY)
-            |   +-- Inline editable stitchCount field (NEW EditableNumber)
-            |   +-- Auto-calculated skeins display (NEW)
-            |   |   +-- calculateSkeinsNeeded(stitchCount, fabric?.count ?? 14)
-            |   +-- updateProjectSupplyQuantity action (existing, already accepts stitchCount)
-            |
-            +-- Sum per-colour stitchCounts -> display total (NEW)
-                +-- Compare to chart.stitchCount for validation hint
-                    ("Per-colour total: 45,000 / Chart total: 50,000")
-```
+### Anti-Pattern 3: Storing Computed Progress Redundantly
 
-**Important discovery:** The `updateProjectSupplyQuantity` action already handles generic field updates via a `{ [field]: value }` pattern. The `stitchCount` field exists on `ProjectThread` in the schema. The validation schema in `supply.ts` may need updating to allow `stitchCount` in the update payload.
+**What:** Adding `progressPercent` as a stored field on Project.
+**Why bad:** Must be kept in sync with `stitchesCompleted` and chart's `stitchCount`. Double bookkeeping.
+**Instead:** `stitchesCompleted` is the stored value (updated via session sum). Percentage is calculated at display time: `Math.round((stitchesCompleted / stitchCount) * 100)`.
 
-### Fabric Selector Flow
+### Anti-Pattern 4: LogSessionModal as a Route
 
-```
-ChartAddForm / ChartEditModal
-    |
-    +-- ProjectSetupSection (existing, MODIFY)
-            |
-            +-- StorageLocation dropdown (NEW -- replaces hardcoded projectBin)
-            |   +-- getStorageLocations() server action (fetched by parent page)
-            |   +-- Uses existing SearchableSelect component
-            |
-            +-- Fabric selector (NEW -- replaces disabled placeholder)
-                +-- getUnassignedFabrics() server action
-                    +-- Prisma: Fabric WHERE linkedProjectId IS NULL
-                        OR linkedProjectId = currentProjectId (for edit case)
-                +-- Uses existing SearchableSelect component
-                +-- On select: links fabric via updateFabric(fabricId, { linkedProjectId })
-```
+**What:** Making `/log-session` a page or parallel route.
+**Why bad:** It's a modal overlay, not a destination. Opening it from the header shouldn't navigate away from the current page.
+**Instead:** React context at the layout level with a portal-rendered Dialog.
 
-### Cover Image Aspect Ratio Fix Flow
+### Anti-Pattern 5: Raw SQL for Simple Aggregations
 
-The issue is in `cover-image-upload.tsx` where the preview container uses `h-32` with `object-cover`, which crops tall/square images into a narrow strip.
+**What:** Using `$queryRaw` for counts and sums that Prisma supports natively.
+**Why bad:** Loses type safety, must maintain raw SQL strings.
+**Instead:** Use Prisma's `aggregate`, `groupBy`, and `count`. Reserve `$queryRaw` only for `COUNT(DISTINCT)` if/when needed in v1.3.
 
-```
-CoverImageUpload (existing, MODIFY)
-    |
-    +-- Preview container: h-32 -> min-h-32 max-h-48
-        +-- img: object-cover -> object-contain with bg-muted background
-            (preserves full image visibility without cropping)
+## Build Order (Dependency-Informed)
 
-ChartDetail CoverImage (existing, already uses aspect-[4/3])
-    +-- No change needed -- already correct
+The build order must respect data dependencies: sessions must exist before dashboards can show session-derived data.
+
+### Phase 8: Session Logging + Pattern Dive
+
+1. **StitchSession schema** -- `prisma db push` + `prisma generate`
+2. **Session server actions** -- CRUD + progress recalculation
+3. **LogSessionModal** -- UI component + Zod validation
+4. **SessionModalProvider** -- context at layout level
+5. **Wire TopBar button** -- replace toast placeholder with `openLogSession()`
+6. **Sessions tab on project detail** -- add third tab to project-detail-page
+7. **Pattern Dive tabs** -- refactor /charts to Pattern Dive with Browse + 3 new tabs
+   - Browse reuses existing gallery infrastructure
+   - What's Next, Fabric Requirements, Storage View are new
+
+**Why sessions first:** Pattern Dive doesn't depend on sessions, but building sessions first establishes the data foundation. The dashboard (Phase 9) depends on both sessions and the query patterns established here.
+
+### Phase 9: Dashboards + Shopping Cart Upgrade
+
+1. **Dashboard query functions** -- `dashboard-queries.ts`
+2. **Main Dashboard** -- replace placeholder / page
+3. **Project Dashboard** -- new /projects route
+4. **Shopping Cart upgrade** -- tabbed supply types, fabric matching
+5. **Nav updates** -- add /projects to nav, rename /charts label
+
+**Why dashboards after sessions:** Main Dashboard shows "Currently Stitching" cards with last-session info. Project Dashboard shows progress buckets with stitching-day counts. Both depend on StitchSession data.
+
+## Navigation Changes
+
+Current nav structure needs updates:
+
+```typescript
+// nav-items.ts changes:
+{
+  label: "Projects",
+  items: [
+    { label: "Dashboard", href: "/", icon: LayoutDashboard },        // KEEP (new content)
+    { label: "Pattern Dive", href: "/charts", icon: Scissors },      // RENAME from "Projects"
+    { label: "Project Dashboard", href: "/projects", icon: BarChart3 },  // NEW
+    { label: "Shopping", href: "/shopping", icon: ShoppingCart },     // KEEP
+  ],
+},
 ```
 
-### Thread Picker Scroll Fix Flow
+**Note:** The "Statistics" nav item (`/stats`) remains as a placeholder for v1.3. The "Sessions" nav item (`/sessions`) could be repurposed as a standalone session log viewer or kept as placeholder.
 
-```
-SearchToAdd (existing, MODIFY)
-    |
-    +-- On item added to project:
-        +-- Call scrollIntoView on the search input container
-            (keeps the search box and "+ Add more" button visible)
-        +-- Alternative: scroll the results list to keep input pinned at top
-```
+## Scalability Considerations
 
-## Integration Points
+| Concern | At 500 charts (now) | At 1,000 sessions | At 5,000 sessions |
+|---------|---------------------|--------------------|--------------------|
+| Dashboard load | <200ms (single query) | <200ms (aggregate only) | <200ms (aggregate only) |
+| Session list load | N/A | 50 rows paginated | 50 rows paginated |
+| Gallery load | ~200ms (existing) | No change | No change |
+| Progress recalc | <50ms | <50ms (single aggregate) | <50ms (single aggregate) |
+| Neon cold start | +200ms first query | Same | Same |
 
-### Internal Boundaries
-
-| Boundary | Communication | Notes |
-|----------|---------------|-------|
-| Charts page -> GalleryGrid | Server Component passes props to Client Component | Gallery data transformed server-side, images resolved server-side via presigned URLs |
-| GalleryCard -> Router | `Link` component to `/charts/[id]` | Cards link to chart detail page; no callback needed, use `<Link>` |
-| ProjectSetupSection -> StorageLocation | Server action fetches locations for dropdown | Replace hardcoded `DEFAULT_BIN_OPTIONS` array with DB-backed list |
-| ProjectSetupSection -> Fabric | Server action fetches unassigned fabrics | Replace disabled "Phase 5" placeholder with working `SearchableSelect` |
-| SupplyRow -> SkeinCalculator | Pure function call at render time | Needs fabric count from project's linked fabric (passed as prop from parent) |
-| StorageLocation CRUD -> Project | `onDelete: SetNull` relationship | Deleting a location nulls the FK reference, project is preserved |
-| DMC seed -> Thread table | Prisma upsert during seed | Idempotent -- existing 459 rows untouched, ~149 new rows added |
-
-### Key Dependencies Between Features
-
-```
-StorageLocation model -----> Project.storageLocationId -----> ProjectSetupSection dropdown
-                                                         +--> GalleryCard filter options (deferred to M3)
-
-Fabric selector wiring -----> Skein calculator (needs fabric.count for accurate calculation)
-                         +--> Gallery cards (UnstartedCardData.fabricStatus computation)
-
-Per-colour stitch counts ---> Skein calculator display
-                         +--> Total stitch count validation hint
-                         +--> Gallery cards (threadColourCount already works via _count)
-
-DMC catalog completion -----> SearchToAdd (more colours available to search)
-                              No code changes needed, purely data
-
-Cover image fix ------------> Gallery cards (better images in gallery view)
-                              Independent of other features
-```
-
-## Anti-Patterns
-
-### Anti-Pattern 1: Client-Side Gallery Data Fetching
-
-**What people do:** Fetch gallery data on the client with `useEffect` + `useState`, add loading spinners.
-**Why it's wrong:** With 500+ charts, this creates a loading waterfall (page shell -> JS download -> fetch -> render). Server Components eliminate this by streaming HTML with data already included.
-**Do this instead:** Fetch all gallery data in the Server Component (`page.tsx`), transform it server-side, pass as props to the client `GalleryGrid` component. The page renders with data on first paint.
-
-### Anti-Pattern 2: Storing Computed Skein Counts in the Database
-
-**What people do:** Add a `skeinsRequired` column to `ProjectThread` and update it whenever stitch count or fabric changes.
-**Why it's wrong:** Violates the "calculated fields at query time" convention. Creates sync bugs when fabric count changes but skein counts aren't recalculated.
-**Do this instead:** Calculate skeins as a pure function at render time. Cheap to compute, always consistent with current fabric + stitch count.
-
-### Anti-Pattern 3: Separate API Routes for Storage Location CRUD
-
-**What people do:** Create `/api/storage-locations/` REST endpoints.
-**Why it's wrong:** Server Actions are the established pattern in this codebase. Every existing action file uses `"use server"` + `requireAuth()` + Zod. API routes add unnecessary abstraction and bypass the existing auth guard + Zod validation patterns.
-**Do this instead:** Server Actions in `storage-actions.ts` following the exact same pattern as `designer-actions.ts` (which is the closest analog -- simple entity CRUD).
-
-### Anti-Pattern 4: URL-Based View Mode State
-
-**What people do:** Store view mode in URL search params (`?view=gallery`).
-**Why it's wrong:** With Server Components, changing search params triggers a full server re-render and data re-fetch. Also pollutes browser history with preference toggles.
-**Do this instead:** localStorage for view mode persistence. It's a UI preference, not shareable state. The data doesn't change between view modes -- only the presentation does.
-
-### Anti-Pattern 5: Creating a New "Project Setup" Flow
-
-**What people do:** Build a multi-step wizard for project setup that combines chart creation + supply entry + fabric assignment.
-**Why it's wrong:** Over-engineers the backlog item 999.0.7 ("rework project supply entry workflow"). The existing chart form + detail page pattern works. The improvement is about insertion order and inline creation, not a new flow.
-**Do this instead:** Improve the existing supply entry within the chart detail page: maintain insertion order, add `scrollIntoView`, allow inline supply creation from the search panel.
-
-## Scaling Considerations
-
-Not a primary concern for this single-user app, but noting the gallery-specific consideration:
-
-| Scale | Architecture Adjustments |
-|-------|--------------------------|
-| 500 charts (current) | Single aggregation query with includes is fine. No pagination needed. All view modes render full dataset. |
-| 2000+ charts | Consider cursor-based pagination or virtual scrolling for gallery view. Table view would need pagination first (more DOM nodes). |
-| Image-heavy gallery | Thumbnail-first strategy already in place (`coverThumbnailUrl` preferred). Consider lazy loading for gallery cards below the fold. |
-
-### First Bottleneck: Presigned URL Batch Resolution
-
-With 500+ charts, resolving presigned URLs for all cover images/thumbnails is the most expensive operation in the gallery page. Current approach: batch resolve via `getPresignedImageUrls()`. This already exists and works. Gallery cards should prefer `coverThumbnailUrl` (smaller files, faster load) with fallback to `coverImageUrl`.
-
-## Build Order Recommendation
-
-Based on dependency analysis:
-
-1. **StorageLocation model + migration** -- foundational; ProjectSetupSection and gallery cards depend on it
-2. **DMC catalog completion** -- data-only, no code dependencies, can run in parallel with #1
-3. **Storage location CRUD** -- new route + actions, establishes the pattern for the new model
-4. **Gallery types + data aggregation query** -- server-side data transformation layer
-5. **Gallery cards + view mode switcher** -- largest UI feature, depends on types from #4
-6. **Wire fabric selector into chart form** -- connects existing fabric model to chart form
-7. **Per-colour stitch counts + skein calculator** -- extends existing supply tab, benefits from fabric selector (#6)
-8. **Supply entry workflow improvements** -- ordering, inline creation from search panel
-9. **Cover image aspect ratio fix** -- small CSS change, independent
-10. **Thread picker scroll UX fix** -- small JS fix (scrollIntoView), independent
-
-Items 1-2 can run in parallel. Items 9-10 are independent small fixes that can slot anywhere in the sequence.
+**Key insight:** The aggregation strategy (server-side `aggregate`/`groupBy`) scales well because PostgreSQL handles the heavy lifting. The main risk is Neon cold starts, which affect the first page load after 5 minutes of inactivity. This is a hosting constraint, not an architecture one.
 
 ## Sources
 
-- Existing codebase analysis: `prisma/schema.prisma`, `src/components/features/charts/`, `src/lib/actions/`
-- DesignOS gallery cards: `product-plan/sections/gallery-cards-and-advanced-filtering/` (types.ts, GalleryCard.tsx, GalleryGrid.tsx)
-- DesignOS storage locations: `product-plan/sections/fabric-series-and-reference-data/components/StorageLocation*.tsx`
-- DesignOS storage types: `product-plan/sections/fabric-series-and-reference-data/types.ts`
-- Skein calculation data: [Lord Libidan -- stitches per 8m skein](https://lordlibidan.com/how-many-stitches-can-you-get-out-of-a-8m-skein/)
-- Cross-stitch calculator references: [thread-bare.com](https://www.thread-bare.com/tools/cross-stitch-skein-estimator), [cross-stitched.com](https://cross-stitched.com/en-us/pages/cross-stitch-calculator)
-- DMC fixture gap analysis: `prisma/fixtures/dmc-threads.json` -- 459 entries, starts at DMC 150/B5200, missing 1-149 + Blanc
-
----
-*Architecture research for: Cross-stitch tracker M2 (Browse & Organize)*
-*Researched: 2026-04-11*
+- Prisma 7 aggregate/groupBy docs: Context7 (HIGH confidence)
+- Existing codebase patterns: direct code inspection (HIGH confidence)
+- Design components: `product-plan/sections/dashboards-and-views/` and `product-plan/sections/stitching-sessions-and-statistics/` (HIGH confidence)
+- Neon free tier specs: verified from existing deployment constraints (HIGH confidence)
