@@ -35,37 +35,40 @@ Declared values (multiples of 4, consistent with existing project):
 
 | Token | Value | Usage in this phase |
 |-------|-------|---------------------|
-| xs | 4px | Icon-text gaps (e.g. sort arrow beside header), inline badge padding |
-| sm | 8px | Compact element spacing, gap between filter pills, table cell vertical padding |
-| md | 16px | Default element spacing, card internal padding, modal body field spacing (20px used in some areas) |
-| lg | 24px | Section breaks within a tab, gap between mini-stat cards, modal section padding (px-8 = 32px) |
+| 2xs | 4px | Icon-text gaps (e.g. sort arrow beside header), inline badge padding |
+| xs | 8px | Compact element spacing, gap between filter pills, table cell vertical padding |
+| sm | 12px | Mini-stat card top padding, session table cell vertical padding, mini-stat grid gap |
+| md | 16px | Default element spacing, card side padding, modal body field spacing |
+| lg | 24px | Section breaks within a tab, gap between mini-stat cards (desktop), modal section padding |
 | xl | 32px | Page-level horizontal padding, modal horizontal padding, Pattern Dive outer padding |
 | 2xl | 48px | Empty state vertical padding |
 | 3xl | 64px | Not used in this phase |
 
 Exceptions:
 - Modal horizontal padding: 32px (px-8) per DesignOS LogSessionModal
-- Mini-stat card inner padding: 14px top/16px sides per DesignOS (non-standard but matches design)
-- Session table cell padding: 12px vertical / 16px horizontal per DesignOS
+- No non-standard values remain; all spacing snapped to multiples of 4
 
 ---
 
 ## Typography
 
+4 sizes, 2 weights. All roles mapped to one of these.
+
 | Role | Size | Weight | Line Height | Font Family | Usage |
 |------|------|--------|-------------|-------------|-------|
-| Body | 14px | 400 (regular) | 1.5 | Source Sans 3 | Table cells, descriptions, session counts |
-| Label | 10-11px | 600 (semibold) | 1.4 | Source Sans 3 | Uppercase tracking-wider labels (DATE, STITCHES, TOTAL STITCHES) |
-| Heading | 18px | 600 (semibold) | 1.3 | Fraunces | Page subtitle, stat values, project names in cards |
-| Display | 24px | 700 (bold) | 1.2 | Fraunces | "Pattern Dive" page title |
-| Stat Value | 18px | 600 (semibold) | 1.3 | JetBrains Mono | Mini-stat numeric values (tabular-nums) |
-| Helper | 12-13px | 400 (regular) | 1.5 | Source Sans 3 | Hint text, count summaries, sub-labels |
-| Micro | 10px | 600 (semibold) | 1.4 | Source Sans 3 | Uppercase section labels, fabric count headers |
+| Body | 14px | 400 (regular) | 1.5 | Source Sans 3 | Table cells, descriptions, session counts, hint text, count summaries, sub-labels |
+| Micro | 12px | 600 (semibold) | 1.4 | Source Sans 3 | Uppercase tracking-wider labels (DATE, STITCHES, TOTAL STITCHES), section headers, fabric count headers |
+| Heading | 18px | 600 (semibold) | 1.3 | Fraunces | Page subtitle, project names in cards |
+| Display | 24px | 600 (semibold) | 1.2 | Fraunces | "Pattern Dive" page title |
+
+**Stat values** use 18px / 600 (semibold) in JetBrains Mono with `font-variant-numeric: tabular-nums`. Same size and weight as Heading role but different font family for numeric alignment.
 
 Notes:
 - All uppercase labels use `tracking-wider` (letter-spacing: 0.05em)
 - Stat values use `font-variant-numeric: tabular-nums` for alignment
-- Weights used in this phase: 400 (regular) and 600 (semibold), with 700 (bold) only for page display heading
+- Weights used in this phase: 400 (regular) and 600 (semibold) only
+- Previous micro labels at 10-11px consolidated to 12px for legibility and scale compliance
+- Previous helper text at 12-13px consolidated to 14px (Body role)
 
 ---
 
@@ -155,7 +158,7 @@ Uses existing project semantic tokens from `globals.css`. No new tokens needed.
 | Edit mode | Same modal, pre-populated fields, "Delete session" link appears in footer |
 | Delete flow | Two-step inline confirmation: "Delete session" text -> "Delete? [Yes] [No]" buttons |
 | Save | Disabled state when project or stitch count empty (opacity-40) |
-| Close | Backdrop click or Cancel button |
+| Close | Backdrop click or dismiss button (see Copywriting Contract for dismiss label) |
 
 ### Session Table (ProjectSessionsTab & SessionsPage)
 
@@ -214,6 +217,17 @@ Uses existing project semantic tokens from `globals.css`. No new tokens needed.
 
 ---
 
+## Focal Points
+
+| Screen | Focal Point | Rationale |
+|--------|-------------|-----------|
+| LogSessionModal | Stitch count input field | The one required data point per session; eyes land here first |
+| Pattern Dive | Tab bar + active tab content area | Navigation choice drives the entire page; active tab underline in emerald draws focus |
+| ProjectSessionsTab | Mini-stat cards row | Summary numbers at top anchor the session history; table is secondary browse |
+| SessionsPage | Session table (most recent row) | Chronological log; latest entry is the reason users visit this page |
+
+---
+
 ## Copywriting Contract
 
 | Element | Copy | Source |
@@ -224,6 +238,8 @@ Uses existing project semantic tokens from `globals.css`. No new tokens needed.
 | Modal title (edit) | "Edit Session" | DesignOS LogSessionModal |
 | Modal save (create) | "Log Stitches" | DesignOS LogSessionModal |
 | Modal save (edit) | "Save Changes" | DesignOS LogSessionModal |
+| Modal dismiss (create) | "Discard" | Checker revision: explicit dismiss label, avoids blocked "Cancel" |
+| Modal dismiss (edit) | "Discard Changes" | Checker revision: differentiates edit-mode dismiss from create-mode |
 | Date field hint | "Defaults to today. Change to backfill older sessions." | DesignOS LogSessionModal |
 | Stitch count hint | "Number of stitches completed this session" | DesignOS LogSessionModal |
 | Project picker placeholder | "Select a project..." | DesignOS LogSessionModal |
@@ -246,6 +262,10 @@ Uses existing project semantic tokens from `globals.css`. No new tokens needed.
 | What's Next count | "{n} project{s} ready or getting ready to stitch" | DesignOS PatternDive WhatsNextTab |
 | Storage View count | "{n} location{s} . {n} item{s}" | DesignOS PatternDive StorageViewTab |
 | Destructive: Delete session | "Delete session" link -> "Delete? [Yes] [No]" inline confirmation | DesignOS LogSessionModal |
+| Error: session save (validation) | "Session could not be saved. Check that stitch count is a positive number and a project is selected." | Checker revision: specific validation failure message |
+| Error: session save (network) | "Session could not be saved. Check your connection and try again." | Checker revision: specific network failure message |
+| Error: session delete | "Session could not be deleted. Check your connection and try again." | Checker revision: specific failure + solution path |
+| Error: photo upload | "Photo upload failed. Your session was saved without the photo." | Partial success path — session data preserved |
 
 ---
 
@@ -254,7 +274,7 @@ Uses existing project semantic tokens from `globals.css`. No new tokens needed.
 | Breakpoint | Adaptation |
 |------------|------------|
 | Desktop (md+) | Full table layout for sessions, kitting progress bar visible on What's Next cards, fabric count preview visible on Fabric Requirements, storage item fabric names visible |
-| Mobile (<md) | "Log Stitches" TopBar button shows icon only (text hidden via `hidden sm:inline`). Kitting progress bar hidden on What's Next cards (`max-md:hidden`). Fabric count previews hidden. Sessions table scrolls horizontally. Pattern Dive tabs scroll horizontally with `whitespace-nowrap` |
+| Mobile (<md) | "Log Stitches" TopBar button shows icon only (text hidden via `hidden sm:inline`), with `aria-label="Log Stitches"` for screen readers. Kitting progress bar hidden on What's Next cards (`max-md:hidden`). Fabric count previews hidden. Sessions table scrolls horizontally. Pattern Dive tabs scroll horizontally with `whitespace-nowrap` |
 | Touch targets | All interactive elements minimum 44px touch target (`min-h-11`) on mobile |
 
 ---
@@ -265,6 +285,7 @@ Uses existing project semantic tokens from `globals.css`. No new tokens needed.
 |-------------|---------------|
 | Modal focus trap | Dialog component handles focus trap automatically |
 | Modal close on Escape | Built into Dialog component |
+| TopBar button (mobile) | `aria-label="Log Stitches"` on icon-only mobile state |
 | Sort column headers | Clickable with `cursor-pointer`, icon indicates active sort |
 | Tab navigation | ARIA tab pattern via Base UI Tabs component |
 | Edit button label | `title="Edit session"` on pencil icon button |
@@ -281,8 +302,9 @@ Uses existing project semantic tokens from `globals.css`. No new tokens needed.
 - LogSessionModal: No loading state on open (project list passed as props). Save button should show pending state during server action
 
 ### Error States
-- Session save failure: Toast notification "Something went wrong. Please try again." with rollback of any optimistic updates
-- Session delete failure: Toast notification "Could not delete session. Please try again."
+- Session save failure (validation): Toast notification "Session could not be saved. Check that stitch count is a positive number and a project is selected." with rollback of any optimistic updates
+- Session save failure (network): Toast notification "Session could not be saved. Check your connection and try again." with rollback of any optimistic updates
+- Session delete failure: Toast notification "Session could not be deleted. Check your connection and try again."
 - Photo upload failure: Toast notification "Photo upload failed. Your session was saved without the photo."
 
 ### Optimistic Updates
@@ -307,7 +329,7 @@ No third-party registries declared for this phase.
 The sessions tab uses a 4-column grid of mini-stat cards. Each card follows this exact layout:
 
 ```
-[icon 13px] [UPPERCASE LABEL 10px tracking-wider]
+[icon 13px] [UPPERCASE LABEL 12px tracking-wider semibold]
 [VALUE 18px semibold tabular-nums]
 ```
 
@@ -320,7 +342,7 @@ The sessions tab uses a 4-column grid of mini-stat cards. Each card follows this
 
 Card background: `bg-stone-50 dark:bg-stone-800/50`
 Card border-radius: `rounded-lg` (8px)
-Card padding: 14px top, 16px sides
+Card padding: 12px top, 16px sides
 Grid gap: 12px
 Responsive: 4 columns on desktop, 2 columns on mobile
 
