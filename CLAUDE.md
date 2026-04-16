@@ -4,9 +4,9 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 2 (Browse & Organize) | **Phase:** 7 — planned, ready to execute
-**Last Updated:** 2026-04-15
-**Roadmap:** 4 milestones / 11 phases — v1.0 shipped, M2 phases 5-6 complete, phase 7 next
+**Milestone:** 2 (Browse & Organize) | **Phase:** 7 — COMPLETE, v1.1 milestone done
+**Last Updated:** 2026-04-16
+**Roadmap:** 4 milestones / 11 phases — v1.0 shipped, v1.1 complete (phases 5-7), v1.2 next
 
 ### Done
 
@@ -114,20 +114,23 @@
   - Loading skeleton now view-agnostic (4x4 animated stitch grid instead of gallery card wireframes)
   - 9 new tests (4 hook persistence, 5 back link), all passing
 
-- **Phase 7: Project Detail Experience** — executed, pending review fixes + verification (2026-04-15)
-  - 6 plans in 4 waves: data layer + hero → tabs + supplies tab → SearchToAdd enhancements → page wiring + schema push
-  - All plans executed: 864 tests passing, schema pushed, checkpoint feedback applied
-  - Checkpoint fixes: removed mono font, added "Designer:"/"Stitch Count:" labels, exact/estimated indicator, "187w × 248h" dimensions, designer linked to /designers/[id], empty state supplies add buttons
-  - **Code review** (2026-04-15): 38 files, 3 critical + 3 warning + 3 info findings
-    - CR-01–03: Auth bypass in supply remove/update/add actions (no ownership check)
-    - WR-01: Hardcoded brandId in InlineSupplyCreate, WR-02: missing router.refresh on remove, WR-03: no fabricCount=0 guard
-  - User feedback to discuss: genre pills on hero, clickable genres/designers, project setup content, kitting checklist (onion skin, stitching app), storage location, edit modal redesign
+- **Phase 7: Project Detail Experience** — COMPLETE (2026-04-16)
+  - 8 plans (6 original + 2 gap closure): data layer + hero → tabs + supplies tab → SearchToAdd enhancements → page wiring → UAT gap fixes → visual consistency + color filter
+  - 866 tests passing, schema pushed, all UAT items verified
+  - Gap closure: skein formula corrected (1.3 constant), FINISHED/FFO section ordering, supply section UI fixes, visual consistency with Overview tab, color family filter dropdown
+  - Auth fixes: ownership mocks added for CR-01/CR-02/CR-03 supply action tests
+  - Stitch count input widened (w-16 text-xs) for 4+ digit numbers
+  - **Code review** (2026-04-16): 38 files, 1 critical + 2 warning + 3 info
+    - CR-01: getProjectSupplies missing ownership check (any authenticated user can read any project's supplies)
+    - WR-01: resolveDefaultBrandId shared "Custom" brand across supply types, WR-02: calculator settings stale closure
+  - User feedback deferred: genre pills, clickable genres/designers, project setup content, kitting checklist, storage location, edit modal redesign
 
 ### Next Up
 
-1. `/gsd-code-review-fix 7` — fix 3 critical auth bypasses + 3 warnings
-2. Phase verification → ship
-3. `/gsd-explore` — discuss user feedback items (genre pills, project setup, kitting, edit modal) before deciding scope
+1. `/gsd-ship 7` — create PR, run multi-agent review, fix findings
+2. `/gsd-code-review-fix 7` — fix CR-01 (getProjectSupplies ownership) before or after PR
+3. `/gsd-complete-milestone` — v1.1 Browse & Organize milestone wrap-up
+4. `/gsd-explore` — discuss user feedback items (genre pills, project setup, kitting, edit modal) before v1.2
 
 ### Backlog (post-MVP)
 
@@ -140,7 +143,7 @@
 - 999.0.10: Quick-add missing supplies from project detail page — if a thread/bead/specialty item isn't in the catalog, allow inline creation without navigating away to the supplies page
 - 999.0.12: Collapsible projects in shopping list — list gets long fast; projects should be collapsible with collapsed as the default state
 - 999.0.13: Thread colour picker scroll UX — adding thread colours doesn't auto-scroll to keep the search box/+Add more button visible; needs scrollIntoView or similar when adding items
-- 999.0.15: SearchToAdd panel positioning for long lists — when flipUp activates, panel overlays existing thread rows (bottom-0); ideally should use a portal or anchor to the "+ Add more" button so it opens adjacent without covering content
+- 999.0.15: SearchToAdd side-by-side layout — current drop-up panel covers existing supply rows (especially with color family dropdown), making it hard to see what was just added; redesign as side-by-side on desktop (supply list left, SearchToAdd panel right in a 2-column grid when active, collapse back to single column on close); mobile falls back to current overlay; replaces portal/anchor approach — this is a layout problem, not a positioning one
 - 999.0.16: SearchToAdd highlight conflict — first item starts with bg-muted highlight (highlightIndex=0) which clashes with hover:bg-muted on other items; should only show keyboard highlight after arrow key use, not on initial render
 - 999.0.14: Project Bin & iPad App management — "Add New" with empty search creates "New Location" with no way to rename; need proper add/edit/delete for storage locations and stitching apps (currently hardcoded arrays in project-setup-section.tsx)
 - 999.0.17: StorageLocation/StitchingApp multi-user hardening — add @@unique([userId, name]) and @@index([userId]) to both models in schema.prisma (no uniqueness check at DB or app level currently); also add ownership validation on writes in chart-actions.ts createChart/updateChart — storageLocationId and stitchingAppId are passed directly without verifying they belong to user.id (fabric already has this check, these don't)
