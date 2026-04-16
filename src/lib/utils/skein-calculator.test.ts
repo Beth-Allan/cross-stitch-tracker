@@ -2,12 +2,26 @@ import { describe, it, expect } from "vitest";
 import { calculateSkeins } from "./skein-calculator";
 
 describe("calculateSkeins", () => {
-  it("calculates correct skeins for 1000 stitches, 14ct, 2 strands, over 2, 20% waste", () => {
+  it("calculates ~1 skein for 1000 stitches on 14ct Aida over 1 with 2 strands, 20% waste", () => {
+    // effectiveCount = 14/1 = 14
+    // threadPerStitch = (2 * 1.3) / 14 = 0.1857
+    // rawSkeins = (1000 * 0.1857 * 1.2) / 255 = 0.874
+    // ceil = 1
+    const result = calculateSkeins({
+      stitchCount: 1000,
+      strandCount: 2,
+      fabricCount: 14,
+      overCount: 1,
+      wastePercent: 20,
+    });
+    expect(result).toBe(1);
+  });
+
+  it("calculates ~2 skeins for 1000 stitches on 14ct over 2 with 2 strands, 20% waste", () => {
     // effectiveCount = 14/2 = 7
-    // threadPerStitch = (2 * 6) / 7 = 1.714 inches
-    // wasteFactor = 1.2
-    // rawSkeins = (1000 * 1.714 * 1.2) / 255 = 2057.14 / 255 = 8.067
-    // ceil(8.067) = 9
+    // threadPerStitch = (2 * 1.3) / 7 = 0.3714
+    // rawSkeins = (1000 * 0.3714 * 1.2) / 255 = 1.747
+    // ceil = 2
     const result = calculateSkeins({
       stitchCount: 1000,
       strandCount: 2,
@@ -15,14 +29,14 @@ describe("calculateSkeins", () => {
       overCount: 2,
       wastePercent: 20,
     });
-    expect(result).toBe(9);
+    expect(result).toBe(2);
   });
 
-  it("calculates correct skeins for 10000 stitches, 14ct, 2 strands, over 2, 20% waste", () => {
+  it("calculates ~18 skeins for 10000 stitches on 14ct over 2 with 2 strands, 20% waste", () => {
     // effectiveCount = 14/2 = 7
-    // threadPerStitch = (2 * 6) / 7 = 1.714
-    // rawSkeins = (10000 * 1.714 * 1.2) / 255 = 20571.4 / 255 = 80.67
-    // ceil(80.67) = 81
+    // threadPerStitch = (2 * 1.3) / 7 = 0.3714
+    // rawSkeins = (10000 * 0.3714 * 1.2) / 255 = 17.47
+    // ceil = 18
     const result = calculateSkeins({
       stitchCount: 10000,
       strandCount: 2,
@@ -30,14 +44,14 @@ describe("calculateSkeins", () => {
       overCount: 2,
       wastePercent: 20,
     });
-    expect(result).toBe(81);
+    expect(result).toBe(18);
   });
 
-  it("calculates correct skeins for 10000 stitches with over 1 (uses less thread)", () => {
+  it("calculates ~9 skeins for 10000 stitches on 14ct over 1 with 2 strands, 20% waste", () => {
     // effectiveCount = 14/1 = 14
-    // threadPerStitch = (2 * 6) / 14 = 0.857
-    // rawSkeins = (10000 * 0.857 * 1.2) / 255 = 10285.7 / 255 = 40.34
-    // ceil(40.34) = 41
+    // threadPerStitch = (2 * 1.3) / 14 = 0.1857
+    // rawSkeins = (10000 * 0.1857 * 1.2) / 255 = 8.74
+    // ceil = 9
     const result = calculateSkeins({
       stitchCount: 10000,
       strandCount: 2,
@@ -45,7 +59,7 @@ describe("calculateSkeins", () => {
       overCount: 1,
       wastePercent: 20,
     });
-    expect(result).toBe(41);
+    expect(result).toBe(9);
   });
 
   it("returns 0 for stitchCount of 0", () => {
@@ -119,22 +133,6 @@ describe("calculateSkeins", () => {
     expect(result).toBeGreaterThan(0);
   });
 
-  it("handles typical 14ct Aida over 1 correctly", () => {
-    // 14ct Aida is typically stitched over 1
-    // effectiveCount = 14/1 = 14
-    // threadPerStitch = (2 * 6) / 14 = 0.857
-    // rawSkeins = (1000 * 0.857 * 1.2) / 255 = 1028.57 / 255 = 4.03
-    // ceil(4.03) = 5
-    const result = calculateSkeins({
-      stitchCount: 1000,
-      strandCount: 2,
-      fabricCount: 14,
-      overCount: 1,
-      wastePercent: 20,
-    });
-    expect(result).toBe(5);
-  });
-
   it("over 2 uses exactly twice the thread per stitch as over 1", () => {
     // With over 2, effectiveCount halves, so thread per stitch doubles
     const over1 = calculateSkeins({
@@ -152,9 +150,9 @@ describe("calculateSkeins", () => {
       wastePercent: 0,
     });
     // over 2 raw value is exactly 2x over 1, but ceiling may differ slightly
-    // over 1 raw = 10000 * 12/14 / 255 = 33.61 -> 34
-    // over 2 raw = 10000 * 12/7 / 255 = 67.23 -> 68
-    expect(over2).toBe(68);
-    expect(over1).toBe(34);
+    // over 1 raw = 10000 * 2.6/14 / 255 = 7.28 -> 8
+    // over 2 raw = 10000 * 2.6/7 / 255 = 14.56 -> 15
+    expect(over1).toBe(8);
+    expect(over2).toBe(15);
   });
 });

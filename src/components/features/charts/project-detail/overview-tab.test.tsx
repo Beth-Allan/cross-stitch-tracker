@@ -99,6 +99,33 @@ describe("OverviewTab", () => {
       );
     });
 
+    it("renders Project Setup section for FINISHED status", () => {
+      const chart = makeChart({
+        project: {
+          status: "FINISHED",
+          finishDate: new Date("2025-06-01"),
+          stitchesCompleted: 45000,
+        },
+      });
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+
+      expect(screen.getByText("Project Setup")).toBeInTheDocument();
+    });
+
+    it("renders Project Setup section for FFO status", () => {
+      const chart = makeChart({
+        project: {
+          status: "FFO",
+          finishDate: new Date("2025-06-01"),
+          ffoDate: new Date("2025-07-01"),
+          stitchesCompleted: 45000,
+        },
+      });
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+
+      expect(screen.getByText("Project Setup")).toBeInTheDocument();
+    });
+
     it("does NOT render Progress or Kitting for KITTED", () => {
       const chart = makeChart({ project: { status: "KITTED", stitchesCompleted: 0 } });
       render(<OverviewTab chart={chart} supplies={makeSupplies()} />);

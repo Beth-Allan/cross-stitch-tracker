@@ -107,6 +107,6 @@ export const SECTION_ORDER: Record<ProjectStatus, OverviewSection[]> = {
   KITTED: ["patternDetails", "projectSetup", "dates"],
   IN_PROGRESS: ["progress", "patternDetails", "dates", "projectSetup"],
   ON_HOLD: ["progress", "patternDetails", "dates", "projectSetup"],
-  FINISHED: ["completion", "patternDetails", "dates"],
-  FFO: ["completion", "patternDetails", "dates"],
+  FINISHED: ["completion", "patternDetails", "dates", "projectSetup"],
+  FFO: ["completion", "patternDetails", "dates", "projectSetup"],
 };
