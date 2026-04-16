@@ -101,7 +101,7 @@ Plans:
 - [x] 07-04-PLAN.md — Supplies tab: settings bar, two-line supply rows, calculator integration, totals
 - [x] 07-05-PLAN.md — SearchToAdd enhancements: inline create, scroll/positioning/highlight fixes
 - [x] 07-06-PLAN.md — Page wiring, schema push, visual verification checkpoint
-- [ ] 07-07-PLAN.md — Gap closure: Fix section ordering, skein formula, supply button bugs
+- [x] 07-07-PLAN.md — Gap closure: Fix section ordering, skein formula, supply button bugs
 - [ ] 07-08-PLAN.md — Gap closure: Supplies tab visual consistency, SearchToAdd color filter
 **UI hint**: yes
 
