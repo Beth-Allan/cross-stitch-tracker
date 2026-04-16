@@ -57,7 +57,7 @@ export function EditableNumber({
             setEditing(false);
           }
         }}
-        className="bg-card text-foreground border-primary focus:ring-primary/40 w-14 rounded border px-1.5 py-0.5 text-center font-mono text-sm tabular-nums focus:ring-2 focus:outline-none"
+        className="bg-card text-foreground border-primary focus:ring-primary/40 w-16 rounded border px-1.5 py-0.5 text-center font-mono text-xs tabular-nums focus:ring-2 focus:outline-none"
       />
     );
   }
