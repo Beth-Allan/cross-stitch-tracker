@@ -20,21 +20,21 @@ export function HeroCoverBanner({ imageUrl, chartName }: HeroCoverBannerProps) {
   if (!imageUrl || imgError) return null;
 
   return (
-    <div className="relative w-full overflow-hidden rounded-lg bg-muted max-h-64 md:max-h-48 max-[767px]:max-h-40">
+    <div className="bg-muted relative max-h-64 w-full overflow-hidden rounded-lg max-[767px]:max-h-40 md:max-h-48">
       {/* Blurred background fill (per RESEARCH.md Pitfall 1: use filter:blur on <img>, NOT backdrop-filter) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={imageUrl}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover scale-110 blur-[20px] opacity-60"
+        className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-[20px]"
       />
       {/* Foreground image with object-contain (D-01: never crop) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={imageUrl}
         alt={`Cover for ${chartName}`}
-        className="relative mx-auto max-h-64 w-full object-contain md:max-h-48 max-[767px]:max-h-40"
+        className="relative mx-auto max-h-64 w-full object-contain max-[767px]:max-h-40 md:max-h-48"
         loading="lazy"
         decoding="async"
         onError={() => setImgError(true)}

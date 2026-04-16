@@ -17,9 +17,7 @@ describe("HeroStatusBadge", () => {
   });
 
   it("renders different status labels correctly", () => {
-    const { unmount } = render(
-      <HeroStatusBadge chartId="c1" currentStatus="UNSTARTED" />,
-    );
+    const { unmount } = render(<HeroStatusBadge chartId="c1" currentStatus="UNSTARTED" />);
     expect(screen.getByText("Unstarted")).toBeInTheDocument();
     unmount();
 
@@ -28,9 +26,7 @@ describe("HeroStatusBadge", () => {
   });
 
   it("renders chevron-down icon", () => {
-    const { container } = render(
-      <HeroStatusBadge chartId="c1" currentStatus="KITTING" />,
-    );
+    const { container } = render(<HeroStatusBadge chartId="c1" currentStatus="KITTING" />);
     // The SelectTrigger includes a ChevronDown icon via the select primitive
     // We just verify the trigger renders with the select component
     expect(container.querySelector("[data-slot='select-trigger']")).toBeInTheDocument();
@@ -38,9 +34,7 @@ describe("HeroStatusBadge", () => {
 
   it('has aria-label "Change project status"', () => {
     render(<HeroStatusBadge chartId="c1" currentStatus="IN_PROGRESS" />);
-    expect(
-      screen.getByLabelText("Change project status"),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Change project status")).toBeInTheDocument();
   });
 
   it("has min-h-11 for 44px touch target", () => {
@@ -50,9 +44,7 @@ describe("HeroStatusBadge", () => {
   });
 
   it("renders status dot with correct color class", () => {
-    const { container } = render(
-      <HeroStatusBadge chartId="c1" currentStatus="KITTED" />,
-    );
+    const { container } = render(<HeroStatusBadge chartId="c1" currentStatus="KITTED" />);
     const dot = container.querySelector("[aria-hidden='true']");
     expect(dot).toBeInTheDocument();
     expect(dot?.className).toContain("bg-emerald-500");
