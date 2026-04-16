@@ -657,6 +657,7 @@ describe("supply-actions", () => {
 
   describe("addThreadToProject", () => {
     it("creates junction record with default quantity 1", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const mockJunction = createMockProjectThread({
         projectId: "p1",
         threadId: "t1",
@@ -681,6 +682,7 @@ describe("supply-actions", () => {
     });
 
     it("returns error for duplicate project+thread (P2002)", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const p2002Error = Object.assign(new Error("Unique constraint"), {
         code: "P2002",
       });
@@ -701,6 +703,7 @@ describe("supply-actions", () => {
 
   describe("addBeadToProject", () => {
     it("creates junction record", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const mockJunction = createMockProjectBead({
         projectId: "p1",
         beadId: "b1",
@@ -717,6 +720,7 @@ describe("supply-actions", () => {
     });
 
     it("returns error for duplicate (P2002)", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const p2002Error = Object.assign(new Error("Unique constraint"), {
         code: "P2002",
       });
@@ -737,6 +741,7 @@ describe("supply-actions", () => {
 
   describe("addSpecialtyToProject", () => {
     it("creates junction record", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const mockJunction = createMockProjectSpecialty({
         projectId: "p1",
         specialtyItemId: "s1",
@@ -753,6 +758,7 @@ describe("supply-actions", () => {
     });
 
     it("returns error for duplicate (P2002)", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const p2002Error = Object.assign(new Error("Unique constraint"), {
         code: "P2002",
       });
@@ -773,6 +779,7 @@ describe("supply-actions", () => {
 
   describe("updateProjectSupplyQuantity", () => {
     it("updates thread junction record quantities", async () => {
+      mockPrisma.projectThread.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
       const updated = createMockProjectThread({
         id: "pt1",
         quantityRequired: 3,
@@ -794,6 +801,7 @@ describe("supply-actions", () => {
     });
 
     it("updates bead junction record quantities", async () => {
+      mockPrisma.projectBead.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
       const updated = createMockProjectBead({ id: "pb1", quantityRequired: 5 });
       mockPrisma.projectBead.update.mockResolvedValueOnce(updated);
       const { updateProjectSupplyQuantity } = await import("./supply-actions");
@@ -810,6 +818,9 @@ describe("supply-actions", () => {
     });
 
     it("updates specialty junction record quantities", async () => {
+      mockPrisma.projectSpecialty.findUnique.mockResolvedValueOnce({
+        project: { userId: "user-1" },
+      });
       const updated = createMockProjectSpecialty({
         id: "ps1",
         quantityAcquired: 1,
@@ -831,6 +842,7 @@ describe("supply-actions", () => {
 
   describe("removeProjectThread", () => {
     it("deletes junction record and returns success", async () => {
+      mockPrisma.projectThread.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
       mockPrisma.projectThread.delete.mockResolvedValueOnce({});
       const { removeProjectThread } = await import("./supply-actions");
 
@@ -845,6 +857,7 @@ describe("supply-actions", () => {
 
   describe("removeProjectBead", () => {
     it("deletes junction record and returns success", async () => {
+      mockPrisma.projectBead.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
       mockPrisma.projectBead.delete.mockResolvedValueOnce({});
       const { removeProjectBead } = await import("./supply-actions");
 
@@ -859,6 +872,9 @@ describe("supply-actions", () => {
 
   describe("removeProjectSpecialty", () => {
     it("deletes junction record and returns success", async () => {
+      mockPrisma.projectSpecialty.findUnique.mockResolvedValueOnce({
+        project: { userId: "user-1" },
+      });
       mockPrisma.projectSpecialty.delete.mockResolvedValueOnce({});
       const { removeProjectSpecialty } = await import("./supply-actions");
 
