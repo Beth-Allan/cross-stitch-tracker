@@ -41,9 +41,12 @@ async function resolveDefaultBrandId(
 ): Promise<string> {
   if (brandId !== "default") return brandId;
 
+  // Use distinct brand names per supply type so each type gets its own
+  // "Custom" brand record with the correct supplyType field.
+  const brandName = `Custom (${supplyType.charAt(0) + supplyType.slice(1).toLowerCase()})`;
   const brand = await prisma.supplyBrand.upsert({
-    where: { name: "Custom" },
-    create: { name: "Custom", supplyType },
+    where: { name: brandName },
+    create: { name: brandName, supplyType },
     update: {},
   });
   return brand.id;
