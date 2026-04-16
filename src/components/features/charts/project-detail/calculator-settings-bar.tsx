@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useCallback } from "react";
+import { useState, useTransition, useCallback, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { EditableNumber } from "@/components/features/charts/editable-number";
 import { updateProjectSettings } from "@/lib/actions/chart-actions";
@@ -38,12 +38,19 @@ export function CalculatorSettingsBar({
 
   const currentSettings = isPending ? localSettings : settings;
 
+  // Keep a ref to the latest settings so handleSettingChange always reads
+  // the most recent value, avoiding stale closures during rapid edits.
+  const settingsRef = useRef(currentSettings);
+  useEffect(() => {
+    settingsRef.current = currentSettings;
+  }, [currentSettings]);
+
   // ─── Handlers ─────────────────────────────────────────────────────────────
   // All hooks must be declared before any conditional returns (React rules of hooks)
 
   const handleSettingChange = useCallback(
     (field: keyof CalculatorSettings, value: number) => {
-      const newSettings = { ...currentSettings, [field]: value };
+      const newSettings = { ...settingsRef.current, [field]: value };
       setLocalSettings(newSettings);
       onSettingsChange(newSettings);
 
@@ -62,7 +69,7 @@ export function CalculatorSettingsBar({
         }
       });
     },
-    [chartId, currentSettings, settings, onSettingsChange],
+    [chartId, settings, onSettingsChange],
   );
 
   const handleStrandChange = useCallback(
