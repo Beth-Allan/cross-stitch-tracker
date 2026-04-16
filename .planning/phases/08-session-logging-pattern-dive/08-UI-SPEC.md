@@ -36,9 +36,8 @@ Declared values (multiples of 4, consistent with existing project):
 | Token | Value | Usage in this phase |
 |-------|-------|---------------------|
 | 2xs | 4px | Icon-text gaps (e.g. sort arrow beside header), inline badge padding |
-| xs | 8px | Compact element spacing, gap between filter pills, table cell vertical padding |
-| sm | 12px | Mini-stat card top padding, session table cell vertical padding, mini-stat grid gap |
-| md | 16px | Default element spacing, card side padding, modal body field spacing |
+| xs | 8px | Compact element spacing, gap between filter pills, table cell vertical padding, session table cell vertical padding |
+| md | 16px | Default element spacing, card side padding, modal body field spacing, mini-stat card top padding, mini-stat grid gap |
 | lg | 24px | Section breaks within a tab, gap between mini-stat cards (desktop), modal section padding |
 | xl | 32px | Page-level horizontal padding, modal horizontal padding, Pattern Dive outer padding |
 | 2xl | 48px | Empty state vertical padding |
@@ -46,7 +45,7 @@ Declared values (multiples of 4, consistent with existing project):
 
 Exceptions:
 - Modal horizontal padding: 32px (px-8) per DesignOS LogSessionModal
-- No non-standard values remain; all spacing snapped to multiples of 4
+- All spacing values use the standard set {4, 8, 16, 24, 32, 48, 64}; no non-standard values remain
 
 ---
 
@@ -265,7 +264,7 @@ Uses existing project semantic tokens from `globals.css`. No new tokens needed.
 | Error: session save (validation) | "Session could not be saved. Check that stitch count is a positive number and a project is selected." | Checker revision: specific validation failure message |
 | Error: session save (network) | "Session could not be saved. Check your connection and try again." | Checker revision: specific network failure message |
 | Error: session delete | "Session could not be deleted. Check your connection and try again." | Checker revision: specific failure + solution path |
-| Error: photo upload | "Photo upload failed. Your session was saved without the photo." | Partial success path — session data preserved |
+| Error: photo upload | "Photo upload failed. Your session was saved without the photo." | Partial success path -- session data preserved |
 
 ---
 
@@ -342,8 +341,8 @@ The sessions tab uses a 4-column grid of mini-stat cards. Each card follows this
 
 Card background: `bg-stone-50 dark:bg-stone-800/50`
 Card border-radius: `rounded-lg` (8px)
-Card padding: 12px top, 16px sides
-Grid gap: 12px
+Card padding: 16px top, 16px sides
+Grid gap: 16px
 Responsive: 4 columns on desktop, 2 columns on mobile
 
 ---
