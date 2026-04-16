@@ -185,8 +185,8 @@ describe("OverviewTab", () => {
       const chart = makeChart();
       render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
 
-      // formatDate produces "Jan 1, 2025" style
-      expect(screen.getByText(/Jan/)).toBeInTheDocument();
+      // formatDateOnly produces "Jan 1, 2025" style
+      expect(screen.getByText(/Jan 1, 2025/)).toBeInTheDocument();
     });
 
     it("shows formatted start date when present", () => {
