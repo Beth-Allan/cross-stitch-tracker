@@ -8,20 +8,12 @@ A personal cross-stitch project management app that replaced a complex Notion sy
 
 A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
 
-## Current Milestone: v1.1 Browse & Organize
+## Current State
 
-**Goal:** Make the collection browsable and visually appealing, with quality-of-life improvements to project setup and supply management.
+**Shipped:** v1.1 Browse & Organize (2026-04-16)
+**Next:** v1.2 Track & Measure — dashboards, session logging, activity stats
 
-**Target features:**
-- Gallery cards with status-specific layouts
-- Gallery/list/table view modes with sorting
-- Storage location management with proper CRUD
-- Wire fabric selector into chart form
-- Per-colour stitch counts & automatic skein calculator
-- Rework supply entry workflow
-- Complete DMC catalog (DMC 1-149 including Blanc, Ecru)
-- Cover image aspect ratio fix
-- Thread colour picker scroll UX fix
+The app now has a browsable gallery experience with three view modes, a rich project detail page with tabbed layout and skein calculator, and proper storage/app management. 867 tests, deployed to Vercel.
 
 ## Requirements
 
@@ -42,18 +34,18 @@ A stitcher can manage their entire chart collection and supplies faster and more
 - ✓ Project-to-supply linking with per-project quantities (three junction tables) — v1.0
 - ✓ Fabric CRUD with size auto-calculation — v1.0
 - ✓ Auto-generated shopping lists grouped by project with fulfillment tracking — v1.0
-
-### Active — Milestone 2: Browse & Organize (v1.1)
-
-- [ ] Gallery cards with status-specific layouts (WIP: progress, Unstarted: kitting, Finished: completion)
-- [ ] Gallery/list/table view modes with sorting
-- [ ] Storage location management with proper CRUD (replacing hardcoded arrays)
-- [ ] Wire fabric selector into chart form
-- [ ] Per-colour stitch counts & automatic skein calculator
-- [ ] Rework supply entry workflow (maintain insertion order, streamlined flow)
-- [ ] Complete DMC catalog (fill gaps: DMC 1-149 including Blanc, Ecru)
-- [ ] Cover image aspect ratio fix
-- [ ] Thread colour picker scroll UX fix
+- ✓ Gallery cards with status-specific layouts (WIP progress, kitting dots, celebration borders) — v1.1
+- ✓ Gallery/list/table view modes with sorting and view persistence — v1.1
+- ✓ Storage location management with proper CRUD and detail pages — v1.1
+- ✓ Stitching app management with CRUD and detail pages — v1.1
+- ✓ Fabric selector wired into chart form with inline "Add New" — v1.1
+- ✓ Per-colour stitch counts & automatic skein calculator with manual override — v1.1
+- ✓ Supply entry workflow with insertion order, inline create, and color family filter — v1.1
+- ✓ DMC catalog completed to 495 threads (Blanc, Ecru, 1-149 filled) — v1.1
+- ✓ Cover image aspect ratio fix (object-contain with letterboxing) — v1.1
+- ✓ Thread colour picker scroll UX fix with viewport collision detection — v1.1
+- ✓ Project detail page with hero banner, tabbed layout, supplies tab — v1.1
+- ✓ Search and filter by name, designer, status, and size category — v1.1
 
 ### Active — Milestone 3: Track & Measure
 
@@ -96,20 +88,24 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 ## Context
 
-**Current state (v1.0 shipped):**
-- 48k LOC TypeScript, 395 tests, deployed to Vercel
+**Current state (v1.1 shipped):**
+- 867 tests, deployed to Vercel
 - Tech stack: Next.js 16, Prisma 7, Tailwind v4, Auth.js v5 beta, shadcn/ui v4 (Base UI)
 - Database: PostgreSQL on Neon (prod), Cloudflare R2 (file storage)
-- 15 backlog items captured from smoke testing (see CLAUDE.md backlog section)
-- 8 minor tech debt items documented in milestone audit
+- 25+ backlog items captured (see CLAUDE.md backlog section)
+- Gallery with 3 view modes, project detail with tabbed layout, skein calculator
+- Storage location and stitching app management with CRUD + detail pages
+- DMC catalog complete at 495 threads
 
-**Design system:** Emerald/amber/stone palette. Fraunces headings, Source Sans 3 body, JetBrains Mono hero stats. 7 status colors. Full design token CSS.
+**Design system:** Emerald/amber/stone palette. Fraunces headings, Source Sans 3 body, JetBrains Mono hero stats. 7 status colors. Full design token CSS. Semantic tokens used throughout (bg-card, text-muted-foreground, etc.).
 
 **50+ components designed:** All sections in `product-plan/` with screenshots. Components map to phases via `.claude/rules/ui-design-reference.md`.
 
-**Data model:** ~20 entities including 9 supply/fabric models. Three separate junction tables (ProjectThread, ProjectBead, ProjectSpecialty). Calculated fields at query time.
+**Data model:** ~20 entities including 9 supply/fabric models. Three separate junction tables (ProjectThread, ProjectBead, ProjectSpecialty). Calculated fields at query time. Per-colour stitch counts with skein calculator formula.
 
 **User context:** Power user replacing Notion. 500+ charts. Mac + iPhone. Stitches on iPad apps (Markup R-XP, Saga). Wants speed, comprehensive stats, polished UX.
+
+**User feedback from v1.1 UAT:** Genre pills on project detail, clickable genres/designers, project setup content, kitting checklist, storage location on detail page, edit modal redesign — all deferred to future milestones.
 
 ## Constraints
 
@@ -135,6 +131,14 @@ A stitcher can manage their entire chart collection and supplies faster and more
 | Fabric bundled with supplies (Phase 4) | Both are "stuff linked to projects"; fabric needed for kitting assessment | ✓ Good |
 | Pre-seeded DMC catalog in MVP | Search-and-select is the Notion-beater, not manual entry | ✓ Good |
 | Sessions after browsing/dashboards | Collection-level stats don't need sessions; activity stats do | — Pending |
+| InlineNameEdit + DeleteEntityDialog reusable pattern | Storage/app pages share identical CRUD UX; extract once, reuse | ✓ Good |
+| SearchableSelect with inline "Add New" | Avoids navigating away from chart form to create new entities | ✓ Good |
+| Gallery view modes with URL state | nuqs for URL params, localStorage fallback for persistence | ✓ Good |
+| Status-specific gallery card footers | WIP/Unstarted/Finished each show relevant info; data-driven kitting dots | ✓ Good |
+| Skein formula: 1.3 constant | Validated against community calculators; replaced initial 6.0 overestimate | ✓ Good |
+| Native select for color family filter | Simpler than shadcn Select inside floating SearchToAdd panel | ✓ Good |
+| Tabbed project detail (Overview + Supplies) | Separates browsing from supply management; URL-persisted tab state | ✓ Good |
+| TooltipTrigger without asChild | Avoids nested button hydration issues with Base UI | ✓ Good |
 | Kitting auto-calc deferred | 8-condition status is complex; MVP tracks supplies without auto-computing "kitted" | ✓ Good |
 | SAL support deferred | Multi-part charts add complexity; core CRUD sufficient for MVP | ✓ Good |
 | Zod 3 over Zod 4 | Zod 4 was beta at time of Phase 1; stable 3.24.4 chosen | ✓ Good |
@@ -161,4 +165,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-11 after milestone v1.1 started*
+*Last updated: 2026-04-16 after v1.1 milestone complete*
