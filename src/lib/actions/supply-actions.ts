@@ -455,22 +455,44 @@ export async function updateProjectSupplyQuantity(
   type: "thread" | "bead" | "specialty",
   formData: unknown,
 ) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validated = updateQuantitySchema.parse(formData);
 
+    // Verify ownership before updating
     if (type === "thread") {
+      const record = await prisma.projectThread.findUnique({
+        where: { id },
+        select: { project: { select: { userId: true } } },
+      });
+      if (!record || record.project.userId !== user.id) {
+        return { success: false as const, error: "Supply not found" };
+      }
       await prisma.projectThread.update({
         where: { id },
         data: validated,
       });
     } else if (type === "bead") {
+      const record = await prisma.projectBead.findUnique({
+        where: { id },
+        select: { project: { select: { userId: true } } },
+      });
+      if (!record || record.project.userId !== user.id) {
+        return { success: false as const, error: "Supply not found" };
+      }
       await prisma.projectBead.update({
         where: { id },
         data: validated,
       });
     } else {
+      const record = await prisma.projectSpecialty.findUnique({
+        where: { id },
+        select: { project: { select: { userId: true } } },
+      });
+      if (!record || record.project.userId !== user.id) {
+        return { success: false as const, error: "Supply not found" };
+      }
       await prisma.projectSpecialty.update({
         where: { id },
         data: validated,
