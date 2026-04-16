@@ -4,162 +4,52 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 2 (Browse & Organize) | **Phase:** 7 — COMPLETE, v1.1 milestone done
+**Milestone:** v1.1 shipped | **Next:** v1.2 Track & Measure
 **Last Updated:** 2026-04-16
-**Roadmap:** 4 milestones / 11 phases — v1.0 shipped, v1.1 complete (phases 5-7), v1.2 next
+**Roadmap:** 4 milestones / 11 phases — v1.0 + v1.1 shipped, v1.2 next (phases 8-9)
 
 ### Done
 
-- **v1.0 MVP shipped** (2026-04-11): 4 phases, 23 plans, 48k LOC, 395 tests, tagged `v1.0`
-  - Full details: `.planning/MILESTONES.md` and `.planning/RETROSPECTIVE.md`
+- **v1.0 MVP shipped** (2026-04-11): 4 phases, 23 plans, 395 tests, tagged `v1.0`
   - Archived to: `.planning/milestones/v1.0-*`
   - Live at: https://cross-stitch-tracker-adolwyn.vercel.app
-- 12 quick-fix tasks completed post-deploy (thread sort, idempotency, thumbnails, etc.)
-- **Phase 5: Foundation & Quick Wins** (2026-04-12–13): 8 plans, 506 tests passing
-  - Storage Location & Stitching App CRUD (data layer + UI)
-  - Chart form wired to database-backed dropdowns with inline "Add New"
-  - Fabric selector wired in chart form
-  - Cover image aspect ratio fix, thread picker scroll fix, DMC catalog completed
-  - Gap closure: Prisma client regen + onAddNew handlers
-  - Gap closure: SearchableSelect "Add New" only shows with search text, thread picker stays open for multi-add
-  - Gap closure: SearchableSelect forceMount (spaces in search), thread picker viewport flip
-  - **Database sync required:** `prisma db push` needed after schema changes (no migration created)
-- **Phase 5 audit + harden + polish** (2026-04-12): impeccable:audit scored 15/20, all P1-P2 fixes applied
-  - Fixed blur-cancels-tab bug in InlineAddRow, added aria-labels, wired label association on SearchableSelect
-  - Replaced transition-all, added responsive breakpoint, removed dead code — score now 17/20
-- **Critique report infrastructure fixes** (2026-04-12): addressed P3/P4 from critique (scored 24/40)
-  - 11 loading.tsx skeleton screens (all dashboard routes), global-error.tsx, not-found.tsx
-  - Sidebar nav grouped into 4 labeled sections (Projects, Track, Reference, System) with dividers — desktop + mobile
-  - Polish: transition-colors, semantic avatar tokens, max-w-7xl content constraint, font-heading consistency
-- **Phase 5 code review** (2026-04-13): 38 files reviewed, 3 critical + 3 warning + 3 info findings
-  - Critical: authz bypass in storage/stitching app actions, hardcoded `@default("1")` on Project.userId
-- **Human UAT session** (2026-04-13): 5 passed, 1 blocked
-  - Fixed: SearchableSelect "Add New" now opens InlineNameDialog (matches designer pattern) instead of silent no-op
-  - Added: InlineNameDialog component, use-chart-form handler tests, integration tests with real cmdk
-  - Fixed: Thread picker flipUp positioning — `bottom-full` sent panel off-screen on long lists, changed to `bottom-0`
-  - Fixed: Click-outside handler timing — replaced rAF with 200ms timestamp guard
-  - Passed: Storage CRUD, Stitching App, Add New dialog, Fabric selector, Thread picker multi-add
-  - Blocked: Cover image (no local file storage configured)
-- **Code review fixes** (2026-04-13): 3 critical findings fixed
-  - WR-01: try/catch around deleteChart in startTransition
-  - WR-02: userId filter on storage location and stitching app list queries
-  - WR-03: userId scoping to fabric actions via linked project ownership
-- **Phase 5 shipped** (2026-04-13): PR #7 — 74 commits, 126 files, 535 tests, 8 REQ-IDs
-- **PR review round 1 fixes** (2026-04-13): all 5 critical + 6 important findings addressed
-  - C1-C2: Removed try/catch from 12 read-only actions (error boundaries handle DB failures)
-  - C3: Wrapped chart+fabric operations in `$transaction`
-  - C4-C5: Added fabric ownership rejection + getUnassignedFabrics tests
-  - I1-I6: ProjectStatus type, SearchToAdd error state, fabric ownership check, delete dialog retry, auth guard tests, form error logging
-  - 546 tests passing, build clean
-- **PR review round 2 fixes** (2026-04-12): all 3 critical + 8 important + 9 suggestions addressed
-  - C1: createFabric ownership check on linkedProjectId
-  - C2: Removed error-swallowing try/catch from 6 read-only designer/genre actions
-  - C3: InlineNameEdit stays in edit mode on save failure (callers re-throw)
-  - I1-I2: Happy-path tests for createChart + updateChart fabric link/unlink logic
-  - I3: try/catch on handleDelete in 4 components, I4: semantic tokens in global-error
-  - I8: Thumbnail failure → console.error + warning field + client toast
-  - S1-S2: Flattened \_count.projects → projectCount, extracted EntityProject type
-  - S5: Removed dead ChartListItem/ChartDetail types, S8: stale Prisma comment
-  - 567 tests passing, TypeScript clean
-- **PR review round 3 fixes** (2026-04-12): 2 critical + 6 important findings addressed
-  - C1: updateChart now returns thumbnail warning (mirrors createChart)
-  - C2: Series hint changed from stale "Phase 5" to "Coming soon"
-  - I1: DeleteChartDialog stays open on failure, I2-I3: console.error in empty catches
-  - I4: Cover image shows error on presigned URL failure
-  - I5: createChart fabric ownership rejection test, I6: expanded fabric ownership comment
-  - 568 tests passing, TypeScript clean
+- **v1.1 Browse & Organize shipped** (2026-04-16): 3 phases, 20 plans, 867 tests, tagged `v1.1`
+  - Phase 5: Storage/app CRUD, fabric selector, DMC catalog, UX fixes (PR #7)
+  - Phase 6: Gallery cards, 3 view modes, sorting/search/filtering (PR #15)
+  - Phase 7: Project detail hero, tabbed layout, skein calculator, supply redesign (PR #16)
+  - Archived to: `.planning/milestones/v1.1-*`
+  - Full details: `.planning/MILESTONES.md` and `.planning/RETROSPECTIVE.md`
 
 ### In Progress
 
-- **Phase 6: Gallery Cards & View Modes** — all 4 plans executed + visual verification + audit fixes applied
-  - 06-01: Data layer, types, URL state hook, server action (66 tests)
-  - 06-02: GalleryCard with 3 status-specific footers (37 tests)
-  - 06-03: FilterBar, FilterChips, MultiSelectDropdown, SortDropdown, ViewToggleBar (31 tests)
-  - 06-04: GalleryGrid, ProjectGallery orchestrator, /charts page wiring, sidebar rename
-  - **Visual verification fixes** (2026-04-13): back link Charts→Projects, thumbnails in list/table views, table bg-card + underline links, kitting dots reworked to data-driven (quantityAcquired vs quantityRequired) with new "partial" amber state
-  - **Impeccable audit** (2026-04-13): scored 14/20 — all P1/P2 findings addressed across 4 skills:
-    - `/harden`: ARIA on dropdowns (aria-expanded, listbox/option roles, keyboard nav), search aria-label, 44px touch targets, chip hit areas, header wrapping, search chip truncation
-    - `/optimize`: lazy loading + decoding=async on all images, removed backdrop-blur GPU cost, cached Intl.NumberFormat
-    - `/adapt`: ListView grid collapses to 3 columns on mobile (was 7-column inline grid)
-    - `/polish`: extracted shared formatters, STATUS_GRADIENTS → Tailwind classes with dark: variants, celebration styles → class-based with boosted dark shadow opacity, ~30 stone-\* neutrals → semantic tokens
-  - **Impeccable critique** (2026-04-13): scored 26/40 on Nielsen's heuristics, AI slop PASS
-    - 4x P2 findings: ARIA violation (role="checkbox" in role="option"), search clear button, sort direction visibility, Progress/Stitches shared sort field
-    - 2x P2 additions: ListView missing role="list", styled tooltips for kitting dots + size categories
-    - 1x P3: loading skeleton doesn't match gallery card grid layout
-    - Minor: duplicate kitting icon code, hardcoded stone colors, dual transition utilities
-    - Full report: `.planning/phases/06-gallery-cards-view-modes/CRITIQUE.md`
-  - **Critique fixes** (2026-04-13): all P2/P3 findings + minor items addressed
-    - `/harden` pass 1: Removed invalid role="checkbox" in role="option", added role="list"/role="listitem" to ListView
-    - `/harden` pass 2: Search clear button, directional sort arrow, new "progress" sort field (Progress/Stitches now sort independently)
-    - `/harden` pass 3: Styled Base UI tooltips on kitting dots + size badges (all 3 views), shared KittingDotIcon export, stone-\* → semantic tokens
-    - `/polish`: Loading skeleton matches gallery card grid, fixed dual transition override, empty filter state has suggestion text + "Clear all filters" button
-  - **Critique re-run** (2026-04-13): scored 28/40 on Nielsen's heuristics, AI slop PASS (2 false positives)
-    - 3x P2 findings: search only matches project name (not designer), view toggle title tooltips invisible on touch, list view mobile too sparse
-    - 2x P3 findings: gallery grid not center-justified, loading skeleton missing page header
-  - **Critique re-run fixes** (2026-04-13): all P2/P3 findings addressed
-    - `/harden`: Search matches designer name + project name; view toggle uses Base UI Tooltip (touch-accessible)
-    - `/adapt`: List view mobile 4-column grid with StatusBadge + compact stat line (ListMobileStat)
-    - `/layout`: Gallery grid centered with justify-center
-    - `/polish`: Loading skeleton restructured to match real page layout (header + separator + toggle bar)
-    - 148 gallery tests passing, TypeScript clean
-  - **UAT verified** (2026-04-15): 9/10 passed, 1 dev-only hydration issue (Turbopack cache staleness — not a code bug)
-  - **Phase 6 complete** (2026-04-15): marked complete in ROADMAP + STATE, transitioned to Phase 7
-  - **Phase 6 shipped** (2026-04-14): PR #15 created, multi-agent review (4 agents), 4 important + 1 suggestion fixed
-    - Removed stray "use client" from test, defensive Date coercion in formatDate, dead types removed, progress sort tests added, exhaustive never check in compareFn
-    - 150 gallery tests passing, TypeScript clean, build passing
-
-- **Quick fix: gallery view mode persistence** (2026-04-15): localStorage persistence for view mode, back link preserves view param, loading skeleton replaced with themed stitch animation
-  - localStorage write on setView, mount-time restore when no URL param present
-  - BackToGalleryLink client component reads localStorage for back navigation
-  - Loading skeleton now view-agnostic (4x4 animated stitch grid instead of gallery card wireframes)
-  - 9 new tests (4 hook persistence, 5 back link), all passing
-
-- **Phase 7: Project Detail Experience** — COMPLETE (2026-04-16)
-  - 8 plans (6 original + 2 gap closure): data layer + hero → tabs + supplies tab → SearchToAdd enhancements → page wiring → UAT gap fixes → visual consistency + color filter
-  - 866 tests passing, schema pushed, all UAT items verified
-  - Gap closure: skein formula corrected (1.3 constant), FINISHED/FFO section ordering, supply section UI fixes, visual consistency with Overview tab, color family filter dropdown
-  - Auth fixes: ownership mocks added for CR-01/CR-02/CR-03 supply action tests
-  - Stitch count input widened (w-16 text-xs) for 4+ digit numbers
-  - **Code review** (2026-04-16): 38 files, 1 critical + 2 warning + 3 info
-    - CR-01: getProjectSupplies missing ownership check (any authenticated user can read any project's supplies)
-    - WR-01: resolveDefaultBrandId shared "Custom" brand across supply types, WR-02: calculator settings stale closure
-  - User feedback deferred: genre pills, clickable genres/designers, project setup content, kitting checklist, storage location, edit modal redesign
+Nothing — between milestones.
 
 ### Next Up
 
-1. `/gsd-ship 7` — create PR, run multi-agent review, fix findings
-2. `/gsd-code-review-fix 7` — fix CR-01 (getProjectSupplies ownership) before or after PR
-3. `/gsd-complete-milestone` — v1.1 Browse & Organize milestone wrap-up
-4. `/gsd-explore` — discuss user feedback items (genre pills, project setup, kitting, edit modal) before v1.2
+1. `/gsd-new-milestone` — define v1.2 Track & Measure (requirements → roadmap)
+2. `/gsd-explore` — discuss user feedback items (genre pills, project setup, kitting, edit modal) before v1.2 planning
 
-### Backlog (post-MVP)
+### Backlog
 
-- **999.0: Multiple digital working copies per chart (HIGH PRIORITY)** — support multiple files per chart (PDF, Saga .saga/.oxs/.xsd, Pattern Keeper .pdf, etc.). Needs ChartFile table (name, type, key, chartId) to replace single digitalWorkingCopyUrl field.
-- **999.0.1: Wire fabric selector in chart form (HIGH PRIORITY)** — fabric CRUD exists (Phase 4) but chart form still shows disabled "Phase 5" placeholder. Wire dropdown to fetch unassigned fabrics, save linkedProjectId. Also update Series placeholder.
-- **999.0.2: Per-colour stitch counts & skein calculator (HIGH PRIORITY)** — when adding thread colours to a chart, allow entering stitch count per colour; auto-calculate skeins needed (based on fabric count, strand count, stitch type); sum per-colour counts for total stitch count; needs manual override for charts without per-colour data; future: track stitch types (cross, backstitch, french knots, etc.) which affect thread usage differently
-- 999.0.4: Duplicate chart detection — add a check (by name + designer) to warn before creating a chart that may already exist
-- 999.0.7: Rework project supply entry workflow — supplies should maintain insertion order during entry (easier to verify nothing skipped); detail page can sort independently; consider a dedicated "set up project" flow that combines chart creation + supply entry in one workflow
-- 999.0.9: Incomplete DMC thread catalog — seed data starts at DMC 150, missing 1-149 (including Blanc, Ecru) plus any other gaps; need complete fixture file (~500+ colours)
-- 999.0.10: Quick-add missing supplies from project detail page — if a thread/bead/specialty item isn't in the catalog, allow inline creation without navigating away to the supplies page
-- 999.0.12: Collapsible projects in shopping list — list gets long fast; projects should be collapsible with collapsed as the default state
-- 999.0.13: Thread colour picker scroll UX — adding thread colours doesn't auto-scroll to keep the search box/+Add more button visible; needs scrollIntoView or similar when adding items
-- 999.0.15: SearchToAdd side-by-side layout — current drop-up panel covers existing supply rows (especially with color family dropdown), making it hard to see what was just added; redesign as side-by-side on desktop (supply list left, SearchToAdd panel right in a 2-column grid when active, collapse back to single column on close); mobile falls back to current overlay; replaces portal/anchor approach — this is a layout problem, not a positioning one
-- 999.0.16: SearchToAdd highlight conflict — first item starts with bg-muted highlight (highlightIndex=0) which clashes with hover:bg-muted on other items; should only show keyboard highlight after arrow key use, not on initial render
-- 999.0.14: Project Bin & iPad App management — "Add New" with empty search creates "New Location" with no way to rename; need proper add/edit/delete for storage locations and stitching apps (currently hardcoded arrays in project-setup-section.tsx)
-- 999.0.17: StorageLocation/StitchingApp multi-user hardening — add @@unique([userId, name]) and @@index([userId]) to both models in schema.prisma (no uniqueness check at DB or app level currently); also add ownership validation on writes in chart-actions.ts createChart/updateChart — storageLocationId and stitchingAppId are passed directly without verifying they belong to user.id (fabric already has this check, these don't)
-- 999.0.18: Test infrastructure cleanup for $transaction — createMockPrisma() should default $transaction to handle both callback and array forms (duplicated in chart-actions-errors/thumbnail tests); also fix vacuous $transaction assertions in delete tests (storage-location, stitching-app, designer, genre) where calling mock methods inside toHaveBeenCalledWith records side-effect calls and compares undefined values
-- 999.0.19: Refactor clickable card rows to avoid nested interactive elements — storage-location-list.tsx and stitching-app-list.tsx use role="button" div containing Rename/Delete buttons (ARIA violation); restructure so navigable element and action buttons are siblings
-- 999.0.20: Supply action ownership rejection tests (HIGH PRIORITY) — updateProjectSupplyQuantity (3 branches), removeProjectThread/Bead/Specialty, and addThread/Bead/SpecialtyToProject all have ownership checks but zero tests verifying rejection when project belongs to different user; same class as CR-01 bug — if someone regresses these checks, nothing catches it
-- 999.0.21: EditableNumber invalid input feedback — component silently discards invalid values (non-numeric, out of range) on blur with no user indication; should show brief visual feedback (red border flash or shake) so users know their entry was rejected; especially problematic for stitch counts where a typo like "15o00" silently reverts
-- 999.0.22: Clean up planning doc references in code comments — several comments reference internal planning IDs ("Pitfall 5", "Pitfall 6", "D-01", "D-02", "D-06", "D-17") that are opaque without .planning/ docs; either expand inline or remove; also remove misleading "Recalculate when props change" comment in supply-row.tsx:53
-- 999.0.23: Narrow strandCount type to literal union — CalculatorSettings uses `strandCount: number` but domain is 1-6; could be typed as `1 | 2 | 3 | 4 | 5 | 6` matching the `overCount: 1 | 2` pattern for compile-time safety
-- 999.0.24: Add skein calculator edge case tests — calculateSkeins with fabricCount=0 guard is untested (division-by-zero protection); resolveDefaultBrandId per-type brand naming from WR-01 fix has no regression test
+- **999.0: Multiple digital working copies per chart (HIGH PRIORITY)** — ChartFile table to replace single digitalWorkingCopyUrl field
+- 999.0.4: Duplicate chart detection — warn before creating a chart that may already exist
+- 999.0.10: Quick-add missing supplies from project detail page — inline creation without navigating away
+- 999.0.12: Collapsible projects in shopping list — collapsed as default state
+- 999.0.15: SearchToAdd side-by-side layout — desktop 2-column grid when active, mobile overlay fallback
+- 999.0.16: SearchToAdd highlight conflict — only show keyboard highlight after arrow key use
+- 999.0.17: StorageLocation/StitchingApp multi-user hardening — @@unique([userId, name]), ownership validation on writes
+- 999.0.18: Test infrastructure cleanup for $transaction — createMockPrisma() defaults, vacuous assertion fixes
+- 999.0.19: Refactor clickable card rows to avoid nested interactive elements (ARIA violation)
+- **999.0.20: Supply action ownership rejection tests (HIGH PRIORITY)** — zero tests verifying rejection when project belongs to different user
+- 999.0.21: EditableNumber invalid input feedback — visual indication when entry is rejected
+- 999.0.22: Clean up planning doc references in code comments
+- 999.0.23: Narrow strandCount type to literal union (1-6)
+- 999.0.24: Add skein calculator edge case tests (fabricCount=0, resolveDefaultBrandId)
 - 999.1: Supply detail modal (read-only view with "used in projects" list)
 - 999.2: Bulk supply editor
 - 999.3: Fabric type hierarchy (replace flat dropdown)
-- 999.4: Project supplies as separate tab
-- 999.5: Supplies page first-load view flash (URL param fixes refresh, but first navigation still shows default view briefly before localStorage kicks in — investigate SSR cookie or middleware approach)
-- 999.6: Cover image preview aspect ratio — h-32 + object-cover crops tall/square images into a narrow strip; use object-contain or dynamic aspect ratio (cover-image-upload.tsx:155)
+- 999.5: Supplies page first-load view flash (investigate SSR cookie or middleware)
+- 999.6: Cover image preview aspect ratio — use object-contain or dynamic aspect ratio
 
 ### Blockers
 
