@@ -20,7 +20,7 @@ export const uploadRequestSchema = z.object({
     .int()
     .positive()
     .max(MAX_FILE_SIZE, "File is too large. Maximum size is 10MB."),
-  category: z.enum(["covers", "files"]),
+  category: z.enum(["covers", "files", "sessions"]),
   projectId: z.string().min(1),
 });
 
