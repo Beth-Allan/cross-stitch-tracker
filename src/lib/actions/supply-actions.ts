@@ -635,7 +635,16 @@ export async function removeProjectSpecialty(id: string) {
 }
 
 export async function getProjectSupplies(projectId: string) {
-  await requireAuth();
+  const user = await requireAuth();
+
+  // Verify project ownership
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { userId: true },
+  });
+  if (!project || project.userId !== user.id) {
+    return { threads: [], beads: [], specialty: [] };
+  }
 
   const [threads, beads, specialty] = await Promise.all([
     prisma.projectThread.findMany({

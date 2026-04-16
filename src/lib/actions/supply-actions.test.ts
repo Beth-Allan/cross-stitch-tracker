@@ -889,6 +889,7 @@ describe("supply-actions", () => {
 
   describe("getProjectSupplies", () => {
     it("returns threads, beads, specialty grouped with brand details", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const brand = createMockSupplyBrand();
       mockPrisma.projectThread.findMany.mockResolvedValueOnce([
         {
@@ -919,6 +920,7 @@ describe("supply-actions", () => {
     });
 
     it("returns threads ordered by createdAt ascending (insertion order)", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const brand = createMockSupplyBrand();
       // Threads returned in insertion order (createdAt ascending) from DB
       const thread1 = {
@@ -953,6 +955,30 @@ describe("supply-actions", () => {
           orderBy: { createdAt: "asc" },
         }),
       );
+    });
+
+    it("returns empty arrays when project not owned by user", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { getProjectSupplies } = await import("./supply-actions");
+
+      const result = await getProjectSupplies("proj-1");
+
+      expect(result.threads).toHaveLength(0);
+      expect(result.beads).toHaveLength(0);
+      expect(result.specialty).toHaveLength(0);
+      // Should NOT query junction tables when ownership fails
+      expect(mockPrisma.projectThread.findMany).not.toHaveBeenCalled();
+    });
+
+    it("returns empty arrays when project does not exist", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce(null);
+      const { getProjectSupplies } = await import("./supply-actions");
+
+      const result = await getProjectSupplies("nonexistent");
+
+      expect(result.threads).toHaveLength(0);
+      expect(result.beads).toHaveLength(0);
+      expect(result.specialty).toHaveLength(0);
     });
   });
 
