@@ -28,7 +28,7 @@ export function calculateSkeins(params: {
   wastePercent: number; // 0-50, default 20
 }): number {
   const { stitchCount, strandCount, fabricCount, overCount, wastePercent } = params;
-  if (stitchCount <= 0) return 0;
+  if (stitchCount <= 0 || fabricCount <= 0) return 0;
 
   const effectiveCount = fabricCount / overCount;
   const threadPerStitch = (strandCount * INCHES_PER_STITCH_UNIT) / effectiveCount;
