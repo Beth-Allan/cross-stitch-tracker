@@ -10,7 +10,7 @@ Design components from `product-plan/sections/` are imported and adapted as each
 
 - ✅ **v1.0 MVP — "Replace Notion"** — Phases 1-4 (shipped 2026-04-11)
 - ✅ **v1.1 Browse & Organize** — Phases 5-7 (shipped 2026-04-16)
-- 📋 **v1.2 Track & Measure** — Phases 8-9 (planned)
+- 🚧 **v1.2 Track & Measure** — Phases 8-9 (in progress)
 - 📋 **v1.3 Motivation & Planning** — Phases 10-11 (planned)
 
 ## Phases
@@ -38,10 +38,12 @@ Full details: `milestones/v1.1-ROADMAP.md`
 
 </details>
 
-### 📋 v1.2 Track & Measure
+### 🚧 v1.2 Track & Measure
 
-- [ ] **Phase 8: Dashboards & Collection Views** - Main dashboard, Pattern Dive browser, shopping cart dashboard
-- [ ] **Phase 9: Session Logging & Activity Stats** - Quick session entry, progress tracking, activity statistics
+**Milestone Goal:** Add session logging as the data foundation for progress tracking, evolve the Charts page into Pattern Dive, and build dashboard pages that surface collection insights and streamline shopping.
+
+- [ ] **Phase 8: Session Logging & Pattern Dive** - StitchSession model, global log modal, auto-updating progress, Pattern Dive tabs
+- [ ] **Phase 9: Dashboards & Shopping Cart** - Main Dashboard, Project Dashboard, Shopping Cart upgrade with project selection
 
 ### 📋 v1.3 Motivation & Planning
 
@@ -50,24 +52,28 @@ Full details: `milestones/v1.1-ROADMAP.md`
 
 ## Phase Details
 
-### Phase 8: Dashboards & Collection Views
-**Goal**: Users have a main dashboard and collection-level statistics that don't depend on session logging
-**Depends on**: Phase 6 (uses gallery cards and filter components)
-**Requirements**: TBD (v1.2 milestone)
+### Phase 8: Session Logging & Pattern Dive
+**Goal**: Users can log stitch sessions that automatically update project progress, and browse their collection through specialized Pattern Dive tabs
+**Depends on**: Phase 7 (uses project detail tabbed layout, gallery infrastructure from Phase 6)
+**Requirements**: SESS-01, SESS-02, SESS-03, SESS-04, SESS-05, SESS-06, PDIV-01, PDIV-02, PDIV-03, PDIV-04, PDIV-05
 **Success Criteria** (what must be TRUE):
-  1. Main Dashboard shows recently added projects, currently stitching projects, buried treasures, and a spotlight feature
-  2. Pattern Dive provides a library browser with filtering, fabric requirements display, and storage location views
+  1. User can log a stitch session from the header, project detail page, or dashboard, providing date, project, stitch count, and optionally time and a progress photo
+  2. After logging, editing, or deleting a session, the project's progress percentage updates automatically without manual recalculation
+  3. User can view a per-project session history on the project detail Sessions tab showing total stitches, session count, average per session, and active-since date
+  4. User can navigate Pattern Dive tabs (Browse, What's Next, Fabric Requirements, Storage View) to explore their collection from different angles
+  5. The Charts page nav label reads "Pattern Dive" while the URL path remains `/charts`
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 9: Session Logging & Activity Stats
-**Goal**: Users can log daily stitch sessions and see activity-based statistics
-**Depends on**: Phase 8
-**Requirements**: TBD (v1.2 milestone)
+### Phase 9: Dashboards & Shopping Cart
+**Goal**: Users have a curated home dashboard, a progress-oriented project dashboard, and a shopping cart that lets them plan supply runs by project
+**Depends on**: Phase 8 (dashboards use session data for "last stitched" sorting, progress aggregations, and stitching-day stats)
+**Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, PROJ-01, PROJ-02, PROJ-03, PROJ-04, PROJ-05, SHOP-01, SHOP-02, SHOP-03, SHOP-04
 **Success Criteria** (what must be TRUE):
-  1. User can log a stitch session (date, project, count, optional photo, optional time) in under 30 seconds
-  2. Project progress percentage updates automatically from logged sessions
-  3. App displays activity statistics: daily, weekly, monthly, yearly stitch counts
+  1. User sees a Main Dashboard home page with Currently Stitching (sorted by most recently worked on), Start Next, Buried Treasures, Spotlight, and Collection Stats sections
+  2. User can use Quick Add from the dashboard to create charts, supplies, designers, or log a session without navigating away
+  3. User sees a Project Dashboard with hero stats, progress buckets (Unstarted through Almost There) with sortable projects, and a Finished tab with per-project stats sortable by multiple dimensions
+  4. User can select specific projects to shop for, see aggregated supply needs in tabbed view (Threads, Beads, Specialty, Fabric) with badge counts, and mark individual items as acquired
 **Plans**: TBD
 **UI hint**: yes
 
@@ -96,7 +102,8 @@ Full details: `milestones/v1.1-ROADMAP.md`
 
 ## Execution Order
 
-- v1.1: 5 → 6 → 7 (6 and 7 both depend on 5; 7 benefits from 6 being complete but not strictly required)
+- v1.0: 1 → 2 → 3 → 4
+- v1.1: 5 → 6 → 7
 - v1.2: 8 → 9
 - v1.3: 10 → 11
 
@@ -111,7 +118,7 @@ Full details: `milestones/v1.1-ROADMAP.md`
 | 5. Foundation & Quick Wins | v1.1 | 8/8 | Complete | 2026-04-13 |
 | 6. Gallery Cards & View Modes | v1.1 | 4/4 | Complete | 2026-04-15 |
 | 7. Project Detail Experience | v1.1 | 8/8 | Complete | 2026-04-16 |
-| 8. Dashboards & Collection Views | v1.2 | 0/TBD | Not started | - |
-| 9. Session Logging & Activity Stats | v1.2 | 0/TBD | Not started | - |
+| 8. Session Logging & Pattern Dive | v1.2 | 0/TBD | Not started | - |
+| 9. Dashboards & Shopping Cart | v1.2 | 0/TBD | Not started | - |
 | 10. Advanced Stats | v1.3 | 0/TBD | Not started | - |
 | 11. Goals & Scheduling | v1.3 | 0/TBD | Not started | - |

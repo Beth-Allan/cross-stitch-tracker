@@ -98,38 +98,38 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SESS-01 | TBD | Pending |
-| SESS-02 | TBD | Pending |
-| SESS-03 | TBD | Pending |
-| SESS-04 | TBD | Pending |
-| SESS-05 | TBD | Pending |
-| SESS-06 | TBD | Pending |
-| DASH-01 | TBD | Pending |
-| DASH-02 | TBD | Pending |
-| DASH-03 | TBD | Pending |
-| DASH-04 | TBD | Pending |
-| DASH-05 | TBD | Pending |
-| DASH-06 | TBD | Pending |
-| PDIV-01 | TBD | Pending |
-| PDIV-02 | TBD | Pending |
-| PDIV-03 | TBD | Pending |
-| PDIV-04 | TBD | Pending |
-| PDIV-05 | TBD | Pending |
-| PROJ-01 | TBD | Pending |
-| PROJ-02 | TBD | Pending |
-| PROJ-03 | TBD | Pending |
-| PROJ-04 | TBD | Pending |
-| PROJ-05 | TBD | Pending |
-| SHOP-01 | TBD | Pending |
-| SHOP-02 | TBD | Pending |
-| SHOP-03 | TBD | Pending |
-| SHOP-04 | TBD | Pending |
+| SESS-01 | Phase 8 | Pending |
+| SESS-02 | Phase 8 | Pending |
+| SESS-03 | Phase 8 | Pending |
+| SESS-04 | Phase 8 | Pending |
+| SESS-05 | Phase 8 | Pending |
+| SESS-06 | Phase 8 | Pending |
+| DASH-01 | Phase 9 | Pending |
+| DASH-02 | Phase 9 | Pending |
+| DASH-03 | Phase 9 | Pending |
+| DASH-04 | Phase 9 | Pending |
+| DASH-05 | Phase 9 | Pending |
+| DASH-06 | Phase 9 | Pending |
+| PDIV-01 | Phase 8 | Pending |
+| PDIV-02 | Phase 8 | Pending |
+| PDIV-03 | Phase 8 | Pending |
+| PDIV-04 | Phase 8 | Pending |
+| PDIV-05 | Phase 8 | Pending |
+| PROJ-01 | Phase 9 | Pending |
+| PROJ-02 | Phase 9 | Pending |
+| PROJ-03 | Phase 9 | Pending |
+| PROJ-04 | Phase 9 | Pending |
+| PROJ-05 | Phase 9 | Pending |
+| SHOP-01 | Phase 9 | Pending |
+| SHOP-02 | Phase 9 | Pending |
+| SHOP-03 | Phase 9 | Pending |
+| SHOP-04 | Phase 9 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 26 total
-- Mapped to phases: 0
-- Unmapped: 26
+- Mapped to phases: 26
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-15 after initial definition*
+*Last updated: 2026-04-16 after roadmap creation*
