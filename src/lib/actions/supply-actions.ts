@@ -370,10 +370,20 @@ export async function getSupplyBrands() {
 // ─── Junction Operations ─────────────────────────────────────────────────────
 
 export async function addThreadToProject(formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validated = projectThreadSchema.parse(formData);
+
+    // Verify project ownership
+    const project = await prisma.project.findUnique({
+      where: { id: validated.projectId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
     const record = await prisma.projectThread.create({ data: validated });
     revalidatePath(`/charts/${validated.projectId}`);
     revalidatePath("/shopping");
@@ -397,10 +407,20 @@ export async function addThreadToProject(formData: unknown) {
 }
 
 export async function addBeadToProject(formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validated = projectBeadSchema.parse(formData);
+
+    // Verify project ownership
+    const project = await prisma.project.findUnique({
+      where: { id: validated.projectId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
     const record = await prisma.projectBead.create({ data: validated });
     revalidatePath(`/charts/${validated.projectId}`);
     revalidatePath("/shopping");
@@ -424,10 +444,20 @@ export async function addBeadToProject(formData: unknown) {
 }
 
 export async function addSpecialtyToProject(formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validated = projectSpecialtySchema.parse(formData);
+
+    // Verify project ownership
+    const project = await prisma.project.findUnique({
+      where: { id: validated.projectId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
     const record = await prisma.projectSpecialty.create({ data: validated });
     revalidatePath(`/charts/${validated.projectId}`);
     revalidatePath("/shopping");
