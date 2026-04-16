@@ -50,6 +50,7 @@ Nothing — between milestones.
 - 999.3: Fabric type hierarchy (replace flat dropdown)
 - 999.5: Supplies page first-load view flash (investigate SSR cookie or middleware)
 - 999.6: Cover image preview aspect ratio — use object-contain or dynamic aspect ratio
+- 999.7: Estimated completion dates — compute "at this pace, finish on [date]" from session averages + remaining stitches; display on project detail and dashboard cards
 
 ### Blockers
 
