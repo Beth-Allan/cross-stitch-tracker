@@ -1,6 +1,6 @@
 ---
 phase: 07-project-detail-experience
-reviewed: 2026-04-16T00:03:41Z
+reviewed: 2026-04-15T19:00:00Z
 depth: standard
 files_reviewed: 38
 files_reviewed_list:
@@ -43,150 +43,138 @@ files_reviewed_list:
   - src/lib/utils/skein-calculator.ts
   - src/lib/validations/supply.ts
 findings:
-  critical: 3
-  warning: 3
+  critical: 1
+  warning: 2
   info: 3
-  total: 9
+  total: 6
 status: issues_found
 ---
 
 # Phase 7: Code Review Report
 
-**Reviewed:** 2026-04-16T00:03:41Z
+**Reviewed:** 2026-04-15T19:00:00Z
 **Depth:** standard
 **Files Reviewed:** 38
 **Status:** issues_found
 
 ## Summary
 
-Phase 7 adds the Project Detail Experience: a hero section with interactive status change and delete, tabbed layout (Overview + Supplies), a skein calculator with editable settings, inline supply management (add/remove/edit quantities), and inline supply creation for missing catalog items. The code is well-structured with proper auth guards on new server actions (`updateProjectSettings`, `createAndAdd*`), Zod validation at all boundaries, optimistic UI with rollback, and thorough test coverage.
+Phase 7 adds the Project Detail Experience: hero section with interactive status badge, cover banner, and kebab menu; tabbed layout (Overview + Supplies); skein calculator with editable settings bar; inline supply management (add/remove/edit quantities via SearchToAdd); and inline supply creation for missing catalog items.
 
-Three critical authorization bypass findings affect supply mutation actions (`remove*`, `updateProjectSupplyQuantity`, `add*ToProject`) that accept arbitrary record/project IDs without verifying ownership. Three warnings cover a hardcoded placeholder brand ID that will cause FK errors, missing `router.refresh()` after supply removal, and a potential division-by-zero in the skein calculator. Three info items note code duplication opportunities and an unusual render-time setState pattern.
+This is a second-pass review. The previous review's 3 critical auth bypasses (remove/update/add supply actions) and 3 warnings (hardcoded brandId, missing router.refresh, fabricCount guard) have all been fixed. The supply actions now consistently verify project ownership before mutations. The `resolveDefaultBrandId` helper handles the "default" brand placeholder. The skein calculator guards against `fabricCount <= 0`.
+
+Remaining concerns: one authorization gap on a read-only action, a stale-closure risk in the settings bar, a data integrity issue with the shared "Custom" brand, and minor code quality items.
 
 ## Critical Issues
 
-### CR-01: Authorization bypass in removeProjectThread / removeProjectBead / removeProjectSpecialty
+### CR-01: getProjectSupplies lacks ownership check -- any authenticated user can read any project's supplies
 
-**File:** `src/lib/actions/supply-actions.ts:494-540`
-**Issue:** These three actions accept a junction record ID and delete it without verifying the record belongs to the authenticated user's project. While `requireAuth()` is called (confirming the user is logged in), there is no ownership check on the specific record. Any authenticated user who knows or enumerates a junction record ID could delete supply links from another user's project. This is the same class of authorization bypass previously fixed for other actions in Phase 5 (WR-02/WR-03).
-**Fix:** Look up the junction record's associated project and verify `project.userId === user.id` before deleting:
+**File:** `src/lib/actions/supply-actions.ts:637-659`
+**Issue:** `getProjectSupplies` only calls `requireAuth()` but does not verify that the requesting user owns the project. Since this is exported from a `"use server"` module, it is a publicly callable server action. Any authenticated user could call `getProjectSupplies("any-project-id")` directly from client code and retrieve another user's supply data -- thread color codes, quantities needed/acquired, brand names, and stitch counts per color.
+
+The page-level call path (`charts/[id]/page.tsx`) gates through `getChart()` which does check ownership, so normal UI navigation is safe. But the server action surface is directly accessible.
+**Fix:**
 ```ts
-export async function removeProjectThread(id: string) {
+export async function getProjectSupplies(projectId: string) {
   const user = await requireAuth();
 
-  try {
-    const record = await prisma.projectThread.findUnique({
-      where: { id },
-      select: { project: { select: { userId: true } } },
-    });
-    if (!record || record.project.userId !== user.id) {
-      return { success: false as const, error: "Supply not found" };
-    }
-
-    await prisma.projectThread.delete({ where: { id } });
-    revalidatePath("/shopping");
-    return { success: true as const };
-  } catch (error) {
-    console.error("removeProjectThread error:", error);
-    return { success: false as const, error: "Failed to remove thread from project" };
+  // Verify project ownership
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { userId: true },
+  });
+  if (!project || project.userId !== user.id) {
+    return { threads: [], beads: [], specialty: [] };
   }
+
+  const [threads, beads, specialty] = await Promise.all([
+    prisma.projectThread.findMany({
+      where: { projectId },
+      include: { thread: { include: { brand: true } } },
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.projectBead.findMany({
+      where: { projectId },
+      include: { bead: { include: { brand: true } } },
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.projectSpecialty.findMany({
+      where: { projectId },
+      include: { specialtyItem: { include: { brand: true } } },
+      orderBy: { createdAt: "asc" },
+    }),
+  ]);
+
+  return { threads, beads, specialty };
 }
 ```
-Apply the same pattern to `removeProjectBead` (line 510) and `removeProjectSpecialty` (line 526).
-
-### CR-02: Authorization bypass in updateProjectSupplyQuantity
-
-**File:** `src/lib/actions/supply-actions.ts:453-492`
-**Issue:** `updateProjectSupplyQuantity` accepts a junction record ID and type, validates the quantity data via Zod, then updates the record directly without verifying the record belongs to the authenticated user. An attacker could modify `stitchCount`, `quantityRequired`, `quantityAcquired`, or `isNeedOverridden` on any user's project supplies by providing a valid junction ID and type.
-**Fix:** Add ownership verification before the update:
-```ts
-// For type === "thread":
-const record = await prisma.projectThread.findUnique({
-  where: { id },
-  select: { project: { select: { userId: true } } },
-});
-if (!record || record.project.userId !== user.id) {
-  return { success: false as const, error: "Supply not found" };
-}
-await prisma.projectThread.update({ where: { id }, data: validated });
-```
-Apply for all three type branches (thread, bead, specialty).
-
-### CR-03: Authorization bypass in addThreadToProject / addBeadToProject / addSpecialtyToProject
-
-**File:** `src/lib/actions/supply-actions.ts:372-451`
-**Issue:** These three actions accept a `projectId` from the client and create a junction record without verifying the project belongs to the authenticated user. An attacker could link arbitrary supplies to another user's project. The `createAndAdd*` variants (lines 566+) DO correctly verify project ownership via `prisma.project.findUnique` + `userId` check -- the plain `add*ToProject` variants are the gap.
-**Fix:** Add the same ownership check used in the `createAndAdd*` functions:
-```ts
-export async function addThreadToProject(formData: unknown) {
-  const user = await requireAuth();
-
-  try {
-    const validated = projectThreadSchema.parse(formData);
-
-    // Verify project ownership
-    const project = await prisma.project.findUnique({
-      where: { id: validated.projectId },
-      select: { userId: true },
-    });
-    if (!project || project.userId !== user.id) {
-      return { success: false as const, error: "Project not found" };
-    }
-
-    const record = await prisma.projectThread.create({ data: validated });
-    revalidatePath(`/charts/${validated.projectId}`);
-    revalidatePath("/shopping");
-    return { success: true as const, record };
-  } catch (error) {
-    // ... existing error handling unchanged
-  }
-}
-```
-Apply the same pattern to `addBeadToProject` (line 399) and `addSpecialtyToProject` (line 427).
 
 ## Warnings
 
-### WR-01: Hardcoded brandId "default" in InlineSupplyCreate will cause FK errors
+### WR-01: resolveDefaultBrandId shares a single "Custom" brand across all supply types -- supplyType mismatch
 
-**File:** `src/components/features/charts/project-detail/inline-supply-create.tsx:110-114`
-**Issue:** The component passes `brandId: "default"` when calling `createAndAddThread`, `createAndAddBead`, and `createAndAddSpecialty`. There is no brand record with ID `"default"` in the database. The Zod schema (`z.string().min(1, "Brand is required")`) passes validation since `"default"` has length 7, but the Prisma create inside the `$transaction` will fail with a foreign key constraint violation. This gets caught by the generic error handler and returns `"Failed to create and add thread"` -- a confusing error message for the user, and the inline create dialog is effectively non-functional.
-**Fix:** Either:
-1. (Minimal) Resolve the brand at action time using upsert:
+**File:** `src/lib/actions/supply-actions.ts:38-50`
+**Issue:** The `resolveDefaultBrandId` function upserts a brand with `where: { name: "Custom" }`. The `SupplyBrand.name` has a `@unique` constraint, so all three supply types (thread, bead, specialty) will share the same "Custom" brand record. The first call creates it with whatever `supplyType` was passed (e.g., "THREAD"), and subsequent calls for different types will reuse that same record via the `update: {}` no-op branch.
+
+This means the "Custom" brand's `supplyType` field will permanently reflect whichever type was created first. Any code or UI that filters brands by `supplyType` (e.g., showing only thread brands on the thread management page) will either:
+- Show the "Custom" brand under the wrong supply type, or
+- Fail to show it for the supply types it actually contains items for.
+
+This is a data integrity issue, not a crash, but it will cause confusing behavior if supply brand management is later expanded.
+**Fix:** Use distinct brand names per supply type:
 ```ts
-// In createAndAddThread, before the $transaction:
-let resolvedBrandId = validated.brandId;
-if (resolvedBrandId === "default") {
+async function resolveDefaultBrandId(
+  brandId: string,
+  supplyType: "THREAD" | "BEAD" | "SPECIALTY",
+): Promise<string> {
+  if (brandId !== "default") return brandId;
+
+  const brandName = `Custom (${supplyType.charAt(0) + supplyType.slice(1).toLowerCase()})`;
   const brand = await prisma.supplyBrand.upsert({
-    where: { name: "Custom" },
-    create: { name: "Custom", supplyType: "THREAD" },
+    where: { name: brandName },
+    create: { name: brandName, supplyType },
     update: {},
   });
-  resolvedBrandId = brand.id;
-}
-```
-2. (Better) Add a brand selector dropdown to the `InlineSupplyCreate` dialog so the user picks a real brand.
-
-### WR-02: No router.refresh() after supply removal -- stale UI
-
-**File:** `src/components/features/charts/project-detail/supplies-tab.tsx:201-243`
-**Issue:** When `handleRemove` successfully deletes a supply link via `removeProjectThread`/`removeProjectBead`/`removeProjectSpecialty`, it does not call `router.refresh()` or update local state. The deleted item remains visible in the UI until the user navigates away or manually refreshes. Compare with `handleSupplyAdded` (line 262) and `handleCreated` (line 267) which both correctly call `router.refresh()`.
-**Fix:** Add `router.refresh()` after successful removal in all three branches:
-```ts
-const result = await removeProjectThread(id);
-if (!result.success) {
-  toast.error("Couldn't remove this supply. Please try again.");
-} else {
-  router.refresh();
+  return brand.id;
 }
 ```
 
-### WR-03: Division by zero in skein calculator when fabricCount is 0
+### WR-02: CalculatorSettingsBar handleSettingChange captures stale currentSettings via closure
 
-**File:** `src/lib/utils/skein-calculator.ts:33`
-**Issue:** If `fabricCount` is 0 (e.g., linked fabric has count 0, or data corruption), `effectiveCount = 0 / overCount = 0` on line 33, `threadPerStitch` becomes `Infinity`, and `Math.ceil(Infinity) = Infinity`. The UI would display "Infinity skeins" or "Infinity" in the supply row calculations. While the schema defaults fabric count to 14 and the UI defaults to 14, a defensive guard prevents unexpected display bugs from bad data.
-**Fix:**
+**File:** `src/components/features/charts/project-detail/calculator-settings-bar.tsx:44-66`
+**Issue:** The `handleSettingChange` callback depends on `currentSettings` (line 65), which is derived as `isPending ? localSettings : settings`. When memoized by `useCallback`, the closure captures the value of `currentSettings` at the time the callback was last created. If two rapid setting changes occur while the first is still in its `startTransition`, the second change may read a stale `currentSettings`.
+
+Scenario: User changes strands from 2 to 3 (starts pending). While pending, they change waste from 20 to 25. The second call's `currentSettings` in the closure may still be the pre-strand-change value (strands=2, waste=20). The new settings spread `{ ...currentSettings, wastePercent: 25 }` would produce strands=2 (lost), waste=25 -- losing the first change.
+
+In practice this requires very fast sequential edits, but the fix is straightforward.
+**Fix:** Use a ref to always read the latest settings:
 ```ts
-if (stitchCount <= 0 || fabricCount <= 0) return 0;
+const settingsRef = useRef(settings);
+settingsRef.current = isPending ? localSettings : settings;
+
+const handleSettingChange = useCallback(
+  (field: keyof CalculatorSettings, value: number) => {
+    const newSettings = { ...settingsRef.current, [field]: value };
+    setLocalSettings(newSettings);
+    onSettingsChange(newSettings);
+
+    startTransition(async () => {
+      try {
+        const result = await updateProjectSettings(chartId, { [field]: value });
+        if (!result.success) {
+          setLocalSettings(settings);
+          onSettingsChange(settings);
+          toast.error("Couldn't save settings. Please try again.");
+        }
+      } catch {
+        setLocalSettings(settings);
+        onSettingsChange(settings);
+        toast.error("Couldn't save settings. Please try again.");
+      }
+    });
+  },
+  [chartId, settings, onSettingsChange],
+);
 ```
 
 ## Info
@@ -194,28 +182,28 @@ if (stitchCount <= 0 || fabricCount <= 0) return 0;
 ### IN-01: Duplicated needsBorder helper function
 
 **File:** `src/components/features/charts/project-detail/supply-row.tsx:14-19` and `src/components/features/supplies/search-to-add.tsx:19-23`
-**Issue:** The `needsBorder(hex: string): boolean` function is copy-pasted identically in both files. This is a minor DRY violation.
+**Issue:** The `needsBorder(hex: string): boolean` luminance check function is copy-pasted identically in both files.
 **Fix:** Extract to a shared utility (e.g., `src/lib/utils/color.ts`) and import from both files.
 
-### IN-02: Duplicated Intl.NumberFormat instances across modules
+### IN-02: Three duplicate Intl.NumberFormat instances across modules
 
-**File:** `src/components/features/charts/project-detail/supply-row.tsx:21`, `supply-footer-totals.tsx:5`, `project-detail-hero.tsx:15`
-**Issue:** Three separate `new Intl.NumberFormat()` instances are created at module scope across these files. The project already has `formatNumber` in `src/components/features/gallery/gallery-format.ts` used in `overview-tab.tsx`. Using it consistently would reduce duplication.
-**Fix:** Import the shared `formatNumber` from `gallery-format.ts` or extract a shared formatter to a utility module.
+**File:** `src/components/features/charts/project-detail/supply-row.tsx:21`, `src/components/features/charts/project-detail/supply-footer-totals.tsx:3`, `src/components/features/charts/project-detail/project-detail-hero.tsx:15`
+**Issue:** Each file creates its own `const numberFormatter = new Intl.NumberFormat()` at module scope. The project already has a shared `formatNumber` utility in `src/components/features/gallery/gallery-format.ts` which is used by `overview-tab.tsx`. The new Phase 7 files could reuse it for consistency.
+**Fix:** Import the shared `formatNumber` from `gallery-format.ts`, or extract a common formatter to `src/lib/utils/format.ts` and use it everywhere.
 
-### IN-03: setState during render in CalculatorSettingsBar ("show once shown" pattern)
+### IN-03: supply-section.tsx uses "colour" as count label for all supply types including specialty items
 
-**File:** `src/components/features/charts/project-detail/calculator-settings-bar.tsx:35-37`
-**Issue:** The pattern `if (hasStitchCounts && !everShown) { setEverShown(true); }` calls `setState` during the render phase. While React handles this for conditional first-render patterns (it triggers a synchronous re-render before painting), a `useEffect` would be more idiomatic and avoids the double-render:
+**File:** `src/components/features/charts/project-detail/supply-section.tsx:54`
+**Issue:** The section header count reads e.g., `(3 colours)` for all supply types. While threads and beads are color-based, specialty items may not be (e.g., needle minders, frames, metallic braids). Using "items" as the generic unit or varying the label by section type would be more accurate.
+**Fix:**
 ```ts
-useEffect(() => {
-  if (hasStitchCounts) setEverShown(true);
-}, [hasStitchCounts]);
+<span className="text-muted-foreground ml-2 text-sm font-normal">
+  ({data.items.length} {data.items.length === 1 ? "item" : "items"})
+</span>
 ```
-The current pattern works correctly -- this is a minor code quality note.
 
 ---
 
-_Reviewed: 2026-04-16T00:03:41Z_
+_Reviewed: 2026-04-15T19:00:00Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
