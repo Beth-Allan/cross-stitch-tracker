@@ -492,9 +492,17 @@ export async function updateProjectSupplyQuantity(
 }
 
 export async function removeProjectThread(id: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    const record = await prisma.projectThread.findUnique({
+      where: { id },
+      select: { project: { select: { userId: true } } },
+    });
+    if (!record || record.project.userId !== user.id) {
+      return { success: false as const, error: "Supply not found" };
+    }
+
     await prisma.projectThread.delete({ where: { id } });
     revalidatePath("/shopping");
     return { success: true as const };
@@ -508,9 +516,17 @@ export async function removeProjectThread(id: string) {
 }
 
 export async function removeProjectBead(id: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    const record = await prisma.projectBead.findUnique({
+      where: { id },
+      select: { project: { select: { userId: true } } },
+    });
+    if (!record || record.project.userId !== user.id) {
+      return { success: false as const, error: "Supply not found" };
+    }
+
     await prisma.projectBead.delete({ where: { id } });
     revalidatePath("/shopping");
     return { success: true as const };
@@ -524,9 +540,17 @@ export async function removeProjectBead(id: string) {
 }
 
 export async function removeProjectSpecialty(id: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    const record = await prisma.projectSpecialty.findUnique({
+      where: { id },
+      select: { project: { select: { userId: true } } },
+    });
+    if (!record || record.project.userId !== user.id) {
+      return { success: false as const, error: "Supply not found" };
+    }
+
     await prisma.projectSpecialty.delete({ where: { id } });
     revalidatePath("/shopping");
     return { success: true as const };
