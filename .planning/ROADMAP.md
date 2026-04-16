@@ -62,7 +62,19 @@ Full details: `milestones/v1.1-ROADMAP.md`
   3. User can view a per-project session history on the project detail Sessions tab showing total stitches, session count, average per session, and active-since date
   4. User can navigate Pattern Dive tabs (Browse, What's Next, Fabric Requirements, Storage View) to explore their collection from different angles
   5. The Charts page nav label reads "Pattern Dive" while the URL path remains `/charts`
-**Plans**: TBD
+**Plans**: 9 plans
+
+Plans:
+- [ ] 08-01-PLAN.md -- Schema, types, validation, test infrastructure foundation
+- [ ] 08-02-PLAN.md -- Session CRUD server actions with atomic progress recalculation (TDD)
+- [ ] 08-03-PLAN.md -- LogSessionModal component and TopBar integration
+- [ ] 08-04-PLAN.md -- Project Sessions tab, SessionTable, global Sessions page
+- [ ] 08-05-PLAN.md -- Pattern Dive nav rename, tab infrastructure, Browse tab
+- [ ] 08-06-PLAN.md -- Pattern Dive data actions (What's Next, Fabric Reqs, Storage)
+- [ ] 08-07-PLAN.md -- Pattern Dive tab components and eager data wiring
+- [ ] 08-08-PLAN.md -- DB push, data migration, conditional EditableNumber
+- [ ] 08-09-PLAN.md -- Integration verification and visual checkpoint
+
 **UI hint**: yes
 
 ### Phase 9: Dashboards & Shopping Cart
@@ -118,7 +130,7 @@ Full details: `milestones/v1.1-ROADMAP.md`
 | 5. Foundation & Quick Wins | v1.1 | 8/8 | Complete | 2026-04-13 |
 | 6. Gallery Cards & View Modes | v1.1 | 4/4 | Complete | 2026-04-15 |
 | 7. Project Detail Experience | v1.1 | 8/8 | Complete | 2026-04-16 |
-| 8. Session Logging & Pattern Dive | v1.2 | 0/TBD | Not started | - |
+| 8. Session Logging & Pattern Dive | v1.2 | 0/9 | Planned | - |
 | 9. Dashboards & Shopping Cart | v1.2 | 0/TBD | Not started | - |
 | 10. Advanced Stats | v1.3 | 0/TBD | Not started | - |
 | 11. Goals & Scheduling | v1.3 | 0/TBD | Not started | - |
