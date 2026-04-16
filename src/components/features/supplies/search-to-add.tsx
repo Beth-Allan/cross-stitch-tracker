@@ -60,6 +60,7 @@ export function SearchToAdd({
   onCreateNew,
 }: SearchToAddProps) {
   const [search, setSearch] = useState("");
+  const [colorFamily, setColorFamily] = useState("");
   const [items, setItems] = useState<SupplyItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState(false);
@@ -106,7 +107,7 @@ export function SearchToAdd({
       try {
         let results: SupplyItem[];
         if (supplyType === "thread") {
-          results = await getThreads(undefined, undefined, search || undefined);
+          results = await getThreads(undefined, colorFamily || undefined, search || undefined);
         } else if (supplyType === "bead") {
           results = await getBeads(search || undefined);
         } else {
@@ -130,7 +131,7 @@ export function SearchToAdd({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [search, supplyType]);
+  }, [search, supplyType, colorFamily]);
 
   // Focus input on mount
   useEffect(() => {
@@ -259,6 +260,29 @@ export function SearchToAdd({
           />
         </div>
       </div>
+      {supplyType === "thread" && (
+        <div className="border-border border-b px-2 pb-2">
+          <select
+            value={colorFamily}
+            onChange={(e) => setColorFamily(e.target.value)}
+            className="border-border bg-card text-foreground w-full rounded border px-2 py-1.5 text-sm"
+            aria-label="Filter by color family"
+          >
+            <option value="">All colors</option>
+            <option value="RED">Red</option>
+            <option value="ORANGE">Orange</option>
+            <option value="YELLOW">Yellow</option>
+            <option value="GREEN">Green</option>
+            <option value="BLUE">Blue</option>
+            <option value="PURPLE">Purple</option>
+            <option value="BROWN">Brown</option>
+            <option value="BLACK">Black</option>
+            <option value="WHITE">White</option>
+            <option value="GRAY">Gray</option>
+            <option value="NEUTRAL">Neutral</option>
+          </select>
+        </div>
+      )}
       <div className="border-border max-h-72 overflow-y-auto border-t">
         {isLoading ? (
           <p className="text-muted-foreground px-3 py-4 text-center text-sm">Searching...</p>
