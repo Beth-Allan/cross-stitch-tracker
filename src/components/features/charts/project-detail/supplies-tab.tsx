@@ -210,6 +210,8 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
             const result = await removeProjectThread(id);
             if (!result.success) {
               toast.error("Couldn't remove this supply. Please try again.");
+            } else {
+              router.refresh();
             }
           } catch {
             toast.error("Couldn't remove this supply. Please try again.");
@@ -221,6 +223,8 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
             const result = await removeProjectBead(id);
             if (!result.success) {
               toast.error("Couldn't remove this supply. Please try again.");
+            } else {
+              router.refresh();
             }
           } catch {
             toast.error("Couldn't remove this supply. Please try again.");
@@ -232,6 +236,8 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
             const result = await removeProjectSpecialty(id);
             if (!result.success) {
               toast.error("Couldn't remove this supply. Please try again.");
+            } else {
+              router.refresh();
             }
           } catch {
             toast.error("Couldn't remove this supply. Please try again.");
@@ -239,7 +245,7 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
         });
       }
     },
-    [sections],
+    [sections, router],
   );
 
   // Open SearchToAdd for a specific supply type
