@@ -29,12 +29,12 @@ export function CalculatorSettingsBar({
 }: CalculatorSettingsBarProps) {
   const [isPending, startTransition] = useTransition();
   const [localSettings, setLocalSettings] = useState(settings);
-  const [everShown, setEverShown] = useState(hasStitchCounts);
 
-  // "Show once shown" pattern (Pitfall 6): once visible, stays visible in session
-  if (hasStitchCounts && !everShown) {
-    setEverShown(true);
-  }
+  // "Show once shown" pattern: once visible, stays visible in session
+  const [everShown, setEverShown] = useState(hasStitchCounts);
+  useEffect(() => {
+    if (hasStitchCounts) setEverShown(true);
+  }, [hasStitchCounts]);
 
   const currentSettings = isPending ? localSettings : settings;
 
@@ -62,7 +62,8 @@ export function CalculatorSettingsBar({
             onSettingsChange(settings);
             toast.error("Couldn't save settings. Please try again.");
           }
-        } catch {
+        } catch (error) {
+          console.error("CalculatorSettingsBar save failed:", error);
           setLocalSettings(settings);
           onSettingsChange(settings);
           toast.error("Couldn't save settings. Please try again.");

@@ -118,8 +118,9 @@ export function SearchToAdd({
           setHighlightIndex(-1);
           setIsLoading(false);
         }
-      } catch {
+      } catch (error) {
         if (!cancelled) {
+          console.error("SearchToAdd fetch failed:", error);
           setFetchError(true);
           setIsLoading(false);
         }
@@ -188,7 +189,8 @@ export function SearchToAdd({
         } else {
           toast.error(result.error ?? "Something went wrong. Please try again.");
         }
-      } catch {
+      } catch (error) {
+        console.error("SearchToAdd handleSelect failed:", error);
         toast.error("Something went wrong. Please try again.");
       }
     });

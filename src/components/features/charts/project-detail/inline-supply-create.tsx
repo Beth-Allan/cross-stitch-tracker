@@ -105,8 +105,8 @@ export function InlineSupplyCreate({
 
         if (type === "thread") {
           formData.colorCode = colorCode.trim() || undefined;
-          // createAndAddThread requires brandId -- use a placeholder brand
-          // The user will need to have a brand set up; for now pass through
+          // "default" brandId is resolved server-side to an auto-created
+          // "Custom (Thread)" brand via resolveDefaultBrandId
           formData.brandId = "default";
         } else {
           formData.code = colorCode.trim() || undefined;
@@ -122,7 +122,8 @@ export function InlineSupplyCreate({
           toast.error(result.error ?? "Something went wrong. Please try again.");
           // Dialog stays open on error (retry-able)
         }
-      } catch {
+      } catch (error) {
+        console.error("InlineSupplyCreate submit failed:", error);
         toast.error("Something went wrong. Please try again.");
         // Dialog stays open on error (retry-able)
       }

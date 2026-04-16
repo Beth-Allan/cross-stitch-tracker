@@ -48,7 +48,8 @@ export function HeroKebabMenu({ chartId, chartName }: HeroKebabMenuProps) {
           // Dialog stays open on failure (retry-able)
           toast.error("Something went wrong. Please try again.");
         }
-      } catch {
+      } catch (error) {
+        console.error("HeroKebabMenu delete failed:", error);
         // Dialog stays open on failure (retry-able)
         toast.error("Something went wrong. Please try again.");
       }
@@ -62,13 +63,10 @@ export function HeroKebabMenu({ chartId, chartName }: HeroKebabMenuProps) {
           aria-label="Project actions"
           className="hover:bg-accent focus-visible:ring-ring flex min-h-11 min-w-11 items-center justify-center rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
         >
-          <MoreHorizontal className="size-5 text-muted-foreground" />
+          <MoreHorizontal className="text-muted-foreground size-5" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" sideOffset={8} className="w-48">
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={() => setDialogOpen(true)}
-          >
+          <DropdownMenuItem variant="destructive" onClick={() => setDialogOpen(true)}>
             <Trash2 className="size-4" />
             Delete Project
           </DropdownMenuItem>
@@ -80,23 +78,14 @@ export function HeroKebabMenu({ chartId, chartName }: HeroKebabMenuProps) {
           <DialogHeader>
             <DialogTitle>Delete {chartName}?</DialogTitle>
             <DialogDescription>
-              This will permanently delete this project and all its supplies.
-              This cannot be undone.
+              This will permanently delete this project and all its supplies. This cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDialogOpen(false)}
-              disabled={isPending}
-            >
+            <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={isPending}>
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isPending}
-            >
+            <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
               {isPending ? "Deleting..." : "Delete Project"}
             </Button>
           </DialogFooter>

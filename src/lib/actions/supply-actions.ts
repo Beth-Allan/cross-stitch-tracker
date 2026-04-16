@@ -407,7 +407,7 @@ export async function addThreadToProject(formData: unknown) {
     }
 
     const record = await prisma.projectThread.create({ data: validated });
-    revalidatePath(`/charts/${validated.projectId}`);
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const, record };
   } catch (error) {
@@ -444,7 +444,7 @@ export async function addBeadToProject(formData: unknown) {
     }
 
     const record = await prisma.projectBead.create({ data: validated });
-    revalidatePath(`/charts/${validated.projectId}`);
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const, record };
   } catch (error) {
@@ -481,7 +481,7 @@ export async function addSpecialtyToProject(formData: unknown) {
     }
 
     const record = await prisma.projectSpecialty.create({ data: validated });
-    revalidatePath(`/charts/${validated.projectId}`);
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const, record };
   } catch (error) {
@@ -551,6 +551,7 @@ export async function updateProjectSupplyQuantity(
       });
     }
 
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const };
   } catch (error) {
@@ -578,6 +579,7 @@ export async function removeProjectThread(id: string) {
     }
 
     await prisma.projectThread.delete({ where: { id } });
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const };
   } catch (error) {
@@ -602,6 +604,7 @@ export async function removeProjectBead(id: string) {
     }
 
     await prisma.projectBead.delete({ where: { id } });
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const };
   } catch (error) {
@@ -626,6 +629,7 @@ export async function removeProjectSpecialty(id: string) {
     }
 
     await prisma.projectSpecialty.delete({ where: { id } });
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const };
   } catch (error) {

@@ -132,7 +132,7 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
   const [sortOption, setSortOption] = useState<SupplySortOption>("added");
   const [settings, setSettings] = useState<CalculatorSettings>({
     strandCount: project.strandCount,
-    overCount: project.overCount as 1 | 2,
+    overCount: project.overCount,
     fabricCount: project.fabric?.count ?? 14,
     wastePercent: project.wastePercent,
   });
@@ -221,7 +221,8 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
             } else {
               router.refresh();
             }
-          } catch {
+          } catch (error) {
+            console.error("SuppliesTab removeThread failed:", error);
             toast.error("Couldn't remove this supply. Please try again.");
           }
         });
@@ -234,7 +235,8 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
             } else {
               router.refresh();
             }
-          } catch {
+          } catch (error) {
+            console.error("SuppliesTab removeBead failed:", error);
             toast.error("Couldn't remove this supply. Please try again.");
           }
         });
@@ -247,7 +249,8 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
             } else {
               router.refresh();
             }
-          } catch {
+          } catch (error) {
+            console.error("SuppliesTab removeSpecialty failed:", error);
             toast.error("Couldn't remove this supply. Please try again.");
           }
         });

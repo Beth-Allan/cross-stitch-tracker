@@ -32,10 +32,12 @@ export function ProjectDetailPage({ chart, imageUrls, supplies }: ProjectDetailP
   );
 
   // Build chart data with current status for overview tab section ordering
-  const chartWithCurrentStatus = {
-    ...chart,
-    project: chart.project ? { ...chart.project, status: currentStatus } : null,
-  };
+  // Narrow overCount from Prisma's `number` to the domain-valid `1 | 2` at this boundary
+  const project = chart.project
+    ? { ...chart.project, status: currentStatus, overCount: chart.project.overCount as 1 | 2 }
+    : null;
+
+  const chartWithCurrentStatus = { ...chart, project };
 
   return (
     <div className="space-y-6">
@@ -44,8 +46,8 @@ export function ProjectDetailPage({ chart, imageUrls, supplies }: ProjectDetailP
       <ProjectTabs
         overviewContent={<OverviewTab chart={chartWithCurrentStatus} supplies={supplies} />}
         suppliesContent={
-          chart.project && supplies ? (
-            <SuppliesTab chartId={chart.id} project={chart.project} supplies={supplies} />
+          project && supplies ? (
+            <SuppliesTab chartId={chart.id} project={project} supplies={supplies} />
           ) : (
             <div className="text-muted-foreground py-12 text-center">
               <p className="font-heading text-lg font-semibold">No project linked</p>

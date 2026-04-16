@@ -76,7 +76,7 @@ export interface ProjectDetailProps {
       startingStitches: number;
       stitchesCompleted: number;
       strandCount: number;
-      overCount: number;
+      overCount: 1 | 2;
       wastePercent: number;
       storageLocation: { id: string; name: string } | null;
       stitchingApp: { id: string; name: string } | null;

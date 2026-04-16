@@ -87,6 +87,9 @@ export function SupplyRow({ data, settings, onRemove, onStitchCountChange }: Sup
         wastePercent: settings.wastePercent,
       });
 
+      // Optimistic update to parent totals immediately
+      onStitchCountChange?.(data.id, newCount);
+
       if (currentData.isNeedOverridden) {
         // Keep the manual override, just update stitch count
         const optimistic = { ...currentData, stitchCount: newCount };
@@ -98,10 +101,13 @@ export function SupplyRow({ data, settings, onRemove, onStitchCountChange }: Sup
             });
             if (!result.success) {
               setLocalData(data);
+              onStitchCountChange?.(data.id, data.stitchCount);
               toast.error("Couldn't save supply changes. Please try again.");
             }
-          } catch {
+          } catch (error) {
+            console.error("SupplyRow handleStitchCountSave failed:", error);
             setLocalData(data);
+            onStitchCountChange?.(data.id, data.stitchCount);
             toast.error("Couldn't save supply changes. Please try again.");
           }
         });
@@ -123,16 +129,17 @@ export function SupplyRow({ data, settings, onRemove, onStitchCountChange }: Sup
             });
             if (!result.success) {
               setLocalData(data);
+              onStitchCountChange?.(data.id, data.stitchCount);
               toast.error("Couldn't save supply changes. Please try again.");
             }
-          } catch {
+          } catch (error) {
+            console.error("SupplyRow handleStitchCountSave failed:", error);
             setLocalData(data);
+            onStitchCountChange?.(data.id, data.stitchCount);
             toast.error("Couldn't save supply changes. Please try again.");
           }
         });
       }
-
-      onStitchCountChange?.(data.id, newCount);
     },
     [currentData, data, settings, onStitchCountChange],
   );
@@ -155,7 +162,8 @@ export function SupplyRow({ data, settings, onRemove, onStitchCountChange }: Sup
             setLocalData(data);
             toast.error("Couldn't save supply changes. Please try again.");
           }
-        } catch {
+        } catch (error) {
+          console.error("SupplyRow handleNeedSave failed:", error);
           setLocalData(data);
           toast.error("Couldn't save supply changes. Please try again.");
         }
@@ -177,7 +185,8 @@ export function SupplyRow({ data, settings, onRemove, onStitchCountChange }: Sup
             setLocalData(data);
             toast.error("Couldn't save supply changes. Please try again.");
           }
-        } catch {
+        } catch (error) {
+          console.error("SupplyRow handleHaveSave failed:", error);
           setLocalData(data);
           toast.error("Couldn't save supply changes. Please try again.");
         }
@@ -204,7 +213,8 @@ export function SupplyRow({ data, settings, onRemove, onStitchCountChange }: Sup
           setLocalData(data);
           toast.error("Couldn't save supply changes. Please try again.");
         }
-      } catch {
+      } catch (error) {
+        console.error("SupplyRow handleAcceptCalc failed:", error);
         setLocalData(data);
         toast.error("Couldn't save supply changes. Please try again.");
       }

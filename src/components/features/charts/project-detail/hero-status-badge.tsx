@@ -25,11 +25,7 @@ interface HeroStatusBadgeProps {
  * 44px touch target, chevron-down indicator (via SelectTrigger), and
  * rollback on failure per UI-SPEC status change interaction.
  */
-export function HeroStatusBadge({
-  chartId,
-  currentStatus,
-  onStatusChange,
-}: HeroStatusBadgeProps) {
+export function HeroStatusBadge({ chartId, currentStatus, onStatusChange }: HeroStatusBadgeProps) {
   const [status, setStatus] = useState<ProjectStatus>(currentStatus);
   const [isPending, startTransition] = useTransition();
 
@@ -52,7 +48,8 @@ export function HeroStatusBadge({
         // Rollback on failure
         setStatus(previousStatus);
         toast.error("Couldn't update project status. Please try again.");
-      } catch {
+      } catch (error) {
+        console.error("HeroStatusBadge status change failed:", error);
         // Rollback on error
         setStatus(previousStatus);
         toast.error("Couldn't update project status. Please try again.");
@@ -70,13 +67,8 @@ export function HeroStatusBadge({
       >
         <SelectValue>
           <span className="flex items-center gap-1.5">
-            <span
-              aria-hidden="true"
-              className={`h-2 w-2 rounded-full ${config.dotClass}`}
-            />
-            <span className={`text-sm font-medium ${config.textClass}`}>
-              {config.label}
-            </span>
+            <span aria-hidden="true" className={`h-2 w-2 rounded-full ${config.dotClass}`} />
+            <span className={`text-sm font-medium ${config.textClass}`}>{config.label}</span>
           </span>
         </SelectValue>
       </SelectTrigger>
