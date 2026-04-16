@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-04-15T06:21:55.393Z",
+  "phase": "07",
+  "phase_name": "project-detail-experience",
+  "phase_dir": ".planning/phases/07-project-detail-experience",
+  "plan": 6,
+  "task": 2,
+  "total_tasks": 2,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": "07-01", "name": "Data layer & skein calculator", "status": "done", "commits": ["7aeb15f", "f9a678c", "e9830c9"]},
+    {"id": "07-02", "name": "Hero section", "status": "done", "commits": ["f1972da", "a4cad63", "fbdd898"]},
+    {"id": "07-03", "name": "Tab container & overview tab", "status": "done", "commits": ["6aedbe7", "485d72f", "95ee3c3"]},
+    {"id": "07-04", "name": "Supplies tab", "status": "done", "commits": ["338ee9d", "7984e4b", "fb2f885"]},
+    {"id": "07-05", "name": "SearchToAdd enhancements + inline supply create", "status": "done", "commits": ["4bfb94b", "946be74", "eeedd69"]},
+    {"id": "07-06", "name": "Page wiring + schema push + checkpoint fixes", "status": "done", "commits": ["93780b8", "4115c42"]}
+  ],
+  "remaining_tasks": [],
+  "blockers": [],
+  "human_actions_pending": [],
+  "decisions": [
+    {"decision": "Remove mono font from stitch counts and progress percentages", "rationale": "User feedback: mono looks silly for just stitch counts", "phase": "07"},
+    {"decision": "Add 'Designer:' and 'Stitch Count:' labels to hero metadata", "rationale": "User feedback: context labels needed", "phase": "07"},
+    {"decision": "Show exact vs estimated indicator on stitch count", "rationale": "User feedback: users need to know if count is calculated from dimensions", "phase": "07"},
+    {"decision": "Link designer name to /designers/[id] page", "rationale": "User feedback: navigable cross-references", "phase": "07"},
+    {"decision": "Fix empty state in supplies tab to show add buttons", "rationale": "Bug: empty state blocked supply addition entirely", "phase": "07"}
+  ],
+  "uncommitted_files": [".planning/phases/07-project-detail-experience/07-06-SUMMARY.md"],
+  "background_processes": ["Code review agent running on 38 files — will produce 07-REVIEW.md"],
+  "next_action": "Wait for code review to finish, then run verification gate. After that, discuss user feedback items (genre pills, project setup content, kitting checklist, clickable genres, edit modal) via /gsd-explore or /gsd-discuss-phase before deciding what goes in this phase vs backlog.",
+  "context_notes": "All 6 plans executed successfully across 4 waves. 864 tests passing. Checkpoint feedback applied (6 UI tweaks). User has significant design feedback to discuss: genre pills on hero, clickable genres, project setup section content, kitting checklist additions (onion skin, stitching app), storage location placement, edit modal redesign. User wants to /gsd-explore or discuss these before proceeding."
+}

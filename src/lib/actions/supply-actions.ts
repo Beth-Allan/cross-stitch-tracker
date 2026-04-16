@@ -14,9 +14,12 @@ import {
   projectBeadSchema,
   projectSpecialtySchema,
   updateQuantitySchema,
+  createAndAddThreadSchema,
+  createAndAddBeadSchema,
+  createAndAddSpecialtySchema,
 } from "@/lib/validations/supply";
 
-// ─── Helper ──────────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function isP2002(error: unknown): boolean {
   return (
@@ -25,6 +28,28 @@ function isP2002(error: unknown): boolean {
     "code" in error &&
     (error as { code: string }).code === "P2002"
   );
+}
+
+/**
+ * Resolve a brandId for inline supply creation. When the client sends
+ * "default" (no brand picker in the dialog), upsert a "Custom" brand
+ * of the appropriate supply type so there is always a valid FK target.
+ */
+async function resolveDefaultBrandId(
+  brandId: string,
+  supplyType: "THREAD" | "BEAD" | "SPECIALTY",
+): Promise<string> {
+  if (brandId !== "default") return brandId;
+
+  // Use distinct brand names per supply type so each type gets its own
+  // "Custom" brand record with the correct supplyType field.
+  const brandName = `Custom (${supplyType.charAt(0) + supplyType.slice(1).toLowerCase()})`;
+  const brand = await prisma.supplyBrand.upsert({
+    where: { name: brandName },
+    create: { name: brandName, supplyType },
+    update: {},
+  });
+  return brand.id;
 }
 
 // ─── Thread CRUD ─────────────────────────────────────────────────────────────
@@ -367,12 +392,22 @@ export async function getSupplyBrands() {
 // ─── Junction Operations ─────────────────────────────────────────────────────
 
 export async function addThreadToProject(formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validated = projectThreadSchema.parse(formData);
+
+    // Verify project ownership
+    const project = await prisma.project.findUnique({
+      where: { id: validated.projectId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
     const record = await prisma.projectThread.create({ data: validated });
-    revalidatePath(`/charts/${validated.projectId}`);
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const, record };
   } catch (error) {
@@ -394,12 +429,22 @@ export async function addThreadToProject(formData: unknown) {
 }
 
 export async function addBeadToProject(formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validated = projectBeadSchema.parse(formData);
+
+    // Verify project ownership
+    const project = await prisma.project.findUnique({
+      where: { id: validated.projectId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
     const record = await prisma.projectBead.create({ data: validated });
-    revalidatePath(`/charts/${validated.projectId}`);
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const, record };
   } catch (error) {
@@ -421,12 +466,22 @@ export async function addBeadToProject(formData: unknown) {
 }
 
 export async function addSpecialtyToProject(formData: unknown) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validated = projectSpecialtySchema.parse(formData);
+
+    // Verify project ownership
+    const project = await prisma.project.findUnique({
+      where: { id: validated.projectId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
     const record = await prisma.projectSpecialty.create({ data: validated });
-    revalidatePath(`/charts/${validated.projectId}`);
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const, record };
   } catch (error) {
@@ -452,28 +507,51 @@ export async function updateProjectSupplyQuantity(
   type: "thread" | "bead" | "specialty",
   formData: unknown,
 ) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     const validated = updateQuantitySchema.parse(formData);
 
+    // Verify ownership before updating
     if (type === "thread") {
+      const record = await prisma.projectThread.findUnique({
+        where: { id },
+        select: { project: { select: { userId: true } } },
+      });
+      if (!record || record.project.userId !== user.id) {
+        return { success: false as const, error: "Supply not found" };
+      }
       await prisma.projectThread.update({
         where: { id },
         data: validated,
       });
     } else if (type === "bead") {
+      const record = await prisma.projectBead.findUnique({
+        where: { id },
+        select: { project: { select: { userId: true } } },
+      });
+      if (!record || record.project.userId !== user.id) {
+        return { success: false as const, error: "Supply not found" };
+      }
       await prisma.projectBead.update({
         where: { id },
         data: validated,
       });
     } else {
+      const record = await prisma.projectSpecialty.findUnique({
+        where: { id },
+        select: { project: { select: { userId: true } } },
+      });
+      if (!record || record.project.userId !== user.id) {
+        return { success: false as const, error: "Supply not found" };
+      }
       await prisma.projectSpecialty.update({
         where: { id },
         data: validated,
       });
     }
 
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const };
   } catch (error) {
@@ -489,10 +567,19 @@ export async function updateProjectSupplyQuantity(
 }
 
 export async function removeProjectThread(id: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    const record = await prisma.projectThread.findUnique({
+      where: { id },
+      select: { project: { select: { userId: true } } },
+    });
+    if (!record || record.project.userId !== user.id) {
+      return { success: false as const, error: "Supply not found" };
+    }
+
     await prisma.projectThread.delete({ where: { id } });
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const };
   } catch (error) {
@@ -505,10 +592,19 @@ export async function removeProjectThread(id: string) {
 }
 
 export async function removeProjectBead(id: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    const record = await prisma.projectBead.findUnique({
+      where: { id },
+      select: { project: { select: { userId: true } } },
+    });
+    if (!record || record.project.userId !== user.id) {
+      return { success: false as const, error: "Supply not found" };
+    }
+
     await prisma.projectBead.delete({ where: { id } });
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const };
   } catch (error) {
@@ -521,10 +617,19 @@ export async function removeProjectBead(id: string) {
 }
 
 export async function removeProjectSpecialty(id: string) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
+    const record = await prisma.projectSpecialty.findUnique({
+      where: { id },
+      select: { project: { select: { userId: true } } },
+    });
+    if (!record || record.project.userId !== user.id) {
+      return { success: false as const, error: "Supply not found" };
+    }
+
     await prisma.projectSpecialty.delete({ where: { id } });
+    revalidatePath("/charts");
     revalidatePath("/shopping");
     return { success: true as const };
   } catch (error) {
@@ -537,28 +642,184 @@ export async function removeProjectSpecialty(id: string) {
 }
 
 export async function getProjectSupplies(projectId: string) {
-  await requireAuth();
+  const user = await requireAuth();
+
+  // Verify project ownership
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { userId: true },
+  });
+  if (!project || project.userId !== user.id) {
+    return { threads: [], beads: [], specialty: [] };
+  }
 
   const [threads, beads, specialty] = await Promise.all([
     prisma.projectThread.findMany({
       where: { projectId },
       include: { thread: { include: { brand: true } } },
+      orderBy: { createdAt: "asc" },
     }),
     prisma.projectBead.findMany({
       where: { projectId },
       include: { bead: { include: { brand: true } } },
-      orderBy: { bead: { productCode: "asc" } },
+      orderBy: { createdAt: "asc" },
     }),
     prisma.projectSpecialty.findMany({
       where: { projectId },
       include: { specialtyItem: { include: { brand: true } } },
-      orderBy: { specialtyItem: { productCode: "asc" } },
+      orderBy: { createdAt: "asc" },
     }),
   ]);
 
-  const sortedThreads = threads.sort((a, b) =>
-    naturalSortByCode(a.thread.colorCode, b.thread.colorCode),
-  );
+  return { threads, beads, specialty };
+}
 
-  return { threads: sortedThreads, beads, specialty };
+export async function createAndAddThread(formData: unknown) {
+  const user = await requireAuth();
+
+  try {
+    const validated = createAndAddThreadSchema.parse(formData);
+
+    // Verify project ownership
+    const project = await prisma.project.findUnique({
+      where: { id: validated.projectId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
+    const resolvedBrandId = await resolveDefaultBrandId(validated.brandId, "THREAD");
+
+    const result = await prisma.$transaction(async (tx) => {
+      const thread = await tx.thread.create({
+        data: {
+          colorCode: validated.colorCode || "CUSTOM",
+          colorName: validated.name,
+          hexColor: validated.hexColor,
+          brandId: resolvedBrandId,
+          colorFamily: validated.colorFamily,
+        },
+      });
+      const link = await tx.projectThread.create({
+        data: {
+          projectId: validated.projectId,
+          threadId: thread.id,
+          stitchCount: 0,
+          quantityRequired: 1,
+          quantityAcquired: 0,
+        },
+      });
+      return { thread, link };
+    });
+
+    revalidatePath("/charts");
+    revalidatePath("/shopping");
+    return { success: true as const, record: result };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false as const, error: error.errors[0].message };
+    }
+    console.error("createAndAddThread error:", error);
+    return { success: false as const, error: "Failed to create and add thread" };
+  }
+}
+
+export async function createAndAddBead(formData: unknown) {
+  const user = await requireAuth();
+
+  try {
+    const validated = createAndAddBeadSchema.parse(formData);
+
+    // Verify project ownership
+    const project = await prisma.project.findUnique({
+      where: { id: validated.projectId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
+    const resolvedBrandId = await resolveDefaultBrandId(validated.brandId, "BEAD");
+
+    const result = await prisma.$transaction(async (tx) => {
+      const bead = await tx.bead.create({
+        data: {
+          productCode: validated.code || "CUSTOM",
+          colorName: validated.name,
+          hexColor: "#808080",
+          brandId: resolvedBrandId,
+          colorFamily: "NEUTRAL",
+        },
+      });
+      const link = await tx.projectBead.create({
+        data: {
+          projectId: validated.projectId,
+          beadId: bead.id,
+          quantityRequired: 1,
+          quantityAcquired: 0,
+        },
+      });
+      return { bead, link };
+    });
+
+    revalidatePath("/charts");
+    revalidatePath("/shopping");
+    return { success: true as const, record: result };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false as const, error: error.errors[0].message };
+    }
+    console.error("createAndAddBead error:", error);
+    return { success: false as const, error: "Failed to create and add bead" };
+  }
+}
+
+export async function createAndAddSpecialty(formData: unknown) {
+  const user = await requireAuth();
+
+  try {
+    const validated = createAndAddSpecialtySchema.parse(formData);
+
+    // Verify project ownership
+    const project = await prisma.project.findUnique({
+      where: { id: validated.projectId },
+      select: { userId: true },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
+    const resolvedBrandId = await resolveDefaultBrandId(validated.brandId, "SPECIALTY");
+
+    const result = await prisma.$transaction(async (tx) => {
+      const item = await tx.specialtyItem.create({
+        data: {
+          productCode: validated.code || "CUSTOM",
+          colorName: validated.name,
+          hexColor: "#808080",
+          brandId: resolvedBrandId,
+        },
+      });
+      const link = await tx.projectSpecialty.create({
+        data: {
+          projectId: validated.projectId,
+          specialtyItemId: item.id,
+          quantityRequired: 1,
+          quantityAcquired: 0,
+        },
+      });
+      return { item, link };
+    });
+
+    revalidatePath("/charts");
+    revalidatePath("/shopping");
+    return { success: true as const, record: result };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false as const, error: error.errors[0].message };
+    }
+    console.error("createAndAddSpecialty error:", error);
+    return { success: false as const, error: "Failed to create and add specialty item" };
+  }
 }

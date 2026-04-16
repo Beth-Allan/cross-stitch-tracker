@@ -81,6 +81,10 @@ model Project {
   needsOnionSkinning   Boolean            @default(false)
   wantToStartNext      Boolean            @default(false)
   preferredStartSeason String?
+  // Calculator settings (Phase 7)
+  strandCount          Int                @default(2)    // 1-6, default 2
+  overCount            Int                @default(2)    // 1 or 2, default 2 (over 2 for evenweave/linen)
+  wastePercent         Int                @default(20)   // 0-50, default 20%
   projectThreads       ProjectThread[]
   projectBeads         ProjectBead[]
   projectSpecialty     ProjectSpecialty[]
@@ -179,10 +183,11 @@ model ProjectThread {
   thread           Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
   threadId         String
   stitchCount      Int      @default(0)
-  quantityRequired Int      @default(1)
-  quantityAcquired Int      @default(0)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  quantityRequired  Int      @default(1)
+  quantityAcquired  Int      @default(0)
+  isNeedOverridden  Boolean  @default(false)  // true when user manually edited Need
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   @@unique([projectId, threadId])
 }

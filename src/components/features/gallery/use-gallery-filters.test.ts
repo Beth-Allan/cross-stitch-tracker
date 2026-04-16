@@ -312,3 +312,73 @@ describe("useGalleryFilters", () => {
     expect(result.current.filteredAndSorted[0].name).toBe("Gamma");
   });
 });
+
+// ─── View mode persistence ────────────────────────────────────────────────────
+
+describe("view mode persistence", () => {
+  const cards = [
+    createMockGalleryCard({
+      chartId: "c1",
+      name: "Alpha",
+      status: "IN_PROGRESS",
+      dateAdded: new Date("2026-01-01"),
+    }),
+  ];
+
+  const VIEW_STORAGE_KEY = "gallery-view-mode";
+
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("setView writes the chosen view mode to localStorage", async () => {
+    const { result } = renderHook(() => useGalleryFilters(cards), {
+      wrapper: withNuqsTestingAdapter({ hasMemory: true }),
+    });
+
+    await act(() => result.current.setView("table"));
+    expect(localStorage.getItem(VIEW_STORAGE_KEY)).toBe("table");
+  });
+
+  it("initializes from localStorage when no URL param is present", async () => {
+    localStorage.setItem(VIEW_STORAGE_KEY, "list");
+
+    const { result } = renderHook(() => useGalleryFilters(cards), {
+      wrapper: withNuqsTestingAdapter({ hasMemory: true }),
+    });
+
+    // Wait for the useEffect to fire
+    await act(() => Promise.resolve());
+
+    expect(result.current.view).toBe("list");
+  });
+
+  it("URL param takes precedence over localStorage value", async () => {
+    localStorage.setItem(VIEW_STORAGE_KEY, "list");
+
+    const { result } = renderHook(() => useGalleryFilters(cards), {
+      wrapper: withNuqsTestingAdapter({
+        hasMemory: true,
+        searchParams: { view: "table" },
+      }),
+    });
+
+    // Wait for the useEffect to fire
+    await act(() => Promise.resolve());
+
+    expect(result.current.view).toBe("table");
+  });
+
+  it("invalid localStorage value falls back to gallery default", async () => {
+    localStorage.setItem(VIEW_STORAGE_KEY, "invalid");
+
+    const { result } = renderHook(() => useGalleryFilters(cards), {
+      wrapper: withNuqsTestingAdapter({ hasMemory: true }),
+    });
+
+    // Wait for the useEffect to fire
+    await act(() => Promise.resolve());
+
+    expect(result.current.view).toBe("gallery");
+  });
+});

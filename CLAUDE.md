@@ -4,9 +4,9 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** 2 (Browse & Organize) | **Phase:** 6 — verified & complete
-**Last Updated:** 2026-04-15
-**Roadmap:** 4 milestones / 11 phases — v1.0 shipped, M2 phases 5-6 complete, phase 7 next
+**Milestone:** 2 (Browse & Organize) | **Phase:** 7 — COMPLETE, v1.1 milestone done
+**Last Updated:** 2026-04-16
+**Roadmap:** 4 milestones / 11 phases — v1.0 shipped, v1.1 complete (phases 5-7), v1.2 next
 
 ### Done
 
@@ -108,10 +108,29 @@
     - Removed stray "use client" from test, defensive Date coercion in formatDate, dead types removed, progress sort tests added, exhaustive never check in compareFn
     - 150 gallery tests passing, TypeScript clean, build passing
 
+- **Quick fix: gallery view mode persistence** (2026-04-15): localStorage persistence for view mode, back link preserves view param, loading skeleton replaced with themed stitch animation
+  - localStorage write on setView, mount-time restore when no URL param present
+  - BackToGalleryLink client component reads localStorage for back navigation
+  - Loading skeleton now view-agnostic (4x4 animated stitch grid instead of gallery card wireframes)
+  - 9 new tests (4 hook persistence, 5 back link), all passing
+
+- **Phase 7: Project Detail Experience** — COMPLETE (2026-04-16)
+  - 8 plans (6 original + 2 gap closure): data layer + hero → tabs + supplies tab → SearchToAdd enhancements → page wiring → UAT gap fixes → visual consistency + color filter
+  - 866 tests passing, schema pushed, all UAT items verified
+  - Gap closure: skein formula corrected (1.3 constant), FINISHED/FFO section ordering, supply section UI fixes, visual consistency with Overview tab, color family filter dropdown
+  - Auth fixes: ownership mocks added for CR-01/CR-02/CR-03 supply action tests
+  - Stitch count input widened (w-16 text-xs) for 4+ digit numbers
+  - **Code review** (2026-04-16): 38 files, 1 critical + 2 warning + 3 info
+    - CR-01: getProjectSupplies missing ownership check (any authenticated user can read any project's supplies)
+    - WR-01: resolveDefaultBrandId shared "Custom" brand across supply types, WR-02: calculator settings stale closure
+  - User feedback deferred: genre pills, clickable genres/designers, project setup content, kitting checklist, storage location, edit modal redesign
+
 ### Next Up
 
-1. Merge PR #15 when CI passes
-2. `/gsd-discuss-phase 7` — Skein Calculator & Supply Workflow
+1. `/gsd-ship 7` — create PR, run multi-agent review, fix findings
+2. `/gsd-code-review-fix 7` — fix CR-01 (getProjectSupplies ownership) before or after PR
+3. `/gsd-complete-milestone` — v1.1 Browse & Organize milestone wrap-up
+4. `/gsd-explore` — discuss user feedback items (genre pills, project setup, kitting, edit modal) before v1.2
 
 ### Backlog (post-MVP)
 
@@ -124,12 +143,17 @@
 - 999.0.10: Quick-add missing supplies from project detail page — if a thread/bead/specialty item isn't in the catalog, allow inline creation without navigating away to the supplies page
 - 999.0.12: Collapsible projects in shopping list — list gets long fast; projects should be collapsible with collapsed as the default state
 - 999.0.13: Thread colour picker scroll UX — adding thread colours doesn't auto-scroll to keep the search box/+Add more button visible; needs scrollIntoView or similar when adding items
-- 999.0.15: SearchToAdd panel positioning for long lists — when flipUp activates, panel overlays existing thread rows (bottom-0); ideally should use a portal or anchor to the "+ Add more" button so it opens adjacent without covering content
+- 999.0.15: SearchToAdd side-by-side layout — current drop-up panel covers existing supply rows (especially with color family dropdown), making it hard to see what was just added; redesign as side-by-side on desktop (supply list left, SearchToAdd panel right in a 2-column grid when active, collapse back to single column on close); mobile falls back to current overlay; replaces portal/anchor approach — this is a layout problem, not a positioning one
 - 999.0.16: SearchToAdd highlight conflict — first item starts with bg-muted highlight (highlightIndex=0) which clashes with hover:bg-muted on other items; should only show keyboard highlight after arrow key use, not on initial render
 - 999.0.14: Project Bin & iPad App management — "Add New" with empty search creates "New Location" with no way to rename; need proper add/edit/delete for storage locations and stitching apps (currently hardcoded arrays in project-setup-section.tsx)
 - 999.0.17: StorageLocation/StitchingApp multi-user hardening — add @@unique([userId, name]) and @@index([userId]) to both models in schema.prisma (no uniqueness check at DB or app level currently); also add ownership validation on writes in chart-actions.ts createChart/updateChart — storageLocationId and stitchingAppId are passed directly without verifying they belong to user.id (fabric already has this check, these don't)
 - 999.0.18: Test infrastructure cleanup for $transaction — createMockPrisma() should default $transaction to handle both callback and array forms (duplicated in chart-actions-errors/thumbnail tests); also fix vacuous $transaction assertions in delete tests (storage-location, stitching-app, designer, genre) where calling mock methods inside toHaveBeenCalledWith records side-effect calls and compares undefined values
 - 999.0.19: Refactor clickable card rows to avoid nested interactive elements — storage-location-list.tsx and stitching-app-list.tsx use role="button" div containing Rename/Delete buttons (ARIA violation); restructure so navigable element and action buttons are siblings
+- 999.0.20: Supply action ownership rejection tests (HIGH PRIORITY) — updateProjectSupplyQuantity (3 branches), removeProjectThread/Bead/Specialty, and addThread/Bead/SpecialtyToProject all have ownership checks but zero tests verifying rejection when project belongs to different user; same class as CR-01 bug — if someone regresses these checks, nothing catches it
+- 999.0.21: EditableNumber invalid input feedback — component silently discards invalid values (non-numeric, out of range) on blur with no user indication; should show brief visual feedback (red border flash or shake) so users know their entry was rejected; especially problematic for stitch counts where a typo like "15o00" silently reverts
+- 999.0.22: Clean up planning doc references in code comments — several comments reference internal planning IDs ("Pitfall 5", "Pitfall 6", "D-01", "D-02", "D-06", "D-17") that are opaque without .planning/ docs; either expand inline or remove; also remove misleading "Recalculate when props change" comment in supply-row.tsx:53
+- 999.0.23: Narrow strandCount type to literal union — CalculatorSettings uses `strandCount: number` but domain is 1-6; could be typed as `1 | 2 | 3 | 4 | 5 | 6` matching the `overCount: 1 | 2` pattern for compile-time safety
+- 999.0.24: Add skein calculator edge case tests — calculateSkeins with fabricCount=0 guard is untested (division-by-zero protection); resolveDefaultBrandId per-type brand naming from WR-01 fix has no regression test
 - 999.1: Supply detail modal (read-only view with "used in projects" list)
 - 999.2: Bulk supply editor
 - 999.3: Fabric type hierarchy (replace flat dropdown)

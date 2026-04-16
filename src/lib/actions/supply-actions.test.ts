@@ -657,6 +657,7 @@ describe("supply-actions", () => {
 
   describe("addThreadToProject", () => {
     it("creates junction record with default quantity 1", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const mockJunction = createMockProjectThread({
         projectId: "p1",
         threadId: "t1",
@@ -681,6 +682,7 @@ describe("supply-actions", () => {
     });
 
     it("returns error for duplicate project+thread (P2002)", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const p2002Error = Object.assign(new Error("Unique constraint"), {
         code: "P2002",
       });
@@ -701,6 +703,7 @@ describe("supply-actions", () => {
 
   describe("addBeadToProject", () => {
     it("creates junction record", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const mockJunction = createMockProjectBead({
         projectId: "p1",
         beadId: "b1",
@@ -717,6 +720,7 @@ describe("supply-actions", () => {
     });
 
     it("returns error for duplicate (P2002)", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const p2002Error = Object.assign(new Error("Unique constraint"), {
         code: "P2002",
       });
@@ -737,6 +741,7 @@ describe("supply-actions", () => {
 
   describe("addSpecialtyToProject", () => {
     it("creates junction record", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const mockJunction = createMockProjectSpecialty({
         projectId: "p1",
         specialtyItemId: "s1",
@@ -753,6 +758,7 @@ describe("supply-actions", () => {
     });
 
     it("returns error for duplicate (P2002)", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const p2002Error = Object.assign(new Error("Unique constraint"), {
         code: "P2002",
       });
@@ -773,6 +779,7 @@ describe("supply-actions", () => {
 
   describe("updateProjectSupplyQuantity", () => {
     it("updates thread junction record quantities", async () => {
+      mockPrisma.projectThread.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
       const updated = createMockProjectThread({
         id: "pt1",
         quantityRequired: 3,
@@ -794,6 +801,7 @@ describe("supply-actions", () => {
     });
 
     it("updates bead junction record quantities", async () => {
+      mockPrisma.projectBead.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
       const updated = createMockProjectBead({ id: "pb1", quantityRequired: 5 });
       mockPrisma.projectBead.update.mockResolvedValueOnce(updated);
       const { updateProjectSupplyQuantity } = await import("./supply-actions");
@@ -810,6 +818,9 @@ describe("supply-actions", () => {
     });
 
     it("updates specialty junction record quantities", async () => {
+      mockPrisma.projectSpecialty.findUnique.mockResolvedValueOnce({
+        project: { userId: "user-1" },
+      });
       const updated = createMockProjectSpecialty({
         id: "ps1",
         quantityAcquired: 1,
@@ -831,6 +842,7 @@ describe("supply-actions", () => {
 
   describe("removeProjectThread", () => {
     it("deletes junction record and returns success", async () => {
+      mockPrisma.projectThread.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
       mockPrisma.projectThread.delete.mockResolvedValueOnce({});
       const { removeProjectThread } = await import("./supply-actions");
 
@@ -845,6 +857,7 @@ describe("supply-actions", () => {
 
   describe("removeProjectBead", () => {
     it("deletes junction record and returns success", async () => {
+      mockPrisma.projectBead.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
       mockPrisma.projectBead.delete.mockResolvedValueOnce({});
       const { removeProjectBead } = await import("./supply-actions");
 
@@ -859,6 +872,9 @@ describe("supply-actions", () => {
 
   describe("removeProjectSpecialty", () => {
     it("deletes junction record and returns success", async () => {
+      mockPrisma.projectSpecialty.findUnique.mockResolvedValueOnce({
+        project: { userId: "user-1" },
+      });
       mockPrisma.projectSpecialty.delete.mockResolvedValueOnce({});
       const { removeProjectSpecialty } = await import("./supply-actions");
 
@@ -873,6 +889,7 @@ describe("supply-actions", () => {
 
   describe("getProjectSupplies", () => {
     it("returns threads, beads, specialty grouped with brand details", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const brand = createMockSupplyBrand();
       mockPrisma.projectThread.findMany.mockResolvedValueOnce([
         {
@@ -902,23 +919,23 @@ describe("supply-actions", () => {
       expect(result.specialty).toHaveLength(1);
     });
 
-    it("returns project threads sorted by colorCode numerically", async () => {
+    it("returns threads ordered by createdAt ascending (insertion order)", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const brand = createMockSupplyBrand();
-      // Mock returns alphabetical DB order: 3761 before 500
-      mockPrisma.projectThread.findMany.mockResolvedValueOnce([
-        {
-          ...createMockProjectThread({ id: "pt-1" }),
-          thread: { ...createMockThread({ id: "t1", colorCode: "3761" }), brand },
-        },
-        {
-          ...createMockProjectThread({ id: "pt-2" }),
-          thread: { ...createMockThread({ id: "t2", colorCode: "334" }), brand },
-        },
-        {
-          ...createMockProjectThread({ id: "pt-3" }),
-          thread: { ...createMockThread({ id: "t3", colorCode: "500" }), brand },
-        },
-      ]);
+      // Threads returned in insertion order (createdAt ascending) from DB
+      const thread1 = {
+        ...createMockProjectThread({ id: "pt-1", createdAt: new Date("2026-01-01") }),
+        thread: { ...createMockThread({ id: "t1", colorCode: "3761" }), brand },
+      };
+      const thread2 = {
+        ...createMockProjectThread({ id: "pt-2", createdAt: new Date("2026-01-02") }),
+        thread: { ...createMockThread({ id: "t2", colorCode: "334" }), brand },
+      };
+      const thread3 = {
+        ...createMockProjectThread({ id: "pt-3", createdAt: new Date("2026-01-03") }),
+        thread: { ...createMockThread({ id: "t3", colorCode: "500" }), brand },
+      };
+      mockPrisma.projectThread.findMany.mockResolvedValueOnce([thread1, thread2, thread3]);
       mockPrisma.projectBead.findMany.mockResolvedValueOnce([]);
       mockPrisma.projectSpecialty.findMany.mockResolvedValueOnce([]);
 
@@ -927,9 +944,318 @@ describe("supply-actions", () => {
       const result = await getProjectSupplies("proj-1");
 
       expect(result.threads).toHaveLength(3);
-      expect(result.threads[0].thread.colorCode).toBe("334");
-      expect(result.threads[1].thread.colorCode).toBe("500");
-      expect(result.threads[2].thread.colorCode).toBe("3761");
+      // Preserved insertion order (not re-sorted by colorCode)
+      expect(result.threads[0].id).toBe("pt-1");
+      expect(result.threads[1].id).toBe("pt-2");
+      expect(result.threads[2].id).toBe("pt-3");
+
+      // Verify DB query uses createdAt ascending ordering
+      expect(mockPrisma.projectThread.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { createdAt: "asc" },
+        }),
+      );
+    });
+
+    it("returns empty arrays when project not owned by user", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { getProjectSupplies } = await import("./supply-actions");
+
+      const result = await getProjectSupplies("proj-1");
+
+      expect(result.threads).toHaveLength(0);
+      expect(result.beads).toHaveLength(0);
+      expect(result.specialty).toHaveLength(0);
+      // Should NOT query junction tables when ownership fails
+      expect(mockPrisma.projectThread.findMany).not.toHaveBeenCalled();
+    });
+
+    it("returns empty arrays when project does not exist", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce(null);
+      const { getProjectSupplies } = await import("./supply-actions");
+
+      const result = await getProjectSupplies("nonexistent");
+
+      expect(result.threads).toHaveLength(0);
+      expect(result.beads).toHaveLength(0);
+      expect(result.specialty).toHaveLength(0);
+    });
+  });
+
+  // ─── createAndAddThread ─────────────────────────────────────────────────────
+
+  describe("createAndAddThread", () => {
+    it("requires auth", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { createAndAddThread } = await import("./supply-actions");
+      await expect(
+        createAndAddThread({ projectId: "p1", name: "Custom Red", brandId: "brand-1" }),
+      ).rejects.toThrow("Unauthorized");
+    });
+
+    it("validates name with trim and min(1)", async () => {
+      const { createAndAddThread } = await import("./supply-actions");
+
+      const result = await createAndAddThread({
+        projectId: "p1",
+        name: "   ",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Name is required");
+      }
+    });
+
+    it("checks project ownership before creating", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { createAndAddThread } = await import("./supply-actions");
+
+      const result = await createAndAddThread({
+        projectId: "p1",
+        name: "Custom Red",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Project not found");
+      }
+    });
+
+    it("creates thread and links to project in a transaction", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const mockThread = createMockThread({ id: "new-thread" });
+      const mockLink = createMockProjectThread({ id: "new-pt", threadId: "new-thread" });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          thread: { create: vi.fn().mockResolvedValue(mockThread) },
+          projectThread: { create: vi.fn().mockResolvedValue(mockLink) },
+        });
+      });
+
+      const { createAndAddThread } = await import("./supply-actions");
+
+      const result = await createAndAddThread({
+        projectId: "p1",
+        name: "Custom Red",
+        brandId: "brand-1",
+        colorCode: "CUS1",
+        hexColor: "#FF0000",
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
+    });
+
+    it("returns success with the created record", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const mockThread = createMockThread({ id: "new-thread", colorName: "Custom Red" });
+      const mockLink = createMockProjectThread({ id: "new-pt", threadId: "new-thread" });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          thread: { create: vi.fn().mockResolvedValue(mockThread) },
+          projectThread: { create: vi.fn().mockResolvedValue(mockLink) },
+        });
+      });
+
+      const { createAndAddThread } = await import("./supply-actions");
+
+      const result = await createAndAddThread({
+        projectId: "p1",
+        name: "Custom Red",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.record).toBeDefined();
+      }
+    });
+  });
+
+  // ─── createAndAddBead ──────────────────────────────────────────────────────
+
+  describe("createAndAddBead", () => {
+    it("requires auth", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { createAndAddBead } = await import("./supply-actions");
+      await expect(
+        createAndAddBead({ projectId: "p1", name: "Custom Bead", brandId: "brand-1" }),
+      ).rejects.toThrow("Unauthorized");
+    });
+
+    it("validates name with trim and min(1)", async () => {
+      const { createAndAddBead } = await import("./supply-actions");
+
+      const result = await createAndAddBead({
+        projectId: "p1",
+        name: "   ",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Name is required");
+      }
+    });
+
+    it("checks project ownership before creating", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { createAndAddBead } = await import("./supply-actions");
+
+      const result = await createAndAddBead({
+        projectId: "p1",
+        name: "Custom Bead",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Project not found");
+      }
+    });
+
+    it("creates bead and links to project in a transaction", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const mockBead = createMockBead({ id: "new-bead" });
+      const mockLink = createMockProjectBead({ id: "new-pb", beadId: "new-bead" });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          bead: { create: vi.fn().mockResolvedValue(mockBead) },
+          projectBead: { create: vi.fn().mockResolvedValue(mockLink) },
+        });
+      });
+
+      const { createAndAddBead } = await import("./supply-actions");
+
+      const result = await createAndAddBead({
+        projectId: "p1",
+        name: "Custom Bead",
+        brandId: "brand-1",
+        code: "CB01",
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
+    });
+
+    it("returns success with the created record", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const mockBead = createMockBead({ id: "new-bead", colorName: "Custom Bead" });
+      const mockLink = createMockProjectBead({ id: "new-pb", beadId: "new-bead" });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          bead: { create: vi.fn().mockResolvedValue(mockBead) },
+          projectBead: { create: vi.fn().mockResolvedValue(mockLink) },
+        });
+      });
+
+      const { createAndAddBead } = await import("./supply-actions");
+
+      const result = await createAndAddBead({
+        projectId: "p1",
+        name: "Custom Bead",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.record).toBeDefined();
+      }
+    });
+  });
+
+  // ─── createAndAddSpecialty ─────────────────────────────────────────────────
+
+  describe("createAndAddSpecialty", () => {
+    it("requires auth", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { createAndAddSpecialty } = await import("./supply-actions");
+      await expect(
+        createAndAddSpecialty({ projectId: "p1", name: "Custom Item", brandId: "brand-1" }),
+      ).rejects.toThrow("Unauthorized");
+    });
+
+    it("validates name with trim and min(1)", async () => {
+      const { createAndAddSpecialty } = await import("./supply-actions");
+
+      const result = await createAndAddSpecialty({
+        projectId: "p1",
+        name: "   ",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Name is required");
+      }
+    });
+
+    it("checks project ownership before creating", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { createAndAddSpecialty } = await import("./supply-actions");
+
+      const result = await createAndAddSpecialty({
+        projectId: "p1",
+        name: "Custom Item",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Project not found");
+      }
+    });
+
+    it("creates specialty item and links to project in a transaction", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const mockItem = createMockSpecialtyItem({ id: "new-item" });
+      const mockLink = createMockProjectSpecialty({ id: "new-ps", specialtyItemId: "new-item" });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          specialtyItem: { create: vi.fn().mockResolvedValue(mockItem) },
+          projectSpecialty: { create: vi.fn().mockResolvedValue(mockLink) },
+        });
+      });
+
+      const { createAndAddSpecialty } = await import("./supply-actions");
+
+      const result = await createAndAddSpecialty({
+        projectId: "p1",
+        name: "Custom Item",
+        brandId: "brand-1",
+        code: "CI01",
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
+    });
+
+    it("returns success with the created record", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const mockItem = createMockSpecialtyItem({ id: "new-item", colorName: "Custom Item" });
+      const mockLink = createMockProjectSpecialty({ id: "new-ps", specialtyItemId: "new-item" });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          specialtyItem: { create: vi.fn().mockResolvedValue(mockItem) },
+          projectSpecialty: { create: vi.fn().mockResolvedValue(mockLink) },
+        });
+      });
+
+      const { createAndAddSpecialty } = await import("./supply-actions");
+
+      const result = await createAndAddSpecialty({
+        projectId: "p1",
+        name: "Custom Item",
+        brandId: "brand-1",
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.record).toBeDefined();
+      }
     });
   });
 });
