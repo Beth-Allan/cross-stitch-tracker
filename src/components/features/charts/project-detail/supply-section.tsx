@@ -34,7 +34,7 @@ export function SupplySection({
   const hasItems = data.items.length > 0;
 
   return (
-    <div className="border-border bg-card overflow-hidden rounded-xl border">
+    <div className="border-border bg-card overflow-visible rounded-xl border">
       {/* Section header */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -85,7 +85,8 @@ export function SupplySection({
                     type="button"
                     className="text-primary hover:text-primary/80 flex items-center gap-1.5 text-sm font-medium transition-colors"
                   >
-                    <Plus className="size-3.5" />+ Add {data.label.toLowerCase()}
+                    <Plus className="size-3.5" />
+                    Add {data.label.toLowerCase()}
                   </button>
                 )}
               </div>
@@ -95,7 +96,7 @@ export function SupplySection({
               <p className="text-muted-foreground mb-2 text-sm">
                 No {data.label.toLowerCase()} linked to this project
               </p>
-              <div className="relative flex justify-center">
+              <div className="relative mt-3">
                 {addComponent ?? (
                   <button
                     onClick={(e) => {
@@ -105,7 +106,8 @@ export function SupplySection({
                     type="button"
                     className="text-primary hover:text-primary/80 flex items-center gap-1.5 text-sm font-medium transition-colors"
                   >
-                    <Plus className="size-3.5" />+ Add {data.label.toLowerCase()}
+                    <Plus className="size-3.5" />
+                    Add {data.label.toLowerCase()}
                   </button>
                 )}
               </div>

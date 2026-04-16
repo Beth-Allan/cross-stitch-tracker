@@ -408,7 +408,8 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
                     type="button"
                     className="text-primary hover:text-primary/80 flex items-center gap-1.5 text-sm font-medium transition-colors"
                   >
-                    <Plus className="size-3.5" />+ Add {section.label.toLowerCase()}
+                    <Plus className="size-3.5" />
+                    Add {section.label.toLowerCase()}
                   </button>
                 )
               }
