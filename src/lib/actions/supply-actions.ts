@@ -19,7 +19,7 @@ import {
   createAndAddSpecialtySchema,
 } from "@/lib/validations/supply";
 
-// ─── Helper ──────────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function isP2002(error: unknown): boolean {
   return (
@@ -28,6 +28,25 @@ function isP2002(error: unknown): boolean {
     "code" in error &&
     (error as { code: string }).code === "P2002"
   );
+}
+
+/**
+ * Resolve a brandId for inline supply creation. When the client sends
+ * "default" (no brand picker in the dialog), upsert a "Custom" brand
+ * of the appropriate supply type so there is always a valid FK target.
+ */
+async function resolveDefaultBrandId(
+  brandId: string,
+  supplyType: "THREAD" | "BEAD" | "SPECIALTY",
+): Promise<string> {
+  if (brandId !== "default") return brandId;
+
+  const brand = await prisma.supplyBrand.upsert({
+    where: { name: "Custom" },
+    create: { name: "Custom", supplyType },
+    update: {},
+  });
+  return brand.id;
 }
 
 // ─── Thread CRUD ─────────────────────────────────────────────────────────────
@@ -654,13 +673,15 @@ export async function createAndAddThread(formData: unknown) {
       return { success: false as const, error: "Project not found" };
     }
 
+    const resolvedBrandId = await resolveDefaultBrandId(validated.brandId, "THREAD");
+
     const result = await prisma.$transaction(async (tx) => {
       const thread = await tx.thread.create({
         data: {
           colorCode: validated.colorCode || "CUSTOM",
           colorName: validated.name,
           hexColor: validated.hexColor,
-          brandId: validated.brandId,
+          brandId: resolvedBrandId,
           colorFamily: validated.colorFamily,
         },
       });
@@ -703,13 +724,15 @@ export async function createAndAddBead(formData: unknown) {
       return { success: false as const, error: "Project not found" };
     }
 
+    const resolvedBrandId = await resolveDefaultBrandId(validated.brandId, "BEAD");
+
     const result = await prisma.$transaction(async (tx) => {
       const bead = await tx.bead.create({
         data: {
           productCode: validated.code || "CUSTOM",
           colorName: validated.name,
           hexColor: "#808080",
-          brandId: validated.brandId,
+          brandId: resolvedBrandId,
           colorFamily: "NEUTRAL",
         },
       });
@@ -751,13 +774,15 @@ export async function createAndAddSpecialty(formData: unknown) {
       return { success: false as const, error: "Project not found" };
     }
 
+    const resolvedBrandId = await resolveDefaultBrandId(validated.brandId, "SPECIALTY");
+
     const result = await prisma.$transaction(async (tx) => {
       const item = await tx.specialtyItem.create({
         data: {
           productCode: validated.code || "CUSTOM",
           colorName: validated.name,
           hexColor: "#808080",
-          brandId: validated.brandId,
+          brandId: resolvedBrandId,
         },
       });
       const link = await tx.projectSpecialty.create({
