@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 07-project-detail-experience
 source: 07-01-SUMMARY.md, 07-02-SUMMARY.md, 07-03-SUMMARY.md, 07-04-SUMMARY.md, 07-05-SUMMARY.md, 07-06-SUMMARY.md
 started: 2026-04-16T00:45:00Z
-updated: 2026-04-16T01:10:00Z
+updated: 2026-04-16T01:15:00Z
 ---
 
 ## Current Test
@@ -88,9 +88,12 @@ blocked: 2
   reason: "User reported: The only not quite right piece is that the Finished status doesn't have the project setup card. It probably should."
   severity: minor
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "SECTION_ORDER in types.ts line 110 excludes 'projectSetup' for FINISHED and FFO statuses"
+  artifacts:
+    - path: "src/components/features/charts/project-detail/types.ts"
+      issue: "SECTION_ORDER.FINISHED missing 'projectSetup', same for FFO"
+  missing:
+    - "Add 'projectSetup' to SECTION_ORDER arrays for FINISHED and FFO statuses"
   debug_session: ""
 
 - truth: "Supplies tab design should be consistent with overview page, and skein calculation should be correct"
@@ -98,9 +101,13 @@ blocked: 2
   reason: "User reported: It matches, but we need to work on the design of it (it doesn't match the overview page even a little bit) AND the skein calculation is very wrong."
   severity: major
   test: 7
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Skein formula uses INCHES_PER_STITCH_UNIT=6 as raw multiplier instead of 6/fabricCount. Produces 9 skeins for 1000 stitches (should be ~2). Formula is ~4x too high. Design inconsistency is a separate visual concern."
+  artifacts:
+    - path: "src/lib/utils/skein-calculator.ts"
+      issue: "threadPerStitch formula: (strandCount * 6) / effectiveCount overestimates by ~4x"
+  missing:
+    - "Correct the skein formula to match community-standard calculation (1000 stitches @ 2 strands over 2 on 14ct ≈ 1-2 skeins)"
+    - "Design pass on supplies tab to match overview page visual consistency"
   debug_session: ""
 
 - truth: "Add supply buttons should show single + prefix, consistent alignment, and SearchToAdd panel should display correctly without overflow"
@@ -108,7 +115,15 @@ blocked: 2
   reason: "User reported: duplicate + + Add threads, alignment inconsistency between add buttons, search box overflows the card and colour dropdown is missing"
   severity: major
   test: 10
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "4 issues: (1) supply-section.tsx lines 88,108 render Plus icon AND hardcoded '+' in text. (2) Non-empty sections use 'relative mt-3' (left-aligned) while empty sections use 'relative flex justify-center'. (3) supply-section.tsx line 37 has overflow-hidden which clips the absolutely-positioned SearchToAdd panel. (4) SearchToAdd component lacks colorFamily filter prop/UI."
+  artifacts:
+    - path: "src/components/features/charts/project-detail/supply-section.tsx"
+      issue: "Duplicate + (lines 88,108), alignment inconsistency (lines 78,98), overflow-hidden (line 37)"
+    - path: "src/components/features/supplies/search-to-add.tsx"
+      issue: "No colorFamily filter prop or dropdown UI"
+  missing:
+    - "Remove hardcoded '+' from button text (lines 88, 108)"
+    - "Consistent alignment on add button containers (lines 78, 98)"
+    - "Change overflow-hidden to overflow-visible on line 37"
+    - "Add colorFamily filter dropdown to SearchToAdd for thread type"
   debug_session: ""
