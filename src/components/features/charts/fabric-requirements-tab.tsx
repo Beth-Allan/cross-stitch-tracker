@@ -136,12 +136,12 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
     });
   }
 
-  function handleAssign(fabricId: string, chartId: string) {
+  function handleAssign(fabricId: string, projectId: string) {
     startTransition(async () => {
       try {
-        const result = await assignFabricToProject(fabricId, chartId);
+        const result = await assignFabricToProject(fabricId, projectId);
         if (result.success) {
-          setAssignedPairs((prev) => new Set(prev).add(`${fabricId}-${chartId}`));
+          setAssignedPairs((prev) => new Set(prev).add(`${fabricId}-${projectId}`));
         } else {
           toast.error("Could not assign fabric. Please try again.");
         }
@@ -278,7 +278,7 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                         </h4>
                         <div className="flex flex-col gap-2">
                           {row.matchingFabrics.map((fabric) => {
-                            const isAssigned = assignedPairs.has(`${fabric.id}-${row.chartId}`);
+                            const isAssigned = assignedPairs.has(`${fabric.id}-${row.projectId}`);
                             const fits = fabric.fitsWidth && fabric.fitsHeight;
 
                             return (
@@ -323,7 +323,7 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                                     disabled={isPending}
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      handleAssign(fabric.id, row.chartId);
+                                      handleAssign(fabric.id, row.projectId);
                                     }}
                                     className="shrink-0 cursor-pointer rounded-full border border-emerald-300 px-3 py-1 text-xs font-medium text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-50"
                                   >

@@ -28,6 +28,7 @@ vi.mock("next/link", () => ({
 function makeRow(overrides: Partial<FabricRequirementRow> = {}): FabricRequirementRow {
   return {
     chartId: "chart-1",
+    projectId: "project-1",
     chartName: "Test Pattern",
     coverThumbnailUrl: null,
     designerName: "Test Designer",
@@ -214,7 +215,39 @@ describe("FabricRequirementsTab", () => {
     fireEvent.click(screen.getByText("Assign"));
 
     await waitFor(() => {
-      expect(assignFabricToProject).toHaveBeenCalledWith("fab-1", "chart-1");
+      expect(assignFabricToProject).toHaveBeenCalledWith("fab-1", "project-1");
+    });
+  });
+
+  it("Assign button passes projectId (not chartId) to server action", async () => {
+    const { assignFabricToProject } = await import("@/lib/actions/pattern-dive-actions");
+
+    const rows = [
+      makeRow({
+        chartId: "chart-different",
+        projectId: "project-correct",
+        matchingFabrics: [
+          {
+            id: "fab-1",
+            name: "White Aida",
+            brandName: "DMC",
+            count: 14,
+            shortestEdgeInches: 24,
+            longestEdgeInches: 30,
+            fitsWidth: true,
+            fitsHeight: true,
+          },
+        ],
+      }),
+    ];
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
+
+    fireEvent.click(screen.getByText("Test Pattern"));
+    fireEvent.click(screen.getByText("Assign"));
+
+    await waitFor(() => {
+      expect(assignFabricToProject).toHaveBeenCalledWith("fab-1", "project-correct");
+      expect(assignFabricToProject).not.toHaveBeenCalledWith("fab-1", "chart-different");
     });
   });
 
