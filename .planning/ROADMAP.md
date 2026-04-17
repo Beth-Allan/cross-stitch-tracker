@@ -71,8 +71,8 @@ Plans:
 - [x] 08-04-PLAN.md -- Project Sessions tab, SessionTable, global Sessions page
 - [x] 08-05-PLAN.md -- Pattern Dive nav rename, tab infrastructure, Browse tab
 - [x] 08-06-PLAN.md -- Pattern Dive data actions (What's Next, Fabric Reqs, Storage)
-- [ ] 08-07-PLAN.md -- Pattern Dive tab components and eager data wiring
-- [ ] 08-08-PLAN.md -- DB push, data migration, conditional EditableNumber
+- [x] 08-07-PLAN.md -- Pattern Dive tab components and eager data wiring
+- [x] 08-08-PLAN.md -- DB push, data migration, conditional EditableNumber
 - [ ] 08-09-PLAN.md -- Integration verification and visual checkpoint
 
 **UI hint**: yes
