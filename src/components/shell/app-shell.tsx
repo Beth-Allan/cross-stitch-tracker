@@ -1,12 +1,15 @@
+import type { ActiveProjectForPicker } from "@/types/session";
 import { Sidebar } from "./sidebar";
 import { TopBar } from "./top-bar";
 
 interface AppShellProps {
   children: React.ReactNode;
   user: { name: string; email: string };
+  activeProjects: ActiveProjectForPicker[];
+  imageUrls: Record<string, string>;
 }
 
-export function AppShell({ children, user }: AppShellProps) {
+export function AppShell({ children, user, activeProjects, imageUrls }: AppShellProps) {
   return (
     <div className="bg-background flex h-screen overflow-hidden">
       <a
@@ -17,7 +20,7 @@ export function AppShell({ children, user }: AppShellProps) {
       </a>
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <TopBar user={user} />
+        <TopBar user={user} activeProjects={activeProjects} imageUrls={imageUrls} />
         <main
           id="main-content"
           className="flex-1 overflow-y-auto p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]"

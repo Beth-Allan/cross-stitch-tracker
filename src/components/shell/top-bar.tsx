@@ -3,21 +3,25 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, Clock, Plus } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { LinkButton } from "@/components/ui/link-button";
 import { Sheet, SheetTrigger, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { LogSessionModal } from "@/components/features/sessions/log-session-modal";
 import { UserMenu } from "./user-menu";
 import { navigationSections, settingsItem } from "./nav-items";
 import { Logo } from "./logo";
 import { NavItemLink } from "./nav-item-link";
+import type { ActiveProjectForPicker } from "@/types/session";
 
 interface TopBarProps {
   user: { name: string; email: string };
+  activeProjects: ActiveProjectForPicker[];
+  imageUrls: Record<string, string>;
 }
 
-export function TopBar({ user }: TopBarProps) {
+export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [logModalOpen, setLogModalOpen] = useState(false);
 
   return (
     <header className="border-border bg-card flex h-14 shrink-0 items-center gap-3 border-b px-4 pt-[env(safe-area-inset-top)]">
@@ -83,14 +87,10 @@ export function TopBar({ user }: TopBarProps) {
       {/* Quick actions */}
       <div className="ml-auto flex items-center gap-2">
         <Button
-          variant="secondary"
           size="sm"
-          onClick={() =>
-            toast("Coming soon", {
-              description: "You'll be able to log your stitching sessions here.",
-            })
-          }
-          className="flex min-h-11 items-center gap-1.5 sm:min-h-0"
+          onClick={() => setLogModalOpen(true)}
+          className="flex min-h-11 items-center gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 sm:min-h-0"
+          aria-label="Log Stitches"
         >
           <Clock className="h-3.5 w-3.5" strokeWidth={2} />
           <span className="hidden sm:inline">Log Stitches</span>
@@ -110,6 +110,13 @@ export function TopBar({ user }: TopBarProps) {
           <UserMenu user={user} />
         </div>
       </div>
+
+      <LogSessionModal
+        isOpen={logModalOpen}
+        onOpenChange={setLogModalOpen}
+        activeProjects={activeProjects}
+        imageUrls={imageUrls}
+      />
     </header>
   );
 }
