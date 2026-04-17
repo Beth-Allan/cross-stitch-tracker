@@ -188,9 +188,7 @@ describe("FabricRequirementsTab", () => {
   });
 
   it("Assign button calls assignFabricToProject", async () => {
-    const { assignFabricToProject } = await import(
-      "@/lib/actions/pattern-dive-actions"
-    );
+    const { assignFabricToProject } = await import("@/lib/actions/pattern-dive-actions");
 
     const rows = [
       makeRow({
@@ -223,9 +221,7 @@ describe("FabricRequirementsTab", () => {
   it("renders empty state", () => {
     render(<FabricRequirementsTab rows={[]} imageUrls={{}} />);
 
-    expect(
-      screen.getByText(/All projects have fabric assigned/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/All projects have fabric assigned/)).toBeInTheDocument();
   });
 
   it("shows formula hint text", () => {

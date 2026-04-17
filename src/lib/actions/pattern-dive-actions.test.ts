@@ -153,9 +153,7 @@ describe("pattern-dive-actions", () => {
             status: "UNSTARTED",
             wantToStartNext: false,
             fabric: null,
-            projectThreads: [
-              { quantityRequired: 5, quantityAcquired: 1 },
-            ],
+            projectThreads: [{ quantityRequired: 5, quantityAcquired: 1 }],
             projectBeads: [],
             projectSpecialty: [],
           },
@@ -172,9 +170,7 @@ describe("pattern-dive-actions", () => {
             status: "UNSTARTED",
             wantToStartNext: false,
             fabric: { id: "f1" },
-            projectThreads: [
-              { quantityRequired: 5, quantityAcquired: 5 },
-            ],
+            projectThreads: [{ quantityRequired: 5, quantityAcquired: 5 }],
             projectBeads: [],
             projectSpecialty: [],
           },
@@ -283,9 +279,7 @@ describe("pattern-dive-actions", () => {
             status: "UNSTARTED",
             wantToStartNext: false,
             fabric: null, // No fabric linked
-            projectThreads: [
-              { quantityRequired: 2, quantityAcquired: 2 },
-            ],
+            projectThreads: [{ quantityRequired: 2, quantityAcquired: 2 }],
             projectBeads: [],
             projectSpecialty: [],
           },
@@ -302,9 +296,7 @@ describe("pattern-dive-actions", () => {
             status: "UNSTARTED",
             wantToStartNext: false,
             fabric: { id: "f1" }, // Fabric linked
-            projectThreads: [
-              { quantityRequired: 2, quantityAcquired: 2 },
-            ],
+            projectThreads: [{ quantityRequired: 2, quantityAcquired: 2 }],
             projectBeads: [],
             projectSpecialty: [],
           },
@@ -406,9 +398,7 @@ describe("pattern-dive-actions", () => {
             status: "KITTED",
             wantToStartNext: true,
             fabric: { id: "f1" },
-            projectThreads: [
-              { quantityRequired: 3, quantityAcquired: 3 },
-            ],
+            projectThreads: [{ quantityRequired: 3, quantityAcquired: 3 }],
             projectBeads: [],
             projectSpecialty: [],
           },
@@ -824,9 +814,7 @@ describe("pattern-dive-actions", () => {
     it("rejects unauthenticated calls", async () => {
       mockAuth.mockResolvedValueOnce(null);
       const { assignFabricToProject } = await import("./pattern-dive-actions");
-      await expect(
-        assignFabricToProject("fabric-1", "project-1"),
-      ).rejects.toThrow("Unauthorized");
+      await expect(assignFabricToProject("fabric-1", "project-1")).rejects.toThrow("Unauthorized");
     });
 
     it("verifies project ownership before linking", async () => {

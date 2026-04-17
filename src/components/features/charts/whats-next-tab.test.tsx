@@ -90,9 +90,7 @@ describe("WhatsNextTab", () => {
   it("renders count text with correct pluralization", () => {
     const projects = [makeProject()];
     render(<WhatsNextTab projects={projects} imageUrls={{}} />);
-    expect(
-      screen.getByText("1 project ready or getting ready to stitch"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("1 project ready or getting ready to stitch")).toBeInTheDocument();
 
     const { unmount } = render(
       <WhatsNextTab
@@ -100,18 +98,14 @@ describe("WhatsNextTab", () => {
         imageUrls={{}}
       />,
     );
-    expect(
-      screen.getByText("2 projects ready or getting ready to stitch"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("2 projects ready or getting ready to stitch")).toBeInTheDocument();
     unmount();
   });
 
   it("renders empty state when no projects", () => {
     render(<WhatsNextTab projects={[]} imageUrls={{}} />);
 
-    expect(
-      screen.getByText(/No projects queued up/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/No projects queued up/)).toBeInTheDocument();
   });
 
   it("card links to /charts/{chartId}", () => {

@@ -58,9 +58,9 @@ describe("sessionFormSchema", () => {
   });
 
   it("rejects negative timeSpentMinutes", () => {
-    expect(() =>
-      sessionFormSchema.parse({ ...validInput, timeSpentMinutes: -1 }),
-    ).toThrow("Time cannot be negative");
+    expect(() => sessionFormSchema.parse({ ...validInput, timeSpentMinutes: -1 })).toThrow(
+      "Time cannot be negative",
+    );
   });
 
   it("defaults timeSpentMinutes to null when omitted", () => {

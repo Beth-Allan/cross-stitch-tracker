@@ -97,15 +97,34 @@ describe("StorageViewTab", () => {
         locationId: "loc-1",
         locationName: "Craft Room",
         items: [
-          { type: "project", id: "c1", name: "Pattern A", coverThumbnailUrl: null, status: "UNSTARTED" },
-          { type: "fabric", id: "f1", name: "Fabric A", coverThumbnailUrl: null, fabricCount: 14, brandName: "DMC" },
+          {
+            type: "project",
+            id: "c1",
+            name: "Pattern A",
+            coverThumbnailUrl: null,
+            status: "UNSTARTED",
+          },
+          {
+            type: "fabric",
+            id: "f1",
+            name: "Fabric A",
+            coverThumbnailUrl: null,
+            fabricCount: 14,
+            brandName: "DMC",
+          },
         ],
       }),
       makeGroup({
         locationId: "loc-2",
         locationName: "Closet",
         items: [
-          { type: "project", id: "c2", name: "Pattern B", coverThumbnailUrl: null, status: "KITTED" },
+          {
+            type: "project",
+            id: "c2",
+            name: "Pattern B",
+            coverThumbnailUrl: null,
+            status: "KITTED",
+          },
         ],
       }),
     ];
@@ -119,9 +138,7 @@ describe("StorageViewTab", () => {
   it("renders empty state", () => {
     render(<StorageViewTab groups={[]} imageUrls={{}} />);
 
-    expect(
-      screen.getByText(/No storage locations set up yet/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/No storage locations set up yet/)).toBeInTheDocument();
   });
 
   it("project items link to /charts/{id}", () => {

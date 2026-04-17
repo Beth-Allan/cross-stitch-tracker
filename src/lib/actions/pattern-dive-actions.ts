@@ -3,11 +3,7 @@
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import type {
-  WhatsNextProject,
-  FabricRequirementRow,
-  StorageGroup,
-} from "@/types/session";
+import type { WhatsNextProject, FabricRequirementRow, StorageGroup } from "@/types/session";
 
 /**
  * D-07: Only UNSTARTED and KITTED projects.
@@ -49,28 +45,19 @@ export async function getWhatsNextProjects(): Promise<WhatsNextProject[]> {
     .filter((c) => c.project)
     .map((c) => {
       const p = c.project!;
-      const supplies = [
-        ...p.projectThreads,
-        ...p.projectBeads,
-        ...p.projectSpecialty,
-      ];
+      const supplies = [...p.projectThreads, ...p.projectBeads, ...p.projectSpecialty];
 
       // Fabric counts as 1 supply item
       const fabricRequired = 1;
       const fabricAcquired = p.fabric ? 1 : 0;
 
-      const totalRequired =
-        supplies.reduce((s, i) => s + i.quantityRequired, 0) + fabricRequired;
+      const totalRequired = supplies.reduce((s, i) => s + i.quantityRequired, 0) + fabricRequired;
       const totalAcquired =
-        supplies.reduce(
-          (s, i) => s + Math.min(i.quantityAcquired, i.quantityRequired),
-          0,
-        ) + fabricAcquired;
+        supplies.reduce((s, i) => s + Math.min(i.quantityAcquired, i.quantityRequired), 0) +
+        fabricAcquired;
 
       const kittingPercent =
-        totalRequired === 0
-          ? 100
-          : Math.round((totalAcquired / totalRequired) * 100);
+        totalRequired === 0 ? 100 : Math.round((totalAcquired / totalRequired) * 100);
 
       return {
         chartId: c.id,
@@ -87,10 +74,8 @@ export async function getWhatsNextProjects(): Promise<WhatsNextProject[]> {
 
   // D-08 ranking: wantToStartNext first, then kitting % desc, then dateAdded asc
   projects.sort((a, b) => {
-    if (a.wantToStartNext !== b.wantToStartNext)
-      return a.wantToStartNext ? -1 : 1;
-    if (a.kittingPercent !== b.kittingPercent)
-      return b.kittingPercent - a.kittingPercent;
+    if (a.wantToStartNext !== b.wantToStartNext) return a.wantToStartNext ? -1 : 1;
+    if (a.kittingPercent !== b.kittingPercent) return b.kittingPercent - a.kittingPercent;
     return a.dateAdded.getTime() - b.dateAdded.getTime();
   });
 
@@ -174,11 +159,9 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
               .map((f) => {
                 // Compare either edge to required dimensions (fabric can be rotated)
                 const fitsWidth =
-                  f.shortestEdgeInches >= requiredWidth ||
-                  f.longestEdgeInches >= requiredWidth;
+                  f.shortestEdgeInches >= requiredWidth || f.longestEdgeInches >= requiredWidth;
                 const fitsHeight =
-                  f.shortestEdgeInches >= requiredHeight ||
-                  f.longestEdgeInches >= requiredHeight;
+                  f.shortestEdgeInches >= requiredHeight || f.longestEdgeInches >= requiredHeight;
                 return {
                   id: f.id,
                   name: f.name,
@@ -303,10 +286,7 @@ export async function getStorageGroups(): Promise<StorageGroup[]> {
  * Links a fabric to a project, unlinking any previously linked fabric.
  * T-08-14: Verifies project ownership before linking.
  */
-export async function assignFabricToProject(
-  fabricId: string,
-  projectId: string,
-) {
+export async function assignFabricToProject(fabricId: string, projectId: string) {
   const user = await requireAuth();
 
   // Verify project ownership

@@ -7,12 +7,7 @@ export const sessionFormSchema = z.object({
     .number()
     .int("Stitch count must be a whole number")
     .min(1, "Stitch count must be at least 1"),
-  timeSpentMinutes: z
-    .number()
-    .int()
-    .min(0, "Time cannot be negative")
-    .nullable()
-    .default(null),
+  timeSpentMinutes: z.number().int().min(0, "Time cannot be negative").nullable().default(null),
   photoKey: z.string().nullable().default(null),
 });
 
