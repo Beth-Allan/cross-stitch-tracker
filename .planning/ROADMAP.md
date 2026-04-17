@@ -73,7 +73,7 @@ Plans:
 - [x] 08-06-PLAN.md -- Pattern Dive data actions (What's Next, Fabric Reqs, Storage)
 - [x] 08-07-PLAN.md -- Pattern Dive tab components and eager data wiring
 - [x] 08-08-PLAN.md -- DB push, data migration, conditional EditableNumber
-- [ ] 08-09-PLAN.md -- Integration verification and visual checkpoint
+- [x] 08-09-PLAN.md -- Integration verification and visual checkpoint
 
 **UI hint**: yes
 
