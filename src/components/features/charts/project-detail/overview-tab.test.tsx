@@ -59,7 +59,7 @@ describe("OverviewTab", () => {
   describe("section ordering by status", () => {
     it("renders Progress section first for IN_PROGRESS", () => {
       const chart = makeChart({ project: { status: "IN_PROGRESS" } });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       const headings = screen.getAllByRole("heading", { level: 3 });
       const headingTexts = headings.map((h) => h.textContent);
@@ -71,7 +71,7 @@ describe("OverviewTab", () => {
 
     it("renders Kitting Checklist first for UNSTARTED", () => {
       const chart = makeChart({ project: { status: "UNSTARTED", stitchesCompleted: 0 } });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       const headings = screen.getAllByRole("heading", { level: 3 });
       const headingTexts = headings.map((h) => h.textContent);
@@ -89,7 +89,7 @@ describe("OverviewTab", () => {
           stitchesCompleted: 45000,
         },
       });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       const headings = screen.getAllByRole("heading", { level: 3 });
       const headingTexts = headings.map((h) => h.textContent);
@@ -107,7 +107,7 @@ describe("OverviewTab", () => {
           stitchesCompleted: 45000,
         },
       });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText("Project Setup")).toBeInTheDocument();
     });
@@ -121,14 +121,14 @@ describe("OverviewTab", () => {
           stitchesCompleted: 45000,
         },
       });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText("Project Setup")).toBeInTheDocument();
     });
 
     it("does NOT render Progress or Kitting for KITTED", () => {
       const chart = makeChart({ project: { status: "KITTED", stitchesCompleted: 0 } });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.queryByText("Stitching Progress")).not.toBeInTheDocument();
       expect(screen.queryByText("Kitting Checklist")).not.toBeInTheDocument();
@@ -138,28 +138,28 @@ describe("OverviewTab", () => {
   describe("Pattern Details section", () => {
     it("always renders Pattern Details", () => {
       const chart = makeChart();
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText("Pattern Details")).toBeInTheDocument();
     });
 
     it("shows stitch count formatted with commas", () => {
       const chart = makeChart({ chart: { stitchCount: 45000 } });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText("45,000")).toBeInTheDocument();
     });
 
     it("shows dimensions when available", () => {
       const chart = makeChart({ chart: { stitchesWide: 300, stitchesHigh: 150 } });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText(/300w\s*[x\u00D7]\s*150h/)).toBeInTheDocument();
     });
 
     it("shows designer name", () => {
       const chart = makeChart();
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText("Test Designer")).toBeInTheDocument();
     });
@@ -173,7 +173,7 @@ describe("OverviewTab", () => {
           ],
         },
       });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText(/Sampler/)).toBeInTheDocument();
       expect(screen.getByText(/Animals/)).toBeInTheDocument();
@@ -183,7 +183,7 @@ describe("OverviewTab", () => {
   describe("Dates section", () => {
     it("shows formatted date added", () => {
       const chart = makeChart();
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       // formatDateOnly produces "Jan 1, 2025" style
       expect(screen.getByText(/Jan 1, 2025/)).toBeInTheDocument();
@@ -191,7 +191,7 @@ describe("OverviewTab", () => {
 
     it("shows formatted start date when present", () => {
       const chart = makeChart({ project: { startDate: new Date("2025-01-15") } });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText(/Jan 15, 2025/)).toBeInTheDocument();
     });
@@ -204,7 +204,7 @@ describe("OverviewTab", () => {
           stitchesCompleted: 45000,
         },
       });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       // Date appears in both Completion and Dates sections
       const matches = screen.getAllByText(/Jun 1, 2025/);
@@ -215,21 +215,21 @@ describe("OverviewTab", () => {
   describe("Project Setup section", () => {
     it("shows storage location name", () => {
       const chart = makeChart();
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText("Craft Room")).toBeInTheDocument();
     });
 
     it("shows stitching app name", () => {
       const chart = makeChart();
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText("Pattern Keeper")).toBeInTheDocument();
     });
 
     it("shows fabric name and count", () => {
       const chart = makeChart();
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText(/White Aida/)).toBeInTheDocument();
       expect(screen.getByText(/14/)).toBeInTheDocument();
@@ -239,14 +239,14 @@ describe("OverviewTab", () => {
   describe("Progress section", () => {
     it("shows ProgressBar for IN_PROGRESS status", () => {
       const chart = makeChart({ project: { status: "IN_PROGRESS", stitchesCompleted: 12000 } });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByRole("progressbar")).toBeInTheDocument();
     });
 
     it("shows completed stitch count", () => {
       const chart = makeChart({ project: { status: "IN_PROGRESS", stitchesCompleted: 12000 } });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText(/12,000/)).toBeInTheDocument();
     });
@@ -255,7 +255,7 @@ describe("OverviewTab", () => {
   describe("Kitting Checklist", () => {
     it("shows fabric status for UNSTARTED", () => {
       const chart = makeChart({ project: { status: "UNSTARTED", stitchesCompleted: 0 } });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText("Kitting Checklist")).toBeInTheDocument();
       // Fabric text appears in both Kitting Checklist and Project Setup sections
@@ -268,7 +268,7 @@ describe("OverviewTab", () => {
         chart: { digitalWorkingCopyUrl: "https://example.com/file.pdf" },
         project: { status: "UNSTARTED", stitchesCompleted: 0 },
       });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText(/Digital Copy/i)).toBeInTheDocument();
     });
@@ -283,7 +283,7 @@ describe("OverviewTab", () => {
           stitchesCompleted: 45000,
         },
       });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       expect(screen.getByText("Completion")).toBeInTheDocument();
       // Date appears in both Completion and Dates sections
@@ -300,11 +300,67 @@ describe("OverviewTab", () => {
           stitchesCompleted: 45000,
         },
       });
-      render(<OverviewTab chart={chart} supplies={makeSupplies()} />);
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
       // FFO date appears in both Completion and Dates sections
       const ffoMatches = screen.getAllByText(/Jul 1, 2025/);
       expect(ffoMatches.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe("Conditional stitchesCompleted display (D-06)", () => {
+    it("shows auto-calculated text when sessionCount > 0", () => {
+      const chart = makeChart({
+        project: { status: "IN_PROGRESS", stitchesCompleted: 12000 },
+      });
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={5} />);
+
+      expect(screen.getByText(/Auto-calculated from 5 sessions/)).toBeInTheDocument();
+    });
+
+    it("does not show auto-calculated text when sessionCount is 0", () => {
+      const chart = makeChart({
+        project: { status: "IN_PROGRESS", stitchesCompleted: 12000 },
+      });
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
+
+      expect(screen.queryByText(/Auto-calculated/)).not.toBeInTheDocument();
+    });
+
+    it("uses singular 'session' when sessionCount is 1", () => {
+      const chart = makeChart({
+        project: { status: "IN_PROGRESS", stitchesCompleted: 500 },
+      });
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={1} />);
+
+      expect(screen.getByText(/Auto-calculated from 1 session$/)).toBeInTheDocument();
+    });
+
+    it("renders stitchesCompleted in styled read-only span when sessions exist", () => {
+      const chart = makeChart({
+        project: { status: "IN_PROGRESS", stitchesCompleted: 12000 },
+      });
+      const { container } = render(
+        <OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={3} />,
+      );
+
+      // The read-only span uses min-h-11 which distinguishes it from the ProgressBar percentage
+      const readOnlySpan = container.querySelector("span.min-h-11.font-mono.tabular-nums");
+      expect(readOnlySpan).toBeInTheDocument();
+      expect(readOnlySpan?.textContent).toContain("12,000");
+    });
+
+    it("does not render read-only styled span when no sessions", () => {
+      const chart = makeChart({
+        project: { status: "IN_PROGRESS", stitchesCompleted: 12000 },
+      });
+      const { container } = render(
+        <OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />,
+      );
+
+      // No read-only span with min-h-11 styling
+      const readOnlySpan = container.querySelector("span.min-h-11.font-mono.tabular-nums");
+      expect(readOnlySpan).not.toBeInTheDocument();
     });
   });
 });
