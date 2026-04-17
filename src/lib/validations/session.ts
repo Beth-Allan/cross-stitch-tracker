@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const sessionFormSchema = z.object({
-  projectId: z.string().min(1, "Project is required"),
+  projectId: z.string().trim().min(1, "Project is required"),
   date: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date" }),
   stitchCount: z
     .number()

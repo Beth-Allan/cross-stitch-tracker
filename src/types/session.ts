@@ -60,6 +60,7 @@ export interface WhatsNextProject {
 
 export interface FabricRequirementRow {
   chartId: string;
+  projectId: string;
   chartName: string;
   coverThumbnailUrl: string | null;
   designerName: string | null;

@@ -871,13 +871,21 @@ describe("pattern-dive-actions", () => {
         chartId: "c1",
         fabric: null,
       });
-      mockPrisma.fabric.update.mockResolvedValue({});
+      const txMock = {
+        fabric: {
+          findUnique: vi.fn().mockResolvedValue({ linkedProjectId: null }),
+          update: vi.fn().mockResolvedValue({}),
+        },
+      };
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
+      );
 
       const { assignFabricToProject } = await import("./pattern-dive-actions");
       const result = await assignFabricToProject("fabric-1", "project-1");
 
       expect(result).toEqual({ success: true });
-      expect(mockPrisma.fabric.update).toHaveBeenCalledWith({
+      expect(txMock.fabric.update).toHaveBeenCalledWith({
         where: { id: "fabric-1" },
         data: { linkedProjectId: "project-1" },
       });
@@ -889,7 +897,15 @@ describe("pattern-dive-actions", () => {
         chartId: "c1",
         fabric: { id: "old-fabric" },
       });
-      mockPrisma.fabric.update.mockResolvedValue({});
+      const txMock = {
+        fabric: {
+          findUnique: vi.fn().mockResolvedValue({ linkedProjectId: null }),
+          update: vi.fn().mockResolvedValue({}),
+        },
+      };
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
+      );
 
       const { assignFabricToProject } = await import("./pattern-dive-actions");
       const result = await assignFabricToProject("new-fabric", "project-1");
@@ -897,13 +913,13 @@ describe("pattern-dive-actions", () => {
       expect(result).toEqual({ success: true });
 
       // First call unlinks the old fabric
-      expect(mockPrisma.fabric.update).toHaveBeenCalledWith({
+      expect(txMock.fabric.update).toHaveBeenCalledWith({
         where: { id: "old-fabric" },
         data: { linkedProjectId: null },
       });
 
       // Second call links the new fabric
-      expect(mockPrisma.fabric.update).toHaveBeenCalledWith({
+      expect(txMock.fabric.update).toHaveBeenCalledWith({
         where: { id: "new-fabric" },
         data: { linkedProjectId: "project-1" },
       });
@@ -977,7 +993,15 @@ describe("pattern-dive-actions", () => {
         chartId: "c1",
         fabric: null,
       });
-      mockPrisma.fabric.update.mockResolvedValue({});
+      const txMock = {
+        fabric: {
+          findUnique: vi.fn().mockResolvedValue({ linkedProjectId: null }),
+          update: vi.fn().mockResolvedValue({}),
+        },
+      };
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
+      );
 
       const { revalidatePath } = await import("next/cache");
       const { assignFabricToProject } = await import("./pattern-dive-actions");

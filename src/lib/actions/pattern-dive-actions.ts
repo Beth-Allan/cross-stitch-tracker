@@ -177,6 +177,7 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
 
       return {
         chartId: c.id,
+        projectId: p.id,
         chartName: c.name,
         coverThumbnailUrl: c.coverThumbnailUrl,
         designerName: c.designer?.name ?? null,
@@ -302,19 +303,39 @@ export async function assignFabricToProject(fabricId: string, projectId: string)
     return { success: false as const, error: "Project not found" };
   }
 
-  // Unlink previous fabric if any
-  if (project.fabric) {
-    await prisma.fabric.update({
-      where: { id: project.fabric.id },
-      data: { linkedProjectId: null },
-    });
-  }
+  // Atomic unlink + availability check + link (WR-01, WR-03)
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Check fabric is not already linked to another project (WR-03)
+      const fabric = await tx.fabric.findUnique({
+        where: { id: fabricId },
+        select: { linkedProjectId: true },
+      });
+      if (fabric?.linkedProjectId && fabric.linkedProjectId !== projectId) {
+        throw new Error("FABRIC_ALREADY_LINKED");
+      }
 
-  // Link new fabric
-  await prisma.fabric.update({
-    where: { id: fabricId },
-    data: { linkedProjectId: projectId },
-  });
+      // Unlink previous fabric if any
+      if (project.fabric && project.fabric.id !== fabricId) {
+        await tx.fabric.update({
+          where: { id: project.fabric.id },
+          data: { linkedProjectId: null },
+        });
+      }
+
+      // Link new fabric
+      await tx.fabric.update({
+        where: { id: fabricId },
+        data: { linkedProjectId: projectId },
+      });
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message === "FABRIC_ALREADY_LINKED") {
+      return { success: false as const, error: "Fabric is already assigned to another project" };
+    }
+    console.error("assignFabricToProject error:", error);
+    return { success: false as const, error: "Failed to assign fabric" };
+  }
 
   revalidatePath(`/charts/${project.chartId}`);
   revalidatePath("/charts");
