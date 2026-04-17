@@ -48,6 +48,15 @@ export async function getPresignedUploadUrl(input: unknown) {
     };
   }
   if (
+    validated.category === "sessions" &&
+    !ALLOWED_IMAGE_TYPES.includes(validated.contentType as (typeof ALLOWED_IMAGE_TYPES)[number])
+  ) {
+    return {
+      success: false as const,
+      error: `Invalid image type. Allowed: ${ALLOWED_IMAGE_TYPES.join(", ")}`,
+    };
+  }
+  if (
     validated.category === "files" &&
     !ALLOWED_FILE_TYPES.includes(validated.contentType as (typeof ALLOWED_FILE_TYPES)[number])
   ) {
