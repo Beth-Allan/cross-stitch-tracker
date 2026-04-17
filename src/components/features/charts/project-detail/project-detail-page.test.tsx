@@ -18,16 +18,23 @@ vi.mock("./project-tabs", () => ({
     ({
       overviewContent,
       suppliesContent,
+      sessionsContent,
     }: {
       overviewContent: React.ReactNode;
       suppliesContent: React.ReactNode;
+      sessionsContent: React.ReactNode;
     }) => (
       <div data-testid="project-tabs">
         <div data-testid="overview-content">{overviewContent}</div>
         <div data-testid="supplies-content">{suppliesContent}</div>
+        <div data-testid="sessions-content">{sessionsContent}</div>
       </div>
     ),
   ),
+}));
+
+vi.mock("@/components/features/sessions/project-sessions-tab", () => ({
+  ProjectSessionsTab: vi.fn(() => <div data-testid="project-sessions-tab" />),
 }));
 
 vi.mock("./overview-tab", () => ({
@@ -54,6 +61,18 @@ function makeSupplies(): NonNullable<ProjectDetailProps["supplies"]> {
   };
 }
 
+// Default session-related props
+const defaultSessionProps = {
+  sessions: [],
+  sessionStats: {
+    totalStitches: 0,
+    sessionsLogged: 0,
+    avgPerSession: 0,
+    activeSince: null,
+  },
+  activeProjects: [],
+};
+
 describe("ProjectDetailPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -65,7 +84,14 @@ describe("ProjectDetailPage", () => {
       project: { status: "IN_PROGRESS" },
     });
 
-    render(<ProjectDetailPage chart={chart} imageUrls={{}} supplies={makeSupplies()} />);
+    render(
+      <ProjectDetailPage
+        chart={chart}
+        imageUrls={{}}
+        supplies={makeSupplies()}
+        {...defaultSessionProps}
+      />,
+    );
 
     expect(screen.getByTestId("project-detail-hero")).toBeInTheDocument();
     expect(ProjectDetailHero).toHaveBeenCalledWith(
@@ -81,7 +107,14 @@ describe("ProjectDetailPage", () => {
       project: { status: "UNSTARTED" },
     });
 
-    render(<ProjectDetailPage chart={chart} imageUrls={{}} supplies={makeSupplies()} />);
+    render(
+      <ProjectDetailPage
+        chart={chart}
+        imageUrls={{}}
+        supplies={makeSupplies()}
+        {...defaultSessionProps}
+      />,
+    );
 
     expect(screen.getByTestId("project-tabs")).toBeInTheDocument();
     expect(screen.getByTestId("overview-content")).toBeInTheDocument();
@@ -95,7 +128,14 @@ describe("ProjectDetailPage", () => {
     });
     const supplies = makeSupplies();
 
-    render(<ProjectDetailPage chart={chart} imageUrls={{}} supplies={supplies} />);
+    render(
+      <ProjectDetailPage
+        chart={chart}
+        imageUrls={{}}
+        supplies={supplies}
+        {...defaultSessionProps}
+      />,
+    );
 
     expect(screen.getByTestId("overview-tab")).toBeInTheDocument();
     expect(OverviewTab).toHaveBeenCalledWith(
@@ -113,7 +153,14 @@ describe("ProjectDetailPage", () => {
       project: { id: "proj-42", status: "IN_PROGRESS" },
     });
 
-    render(<ProjectDetailPage chart={chart} imageUrls={{}} supplies={makeSupplies()} />);
+    render(
+      <ProjectDetailPage
+        chart={chart}
+        imageUrls={{}}
+        supplies={makeSupplies()}
+        {...defaultSessionProps}
+      />,
+    );
 
     expect(screen.getByTestId("supplies-tab")).toBeInTheDocument();
   });
@@ -123,10 +170,14 @@ describe("ProjectDetailPage", () => {
       project: null,
     });
 
-    render(<ProjectDetailPage chart={chart} imageUrls={{}} supplies={null} />);
+    render(
+      <ProjectDetailPage chart={chart} imageUrls={{}} supplies={null} {...defaultSessionProps} />,
+    );
 
-    expect(screen.getByText("No project linked")).toBeInTheDocument();
+    // Both supplies and sessions show "No project linked" when project is null
+    expect(screen.getAllByText("No project linked")).toHaveLength(2);
     expect(screen.getByText(/Create a project to manage supplies/)).toBeInTheDocument();
+    expect(screen.getByText(/Create a project to manage sessions/)).toBeInTheDocument();
     expect(screen.queryByTestId("supplies-tab")).not.toBeInTheDocument();
   });
 
@@ -136,9 +187,11 @@ describe("ProjectDetailPage", () => {
       project: null,
     });
 
-    render(<ProjectDetailPage chart={chart} imageUrls={{}} supplies={null} />);
+    render(
+      <ProjectDetailPage chart={chart} imageUrls={{}} supplies={null} {...defaultSessionProps} />,
+    );
 
-    expect(screen.getByText("No project linked")).toBeInTheDocument();
+    expect(screen.getAllByText("No project linked")).toHaveLength(2);
   });
 
   it("passes imageUrls to ProjectDetailHero", () => {
@@ -148,7 +201,14 @@ describe("ProjectDetailPage", () => {
     });
     const imageUrls = { "covers/test.jpg": "https://signed.url/test.jpg" };
 
-    render(<ProjectDetailPage chart={chart} imageUrls={imageUrls} supplies={makeSupplies()} />);
+    render(
+      <ProjectDetailPage
+        chart={chart}
+        imageUrls={imageUrls}
+        supplies={makeSupplies()}
+        {...defaultSessionProps}
+      />,
+    );
 
     expect(ProjectDetailHero).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -165,7 +225,14 @@ describe("ProjectDetailPage", () => {
       project: { status: "IN_PROGRESS" },
     });
 
-    render(<ProjectDetailPage chart={chart} imageUrls={{}} supplies={makeSupplies()} />);
+    render(
+      <ProjectDetailPage
+        chart={chart}
+        imageUrls={{}}
+        supplies={makeSupplies()}
+        {...defaultSessionProps}
+      />,
+    );
 
     expect(ProjectDetailHero).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -180,7 +247,14 @@ describe("ProjectDetailPage", () => {
       project: { status: "IN_PROGRESS" },
     });
 
-    render(<ProjectDetailPage chart={chart} imageUrls={{}} supplies={makeSupplies()} />);
+    render(
+      <ProjectDetailPage
+        chart={chart}
+        imageUrls={{}}
+        supplies={makeSupplies()}
+        {...defaultSessionProps}
+      />,
+    );
 
     // Extract the onStatusChange callback and call it (wrapped in act for state update)
     const heroCall = (ProjectDetailHero as Mock).mock.calls[0][0];

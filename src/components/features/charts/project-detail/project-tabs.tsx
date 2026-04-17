@@ -7,9 +7,14 @@ import { TAB_VALUES, type TabValue } from "./types";
 interface ProjectTabsProps {
   overviewContent: React.ReactNode;
   suppliesContent: React.ReactNode;
+  sessionsContent: React.ReactNode;
 }
 
-export function ProjectTabs({ overviewContent, suppliesContent }: ProjectTabsProps) {
+export function ProjectTabs({
+  overviewContent,
+  suppliesContent,
+  sessionsContent,
+}: ProjectTabsProps) {
   const [tab, setTab] = useQueryState(
     "tab",
     parseAsStringLiteral([...TAB_VALUES]).withDefault("overview"),
@@ -24,12 +29,18 @@ export function ProjectTabs({ overviewContent, suppliesContent }: ProjectTabsPro
         <TabsTrigger value="supplies" className="min-h-11">
           Supplies
         </TabsTrigger>
+        <TabsTrigger value="sessions" className="min-h-11">
+          Sessions
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="overview" className="pt-6">
         {overviewContent}
       </TabsContent>
       <TabsContent value="supplies" className="pt-6">
         {suppliesContent}
+      </TabsContent>
+      <TabsContent value="sessions" className="pt-6">
+        {sessionsContent}
       </TabsContent>
     </Tabs>
   );

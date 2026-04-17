@@ -7,7 +7,7 @@ import type {
 
 // ─── Tab Navigation ────────────────────────────────────────────────────────
 
-export const TAB_VALUES = ["overview", "supplies"] as const;
+export const TAB_VALUES = ["overview", "supplies", "sessions"] as const;
 export type TabValue = (typeof TAB_VALUES)[number];
 
 // ─── Supply Sorting ────────────────────────────────────────────────────────
