@@ -61,12 +61,12 @@ The app now has a browsable gallery experience with three view modes, a rich pro
 ### Active — Milestone 3: Track & Measure (v1.2)
 
 - [ ] Main Dashboard (Currently Stitching, Start Next, Buried Treasures, Spotlight, Collection Stats)
-- [ ] Pattern Dive (evolve Charts page: rename + add What's Next, Fabric Requirements, Storage View tabs)
+- ✓ Pattern Dive (evolve Charts page: rename + add What's Next, Fabric Requirements, Storage View tabs) — v1.2 Phase 8
 - [ ] Project Dashboard (progress buckets with hero stats, Finished projects tab)
 - [ ] Shopping Cart (upgrade: project selection, tabbed supply types, fabric-to-stash matching)
-- [ ] Quick stitch session logging (date, project, count, optional photo/time)
-- [ ] Auto-updating project progress from logged sessions
-- [ ] Project detail Sessions tab (per-project session history with mini stats)
+- ✓ Quick stitch session logging (date, project, count, optional photo/time) — v1.2 Phase 8
+- ✓ Auto-updating project progress from logged sessions — v1.2 Phase 8
+- ✓ Project detail Sessions tab (per-project session history with mini stats) — v1.2 Phase 8
 
 ### Active — Milestone 4: Motivation & Planning (v1.3)
 
@@ -101,14 +101,15 @@ The app now has a browsable gallery experience with three view modes, a rich pro
 
 ## Context
 
-**Current state (v1.1 shipped):**
-- 867 tests, deployed to Vercel
+**Current state (Phase 8 complete):**
+- 1022 tests, deployed to Vercel
 - Tech stack: Next.js 16, Prisma 7, Tailwind v4, Auth.js v5 beta, shadcn/ui v4 (Base UI)
 - Database: PostgreSQL on Neon (prod), Cloudflare R2 (file storage)
 - 25+ backlog items captured (see CLAUDE.md backlog section)
 - Gallery with 3 view modes, project detail with tabbed layout, skein calculator
 - Storage location and stitching app management with CRUD + detail pages
 - DMC catalog complete at 495 threads
+- Session logging with auto-updating progress, Pattern Dive tabs (What's Next, Fabric Requirements, Storage View)
 
 **Design system:** Emerald/amber/stone palette. Fraunces headings, Source Sans 3 body, JetBrains Mono hero stats. 7 status colors. Full design token CSS. Semantic tokens used throughout (bg-card, text-muted-foreground, etc.).
 
