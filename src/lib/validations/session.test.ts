@@ -74,4 +74,15 @@ describe("sessionFormSchema", () => {
     const result = sessionFormSchema.parse(withoutPhoto);
     expect(result.photoKey).toBeNull();
   });
+
+  it("rejects whitespace-only projectId after trim", () => {
+    expect(() => sessionFormSchema.parse({ ...validInput, projectId: "   " })).toThrow(
+      "Project is required",
+    );
+  });
+
+  it("trims leading and trailing whitespace from projectId", () => {
+    const result = sessionFormSchema.parse({ ...validInput, projectId: " proj-1 " });
+    expect(result.projectId).toBe("proj-1");
+  });
 });

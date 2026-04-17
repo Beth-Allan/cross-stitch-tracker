@@ -617,6 +617,30 @@ describe("pattern-dive-actions", () => {
       expect(result[0].matchingFabrics[0].count).toBe(14);
     });
 
+    it("returns projectId in each FabricRequirementRow", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Chart With Dims",
+          coverThumbnailUrl: null,
+          stitchCount: 5000,
+          stitchesWide: 200,
+          stitchesHigh: 300,
+          designer: { name: "Designer A" },
+          project: {
+            id: "project-abc",
+            fabric: null,
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      expect(result[0].projectId).toBe("project-abc");
+    });
+
     it("sets fitsWidth/fitsHeight flags correctly comparing fabric to required size", async () => {
       // Required: 200/14+6 = 20.3" wide, 300/14+6 = 27.4" high
       mockPrisma.chart.findMany.mockResolvedValue([
@@ -883,6 +907,68 @@ describe("pattern-dive-actions", () => {
         where: { id: "new-fabric" },
         data: { linkedProjectId: "project-1" },
       });
+    });
+
+    it("wraps unlink and link in a $transaction", async () => {
+      // Setup: project with existing fabric
+      const txMock = {
+        fabric: {
+          findUnique: vi.fn().mockResolvedValue({ linkedProjectId: null }),
+          update: vi.fn().mockResolvedValue({}),
+        },
+      };
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "user-1",
+        chartId: "c1",
+        fabric: { id: "old-fabric" },
+      });
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
+      );
+
+      const { assignFabricToProject } = await import("./pattern-dive-actions");
+      const result = await assignFabricToProject("new-fabric", "project-1");
+
+      expect(result).toEqual({ success: true });
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
+      // Verify unlink old fabric inside tx
+      expect(txMock.fabric.update).toHaveBeenCalledWith({
+        where: { id: "old-fabric" },
+        data: { linkedProjectId: null },
+      });
+      // Verify link new fabric inside tx
+      expect(txMock.fabric.update).toHaveBeenCalledWith({
+        where: { id: "new-fabric" },
+        data: { linkedProjectId: "project-1" },
+      });
+    });
+
+    it("rejects when fabric is already linked to another project", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "user-1",
+        chartId: "c1",
+        fabric: null,
+      });
+      // Fabric already linked to a different project
+      const txMock = {
+        fabric: {
+          findUnique: vi.fn().mockResolvedValue({ linkedProjectId: "other-project" }),
+          update: vi.fn(),
+        },
+      };
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
+      );
+
+      const { assignFabricToProject } = await import("./pattern-dive-actions");
+      const result = await assignFabricToProject("fabric-1", "project-1");
+
+      expect(result).toEqual({
+        success: false,
+        error: "Fabric is already assigned to another project",
+      });
+      // Should NOT have called fabric.update for linking
+      expect(txMock.fabric.update).not.toHaveBeenCalled();
     });
 
     it("revalidates paths after linking", async () => {
