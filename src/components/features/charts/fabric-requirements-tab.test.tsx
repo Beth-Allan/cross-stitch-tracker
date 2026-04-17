@@ -125,10 +125,10 @@ describe("FabricRequirementsTab", () => {
     render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
     fireEvent.click(screen.getByText("All Projects"));
 
-    expect(screen.getByTestId("status-icon-chart-1")).toBeInTheDocument();
-    // Check icon should have emerald color
     const icon = screen.getByTestId("status-icon-chart-1");
-    expect(icon.className).toContain("text-emerald");
+    expect(icon).toBeInTheDocument();
+    // SVG className is an SVGAnimatedString — use getAttribute
+    expect(icon.getAttribute("class")).toContain("text-emerald");
   });
 
   it("shows AlertTriangle (amber) when fabric too small", () => {
@@ -150,7 +150,7 @@ describe("FabricRequirementsTab", () => {
     fireEvent.click(screen.getByText("All Projects"));
 
     const icon = screen.getByTestId("status-icon-chart-1");
-    expect(icon.className).toContain("text-amber");
+    expect(icon.getAttribute("class")).toContain("text-amber");
   });
 
   it("shows Package icon (stone) when no fabric", () => {
@@ -158,7 +158,7 @@ describe("FabricRequirementsTab", () => {
     render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
 
     const icon = screen.getByTestId("status-icon-chart-1");
-    expect(icon.className).toContain("text-stone");
+    expect(icon.getAttribute("class")).toContain("text-stone");
   });
 
   it("expandable row shows matching fabrics from stash", () => {
