@@ -262,4 +262,103 @@ describe("LogSessionModal", () => {
       expect(screen.queryByText("Select a project...")).not.toBeInTheDocument();
     });
   });
+
+  describe("SESS-06: photo upload", () => {
+    it("renders 'Add progress photo' button in create mode", () => {
+      renderModal({ lockedProjectId: "proj-1" });
+      expect(screen.getByText("Add progress photo")).toBeInTheDocument();
+    });
+
+    it("calls getPresignedUploadUrl when a file is selected", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+
+      mockGetPresignedUploadUrl.mockResolvedValue({
+        success: true,
+        url: "https://r2.example.com/presigned",
+        key: "sessions/proj-1/photo.jpg",
+      });
+
+      // Mock fetch for the R2 PUT upload
+      global.fetch = vi.fn().mockResolvedValue({ ok: true });
+
+      renderModal({ lockedProjectId: "proj-1" });
+
+      const file = new File(["photo data"], "photo.jpg", { type: "image/jpeg" });
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      await user.upload(fileInput, file);
+
+      await waitFor(() => {
+        expect(mockGetPresignedUploadUrl).toHaveBeenCalledWith(
+          expect.objectContaining({
+            category: "sessions",
+            fileName: "photo.jpg",
+            contentType: "image/jpeg",
+          }),
+        );
+      });
+    });
+
+    it("includes photoKey in createSession call after successful upload", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+
+      mockGetPresignedUploadUrl.mockResolvedValue({
+        success: true,
+        url: "https://r2.example.com/presigned",
+        key: "sessions/proj-1/photo.jpg",
+      });
+      global.fetch = vi.fn().mockResolvedValue({ ok: true });
+      mockCreateSession.mockResolvedValue({ success: true, session: { id: "new-1" } });
+
+      renderModal({ lockedProjectId: "proj-1" });
+
+      // Upload a photo
+      const file = new File(["photo data"], "photo.jpg", { type: "image/jpeg" });
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      await user.upload(fileInput, file);
+
+      // Wait for upload to complete and "Replace photo" to appear
+      await waitFor(() => {
+        expect(screen.getByText("Replace photo")).toBeInTheDocument();
+      });
+
+      // Fill in stitch count and save
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.type(stitchInput, "300");
+      await user.click(screen.getByRole("button", { name: /log stitches/i }));
+
+      await waitFor(() => {
+        expect(mockCreateSession).toHaveBeenCalledWith(
+          expect.objectContaining({
+            photoKey: "sessions/proj-1/photo.jpg",
+          }),
+        );
+      });
+    });
+
+    it("shows 'Replace photo' link after a photo is uploaded", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+
+      mockGetPresignedUploadUrl.mockResolvedValue({
+        success: true,
+        url: "https://r2.example.com/presigned",
+        key: "sessions/proj-1/photo.jpg",
+      });
+      global.fetch = vi.fn().mockResolvedValue({ ok: true });
+
+      renderModal({ lockedProjectId: "proj-1" });
+
+      const file = new File(["photo data"], "photo.jpg", { type: "image/jpeg" });
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      await user.upload(fileInput, file);
+
+      await waitFor(() => {
+        expect(screen.getByText("Replace photo")).toBeInTheDocument();
+      });
+
+      expect(screen.queryByText("Add progress photo")).not.toBeInTheDocument();
+    });
+  });
 });

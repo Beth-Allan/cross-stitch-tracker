@@ -22,7 +22,7 @@ function makeChart(
     coverThumbnailUrl: null,
     digitalWorkingCopyUrl: null,
     notes: null,
-    dateAdded: new Date("2025-01-01"),
+    dateAdded: new Date("2025-01-01T12:00:00Z"),
     designer: { id: "d-1", name: "Test Designer" },
     genres: [{ id: "g-1", name: "Sampler" }],
     ...overrides.chart,
