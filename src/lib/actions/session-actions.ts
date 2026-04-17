@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import type { Prisma } from "@/generated/prisma/client";
 import { sessionFormSchema } from "@/lib/validations/session";
 import type {
   StitchSessionRow,
@@ -18,16 +19,7 @@ import type {
  * Formula: stitchesCompleted = startingStitches + sum(session.stitchCount)
  * Per D-04, startingStitches is fetched inside the transaction to stay atomic.
  */
-async function recalculateProgress(
-  tx: {
-    stitchSession: { aggregate: (args: unknown) => Promise<{ _sum: { stitchCount: number | null } }> };
-    project: {
-      findUnique: (args: unknown) => Promise<{ startingStitches: number } | null>;
-      update: (args: unknown) => Promise<unknown>;
-    };
-  },
-  projectId: string,
-): Promise<void> {
+async function recalculateProgress(tx: Prisma.TransactionClient, projectId: string): Promise<void> {
   const [aggregation, project] = await Promise.all([
     tx.stitchSession.aggregate({
       where: { projectId },
@@ -69,7 +61,7 @@ export async function createSession(formData: unknown) {
       return { success: false as const, error: "Project not found" };
     }
 
-    const session = await prisma.$transaction(async (tx: typeof prisma) => {
+    const session = await prisma.$transaction(async (tx) => {
       const created = await tx.stitchSession.create({
         data: {
           projectId: validated.projectId,
@@ -121,7 +113,7 @@ export async function updateSession(sessionId: string, formData: unknown) {
     const projectId = existing.project.id;
     const chartId = existing.project.chartId;
 
-    const session = await prisma.$transaction(async (tx: typeof prisma) => {
+    const session = await prisma.$transaction(async (tx) => {
       const updated = await tx.stitchSession.update({
         where: { id: sessionId },
         data: {
@@ -171,7 +163,7 @@ export async function deleteSession(sessionId: string) {
     const projectId = existing.project.id;
     const chartId = existing.project.chartId;
 
-    await prisma.$transaction(async (tx: typeof prisma) => {
+    await prisma.$transaction(async (tx) => {
       await tx.stitchSession.delete({
         where: { id: sessionId },
       });
