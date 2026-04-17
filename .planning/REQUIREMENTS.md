@@ -9,7 +9,7 @@ Requirements for Track & Measure milestone. Each maps to roadmap phases.
 
 ### Session Logging
 
-- [ ] **SESS-01**: User can log a stitch session with date, project, stitch count, and optional time/photo
+- [x] **SESS-01**: User can log a stitch session with date, project, stitch count, and optional time/photo
 - [ ] **SESS-02**: User can access the Log Session modal from the header button, project detail, and dashboard
 - [ ] **SESS-03**: User can view per-project session history with mini stats (total stitches, sessions logged, avg per session, active since)
 - [ ] **SESS-04**: User can edit or delete an existing session
@@ -30,7 +30,7 @@ Requirements for Track & Measure milestone. Each maps to roadmap phases.
 - [ ] **PDIV-01**: Charts page is renamed to "Pattern Dive" in navigation (URL path stays `/charts`)
 - [ ] **PDIV-02**: Existing gallery Browse functionality becomes the Browse tab with tab navigation infrastructure
 - [ ] **PDIV-03**: User can view a "What's Next" tab showing projects ranked by kitting readiness and start-next flag
-- [ ] **PDIV-04**: User can view a "Fabric Requirements" tab showing cross-project fabric needs with stash matching
+- [x] **PDIV-04**: User can view a "Fabric Requirements" tab showing cross-project fabric needs with stash matching
 - [ ] **PDIV-05**: User can view a "Storage View" tab showing projects and fabrics grouped by storage location
 
 ### Project Dashboard
@@ -98,7 +98,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SESS-01 | Phase 8 | Pending |
+| SESS-01 | Phase 8 | Complete |
 | SESS-02 | Phase 8 | Pending |
 | SESS-03 | Phase 8 | Pending |
 | SESS-04 | Phase 8 | Pending |
@@ -113,7 +113,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PDIV-01 | Phase 8 | Pending |
 | PDIV-02 | Phase 8 | Pending |
 | PDIV-03 | Phase 8 | Pending |
-| PDIV-04 | Phase 8 | Pending |
+| PDIV-04 | Phase 8 | Complete |
 | PDIV-05 | Phase 8 | Pending |
 | PROJ-01 | Phase 9 | Pending |
 | PROJ-02 | Phase 9 | Pending |

@@ -74,7 +74,7 @@ Plans:
 - [x] 08-07-PLAN.md -- Pattern Dive tab components and eager data wiring
 - [x] 08-08-PLAN.md -- DB push, data migration, conditional EditableNumber
 - [x] 08-09-PLAN.md -- Integration verification and visual checkpoint
-- [ ] 08-10-PLAN.md -- Gap closure: fabric assign bug (CR-01), $transaction, availability guard, validation trim
+- [x] 08-10-PLAN.md -- Gap closure: fabric assign bug (CR-01), $transaction, availability guard, validation trim
 
 **UI hint**: yes
 
