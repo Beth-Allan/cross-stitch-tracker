@@ -10,7 +10,7 @@ function createSession(overrides: Partial<StitchSessionRow> = {}): StitchSession
     id: "session-1",
     projectId: "proj-1",
     projectName: "Autumn Sampler",
-    date: new Date("2026-03-19"),
+    date: new Date("2026-03-19T12:00:00"),
     stitchCount: 423,
     timeSpentMinutes: 75,
     photoKey: null,
@@ -22,20 +22,20 @@ function createSession(overrides: Partial<StitchSessionRow> = {}): StitchSession
 const baseSessions: StitchSessionRow[] = [
   createSession({
     id: "s1",
-    date: new Date("2026-03-19"),
+    date: new Date("2026-03-19T12:00:00"),
     stitchCount: 423,
     timeSpentMinutes: 75,
   }),
   createSession({
     id: "s2",
-    date: new Date("2026-03-18"),
+    date: new Date("2026-03-18T12:00:00"),
     stitchCount: 512,
     timeSpentMinutes: 90,
     photoKey: "photos/session-s2.jpg",
   }),
   createSession({
     id: "s3",
-    date: new Date("2026-03-16"),
+    date: new Date("2026-03-16T12:00:00"),
     stitchCount: 380,
     timeSpentMinutes: 65,
   }),
@@ -116,11 +116,17 @@ describe("SessionTable", () => {
   it("shows camera icon for rows with photoKey", () => {
     render(<SessionTable {...defaultProps} />);
 
-    // Only session s2 has photoKey — there should be exactly 1 camera icon
-    const rows = screen.getAllByRole("row");
-    // The camera icon cell in data rows — we can check by the emerald color class
-    const cameraIcons = document.querySelectorAll(".text-emerald-500");
-    expect(cameraIcons.length).toBe(1);
+    // Only session s2 has photoKey — count emerald camera icons inside table body cells
+    const dataRows = screen.getAllByRole("row").slice(1); // skip header
+    let cameraCount = 0;
+    for (const row of dataRows) {
+      // Photo column is 4th cell (index 3) when showProjectName=false
+      const photoCell = row.querySelectorAll("td")[3];
+      if (photoCell?.querySelector(".text-emerald-500")) {
+        cameraCount++;
+      }
+    }
+    expect(cameraCount).toBe(1);
   });
 
   it("renders empty state message when no sessions", () => {
