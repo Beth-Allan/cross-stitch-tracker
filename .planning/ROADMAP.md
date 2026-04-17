@@ -67,10 +67,10 @@ Full details: `milestones/v1.1-ROADMAP.md`
 Plans:
 - [x] 08-01-PLAN.md -- Schema, types, validation, test infrastructure foundation
 - [x] 08-02-PLAN.md -- Session CRUD server actions with atomic progress recalculation (TDD)
-- [ ] 08-03-PLAN.md -- LogSessionModal component and TopBar integration
-- [ ] 08-04-PLAN.md -- Project Sessions tab, SessionTable, global Sessions page
+- [x] 08-03-PLAN.md -- LogSessionModal component and TopBar integration
+- [x] 08-04-PLAN.md -- Project Sessions tab, SessionTable, global Sessions page
 - [x] 08-05-PLAN.md -- Pattern Dive nav rename, tab infrastructure, Browse tab
-- [ ] 08-06-PLAN.md -- Pattern Dive data actions (What's Next, Fabric Reqs, Storage)
+- [x] 08-06-PLAN.md -- Pattern Dive data actions (What's Next, Fabric Reqs, Storage)
 - [ ] 08-07-PLAN.md -- Pattern Dive tab components and eager data wiring
 - [ ] 08-08-PLAN.md -- DB push, data migration, conditional EditableNumber
 - [ ] 08-09-PLAN.md -- Integration verification and visual checkpoint
