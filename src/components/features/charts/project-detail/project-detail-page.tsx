@@ -60,7 +60,7 @@ export function ProjectDetailPage({
       <ProjectDetailHero chart={chart} imageUrls={imageUrls} onStatusChange={handleStatusChange} />
 
       <ProjectTabs
-        overviewContent={<OverviewTab chart={chartWithCurrentStatus} supplies={supplies} />}
+        overviewContent={<OverviewTab chart={chartWithCurrentStatus} supplies={supplies} sessionCount={sessions.length} />}
         suppliesContent={
           project && supplies ? (
             <SuppliesTab chartId={chart.id} project={project} supplies={supplies} />
