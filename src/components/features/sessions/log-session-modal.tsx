@@ -12,11 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  createSession,
-  updateSession,
-  deleteSession,
-} from "@/lib/actions/session-actions";
+import { createSession, updateSession, deleteSession } from "@/lib/actions/session-actions";
 import { getPresignedUploadUrl } from "@/lib/actions/upload-actions";
 import type { ActiveProjectForPicker } from "@/types/session";
 
@@ -43,7 +39,8 @@ export interface LogSessionModalProps {
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function todayString(): string {
-  return new Date().toISOString().split("T")[0];
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
@@ -110,9 +107,7 @@ export function LogSessionModal({
 
   // ─── Derived State ──────────────────────────────────────────────────────
 
-  const selectedProject = activeProjects.find(
-    (p) => p.projectId === selectedProjectId,
-  );
+  const selectedProject = activeProjects.find((p) => p.projectId === selectedProjectId);
   const filteredProjects = activeProjects.filter((p) =>
     p.chartName.toLowerCase().includes(projectSearch.toLowerCase()),
   );
@@ -120,8 +115,7 @@ export function LogSessionModal({
   const parsedStitchCount = parseInt(stitchCount, 10);
   const isValid = !!selectedProjectId && !isNaN(parsedStitchCount) && parsedStitchCount >= 1;
 
-  const totalMinutes =
-    (parseInt(hours, 10) || 0) * 60 + (parseInt(minutes, 10) || 0);
+  const totalMinutes = (parseInt(hours, 10) || 0) * 60 + (parseInt(minutes, 10) || 0);
 
   // ─── Photo Upload ───────────────────────────────────────────────────────
 
@@ -209,9 +203,7 @@ export function LogSessionModal({
           );
         }
       } catch {
-        toast.error(
-          "Session could not be saved. Check your connection and try again.",
-        );
+        toast.error("Session could not be saved. Check your connection and try again.");
       }
     });
   }
@@ -229,13 +221,9 @@ export function LogSessionModal({
           onOpenChange(false);
           return;
         }
-        toast.error(
-          "Session could not be deleted. Check your connection and try again.",
-        );
+        toast.error("Session could not be deleted. Check your connection and try again.");
       } catch {
-        toast.error(
-          "Session could not be deleted. Check your connection and try again.",
-        );
+        toast.error("Session could not be deleted. Check your connection and try again.");
       }
     });
   }
@@ -246,9 +234,7 @@ export function LogSessionModal({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? "Edit Session" : "Log Stitches"}
-          </DialogTitle>
+          <DialogTitle>{isEditing ? "Edit Session" : "Log Stitches"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -257,7 +243,7 @@ export function LogSessionModal({
             <div className="relative">
               <label
                 htmlFor="project-picker-trigger"
-                className="text-muted-foreground mb-1.5 block text-xs font-semibold uppercase tracking-wider"
+                className="text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase"
               >
                 Project
               </label>
@@ -267,13 +253,7 @@ export function LogSessionModal({
                 onClick={() => setShowProjectDropdown(!showProjectDropdown)}
                 className="border-input flex h-8 w-full items-center justify-between rounded-lg border bg-transparent px-2.5 py-1 text-sm"
               >
-                <span
-                  className={
-                    selectedProject
-                      ? "text-foreground"
-                      : "text-muted-foreground"
-                  }
-                >
+                <span className={selectedProject ? "text-foreground" : "text-muted-foreground"}>
                   {selectedProject?.chartName ?? "Select a project..."}
                 </span>
                 <ChevronDown className="text-muted-foreground h-4 w-4 shrink-0" />
@@ -312,8 +292,7 @@ export function LogSessionModal({
                       >
                         {/* 28px thumbnail */}
                         <div className="bg-muted h-7 w-7 shrink-0 overflow-hidden rounded">
-                          {project.coverThumbnailUrl &&
-                          imageUrls[project.coverThumbnailUrl] ? (
+                          {project.coverThumbnailUrl && imageUrls[project.coverThumbnailUrl] ? (
                             <img
                               src={imageUrls[project.coverThumbnailUrl]}
                               alt=""
@@ -326,9 +305,7 @@ export function LogSessionModal({
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="truncate font-medium">
-                            {project.chartName}
-                          </p>
+                          <p className="truncate font-medium">{project.chartName}</p>
                           <p className="text-muted-foreground text-[11px]">
                             {project.totalStitches > 0
                               ? `${Math.round((project.stitchesCompleted / project.totalStitches) * 100)}% complete`
@@ -352,7 +329,7 @@ export function LogSessionModal({
           <div>
             <label
               htmlFor="session-date"
-              className="text-muted-foreground mb-1.5 block text-xs font-semibold uppercase tracking-wider"
+              className="text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase"
             >
               Date
             </label>
@@ -371,7 +348,7 @@ export function LogSessionModal({
           <div>
             <label
               htmlFor="session-stitch-count"
-              className="text-muted-foreground mb-1.5 block text-xs font-semibold uppercase tracking-wider"
+              className="text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase"
             >
               Stitch Count
             </label>
@@ -390,9 +367,9 @@ export function LogSessionModal({
 
           {/* Time Spent (optional) */}
           <div>
-            <span className="text-muted-foreground mb-1.5 block text-xs font-semibold uppercase tracking-wider">
+            <span className="text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase">
               Time Spent{" "}
-              <span className="text-muted-foreground/70 normal-case tracking-normal">
+              <span className="text-muted-foreground/70 tracking-normal normal-case">
                 (optional)
               </span>
             </span>
@@ -423,9 +400,9 @@ export function LogSessionModal({
 
           {/* Photo Upload (optional) */}
           <div>
-            <span className="text-muted-foreground mb-1.5 block text-xs font-semibold uppercase tracking-wider">
+            <span className="text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase">
               Progress Photo{" "}
-              <span className="text-muted-foreground/70 normal-case tracking-normal">
+              <span className="text-muted-foreground/70 tracking-normal normal-case">
                 (optional)
               </span>
             </span>
@@ -518,11 +495,7 @@ export function LogSessionModal({
 
           {/* Right side: dismiss + save */}
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-            >
+            <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isPending}>
               {isEditing ? "Discard Changes" : "Discard"}
             </Button>
             <Button

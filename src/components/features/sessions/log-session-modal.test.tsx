@@ -66,9 +66,7 @@ const editSession = {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function renderModal(
-  overrides?: Partial<React.ComponentProps<typeof LogSessionModal>>,
-) {
+function renderModal(overrides?: Partial<React.ComponentProps<typeof LogSessionModal>>) {
   const defaultProps = {
     isOpen: true,
     onOpenChange: vi.fn(),
@@ -91,7 +89,7 @@ describe("LogSessionModal", () => {
     vi.clearAllMocks();
     // Mock Date to ensure consistent "today" in tests
     vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-04-15"));
+    vi.setSystemTime(new Date(2026, 3, 15, 12, 0, 0));
   });
 
   afterEach(() => {
@@ -156,12 +154,6 @@ describe("LogSessionModal", () => {
       const user = userEvent.setup();
       mockCreateSession.mockResolvedValue({ success: true, session: { id: "new-1" } });
 
-      // Need to mock Date.now for the date default since we switched to real timers
-      const originalToISOString = Date.prototype.toISOString;
-      Date.prototype.toISOString = function () {
-        return "2026-04-15T12:00:00.000Z";
-      };
-
       renderModal();
 
       // Select a project
@@ -183,8 +175,6 @@ describe("LogSessionModal", () => {
           }),
         );
       });
-
-      Date.prototype.toISOString = originalToISOString;
     });
 
     it('does not show "Delete session" link in create mode', () => {

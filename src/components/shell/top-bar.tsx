@@ -41,7 +41,7 @@ export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
               <Link
                 href="/"
                 onClick={() => setSheetOpen(false)}
-                className="border-sidebar-border focus-visible:ring-ring flex items-center gap-3 border-b px-4 py-5 outline-none focus-visible:ring-2 focus-visible:ring-inset"
+                className="border-sidebar-border focus-visible:ring-ring flex h-14 items-center gap-3 border-b px-4 outline-none focus-visible:ring-2 focus-visible:ring-inset"
               >
                 <Logo />
                 <span className="font-heading text-sidebar-foreground truncate text-base font-semibold">

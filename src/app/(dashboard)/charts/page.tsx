@@ -14,13 +14,12 @@ import { StorageViewTab } from "@/components/features/charts/storage-view-tab";
 export default async function ChartsPage() {
   // D-10: All four tab datasets fetched eagerly via Promise.all()
   // Avoids Neon cold start waterfall — single parallel batch
-  const [charts, whatsNextProjects, fabricRequirements, storageGroups] =
-    await Promise.all([
-      getChartsForGallery(),
-      getWhatsNextProjects(),
-      getFabricRequirements(),
-      getStorageGroups(),
-    ]);
+  const [charts, whatsNextProjects, fabricRequirements, storageGroups] = await Promise.all([
+    getChartsForGallery(),
+    getWhatsNextProjects(),
+    getFabricRequirements(),
+    getStorageGroups(),
+  ]);
 
   // Collect all image keys that need presigned URLs across all tabs
   const imageKeys = [
@@ -37,27 +36,15 @@ export default async function ChartsPage() {
       <div>
         <h1 className="font-heading text-2xl font-semibold">Pattern Dive</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Explore your collection, plan what&apos;s next, and find the right
-          fabric
+          Explore your collection, plan what&apos;s next, and find the right fabric
         </p>
       </div>
 
       <PatternDiveTabs
-        browseContent={
-          <ProjectGallery charts={charts} imageUrls={imageUrls} />
-        }
-        whatsNextContent={
-          <WhatsNextTab projects={whatsNextProjects} imageUrls={imageUrls} />
-        }
-        fabricContent={
-          <FabricRequirementsTab
-            rows={fabricRequirements}
-            imageUrls={imageUrls}
-          />
-        }
-        storageContent={
-          <StorageViewTab groups={storageGroups} imageUrls={imageUrls} />
-        }
+        browseContent={<ProjectGallery charts={charts} imageUrls={imageUrls} hideHeader />}
+        whatsNextContent={<WhatsNextTab projects={whatsNextProjects} imageUrls={imageUrls} />}
+        fabricContent={<FabricRequirementsTab rows={fabricRequirements} imageUrls={imageUrls} />}
+        storageContent={<StorageViewTab groups={storageGroups} imageUrls={imageUrls} />}
       />
     </div>
   );

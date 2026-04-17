@@ -40,7 +40,7 @@ export function Sidebar() {
           {/* Logo */}
           <Link
             href="/"
-            className="border-sidebar-border hover:bg-muted focus-visible:ring-ring flex items-center gap-3 border-b px-4 py-5 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset"
+            className="border-sidebar-border hover:bg-muted focus-visible:ring-ring flex h-14 items-center gap-3 border-b px-4 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset"
           >
             <Logo />
             {!collapsed && (
