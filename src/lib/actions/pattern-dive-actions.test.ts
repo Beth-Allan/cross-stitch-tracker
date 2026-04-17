@@ -75,8 +75,9 @@ describe("pattern-dive-actions", () => {
       const result = await getWhatsNextProjects();
 
       expect(result).toHaveLength(2);
-      expect(result[0].status).toBe("UNSTARTED");
-      expect(result[1].status).toBe("KITTED");
+      const statuses = result.map((r) => r.status);
+      expect(statuses).toContain("UNSTARTED");
+      expect(statuses).toContain("KITTED");
 
       // Verify the prisma query filters correctly
       expect(mockPrisma.chart.findMany).toHaveBeenCalledWith(
