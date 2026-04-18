@@ -39,7 +39,7 @@ Declared values (must be multiples of 4):
 | lg | 24px | Section padding, page horizontal padding |
 | xl | 32px | Page top padding, layout column gaps, hero stats margin-bottom |
 | 2xl | 48px | Major section vertical gaps (between Currently Stitching and Start Next) |
-| 3xl | 56px | Page-level section breaks (between full-width dashboard sections) |
+| 3xl | 64px | Page-level section breaks (between full-width dashboard sections) |
 
 Exceptions:
 - Currently Stitching cards: fixed 280px width, 160px cover height (per DesignOS D-04)
@@ -57,7 +57,7 @@ Exceptions:
 | Body | 14px (text-sm) | 400 (regular) | 1.5 | Source Sans 3 |
 | Label / Micro | 11px (text-[11px]) | 700 (bold) | 1.4 | Source Sans 3, uppercase tracking-wider |
 | Heading | 20px (text-xl) | 700 (bold) | 1.2 | Fraunces |
-| Page Title | 28-30px (text-2xl to text-3xl) | 700 (bold) | 1.2 | Fraunces |
+| Page Title | 28px (text-2xl) | 700 (bold) | 1.2 | Fraunces |
 | Stat Number | 20px (text-xl) | 700 (bold) | 1.2 | JetBrains Mono, tabular-nums |
 
 Additional rules:
@@ -151,6 +151,8 @@ Finished tab stat cards: violet-50 bg, violet-100 border, violet-500 icon (disti
 
 ## Layout Contracts
 
+Primary visual anchor: Currently Stitching scrollable row -- largest content block, positioned first in reading order, with the most prominent card treatment (280px cover images with progress overlays).
+
 ### Main Dashboard (/ with tab="library" or default)
 
 ```
@@ -177,7 +179,7 @@ Finished tab stat cards: violet-50 bg, violet-100 border, violet-500 icon (disti
 
 - Max-width: 1100px, centered
 - Page padding: 32px top, 24px horizontal
-- Section vertical spacing: 56px between full-width sections, 48px between sidebar-area sections
+- Section vertical spacing: 64px between full-width sections, 48px between sidebar-area sections
 - Mobile (max-lg): single column, sidebar moves below main, `mt-12` gap
 
 ### Project Dashboard (/ with tab="progress")
