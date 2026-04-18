@@ -73,6 +73,20 @@ export function LogSessionModal({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // ─── Close project dropdown on outside click ───────────────────────────
+
+  useEffect(() => {
+    if (!showProjectDropdown) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowProjectDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showProjectDropdown]);
 
   // ─── Reset form when modal opens/closes or editSession changes ──────────
 
@@ -240,7 +254,7 @@ export function LogSessionModal({
         <div className="space-y-4">
           {/* Project Picker */}
           {!lockedProjectId && (
-            <div className="relative">
+            <div ref={dropdownRef} className="relative">
               <label
                 htmlFor="project-picker-trigger"
                 className="text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase"
