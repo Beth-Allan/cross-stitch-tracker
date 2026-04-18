@@ -1,9 +1,9 @@
 ---
-status: complete
+status: resolved
 phase: 08-session-logging-pattern-dive
 source: [08-01-SUMMARY.md, 08-02-SUMMARY.md, 08-03-SUMMARY.md, 08-04-SUMMARY.md, 08-05-SUMMARY.md, 08-06-SUMMARY.md, 08-07-SUMMARY.md, 08-08-SUMMARY.md, 08-09-SUMMARY.md, 08-10-SUMMARY.md]
 started: 2026-04-17T19:00:00Z
-updated: 2026-04-17T19:25:00Z
+updated: 2026-04-17T19:28:00Z
 ---
 
 ## Current Test
@@ -90,11 +90,17 @@ blocked: 0
 ## Gaps
 
 - truth: "In Fabric Requirements tab, expand a project row with matching fabrics, click Assign. Fabric assigned, status updates."
-  status: failed
+  status: resolved
   reason: "User reported: The assignment doesn't seem to work. I have a 37x42 inch fabric that is unassigned. When I click on a design that needs 16.7x8 inch fabric, it says 'no fabrics in your stash fit this project.'"
   severity: major
   test: 13
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Catch-22: fabricCount derived from assigned fabric (p.fabric?.count), but 'Needs Fabric' filter shows only projects without assigned fabric, so fabricCount is always null, making requiredWidth/requiredHeight null, making matchingFabrics always []. Additionally, f.count === fabricCount requires exact count match even when fabric is assigned."
+  artifacts:
+    - path: "src/lib/actions/pattern-dive-actions.ts"
+      issue: "Lines 134-176: fabricCount from assigned fabric makes matching impossible for unassigned projects"
+    - path: "src/components/features/charts/fabric-requirements-tab.tsx"
+      issue: "Line 125: default 'needs' filter shows only !assignedFabric rows which always have null fabricCount"
+  missing:
+    - "For unassigned projects, show fabrics grouped by count with calculated sizes for each count"
+    - "Or add plannedFabricCount to Project model for pre-assignment matching"
   debug_session: ""
