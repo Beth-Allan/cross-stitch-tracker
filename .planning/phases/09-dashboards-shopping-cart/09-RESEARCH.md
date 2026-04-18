@@ -535,22 +535,25 @@ export function DashboardTabs({ libraryContent, progressContent }: DashboardTabs
 | A3 | Shopping cart can pre-fetch all supply data and filter client-side without performance issues | Architecture Patterns | If user has 100+ projects with thousands of supplies, initial load may be too large; would need pagination or server-side filtering |
 | A4 | Currently Stitching session data (last stitched, stitching days) can be computed from included sessions without a separate aggregation query | Code Examples | If projects have hundreds of sessions, including all sessions in the main query may be expensive; may need aggregate-only approach |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Quick Add Modal Communication**
    - What we know: "Log Stitches" in Quick Add must open the existing LogSessionModal which lives in TopBar
    - What's unclear: Best way to trigger the modal from Quick Add without deep prop threading
    - Recommendation: Pass an `onOpenLogModal` callback from the dashboard page through to QuickAddMenu. The page.tsx (or its layout) already renders TopBar with the modal. Alternatively, lift the LogSessionModal state to a shared context.
+   - RESOLVED: Plans 07/08 use custom DOM event (`open-log-session-modal`) dispatched from Quick Add, listened by TopBar. Avoids prop threading entirely.
 
 2. **Shopping Cart: Include Finished/FFO Projects?**
    - What we know: D-09 says "project selection"; the existing ShoppingList queries all projects with supplies
    - What's unclear: Whether finished projects should appear in the shopping cart project list
    - Recommendation: Exclude FINISHED/FFO from the project selection list (they've been completed; buying more supplies doesn't make sense). But this is a CONTEXT decision that should be confirmed.
+   - RESOLVED: Plan 03 excludes FINISHED/FFO projects via `status: { notIn: ["FINISHED", "FFO"] }` filter. Aligns with recommendation.
 
 3. **Dashboard Data Fetch Size**
    - What we know: Single user app with ~500 charts
    - What's unclear: Whether fetching all data for both dashboard tabs in one Promise.all() will be fast enough
    - Recommendation: Start with eager fetch (D-02); monitor. The data volume for a single user is modest. If it becomes slow, D-02 explicitly notes this is "designed for easy route-splitting later."
+   - RESOLVED: D-02 mandates eager Promise.all() fetch. Single-user data volume is modest. Plans follow this pattern. Route-splitting path documented for future if needed.
 
 ## Environment Availability
 
