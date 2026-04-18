@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface HeroCoverBannerProps {
   imageUrl: string | null;
@@ -22,22 +23,24 @@ export function HeroCoverBanner({ imageUrl, chartName }: HeroCoverBannerProps) {
   return (
     <div className="bg-muted relative max-h-64 w-full overflow-hidden rounded-lg max-[767px]:max-h-40 md:max-h-48">
       {/* Blurred background fill (per RESEARCH.md Pitfall 1: use filter:blur on <img>, NOT backdrop-filter) */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={imageUrl}
         alt=""
+        fill
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-[20px]"
+        className="scale-110 object-cover opacity-60 blur-[20px]"
+        unoptimized
       />
-      {/* Foreground image with object-contain (D-01: never crop) */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      {/* Foreground image with object-contain (D-01: never crop) — priority for LCP */}
+      <Image
         src={imageUrl}
         alt={`Cover for ${chartName}`}
+        width={1200}
+        height={800}
+        priority
         className="relative mx-auto max-h-64 w-full object-contain max-[767px]:max-h-40 md:max-h-48"
-        loading="lazy"
-        decoding="async"
         onError={() => setImgError(true)}
+        unoptimized
       />
     </div>
   );

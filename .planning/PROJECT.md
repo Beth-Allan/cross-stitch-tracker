@@ -8,10 +8,21 @@ A personal cross-stitch project management app that replaced a complex Notion sy
 
 A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
 
+## Current Milestone: v1.2 Track & Measure
+
+**Goal:** Add dashboards for navigating the collection and tracking progress, plus session logging as the data foundation for future statistics.
+
+**Target features:**
+- Main Dashboard — curated home page (Currently Stitching, Start Next, Buried Treasures, Spotlight, Collection Stats)
+- Pattern Dive — evolve Charts page with What's Next, Fabric Requirements, Storage View tabs
+- Project Dashboard — progress buckets, hero stats, Finished projects tab
+- Shopping Cart — upgrade with project selection, tabbed supply types, fabric-to-stash matching
+- Session Logging — StitchSession model, Log Session modal, project detail Sessions tab, auto-updating progress
+
 ## Current State
 
 **Shipped:** v1.1 Browse & Organize (2026-04-16)
-**Next:** v1.2 Track & Measure — dashboards, session logging, activity stats
+**Active:** v1.2 Track & Measure — dashboards, session logging
 
 The app now has a browsable gallery experience with three view modes, a rich project detail page with tabbed layout and skein calculator, and proper storage/app management. 867 tests, deployed to Vercel.
 
@@ -47,20 +58,22 @@ The app now has a browsable gallery experience with three view modes, a rich pro
 - ✓ Project detail page with hero banner, tabbed layout, supplies tab — v1.1
 - ✓ Search and filter by name, designer, status, and size category — v1.1
 
-### Active — Milestone 3: Track & Measure
+### Active — Milestone 3: Track & Measure (v1.2)
 
-- [ ] Main Dashboard (recently added, currently stitching, buried treasures, spotlight)
-- [ ] Pattern Dive (library browser with filtering, fabric requirements, storage views)
-- [ ] Quick stitch session logging (date, project, count, optional photo/time)
-- [ ] Auto-updating project progress from logged sessions
+- [ ] Main Dashboard (Currently Stitching, Start Next, Buried Treasures, Spotlight, Collection Stats)
+- ✓ Pattern Dive (evolve Charts page: rename + add What's Next, Fabric Requirements, Storage View tabs) — v1.2 Phase 8
+- [ ] Project Dashboard (progress buckets with hero stats, Finished projects tab)
+- [ ] Shopping Cart (upgrade: project selection, tabbed supply types, fabric-to-stash matching)
+- ✓ Quick stitch session logging (date, project, count, optional photo/time) — v1.2 Phase 8
+- ✓ Auto-updating project progress from logged sessions — v1.2 Phase 8
+- ✓ Project detail Sessions tab (per-project session history with mini stats) — v1.2 Phase 8
+
+### Active — Milestone 4: Motivation & Planning (v1.3)
+
 - [ ] Comprehensive statistics engine (daily/weekly/monthly/yearly metrics)
-- [ ] Project Dashboard (active work tracking with goals)
-- [ ] Shopping Cart dashboard (aggregated supply and fabric needs)
-
-### Active — Milestone 4: Motivation & Planning
-
 - [ ] Monthly stitch bar charts and stitching calendar view
 - [ ] Year in Review tab with 8 stat sections and year selector
+- [ ] Personal bests (most stitches in a day, longest streak, records)
 - [ ] Goal tracking (project-specific and global, milestone targets, frequency goals)
 - [ ] Scheduling plans (project start dates, recurring stitching days, seasonal focus)
 - [ ] Multi-style rotation management (Focus+Rotate, Milestone, Daily, Round Robin, Random, Seasonal)
@@ -88,14 +101,15 @@ The app now has a browsable gallery experience with three view modes, a rich pro
 
 ## Context
 
-**Current state (v1.1 shipped):**
-- 867 tests, deployed to Vercel
+**Current state (Phase 8 complete):**
+- 1022 tests, deployed to Vercel
 - Tech stack: Next.js 16, Prisma 7, Tailwind v4, Auth.js v5 beta, shadcn/ui v4 (Base UI)
 - Database: PostgreSQL on Neon (prod), Cloudflare R2 (file storage)
 - 25+ backlog items captured (see CLAUDE.md backlog section)
 - Gallery with 3 view modes, project detail with tabbed layout, skein calculator
 - Storage location and stitching app management with CRUD + detail pages
 - DMC catalog complete at 495 threads
+- Session logging with auto-updating progress, Pattern Dive tabs (What's Next, Fabric Requirements, Storage View)
 
 **Design system:** Emerald/amber/stone palette. Fraunces headings, Source Sans 3 body, JetBrains Mono hero stats. 7 status colors. Full design token CSS. Semantic tokens used throughout (bg-card, text-muted-foreground, etc.).
 
@@ -165,4 +179,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-16 after v1.1 milestone complete*
+*Last updated: 2026-04-15 after v1.2 milestone started*

@@ -14,6 +14,7 @@ import {
   FileText,
 } from "lucide-react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { SizeBadge } from "@/components/features/charts/size-badge";
 import { DesignerFormModal } from "./designer-form-modal";
@@ -232,10 +233,7 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
             ))}
           </div>
         ) : (
-          <div className="py-12 text-center">
-            <FileText className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
-            <p className="text-muted-foreground text-sm">No charts found for this designer</p>
-          </div>
+          <EmptyState icon={FileText} title="No charts found for this designer" />
         )}
       </div>
 

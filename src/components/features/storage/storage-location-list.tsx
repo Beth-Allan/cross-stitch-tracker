@@ -264,14 +264,14 @@ function LocationRow({
       </div>
 
       {/* Hover actions */}
-      <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+      <div className="flex shrink-0 items-center gap-1 transition-opacity group-focus-within:opacity-100 md:opacity-0 md:group-hover:opacity-100">
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
             onStartEdit();
           }}
-          className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-md p-1.5 transition-colors"
+          className="text-muted-foreground hover:text-foreground hover:bg-muted flex min-h-11 min-w-11 items-center justify-center rounded-md p-1.5 transition-colors"
           aria-label={`Rename ${location.name}`}
         >
           <Pencil className="h-3.5 w-3.5" />
@@ -282,7 +282,7 @@ function LocationRow({
             e.stopPropagation();
             onDelete();
           }}
-          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md p-1.5 transition-colors"
+          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex min-h-11 min-w-11 items-center justify-center rounded-md p-1.5 transition-colors"
           aria-label={`Delete ${location.name}`}
         >
           <Trash2 className="h-3.5 w-3.5" />

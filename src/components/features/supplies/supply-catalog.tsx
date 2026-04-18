@@ -532,7 +532,11 @@ export function SupplyCatalog({
   return (
     <div className="space-y-6">
       {/* Tabs */}
-      <div className="border-border flex items-center gap-1 border-b">
+      <div
+        className="border-border flex items-center gap-1 border-b"
+        role="tablist"
+        aria-label="Supply categories"
+      >
         {TAB_CONFIG.map((tab) => {
           const isActive = activeTab === tab.key;
           const Icon = tab.icon;
@@ -540,6 +544,9 @@ export function SupplyCatalog({
             <button
               key={tab.key}
               type="button"
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`tabpanel-${tab.key}`}
               onClick={() => setActiveTab(tab.key)}
               className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
                 isActive
@@ -560,6 +567,7 @@ export function SupplyCatalog({
         <select
           value={brandFilter}
           onChange={(e) => setBrandFilter(e.target.value)}
+          aria-label="Filter by brand"
           className="border-input bg-background ring-offset-background focus-visible:ring-ring rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           <option value="">All Brands</option>
@@ -581,6 +589,7 @@ export function SupplyCatalog({
           <select
             value={colorFamilyFilter}
             onChange={(e) => setColorFamilyFilter(e.target.value as ColorFamily | "")}
+            aria-label="Filter by color family"
             className="border-input bg-background ring-offset-background focus-visible:ring-ring rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             <option value="">All Colors</option>

@@ -2,6 +2,55 @@
 
 ---
 
+## Phase 8 — Session Logging & Pattern Dive
+
+**Audit Date:** 2026-04-16
+**ASVS Level:** 1
+**Auditor:** gsd-security-auditor
+**Result:** SECURED — 0 open, 20 closed
+
+### Threat Verification
+
+| Threat ID | Category               | Disposition | Status | Evidence                                                                                                                                                                                                                                                                                                                       |
+| --------- | ---------------------- | ----------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| T-08-01   | Tampering              | mitigate    | CLOSED | `src/lib/validations/session.ts:9` `.min(1, "Stitch count must be at least 1")`, line 5 date refine, line 4 `.trim().min(1, "Project is required")`                                                                                                                                                                            |
+| T-08-02   | Tampering              | mitigate    | CLOSED | `src/lib/actions/upload-actions.ts:50-57` — added `category === "sessions"` branch checking `ALLOWED_IMAGE_TYPES`, matching the "covers" enforcement pattern. Test added in `upload-actions.test.ts`.                                                                                                                          |
+| T-08-03   | Elevation of Privilege | mitigate    | CLOSED | `src/lib/actions/session-actions.ts:60` `if (!project \|\| project.userId !== user.id)`                                                                                                                                                                                                                                        |
+| T-08-04   | Elevation of Privilege | mitigate    | CLOSED | `src/lib/actions/session-actions.ts:109` `if (!existing \|\| !existing.project \|\| existing.project.userId !== user.id)`                                                                                                                                                                                                      |
+| T-08-05   | Elevation of Privilege | mitigate    | CLOSED | `src/lib/actions/session-actions.ts:159` same ownership traversal pattern as updateSession                                                                                                                                                                                                                                     |
+| T-08-06   | Tampering              | mitigate    | CLOSED | Same schema as T-08-01 — `sessionFormSchema` in `src/lib/validations/session.ts`                                                                                                                                                                                                                                               |
+| T-08-07   | Tampering              | mitigate    | CLOSED | `src/lib/actions/session-actions.ts:64,116,166` all mutations wrapped in `prisma.$transaction`; `recalculateProgress` aggregates from DB, never reads client input                                                                                                                                                             |
+| T-08-08   | Information Disclosure | mitigate    | CLOSED | `src/lib/actions/session-actions.ts:190-195` project ownership verified before `stitchSession.findMany`                                                                                                                                                                                                                        |
+| T-08-09   | Spoofing               | mitigate    | CLOSED | `src/lib/auth-guard.ts:18-21` `requireAuth()` throws "Unauthorized" if no session; modal is UI-only with no data access                                                                                                                                                                                                        |
+| T-08-10   | Denial of Service      | mitigate    | CLOSED | `src/lib/validations/upload.ts:22` `.max(MAX_FILE_SIZE, "File is too large. Maximum size is 10MB.")`; `ALLOWED_IMAGE_TYPES` defined at line 3                                                                                                                                                                                  |
+| T-08-11   | Information Disclosure | accept      | CLOSED | Active projects picker filters by `userId`: `src/lib/actions/session-actions.ts:274` `where: { userId: user.id, status: { in: [...ACTIVE_STATUSES] } }`                                                                                                                                                                        |
+| T-08-12   | Information Disclosure | mitigate    | CLOSED | `src/lib/actions/session-actions.ts:190-195` ownership check before returning session data (same as T-08-08)                                                                                                                                                                                                                   |
+| T-08-13   | Information Disclosure | mitigate    | CLOSED | `src/lib/actions/session-actions.ts:236` `where: { project: { userId: user.id } }` in `getAllSessions`                                                                                                                                                                                                                         |
+| T-08-14   | Elevation of Privilege | mitigate    | CLOSED | `src/lib/actions/pattern-dive-actions.ts:302` `if (!project \|\| project.userId !== user.id)` before fabric assignment                                                                                                                                                                                                         |
+| T-08-15   | Information Disclosure | mitigate    | CLOSED | `src/lib/actions/pattern-dive-actions.ts:100` `where: { project: { userId: user.id } }` in `getFabricRequirements`                                                                                                                                                                                                             |
+| T-08-16   | Information Disclosure | mitigate    | CLOSED | `src/lib/actions/pattern-dive-actions.ts:209` `where: { userId: user.id }` for projects; line 223 `linkedProject: { userId: user.id }` for owned fabrics. Note: unassigned fabrics (`linkedProjectId: null`) are visible to all authenticated users — acknowledged in 08-06-SUMMARY.md as correct behavior for single-user app |
+| T-08-17   | Tampering              | mitigate    | CLOSED | `src/lib/actions/pattern-dive-actions.ts:310-314` checks `fabric.linkedProjectId` is null or equals current project inside `$transaction` before linking                                                                                                                                                                       |
+| T-08-18   | Tampering              | mitigate    | CLOSED | `src/lib/validations/session.ts:4` `z.string().trim().min(1, "Project is required")` — `.trim()` applied before `.min(1)`                                                                                                                                                                                                      |
+| T-08-19   | Tampering              | mitigate    | CLOSED | `src/components/features/charts/project-detail/overview-tab.tsx:72-79` renders read-only span when `sessionCount > 0`; `stitchesCompleted` only written by `recalculateProgress` via aggregate                                                                                                                                 |
+| T-08-20   | Tampering              | accept      | CLOSED | Migration already run; idempotent additive SQL, no user input surface                                                                                                                                                                                                                                                          |
+
+### Open Threats
+
+None — all threats closed.
+
+### Accepted Risks Log
+
+| Threat ID | Category               | Rationale                                                                                                                                      |
+| --------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| T-08-11   | Information Disclosure | Active projects picker filters by `userId` — only shows the authenticated user's own projects. Single-user app removes any cross-user concern. |
+| T-08-20   | Tampering              | Data migration is idempotent additive SQL that only sets `startingStitches` where currently 0. Already executed; no runtime input surface.     |
+
+### Unregistered Flags
+
+The 08-06-SUMMARY.md "Decisions Made" section notes that unassigned fabrics (`linkedProjectId: null`) are returned by `getStorageGroups` without a `userId` scope check. This maps to T-08-16 and is documented there. No unregistered flag — the SUMMARY section is labeled "Decisions Made", not "Threat Flags".
+
+---
+
 ## Phase 4 — Supplies & Fabric
 
 **Audit Date:** 2026-04-11

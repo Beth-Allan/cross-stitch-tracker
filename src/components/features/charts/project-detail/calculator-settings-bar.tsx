@@ -127,6 +127,8 @@ export function CalculatorSettingsBar({
         <div className="flex gap-1">
           <button
             onClick={() => handleOverChange(1)}
+            aria-pressed={currentSettings.overCount === 1}
+            aria-label="Stitch over 1 thread"
             className={`min-h-8 min-w-8 rounded px-2 py-1 text-sm font-medium transition-colors ${
               currentSettings.overCount === 1
                 ? "bg-primary text-primary-foreground"
@@ -137,6 +139,8 @@ export function CalculatorSettingsBar({
           </button>
           <button
             onClick={() => handleOverChange(2)}
+            aria-pressed={currentSettings.overCount === 2}
+            aria-label="Stitch over 2 threads"
             className={`min-h-8 min-w-8 rounded px-2 py-1 text-sm font-medium transition-colors ${
               currentSettings.overCount === 2
                 ? "bg-primary text-primary-foreground"

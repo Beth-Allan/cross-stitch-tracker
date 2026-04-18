@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { DesignerFormModal } from "./designer-form-modal";
 import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
@@ -138,17 +139,17 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
           <h1 className="font-heading text-2xl font-semibold">Designers</h1>
         </div>
 
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Users className="text-muted-foreground/40 mb-3 h-12 w-12" />
-          <h2 className="font-heading text-lg font-semibold">No designers added yet</h2>
-          <p className="text-muted-foreground mt-1.5 max-w-xs text-sm">
-            Add your first designer to start organizing your collection.
-          </p>
-          <Button className="mt-4" onClick={() => setCreateModalOpen(true)}>
+        <EmptyState
+          icon={Users}
+          title="No designers added yet"
+          description="Add your first designer to start organizing your collection."
+          heading
+        >
+          <Button onClick={() => setCreateModalOpen(true)}>
             <Plus className="h-4 w-4" data-icon="inline-start" />
             Add Designer
           </Button>
-        </div>
+        </EmptyState>
 
         <DesignerFormModal
           open={createModalOpen}
@@ -247,13 +248,15 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
             ))}
             {filteredDesigners.length === 0 && (
               <tr>
-                <td colSpan={7} className="py-12 text-center">
-                  <Users className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
-                  <p className="text-muted-foreground text-sm">
-                    {hasActiveFilters
-                      ? "No designers match your filters"
-                      : "No designers added yet"}
-                  </p>
+                <td colSpan={7}>
+                  <EmptyState
+                    icon={Users}
+                    title={
+                      hasActiveFilters
+                        ? "No designers match your filters"
+                        : "No designers added yet"
+                    }
+                  />
                 </td>
               </tr>
             )}
@@ -272,12 +275,10 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
           />
         ))}
         {filteredDesigners.length === 0 && (
-          <div className="py-12 text-center">
-            <Users className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
-            <p className="text-muted-foreground text-sm">
-              {hasActiveFilters ? "No designers match your filters" : "No designers added yet"}
-            </p>
-          </div>
+          <EmptyState
+            icon={Users}
+            title={hasActiveFilters ? "No designers match your filters" : "No designers added yet"}
+          />
         )}
       </div>
 
@@ -358,7 +359,7 @@ function DesignerRow({
         <span className="text-muted-foreground text-sm">&mdash;</span>
       </td>
       <td className="px-4 py-3">
-        <div className="flex items-center justify-end gap-1 opacity-40 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+        <div className="flex items-center justify-end gap-1 transition-opacity group-focus-within:opacity-100 md:opacity-40 md:group-hover:opacity-100">
           <button
             type="button"
             onClick={onEdit}

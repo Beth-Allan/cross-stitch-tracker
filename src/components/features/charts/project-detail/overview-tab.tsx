@@ -32,9 +32,10 @@ function formatDateOnly(date: Date | null | undefined): string {
 interface OverviewTabProps {
   chart: ProjectDetailProps["chart"];
   supplies: ProjectDetailProps["supplies"];
+  sessionCount: number;
 }
 
-export function OverviewTab({ chart, supplies }: OverviewTabProps) {
+export function OverviewTab({ chart, supplies, sessionCount }: OverviewTabProps) {
   const project = chart.project;
 
   if (!project) {
@@ -64,10 +65,25 @@ export function OverviewTab({ chart, supplies }: OverviewTabProps) {
             max={effectiveStitchCount}
             className="mb-4"
           />
-          <DetailRow
-            label="Completed"
-            value={`${formatNumber(project.stitchesCompleted)} stitches`}
-          />
+          <div>
+            <DetailRow
+              label="Completed"
+              value={
+                sessionCount > 0 ? (
+                  <span className="min-h-11 min-w-11 rounded px-1.5 py-0.5 font-mono tabular-nums">
+                    {formatNumber(project.stitchesCompleted)} stitches
+                  </span>
+                ) : (
+                  `${formatNumber(project.stitchesCompleted)} stitches`
+                )
+              }
+            />
+            {sessionCount > 0 && (
+              <p className="text-muted-foreground mt-0.5 ml-auto text-xs">
+                Auto-calculated from {sessionCount} session{sessionCount !== 1 ? "s" : ""}
+              </p>
+            )}
+          </div>
           <DetailRow
             label="Remaining"
             value={`${formatNumber(Math.max(0, effectiveStitchCount - project.stitchesCompleted))} stitches`}

@@ -56,6 +56,23 @@ describe("upload-actions failure modes", () => {
       }
     });
 
+    it("returns error for invalid image type on sessions category", async () => {
+      const { getPresignedUploadUrl } = await import("./upload-actions");
+
+      const result = await getPresignedUploadUrl({
+        fileName: "document.pdf",
+        contentType: "application/pdf",
+        fileSize: 1024,
+        category: "sessions",
+        projectId: "p1",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toContain("Invalid image type");
+      }
+    });
+
     it("returns error for invalid file type on files category", async () => {
       const { getPresignedUploadUrl } = await import("./upload-actions");
 

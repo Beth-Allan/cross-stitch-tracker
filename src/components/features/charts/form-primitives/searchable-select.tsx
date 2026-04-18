@@ -38,6 +38,7 @@ export function SearchableSelect({
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const listboxId = "searchable-select-listbox";
 
   const selectedLabel = options.find((o) => o.value === value)?.label;
 
@@ -45,6 +46,10 @@ export function SearchableSelect({
     <div className="flex items-center gap-1.5">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
+          role="combobox"
+          aria-expanded={open}
+          aria-haspopup="listbox"
+          aria-controls={open ? listboxId : undefined}
           disabled={disabled}
           className={cn(
             "border-border bg-background flex h-9 w-full items-center justify-between rounded-lg border px-3 text-sm transition-colors",
@@ -59,7 +64,7 @@ export function SearchableSelect({
         <PopoverContent className="w-(--anchor-width) p-0" align="start" sideOffset={4}>
           <Command>
             <CommandInput placeholder="Search..." value={search} onValueChange={setSearch} />
-            <CommandList>
+            <CommandList id={listboxId} role="listbox">
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup>
                 {options.map((option) => (

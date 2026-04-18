@@ -54,6 +54,7 @@ export function StitchCountFields({
             onChange={(e) => onWidthChange(e.target.value)}
             placeholder="Width"
             className="flex-1"
+            aria-describedby={errors?.stitchesWide ? "stitches-wide-error" : undefined}
           />
           <span className="text-muted-foreground shrink-0 px-2 text-sm">w ×</span>
           <Input
@@ -63,6 +64,7 @@ export function StitchCountFields({
             value={stitchesHigh || ""}
             onChange={(e) => onHeightChange(e.target.value)}
             placeholder="Height"
+            aria-label="Height (stitches)"
             className="flex-1"
           />
           <span className="text-muted-foreground shrink-0 px-2 text-sm">h</span>
@@ -82,6 +84,11 @@ export function StitchCountFields({
           value={stitchCount || ""}
           onChange={(e) => onCountChange(e.target.value)}
           placeholder={isAutoCalculated ? effectiveCount.toLocaleString() : "0"}
+          aria-describedby={
+            [errors?.stitchCount && "stitch-count-error", "stitch-count-hint"]
+              .filter(Boolean)
+              .join(" ") || undefined
+          }
         />
         {effectiveCount > 0 && sizeCategory && (
           <div className="mt-2 flex items-center gap-2">

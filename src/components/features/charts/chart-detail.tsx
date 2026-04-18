@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   Calendar,
@@ -174,12 +174,14 @@ function CoverImage({
 
   if (coverImageUrl && !imgError) {
     return (
-      /* eslint-disable-next-line @next/next/no-img-element */
-      <img
+      <Image
         src={coverImageUrl}
         alt={`Cover for ${chartName}`}
+        width={320}
+        height={240}
         className="bg-muted aspect-[4/3] max-h-80 w-full rounded-lg object-contain lg:w-80"
         onError={() => setImgError(true)}
+        unoptimized
       />
     );
   }

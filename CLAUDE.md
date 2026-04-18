@@ -5,7 +5,7 @@
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
 **Milestone:** v1.1 shipped | **Next:** v1.2 Track & Measure
-**Last Updated:** 2026-04-16
+**Last Updated:** 2026-04-17
 **Roadmap:** 4 milestones / 11 phases — v1.0 + v1.1 shipped, v1.2 next (phases 8-9)
 
 ### Done
@@ -22,12 +22,12 @@
 
 ### In Progress
 
-Nothing — between milestones.
+Phase 8 verified and complete. Phase 9 ready to plan.
 
 ### Next Up
 
-1. `/gsd-new-milestone` — define v1.2 Track & Measure (requirements → roadmap)
-2. `/gsd-explore` — discuss user feedback items (genre pills, project setup, kitting, edit modal) before v1.2 planning
+1. Phase 9 planning — `/gsd-discuss-phase 9` then `/gsd-plan-phase 9`
+2. `/gsd-explore` — discuss user feedback items before next milestone
 
 ### Backlog
 
@@ -50,6 +50,10 @@ Nothing — between milestones.
 - 999.3: Fabric type hierarchy (replace flat dropdown)
 - 999.5: Supplies page first-load view flash (investigate SSR cookie or middleware)
 - 999.6: Cover image preview aspect ratio — use object-contain or dynamic aspect ratio
+- 999.7: Estimated completion dates — compute "at this pace, finish on [date]" from session averages + remaining stitches; display on project detail and dashboard cards
+- 999.8: What's Next card styling — use same/similar gallery cards as Browse tab for visual consistency
+- 999.9: What's Next kitting label at 0% — "Kitting" label misleading when no supplies tracked; consider "Not kitted" or hiding label
+- 999.10: Auto-status from kitting activity — consider auto-transitioning project status to "Kitting" when user starts adding supplies/fabric
 
 ### Blockers
 

@@ -3,21 +3,26 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, Clock, Plus } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { LinkButton } from "@/components/ui/link-button";
 import { Sheet, SheetTrigger, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { LogSessionModal } from "@/components/features/sessions/log-session-modal";
 import { UserMenu } from "./user-menu";
 import { navigationSections, settingsItem } from "./nav-items";
 import { Logo } from "./logo";
 import { NavItemLink } from "./nav-item-link";
+import { ThemeToggle } from "./theme-toggle";
+import type { ActiveProjectForPicker } from "@/types/session";
 
 interface TopBarProps {
   user: { name: string; email: string };
+  activeProjects: ActiveProjectForPicker[];
+  imageUrls: Record<string, string>;
 }
 
-export function TopBar({ user }: TopBarProps) {
+export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [logModalOpen, setLogModalOpen] = useState(false);
 
   return (
     <header className="border-border bg-card flex h-14 shrink-0 items-center gap-3 border-b px-4 pt-[env(safe-area-inset-top)]">
@@ -37,7 +42,7 @@ export function TopBar({ user }: TopBarProps) {
               <Link
                 href="/"
                 onClick={() => setSheetOpen(false)}
-                className="border-sidebar-border focus-visible:ring-ring flex items-center gap-3 border-b px-4 py-5 outline-none focus-visible:ring-2 focus-visible:ring-inset"
+                className="border-sidebar-border focus-visible:ring-ring flex h-14 items-center gap-3 border-b px-4 outline-none focus-visible:ring-2 focus-visible:ring-inset"
               >
                 <Logo />
                 <span className="font-heading text-sidebar-foreground truncate text-base font-semibold">
@@ -68,9 +73,10 @@ export function TopBar({ user }: TopBarProps) {
                 ))}
               </div>
 
-              {/* Settings at bottom */}
-              <div className="border-sidebar-border border-t px-2 py-3">
+              {/* Settings + theme at bottom */}
+              <div className="border-sidebar-border space-y-0.5 border-t px-2 py-3">
                 <NavItemLink item={settingsItem} onClick={() => setSheetOpen(false)} />
+                <ThemeToggle />
               </div>
             </nav>
           </SheetContent>
@@ -83,14 +89,10 @@ export function TopBar({ user }: TopBarProps) {
       {/* Quick actions */}
       <div className="ml-auto flex items-center gap-2">
         <Button
-          variant="secondary"
           size="sm"
-          onClick={() =>
-            toast("Coming soon", {
-              description: "You'll be able to log your stitching sessions here.",
-            })
-          }
+          onClick={() => setLogModalOpen(true)}
           className="flex min-h-11 items-center gap-1.5 sm:min-h-0"
+          aria-label="Log Stitches"
         >
           <Clock className="h-3.5 w-3.5" strokeWidth={2} />
           <span className="hidden sm:inline">Log Stitches</span>
@@ -100,9 +102,12 @@ export function TopBar({ user }: TopBarProps) {
           variant="outline"
           size="sm"
           className="flex min-h-11 items-center gap-1.5 sm:min-h-0"
+          aria-label="Add Chart"
         >
           <Plus className="h-3.5 w-3.5" strokeWidth={2} />
-          <span className="hidden sm:inline">Add Chart</span>
+          <span className="hidden sm:inline" aria-hidden="true">
+            Add Chart
+          </span>
         </LinkButton>
 
         {/* User menu */}
@@ -110,6 +115,13 @@ export function TopBar({ user }: TopBarProps) {
           <UserMenu user={user} />
         </div>
       </div>
+
+      <LogSessionModal
+        isOpen={logModalOpen}
+        onOpenChange={setLogModalOpen}
+        activeProjects={activeProjects}
+        imageUrls={imageUrls}
+      />
     </header>
   );
 }

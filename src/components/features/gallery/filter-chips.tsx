@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { X } from "lucide-react";
 import { STATUS_CONFIG } from "@/lib/utils/status";
 import type { ProjectStatus } from "@/generated/prisma/client";
@@ -32,39 +33,43 @@ export function FilterChips({
 }: FilterChipsProps) {
   const hasFilters = search.length > 0 || statusFilter.length > 0 || sizeFilter.length > 0;
 
+  const chips = useMemo(() => {
+    const result: Chip[] = [];
+
+    if (search) {
+      const truncatedSearch = search.length > 30 ? search.slice(0, 30) + "\u2026" : search;
+      result.push({
+        key: "search",
+        label: `Search: ${truncatedSearch}`,
+        ariaLabel: `Remove search filter: ${search}`,
+        onRemove: onRemoveSearch,
+      });
+    }
+
+    for (const status of statusFilter) {
+      const config = STATUS_CONFIG[status as ProjectStatus];
+      const displayLabel = config?.label ?? status;
+      result.push({
+        key: `status-${status}`,
+        label: `Status: ${displayLabel}`,
+        ariaLabel: `Remove Status: ${displayLabel} filter`,
+        onRemove: () => onRemoveStatus(status),
+      });
+    }
+
+    for (const size of sizeFilter) {
+      result.push({
+        key: `size-${size}`,
+        label: `Size: ${size}`,
+        ariaLabel: `Remove Size: ${size} filter`,
+        onRemove: () => onRemoveSize(size),
+      });
+    }
+
+    return result;
+  }, [search, statusFilter, sizeFilter, onRemoveSearch, onRemoveStatus, onRemoveSize]);
+
   if (!hasFilters) return null;
-
-  const chips: Chip[] = [];
-
-  if (search) {
-    const truncatedSearch = search.length > 30 ? search.slice(0, 30) + "\u2026" : search;
-    chips.push({
-      key: "search",
-      label: `Search: ${truncatedSearch}`,
-      ariaLabel: `Remove search filter: ${search}`,
-      onRemove: onRemoveSearch,
-    });
-  }
-
-  for (const status of statusFilter) {
-    const config = STATUS_CONFIG[status as ProjectStatus];
-    const displayLabel = config?.label ?? status;
-    chips.push({
-      key: `status-${status}`,
-      label: `Status: ${displayLabel}`,
-      ariaLabel: `Remove Status: ${displayLabel} filter`,
-      onRemove: () => onRemoveStatus(status),
-    });
-  }
-
-  for (const size of sizeFilter) {
-    chips.push({
-      key: `size-${size}`,
-      label: `Size: ${size}`,
-      ariaLabel: `Remove Size: ${size} filter`,
-      onRemove: () => onRemoveSize(size),
-    });
-  }
 
   return (
     <div className="flex flex-wrap items-center gap-2">

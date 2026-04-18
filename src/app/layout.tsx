@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Source_Sans_3, JetBrains_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -45,10 +46,13 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${fraunces.variable} ${sourceSans.variable} ${jetbrainsMono.variable} h-full`}
+      suppressHydrationWarning
     >
       <body className="font-body flex min-h-full flex-col antialiased">
-        <NuqsAdapter>{children}</NuqsAdapter>
-        <Toaster richColors position="bottom-right" />
+        <ThemeProvider>
+          <NuqsAdapter>{children}</NuqsAdapter>
+          <Toaster richColors position="bottom-right" />
+        </ThemeProvider>
       </body>
     </html>
   );

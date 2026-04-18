@@ -61,10 +61,11 @@ export function BasicInfoSection({
             placeholder="e.g. Enchanted Forest Sampler"
             aria-required="true"
             aria-invalid={!!errors?.name}
+            aria-describedby={errors?.name ? "chart-name-error" : undefined}
           />
         </FormField>
 
-        <FormField label="Designer" htmlFor="designer">
+        <FormField label="Designer">
           <SearchableSelect
             options={designerOptions}
             value={designerId}

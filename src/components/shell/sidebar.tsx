@@ -8,6 +8,7 @@ import { navigationSections, settingsItem } from "./nav-items";
 import { Logo } from "./logo";
 import { NavItemLink } from "./nav-item-link";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeToggle } from "./theme-toggle";
 
 const STORAGE_KEY = "sidebar-collapsed";
 
@@ -40,7 +41,7 @@ export function Sidebar() {
           {/* Logo */}
           <Link
             href="/"
-            className="border-sidebar-border hover:bg-muted focus-visible:ring-ring flex items-center gap-3 border-b px-4 py-5 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset"
+            className="border-sidebar-border hover:bg-muted focus-visible:ring-ring flex h-14 items-center gap-3 border-b px-4 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset"
           >
             <Logo />
             {!collapsed && (
@@ -96,6 +97,18 @@ export function Sidebar() {
               </Tooltip>
             ) : (
               <NavItemLink item={settingsItem} />
+            )}
+
+            {/* Theme toggle */}
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger render={<div />}>
+                  <ThemeToggle collapsed />
+                </TooltipTrigger>
+                <TooltipContent side="right">Toggle theme</TooltipContent>
+              </Tooltip>
+            ) : (
+              <ThemeToggle />
             )}
 
             {/* Collapse toggle */}

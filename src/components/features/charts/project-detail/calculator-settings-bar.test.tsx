@@ -45,7 +45,7 @@ describe("CalculatorSettingsBar", () => {
       />,
     );
     // Over toggle buttons
-    expect(screen.getByRole("button", { name: "1" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Stitch over 1 thread" })).toBeInTheDocument();
     // Fabric count display
     expect(screen.getByText(/14ct/)).toBeInTheDocument();
     // Waste value displays "20%"

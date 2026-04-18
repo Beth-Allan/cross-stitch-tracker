@@ -1,36 +1,36 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Browse & Organize
-status: shipped
-stopped_at: Milestone v1.1 complete
-last_updated: "2026-04-16T02:50:00.000Z"
-last_activity: 2026-04-16
+milestone: v1.2
+milestone_name: Track & Measure
+status: ready_to_plan
+stopped_at: Phase 8 complete, ready to plan Phase 9
+last_updated: "2026-04-18T02:00:00.000Z"
+last_activity: 2026-04-18
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 20
-  completed_plans: 20
-  percent: 100
+  total_phases: 2
+  completed_phases: 1
+  total_plans: 11
+  completed_plans: 11
+  percent: 50
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-16)
+See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Planning next milestone (v1.2 Track & Measure)
+**Current focus:** Phase 09 — Dashboards & Shopping Cart
 
 ## Current Position
 
-Phase: Complete (v1.1 shipped)
-Plan: N/A
-Status: Milestone closed
-Last activity: 2026-04-16
+Phase: 09
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-04-18
 
-Progress: [██████████] 100%
+Progress: [█████░░░░░] 50%
 
 ## Milestone Structure
 
@@ -38,14 +38,14 @@ Progress: [██████████] 100%
 |-----------|-------|--------|--------|
 | v1.0 | MVP — "Replace Notion" | 1-4 | Shipped 2026-04-11 |
 | v1.1 | Browse & Organize | 5-7 | Shipped 2026-04-16 |
-| v1.2 | Track & Measure | 8-9 | Not started |
+| v1.2 | Track & Measure | 8-9 | In progress (Phase 8 complete) |
 | v1.3 | Motivation & Planning | 10-11 | Not started |
 
 ## Performance Metrics
 
 **Velocity (v1.0):**
 
-- Total plans completed: 23
+- Total plans completed: 33
 - Total execution time: 22 days
 - Average: ~1 plan/day
 
@@ -61,6 +61,8 @@ Progress: [██████████] 100%
 
 Decisions are logged in PROJECT.md Key Decisions table.
 
+- [Phase 08]: Used throw-inside-transaction pattern for fabric availability guard to keep $transaction atomic while surfacing user-friendly errors
+
 ### Pending Todos
 
 None.
@@ -68,10 +70,14 @@ None.
 ### Blockers/Concerns
 
 - `.env.local` bcrypt hashes must escape `$` as `\$`
-- Research flags Phase 9 (sessions/statistics) for TypedSQL/CTE research before planning
+- Pattern Dive Browse tab reuses existing gallery infrastructure — minimize duplication
+- Main Dashboard Goals Summary section depends on v1.3 goals — omit for v1.2
+- What's Next tab priorityRanking depends on v1.3 goals — use simpler heuristics (kitting readiness, size, date)
+- Progress auto-update must be atomic with session mutations ($transaction)
+- Dashboard queries must use Promise.all() to avoid Neon cold start waterfall
 
 ## Session Continuity
 
-Last session: 2026-04-16
-Stopped at: Milestone v1.1 complete
+Last session: 2026-04-18T02:00:00Z
+Stopped at: Phase 8 complete, ready to plan Phase 9
 Resume file: None
