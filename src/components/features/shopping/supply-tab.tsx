@@ -62,19 +62,14 @@ const typeLabels: Record<string, string> = {
   specialty: "specialty",
 };
 
-export function SupplyTab({
-  supplies,
-  type,
-  onUpdateAcquired,
-  isPending,
-}: SupplyTabProps) {
+export function SupplyTab({ supplies, type, onUpdateAcquired, isPending }: SupplyTabProps) {
   const label = typeLabels[type] ?? type;
 
   if (supplies.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <ShoppingBag className="h-8 w-8 text-muted-foreground/40 mb-3" />
-        <p className="text-sm text-muted-foreground">
+        <ShoppingBag className="text-muted-foreground/40 mb-3 h-8 w-8" />
+        <p className="text-muted-foreground text-sm">
           Select projects on the Projects tab to see {label} needs
         </p>
       </div>
@@ -88,9 +83,7 @@ export function SupplyTab({
   if (unfulfilled.length === 0 && fulfilled.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-sm text-muted-foreground">
-          No {label} needs for selected projects
-        </p>
+        <p className="text-muted-foreground text-sm">No {label} needs for selected projects</p>
       </div>
     );
   }
@@ -140,17 +133,17 @@ function SupplyRow({
     <div
       className={cn(
         "flex items-center gap-3 rounded-lg border p-3",
-        isFulfilled ? "border-emerald-200 bg-emerald-50/30" : "border-border bg-card",
+        isFulfilled
+          ? "border-emerald-200 bg-emerald-50/30 dark:border-emerald-800 dark:bg-emerald-950/20"
+          : "border-border bg-card",
       )}
     >
-      {supply.hexColor && (
-        <ColorSwatch hexColor={supply.hexColor} size="sm" />
-      )}
-      <div className="flex-1 min-w-0">
-        <span className="text-sm font-semibold text-foreground">
+      {supply.hexColor && <ColorSwatch hexColor={supply.hexColor} size="sm" />}
+      <div className="min-w-0 flex-1">
+        <span className="text-foreground text-sm font-semibold">
           {supply.brandName} {supply.code}
         </span>
-        <p className="text-xs text-muted-foreground mt-0.5">
+        <p className="text-muted-foreground mt-0.5 text-xs">
           {supply.colorName}
           {supply.items.length > 1 && (
             <span>
@@ -181,10 +174,7 @@ function SupplyRow({
             const firstItem = supply.items[0];
             const newItemValue = Math.max(
               0,
-              Math.min(
-                firstItem.quantityRequired,
-                firstItem.quantityAcquired + diff,
-              ),
+              Math.min(firstItem.quantityRequired, firstItem.quantityAcquired + diff),
             );
             onUpdateAcquired(type, firstItem.junctionId, newItemValue);
           }

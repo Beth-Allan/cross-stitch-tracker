@@ -12,8 +12,8 @@ export function FabricTab({ fabrics }: FabricTabProps) {
   if (fabrics.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <ShoppingBag className="h-8 w-8 text-muted-foreground/40 mb-3" />
-        <p className="text-sm text-muted-foreground">
+        <ShoppingBag className="text-muted-foreground/40 mb-3 h-8 w-8" />
+        <p className="text-muted-foreground text-sm">
           Select projects on the Projects tab to see fabric needs
         </p>
       </div>
@@ -35,15 +35,13 @@ function FabricRow({ fabric }: { fabric: ShoppingFabricNeed }) {
       className={cn(
         "flex items-center gap-3 rounded-lg border p-4",
         fabric.hasFabric
-          ? "border-emerald-200 bg-emerald-50/30"
+          ? "border-emerald-200 bg-emerald-50/30 dark:border-emerald-800 dark:bg-emerald-950/20"
           : "border-border bg-card",
       )}
     >
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-foreground">
-            {fabric.projectName}
-          </span>
+          <span className="text-foreground text-sm font-semibold">{fabric.projectName}</span>
           {fabric.hasFabric && (
             <span className="inline-flex items-center gap-1 text-xs text-emerald-600">
               <Check className="h-3 w-3" />
@@ -51,7 +49,7 @@ function FabricRow({ fabric }: { fabric: ShoppingFabricNeed }) {
             </span>
           )}
         </div>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1 text-xs">
           {fabric.stitchesWide} x {fabric.stitchesHigh} stitches
           {fabric.fabricName && (
             <span>
@@ -60,9 +58,7 @@ function FabricRow({ fabric }: { fabric: ShoppingFabricNeed }) {
             </span>
           )}
         </p>
-        {!fabric.hasFabric && (
-          <p className="text-xs text-amber-600 mt-1">Needs fabric</p>
-        )}
+        {!fabric.hasFabric && <p className="mt-1 text-xs text-amber-600">Needs fabric</p>}
       </div>
     </div>
   );

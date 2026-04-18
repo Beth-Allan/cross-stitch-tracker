@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus,
@@ -80,14 +80,24 @@ const QUICK_ADD_ITEMS: QuickAddItem[] = [
   },
 ];
 
-/**
- * Quick Add dropdown menu with 8 action items.
- * "Log Stitches" dispatches a custom event to open the LogSessionModal.
- * Other items navigate to their respective add forms.
- */
 export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+
+  const closeMenu = useCallback(() => {
+    setOpen(false);
+    setFocusedIndex(-1);
+    triggerRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (open && focusedIndex >= 0) {
+      itemRefs.current[focusedIndex]?.focus();
+    }
+  }, [open, focusedIndex]);
 
   function handleItemClick(item: QuickAddItem) {
     if (item.action === "logStitches") {
@@ -99,15 +109,53 @@ export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
     } else if (item.href) {
       router.push(item.href);
     }
-    setOpen(false);
+    closeMenu();
+  }
+
+  function handleTriggerKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setOpen(true);
+      setFocusedIndex(0);
+    }
+  }
+
+  function handleMenuKeyDown(e: React.KeyboardEvent) {
+    switch (e.key) {
+      case "Escape":
+        e.preventDefault();
+        closeMenu();
+        break;
+      case "ArrowDown":
+        e.preventDefault();
+        setFocusedIndex((i) => (i + 1) % QUICK_ADD_ITEMS.length);
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setFocusedIndex((i) => (i <= 0 ? QUICK_ADD_ITEMS.length - 1 : i - 1));
+        break;
+      case "Tab":
+        closeMenu();
+        break;
+    }
   }
 
   return (
     <div className="relative">
-      {/* Trigger button */}
       <button
-        onClick={() => setOpen(!open)}
+        ref={triggerRef}
+        onClick={() => {
+          if (open) {
+            closeMenu();
+          } else {
+            setOpen(true);
+            setFocusedIndex(0);
+          }
+        }}
+        onKeyDown={handleTriggerKeyDown}
         type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
         className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
           open
             ? "border-emerald-600 bg-emerald-600 text-white dark:border-emerald-500 dark:bg-emerald-500"
@@ -127,24 +175,30 @@ export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
 
       {open && (
         <>
-          {/* Backdrop to capture outside clicks */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setOpen(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={closeMenu} />
 
-          {/* Dropdown panel */}
-          <div className="absolute right-0 top-full z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+          { }
+          <div
+            role="menu"
+            aria-label="Quick Add"
+            onKeyDown={handleMenuKeyDown}
+            className="border-border bg-card absolute top-full right-0 z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl border shadow-xl"
+          >
             <div className="p-1">
-              {QUICK_ADD_ITEMS.map((item) => {
+              {QUICK_ADD_ITEMS.map((item, index) => {
                 const Icon = item.icon;
                 return (
                   <button
                     key={item.label}
+                    ref={(el) => {
+                      itemRefs.current[index] = el;
+                    }}
                     type="button"
+                    role="menuitem"
+                    tabIndex={focusedIndex === index ? 0 : -1}
                     onClick={() => handleItemClick(item)}
-                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted ${
-                      item.separator ? "border-b border-border" : ""
+                    className={`hover:bg-muted focus:bg-muted flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors focus:outline-none ${
+                      item.separator ? "border-border border-b" : ""
                     }`}
                   >
                     <Icon className={`h-4 w-4 ${item.iconColor}`} strokeWidth={1.5} />

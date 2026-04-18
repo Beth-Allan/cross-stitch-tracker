@@ -55,12 +55,19 @@ export function ProjectSelectionList({
               className={cn(
                 "flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors",
                 isSelected
-                  ? "border-emerald-300 bg-emerald-50/30"
+                  ? "border-emerald-300 bg-emerald-50/30 dark:border-emerald-700 dark:bg-emerald-950/30"
                   : "border-border bg-card hover:bg-muted/50",
               )}
             >
               {/* Checkbox icon */}
-              <span className={cn("shrink-0", isSelected ? "text-emerald-600" : "text-stone-300")}>
+              <span
+                className={cn(
+                  "shrink-0",
+                  isSelected
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-stone-300 dark:text-stone-600",
+                )}
+              >
                 {isSelected ? <CheckSquare className="h-5 w-5" /> : <Square className="h-5 w-5" />}
               </span>
 

@@ -52,7 +52,12 @@ export function BuriedTreasuresSection({ treasures, imageUrls }: BuriedTreasures
               {/* Thumbnail */}
               <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg">
                 {imgUrl ? (
-                  <img src={imgUrl} alt={t.chartName} className="h-full w-full object-cover" />
+                  <img
+                    src={imgUrl}
+                    alt={t.chartName}
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <CoverPlaceholder status="UNSTARTED" />
                 )}

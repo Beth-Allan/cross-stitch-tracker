@@ -42,11 +42,13 @@ export function ScrollableRow({ children, className }: ScrollableRowProps) {
       <button
         onClick={() => scroll("left")}
         aria-label="Scroll left"
-        className={`absolute -left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card shadow-md transition-colors hover:bg-muted ${
+        tabIndex={canScrollLeft ? 0 : -1}
+        aria-hidden={!canScrollLeft}
+        className={`border-border bg-card hover:bg-muted absolute top-1/2 -left-3 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border shadow-md transition-colors ${
           canScrollLeft ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
-        <ChevronLeft className="h-5 w-5 text-muted-foreground" strokeWidth={2} />
+        <ChevronLeft className="text-muted-foreground h-5 w-5" strokeWidth={2} />
       </button>
 
       {/* Scrollable content */}
@@ -66,11 +68,13 @@ export function ScrollableRow({ children, className }: ScrollableRowProps) {
       <button
         onClick={() => scroll("right")}
         aria-label="Scroll right"
-        className={`absolute -right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card shadow-md transition-colors hover:bg-muted ${
+        tabIndex={canScrollRight ? 0 : -1}
+        aria-hidden={!canScrollRight}
+        className={`border-border bg-card hover:bg-muted absolute top-1/2 -right-3 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border shadow-md transition-colors ${
           canScrollRight ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
-        <ChevronRight className="h-5 w-5 text-muted-foreground" strokeWidth={2} />
+        <ChevronRight className="text-muted-foreground h-5 w-5" strokeWidth={2} />
       </button>
     </div>
   );

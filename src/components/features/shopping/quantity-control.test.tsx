@@ -47,9 +47,7 @@ describe("QuantityControl", () => {
   });
 
   it("shows emerald-100 background when fully fulfilled", () => {
-    const { container } = render(
-      <QuantityControl {...defaultProps} acquired={3} required={3} />,
-    );
+    const { container } = render(<QuantityControl {...defaultProps} acquired={3} required={3} />);
     const wrapper = container.firstElementChild as HTMLElement;
     expect(wrapper.className).toContain("bg-emerald-100");
   });
@@ -66,5 +64,43 @@ describe("QuantityControl", () => {
     buttons.forEach((button) => {
       expect(button).toBeDisabled();
     });
+  });
+
+  it("opens inline input on quantity display click and commits on Enter", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<QuantityControl {...defaultProps} onChange={onChange} />);
+    await user.click(screen.getByText("2/3"));
+    const input = screen.getByRole("spinbutton");
+    expect(input).toBeInTheDocument();
+    await user.clear(input);
+    await user.type(input, "1");
+    await user.keyboard("{Enter}");
+    expect(onChange).toHaveBeenCalledWith(1);
+    expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
+  });
+
+  it("cancels inline edit on Escape without calling onChange", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<QuantityControl {...defaultProps} onChange={onChange} />);
+    await user.click(screen.getByText("2/3"));
+    const input = screen.getByRole("spinbutton");
+    await user.click(input);
+    await user.keyboard("{Escape}");
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
+  });
+
+  it("clamps inline input value to [0, required]", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<QuantityControl {...defaultProps} onChange={onChange} />);
+    await user.click(screen.getByText("2/3"));
+    const input = screen.getByRole("spinbutton");
+    await user.clear(input);
+    await user.type(input, "99");
+    await user.keyboard("{Enter}");
+    expect(onChange).toHaveBeenCalledWith(3);
   });
 });

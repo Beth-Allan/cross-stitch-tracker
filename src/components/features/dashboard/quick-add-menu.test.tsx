@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@/__tests__/test-utils";
+import userEvent from "@testing-library/user-event";
 import { QuickAddMenu } from "./quick-add-menu";
 
 // Mock next/navigation
@@ -19,10 +20,8 @@ describe("QuickAddMenu", () => {
   it("renders 8 action items when menu is open", () => {
     render(<QuickAddMenu onLogStitches={vi.fn()} />);
 
-    // Open the menu
     fireEvent.click(screen.getByText("Quick Add"));
 
-    // All 8 items
     expect(screen.getByText("Log Stitches")).toBeInTheDocument();
     expect(screen.getByText("New Chart")).toBeInTheDocument();
     expect(screen.getByText("New Thread")).toBeInTheDocument();
@@ -50,5 +49,44 @@ describe("QuickAddMenu", () => {
     fireEvent.click(screen.getByText("Log Stitches"));
 
     expect(mockOnLogStitches).toHaveBeenCalledTimes(1);
+  });
+
+  it("closes menu on Escape and returns focus to trigger", async () => {
+    const user = userEvent.setup();
+    render(<QuickAddMenu onLogStitches={vi.fn()} />);
+
+    const trigger = screen.getByText("Quick Add").closest("button")!;
+    await user.click(trigger);
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
+  it("navigates items with ArrowDown/ArrowUp", async () => {
+    const user = userEvent.setup();
+    render(<QuickAddMenu onLogStitches={vi.fn()} />);
+
+    await user.click(screen.getByText("Quick Add"));
+    const items = screen.getAllByRole("menuitem");
+
+    expect(items[0]).toHaveFocus();
+
+    await user.keyboard("{ArrowDown}");
+    expect(items[1]).toHaveFocus();
+
+    await user.keyboard("{ArrowUp}");
+    expect(items[0]).toHaveFocus();
+  });
+
+  it("sets aria-expanded on trigger button", () => {
+    render(<QuickAddMenu onLogStitches={vi.fn()} />);
+    const trigger = screen.getByText("Quick Add").closest("button")!;
+
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
   });
 });

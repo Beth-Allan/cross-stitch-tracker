@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, CheckSquare, ShoppingBag, Square, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
@@ -91,25 +91,35 @@ const groupLabels: Record<string, string> = {
   fabric: "Fabric",
 };
 
-export function ShoppingListTab({
-  threads,
-  beads,
-  specialty,
-  fabrics,
-}: ShoppingListTabProps) {
-  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+export function ShoppingListTab({ threads, beads, specialty, fabrics }: ShoppingListTabProps) {
+  const [checkedItems, setCheckedItems] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set<string>();
+    try {
+      const stored = localStorage.getItem("shopping-list-checked");
+      if (!stored) return new Set<string>();
+      const parsed = JSON.parse(stored) as string[];
+      return Array.isArray(parsed) ? new Set(parsed) : new Set<string>();
+    } catch {
+      return new Set<string>();
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("shopping-list-checked", JSON.stringify(Array.from(checkedItems)));
+    } catch {
+      // localStorage may be unavailable
+    }
+  }, [checkedItems]);
 
   const hasAnySupplies =
-    threads.length > 0 ||
-    beads.length > 0 ||
-    specialty.length > 0 ||
-    fabrics.length > 0;
+    threads.length > 0 || beads.length > 0 || specialty.length > 0 || fabrics.length > 0;
 
   if (!hasAnySupplies) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <ShoppingBag className="h-8 w-8 text-muted-foreground/40 mb-3" />
-        <p className="text-sm text-muted-foreground">
+        <ShoppingBag className="text-muted-foreground/40 mb-3 h-8 w-8" />
+        <p className="text-muted-foreground text-sm">
           Select projects on the Projects tab to build your shopping list
         </p>
       </div>
@@ -121,8 +131,8 @@ export function ShoppingListTab({
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <Check className="h-8 w-8 text-emerald-500 mb-3" />
-        <p className="text-sm text-muted-foreground">
+        <Check className="mb-3 h-8 w-8 text-emerald-500" />
+        <p className="text-muted-foreground text-sm">
           All supplies acquired for selected projects!
         </p>
       </div>
@@ -155,8 +165,8 @@ export function ShoppingListTab({
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
-        <p className="text-sm text-muted-foreground">
+      <div className="mb-5 flex items-center justify-between">
+        <p className="text-muted-foreground text-sm">
           {items.length} item{items.length !== 1 ? "s" : ""} to buy
           {checkedCount > 0 && (
             <span className="text-emerald-600">
@@ -169,7 +179,7 @@ export function ShoppingListTab({
           <button
             type="button"
             onClick={clearChecked}
-            className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+            className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs font-medium transition-colors"
           >
             <Trash2 className="h-3 w-3" />
             Clear checked
@@ -181,9 +191,9 @@ export function ShoppingListTab({
       <div className="flex flex-col gap-6">
         {Array.from(grouped.entries()).map(([type, groupItems]) => (
           <div key={type}>
-            <h3 className="font-heading text-base font-semibold text-foreground mb-2.5">
+            <h3 className="font-heading text-foreground mb-2.5 text-base font-semibold">
               {groupLabels[type] ?? type}
-              <span className="text-muted-foreground text-sm font-normal ml-2">
+              <span className="text-muted-foreground ml-2 text-sm font-normal">
                 ({groupItems.length})
               </span>
             </h3>
@@ -196,9 +206,9 @@ export function ShoppingListTab({
                     type="button"
                     onClick={() => toggleCheck(item.key)}
                     className={cn(
-                      "flex items-center gap-2.5 rounded-lg border p-3 w-full text-left transition-colors",
+                      "flex w-full items-center gap-2.5 rounded-lg border p-3 text-left transition-colors",
                       isChecked
-                        ? "border-emerald-300 bg-emerald-50"
+                        ? "border-emerald-300 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-950/30"
                         : "border-border bg-card hover:bg-muted/50",
                     )}
                   >
@@ -206,8 +216,8 @@ export function ShoppingListTab({
                       className={cn(
                         "shrink-0",
                         isChecked
-                          ? "text-emerald-500"
-                          : "text-stone-300",
+                          ? "text-emerald-500 dark:text-emerald-400"
+                          : "text-stone-300 dark:text-stone-600",
                       )}
                     >
                       {isChecked ? (
@@ -217,17 +227,13 @@ export function ShoppingListTab({
                       )}
                     </span>
 
-                    {item.hexColor && (
-                      <ColorSwatch hexColor={item.hexColor} size="sm" />
-                    )}
+                    {item.hexColor && <ColorSwatch hexColor={item.hexColor} size="sm" />}
 
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <span
                         className={cn(
                           "text-sm font-medium",
-                          isChecked
-                            ? "line-through text-muted-foreground"
-                            : "text-foreground",
+                          isChecked ? "text-muted-foreground line-through" : "text-foreground",
                         )}
                       >
                         {item.label}
@@ -236,9 +242,7 @@ export function ShoppingListTab({
                         <span
                           className={cn(
                             "text-xs",
-                            isChecked
-                              ? "text-muted-foreground/60"
-                              : "text-muted-foreground",
+                            isChecked ? "text-muted-foreground/60" : "text-muted-foreground",
                           )}
                         >
                           {" \u2014 "}
@@ -249,10 +253,8 @@ export function ShoppingListTab({
 
                     <span
                       className={cn(
-                        "text-xs font-medium font-mono tabular-nums whitespace-nowrap",
-                        isChecked
-                          ? "text-muted-foreground/60"
-                          : "text-muted-foreground",
+                        "font-mono text-xs font-medium whitespace-nowrap tabular-nums",
+                        isChecked ? "text-muted-foreground/60" : "text-muted-foreground",
                       )}
                     >
                       {item.quantity}

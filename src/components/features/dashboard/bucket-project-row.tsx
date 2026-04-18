@@ -22,7 +22,7 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
   return (
     <Link
       href={`/charts/${project.chartId}`}
-      className="group flex items-center gap-3 border-t border-border px-5 py-3 transition-colors hover:bg-muted/50"
+      className="group border-border hover:bg-muted/50 flex items-center gap-3 border-t px-5 py-3 transition-colors"
     >
       {/* Thumbnail */}
       <div className="h-8 w-8 shrink-0 overflow-hidden rounded-lg">
@@ -30,6 +30,7 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
           <img
             src={imageUrl}
             alt={project.projectName}
+            loading="lazy"
             className="h-full w-full object-cover"
           />
         ) : (
@@ -43,7 +44,7 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
           {project.projectName}
         </p>
         {project.designerName && (
-          <p className="truncate text-xs text-muted-foreground">{project.designerName}</p>
+          <p className="text-muted-foreground truncate text-xs">{project.designerName}</p>
         )}
       </div>
 
@@ -51,13 +52,13 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
       {bucketId !== "unstarted" && (
         <div className="hidden w-[100px] shrink-0 md:block">
           <div className="flex items-center gap-2">
-            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+            <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
               <div
                 className={`h-full rounded-full ${barColor}`}
                 style={{ width: `${project.progressPercent}%` }}
               />
             </div>
-            <span className="font-mono text-[11px] font-medium tabular-nums text-muted-foreground">
+            <span className="text-muted-foreground font-mono text-[11px] font-medium tabular-nums">
               {project.progressPercent}%
             </span>
           </div>
@@ -65,21 +66,19 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
       )}
 
       {/* Stitch count */}
-      <div className="hidden shrink-0 text-right sm:block" style={{ minWidth: "80px" }}>
-        <p className="text-xs tabular-nums text-foreground">
+      <div className="hidden min-w-20 shrink-0 text-right sm:block">
+        <p className="text-foreground text-xs tabular-nums">
           {project.stitchesCompleted.toLocaleString()}/{project.totalStitches.toLocaleString()}
         </p>
-        <p className="text-[10px] text-muted-foreground">stitches</p>
+        <p className="text-muted-foreground text-[10px]">stitches</p>
       </div>
 
       {/* Last stitched (hidden on mobile) */}
-      <div className="hidden shrink-0 text-right md:block" style={{ minWidth: "90px" }}>
+      <div className="hidden min-w-[90px] shrink-0 text-right md:block">
         {project.lastSessionDate ? (
-          <p className="text-xs text-muted-foreground">
-            {project.stitchingDays} stitching days
-          </p>
+          <p className="text-muted-foreground text-xs">{project.stitchingDays} stitching days</p>
         ) : (
-          <p className="text-xs text-muted-foreground/70">Not started</p>
+          <p className="text-muted-foreground/70 text-xs">Not started</p>
         )}
       </div>
     </Link>

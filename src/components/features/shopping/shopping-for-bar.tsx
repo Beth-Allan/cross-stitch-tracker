@@ -10,41 +10,36 @@ interface ShoppingForBarProps {
   onClearAll: () => void;
 }
 
-export function ShoppingForBar({
-  selectedProjects,
-  onRemove,
-  onClearAll,
-}: ShoppingForBarProps) {
+export function ShoppingForBar({ selectedProjects, onRemove, onClearAll }: ShoppingForBarProps) {
   return (
     <div
       className={cn(
-        "sticky top-0 z-20 backdrop-blur-sm bg-background/80",
-        "border-b border-border py-2 px-4",
+        "bg-background/80 sticky top-0 z-20 backdrop-blur-sm",
+        "border-border border-b px-4 py-2",
       )}
     >
       {selectedProjects.length === 0 ? (
         <div className="flex items-center gap-2">
-          <ShoppingBag className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">
-            No projects selected — choose projects below to start your shopping
-            trip
+          <ShoppingBag className="text-muted-foreground h-4 w-4" />
+          <span className="text-muted-foreground text-sm">
+            No projects selected — choose projects below to start your shopping trip
           </span>
         </div>
       ) : (
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider mr-0.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <span className="text-muted-foreground mr-0.5 text-xs font-medium tracking-wider uppercase">
             Shopping for:
           </span>
           {selectedProjects.map((project) => (
             <span
               key={project.projectId}
-              className="bg-emerald-100 text-emerald-800 rounded-full px-3 py-1 text-sm flex items-center gap-1"
+              className="flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-sm text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200"
             >
               {project.projectName}
               <button
                 type="button"
                 onClick={() => onRemove(project.projectId)}
-                className="text-emerald-600 hover:text-emerald-800 transition-colors"
+                className="text-emerald-600 transition-colors hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-200"
                 aria-label={`Remove ${project.projectName}`}
               >
                 <X className="h-3.5 w-3.5" />
@@ -54,7 +49,7 @@ export function ShoppingForBar({
           <button
             type="button"
             onClick={onClearAll}
-            className="text-sm text-muted-foreground underline hover:text-foreground transition-colors ml-1"
+            className="text-muted-foreground hover:text-foreground ml-1 text-sm underline transition-colors"
           >
             Clear all
           </button>

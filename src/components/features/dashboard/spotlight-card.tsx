@@ -58,7 +58,12 @@ export function SpotlightCard({
         {/* Image half -- hidden on mobile */}
         <div className="relative overflow-hidden max-md:hidden">
           {imageUrl ? (
-            <img src={imageUrl} alt={project.projectName} className="h-full w-full object-cover" />
+            <img
+              src={imageUrl}
+              alt={project.projectName}
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
           ) : (
             <CoverPlaceholder status={project.status} />
           )}

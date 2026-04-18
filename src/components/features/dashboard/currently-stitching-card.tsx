@@ -18,8 +18,13 @@ function formatTime(minutes: number): string {
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
-function daysAgo(date: Date): number {
-  return Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+function formatDaysAgo(date: Date): string {
+  const days = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+  if (days === 0) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days < 7) return `${days} days ago`;
+  if (days < 30) return `${Math.floor(days / 7)}w ago`;
+  return `${Math.floor(days / 30)}mo ago`;
 }
 
 /**
@@ -32,7 +37,7 @@ export function CurrentlyStitchingCard({ project, imageUrl }: CurrentlyStitching
   return (
     <Link
       href={`/charts/${project.chartId}`}
-      className="group block w-[280px] flex-shrink-0 overflow-hidden rounded-xl border border-border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+      className="group border-border block w-[280px] flex-shrink-0 overflow-hidden rounded-xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
       style={{ scrollSnapAlign: "start" }}
     >
       {/* Cover area */}
@@ -41,6 +46,7 @@ export function CurrentlyStitchingCard({ project, imageUrl }: CurrentlyStitching
           <img
             src={imageUrl}
             alt={project.projectName}
+            loading="lazy"
             className="h-full w-full object-cover"
           />
         ) : (
@@ -49,15 +55,15 @@ export function CurrentlyStitchingCard({ project, imageUrl }: CurrentlyStitching
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 to-transparent" />
 
         {/* Progress overlay at bottom */}
-        <div className="absolute bottom-3 left-3 right-3">
+        <div className="absolute right-3 bottom-3 left-3">
           <div className="flex items-center gap-2">
-            <div className="flex-1 h-1.5 overflow-hidden rounded-full bg-white/30 backdrop-blur-sm">
+            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/30 backdrop-blur-sm">
               <div
                 className="h-full rounded-full bg-emerald-400"
                 style={{ width: `${project.progressPercent}%` }}
               />
             </div>
-            <span className="font-mono text-xs font-bold tabular-nums text-white drop-shadow-sm">
+            <span className="font-mono text-xs font-bold text-white tabular-nums drop-shadow-sm">
               {project.progressPercent}%
             </span>
           </div>
@@ -65,25 +71,26 @@ export function CurrentlyStitchingCard({ project, imageUrl }: CurrentlyStitching
       </div>
 
       {/* Card body */}
-      <div className="flex flex-col gap-1.5 bg-card p-3.5">
-        <p className="font-heading text-sm font-semibold leading-snug text-foreground line-clamp-1 transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+      <div className="bg-card flex flex-col gap-1.5 p-3.5">
+        <p className="font-heading text-foreground line-clamp-1 text-sm leading-snug font-semibold transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
           {project.projectName}
         </p>
-        <p className="truncate text-xs text-muted-foreground">
-          {project.designerName}
+        <p className="text-muted-foreground truncate text-xs">{project.designerName}</p>
+        <p className="text-muted-foreground text-[11px]">
+          {project.stitchesCompleted.toLocaleString()} / {project.totalStitches.toLocaleString()}{" "}
+          stitches
         </p>
-        <p className="text-[11px] text-muted-foreground">
-          {project.stitchesCompleted.toLocaleString()} / {project.totalStitches.toLocaleString()} stitches
-        </p>
-        <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground/70">
+        <div className="text-muted-foreground/70 flex flex-wrap items-center gap-3 text-[11px]">
           <span className="inline-flex items-center gap-1">
             <Clock className="h-3 w-3" strokeWidth={1.5} />
-            {tracksTime ? formatTime(project.totalTimeMinutes) : `${project.stitchingDays} stitching days`}
+            {tracksTime
+              ? formatTime(project.totalTimeMinutes)
+              : `${project.stitchingDays} stitching days`}
           </span>
           {project.lastSessionDate && (
             <span className="inline-flex items-center gap-1">
               <Calendar className="h-3 w-3" strokeWidth={1.5} />
-              Last stitched {daysAgo(project.lastSessionDate)}d ago
+              {formatDaysAgo(project.lastSessionDate)}
             </span>
           )}
         </div>
