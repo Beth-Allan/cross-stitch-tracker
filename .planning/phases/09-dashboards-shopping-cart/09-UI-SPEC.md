@@ -45,7 +45,7 @@ Exceptions:
 - Currently Stitching cards: fixed 280px width, 160px cover height (per DesignOS D-04)
 - Hero stat cards: `minmax(140px, 1fr)` auto-fit grid (per D-14)
 - Collection Stats sidebar: 260px fixed width on desktop (per DesignOS layout)
-- Shopping-for bar: sticky `top: 0` with `z-index: 20` and 10px vertical / 16px horizontal padding
+- Shopping-for bar: sticky `top: 0` with `z-index: 20` and 8px vertical / 16px horizontal padding
 - Progress bar segments: `min-width: 24px` when count > 0 to ensure visibility
 
 ---
@@ -55,7 +55,7 @@ Exceptions:
 | Role | Size | Weight | Line Height | Font |
 |------|------|--------|-------------|------|
 | Body | 14px (text-sm) | 400 (regular) | 1.5 | Source Sans 3 |
-| Label / Micro | 11px (text-[11px]) | 600 (semibold) | 1.4 | Source Sans 3, uppercase tracking-wider |
+| Label / Micro | 11px (text-[11px]) | 700 (bold) | 1.4 | Source Sans 3, uppercase tracking-wider |
 | Heading | 20px (text-xl) | 700 (bold) | 1.2 | Fraunces |
 | Page Title | 28-30px (text-2xl to text-3xl) | 700 (bold) | 1.2 | Fraunces |
 | Stat Number | 20px (text-xl) | 700 (bold) | 1.2 | JetBrains Mono, tabular-nums |
@@ -63,7 +63,7 @@ Exceptions:
 Additional rules:
 - JetBrains Mono is reserved for numeric stat displays, quantity controls, and tabular data ONLY. Never for body text.
 - Section headings use Fraunces with a 40px (w-10) emerald underline accent bar (h-0.5, rounded-full).
-- Uppercase micro-labels (11px) used for stat card labels and category headers -- always pair with `tracking-wider`.
+- Uppercase micro-labels (11px) used for stat card labels and category headers -- always pair with `tracking-wider`. The bold weight plus uppercase + tracking-wider provides sufficient differentiation from body text without needing a third weight.
 
 ---
 
@@ -309,7 +309,7 @@ Finished tab stat cards: violet-50 bg, violet-100 border, violet-500 icon (disti
 | Shopping Cart subtitle | Select projects to build your shopping list |
 | Primary CTA (Main Dashboard) | Quick Add |
 | Spotlight CTA | Check It Out |
-| Spotlight shuffle | Shuffle |
+| Spotlight shuffle | Shuffle Spotlight |
 | Spotlight section label | Rediscover This One |
 
 ### Empty States
@@ -386,6 +386,8 @@ Mobile-specific behaviors:
 - Stacked bar chart: include `title` attributes on segments for tooltip info
 - Color swatches: include alt text or aria-label with color name
 - Status is never conveyed by color alone -- all badges include text labels with dot indicators
+- ScrollableRow arrow buttons: `aria-label="Scroll left"` on the left arrow, `aria-label="Scroll right"` on the right arrow
+- Spotlight shuffle button: `aria-label="Shuffle spotlight project"` (supplements the visible "Shuffle Spotlight" label for screen readers)
 
 ---
 
