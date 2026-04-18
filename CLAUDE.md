@@ -22,22 +22,12 @@
 
 ### In Progress
 
-Impeccable audit polish — `.planning/AUDIT-2026-04-16.md` — **ALL 6 PASSES COMPLETE**
-
-- Harden pass: ✅ complete (P0s + 4 P1s)
-- Dark theme polish: ✅ complete (all 6 items)
-- Optimize pass: ✅ complete (next/image LCP, useMemo, cache dedup)
-- Adapt pass: ✅ complete (mobile cards, kitting badge, tab aria-labels, touch targets)
-- Harden ARIA pass: ✅ complete (combobox, progressbar, describedby, labels)
-- Distill pass: ✅ complete (EmptyState + ErrorCard extracted)
-
-All changes uncommitted on `main`. Build clean, 1050/1050 tests passing. Score: 10/20 → 16.5/20.
+Phase 8 verified and complete. Phase 9 ready to plan.
 
 ### Next Up
 
-1. Commit all audit fixes (all 6 passes done, uncommitted on `main`)
-2. Phase 9 planning — next phase of v1.2 Track & Measure
-3. `/gsd-explore` — discuss user feedback items before next milestone
+1. Phase 9 planning — `/gsd-discuss-phase 9` then `/gsd-plan-phase 9`
+2. `/gsd-explore` — discuss user feedback items before next milestone
 
 ### Backlog
 
@@ -61,6 +51,9 @@ All changes uncommitted on `main`. Build clean, 1050/1050 tests passing. Score: 
 - 999.5: Supplies page first-load view flash (investigate SSR cookie or middleware)
 - 999.6: Cover image preview aspect ratio — use object-contain or dynamic aspect ratio
 - 999.7: Estimated completion dates — compute "at this pace, finish on [date]" from session averages + remaining stitches; display on project detail and dashboard cards
+- 999.8: What's Next card styling — use same/similar gallery cards as Browse tab for visual consistency
+- 999.9: What's Next kitting label at 0% — "Kitting" label misleading when no supplies tracked; consider "Not kitted" or hiding label
+- 999.10: Auto-status from kitting activity — consider auto-transitioning project status to "Kitting" when user starts adding supplies/fabric
 
 ### Blockers
 
