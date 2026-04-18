@@ -43,7 +43,7 @@ Full details: `milestones/v1.1-ROADMAP.md`
 **Milestone Goal:** Add session logging as the data foundation for progress tracking, evolve the Charts page into Pattern Dive, and build dashboard pages that surface collection insights and streamline shopping.
 
 - [x] **Phase 8: Session Logging & Pattern Dive** - StitchSession model, global log modal, auto-updating progress, Pattern Dive tabs (completed 2026-04-18)
-- [ ] **Phase 9: Dashboards & Shopping Cart** - Main Dashboard, Project Dashboard, Shopping Cart upgrade with project selection
+- [x] **Phase 9: Dashboards & Shopping Cart** - Main Dashboard, Project Dashboard, Shopping Cart upgrade with project selection (completed 2026-04-18)
 
 ### 📋 v1.3 Motivation & Planning
 
@@ -88,7 +88,19 @@ Plans:
   2. User can use Quick Add from the dashboard to create charts, supplies, designers, or log a session without navigating away
   3. User sees a Project Dashboard with hero stats, progress buckets (Unstarted through Almost There) with sortable projects, and a Finished tab with per-project stats sortable by multiple dimensions
   4. User can select specific projects to shop for, see aggregated supply needs in tabbed view (Threads, Beads, Specialty, Fabric) with badge counts, and mark individual items as acquired
-**Plans**: TBD
+**Plans**: 9 plans
+
+Plans:
+- [ ] 09-01-PLAN.md -- Dashboard types + main dashboard data actions (TDD)
+- [ ] 09-02-PLAN.md -- Project dashboard data actions (TDD)
+- [ ] 09-03-PLAN.md -- Shopping cart data actions with IDOR protection (TDD)
+- [ ] 09-04-PLAN.md -- Main Dashboard section components (cards, sidebar, spotlight, scroll)
+- [ ] 09-05-PLAN.md -- Project Dashboard UI (hero stats, progress buckets, finished tab)
+- [ ] 09-06-PLAN.md -- Shopping Cart UI (project selection, supply tabs, quantity control)
+- [ ] 09-07-PLAN.md -- Dashboard page wiring (tabs, Quick Add, layout composition)
+- [ ] 09-08-PLAN.md -- Shopping page wiring + TopBar event listener
+- [ ] 09-09-PLAN.md -- Integration verification and visual checkpoint
+
 **UI hint**: yes
 
 ### Phase 10: Advanced Stats
@@ -133,6 +145,6 @@ Plans:
 | 6. Gallery Cards & View Modes | v1.1 | 4/4 | Complete | 2026-04-15 |
 | 7. Project Detail Experience | v1.1 | 8/8 | Complete | 2026-04-16 |
 | 8. Session Logging & Pattern Dive | v1.2 | 11/11 | Complete | 2026-04-18 |
-| 9. Dashboards & Shopping Cart | v1.2 | 0/TBD | Not started | - |
+| 9. Dashboards & Shopping Cart | v1.2 | 0/9 | Not started | - |
 | 10. Advanced Stats | v1.3 | 0/TBD | Not started | - |
 | 11. Goals & Scheduling | v1.3 | 0/TBD | Not started | - |
