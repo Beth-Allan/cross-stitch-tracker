@@ -27,18 +27,15 @@
 
 ### In Progress
 
-None — v1.2 milestone complete. Ready for PR + ship.
+None — v1.2 milestone complete, PR #18 open.
 
 ### Done This Session
 
-- Critique fixes: harden (error recovery), colorize (violet→emerald), clarify (tooltips + hover cues), polish (skeletons, tap targets, breakpoints, scroll)
-- Fixed shopping cart hydration mismatch (localStorage reads deferred to useEffect)
-- Filtered empty-needs projects from shopping cart project list
-- All 1172 tests pass, build clean
+- Shipped Phase 9 as PR #18: https://github.com/Beth-Allan/cross-stitch-tracker/pull/18
 
 ### Next Up
 
-1. `/gsd-ship` — create PR for Phase 9
+1. Review/merge PR #18
 2. `/gsd-complete-milestone` — archive v1.2
 3. `/gsd-explore` — discuss user feedback items before v1.3
 
