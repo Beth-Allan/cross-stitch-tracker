@@ -335,9 +335,9 @@ describe("dashboard-actions", () => {
     // Test 8: collectionStats returns correct counts
     it("collectionStats returns correct counts for totalProjects, totalWIP, totalOnHold, totalUnstarted, totalFinished", async () => {
       const allProjects = [
-        { id: "p1", status: "IN_PROGRESS", stitchesCompleted: 1000, finishDate: null, chart: { id: "c1", name: "C1", stitchCount: 5000 } },
-        { id: "p2", status: "IN_PROGRESS", stitchesCompleted: 2000, finishDate: null, chart: { id: "c2", name: "C2", stitchCount: 8000 } },
-        { id: "p3", status: "ON_HOLD", stitchesCompleted: 500, finishDate: null, chart: { id: "c3", name: "C3", stitchCount: 3000 } },
+        { id: "p1", status: "IN_PROGRESS", stitchesCompleted: 1000, finishDate: null, chart: { id: "c1", name: "C1", stitchCount: 5000, coverThumbnailUrl: null, designer: null }, sessions: [] },
+        { id: "p2", status: "IN_PROGRESS", stitchesCompleted: 2000, finishDate: null, chart: { id: "c2", name: "C2", stitchCount: 8000, coverThumbnailUrl: null, designer: null }, sessions: [] },
+        { id: "p3", status: "ON_HOLD", stitchesCompleted: 500, finishDate: null, chart: { id: "c3", name: "C3", stitchCount: 3000, coverThumbnailUrl: null, designer: null }, sessions: [] },
         { id: "p4", status: "UNSTARTED", stitchesCompleted: 0, finishDate: null, chart: { id: "c4", name: "C4", stitchCount: 1000 } },
         { id: "p5", status: "KITTING", stitchesCompleted: 0, finishDate: null, chart: { id: "c5", name: "C5", stitchCount: 2000 } },
         { id: "p6", status: "KITTED", stitchesCompleted: 0, finishDate: null, chart: { id: "c6", name: "C6", stitchCount: 4000 } },
@@ -345,7 +345,7 @@ describe("dashboard-actions", () => {
         { id: "p8", status: "FFO", stitchesCompleted: 6000, finishDate: new Date("2026-04-01"), chart: { id: "c8", name: "C8", stitchCount: 6000 } },
       ];
 
-      // Currently stitching query returns WIPs
+      // Currently stitching query filters by status IN, collection stats has no status filter
       mockPrisma.project.findMany.mockImplementation(async (args: { where?: { status?: { in?: string[] } } }) => {
         if (args?.where?.status?.in) {
           return allProjects.filter((p) => args.where!.status!.in!.includes(p.status));
@@ -368,7 +368,7 @@ describe("dashboard-actions", () => {
     // Test 9: collectionStats totalStitchesCompleted
     it("collectionStats returns totalStitchesCompleted sum across all projects", async () => {
       const allProjects = [
-        { id: "p1", status: "IN_PROGRESS", stitchesCompleted: 1000, finishDate: null, chart: { id: "c1", name: "C1", stitchCount: 5000 } },
+        { id: "p1", status: "IN_PROGRESS", stitchesCompleted: 1000, finishDate: null, chart: { id: "c1", name: "C1", stitchCount: 5000, coverThumbnailUrl: null, designer: null }, sessions: [] },
         { id: "p2", status: "FINISHED", stitchesCompleted: 8000, finishDate: new Date("2026-03-01"), chart: { id: "c2", name: "C2", stitchCount: 8000 } },
         { id: "p3", status: "UNSTARTED", stitchesCompleted: 0, finishDate: null, chart: { id: "c3", name: "C3", stitchCount: 3000 } },
       ];
@@ -393,7 +393,7 @@ describe("dashboard-actions", () => {
       const allProjects = [
         { id: "p1", status: "FINISHED", stitchesCompleted: 5000, finishDate: new Date("2026-02-01"), chart: { id: "c1", name: "Old Finish", stitchCount: 5000 } },
         { id: "p2", status: "FFO", stitchesCompleted: 3000, finishDate: new Date("2026-04-10"), chart: { id: "c2", name: "Recent Finish", stitchCount: 3000 } },
-        { id: "p3", status: "IN_PROGRESS", stitchesCompleted: 1000, finishDate: null, chart: { id: "c3", name: "Big WIP", stitchCount: 50000 } },
+        { id: "p3", status: "IN_PROGRESS", stitchesCompleted: 1000, finishDate: null, chart: { id: "c3", name: "Big WIP", stitchCount: 50000, coverThumbnailUrl: null, designer: null }, sessions: [] },
       ];
 
       mockPrisma.project.findMany.mockImplementation(async (args: { where?: { status?: { in?: string[] } } }) => {
