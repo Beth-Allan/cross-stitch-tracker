@@ -56,8 +56,10 @@ export async function getWhatsNextProjects(): Promise<WhatsNextProject[]> {
         supplies.reduce((s, i) => s + Math.min(i.quantityAcquired, i.quantityRequired), 0) +
         fabricAcquired;
 
-      const kittingPercent =
-        totalRequired === 0 ? 100 : Math.round((totalAcquired / totalRequired) * 100);
+      const hasSupplyItems = supplies.length > 0;
+      const kittingPercent = !hasSupplyItems
+        ? 0
+        : Math.round((totalAcquired / totalRequired) * 100);
 
       return {
         chartId: c.id,

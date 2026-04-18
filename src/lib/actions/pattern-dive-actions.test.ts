@@ -356,11 +356,11 @@ describe("pattern-dive-actions", () => {
       expect(result[0].kittingPercent).toBe(0); // fabric required but not linked
     });
 
-    it("returns 100% kitting for project with no supplies and fabric linked", async () => {
+    it("returns 0% kitting for project with fabric but no supply items tracked", async () => {
       mockPrisma.chart.findMany.mockResolvedValue([
         {
           id: "c1",
-          name: "Kit Ready",
+          name: "Fabric Only",
           coverThumbnailUrl: null,
           stitchCount: 1000,
           dateAdded: new Date("2026-01-01"),
@@ -380,7 +380,8 @@ describe("pattern-dive-actions", () => {
       const { getWhatsNextProjects } = await import("./pattern-dive-actions");
       const result = await getWhatsNextProjects();
 
-      expect(result[0].kittingPercent).toBe(100);
+      // Fabric alone doesn't make a project kittable — need at least one supply item
+      expect(result[0].kittingPercent).toBe(0);
     });
 
     it("returns correct WhatsNextProject shape", async () => {
