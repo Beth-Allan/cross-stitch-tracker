@@ -693,8 +693,8 @@ describe("pattern-dive-actions", () => {
       expect(big.fitsHeight).toBe(true);
 
       const small = result[0].matchingFabrics.find((f) => f.id === "f2")!;
-      expect(small.fitsWidth).toBe(true); // longestEdge 25 >= 20.3
-      expect(small.fitsHeight).toBe(false); // neither edge >= 27.4
+      expect(small.fitsWidth).toBe(false); // 15 < reqShort 20.3 — can't fit either orientation
+      expect(small.fitsHeight).toBe(false);
     });
 
     it("matches unassigned fabrics by computing required size per-fabric count (no assigned fabric)", async () => {
@@ -779,7 +779,7 @@ describe("pattern-dive-actions", () => {
       expect(result[0].matchingFabrics[0].fitsHeight).toBe(true);
     });
 
-    it("includes fabric in matchingFabrics even when only one dimension fits", async () => {
+    it("excludes fabric that cannot fit both dimensions in any orientation", async () => {
       mockPrisma.chart.findMany.mockResolvedValue([
         {
           id: "c1",
@@ -810,12 +810,9 @@ describe("pattern-dive-actions", () => {
       const result = await getFabricRequirements();
 
       // Required: 300/14+6=27.4" x 100/14+6=13.1"
-      // Fabric 15x25: fitsWidth — neither 15 nor 25 >= 27.4 → false
-      //               fitsHeight — 15 >= 13.1 → true
-      // Included because fitsWidth || fitsHeight
-      expect(result[0].matchingFabrics).toHaveLength(1);
-      expect(result[0].matchingFabrics[0].fitsWidth).toBe(false);
-      expect(result[0].matchingFabrics[0].fitsHeight).toBe(true);
+      // reqShort=13.1, reqLong=27.4
+      // Fabric 15x25: 15 >= 13.1 (ok) but 25 < 27.4 (too short) → excluded
+      expect(result[0].matchingFabrics).toHaveLength(0);
     });
 
     it("preserves existing behavior: assigned-fabric projects still match by same count", async () => {

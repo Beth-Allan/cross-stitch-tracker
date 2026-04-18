@@ -183,7 +183,7 @@ export function LogSessionModal({
   // ─── Save ───────────────────────────────────────────────────────────────
 
   function handleSave() {
-    if (!isValid) return;
+    if (!isValid || isUploading) return;
 
     const formData = {
       projectId: selectedProjectId,
@@ -515,10 +515,10 @@ export function LogSessionModal({
             </Button>
             <Button
               onClick={handleSave}
-              disabled={!isValid || isPending}
+              disabled={!isValid || isPending || isUploading}
               className="disabled:opacity-40"
             >
-              {isEditing ? "Save Changes" : "Log Stitches"}
+              {isUploading ? "Uploading..." : isEditing ? "Save Changes" : "Log Stitches"}
             </Button>
           </div>
         </DialogFooter>

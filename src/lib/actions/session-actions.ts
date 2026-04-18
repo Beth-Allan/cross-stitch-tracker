@@ -114,6 +114,13 @@ export async function updateSession(sessionId: string, formData: unknown) {
     const projectId = existing.project.id;
     const chartId = existing.project.chartId;
 
+    if (validated.projectId !== projectId) {
+      return {
+        success: false as const,
+        error: "Changing the project for an existing session is not supported",
+      };
+    }
+
     const session = await prisma.$transaction(async (tx) => {
       const updated = await tx.stitchSession.update({
         where: { id: sessionId },

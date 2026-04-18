@@ -157,10 +157,9 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
         ? unassignedFabrics
             .filter((f) => f.count === fabricCount)
             .map((f) => {
-              const fitsWidth =
-                f.shortestEdgeInches >= requiredWidth! || f.longestEdgeInches >= requiredWidth!;
-              const fitsHeight =
-                f.shortestEdgeInches >= requiredHeight! || f.longestEdgeInches >= requiredHeight!;
+              const reqShort = Math.min(requiredWidth!, requiredHeight!);
+              const reqLong = Math.max(requiredWidth!, requiredHeight!);
+              const fits = f.shortestEdgeInches >= reqShort && f.longestEdgeInches >= reqLong;
               return {
                 id: f.id,
                 name: f.name,
@@ -168,16 +167,17 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
                 count: f.count,
                 shortestEdgeInches: f.shortestEdgeInches,
                 longestEdgeInches: f.longestEdgeInches,
-                fitsWidth,
-                fitsHeight,
+                fitsWidth: fits,
+                fitsHeight: fits,
               };
             })
         : unassignedFabrics
             .map((f) => {
               const reqW = Math.round((c.stitchesWide / f.count + MARGIN_TOTAL) * 10) / 10;
               const reqH = Math.round((c.stitchesHigh / f.count + MARGIN_TOTAL) * 10) / 10;
-              const fitsWidth = f.shortestEdgeInches >= reqW || f.longestEdgeInches >= reqW;
-              const fitsHeight = f.shortestEdgeInches >= reqH || f.longestEdgeInches >= reqH;
+              const reqShort = Math.min(reqW, reqH);
+              const reqLong = Math.max(reqW, reqH);
+              const fits = f.shortestEdgeInches >= reqShort && f.longestEdgeInches >= reqLong;
               return {
                 id: f.id,
                 name: f.name,
@@ -185,8 +185,8 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
                 count: f.count,
                 shortestEdgeInches: f.shortestEdgeInches,
                 longestEdgeInches: f.longestEdgeInches,
-                fitsWidth,
-                fitsHeight,
+                fitsWidth: fits,
+                fitsHeight: fits,
               };
             })
             .filter((f) => f.fitsWidth || f.fitsHeight);

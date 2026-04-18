@@ -112,10 +112,9 @@ type FabricFilter = "needs" | "all";
 
 interface FabricRequirementsTabProps {
   rows: FabricRequirementRow[];
-  imageUrls: Record<string, string>;
 }
 
-export function FabricRequirementsTab({ rows, imageUrls: _imageUrls }: FabricRequirementsTabProps) {
+export function FabricRequirementsTab({ rows }: FabricRequirementsTabProps) {
   const [filter, setFilter] = useState<FabricFilter>("needs");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showSizeRef, setShowSizeRef] = useState<Set<string>>(new Set());

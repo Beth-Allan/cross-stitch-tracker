@@ -43,7 +43,7 @@ export default async function ChartsPage() {
       <PatternDiveTabs
         browseContent={<ProjectGallery charts={charts} imageUrls={imageUrls} hideHeader />}
         whatsNextContent={<WhatsNextTab projects={whatsNextProjects} imageUrls={imageUrls} />}
-        fabricContent={<FabricRequirementsTab rows={fabricRequirements} imageUrls={imageUrls} />}
+        fabricContent={<FabricRequirementsTab rows={fabricRequirements} />}
         storageContent={<StorageViewTab groups={storageGroups} imageUrls={imageUrls} />}
       />
     </div>
