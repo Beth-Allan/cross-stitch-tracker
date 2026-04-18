@@ -32,9 +32,7 @@ const WIP_STATUS = "IN_PROGRESS";
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function computeProgressPercent(stitchesCompleted: number, stitchCount: number): number {
-  return stitchCount > 0
-    ? Math.min(100, Math.round((stitchesCompleted / stitchCount) * 100))
-    : 0;
+  return stitchCount > 0 ? Math.min(100, Math.round((stitchesCompleted / stitchCount) * 100)) : 0;
 }
 
 function countDistinctSessionDays(sessions: Array<{ date: Date }>): number {
@@ -193,9 +191,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
 
       const startToFinishDays =
         p.startDate && p.finishDate
-          ? Math.ceil(
-              (p.finishDate.getTime() - p.startDate.getTime()) / (1000 * 60 * 60 * 24),
-            )
+          ? Math.ceil((p.finishDate.getTime() - p.startDate.getTime()) / (1000 * 60 * 60 * 24))
           : null;
 
       return {
@@ -204,9 +200,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
         projectName: p.chart.name,
         designerName: p.chart.designer?.name ?? null,
         coverThumbnailUrl: p.chart.coverThumbnailUrl,
-        fabricDescription: p.fabric
-          ? `${p.fabric.brand.name} ${p.fabric.name}`
-          : null,
+        fabricDescription: p.fabric ? `${p.fabric.brand.name} ${p.fabric.name}` : null,
         startDate: p.startDate,
         finishDate: p.finishDate,
         startToFinishDays,
@@ -215,10 +209,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
         threadCount: p.projectThreads.length,
         beadCount: p.projectBeads.length,
         specialtyCount: p.projectSpecialty.length,
-        avgDailyStitches:
-          stitchingDays > 0
-            ? Math.round(p.chart.stitchCount / stitchingDays)
-            : 0,
+        avgDailyStitches: stitchingDays > 0 ? Math.round(p.stitchesCompleted / stitchingDays) : 0,
         genres: p.chart.genres.map((g) => g.name),
       };
     })
