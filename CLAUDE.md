@@ -22,23 +22,22 @@
 
 ### In Progress
 
-Impeccable audit polish — `.planning/AUDIT-2026-04-16.md`
+Impeccable audit polish — `.planning/AUDIT-2026-04-16.md` — **ALL 6 PASSES COMPLETE**
 
 - Harden pass: ✅ complete (P0s + 4 P1s)
 - Dark theme polish: ✅ complete (all 6 items)
 - Optimize pass: ✅ complete (next/image LCP, useMemo, cache dedup)
-- **Adapt pass: ← START HERE** (1/5 done — session table mobile cards complete; remaining: supply table cards, whats-next mobile kitting, tab aria-labels, touch targets)
-- Harden ARIA pass: remaining (P2 — combobox roles, label associations, progressbar)
-- Distill pass: remaining (P2 — extract shared EmptyState/ErrorCard)
+- Adapt pass: ✅ complete (mobile cards, kitting badge, tab aria-labels, touch targets)
+- Harden ARIA pass: ✅ complete (combobox, progressbar, describedby, labels)
+- Distill pass: ✅ complete (EmptyState + ErrorCard extracted)
 
-All changes uncommitted on `main`. Build clean, 1031/1031 tests passing.
+All changes uncommitted on `main`. Build clean, 1050/1050 tests passing. Score: 10/20 → 16.5/20.
 
 ### Next Up
 
-1. Finish remaining audit passes (`/adapt`, `/harden`, `/distill`)
-2. Commit audit fixes
-3. `/gsd-new-milestone` — define v1.2 Track & Measure (requirements → roadmap)
-4. `/gsd-explore` — discuss user feedback items before v1.2 planning
+1. Commit all audit fixes (all 6 passes done, uncommitted on `main`)
+2. Phase 9 planning — next phase of v1.2 Track & Measure
+3. `/gsd-explore` — discuss user feedback items before next milestone
 
 ### Backlog
 

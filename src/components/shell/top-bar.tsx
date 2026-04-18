@@ -11,6 +11,7 @@ import { UserMenu } from "./user-menu";
 import { navigationSections, settingsItem } from "./nav-items";
 import { Logo } from "./logo";
 import { NavItemLink } from "./nav-item-link";
+import { ThemeToggle } from "./theme-toggle";
 import type { ActiveProjectForPicker } from "@/types/session";
 
 interface TopBarProps {
@@ -72,9 +73,10 @@ export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
                 ))}
               </div>
 
-              {/* Settings at bottom */}
-              <div className="border-sidebar-border border-t px-2 py-3">
+              {/* Settings + theme at bottom */}
+              <div className="border-sidebar-border space-y-0.5 border-t px-2 py-3">
                 <NavItemLink item={settingsItem} onClick={() => setSheetOpen(false)} />
+                <ThemeToggle />
               </div>
             </nav>
           </SheetContent>
@@ -89,7 +91,7 @@ export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
         <Button
           size="sm"
           onClick={() => setLogModalOpen(true)}
-          className="flex min-h-11 items-center gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 sm:min-h-0"
+          className="flex min-h-11 items-center gap-1.5 sm:min-h-0"
           aria-label="Log Stitches"
         >
           <Clock className="h-3.5 w-3.5" strokeWidth={2} />
@@ -100,9 +102,12 @@ export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
           variant="outline"
           size="sm"
           className="flex min-h-11 items-center gap-1.5 sm:min-h-0"
+          aria-label="Add Chart"
         >
           <Plus className="h-3.5 w-3.5" strokeWidth={2} />
-          <span className="hidden sm:inline">Add Chart</span>
+          <span className="hidden sm:inline" aria-hidden="true">
+            Add Chart
+          </span>
         </LinkButton>
 
         {/* User menu */}

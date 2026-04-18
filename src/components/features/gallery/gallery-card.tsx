@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -49,7 +50,14 @@ function WIPFooter({ card }: { card: GalleryCardData }) {
     <div className="flex flex-col gap-2">
       {/* Progress bar */}
       <div className="flex items-center gap-2.5">
-        <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
+        <div
+          className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full"
+          role="progressbar"
+          aria-valuenow={card.progressPercent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Stitching progress"
+        >
           <div
             className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400"
             style={{ width: `${card.progressPercent}%` }}
@@ -101,7 +109,14 @@ function FinishedFooter({ card }: { card: GalleryCardData }) {
     <div className="flex flex-col gap-2">
       {/* 100% progress bar */}
       <div className="flex items-center gap-2.5">
-        <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
+        <div
+          className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full"
+          role="progressbar"
+          aria-valuenow={100}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Stitching progress"
+        >
           <div
             className={`h-full w-full rounded-full ${
               isFFO ? "bg-rose-500 dark:bg-rose-400" : "bg-violet-500 dark:bg-violet-400"
@@ -152,13 +167,13 @@ export function GalleryCard({ card }: GalleryCardProps) {
       {/* Cover image area */}
       <div className="relative aspect-[4/3] overflow-hidden">
         {hasRealImage ? (
-          <img
+          <Image
             src={card.coverImageUrl!}
             alt={card.name}
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
             onError={() => setImgFailed(true)}
+            unoptimized
           />
         ) : (
           <CoverPlaceholder status={card.status} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ProjectDetailHero } from "./project-detail-hero";
 import { ProjectTabs } from "./project-tabs";
@@ -49,11 +49,15 @@ export function ProjectDetailPage({
 
   // Build chart data with current status for overview tab section ordering
   // Narrow overCount from Prisma's `number` to the domain-valid `1 | 2` at this boundary
-  const project = chart.project
-    ? { ...chart.project, status: currentStatus, overCount: chart.project.overCount as 1 | 2 }
-    : null;
+  const project = useMemo(
+    () =>
+      chart.project
+        ? { ...chart.project, status: currentStatus, overCount: chart.project.overCount as 1 | 2 }
+        : null,
+    [chart.project, currentStatus],
+  );
 
-  const chartWithCurrentStatus = { ...chart, project };
+  const chartWithCurrentStatus = useMemo(() => ({ ...chart, project }), [chart, project]);
 
   return (
     <div className="space-y-6">

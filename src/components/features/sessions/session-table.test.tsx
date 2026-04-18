@@ -51,20 +51,18 @@ describe("SessionTable", () => {
   it("renders all session rows with date, stitch count, time, and photo columns", () => {
     render(<SessionTable {...defaultProps} />);
 
-    // Check dates are rendered
-    expect(screen.getByText("Mar 19, 2026")).toBeInTheDocument();
-    expect(screen.getByText("Mar 18, 2026")).toBeInTheDocument();
-    expect(screen.getByText("Mar 16, 2026")).toBeInTheDocument();
+    // Each value appears twice: once in table, once in mobile cards
+    expect(screen.getAllByText("Mar 19, 2026")).toHaveLength(2);
+    expect(screen.getAllByText("Mar 18, 2026")).toHaveLength(2);
+    expect(screen.getAllByText("Mar 16, 2026")).toHaveLength(2);
 
-    // Check stitch counts
-    expect(screen.getByText("423")).toBeInTheDocument();
-    expect(screen.getByText("512")).toBeInTheDocument();
-    expect(screen.getByText("380")).toBeInTheDocument();
+    expect(screen.getAllByText("423")).toHaveLength(1); // table only (mobile shows "423 stitches")
+    expect(screen.getAllByText("512")).toHaveLength(1);
+    expect(screen.getAllByText("380")).toHaveLength(1);
 
-    // Check time
-    expect(screen.getByText("1h 15m")).toBeInTheDocument();
-    expect(screen.getByText("1h 30m")).toBeInTheDocument();
-    expect(screen.getByText("1h 5m")).toBeInTheDocument();
+    expect(screen.getAllByText("1h 15m")).toHaveLength(2);
+    expect(screen.getAllByText("1h 30m")).toHaveLength(2);
+    expect(screen.getAllByText("1h 5m")).toHaveLength(2);
   });
 
   it("sorts by date desc by default", () => {
@@ -103,14 +101,21 @@ describe("SessionTable", () => {
     expect(cells[1].textContent).toContain("512");
   });
 
-  it("pencil icon has opacity-0 by default (hover reveals)", () => {
+  it("desktop table edit buttons have md:opacity-0 (hover reveals)", () => {
     render(<SessionTable {...defaultProps} />);
 
-    const editButtons = screen.getAllByTitle("Edit session");
-    expect(editButtons).toHaveLength(3);
-    editButtons.forEach((btn) => {
-      expect(btn.className).toContain("opacity-0");
-    });
+    const editButtons = screen.getAllByLabelText("Edit session");
+    // 3 in desktop table + 3 in mobile cards = 6
+    expect(editButtons).toHaveLength(6);
+    const desktopButtons = editButtons.filter((btn) => btn.className.includes("md:opacity-0"));
+    expect(desktopButtons).toHaveLength(3);
+  });
+
+  it("renders mobile card view with session data", () => {
+    render(<SessionTable {...defaultProps} />);
+
+    const mobileCards = document.querySelectorAll(".md\\:hidden > div");
+    expect(mobileCards).toHaveLength(3);
   });
 
   it("shows camera icon for rows with photoKey", () => {
@@ -140,8 +145,8 @@ describe("SessionTable", () => {
 
     // Should show a "PROJECT" column header
     expect(screen.getByRole("columnheader", { name: /project/i })).toBeInTheDocument();
-    // Should show project name in cells
-    expect(screen.getAllByText("Autumn Sampler")).toHaveLength(3);
+    // Should show project name in cells (3 table + 3 mobile cards)
+    expect(screen.getAllByText("Autumn Sampler")).toHaveLength(6);
   });
 
   it("does not render project name column by default", () => {
@@ -154,7 +159,7 @@ describe("SessionTable", () => {
     const sessions = [createSession({ id: "s-null", timeSpentMinutes: null })];
     render(<SessionTable sessions={sessions} imageUrls={{}} />);
 
-    // em-dash for null time
-    expect(screen.getByText("\u2014")).toBeInTheDocument();
+    // em-dash for null time — appears in both table and mobile card
+    expect(screen.getAllByText("\u2014")).toHaveLength(2);
   });
 });

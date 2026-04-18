@@ -57,7 +57,15 @@ function SortHeader({
   return (
     <th
       role="columnheader"
+      aria-sort={isActive ? (activeDir === "asc" ? "ascending" : "descending") : undefined}
       onClick={() => onSort(field)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSort(field);
+        }
+      }}
+      tabIndex={0}
       className={`cursor-pointer px-4 py-3 text-xs font-semibold tracking-wider uppercase select-none ${
         align === "right" ? "text-right" : "text-left"
       } text-muted-foreground`}
@@ -74,7 +82,7 @@ function SortHeader({
 
 export function SessionTable({
   sessions,
-  imageUrls,
+  imageUrls: _imageUrls,
   showProjectName = false,
   onEditSession,
 }: SessionTableProps) {
@@ -118,86 +126,133 @@ export function SessionTable({
   }
 
   return (
-    <div className="bg-card border-border overflow-x-auto rounded-xl border">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-border border-b">
-            <SortHeader
-              field="date"
-              label="Date"
-              activeField={sort.field}
-              activeDir={sort.dir}
-              onSort={handleSort}
-            />
-            {showProjectName && (
+    <>
+      {/* Desktop table — hidden on mobile */}
+      <div className="bg-card border-border hidden overflow-x-auto rounded-xl border md:block">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-border border-b">
+              <SortHeader
+                field="date"
+                label="Date"
+                activeField={sort.field}
+                activeDir={sort.dir}
+                onSort={handleSort}
+              />
+              {showProjectName && (
+                <th
+                  role="columnheader"
+                  className="text-muted-foreground px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+                >
+                  Project
+                </th>
+              )}
+              <SortHeader
+                field="stitches"
+                label="Stitches"
+                activeField={sort.field}
+                activeDir={sort.dir}
+                onSort={handleSort}
+              />
+              <SortHeader
+                field="time"
+                label="Time"
+                activeField={sort.field}
+                activeDir={sort.dir}
+                onSort={handleSort}
+              />
               <th
                 role="columnheader"
-                className="text-muted-foreground px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+                className="text-muted-foreground w-10 px-4 py-3"
+                aria-label="Photo"
               >
-                Project
+                <Camera className="size-3.5" />
               </th>
-            )}
-            <SortHeader
-              field="stitches"
-              label="Stitches"
-              activeField={sort.field}
-              activeDir={sort.dir}
-              onSort={handleSort}
-            />
-            <SortHeader
-              field="time"
-              label="Time"
-              activeField={sort.field}
-              activeDir={sort.dir}
-              onSort={handleSort}
-            />
-            <th
-              role="columnheader"
-              className="text-muted-foreground w-10 px-4 py-3"
-              aria-label="Photo"
-            >
-              <Camera className="size-3.5" />
-            </th>
-            <th className="w-10" aria-label="Actions" />
-          </tr>
-        </thead>
-        <tbody>
-          {sortedSessions.map((session) => (
-            <tr
-              key={session.id}
-              className="group border-border/50 hover:bg-muted/50 border-b transition-colors last:border-b-0"
-            >
-              <td className="text-foreground px-4 py-3 whitespace-nowrap tabular-nums">
-                {formatDate(session.date)}
-              </td>
-              {showProjectName && (
-                <td className="text-foreground px-4 py-3">{session.projectName}</td>
-              )}
-              <td className="text-foreground px-4 py-3 whitespace-nowrap tabular-nums">
-                {session.stitchCount.toLocaleString()}
-              </td>
-              <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">
-                {session.timeSpentMinutes != null ? formatTime(session.timeSpentMinutes) : "\u2014"}
-              </td>
-              <td className="px-4 py-3">
-                {session.photoKey && (
-                  <Camera className="size-3.5 text-emerald-500" strokeWidth={1.5} />
-                )}
-              </td>
-              <td className="px-4 py-3">
-                <button
-                  type="button"
-                  onClick={() => onEditSession?.(session)}
-                  className="hover:bg-muted text-muted-foreground rounded-md p-1.5 opacity-0 transition-all group-hover:opacity-100"
-                  title="Edit session"
-                >
-                  <Pencil className="size-3.5" strokeWidth={1.5} />
-                </button>
-              </td>
+              <th className="w-10" aria-label="Actions" />
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {sortedSessions.map((session) => (
+              <tr
+                key={session.id}
+                className="group border-border/50 hover:bg-muted/50 border-b transition-colors last:border-b-0"
+              >
+                <td className="text-foreground px-4 py-3 whitespace-nowrap tabular-nums">
+                  {formatDate(session.date)}
+                </td>
+                {showProjectName && (
+                  <td className="text-foreground px-4 py-3">{session.projectName}</td>
+                )}
+                <td className="text-foreground px-4 py-3 whitespace-nowrap tabular-nums">
+                  {session.stitchCount.toLocaleString()}
+                </td>
+                <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">
+                  {session.timeSpentMinutes != null
+                    ? formatTime(session.timeSpentMinutes)
+                    : "\u2014"}
+                </td>
+                <td className="px-4 py-3">
+                  {session.photoKey && (
+                    <Camera className="size-3.5 text-emerald-500" strokeWidth={1.5} />
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  <button
+                    type="button"
+                    onClick={() => onEditSession?.(session)}
+                    className="hover:bg-muted text-muted-foreground flex min-h-11 min-w-11 items-center justify-center rounded-md p-1.5 transition-all md:opacity-0 md:group-hover:opacity-100"
+                    aria-label="Edit session"
+                  >
+                    <Pencil className="size-3.5" strokeWidth={1.5} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile cards — hidden on md+ */}
+      <div className="flex flex-col gap-2 md:hidden">
+        {sortedSessions.map((session) => (
+          <div
+            key={session.id}
+            className="bg-card border-border flex items-center gap-3 rounded-xl border px-4 py-3"
+          >
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-foreground text-sm font-medium tabular-nums">
+                  {formatDate(session.date)}
+                </span>
+                {session.photoKey && (
+                  <Camera className="size-3 text-emerald-500" strokeWidth={1.5} />
+                )}
+              </div>
+              {showProjectName && session.projectName && (
+                <p className="text-muted-foreground mt-0.5 truncate text-xs">
+                  {session.projectName}
+                </p>
+              )}
+              <div className="text-muted-foreground mt-1 flex items-center gap-3 text-xs tabular-nums">
+                <span>{session.stitchCount.toLocaleString()} stitches</span>
+                <span>
+                  {session.timeSpentMinutes != null
+                    ? formatTime(session.timeSpentMinutes)
+                    : "\u2014"}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => onEditSession?.(session)}
+              className="hover:bg-muted text-muted-foreground flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md transition-colors"
+              aria-label="Edit session"
+            >
+              <Pencil className="size-4" strokeWidth={1.5} />
+            </button>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

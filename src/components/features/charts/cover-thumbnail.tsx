@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import NextImage from "next/image";
 import { Image as ImageIcon } from "lucide-react";
 
 interface CoverThumbnailProps {
@@ -13,12 +14,14 @@ export function CoverThumbnail({ url, name }: CoverThumbnailProps) {
 
   if (url && !imgError) {
     return (
-      /* eslint-disable-next-line @next/next/no-img-element */
-      <img
+      <NextImage
         src={url}
         alt={`Cover for ${name}`}
+        width={40}
+        height={40}
         className="h-10 w-10 shrink-0 rounded-lg object-cover"
         onError={() => setImgError(true)}
+        unoptimized
       />
     );
   }

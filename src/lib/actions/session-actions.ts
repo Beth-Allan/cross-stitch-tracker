@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
@@ -264,8 +265,10 @@ export async function getAllSessions() {
 }
 
 // ─── getActiveProjectsForPicker ─────────────────────────────────────────────
+// Wrapped with React cache() to deduplicate within a single request
+// (layout.tsx + page.tsx both call this — cache ensures only one DB query)
 
-export async function getActiveProjectsForPicker() {
+export const getActiveProjectsForPicker = cache(async function getActiveProjectsForPicker() {
   const user = await requireAuth();
 
   try {
@@ -297,7 +300,7 @@ export async function getActiveProjectsForPicker() {
     console.error("getActiveProjectsForPicker error:", error);
     return { success: false as const, error: "Failed to load projects" };
   }
-}
+});
 
 // ─── getProjectSessionStats ─────────────────────────────────────────────────
 

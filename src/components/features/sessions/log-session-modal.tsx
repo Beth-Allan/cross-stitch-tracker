@@ -501,7 +501,7 @@ export function LogSessionModal({
             <Button
               onClick={handleSave}
               disabled={!isValid || isPending}
-              className="bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-40"
+              className="disabled:opacity-40"
             >
               {isEditing ? "Save Changes" : "Log Stitches"}
             </Button>

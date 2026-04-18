@@ -6,25 +6,14 @@ import { MapPin, ChevronDown, Layers, Scissors } from "lucide-react";
 import type { StorageGroup, StorageGroupItem } from "@/types/session";
 import type { ProjectStatus } from "@/generated/prisma/client";
 import { StatusBadge } from "@/components/features/charts/status-badge";
+import { STATUS_GRADIENT_CLASSES } from "@/components/features/gallery/gallery-utils";
 
 // ─── Status gradient placeholders ───────────────────────────────────────────
 
-const statusGradients: Record<ProjectStatus, [string, string]> = {
-  UNSTARTED: ["#e7e5e4", "#d6d3d1"],
-  KITTING: ["#fef3c7", "#fde68a"],
-  KITTED: ["#d1fae5", "#a7f3d0"],
-  IN_PROGRESS: ["#e0f2fe", "#bae6fd"],
-  ON_HOLD: ["#ffedd5", "#fed7aa"],
-  FINISHED: ["#ede9fe", "#ddd6fe"],
-  FFO: ["#ffe4e6", "#fecdd3"],
-};
-
 function CoverPlaceholder({ status }: { status: ProjectStatus }) {
-  const [from, to] = statusGradients[status] ?? statusGradients.UNSTARTED;
   return (
     <div
-      className="flex h-full w-full items-center justify-center"
-      style={{ background: `linear-gradient(160deg, ${from} 0%, ${to} 100%)` }}
+      className={`flex h-full w-full items-center justify-center ${STATUS_GRADIENT_CLASSES[status] ?? STATUS_GRADIENT_CLASSES.UNSTARTED}`}
     >
       <Scissors className="h-4 w-4 text-stone-400/25" strokeWidth={1} />
     </div>
@@ -87,7 +76,7 @@ function StorageItem({
       {isProject ? (
         <Link
           href={`/charts/${item.id}`}
-          className="min-w-0 flex-1 truncate text-left text-sm text-emerald-700 underline decoration-emerald-300 underline-offset-2 transition-colors hover:text-emerald-800"
+          className="min-w-0 flex-1 truncate text-left text-sm text-emerald-700 underline decoration-emerald-300 underline-offset-2 transition-colors hover:text-emerald-800 dark:text-emerald-400 dark:decoration-emerald-700 dark:hover:text-emerald-300"
         >
           {item.name}
         </Link>

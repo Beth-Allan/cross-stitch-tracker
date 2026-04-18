@@ -43,7 +43,7 @@ export function PatternDiveTabs({
     <Tabs value={tab} onValueChange={(val) => setTab(val as PatternDiveTab)}>
       <TabsList variant="line">
         {TAB_CONFIG.map(({ value, label, icon: Icon }) => (
-          <TabsTrigger key={value} value={value} className="min-h-11 gap-1.5">
+          <TabsTrigger key={value} value={value} className="min-h-11 gap-1.5" aria-label={label}>
             <Icon className="h-4 w-4" />
             <span className="hidden sm:inline">{label}</span>
           </TabsTrigger>

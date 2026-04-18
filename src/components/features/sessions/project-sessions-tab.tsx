@@ -99,7 +99,7 @@ export function ProjectSessionsTab({
       <div className="py-12 text-center">
         <p className="text-muted-foreground text-sm">No sessions logged for this project yet.</p>
         <div className="mt-4">
-          <Button onClick={handleOpenLog} className="bg-emerald-600 hover:bg-emerald-700">
+          <Button onClick={handleOpenLog}>
             <Plus className="mr-1.5 size-4" />
             Log Session
           </Button>
@@ -156,7 +156,7 @@ export function ProjectSessionsTab({
         <p className="text-muted-foreground text-sm">
           {sessions.length} session{sessions.length !== 1 ? "s" : ""} logged
         </p>
-        <Button onClick={handleOpenLog} className="bg-emerald-600 hover:bg-emerald-700" size="sm">
+        <Button onClick={handleOpenLog} size="sm" className="min-h-11 md:min-h-0">
           <Plus className="mr-1.5 size-3.5" />
           Log Session
         </Button>

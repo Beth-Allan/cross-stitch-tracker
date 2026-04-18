@@ -353,6 +353,7 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
       <div className="flex items-center justify-end gap-1">
         <button
           onClick={() => setSortOption("added")}
+          aria-pressed={sortOption === "added"}
           className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
             sortOption === "added"
               ? "bg-primary text-primary-foreground"
@@ -363,6 +364,7 @@ export function SuppliesTab({ chartId, project, supplies }: SuppliesTabProps) {
         </button>
         <button
           onClick={() => setSortOption("alpha")}
+          aria-pressed={sortOption === "alpha"}
           className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
             sortOption === "alpha"
               ? "bg-primary text-primary-foreground"

@@ -13,6 +13,7 @@ import {
   FileText,
 } from "lucide-react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { SizeBadge } from "@/components/features/charts/size-badge";
 import { GenreFormModal } from "./genre-form-modal";
@@ -200,10 +201,7 @@ export function GenreDetail({ genre }: GenreDetailProps) {
             ))}
           </div>
         ) : (
-          <div className="py-12 text-center">
-            <FileText className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
-            <p className="text-muted-foreground text-sm">No charts tagged with this genre</p>
-          </div>
+          <EmptyState icon={FileText} title="No charts tagged with this genre" />
         )}
       </div>
 

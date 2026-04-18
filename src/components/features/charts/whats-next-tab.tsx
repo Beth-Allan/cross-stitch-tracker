@@ -1,30 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Star, ArrowUpDown, Scissors } from "lucide-react";
 import type { WhatsNextProject } from "@/types/session";
 import type { ProjectStatus } from "@/generated/prisma/client";
 import { StatusBadge } from "@/components/features/charts/status-badge";
+import { STATUS_GRADIENT_CLASSES } from "@/components/features/gallery/gallery-utils";
 
 // ─── Status gradient placeholders ───────────────────────────────────────────
 
-const statusGradients: Record<ProjectStatus, [string, string]> = {
-  UNSTARTED: ["#e7e5e4", "#d6d3d1"],
-  KITTING: ["#fef3c7", "#fde68a"],
-  KITTED: ["#d1fae5", "#a7f3d0"],
-  IN_PROGRESS: ["#e0f2fe", "#bae6fd"],
-  ON_HOLD: ["#ffedd5", "#fed7aa"],
-  FINISHED: ["#ede9fe", "#ddd6fe"],
-  FFO: ["#ffe4e6", "#fecdd3"],
-};
-
 function CoverPlaceholder({ status }: { status: ProjectStatus }) {
-  const [from, to] = statusGradients[status] ?? statusGradients.UNSTARTED;
   return (
     <div
-      className="flex h-full w-full items-center justify-center"
-      style={{ background: `linear-gradient(160deg, ${from} 0%, ${to} 100%)` }}
+      className={`flex h-full w-full items-center justify-center ${STATUS_GRADIENT_CLASSES[status] ?? STATUS_GRADIENT_CLASSES.UNSTARTED}`}
     >
       <Scissors className="h-5 w-5 text-stone-400/25" strokeWidth={1} />
     </div>
@@ -79,7 +68,7 @@ interface WhatsNextTabProps {
 
 export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
   const [sort, setSort] = useState<WhatsNextSort>("kitting");
-  const sorted = sortProjects(projects, sort);
+  const sorted = useMemo(() => sortProjects(projects, sort), [projects, sort]);
 
   if (projects.length === 0) {
     return (
@@ -125,7 +114,7 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
             <Link
               key={project.chartId}
               href={`/charts/${project.chartId}`}
-              className="group border-border bg-card flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-all duration-200 hover:border-emerald-200 hover:shadow-sm"
+              className="group border-border bg-card flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-all duration-200 hover:border-emerald-200 hover:shadow-sm dark:hover:border-emerald-800"
             >
               {/* Priority / star indicator */}
               <div className="w-8 shrink-0 text-center">
@@ -156,7 +145,7 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
 
               {/* Info */}
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <p className="font-heading text-foreground truncate text-sm font-semibold transition-colors group-hover:text-emerald-700">
+                <p className="font-heading text-foreground truncate text-sm font-semibold transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
                   {project.chartName}
                 </p>
                 <p className="text-muted-foreground truncate text-xs">{project.designerName}</p>
@@ -165,7 +154,18 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
                 </p>
               </div>
 
-              {/* Kitting progress bar */}
+              {/* Kitting progress — compact badge on mobile, full bar on desktop */}
+              <div className="shrink-0 md:hidden">
+                <span
+                  className={`inline-block rounded-full px-2 py-0.5 font-mono text-xs font-medium tabular-nums ${
+                    project.kittingPercent === 100
+                      ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+                      : "bg-amber-400/10 text-amber-600 dark:bg-amber-400/20 dark:text-amber-400"
+                  }`}
+                >
+                  {project.kittingPercent}%
+                </span>
+              </div>
               <div className="hidden w-[120px] shrink-0 md:block">
                 <div className="flex items-center gap-2">
                   <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">

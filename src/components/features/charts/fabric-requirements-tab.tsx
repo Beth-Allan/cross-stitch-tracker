@@ -94,7 +94,7 @@ function SizeReferenceTable({
                 <td className="text-muted-foreground py-2 text-right tabular-nums">
                   {designW.toFixed(1)}&quot; x {designH.toFixed(1)}&quot;
                 </td>
-                <td className="py-2 text-right font-medium text-emerald-700 tabular-nums">
+                <td className="py-2 text-right font-medium text-emerald-700 tabular-nums dark:text-emerald-400">
                   {totalW.toFixed(1)}&quot; x {totalH.toFixed(1)}&quot;
                 </td>
               </tr>
@@ -115,7 +115,7 @@ interface FabricRequirementsTabProps {
   imageUrls: Record<string, string>;
 }
 
-export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTabProps) {
+export function FabricRequirementsTab({ rows, imageUrls: _imageUrls }: FabricRequirementsTabProps) {
   const [filter, setFilter] = useState<FabricFilter>("needs");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showSizeRef, setShowSizeRef] = useState<Set<string>>(new Set());
@@ -154,13 +154,16 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
   return (
     <div className="flex flex-col gap-5">
       {/* Info banner */}
-      <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <Info className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+      <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/40">
+        <Info
+          className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
+          strokeWidth={2}
+        />
         <div>
-          <p className="text-sm text-emerald-800">
+          <p className="text-sm text-emerald-800 dark:text-emerald-200">
             All sizes include <strong>3&quot; margins</strong> on each side for framing allowance.
           </p>
-          <p className="mt-1 text-xs text-emerald-600">
+          <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">
             Formula: (stitch count / fabric count) + 6&quot; per dimension
           </p>
         </div>
@@ -176,7 +179,7 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
               onClick={() => setFilter(f)}
               className={`cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                 filter === f
-                  ? "bg-emerald-100 text-emerald-700"
+                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
                   : "text-muted-foreground hover:bg-muted"
               }`}
             >
@@ -246,8 +249,8 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs ${
                           fabricFits(row)
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "bg-amber-50 text-amber-700"
+                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
+                            : "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
                         }`}
                       >
                         {fabricFits(row) ? "Fabric fits" : "Fabric too small"}
@@ -286,7 +289,7 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                                 key={fabric.id}
                                 className={`flex items-center gap-3 rounded-lg border p-3 transition-colors ${
                                   isAssigned
-                                    ? "border-emerald-300 bg-emerald-50/50"
+                                    ? "border-emerald-300 bg-emerald-50/50 dark:border-emerald-700 dark:bg-emerald-950/30"
                                     : "border-border bg-muted/30"
                                 }`}
                               >
@@ -314,7 +317,7 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                                 </div>
 
                                 {isAssigned ? (
-                                  <span className="shrink-0 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
+                                  <span className="shrink-0 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
                                     Assigned
                                   </span>
                                 ) : (
@@ -325,7 +328,7 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                                       e.stopPropagation();
                                       handleAssign(fabric.id, row.projectId);
                                     }}
-                                    className="shrink-0 cursor-pointer rounded-full border border-emerald-300 px-3 py-1 text-xs font-medium text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-50"
+                                    className="shrink-0 cursor-pointer rounded-full border border-emerald-300 px-3 py-1 text-xs font-medium text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-950/40"
                                   >
                                     Assign
                                   </button>
@@ -377,7 +380,7 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                     {/* Link to project */}
                     <Link
                       href={`/charts/${row.chartId}`}
-                      className="mt-4 inline-block text-sm text-emerald-700 underline decoration-emerald-300 underline-offset-2 transition-colors hover:text-emerald-800"
+                      className="mt-4 inline-block text-sm text-emerald-700 underline decoration-emerald-300 underline-offset-2 transition-colors hover:text-emerald-800 dark:text-emerald-400 dark:decoration-emerald-700 dark:hover:text-emerald-300"
                     >
                       View project details &rarr;
                     </Link>

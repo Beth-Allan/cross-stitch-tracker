@@ -100,9 +100,9 @@ describe("ProjectSessionsTab", () => {
   it("renders SessionTable with sessions data", () => {
     render(<ProjectSessionsTab {...defaultProps} />);
 
-    // Table should show session dates
-    expect(screen.getByText("Mar 19, 2026")).toBeInTheDocument();
-    expect(screen.getByText("Mar 18, 2026")).toBeInTheDocument();
+    // Session dates appear in both desktop table and mobile cards
+    expect(screen.getAllByText("Mar 19, 2026").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Mar 18, 2026").length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders Log Session button", () => {

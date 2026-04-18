@@ -68,7 +68,12 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setEditModalOpen(true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="min-h-11 md:min-h-0"
+            onClick={() => setEditModalOpen(true)}
+          >
             <Pencil className="h-3.5 w-3.5" data-icon="inline-start" />
             Edit
           </Button>
@@ -76,7 +81,7 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
             variant="outline"
             size="sm"
             onClick={() => setDeleteDialogOpen(true)}
-            className="text-destructive hover:text-destructive"
+            className="text-destructive hover:text-destructive min-h-11 md:min-h-0"
           >
             <Trash2 className="h-3.5 w-3.5" data-icon="inline-start" />
             Delete
