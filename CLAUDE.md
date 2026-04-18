@@ -4,7 +4,7 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** v1.2 Track & Measure (Phase 8 complete, Phase 9 in progress)
+**Milestone:** v1.2 Track & Measure (Phase 8 complete, Phase 9 planned)
 **Last Updated:** 2026-04-17
 **Roadmap:** 4 milestones / 11 phases — v1.0 + v1.1 shipped, v1.2 active (phases 8-9)
 
@@ -23,11 +23,11 @@
 
 ### In Progress
 
-Phase 9 context gathered + UI-SPEC approved (6/6 dimensions passed). Ready for planning.
+Phase 9 planned — 9 plans across 4 waves. Ready for execution.
 
 ### Next Up
 
-1. Phase 9 planning — `/clear` then `/gsd-plan-phase 9`
+1. Phase 9 execution — `/clear` then `/gsd-execute-phase 9`
 2. `/gsd-explore` — discuss user feedback items before next milestone
 
 ### Backlog
