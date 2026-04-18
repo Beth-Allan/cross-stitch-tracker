@@ -57,6 +57,15 @@ describe("sessionFormSchema", () => {
     );
   });
 
+  it("rejects future dates", () => {
+    const futureDate = new Date();
+    futureDate.setFullYear(futureDate.getFullYear() + 1);
+    const futureDateStr = futureDate.toISOString().split("T")[0];
+    expect(() => sessionFormSchema.parse({ ...validInput, date: futureDateStr })).toThrow(
+      "Date cannot be in the future",
+    );
+  });
+
   it("rejects negative timeSpentMinutes", () => {
     expect(() => sessionFormSchema.parse({ ...validInput, timeSpentMinutes: -1 })).toThrow(
       "Time cannot be negative",

@@ -352,6 +352,7 @@ export function LogSessionModal({
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              max={todayString()}
             />
             <p className="text-muted-foreground mt-1 text-sm">
               Defaults to today. Change to backfill older sessions.

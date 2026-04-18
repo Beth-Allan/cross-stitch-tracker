@@ -2,7 +2,10 @@ import { z } from "zod";
 
 export const sessionFormSchema = z.object({
   projectId: z.string().trim().min(1, "Project is required"),
-  date: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date" }),
+  date: z
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date" })
+    .refine((val) => new Date(val) <= new Date(), { message: "Date cannot be in the future" }),
   stitchCount: z
     .number()
     .int("Stitch count must be a whole number")
