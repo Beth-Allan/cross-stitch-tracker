@@ -4,9 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { FinishedTab } from "./finished-tab";
 import type { FinishedProjectData } from "@/types/dashboard";
 
-function createMockFinishedProject(
-  overrides?: Partial<FinishedProjectData>,
-): FinishedProjectData {
+function createMockFinishedProject(overrides?: Partial<FinishedProjectData>): FinishedProjectData {
   return {
     projectId: "fp1",
     chartId: "fc1",
@@ -74,7 +72,7 @@ describe("FinishedTab", () => {
     expect(searchInput).toBeInTheDocument();
   });
 
-  it('shows empty state when no finished projects', () => {
+  it("shows empty state when no finished projects", () => {
     render(<FinishedTab projects={[]} imageUrls={{}} />);
 
     expect(
@@ -89,19 +87,15 @@ describe("FinishedTab", () => {
     const searchInput = screen.getByPlaceholderText(/search finished/i);
     await user.type(searchInput, "zzz nonexistent project");
 
-    expect(
-      screen.getByText("No finished projects match your search."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("No finished projects match your search.")).toBeInTheDocument();
   });
 
   it("renders aggregate stat cards above project list", () => {
-    const { container } = render(
-      <FinishedTab projects={mockProjects} imageUrls={{}} />,
-    );
+    const { container } = render(<FinishedTab projects={mockProjects} imageUrls={{}} />);
 
-    // Aggregate stat cards should have violet-50 styling
-    const violetCards = container.querySelectorAll("[class*='bg-violet-50']");
-    expect(violetCards.length).toBeGreaterThan(0);
+    // Aggregate stat cards should have emerald-50 styling
+    const emeraldCards = container.querySelectorAll("[class*='bg-emerald-50']");
+    expect(emeraldCards.length).toBeGreaterThan(0);
 
     // Should show aggregate labels
     expect(screen.getByText("Projects Finished")).toBeInTheDocument();

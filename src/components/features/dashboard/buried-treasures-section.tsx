@@ -50,7 +50,7 @@ export function BuriedTreasuresSection({ treasures, imageUrls }: BuriedTreasures
               </div>
 
               {/* Thumbnail */}
-              <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg">
+              <div className="bg-muted h-12 w-12 shrink-0 overflow-hidden rounded-lg">
                 {imgUrl ? (
                   <img
                     src={imgUrl}

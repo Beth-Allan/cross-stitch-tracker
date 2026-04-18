@@ -57,12 +57,12 @@ export function CollectionStatsSidebar({ stats }: CollectionStatsSidebarProps) {
       </button>
 
       {/* Desktop: always-visible heading */}
-      <h3 className="text-foreground mb-4 text-[11px] font-bold tracking-wider uppercase max-md:hidden">
+      <h3 className="text-foreground mb-4 hidden text-[11px] font-bold tracking-wider uppercase md:block">
         Collection Stats
       </h3>
 
       {/* Desktop stat rows */}
-      <div className="flex flex-col gap-3.5 max-md:hidden">
+      <div className="hidden flex-col gap-3.5 md:flex">
         {STAT_ROWS.map((row) => (
           <div key={row.key} className="flex items-center gap-2.5">
             <row.icon className={`h-4 w-4 shrink-0 ${row.color}`} strokeWidth={1.5} />

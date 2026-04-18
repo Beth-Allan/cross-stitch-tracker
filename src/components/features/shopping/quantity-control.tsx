@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -8,15 +8,31 @@ interface QuantityControlProps {
   acquired: number;
   required: number;
   isPending: boolean;
+  hasError?: boolean;
   onChange: (newValue: number) => void;
 }
 
-export function QuantityControl({ acquired, required, isPending, onChange }: QuantityControlProps) {
+export function QuantityControl({
+  acquired,
+  required,
+  isPending,
+  hasError = false,
+  onChange,
+}: QuantityControlProps) {
   const isFulfilled = acquired >= required;
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState("");
+  const [shaking, setShaking] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const cancelledRef = useRef(false);
+
+  useEffect(() => {
+    if (hasError) {
+      setShaking(true);
+      const timer = setTimeout(() => setShaking(false), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [hasError]);
 
   function startEditing() {
     if (isPending) return;
@@ -45,6 +61,8 @@ export function QuantityControl({ acquired, required, isPending, onChange }: Qua
       className={cn(
         "inline-flex items-center gap-1",
         isFulfilled && "rounded-lg bg-emerald-100 px-2 dark:bg-emerald-900/30",
+        hasError && "rounded-lg ring-2 ring-red-300 dark:ring-red-700",
+        shaking && "animate-shake",
       )}
     >
       <button
@@ -87,10 +105,10 @@ export function QuantityControl({ acquired, required, isPending, onChange }: Qua
           onClick={startEditing}
           disabled={isPending}
           className={cn(
-            "min-w-[3ch] rounded px-1.5 py-0.5 text-center font-mono text-sm tabular-nums transition-colors",
+            "min-w-[3ch] rounded border border-transparent px-1.5 py-0.5 text-center font-mono text-sm tabular-nums transition-all",
             isFulfilled
-              ? "text-emerald-700 dark:text-emerald-300"
-              : "text-foreground hover:bg-muted",
+              ? "text-emerald-700 hover:border-emerald-300 dark:text-emerald-300 dark:hover:border-emerald-700"
+              : "text-foreground hover:border-border hover:bg-muted",
           )}
           aria-label={`${acquired} of ${required} acquired, click to edit`}
         >

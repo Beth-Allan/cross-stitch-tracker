@@ -103,9 +103,9 @@ export function FinishedTab({ projects, imageUrls }: FinishedTabProps) {
 
       {/* Search + sort */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="relative min-w-[200px] max-w-[320px] flex-1">
+        <div className="relative max-w-[320px] min-w-[200px] flex-1">
           <Search
-            className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
             strokeWidth={1.5}
           />
           <input
@@ -116,15 +116,15 @@ export function FinishedTab({ projects, imageUrls }: FinishedTabProps) {
               setVisibleCount(ITEMS_PER_PAGE);
             }}
             placeholder="Search finished projects..."
-            className="w-full rounded-lg border border-border bg-card py-1.5 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground"
+            className="border-border bg-card text-foreground placeholder:text-muted-foreground w-full rounded-lg border py-1.5 pr-3 pl-9 text-sm"
           />
         </div>
         <div className="flex items-center gap-2">
-          <ArrowUpDown className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+          <ArrowUpDown className="text-muted-foreground h-4 w-4" strokeWidth={1.5} />
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as FinishedSortOption)}
-            className="cursor-pointer rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground"
+            className="border-border bg-card text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm"
           >
             {SORT_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -137,7 +137,7 @@ export function FinishedTab({ projects, imageUrls }: FinishedTabProps) {
 
       {/* Project list or empty state */}
       {filtered.length === 0 ? (
-        <div className="py-16 text-center text-sm text-muted-foreground">
+        <div className="text-muted-foreground py-16 text-center text-sm">
           {search
             ? "No finished projects match your search."
             : "No finished projects yet. Your first finish is going to feel amazing!"}
@@ -146,7 +146,7 @@ export function FinishedTab({ projects, imageUrls }: FinishedTabProps) {
         <div className="flex flex-col gap-3">
           {visible.map((project) => {
             const thumbnailUrl = project.coverThumbnailUrl
-              ? imageUrls[project.coverThumbnailUrl] ?? null
+              ? (imageUrls[project.coverThumbnailUrl] ?? null)
               : null;
             return (
               <FinishedProjectCard
@@ -165,7 +165,7 @@ export function FinishedTab({ projects, imageUrls }: FinishedTabProps) {
               <button
                 type="button"
                 onClick={() => setVisibleCount((v) => v + ITEMS_PER_PAGE)}
-                className="cursor-pointer text-sm font-medium text-emerald-700 transition-colors hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
+                className="cursor-pointer rounded-lg px-4 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50 hover:text-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-950/30 dark:hover:text-emerald-300"
               >
                 Show more ({sorted.length - visibleCount} remaining)
               </button>
@@ -181,8 +181,8 @@ export function FinishedTab({ projects, imageUrls }: FinishedTabProps) {
 
 function AggregateCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-violet-100 bg-violet-50 p-3 dark:border-violet-900/30 dark:bg-violet-950/20">
-      <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+    <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-3 dark:border-emerald-900/30 dark:bg-emerald-950/20">
+      <p className="text-muted-foreground mb-1 text-[11px] font-bold tracking-wider uppercase">
         {label}
       </p>
       <p className="font-mono text-lg font-bold tabular-nums">{value}</p>

@@ -56,7 +56,7 @@ export function SpotlightCard({
     <div className="border-border bg-card relative overflow-hidden rounded-2xl border shadow-sm">
       <div className="grid min-h-[260px] grid-cols-1 md:grid-cols-2">
         {/* Image half -- hidden on mobile */}
-        <div className="relative overflow-hidden max-md:hidden">
+        <div className="bg-muted relative overflow-hidden max-md:hidden">
           {imageUrl ? (
             <img
               src={imageUrl}

@@ -30,6 +30,7 @@ interface ProjectAccordionProps {
     quantity: number,
   ) => void;
   isPending: boolean;
+  failedIds: Set<string>;
 }
 
 export function ProjectAccordion({
@@ -44,8 +45,9 @@ export function ProjectAccordion({
   onSelectAll,
   onUpdateAcquired,
   isPending,
+  failedIds,
 }: ProjectAccordionProps) {
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set(selectedIds));
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
 
   const toggleExpand = useCallback((projectId: string) => {
     setExpandedIds((prev) => {
@@ -176,6 +178,7 @@ export function ProjectAccordion({
                       allSupplies={threads}
                       onUpdateAcquired={onUpdateAcquired}
                       isPending={isPending}
+                      failedIds={failedIds}
                     />
                   )}
                   {projectBeads.length > 0 && (
@@ -188,6 +191,7 @@ export function ProjectAccordion({
                       allSupplies={beads}
                       onUpdateAcquired={onUpdateAcquired}
                       isPending={isPending}
+                      failedIds={failedIds}
                     />
                   )}
                   {projectSpecialty.length > 0 && (
@@ -200,6 +204,7 @@ export function ProjectAccordion({
                       allSupplies={specialty}
                       onUpdateAcquired={onUpdateAcquired}
                       isPending={isPending}
+                      failedIds={failedIds}
                     />
                   )}
                   {projectFabric && (
@@ -262,6 +267,7 @@ function SupplyGroup({
   allSupplies,
   onUpdateAcquired,
   isPending,
+  failedIds,
 }: {
   label: string;
   count: number;
@@ -275,6 +281,7 @@ function SupplyGroup({
     quantity: number,
   ) => void;
   isPending: boolean;
+  failedIds: Set<string>;
 }) {
   return (
     <div className="border-border/30 border-t px-4 py-3">
@@ -311,6 +318,7 @@ function SupplyGroup({
                 acquired={supply.quantityAcquired}
                 required={supply.quantityRequired}
                 isPending={isPending}
+                hasError={failedIds.has(supply.junctionId)}
                 onChange={(newValue) => onUpdateAcquired(type, supply.junctionId, newValue)}
               />
             </div>

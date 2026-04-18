@@ -17,6 +17,7 @@ interface SupplyOverviewProps {
     quantity: number,
   ) => void;
   isPending: boolean;
+  failedIds: Set<string>;
 }
 
 interface AggregatedSupply {
@@ -65,6 +66,7 @@ export function SupplyOverview({
   fabrics,
   onUpdateAcquired,
   isPending,
+  failedIds,
 }: SupplyOverviewProps) {
   const hasAny =
     threads.length > 0 || beads.length > 0 || specialty.length > 0 || fabrics.length > 0;
@@ -91,6 +93,7 @@ export function SupplyOverview({
           type="thread"
           onUpdateAcquired={onUpdateAcquired}
           isPending={isPending}
+          failedIds={failedIds}
         />
       )}
       {aggregatedBeads.length > 0 && (
@@ -100,6 +103,7 @@ export function SupplyOverview({
           type="bead"
           onUpdateAcquired={onUpdateAcquired}
           isPending={isPending}
+          failedIds={failedIds}
         />
       )}
       {aggregatedSpecialty.length > 0 && (
@@ -109,6 +113,7 @@ export function SupplyOverview({
           type="specialty"
           onUpdateAcquired={onUpdateAcquired}
           isPending={isPending}
+          failedIds={failedIds}
         />
       )}
       {fabrics.length > 0 && <FabricSection fabrics={fabrics} />}
@@ -124,6 +129,7 @@ function SupplySection({
   type,
   onUpdateAcquired,
   isPending,
+  failedIds,
 }: {
   label: string;
   aggregated: AggregatedSupply[];
@@ -134,6 +140,7 @@ function SupplySection({
     quantity: number,
   ) => void;
   isPending: boolean;
+  failedIds: Set<string>;
 }) {
   const unfulfilled = aggregated.filter((s) => s.totalAcquired < s.totalRequired);
   const fulfilled = aggregated.filter((s) => s.totalAcquired >= s.totalRequired);
@@ -155,6 +162,7 @@ function SupplySection({
             type={type}
             onUpdateAcquired={onUpdateAcquired}
             isPending={isPending}
+            failedIds={failedIds}
           />
         ))}
         {fulfilled.map((supply) => (
@@ -164,6 +172,7 @@ function SupplySection({
             type={type}
             onUpdateAcquired={onUpdateAcquired}
             isPending={isPending}
+            failedIds={failedIds}
           />
         ))}
       </div>
@@ -178,6 +187,7 @@ function AggregatedSupplyRow({
   type,
   onUpdateAcquired,
   isPending,
+  failedIds,
 }: {
   supply: AggregatedSupply;
   type: "thread" | "bead" | "specialty";
@@ -187,6 +197,7 @@ function AggregatedSupplyRow({
     quantity: number,
   ) => void;
   isPending: boolean;
+  failedIds: Set<string>;
 }) {
   const isFulfilled = supply.totalAcquired >= supply.totalRequired;
   const projectNames = supply.items.map((i) => i.projectName).join(", ");
@@ -213,6 +224,7 @@ function AggregatedSupplyRow({
         acquired={supply.totalAcquired}
         required={supply.totalRequired}
         isPending={isPending}
+        hasError={supply.items.some((i) => failedIds.has(i.junctionId))}
         onChange={(newValue) => {
           if (supply.items.length === 1) {
             onUpdateAcquired(type, supply.items[0].junctionId, newValue);

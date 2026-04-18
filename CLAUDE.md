@@ -29,6 +29,13 @@
 
 None — v1.2 milestone complete. Ready for PR + ship.
 
+### Done This Session
+
+- Critique fixes: harden (error recovery), colorize (violet→emerald), clarify (tooltips + hover cues), polish (skeletons, tap targets, breakpoints, scroll)
+- Fixed shopping cart hydration mismatch (localStorage reads deferred to useEffect)
+- Filtered empty-needs projects from shopping cart project list
+- All 1172 tests pass, build clean
+
 ### Next Up
 
 1. `/gsd-ship` — create PR for Phase 9
@@ -60,6 +67,8 @@ None — v1.2 milestone complete. Ready for PR + ship.
 - 999.8: What's Next card styling — use same/similar gallery cards as Browse tab for visual consistency
 - 999.9: What's Next kitting label at 0% — "Kitting" label misleading when no supplies tracked; consider "Not kitted" or hiding label
 - 999.10: Auto-status from kitting activity — consider auto-transitioning project status to "Kitting" when user starts adding supplies/fabric
+- **999.11: Shopping cart scaling for large collections (HIGH PRIORITY)** — search/filter in project list, status grouping (Kitting/Stitching/Unstarted), supply-type search in By Supply view. Real dataset is 75+ projects in kitting stages.
+- 999.12: Shopping-for bar pill styling — match mockup style (squared-off chips with border, contained card-like bar) instead of current full-round pills
 
 ### Blockers
 

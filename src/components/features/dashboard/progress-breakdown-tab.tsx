@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { ChevronDown, ArrowUpDown } from "lucide-react";
+import { ChevronDown, ArrowUpDown, HelpCircle } from "lucide-react";
 import type { ProgressBucket, BucketProject, ProgressBucketId } from "@/types/dashboard";
 import { BucketProjectRow } from "./bucket-project-row";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // ─── Sort logic ─────────────────────────────────────────────────────────────
 
@@ -22,10 +23,7 @@ const SORT_OPTIONS: { value: ProgressSortOption; label: string }[] = [
   { value: "recentlyStitched", label: "Recently Stitched" },
 ];
 
-function sortBucketProjects(
-  projects: BucketProject[],
-  sort: ProgressSortOption,
-): BucketProject[] {
+function sortBucketProjects(projects: BucketProject[], sort: ProgressSortOption): BucketProject[] {
   return [...projects].sort((a, b) => {
     switch (sort) {
       case "closestToDone":
@@ -48,10 +46,7 @@ function sortBucketProjects(
 
 // ─── Bucket accent colors ───────────────────────────────────────────────────
 
-const BUCKET_ACCENTS: Record<
-  ProgressBucketId,
-  { bar: string; bg: string; dot: string }
-> = {
+const BUCKET_ACCENTS: Record<ProgressBucketId, { bar: string; bg: string; dot: string }> = {
   unstarted: {
     bar: "bg-stone-300 dark:bg-stone-600",
     bg: "bg-stone-50 dark:bg-stone-800/50",
@@ -127,16 +122,30 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
     <div className="flex flex-col gap-5">
       {/* Sort bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          {totalProjects} project{totalProjects !== 1 ? "s" : ""} across{" "}
-          {buckets.filter((b) => b.count > 0).length} stages
-        </p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-muted-foreground text-sm">
+            {totalProjects} project{totalProjects !== 1 ? "s" : ""} across{" "}
+            {buckets.filter((b) => b.count > 0).length} stages
+          </p>
+          <Tooltip>
+            <TooltipTrigger
+              className="text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+              aria-label="About progress breakdown"
+            >
+              <HelpCircle className="h-3.5 w-3.5" />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-[220px]">
+              Projects grouped by stitch completion %. Tap a bucket to see which projects fall in
+              each range.
+            </TooltipContent>
+          </Tooltip>
+        </div>
         <div className="flex items-center gap-2">
-          <ArrowUpDown className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+          <ArrowUpDown className="text-muted-foreground h-4 w-4" strokeWidth={1.5} />
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as ProgressSortOption)}
-            className="cursor-pointer rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground"
+            className="border-border bg-card text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm"
           >
             {SORT_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -148,8 +157,8 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
       </div>
 
       {/* Stacked bar chart */}
-      <div className="overflow-hidden rounded-xl border border-border bg-card p-5">
-        <div className="flex h-6 overflow-hidden rounded-full bg-muted">
+      <div className="border-border bg-card overflow-hidden rounded-xl border p-5">
+        <div className="bg-muted flex h-6 overflow-hidden rounded-full">
           {buckets.map((bucket) => {
             if (bucket.count === 0) return null;
             const pct = (bucket.count / totalProjects) * 100;
@@ -165,7 +174,7 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
                 title={`${bucket.label}: ${bucket.count} projects`}
               >
                 {pct >= 8 && (
-                  <span className="font-mono text-[10px] font-bold tabular-nums text-white">
+                  <span className="font-mono text-[10px] font-bold text-white tabular-nums">
                     {bucket.count}
                   </span>
                 )}
@@ -181,7 +190,7 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
             return (
               <div key={bucket.id} className="flex items-center gap-1.5">
                 <div className={`h-2.5 w-2.5 rounded-full ${accent.dot}`} />
-                <span className="text-[11px] text-muted-foreground">
+                <span className="text-muted-foreground text-[11px]">
                   {bucket.label} ({bucket.count})
                 </span>
               </div>
@@ -199,19 +208,16 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
         const hasMore = bucket.projects.length > visibleCount;
 
         return (
-          <div
-            key={bucket.id}
-            className="overflow-hidden rounded-xl border border-border"
-          >
+          <div key={bucket.id} className="border-border overflow-hidden rounded-xl border">
             {/* Bucket header */}
             <button
               type="button"
               onClick={() => toggleBucket(bucket.id)}
               aria-expanded={isExpanded}
-              className={`flex w-full cursor-pointer items-center gap-3 px-5 py-3.5 transition-colors hover:bg-muted/50 ${accent.bg}`}
+              className={`hover:bg-muted/50 flex w-full cursor-pointer items-center gap-3 px-5 py-3.5 transition-colors ${accent.bg}`}
             >
               <ChevronDown
-                className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
+                className={`text-muted-foreground h-4 w-4 shrink-0 transition-transform duration-200 ${
                   isExpanded ? "" : "-rotate-90"
                 }`}
                 strokeWidth={1.5}
@@ -219,7 +225,7 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
               <span className="font-heading flex-1 text-left text-sm font-bold">
                 {bucket.label}
               </span>
-              <span className="text-xs text-muted-foreground">{bucket.range}</span>
+              <span className="text-muted-foreground text-xs">{bucket.range}</span>
               <span className="min-w-[28px] text-right font-mono text-sm font-bold tabular-nums">
                 {bucket.count}
               </span>
@@ -229,14 +235,14 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
             {isExpanded && (
               <div className="bg-card">
                 {bucket.projects.length === 0 ? (
-                  <div className="py-10 text-center text-sm text-muted-foreground">
+                  <div className="text-muted-foreground py-10 text-center text-sm">
                     No projects in this range yet
                   </div>
                 ) : (
                   <>
                     {visible.map((project) => {
                       const thumbnailUrl = project.coverThumbnailUrl
-                        ? imageUrls[project.coverThumbnailUrl] ?? null
+                        ? (imageUrls[project.coverThumbnailUrl] ?? null)
                         : null;
                       return (
                         <BucketProjectRow
@@ -252,7 +258,7 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
                         <button
                           type="button"
                           onClick={() => showMore(bucket.id)}
-                          className="cursor-pointer text-sm font-medium text-emerald-700 transition-colors hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
+                          className="cursor-pointer rounded-lg px-4 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50 hover:text-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-950/30 dark:hover:text-emerald-300"
                         >
                           Show more ({bucket.projects.length - visibleCount} remaining)
                         </button>

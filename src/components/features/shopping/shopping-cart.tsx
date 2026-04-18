@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ShoppingForBar } from "./shopping-for-bar";
@@ -19,25 +19,27 @@ type ViewMode = "by-project" | "by-supply";
 /* ─── usePersistedSelection ─────────────────────────────────────────────── */
 
 function usePersistedSelection(validProjectIds: string[]) {
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => {
-    if (typeof window === "undefined") return new Set<string>();
-
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) return new Set<string>();
-
-      const parsed = JSON.parse(stored) as string[];
-      if (!Array.isArray(parsed)) return new Set<string>();
-
-      const validSet = new Set(validProjectIds);
-      const filtered = parsed.filter((id) => validSet.has(id));
-      return new Set(filtered);
-    } catch {
-      return new Set<string>();
-    }
-  });
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const hydratedRef = useRef(false);
 
   useEffect(() => {
+    if (hydratedRef.current) return;
+    hydratedRef.current = true;
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) return;
+      const parsed = JSON.parse(stored) as string[];
+      if (!Array.isArray(parsed)) return;
+      const validSet = new Set(validProjectIds);
+      const filtered = parsed.filter((id) => validSet.has(id));
+      if (filtered.length > 0) setSelectedIds(new Set(filtered));
+    } catch {
+      // localStorage may be unavailable
+    }
+  }, [validProjectIds]);
+
+  useEffect(() => {
+    if (!hydratedRef.current) return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(selectedIds)));
     } catch {
@@ -51,18 +53,22 @@ function usePersistedSelection(validProjectIds: string[]) {
 /* ─── usePersistedViewMode ──────────────────────────────────────────────── */
 
 function usePersistedViewMode(): [ViewMode, (mode: ViewMode) => void] {
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    if (typeof window === "undefined") return "by-project";
-    try {
-      const stored = localStorage.getItem(VIEW_KEY);
-      if (stored === "by-supply") return "by-supply";
-    } catch {
-      // ignore
-    }
-    return "by-project";
-  });
+  const [viewMode, setViewMode] = useState<ViewMode>("by-project");
+  const hydratedRef = useRef(false);
 
   useEffect(() => {
+    if (hydratedRef.current) return;
+    hydratedRef.current = true;
+    try {
+      const stored = localStorage.getItem(VIEW_KEY);
+      if (stored === "by-supply") setViewMode("by-supply");
+    } catch {
+      // localStorage may be unavailable
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hydratedRef.current) return;
     try {
       localStorage.setItem(VIEW_KEY, viewMode);
     } catch {
@@ -92,11 +98,22 @@ interface ShoppingCartProps {
 }
 
 export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
-  const validProjectIds = useMemo(() => data.projects.map((p) => p.projectId), [data.projects]);
+  const projectsWithNeeds = useMemo(
+    () =>
+      data.projects.filter(
+        (p) => p.threadCount + p.beadCount + p.specialtyCount > 0 || p.fabricNeeded,
+      ),
+    [data.projects],
+  );
+  const validProjectIds = useMemo(
+    () => projectsWithNeeds.map((p) => p.projectId),
+    [projectsWithNeeds],
+  );
 
   const [selectedIds, setSelectedIds] = usePersistedSelection(validProjectIds);
   const [viewMode, setViewMode] = usePersistedViewMode();
   const [isPending, startTransition] = useTransition();
+  const [failedIds, setFailedIds] = useState<Set<string>>(new Set());
 
   /* ── Selection handlers ─────────────────────────────────── */
 
@@ -157,16 +174,25 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
 
   const handleUpdateAcquired = useCallback(
     (type: "thread" | "bead" | "specialty", junctionId: string, quantity: number) => {
+      setFailedIds((prev) => {
+        if (!prev.has(junctionId)) return prev;
+        const next = new Set(prev);
+        next.delete(junctionId);
+        return next;
+      });
+
       startTransition(async () => {
         try {
           const result = await updateSupplyAcquired(type, junctionId, quantity);
           if (result.success) {
             toast.success("Supply quantity updated");
           } else {
+            setFailedIds((prev) => new Set(prev).add(junctionId));
             toast.error(result.error ?? "Failed to update supply");
           }
         } catch {
-          toast.error("Something went wrong.");
+          setFailedIds((prev) => new Set(prev).add(junctionId));
+          toast.error("Something went wrong. Try again.");
         }
       });
     },
@@ -210,7 +236,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
         <TabsList variant="line" className="w-full">
           <TabsTrigger value="projects">
             Projects
-            <Badge count={data.projects.length} />
+            <Badge count={projectsWithNeeds.length} />
           </TabsTrigger>
           <TabsTrigger value="list" className={cn(!hasSelection && "opacity-50")}>
             Shopping List
@@ -258,7 +284,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
 
             {viewMode === "by-project" ? (
               <ProjectAccordion
-                projects={data.projects}
+                projects={projectsWithNeeds}
                 selectedIds={selectedIds}
                 imageUrls={imageUrls}
                 threads={filteredThreads}
@@ -269,6 +295,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
                 onSelectAll={selectAll}
                 onUpdateAcquired={handleUpdateAcquired}
                 isPending={isPending}
+                failedIds={failedIds}
               />
             ) : (
               <SupplyOverview
@@ -278,6 +305,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
                 fabrics={filteredFabrics}
                 onUpdateAcquired={handleUpdateAcquired}
                 isPending={isPending}
+                failedIds={failedIds}
               />
             )}
           </TabsContent>

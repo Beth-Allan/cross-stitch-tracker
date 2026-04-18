@@ -33,7 +33,6 @@ export function ScrollableRow({ children, className }: ScrollableRowProps) {
     if (!el) return;
     const amount = direction === "left" ? -300 : 300;
     el.scrollTo({ left: el.scrollLeft + amount, behavior: "smooth" });
-    setTimeout(updateScrollState, 350);
   }
 
   return (
