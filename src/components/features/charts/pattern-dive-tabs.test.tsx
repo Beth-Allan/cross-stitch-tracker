@@ -6,7 +6,7 @@ import { PatternDiveTabs, PATTERN_DIVE_TABS } from "./pattern-dive-tabs";
 describe("PatternDiveTabs", () => {
   const defaultProps = {
     browseContent: <div data-testid="browse-content">Browse Content</div>,
-    whatsNextContent: <div data-testid="whats-next-content">What's Next Content</div>,
+    whatsNextContent: <div data-testid="whats-next-content">Whats Next Content</div>,
     fabricContent: <div data-testid="fabric-content">Fabric Content</div>,
     storageContent: <div data-testid="storage-content">Storage Content</div>,
   };
