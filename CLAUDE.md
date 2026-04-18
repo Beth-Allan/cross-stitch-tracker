@@ -4,9 +4,9 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** v1.1 shipped | **Next:** v1.2 Track & Measure
+**Milestone:** v1.2 Track & Measure (Phase 8 complete, Phase 9 in progress)
 **Last Updated:** 2026-04-17
-**Roadmap:** 4 milestones / 11 phases — v1.0 + v1.1 shipped, v1.2 next (phases 8-9)
+**Roadmap:** 4 milestones / 11 phases — v1.0 + v1.1 shipped, v1.2 active (phases 8-9)
 
 ### Done
 
@@ -19,14 +19,15 @@
   - Phase 7: Project detail hero, tabbed layout, skein calculator, supply redesign (PR #16)
   - Archived to: `.planning/milestones/v1.1-*`
   - Full details: `.planning/MILESTONES.md` and `.planning/RETROSPECTIVE.md`
+- **Phase 8: Session Logging & Pattern Dive** (2026-04-18): 11 plans, verified complete
 
 ### In Progress
 
-Phase 8 verified and complete. Phase 9 ready to plan.
+Phase 9 context gathered. Ready for planning.
 
 ### Next Up
 
-1. Phase 9 planning — `/gsd-discuss-phase 9` then `/gsd-plan-phase 9`
+1. Phase 9 planning — `/clear` then `/gsd-plan-phase 9`
 2. `/gsd-explore` — discuss user feedback items before next milestone
 
 ### Backlog
