@@ -8,25 +8,30 @@ vi.mock("@/lib/actions/shopping-cart-actions", () => ({
   updateSupplyAcquired: vi.fn().mockResolvedValue({ success: true }),
 }));
 
-// Mock localStorage
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: vi.fn((key: string) => store[key] ?? null),
-    setItem: vi.fn((key: string, value: string) => {
-      store[key] = value;
-    }),
-    removeItem: vi.fn((key: string) => {
-      delete store[key];
-    }),
-    clear: vi.fn(() => {
-      store = {};
-    }),
-  };
-})();
+// Mock localStorage with a real store
+let localStore: Record<string, string> = {};
+
+const localStorageMock = {
+  getItem: vi.fn((key: string) => localStore[key] ?? null),
+  setItem: vi.fn((key: string, value: string) => {
+    localStore[key] = value;
+  }),
+  removeItem: vi.fn((key: string) => {
+    delete localStore[key];
+  }),
+  clear: vi.fn(() => {
+    localStore = {};
+  }),
+  get length() {
+    return Object.keys(localStore).length;
+  },
+  key: vi.fn((index: number) => Object.keys(localStore)[index] ?? null),
+};
 
 beforeEach(() => {
-  localStorageMock.clear();
+  localStore = {};
+  localStorageMock.getItem.mockClear();
+  localStorageMock.setItem.mockClear();
   vi.stubGlobal("localStorage", localStorageMock);
 });
 
@@ -139,34 +144,30 @@ describe("ShoppingCart", () => {
 
   it("badge counts reflect unfulfilled items for selected projects", () => {
     // Pre-populate localStorage with project p1 selected
-    localStorageMock.getItem.mockReturnValue(JSON.stringify(["p1"]));
+    localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
 
     render(<ShoppingCart data={mockData} imageUrls={{}} />);
 
-    // Threads: p1 has jt1 (acquired 1 < required 3) and jt2 (acquired 2 >= required 2)
-    // So 1 unfulfilled thread for p1
-    // Beads: p1 has jb1 (acquired 0 < required 1) = 1 unfulfilled
-    // Specialty: none
-    // Fabric: p1 needs fabric = 1
-
-    // The badge counts should be visible as numbers
-    // Threads tab should show a badge with count
+    // Threads: p1 has jt1 (acquired 1 < required 3) = 1 unfulfilled
+    // jt2 (acquired 2 >= required 2) = fulfilled
+    // The Threads tab should show badge with count 1
     const threadsTab = screen.getByText(/Threads/);
     expect(threadsTab).toBeInTheDocument();
+
+    // ShoppingForBar should show "Shopping for:" with the selected project
+    expect(screen.getByText("Shopping for:")).toBeInTheDocument();
   });
 
   it("supply tabs show disabled opacity when no projects selected", () => {
     render(<ShoppingCart data={mockData} imageUrls={{}} />);
 
     // With no projects selected, supply tabs should have opacity-50
-    // Check that tab triggers exist and have the disabled appearance
     const threadsTab = screen.getByText(/Threads/).closest("button");
     expect(threadsTab).toBeInTheDocument();
-    // The tab should have opacity styling when no projects are selected
-    expect(threadsTab?.className || threadsTab?.style.opacity).toBeDefined();
+    expect(threadsTab?.className).toContain("opacity-50");
   });
 
-  it("renders ShoppingForBar", () => {
+  it("renders ShoppingForBar with empty state when no projects selected", () => {
     render(<ShoppingCart data={mockData} imageUrls={{}} />);
     // When no projects are selected, the shopping-for bar shows empty state
     expect(
@@ -176,14 +177,20 @@ describe("ShoppingCart", () => {
 
   it("filtering by selected projects returns correct subset of supplies", () => {
     // Pre-populate localStorage with only p2 selected
-    localStorageMock.getItem.mockReturnValue(JSON.stringify(["p2"]));
+    localStore["shopping-cart-selected-projects"] = JSON.stringify(["p2"]);
 
     render(<ShoppingCart data={mockData} imageUrls={{}} />);
 
-    // Only p2 supplies should appear, p1 supplies should not
-    // p2 has 1 thread (DMC 415), no beads, no specialty
-    // The Projects tab should show both projects but only p2 selected
-    expect(screen.getByText("Forest Sampler")).toBeInTheDocument();
-    expect(screen.getByText("Ocean Waves")).toBeInTheDocument();
+    // Projects tab shows both projects (it's the selection list)
+    // Use getAllByText since names appear in both ProjectSelectionList and ShoppingForBar
+    const forestSamplerElements = screen.getAllByText("Forest Sampler");
+    expect(forestSamplerElements.length).toBeGreaterThanOrEqual(1);
+
+    const oceanWavesElements = screen.getAllByText("Ocean Waves");
+    expect(oceanWavesElements.length).toBeGreaterThanOrEqual(1);
+
+    // The ShoppingForBar should show Ocean Waves as selected (as a chip)
+    expect(screen.getByText("Shopping for:")).toBeInTheDocument();
+    expect(screen.getByLabelText("Remove Ocean Waves")).toBeInTheDocument();
   });
 });
