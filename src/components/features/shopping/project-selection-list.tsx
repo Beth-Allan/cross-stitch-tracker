@@ -24,15 +24,14 @@ export function ProjectSelectionList({
 }: ProjectSelectionListProps) {
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-muted-foreground">
-          {projects.length} project{projects.length !== 1 ? "s" : ""} with
-          unfulfilled supply needs
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-muted-foreground text-sm">
+          {projects.length} project{projects.length !== 1 ? "s" : ""} with unfulfilled supply needs
         </p>
         <button
           type="button"
           onClick={onSelectAll}
-          className="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
+          className="text-xs font-medium text-emerald-600 transition-colors hover:text-emerald-700"
         >
           Select all
         </button>
@@ -46,7 +45,7 @@ export function ProjectSelectionList({
             project.beadCount +
             project.specialtyCount +
             (project.fabricNeeded ? 1 : 0);
-          const imageUrl = imageUrls[project.chartId];
+          const imageUrl = imageUrls[project.coverThumbnailUrl ?? ""];
 
           return (
             <button
@@ -54,24 +53,15 @@ export function ProjectSelectionList({
               type="button"
               onClick={() => onToggle(project.projectId)}
               className={cn(
-                "flex items-center gap-3 rounded-lg border p-3 transition-colors text-left w-full",
+                "flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors",
                 isSelected
                   ? "border-emerald-300 bg-emerald-50/30"
                   : "border-border bg-card hover:bg-muted/50",
               )}
             >
               {/* Checkbox icon */}
-              <span
-                className={cn(
-                  "shrink-0",
-                  isSelected ? "text-emerald-600" : "text-stone-300",
-                )}
-              >
-                {isSelected ? (
-                  <CheckSquare className="h-5 w-5" />
-                ) : (
-                  <Square className="h-5 w-5" />
-                )}
+              <span className={cn("shrink-0", isSelected ? "text-emerald-600" : "text-stone-300")}>
+                {isSelected ? <CheckSquare className="h-5 w-5" /> : <Square className="h-5 w-5" />}
               </span>
 
               {/* Cover thumbnail */}
@@ -81,21 +71,21 @@ export function ProjectSelectionList({
                   alt={project.projectName}
                   width={40}
                   height={40}
-                  className="rounded object-cover shrink-0"
+                  className="shrink-0 rounded object-cover"
                 />
               ) : (
-                <div className="h-10 w-10 rounded bg-muted shrink-0" />
+                <div className="bg-muted h-10 w-10 shrink-0 rounded" />
               )}
 
               {/* Info */}
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-foreground truncate">
+                  <span className="text-foreground truncate text-sm font-semibold">
                     {project.projectName}
                   </span>
                   <StatusBadge status={project.status as ProjectStatus} />
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-muted-foreground mt-0.5 text-xs">
                   {project.designerName}
                   {" \u00B7 "}
                   {buildSupplySummary(project)}
@@ -105,7 +95,7 @@ export function ProjectSelectionList({
               </div>
 
               {/* Details chevron */}
-              <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+              <ChevronRight className="text-muted-foreground h-4 w-4 shrink-0" />
             </button>
           );
         })}
