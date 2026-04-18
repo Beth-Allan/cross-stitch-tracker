@@ -695,6 +695,177 @@ describe("pattern-dive-actions", () => {
       expect(small.fitsWidth).toBe(true); // longestEdge 25 >= 20.3
       expect(small.fitsHeight).toBe(false); // neither edge >= 27.4
     });
+
+    it("matches unassigned fabrics by computing required size per-fabric count (no assigned fabric)", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Unassigned Chart",
+          coverThumbnailUrl: null,
+          stitchCount: 20000,
+          stitchesWide: 200,
+          stitchesHigh: 100,
+          designer: null,
+          project: {
+            id: "p1",
+            fabric: null,
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-14ct-big",
+          name: "14ct Big Aida",
+          count: 14,
+          shortestEdgeInches: 37,
+          longestEdgeInches: 42,
+          brand: { name: "Zweigart" },
+        },
+        {
+          id: "f-18ct-small",
+          name: "18ct Small Aida",
+          count: 18,
+          shortestEdgeInches: 10,
+          longestEdgeInches: 10,
+          brand: { name: "DMC" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      // 14ct: required 200/14+6=20.3" x 100/14+6=13.1" — 37x42 fits both
+      // 18ct: required 200/18+6=17.1" x 100/18+6=11.6" — 10x10 does NOT fit
+      expect(result[0].matchingFabrics).toHaveLength(1);
+      expect(result[0].matchingFabrics[0].id).toBe("f-14ct-big");
+      expect(result[0].matchingFabrics[0].fitsWidth).toBe(true);
+      expect(result[0].matchingFabrics[0].fitsHeight).toBe(true);
+    });
+
+    it("UAT scenario: 37x42 inch fabric matches project needing 16.7x8 inch fabric", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "UAT Chart",
+          coverThumbnailUrl: null,
+          stitchCount: 4200,
+          stitchesWide: 150,
+          stitchesHigh: 28,
+          designer: null,
+          project: {
+            id: "p1",
+            fabric: null,
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-uat",
+          name: "37x42 Aida",
+          count: 14,
+          shortestEdgeInches: 37,
+          longestEdgeInches: 42,
+          brand: { name: "Zweigart" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      // Required: 150/14+6=16.7" x 28/14+6=8.0" — 37x42 fits both
+      expect(result[0].matchingFabrics).toHaveLength(1);
+      expect(result[0].matchingFabrics[0].fitsWidth).toBe(true);
+      expect(result[0].matchingFabrics[0].fitsHeight).toBe(true);
+    });
+
+    it("includes fabric in matchingFabrics even when only one dimension fits", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Wide Chart",
+          coverThumbnailUrl: null,
+          stitchCount: 30000,
+          stitchesWide: 300,
+          stitchesHigh: 100,
+          designer: null,
+          project: {
+            id: "p1",
+            fabric: null,
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-partial",
+          name: "15x25 Aida",
+          count: 14,
+          shortestEdgeInches: 15,
+          longestEdgeInches: 25,
+          brand: { name: "Zweigart" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      // Required: 300/14+6=27.4" x 100/14+6=13.1"
+      // Fabric 15x25: fitsWidth — neither 15 nor 25 >= 27.4 → false
+      //               fitsHeight — 15 >= 13.1 → true
+      // Included because fitsWidth || fitsHeight
+      expect(result[0].matchingFabrics).toHaveLength(1);
+      expect(result[0].matchingFabrics[0].fitsWidth).toBe(false);
+      expect(result[0].matchingFabrics[0].fitsHeight).toBe(true);
+    });
+
+    it("preserves existing behavior: assigned-fabric projects still match by same count", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Assigned Chart",
+          coverThumbnailUrl: null,
+          stitchCount: 10000,
+          stitchesWide: 100,
+          stitchesHigh: 100,
+          designer: null,
+          project: {
+            id: "p1",
+            fabric: {
+              id: "f-assigned",
+              name: "Assigned 14ct",
+              count: 14,
+              shortestEdgeInches: 20,
+              longestEdgeInches: 25,
+              brand: { name: "Zweigart" },
+            },
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-14ct",
+          name: "14ct Match",
+          count: 14,
+          shortestEdgeInches: 20,
+          longestEdgeInches: 25,
+          brand: { name: "Zweigart" },
+        },
+        {
+          id: "f-16ct",
+          name: "16ct No Match",
+          count: 16,
+          shortestEdgeInches: 30,
+          longestEdgeInches: 40,
+          brand: { name: "DMC" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      // Only 14ct should match (same count as assigned)
+      expect(result[0].matchingFabrics).toHaveLength(1);
+      expect(result[0].matchingFabrics[0].id).toBe("f-14ct");
+    });
   });
 
   // ─── getStorageGroups ─────────────────────────────────────────────────────
