@@ -151,29 +151,43 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
           }
         : null;
 
-      // Match unassigned fabrics: same count (if known) and check size
-      const matchingFabrics =
-        fabricCount && requiredWidth && requiredHeight
-          ? unassignedFabrics
-              .filter((f) => f.count === fabricCount)
-              .map((f) => {
-                // Compare either edge to required dimensions (fabric can be rotated)
-                const fitsWidth =
-                  f.shortestEdgeInches >= requiredWidth || f.longestEdgeInches >= requiredWidth;
-                const fitsHeight =
-                  f.shortestEdgeInches >= requiredHeight || f.longestEdgeInches >= requiredHeight;
-                return {
-                  id: f.id,
-                  name: f.name,
-                  brandName: f.brand.name,
-                  count: f.count,
-                  shortestEdgeInches: f.shortestEdgeInches,
-                  longestEdgeInches: f.longestEdgeInches,
-                  fitsWidth,
-                  fitsHeight,
-                };
-              })
-          : [];
+      const matchingFabrics = fabricCount
+        ? unassignedFabrics
+            .filter((f) => f.count === fabricCount)
+            .map((f) => {
+              const fitsWidth =
+                f.shortestEdgeInches >= requiredWidth! || f.longestEdgeInches >= requiredWidth!;
+              const fitsHeight =
+                f.shortestEdgeInches >= requiredHeight! || f.longestEdgeInches >= requiredHeight!;
+              return {
+                id: f.id,
+                name: f.name,
+                brandName: f.brand.name,
+                count: f.count,
+                shortestEdgeInches: f.shortestEdgeInches,
+                longestEdgeInches: f.longestEdgeInches,
+                fitsWidth,
+                fitsHeight,
+              };
+            })
+        : unassignedFabrics
+            .map((f) => {
+              const reqW = Math.round((c.stitchesWide / f.count + MARGIN_TOTAL) * 10) / 10;
+              const reqH = Math.round((c.stitchesHigh / f.count + MARGIN_TOTAL) * 10) / 10;
+              const fitsWidth = f.shortestEdgeInches >= reqW || f.longestEdgeInches >= reqW;
+              const fitsHeight = f.shortestEdgeInches >= reqH || f.longestEdgeInches >= reqH;
+              return {
+                id: f.id,
+                name: f.name,
+                brandName: f.brand.name,
+                count: f.count,
+                shortestEdgeInches: f.shortestEdgeInches,
+                longestEdgeInches: f.longestEdgeInches,
+                fitsWidth,
+                fitsHeight,
+              };
+            })
+            .filter((f) => f.fitsWidth || f.fitsHeight);
 
       return {
         chartId: c.id,
