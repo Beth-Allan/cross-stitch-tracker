@@ -44,9 +44,13 @@ vi.mock("@/components/features/gallery/cover-placeholder", () => ({
   ),
 }));
 
-// Mock server action
+// Mock server actions
 vi.mock("@/lib/actions/dashboard-actions", () => ({
   getSpotlightProject: vi.fn(),
+}));
+
+vi.mock("@/lib/actions/upload-actions", () => ({
+  getPresignedImageUrls: vi.fn().mockResolvedValue({}),
 }));
 
 function createMockSpotlight(overrides?: Partial<SpotlightProject>): SpotlightProject {
