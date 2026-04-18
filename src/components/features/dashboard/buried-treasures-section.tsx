@@ -29,34 +29,30 @@ export function BuriedTreasuresSection({ treasures, imageUrls }: BuriedTreasures
   return (
     <div className="flex flex-col gap-4">
       <SectionHeading title="Buried Treasures" />
-      <p className="-mt-1 text-sm text-muted-foreground">
+      <p className="text-muted-foreground -mt-1 text-sm">
         Your longest-waiting unstarted projects — give them some love!
       </p>
 
       <div className="flex flex-col gap-3">
         {treasures.map((t, i) => {
-          const imgUrl = imageUrls[t.chartId] ?? null;
+          const imgUrl = imageUrls[t.coverThumbnailUrl ?? ""] ?? null;
           const linkHref = t.projectId ? `/charts/${t.chartId}` : `/charts/${t.chartId}`;
 
           return (
             <Link
               key={t.chartId}
               href={linkHref}
-              className="group flex items-center gap-4 rounded-xl border border-border bg-card px-4 py-3.5 transition-all duration-200 hover:border-muted-foreground/20 hover:shadow-sm"
+              className="group border-border bg-card hover:border-muted-foreground/20 flex items-center gap-4 rounded-xl border px-4 py-3.5 transition-all duration-200 hover:shadow-sm"
             >
               {/* Index number */}
-              <div className="w-7 shrink-0 text-center font-mono text-lg font-bold tabular-nums text-muted-foreground/40">
+              <div className="text-muted-foreground/40 w-7 shrink-0 text-center font-mono text-lg font-bold tabular-nums">
                 {i + 1}
               </div>
 
               {/* Thumbnail */}
               <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg">
                 {imgUrl ? (
-                  <img
-                    src={imgUrl}
-                    alt={t.chartName}
-                    className="h-full w-full object-cover"
-                  />
+                  <img src={imgUrl} alt={t.chartName} className="h-full w-full object-cover" />
                 ) : (
                   <CoverPlaceholder status="UNSTARTED" />
                 )}
@@ -64,20 +60,18 @@ export function BuriedTreasuresSection({ treasures, imageUrls }: BuriedTreasures
 
               {/* Name + designer */}
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <p className="truncate font-heading text-sm font-semibold text-foreground transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+                <p className="font-heading text-foreground truncate text-sm font-semibold transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
                   {t.chartName}
                 </p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {t.designerName}
-                </p>
+                <p className="text-muted-foreground truncate text-xs">{t.designerName}</p>
               </div>
 
               {/* Age badge - hidden on mobile */}
               <div className="flex shrink-0 flex-col items-end gap-0.5 text-right max-md:hidden">
-                <span className="font-mono text-sm font-bold tabular-nums text-muted-foreground">
+                <span className="text-muted-foreground font-mono text-sm font-bold tabular-nums">
                   {t.daysInLibrary.toLocaleString()}
                 </span>
-                <span className="text-[10px] text-muted-foreground/70">
+                <span className="text-muted-foreground/70 text-[10px]">
                   {formatAge(t.daysInLibrary)} in library
                 </span>
               </div>
@@ -87,7 +81,7 @@ export function BuriedTreasuresSection({ treasures, imageUrls }: BuriedTreasures
                 {t.genres.slice(0, 2).map((g) => (
                   <span
                     key={g}
-                    className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground"
+                    className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px]"
                   >
                     {g}
                   </span>
@@ -96,7 +90,7 @@ export function BuriedTreasuresSection({ treasures, imageUrls }: BuriedTreasures
 
               {/* Chevron */}
               <ChevronRight
-                className="h-4 w-4 shrink-0 text-muted-foreground/30 transition-colors group-hover:text-muted-foreground"
+                className="text-muted-foreground/30 group-hover:text-muted-foreground h-4 w-4 shrink-0 transition-colors"
                 strokeWidth={1.5}
               />
             </Link>
