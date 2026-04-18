@@ -43,7 +43,7 @@ Full details: `milestones/v1.1-ROADMAP.md`
 **Milestone Goal:** Add session logging as the data foundation for progress tracking, evolve the Charts page into Pattern Dive, and build dashboard pages that surface collection insights and streamline shopping.
 
 - [x] **Phase 8: Session Logging & Pattern Dive** - StitchSession model, global log modal, auto-updating progress, Pattern Dive tabs (completed 2026-04-18)
-- [ ] **Phase 9: Dashboards & Shopping Cart** - Main Dashboard, Project Dashboard, Shopping Cart upgrade with project selection
+- [x] **Phase 9: Dashboards & Shopping Cart** - Main Dashboard, Project Dashboard, Shopping Cart upgrade with project selection (completed 2026-04-18)
 
 ### 📋 v1.3 Motivation & Planning
 

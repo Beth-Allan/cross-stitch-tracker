@@ -4,9 +4,9 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** v1.2 Track & Measure (Phase 8 complete, Phase 9 planned)
-**Last Updated:** 2026-04-17
-**Roadmap:** 4 milestones / 11 phases — v1.0 + v1.1 shipped, v1.2 active (phases 8-9)
+**Milestone:** v1.2 Track & Measure (COMPLETE)
+**Last Updated:** 2026-04-18
+**Roadmap:** 4 milestones / 11 phases — v1.0 + v1.1 + v1.2 shipped, v1.3 next
 
 ### Done
 
@@ -20,15 +20,20 @@
   - Archived to: `.planning/milestones/v1.1-*`
   - Full details: `.planning/MILESTONES.md` and `.planning/RETROSPECTIVE.md`
 - **Phase 8: Session Logging & Pattern Dive** (2026-04-18): 11 plans, verified complete
+- **Phase 9: Dashboards & Shopping Cart** (2026-04-18): 9 plans, 1160 tests, verified complete
+  - Main Dashboard with Your Library + Progress tabs, Quick Add menu
+  - Project Dashboard with hero stats, progress buckets, finished tab
+  - Shopping Cart with project selection, tabbed supplies, quantity controls
 
 ### In Progress
 
-Phase 9 planned — 9 plans across 4 waves. Ready for execution.
+None — v1.2 milestone complete. Ready for PR + ship.
 
 ### Next Up
 
-1. Phase 9 execution — `/clear` then `/gsd-execute-phase 9`
-2. `/gsd-explore` — discuss user feedback items before next milestone
+1. `/gsd-ship` — create PR for Phase 9
+2. `/gsd-complete-milestone` — archive v1.2
+3. `/gsd-explore` — discuss user feedback items before v1.3
 
 ### Backlog
 
