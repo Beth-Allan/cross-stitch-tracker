@@ -75,7 +75,7 @@ Plans:
 - [x] 08-08-PLAN.md -- DB push, data migration, conditional EditableNumber
 - [x] 08-09-PLAN.md -- Integration verification and visual checkpoint
 - [x] 08-10-PLAN.md -- Gap closure: fabric assign bug (CR-01), $transaction, availability guard, validation trim
-- [ ] 08-11-PLAN.md -- Gap closure: fix fabric matching Catch-22 for unassigned projects (UAT #13)
+- [x] 08-11-PLAN.md -- Gap closure: fix fabric matching Catch-22 for unassigned projects (UAT #13)
 
 **UI hint**: yes
 
