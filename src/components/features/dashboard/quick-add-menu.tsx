@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 interface QuickAddMenuProps {
-  onLogStitches: () => void;
+  onLogStitches?: () => void;
 }
 
 interface QuickAddItem {
@@ -91,7 +91,11 @@ export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
 
   function handleItemClick(item: QuickAddItem) {
     if (item.action === "logStitches") {
-      onLogStitches();
+      if (onLogStitches) {
+        onLogStitches();
+      } else {
+        window.dispatchEvent(new CustomEvent("open-log-session-modal"));
+      }
     } else if (item.href) {
       router.push(item.href);
     }

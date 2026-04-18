@@ -6,7 +6,6 @@ import { transformToGalleryCard } from "@/components/features/gallery/gallery-ut
 import { DashboardTabs } from "@/components/features/dashboard/dashboard-tabs";
 import { MainDashboard } from "@/components/features/dashboard/main-dashboard";
 import { ProjectDashboard } from "@/components/features/dashboard/project-dashboard";
-import { DashboardLogStitchesProvider } from "@/components/features/dashboard/dashboard-log-stitches-provider";
 
 export default async function DashboardRoute() {
   // D-02: Independent data-fetching functions, fetched via Promise.all()
@@ -43,22 +42,17 @@ export default async function DashboardRoute() {
     .map((c) => transformToGalleryCard(c, imageUrls));
 
   return (
-    <DashboardLogStitchesProvider>
-      {(onLogStitches) => (
-        <DashboardTabs
-          libraryContent={
-            <MainDashboard
-              data={mainData}
-              startNextCards={startNextCards}
-              imageUrls={imageUrls}
-              onLogStitches={onLogStitches}
-            />
-          }
-          progressContent={
-            <ProjectDashboard data={projectData} imageUrls={imageUrls} />
-          }
+    <DashboardTabs
+      libraryContent={
+        <MainDashboard
+          data={mainData}
+          startNextCards={startNextCards}
+          imageUrls={imageUrls}
         />
-      )}
-    </DashboardLogStitchesProvider>
+      }
+      progressContent={
+        <ProjectDashboard data={projectData} imageUrls={imageUrls} />
+      }
+    />
   );
 }

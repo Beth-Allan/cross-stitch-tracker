@@ -15,7 +15,6 @@ interface MainDashboardProps {
   data: MainDashboardData;
   startNextCards: GalleryCardData[];
   imageUrls: Record<string, string>;
-  onLogStitches: () => void;
 }
 
 function EmptySection({ message }: { message: string }) {
@@ -33,7 +32,6 @@ export function MainDashboard({
   data,
   startNextCards,
   imageUrls,
-  onLogStitches,
 }: MainDashboardProps) {
   return (
     <div className="mx-auto max-w-[1100px] space-y-16">
@@ -45,7 +43,7 @@ export function MainDashboard({
             Welcome back to your cross stitch collection
           </p>
         </div>
-        <QuickAddMenu onLogStitches={onLogStitches} />
+        <QuickAddMenu />
       </div>
 
       {/* Two-column area: main + sidebar */}
