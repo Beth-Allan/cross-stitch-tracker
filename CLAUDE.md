@@ -5,7 +5,7 @@
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
 **Milestone:** v1.1 shipped | **Next:** v1.2 Track & Measure
-**Last Updated:** 2026-04-16
+**Last Updated:** 2026-04-17
 **Roadmap:** 4 milestones / 11 phases — v1.0 + v1.1 shipped, v1.2 next (phases 8-9)
 
 ### Done
@@ -22,12 +22,23 @@
 
 ### In Progress
 
-Nothing — between milestones.
+Impeccable audit polish — `.planning/AUDIT-2026-04-16.md`
+
+- Harden pass: ✅ complete (P0s + 4 P1s)
+- Dark theme polish: ✅ complete (all 6 items)
+- Optimize pass: ✅ complete (next/image LCP, useMemo, cache dedup)
+- **Adapt pass: ← START HERE** (1/5 done — session table mobile cards complete; remaining: supply table cards, whats-next mobile kitting, tab aria-labels, touch targets)
+- Harden ARIA pass: remaining (P2 — combobox roles, label associations, progressbar)
+- Distill pass: remaining (P2 — extract shared EmptyState/ErrorCard)
+
+All changes uncommitted on `main`. Build clean, 1031/1031 tests passing.
 
 ### Next Up
 
-1. `/gsd-new-milestone` — define v1.2 Track & Measure (requirements → roadmap)
-2. `/gsd-explore` — discuss user feedback items (genre pills, project setup, kitting, edit modal) before v1.2 planning
+1. Finish remaining audit passes (`/adapt`, `/harden`, `/distill`)
+2. Commit audit fixes
+3. `/gsd-new-milestone` — define v1.2 Track & Measure (requirements → roadmap)
+4. `/gsd-explore` — discuss user feedback items before v1.2 planning
 
 ### Backlog
 
