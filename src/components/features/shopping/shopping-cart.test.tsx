@@ -1,14 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@/__tests__/test-utils";
+import userEvent from "@testing-library/user-event";
 import { ShoppingCart } from "./shopping-cart";
 import type { ShoppingCartData } from "@/types/dashboard";
 
-// Mock the server action
 vi.mock("@/lib/actions/shopping-cart-actions", () => ({
   updateSupplyAcquired: vi.fn().mockResolvedValue({ success: true }),
 }));
 
-// Mock localStorage with a real store
 let localStore: Record<string, string> = {};
 
 const localStorageMock = {
@@ -132,65 +131,80 @@ const mockData: ShoppingCartData = {
 };
 
 describe("ShoppingCart", () => {
-  it("renders tab bar with all 6 tab labels", () => {
+  it("renders 2 tabs (Projects and Shopping List)", () => {
     render(<ShoppingCart data={mockData} imageUrls={{}} />);
     expect(screen.getByText("Projects")).toBeInTheDocument();
-    expect(screen.getByText(/Threads/)).toBeInTheDocument();
-    expect(screen.getByText(/Beads/)).toBeInTheDocument();
-    expect(screen.getByText(/Specialty/)).toBeInTheDocument();
-    expect(screen.getByText(/Fabric/)).toBeInTheDocument();
     expect(screen.getByText(/Shopping List/)).toBeInTheDocument();
   });
 
-  it("badge counts reflect unfulfilled items for selected projects", () => {
-    // Pre-populate localStorage with project p1 selected
-    localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
-
+  it("renders view toggle with By Project and By Supply Type", () => {
     render(<ShoppingCart data={mockData} imageUrls={{}} />);
-
-    // Threads: p1 has jt1 (acquired 1 < required 3) = 1 unfulfilled
-    // jt2 (acquired 2 >= required 2) = fulfilled
-    // The Threads tab should show badge with count 1
-    const threadsTab = screen.getByText(/Threads/);
-    expect(threadsTab).toBeInTheDocument();
-
-    // ShoppingForBar should show "Shopping for:" with the selected project
-    expect(screen.getByText("Shopping for:")).toBeInTheDocument();
+    expect(screen.getByText("By Project")).toBeInTheDocument();
+    expect(screen.getByText("By Supply Type")).toBeInTheDocument();
   });
 
-  it("supply tabs show disabled opacity when no projects selected", () => {
+  it("defaults to By Project view", () => {
     render(<ShoppingCart data={mockData} imageUrls={{}} />);
+    const byProjectBtn = screen.getByText("By Project");
+    expect(byProjectBtn).toHaveAttribute("aria-checked", "true");
+  });
 
-    // With no projects selected, supply tabs should have opacity-50
-    const threadsTab = screen.getByText(/Threads/).closest("button");
-    expect(threadsTab).toBeInTheDocument();
-    expect(threadsTab?.className).toContain("opacity-50");
+  it("shows project accordion in By Project view", () => {
+    render(<ShoppingCart data={mockData} imageUrls={{}} />);
+    expect(screen.getByText("Forest Sampler")).toBeInTheDocument();
+    expect(screen.getByText("Ocean Waves")).toBeInTheDocument();
   });
 
   it("renders ShoppingForBar with empty state when no projects selected", () => {
     render(<ShoppingCart data={mockData} imageUrls={{}} />);
-    // When no projects are selected, the shopping-for bar shows empty state
-    expect(
-      screen.getByText(/No projects selected/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/No projects selected/)).toBeInTheDocument();
   });
 
-  it("filtering by selected projects returns correct subset of supplies", () => {
-    // Pre-populate localStorage with only p2 selected
-    localStore["shopping-cart-selected-projects"] = JSON.stringify(["p2"]);
-
+  it("shopping list tab shows disabled opacity when no projects selected", () => {
     render(<ShoppingCart data={mockData} imageUrls={{}} />);
+    const listTab = screen.getByText(/Shopping List/).closest("button");
+    expect(listTab?.className).toContain("opacity-50");
+  });
 
-    // Projects tab shows both projects (it's the selection list)
-    // Use getAllByText since names appear in both ProjectSelectionList and ShoppingForBar
-    const forestSamplerElements = screen.getAllByText("Forest Sampler");
-    expect(forestSamplerElements.length).toBeGreaterThanOrEqual(1);
+  it("shows ShoppingForBar with selected project names", () => {
+    localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
+    render(<ShoppingCart data={mockData} imageUrls={{}} />);
+    expect(screen.getByText("Shopping for:")).toBeInTheDocument();
+    expect(screen.getByLabelText("Remove Forest Sampler")).toBeInTheDocument();
+  });
 
-    const oceanWavesElements = screen.getAllByText("Ocean Waves");
-    expect(oceanWavesElements.length).toBeGreaterThanOrEqual(1);
-
-    // The ShoppingForBar should show Ocean Waves as selected (as a chip)
+  it("filtering by selected projects returns correct subset", () => {
+    localStore["shopping-cart-selected-projects"] = JSON.stringify(["p2"]);
+    render(<ShoppingCart data={mockData} imageUrls={{}} />);
     expect(screen.getByText("Shopping for:")).toBeInTheDocument();
     expect(screen.getByLabelText("Remove Ocean Waves")).toBeInTheDocument();
+  });
+
+  it("switches to By Supply Type view when toggled", async () => {
+    localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
+    const user = userEvent.setup();
+    render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+    await user.click(screen.getByText("By Supply Type"));
+
+    expect(screen.getByText("By Supply Type")).toHaveAttribute("aria-checked", "true");
+    // Supply overview shows section headers
+    expect(screen.getByText(/Threads/)).toBeInTheDocument();
+  });
+
+  it("persists view mode in localStorage", async () => {
+    const user = userEvent.setup();
+    render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+    await user.click(screen.getByText("By Supply Type"));
+
+    expect(localStorageMock.setItem).toHaveBeenCalledWith("shopping-cart-view-mode", "by-supply");
+  });
+
+  it("restores persisted view mode", () => {
+    localStore["shopping-cart-view-mode"] = "by-supply";
+    localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
+    render(<ShoppingCart data={mockData} imageUrls={{}} />);
+    expect(screen.getByText("By Supply Type")).toHaveAttribute("aria-checked", "true");
   });
 });
