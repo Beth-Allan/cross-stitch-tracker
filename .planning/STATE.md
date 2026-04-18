@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Track & Measure
 status: milestone_complete
-stopped_at: Phase 9 complete — v1.2 milestone ready for archive
-last_updated: "2026-04-18T22:58:00.000Z"
-last_activity: 2026-04-18 -- Phase 09 complete
+stopped_at: Phase 9 shipped — PR #18
+last_updated: "2026-04-19T00:00:00.000Z"
+last_activity: 2026-04-18 -- Phase 09 shipped — PR #18
 progress:
   total_phases: 2
   completed_phases: 2
