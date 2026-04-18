@@ -145,7 +145,7 @@ export function LogSessionModal({
       });
 
       if (!result.success) {
-        toast.error("Photo upload failed. Your session was saved without the photo.");
+        toast.error("Photo upload failed. You can try again or save without a photo.");
         return;
       }
 
@@ -156,14 +156,14 @@ export function LogSessionModal({
       });
 
       if (!response.ok) {
-        toast.error("Photo upload failed. Your session was saved without the photo.");
+        toast.error("Photo upload failed. You can try again or save without a photo.");
         return;
       }
 
       setPhotoKey(result.key);
       setPhotoPreview(URL.createObjectURL(file));
     } catch {
-      toast.error("Photo upload failed. Your session was saved without the photo.");
+      toast.error("Photo upload failed. You can try again or save without a photo.");
     } finally {
       setIsUploading(false);
     }
