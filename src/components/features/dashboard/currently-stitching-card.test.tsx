@@ -32,7 +32,9 @@ vi.mock("@/components/features/charts/status-badge", () => ({
   StatusBadge: ({ status }: { status: string }) => <span data-testid="status-badge">{status}</span>,
 }));
 
-function createMockProject(overrides?: Partial<CurrentlyStitchingProject>): CurrentlyStitchingProject {
+function createMockProject(
+  overrides?: Partial<CurrentlyStitchingProject>,
+): CurrentlyStitchingProject {
   return {
     projectId: "proj-1",
     chartId: "chart-1",

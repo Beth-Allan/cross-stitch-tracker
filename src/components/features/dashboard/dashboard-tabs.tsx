@@ -21,10 +21,7 @@ interface DashboardTabsProps {
  * Top-level dashboard tab switcher using nuqs URL state.
  * Switches between "Your Library" (main dashboard) and "Progress" (project dashboard).
  */
-export function DashboardTabs({
-  libraryContent,
-  progressContent,
-}: DashboardTabsProps) {
+export function DashboardTabs({ libraryContent, progressContent }: DashboardTabsProps) {
   const [tab, setTab] = useQueryState(
     "tab",
     parseAsStringLiteral([...DASHBOARD_TABS]).withDefault("library"),

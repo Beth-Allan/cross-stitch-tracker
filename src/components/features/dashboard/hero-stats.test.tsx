@@ -38,7 +38,7 @@ describe("HeroStats", () => {
     expect(progressValue.className).toContain("font-mono");
   });
 
-  it('renders a dash for closestToCompletion when null', () => {
+  it("renders a dash for closestToCompletion when null", () => {
     render(<HeroStats stats={createMockStats({ closestToCompletion: null })} />);
 
     // The "Closest to Done" label should still be present

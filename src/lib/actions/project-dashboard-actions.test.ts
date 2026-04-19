@@ -77,9 +77,7 @@ function mockProject(overrides: {
     projectBeads,
     projectSpecialty,
     fabric:
-      fabricName && fabricBrandName
-        ? { name: fabricName, brand: { name: fabricBrandName } }
-        : null,
+      fabricName && fabricBrandName ? { name: fabricName, brand: { name: fabricBrandName } } : null,
   };
 }
 

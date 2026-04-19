@@ -23,9 +23,7 @@ export default async function DashboardRoute() {
     mainData.spotlightProject?.coverThumbnailUrl,
     mainData.spotlightProject?.coverImageUrl,
     ...mainData.buriedTreasures.map((t) => t.coverThumbnailUrl),
-    ...projectData.progressBuckets.flatMap((b) =>
-      b.projects.map((p) => p.coverThumbnailUrl),
-    ),
+    ...projectData.progressBuckets.flatMap((b) => b.projects.map((p) => p.coverThumbnailUrl)),
     ...projectData.finishedProjects.map((p) => p.coverThumbnailUrl),
     // GalleryCard uses coverImageUrl and coverThumbnailUrl from chart data
     ...charts.flatMap((c) => [c.coverImageUrl, c.coverThumbnailUrl]),
@@ -34,9 +32,7 @@ export default async function DashboardRoute() {
   const imageUrls = await getPresignedImageUrls(imageKeys);
 
   // Transform Start Next charts to GalleryCardData for GalleryCard reuse (D-05)
-  const startNextChartIds = new Set(
-    mainData.startNextProjects.map((p) => p.chartId),
-  );
+  const startNextChartIds = new Set(mainData.startNextProjects.map((p) => p.chartId));
   const startNextCards = charts
     .filter((c) => startNextChartIds.has(c.id))
     .map((c) => transformToGalleryCard(c, imageUrls));
@@ -44,15 +40,9 @@ export default async function DashboardRoute() {
   return (
     <DashboardTabs
       libraryContent={
-        <MainDashboard
-          data={mainData}
-          startNextCards={startNextCards}
-          imageUrls={imageUrls}
-        />
+        <MainDashboard data={mainData} startNextCards={startNextCards} imageUrls={imageUrls} />
       }
-      progressContent={
-        <ProjectDashboard data={projectData} imageUrls={imageUrls} />
-      }
+      progressContent={<ProjectDashboard data={projectData} imageUrls={imageUrls} />}
     />
   );
 }

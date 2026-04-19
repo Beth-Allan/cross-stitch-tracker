@@ -21,7 +21,7 @@ export function ProjectDashboard({ data, imageUrls }: ProjectDashboardProps) {
     <div className="mx-auto max-w-[1200px] space-y-8">
       <div>
         <h1 className="font-heading text-2xl font-bold">Project Dashboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-1 text-sm">
           Track your progress across every project in your collection
         </p>
       </div>
@@ -44,16 +44,10 @@ export function ProjectDashboard({ data, imageUrls }: ProjectDashboardProps) {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="progress" className="pt-6">
-          <ProgressBreakdownTab
-            buckets={data.progressBuckets}
-            imageUrls={imageUrls}
-          />
+          <ProgressBreakdownTab buckets={data.progressBuckets} imageUrls={imageUrls} />
         </TabsContent>
         <TabsContent value="finished" className="pt-6">
-          <FinishedTab
-            projects={data.finishedProjects}
-            imageUrls={imageUrls}
-          />
+          <FinishedTab projects={data.finishedProjects} imageUrls={imageUrls} />
         </TabsContent>
       </Tabs>
     </div>

@@ -51,12 +51,12 @@ export function HeroStats({ stats }: HeroStatsProps) {
             key={key}
             className="rounded-xl border border-emerald-100 bg-emerald-50/60 p-4 dark:border-emerald-900/30 dark:bg-emerald-950/20"
           >
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            <p className="text-muted-foreground mb-2 text-[11px] font-bold tracking-wider uppercase">
               {label}
             </p>
             <p className="font-mono text-xl font-bold tabular-nums">{value}</p>
             {subtitle && (
-              <p className="font-mono text-sm tabular-nums text-muted-foreground">{subtitle}</p>
+              <p className="text-muted-foreground font-mono text-sm tabular-nums">{subtitle}</p>
             )}
           </div>
         );

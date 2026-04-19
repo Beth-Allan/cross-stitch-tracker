@@ -57,9 +57,7 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: { name: "Designer A" },
           },
-          sessions: [
-            { date: new Date("2026-04-10"), stitchCount: 200, timeSpentMinutes: 60 },
-          ],
+          sessions: [{ date: new Date("2026-04-10"), stitchCount: 200, timeSpentMinutes: 60 }],
         },
         {
           id: "p2",
@@ -84,9 +82,7 @@ describe("dashboard-actions", () => {
       const result = await getMainDashboardData();
 
       expect(result.currentlyStitching).toHaveLength(2);
-      const statuses = result.currentlyStitching.map(
-        (p: CurrentlyStitchingProject) => p.status,
-      );
+      const statuses = result.currentlyStitching.map((p: CurrentlyStitchingProject) => p.status);
       expect(statuses).toContain("IN_PROGRESS");
       expect(statuses).toContain("ON_HOLD");
     });
@@ -221,44 +217,46 @@ describe("dashboard-actions", () => {
     // Test 5: startNextProjects returns only wantToStartNext=true with UNSTARTED or KITTED
     it("startNextProjects returns only projects with wantToStartNext=true and status UNSTARTED or KITTED", async () => {
       mockPrisma.project.findMany.mockResolvedValue([]); // currently stitching
-      mockPrisma.chart.findMany.mockImplementation(async (args: { where?: { project?: { wantToStartNext?: boolean } } }) => {
-        // Start Next query has wantToStartNext filter
-        if (args?.where?.project?.wantToStartNext === true) {
-          return [
-            {
-              id: "c1",
-              name: "Start Me",
-              coverThumbnailUrl: null,
-              coverImageUrl: null,
-              stitchCount: 5000,
-              dateAdded: new Date("2026-01-01"),
-              designer: { name: "Designer A" },
-              genres: [{ name: "Landscape" }],
-              project: {
-                id: "p1",
-                status: "UNSTARTED",
-                wantToStartNext: true,
+      mockPrisma.chart.findMany.mockImplementation(
+        async (args: { where?: { project?: { wantToStartNext?: boolean } } }) => {
+          // Start Next query has wantToStartNext filter
+          if (args?.where?.project?.wantToStartNext === true) {
+            return [
+              {
+                id: "c1",
+                name: "Start Me",
+                coverThumbnailUrl: null,
+                coverImageUrl: null,
+                stitchCount: 5000,
+                dateAdded: new Date("2026-01-01"),
+                designer: { name: "Designer A" },
+                genres: [{ name: "Landscape" }],
+                project: {
+                  id: "p1",
+                  status: "UNSTARTED",
+                  wantToStartNext: true,
+                },
               },
-            },
-            {
-              id: "c2",
-              name: "Start Me Too",
-              coverThumbnailUrl: null,
-              coverImageUrl: null,
-              stitchCount: 3000,
-              dateAdded: new Date("2026-02-01"),
-              designer: null,
-              genres: [],
-              project: {
-                id: "p2",
-                status: "KITTED",
-                wantToStartNext: true,
+              {
+                id: "c2",
+                name: "Start Me Too",
+                coverThumbnailUrl: null,
+                coverImageUrl: null,
+                stitchCount: 3000,
+                dateAdded: new Date("2026-02-01"),
+                designer: null,
+                genres: [],
+                project: {
+                  id: "p2",
+                  status: "KITTED",
+                  wantToStartNext: true,
+                },
               },
-            },
-          ];
-        }
-        return []; // buried treasures
-      });
+            ];
+          }
+          return []; // buried treasures
+        },
+      );
       mockPrisma.project.count.mockResolvedValue(0);
 
       const { getMainDashboardData } = await import("./dashboard-actions");
@@ -284,12 +282,14 @@ describe("dashboard-actions", () => {
       }));
 
       mockPrisma.project.findMany.mockResolvedValue([]); // currently stitching
-      mockPrisma.chart.findMany.mockImplementation(async (args: { where?: { project?: { wantToStartNext?: boolean } } }) => {
-        if (args?.where?.project?.wantToStartNext === true) {
-          return []; // start next
-        }
-        return charts; // buried treasures (all unstarted)
-      });
+      mockPrisma.chart.findMany.mockImplementation(
+        async (args: { where?: { project?: { wantToStartNext?: boolean } } }) => {
+          if (args?.where?.project?.wantToStartNext === true) {
+            return []; // start next
+          }
+          return charts; // buried treasures (all unstarted)
+        },
+      );
       mockPrisma.project.count.mockResolvedValue(0);
 
       const { getMainDashboardData } = await import("./dashboard-actions");
@@ -317,12 +317,14 @@ describe("dashboard-actions", () => {
       }));
 
       mockPrisma.project.findMany.mockResolvedValue([]); // currently stitching
-      mockPrisma.chart.findMany.mockImplementation(async (args: { where?: { project?: { wantToStartNext?: boolean } } }) => {
-        if (args?.where?.project?.wantToStartNext === true) {
-          return []; // start next
-        }
-        return charts;
-      });
+      mockPrisma.chart.findMany.mockImplementation(
+        async (args: { where?: { project?: { wantToStartNext?: boolean } } }) => {
+          if (args?.where?.project?.wantToStartNext === true) {
+            return []; // start next
+          }
+          return charts;
+        },
+      );
       mockPrisma.project.count.mockResolvedValue(0);
 
       const { getMainDashboardData } = await import("./dashboard-actions");
@@ -335,23 +337,94 @@ describe("dashboard-actions", () => {
     // Test 8: collectionStats returns correct counts
     it("collectionStats returns correct counts for totalProjects, totalWIP, totalOnHold, totalUnstarted, totalFinished", async () => {
       const allProjects = [
-        { id: "p1", status: "IN_PROGRESS", stitchesCompleted: 1000, finishDate: null, chart: { id: "c1", name: "C1", stitchCount: 5000, coverThumbnailUrl: null, designer: null }, sessions: [] },
-        { id: "p2", status: "IN_PROGRESS", stitchesCompleted: 2000, finishDate: null, chart: { id: "c2", name: "C2", stitchCount: 8000, coverThumbnailUrl: null, designer: null }, sessions: [] },
-        { id: "p3", status: "ON_HOLD", stitchesCompleted: 500, finishDate: null, chart: { id: "c3", name: "C3", stitchCount: 3000, coverThumbnailUrl: null, designer: null }, sessions: [] },
-        { id: "p4", status: "UNSTARTED", stitchesCompleted: 0, finishDate: null, chart: { id: "c4", name: "C4", stitchCount: 1000 } },
-        { id: "p5", status: "KITTING", stitchesCompleted: 0, finishDate: null, chart: { id: "c5", name: "C5", stitchCount: 2000 } },
-        { id: "p6", status: "KITTED", stitchesCompleted: 0, finishDate: null, chart: { id: "c6", name: "C6", stitchCount: 4000 } },
-        { id: "p7", status: "FINISHED", stitchesCompleted: 10000, finishDate: new Date("2026-03-01"), chart: { id: "c7", name: "C7", stitchCount: 10000 } },
-        { id: "p8", status: "FFO", stitchesCompleted: 6000, finishDate: new Date("2026-04-01"), chart: { id: "c8", name: "C8", stitchCount: 6000 } },
+        {
+          id: "p1",
+          status: "IN_PROGRESS",
+          stitchesCompleted: 1000,
+          finishDate: null,
+          chart: {
+            id: "c1",
+            name: "C1",
+            stitchCount: 5000,
+            coverThumbnailUrl: null,
+            designer: null,
+          },
+          sessions: [],
+        },
+        {
+          id: "p2",
+          status: "IN_PROGRESS",
+          stitchesCompleted: 2000,
+          finishDate: null,
+          chart: {
+            id: "c2",
+            name: "C2",
+            stitchCount: 8000,
+            coverThumbnailUrl: null,
+            designer: null,
+          },
+          sessions: [],
+        },
+        {
+          id: "p3",
+          status: "ON_HOLD",
+          stitchesCompleted: 500,
+          finishDate: null,
+          chart: {
+            id: "c3",
+            name: "C3",
+            stitchCount: 3000,
+            coverThumbnailUrl: null,
+            designer: null,
+          },
+          sessions: [],
+        },
+        {
+          id: "p4",
+          status: "UNSTARTED",
+          stitchesCompleted: 0,
+          finishDate: null,
+          chart: { id: "c4", name: "C4", stitchCount: 1000 },
+        },
+        {
+          id: "p5",
+          status: "KITTING",
+          stitchesCompleted: 0,
+          finishDate: null,
+          chart: { id: "c5", name: "C5", stitchCount: 2000 },
+        },
+        {
+          id: "p6",
+          status: "KITTED",
+          stitchesCompleted: 0,
+          finishDate: null,
+          chart: { id: "c6", name: "C6", stitchCount: 4000 },
+        },
+        {
+          id: "p7",
+          status: "FINISHED",
+          stitchesCompleted: 10000,
+          finishDate: new Date("2026-03-01"),
+          chart: { id: "c7", name: "C7", stitchCount: 10000 },
+        },
+        {
+          id: "p8",
+          status: "FFO",
+          stitchesCompleted: 6000,
+          finishDate: new Date("2026-04-01"),
+          chart: { id: "c8", name: "C8", stitchCount: 6000 },
+        },
       ];
 
       // Currently stitching query filters by status IN, collection stats has no status filter
-      mockPrisma.project.findMany.mockImplementation(async (args: { where?: { status?: { in?: string[] } } }) => {
-        if (args?.where?.status?.in) {
-          return allProjects.filter((p) => args.where!.status!.in!.includes(p.status));
-        }
-        return allProjects; // collection stats
-      });
+      mockPrisma.project.findMany.mockImplementation(
+        async (args: { where?: { status?: { in?: string[] } } }) => {
+          if (args?.where?.status?.in) {
+            return allProjects.filter((p) => args.where!.status!.in!.includes(p.status));
+          }
+          return allProjects; // collection stats
+        },
+      );
       mockPrisma.chart.findMany.mockResolvedValue([]); // start next + buried treasures
       mockPrisma.project.count.mockResolvedValue(0);
 
@@ -368,17 +441,44 @@ describe("dashboard-actions", () => {
     // Test 9: collectionStats totalStitchesCompleted
     it("collectionStats returns totalStitchesCompleted sum across all projects", async () => {
       const allProjects = [
-        { id: "p1", status: "IN_PROGRESS", stitchesCompleted: 1000, finishDate: null, chart: { id: "c1", name: "C1", stitchCount: 5000, coverThumbnailUrl: null, designer: null }, sessions: [] },
-        { id: "p2", status: "FINISHED", stitchesCompleted: 8000, finishDate: new Date("2026-03-01"), chart: { id: "c2", name: "C2", stitchCount: 8000 } },
-        { id: "p3", status: "UNSTARTED", stitchesCompleted: 0, finishDate: null, chart: { id: "c3", name: "C3", stitchCount: 3000 } },
+        {
+          id: "p1",
+          status: "IN_PROGRESS",
+          stitchesCompleted: 1000,
+          finishDate: null,
+          chart: {
+            id: "c1",
+            name: "C1",
+            stitchCount: 5000,
+            coverThumbnailUrl: null,
+            designer: null,
+          },
+          sessions: [],
+        },
+        {
+          id: "p2",
+          status: "FINISHED",
+          stitchesCompleted: 8000,
+          finishDate: new Date("2026-03-01"),
+          chart: { id: "c2", name: "C2", stitchCount: 8000 },
+        },
+        {
+          id: "p3",
+          status: "UNSTARTED",
+          stitchesCompleted: 0,
+          finishDate: null,
+          chart: { id: "c3", name: "C3", stitchCount: 3000 },
+        },
       ];
 
-      mockPrisma.project.findMany.mockImplementation(async (args: { where?: { status?: { in?: string[] } } }) => {
-        if (args?.where?.status?.in) {
-          return allProjects.filter((p) => args.where!.status!.in!.includes(p.status));
-        }
-        return allProjects;
-      });
+      mockPrisma.project.findMany.mockImplementation(
+        async (args: { where?: { status?: { in?: string[] } } }) => {
+          if (args?.where?.status?.in) {
+            return allProjects.filter((p) => args.where!.status!.in!.includes(p.status));
+          }
+          return allProjects;
+        },
+      );
       mockPrisma.chart.findMany.mockResolvedValue([]);
       mockPrisma.project.count.mockResolvedValue(0);
 
@@ -391,17 +491,44 @@ describe("dashboard-actions", () => {
     // Test 10: collectionStats mostRecentFinish and largestProject
     it("collectionStats returns mostRecentFinish and largestProject", async () => {
       const allProjects = [
-        { id: "p1", status: "FINISHED", stitchesCompleted: 5000, finishDate: new Date("2026-02-01"), chart: { id: "c1", name: "Old Finish", stitchCount: 5000 } },
-        { id: "p2", status: "FFO", stitchesCompleted: 3000, finishDate: new Date("2026-04-10"), chart: { id: "c2", name: "Recent Finish", stitchCount: 3000 } },
-        { id: "p3", status: "IN_PROGRESS", stitchesCompleted: 1000, finishDate: null, chart: { id: "c3", name: "Big WIP", stitchCount: 50000, coverThumbnailUrl: null, designer: null }, sessions: [] },
+        {
+          id: "p1",
+          status: "FINISHED",
+          stitchesCompleted: 5000,
+          finishDate: new Date("2026-02-01"),
+          chart: { id: "c1", name: "Old Finish", stitchCount: 5000 },
+        },
+        {
+          id: "p2",
+          status: "FFO",
+          stitchesCompleted: 3000,
+          finishDate: new Date("2026-04-10"),
+          chart: { id: "c2", name: "Recent Finish", stitchCount: 3000 },
+        },
+        {
+          id: "p3",
+          status: "IN_PROGRESS",
+          stitchesCompleted: 1000,
+          finishDate: null,
+          chart: {
+            id: "c3",
+            name: "Big WIP",
+            stitchCount: 50000,
+            coverThumbnailUrl: null,
+            designer: null,
+          },
+          sessions: [],
+        },
       ];
 
-      mockPrisma.project.findMany.mockImplementation(async (args: { where?: { status?: { in?: string[] } } }) => {
-        if (args?.where?.status?.in) {
-          return allProjects.filter((p) => args.where!.status!.in!.includes(p.status));
-        }
-        return allProjects;
-      });
+      mockPrisma.project.findMany.mockImplementation(
+        async (args: { where?: { status?: { in?: string[] } } }) => {
+          if (args?.where?.status?.in) {
+            return allProjects.filter((p) => args.where!.status!.in!.includes(p.status));
+          }
+          return allProjects;
+        },
+      );
       mockPrisma.chart.findMany.mockResolvedValue([]);
       mockPrisma.project.count.mockResolvedValue(0);
 
@@ -443,14 +570,20 @@ describe("dashboard-actions", () => {
 
       // Verify chart queries include userId filter via project relation
       for (const call of mockPrisma.chart.findMany.mock.calls) {
-        const args = call[0] as { where?: { project?: { userId?: string }; OR?: Array<{ project?: { userId?: string } | null }> } };
+        const args = call[0] as {
+          where?: {
+            project?: { userId?: string };
+            OR?: Array<{ project?: { userId?: string } | null }>;
+          };
+        };
         if (args?.where?.project) {
           expect(args.where.project.userId).toBe("user-1");
         }
         // Some chart queries use OR for charts without projects too
         if (args?.where?.OR) {
           const projectFilter = args.where.OR.find(
-            (o: { project?: { userId?: string } | null }) => o.project !== null && o.project !== undefined,
+            (o: { project?: { userId?: string } | null }) =>
+              o.project !== null && o.project !== undefined,
           );
           if (projectFilter?.project) {
             expect(projectFilter.project.userId).toBe("user-1");

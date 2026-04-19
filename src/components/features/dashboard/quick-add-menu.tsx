@@ -177,7 +177,7 @@ export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
         <>
           <div className="fixed inset-0 z-40" onClick={closeMenu} />
 
-          { }
+          {}
           <div
             role="menu"
             aria-label="Quick Add"
