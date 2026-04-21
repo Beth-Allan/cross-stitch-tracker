@@ -92,25 +92,32 @@ const groupLabels: Record<string, string> = {
 };
 
 export function ShoppingListTab({ threads, beads, specialty, fabrics }: ShoppingListTabProps) {
-  const [checkedItems, setCheckedItems] = useState<Set<string>>(() => {
-    if (typeof window === "undefined") return new Set<string>();
-    try {
-      const stored = localStorage.getItem("shopping-list-checked");
-      if (!stored) return new Set<string>();
-      const parsed = JSON.parse(stored) as string[];
-      return Array.isArray(parsed) ? new Set(parsed) : new Set<string>();
-    } catch {
-      return new Set<string>();
-    }
-  });
+  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem("shopping-list-checked");
+      if (stored) {
+        const parsed = JSON.parse(stored) as string[];
+        if (Array.isArray(parsed)) {
+          setCheckedItems(new Set(parsed));
+        }
+      }
+    } catch {
+      // localStorage may be unavailable
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
     try {
       localStorage.setItem("shopping-list-checked", JSON.stringify(Array.from(checkedItems)));
     } catch {
       // localStorage may be unavailable
     }
-  }, [checkedItems]);
+  }, [checkedItems, hydrated]);
 
   const hasAnySupplies =
     threads.length > 0 || beads.length > 0 || specialty.length > 0 || fabrics.length > 0;
@@ -205,6 +212,7 @@ export function ShoppingListTab({ threads, beads, specialty, fabrics }: Shopping
                     key={item.key}
                     type="button"
                     onClick={() => toggleCheck(item.key)}
+                    aria-pressed={isChecked}
                     className={cn(
                       "flex w-full items-center gap-2.5 rounded-lg border p-3 text-left transition-colors",
                       isChecked

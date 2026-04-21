@@ -18,6 +18,7 @@ const BUCKET_BAR_COLORS: Record<ProgressBucketId, string> = {
 
 export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectRowProps) {
   const barColor = BUCKET_BAR_COLORS[bucketId];
+  const progressPercent = Math.min(100, Math.max(0, project.progressPercent));
 
   return (
     <Link
@@ -55,11 +56,11 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
             <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
               <div
                 className={`h-full rounded-full ${barColor}`}
-                style={{ width: `${project.progressPercent}%` }}
+                style={{ width: `${progressPercent}%` }}
               />
             </div>
             <span className="text-muted-foreground font-mono text-[11px] font-medium tabular-nums">
-              {project.progressPercent}%
+              {progressPercent}%
             </span>
           </div>
         </div>

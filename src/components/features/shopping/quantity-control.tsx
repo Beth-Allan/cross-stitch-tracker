@@ -39,8 +39,14 @@ export function QuantityControl({
     cancelledRef.current = false;
     setEditValue(String(acquired));
     setIsEditing(true);
-    requestAnimationFrame(() => inputRef.current?.select());
   }
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [isEditing]);
 
   function commitEdit() {
     if (cancelledRef.current) return;

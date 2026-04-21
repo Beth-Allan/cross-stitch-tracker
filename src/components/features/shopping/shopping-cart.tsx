@@ -249,13 +249,12 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
             {/* View toggle */}
             <div
               className="bg-muted mb-5 inline-flex rounded-lg p-1"
-              role="radiogroup"
+              role="group"
               aria-label="View mode"
             >
               <button
                 type="button"
-                role="radio"
-                aria-checked={viewMode === "by-project"}
+                aria-pressed={viewMode === "by-project"}
                 onClick={() => setViewMode("by-project")}
                 className={cn(
                   "rounded-md px-3.5 py-1.5 text-sm font-medium transition-all",
@@ -268,8 +267,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
               </button>
               <button
                 type="button"
-                role="radio"
-                aria-checked={viewMode === "by-supply"}
+                aria-pressed={viewMode === "by-supply"}
                 onClick={() => setViewMode("by-supply")}
                 className={cn(
                   "rounded-md px-3.5 py-1.5 text-sm font-medium transition-all",

@@ -15,7 +15,14 @@ export default async function DashboardRoute() {
     getChartsForGallery(),
   ]);
 
-  // Collect all image keys from both dashboards
+  // Transform Start Next charts to GalleryCardData for GalleryCard reuse (D-05)
+  // Build lookup preserving the order from startNextProjects
+  const startNextChartIds = new Set(mainData.startNextProjects.map((p) => p.chartId));
+  const startNextChartsMap = new Map(
+    charts.filter((c) => startNextChartIds.has(c.id)).map((c) => [c.id, c]),
+  );
+
+  // Collect all image keys from both dashboards (only Start Next charts, not all gallery)
   const imageKeys = [
     ...mainData.currentlyStitching.map((p) => p.coverThumbnailUrl),
     ...mainData.startNextProjects.map((p) => p.coverThumbnailUrl),
@@ -25,17 +32,16 @@ export default async function DashboardRoute() {
     ...mainData.buriedTreasures.map((t) => t.coverThumbnailUrl),
     ...projectData.progressBuckets.flatMap((b) => b.projects.map((p) => p.coverThumbnailUrl)),
     ...projectData.finishedProjects.map((p) => p.coverThumbnailUrl),
-    // GalleryCard uses coverImageUrl and coverThumbnailUrl from chart data
-    ...charts.flatMap((c) => [c.coverImageUrl, c.coverThumbnailUrl]),
+    ...[...startNextChartsMap.values()].flatMap((c) => [c.coverImageUrl, c.coverThumbnailUrl]),
   ];
 
   const imageUrls = await getPresignedImageUrls(imageKeys);
 
-  // Transform Start Next charts to GalleryCardData for GalleryCard reuse (D-05)
-  const startNextChartIds = new Set(mainData.startNextProjects.map((p) => p.chartId));
-  const startNextCards = charts
-    .filter((c) => startNextChartIds.has(c.id))
-    .map((c) => transformToGalleryCard(c, imageUrls));
+  // Preserve Start Next ordering from the server action
+  const startNextCards = mainData.startNextProjects
+    .map((p) => startNextChartsMap.get(p.chartId))
+    .filter(Boolean)
+    .map((c) => transformToGalleryCard(c!, imageUrls));
 
   return (
     <DashboardTabs

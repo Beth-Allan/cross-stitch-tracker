@@ -135,7 +135,8 @@ export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
         setFocusedIndex((i) => (i <= 0 ? QUICK_ADD_ITEMS.length - 1 : i - 1));
         break;
       case "Tab":
-        closeMenu();
+        setOpen(false);
+        setFocusedIndex(-1);
         break;
     }
   }

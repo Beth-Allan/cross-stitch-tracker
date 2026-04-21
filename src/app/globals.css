@@ -271,6 +271,9 @@
   .animate-skeleton-pulse,
   .animate-shake {
     animation: none;
+  }
+
+  .animate-skeleton-pulse {
     opacity: 0.5;
   }
 }

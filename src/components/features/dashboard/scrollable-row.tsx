@@ -26,6 +26,15 @@ export function ScrollableRow({ children, className }: ScrollableRowProps) {
 
   useEffect(() => {
     updateScrollState();
+    const el = scrollRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(updateScrollState);
+    ro.observe(el);
+    window.addEventListener("resize", updateScrollState);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", updateScrollState);
+    };
   }, [updateScrollState]);
 
   function scroll(direction: "left" | "right") {

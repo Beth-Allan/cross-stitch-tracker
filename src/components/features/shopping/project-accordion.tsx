@@ -106,6 +106,8 @@ export function ProjectAccordion({
                 <button
                   type="button"
                   onClick={() => onToggle(project.projectId)}
+                  role="checkbox"
+                  aria-checked={isSelected}
                   className={cn(
                     "shrink-0",
                     isSelected

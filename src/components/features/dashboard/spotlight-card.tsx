@@ -35,16 +35,17 @@ export function SpotlightCard({
     startTransition(async () => {
       try {
         const newProject = await getSpotlightProject();
-        if (newProject) {
-          setProject(newProject);
-          // Resolve presigned URL for the new project's cover image
-          const key = newProject.coverImageUrl ?? newProject.coverThumbnailUrl;
-          if (key) {
-            const urls = await getPresignedImageUrls([key]);
-            setImageUrl(urls[key] ?? null);
-          } else {
-            setImageUrl(null);
-          }
+        if (!newProject) {
+          toast.message("No other projects to spotlight right now.");
+          return;
+        }
+        setProject(newProject);
+        const key = newProject.coverImageUrl ?? newProject.coverThumbnailUrl;
+        if (key) {
+          const urls = await getPresignedImageUrls([key]);
+          setImageUrl(urls[key] ?? null);
+        } else {
+          setImageUrl(null);
         }
       } catch {
         toast.error("Could not load a new spotlight project. Try again.");

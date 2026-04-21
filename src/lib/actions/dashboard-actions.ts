@@ -85,6 +85,8 @@ async function getStartNextProjects(userId: string): Promise<StartNextProject[]>
         status: { in: ["UNSTARTED", "KITTED"] },
       },
     },
+    orderBy: { dateAdded: "asc" },
+    take: 2,
     include: {
       designer: { select: { name: true } },
       genres: { select: { name: true } },
@@ -104,8 +106,7 @@ async function getStartNextProjects(userId: string): Promise<StartNextProject[]>
       status: c.project!.status,
       totalStitches: c.stitchCount,
       genres: c.genres.map((g) => g.name),
-    }))
-    .slice(0, 2);
+    }));
 }
 
 /**

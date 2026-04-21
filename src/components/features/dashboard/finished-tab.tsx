@@ -116,6 +116,7 @@ export function FinishedTab({ projects, imageUrls }: FinishedTabProps) {
               setVisibleCount(ITEMS_PER_PAGE);
             }}
             placeholder="Search finished projects..."
+            aria-label="Search finished projects"
             className="border-border bg-card text-foreground placeholder:text-muted-foreground w-full rounded-lg border py-1.5 pr-3 pl-9 text-sm"
           />
         </div>
@@ -124,6 +125,7 @@ export function FinishedTab({ projects, imageUrls }: FinishedTabProps) {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as FinishedSortOption)}
+            aria-label="Sort finished projects"
             className="border-border bg-card text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm"
           >
             {SORT_OPTIONS.map((o) => (

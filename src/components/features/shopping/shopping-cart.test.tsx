@@ -146,7 +146,7 @@ describe("ShoppingCart", () => {
   it("defaults to By Project view", () => {
     render(<ShoppingCart data={mockData} imageUrls={{}} />);
     const byProjectBtn = screen.getByText("By Project");
-    expect(byProjectBtn).toHaveAttribute("aria-checked", "true");
+    expect(byProjectBtn).toHaveAttribute("aria-pressed", "true");
   });
 
   it("shows project accordion in By Project view", () => {
@@ -187,7 +187,7 @@ describe("ShoppingCart", () => {
 
     await user.click(screen.getByText("By Supply Type"));
 
-    expect(screen.getByText("By Supply Type")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByText("By Supply Type")).toHaveAttribute("aria-pressed", "true");
     // Supply overview shows section headers
     expect(screen.getByText(/Threads/)).toBeInTheDocument();
   });
@@ -205,6 +205,6 @@ describe("ShoppingCart", () => {
     localStore["shopping-cart-view-mode"] = "by-supply";
     localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
     render(<ShoppingCart data={mockData} imageUrls={{}} />);
-    expect(screen.getByText("By Supply Type")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByText("By Supply Type")).toHaveAttribute("aria-pressed", "true");
   });
 });

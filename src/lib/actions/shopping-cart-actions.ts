@@ -143,22 +143,22 @@ export async function updateSupplyAcquired(
 
   try {
     // Look up junction record with project ownership check
-    let record: { id: string; project: { userId: string } } | null = null;
+    let record: { id: string; quantityRequired: number; project: { userId: string } } | null = null;
 
     if (type === "thread") {
       record = await prisma.projectThread.findUnique({
         where: { id: junctionId },
-        include: { project: { select: { userId: true } } },
+        select: { id: true, quantityRequired: true, project: { select: { userId: true } } },
       });
     } else if (type === "bead") {
       record = await prisma.projectBead.findUnique({
         where: { id: junctionId },
-        include: { project: { select: { userId: true } } },
+        select: { id: true, quantityRequired: true, project: { select: { userId: true } } },
       });
     } else {
       record = await prisma.projectSpecialty.findUnique({
         where: { id: junctionId },
-        include: { project: { select: { userId: true } } },
+        select: { id: true, quantityRequired: true, project: { select: { userId: true } } },
       });
     }
 
@@ -171,21 +171,24 @@ export async function updateSupplyAcquired(
       return { success: false, error: "Unauthorized" };
     }
 
+    // Clamp to [0, quantityRequired]
+    const clamped = Math.min(acquiredQuantity, record.quantityRequired);
+
     // Update quantity
     if (type === "thread") {
       await prisma.projectThread.update({
         where: { id: junctionId },
-        data: { quantityAcquired: acquiredQuantity },
+        data: { quantityAcquired: clamped },
       });
     } else if (type === "bead") {
       await prisma.projectBead.update({
         where: { id: junctionId },
-        data: { quantityAcquired: acquiredQuantity },
+        data: { quantityAcquired: clamped },
       });
     } else {
       await prisma.projectSpecialty.update({
         where: { id: junctionId },
-        data: { quantityAcquired: acquiredQuantity },
+        data: { quantityAcquired: clamped },
       });
     }
 

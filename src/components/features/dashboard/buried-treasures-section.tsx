@@ -36,7 +36,7 @@ export function BuriedTreasuresSection({ treasures, imageUrls }: BuriedTreasures
       <div className="flex flex-col gap-3">
         {treasures.map((t, i) => {
           const imgUrl = imageUrls[t.coverThumbnailUrl ?? ""] ?? null;
-          const linkHref = t.projectId ? `/charts/${t.chartId}` : `/charts/${t.chartId}`;
+          const linkHref = `/charts/${t.chartId}`;
 
           return (
             <Link
