@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, Clock, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,17 @@ interface TopBarProps {
 export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [logModalOpen, setLogModalOpen] = useState(false);
+
+  // Listen for Quick Add "Log Stitches" custom event (D-08)
+  useEffect(() => {
+    function handleOpenLogModal() {
+      setLogModalOpen(true);
+    }
+    window.addEventListener("open-log-session-modal", handleOpenLogModal);
+    return () => {
+      window.removeEventListener("open-log-session-modal", handleOpenLogModal);
+    };
+  }, []);
 
   return (
     <header className="border-border bg-card flex h-14 shrink-0 items-center gap-3 border-b px-4 pt-[env(safe-area-inset-top)]">

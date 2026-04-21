@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shopping Cart Redesign Spike</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --emerald-50: #ecfdf5; --emerald-100: #d1fae5; --emerald-200: #a7f3d0;
+    --emerald-300: #6ee7b7; --emerald-400: #34d399; --emerald-500: #10b981;
+    --emerald-600: #059669; --emerald-700: #047857; --emerald-800: #065f46;
+    --stone-50: #fafaf9; --stone-100: #f5f5f4; --stone-200: #e7e5e4;
+    --stone-300: #d6d3d1; --stone-400: #a8a29e; --stone-500: #78716c;
+    --stone-600: #57534e; --stone-700: #44403c; --stone-800: #292524;
+    --stone-900: #1c1917; --stone-950: #0c0a09;
+    --amber-500: #f59e0b; --amber-600: #d97706;
+    --sky-500: #0ea5e9; --violet-500: #8b5cf6;
+    --bg: #fafaf9; --card: #ffffff; --border: #e7e5e4;
+    --fg: #1c1917; --muted: #78716c; --muted-light: #a8a29e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Sans 3', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.5;
+  }
+
+  /* ─── Page layout ─────────────────────────────────────── */
+
+  .page-header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .page-header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 20px; font-weight: 600;
+    color: var(--fg);
+  }
+  .page-header p {
+    font-size: 13px; color: var(--muted); margin-top: 2px;
+  }
+
+  .layout-switcher {
+    display: flex; gap: 0; margin-top: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  .layout-btn {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px; font-weight: 600;
+    padding: 10px 20px;
+    background: none; border: none; cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .layout-btn:hover { color: var(--fg); }
+  .layout-btn.active {
+    color: var(--emerald-700);
+    border-bottom-color: var(--emerald-600);
+  }
+
+  .layout-panel { display: none; padding: 24px; max-width: 720px; margin: 0 auto; }
+  .layout-panel.active { display: block; }
+
+  /* ─── Shared components ───────────────────────────────── */
+
+  .shopping-for-bar {
+    position: sticky; top: 72px; z-index: 40;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
+  .shopping-for-label {
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .project-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--emerald-50); border: 1px solid var(--emerald-200);
+    border-radius: 6px; padding: 3px 10px;
+    font-size: 13px; font-weight: 500; color: var(--emerald-800);
+  }
+  .chip-x {
+    cursor: pointer; color: var(--emerald-400);
+    font-size: 14px; margin-left: 2px; line-height: 1;
+  }
+
+  .tab-bar {
+    display: flex; gap: 0;
+    border-bottom: 2px solid var(--border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab-btn {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 10px 16px;
+    background: none; border: none; cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .tab-btn:hover { color: var(--fg); }
+  .tab-btn.active { color: var(--emerald-700); border-bottom-color: var(--emerald-600); }
+  .tab-btn.dimmed { opacity: 0.5; }
+  .tab-badge {
+    background: var(--stone-100); color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    padding: 1px 6px; border-radius: 99px; margin-left: 4px;
+  }
+
+  .tab-content { display: none; padding-top: 20px; }
+  .tab-content.active { display: block; }
+
+  .supply-row {
+    display: flex; align-items: center; gap: 12px;
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px; margin-bottom: 4px;
+    background: var(--card);
+    transition: background 0.15s;
+  }
+  .supply-row.fulfilled {
+    border-color: var(--emerald-200);
+    background: rgba(236, 253, 245, 0.3);
+  }
+
+  .color-dot {
+    width: 24px; height: 24px; border-radius: 6px;
+    border: 1px solid rgba(0,0,0,0.08);
+    flex-shrink: 0;
+  }
+
+  .supply-info { flex: 1; min-width: 0; }
+  .supply-name { font-size: 14px; font-weight: 600; color: var(--fg); }
+  .supply-detail { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+  .qty-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 500;
+    color: var(--muted);
+    white-space: nowrap;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--stone-50);
+  }
+  .qty-badge.complete { border-color: var(--emerald-200); color: var(--emerald-600); }
+
+  .section-label {
+    font-family: 'Fraunces', serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 10px;
+  }
+  .section-label::after {
+    content: '';
+    display: block;
+    width: 40px; height: 2px;
+    background: var(--emerald-400);
+    margin-top: 4px;
+    border-radius: 1px;
+  }
+
+  .empty-state {
+    text-align: center; padding: 48px 16px;
+    color: var(--muted); font-size: 14px;
+  }
+
+  /* ─── Layout A: Current 6-tab ─────────────────────────── */
+
+  .project-select-row {
+    display: flex; align-items: center; gap: 12px;
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px; margin-bottom: 4px;
+    background: var(--card); cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .project-select-row:hover { background: var(--stone-50); }
+  .project-select-row.selected {
+    border-color: var(--emerald-300);
+    background: rgba(236, 253, 245, 0.3);
+  }
+
+  .checkbox-icon {
+    width: 20px; height: 20px; border-radius: 4px;
+    border: 2px solid var(--stone-300);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: white;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .selected .checkbox-icon {
+    background: var(--emerald-500);
+    border-color: var(--emerald-500);
+  }
+
+  .project-thumb {
+    width: 40px; height: 40px; border-radius: 6px;
+    flex-shrink: 0; object-fit: cover;
+  }
+  .project-thumb-placeholder {
+    width: 40px; height: 40px; border-radius: 6px;
+    background: var(--stone-200); flex-shrink: 0;
+  }
+  .project-name { font-size: 14px; font-weight: 600; }
+  .project-meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .status-badge {
+    display: inline-block;
+    font-size: 11px; font-weight: 600;
+    padding: 1px 8px; border-radius: 99px;
+  }
+  .status-kitting { background: #fef3c7; color: #92400e; }
+  .status-stitching { background: #d1fae5; color: #065f46; }
+  .status-unstarted { background: var(--stone-100); color: var(--stone-600); }
+
+  .select-all-link {
+    font-size: 13px; font-weight: 500;
+    color: var(--emerald-600); cursor: pointer;
+    border: none; background: none;
+  }
+  .select-all-link:hover { color: var(--emerald-700); }
+
+  /* ─── Layout B: Project-first accordion ───────────────── */
+
+  .accordion-item {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    background: var(--card);
+    overflow: hidden;
+  }
+  .accordion-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .accordion-header:hover { background: var(--stone-50); }
+  .accordion-chevron {
+    width: 20px; height: 20px; flex-shrink: 0;
+    color: var(--muted-light);
+    transition: transform 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .accordion-item.open .accordion-chevron { transform: rotate(90deg); }
+  .accordion-body {
+    display: none;
+    border-top: 1px solid var(--border);
+    padding: 0;
+  }
+  .accordion-item.open .accordion-body { display: block; }
+
+  .supply-type-group {
+    padding: 14px 16px;
+  }
+  .supply-type-group + .supply-type-group {
+    border-top: 1px solid var(--stone-100);
+  }
+  .supply-type-label {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .inline-supply-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0;
+  }
+  .inline-supply-row + .inline-supply-row {
+    border-top: 1px solid var(--stone-50);
+  }
+  .project-needs-summary {
+    font-size: 12px; color: var(--muted);
+    padding: 0 16px 10px;
+  }
+
+  /* ─── Layout C: Consolidated toggle ───────────────────── */
+
+  .view-toggle {
+    display: flex;
+    background: var(--stone-100);
+    border-radius: 8px;
+    padding: 3px;
+    margin-bottom: 20px;
+  }
+  .view-toggle-btn {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 8px 16px;
+    border: none; border-radius: 6px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.15s;
+    flex: 1; text-align: center;
+  }
+  .view-toggle-btn.active {
+    background: var(--card);
+    color: var(--fg);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .consolidated-section { margin-bottom: 24px; }
+  .consolidated-section .section-label { margin-bottom: 8px; }
+
+  .cross-project-note {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 11px; color: var(--emerald-600);
+    margin-top: 2px;
+  }
+  .cross-project-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--emerald-400);
+  }
+
+  /* ─── Shopping list (shared) ──────────────────────────── */
+
+  .checklist-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border); border-radius: 8px;
+    margin-bottom: 3px;
+    background: var(--card);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .checklist-item:hover { background: var(--stone-50); }
+  .checklist-item.checked {
+    border-color: var(--emerald-300);
+    background: var(--emerald-50);
+  }
+  .checklist-item.checked .checklist-label { text-decoration: line-through; color: var(--muted); }
+  .check-box {
+    width: 18px; height: 18px; border-radius: 4px;
+    border: 2px solid var(--stone-300); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: white;
+  }
+  .checked .check-box { background: var(--emerald-500); border-color: var(--emerald-500); }
+  .checklist-label { font-size: 13px; font-weight: 500; flex: 1; }
+  .checklist-detail { font-size: 12px; color: var(--muted); }
+  .checklist-qty { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+  /* ─── Annotations ─────────────────────────────────────── */
+
+  .annotation {
+    background: #fffbeb; border: 1px solid #fde68a;
+    border-radius: 8px; padding: 12px 14px;
+    margin-bottom: 16px; font-size: 13px;
+    color: #92400e; line-height: 1.5;
+  }
+  .annotation strong { color: #78350f; }
+
+  .compare-note {
+    background: var(--stone-50);
+    border: 1px dashed var(--stone-300);
+    border-radius: 8px; padding: 10px 14px;
+    margin: 16px 0; font-size: 12px; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Shopping Cart Redesign Spike</h1>
+  <p>Compare three layouts using the same mock data. Nothing here touches real code.</p>
+
+  <div class="layout-switcher">
+    <button class="layout-btn active" onclick="switchLayout('current')">A: Current (6 tabs)</button>
+    <button class="layout-btn" onclick="switchLayout('project-first')">B: Project-First</button>
+    <button class="layout-btn" onclick="switchLayout('consolidated')">C: Consolidated Toggle</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- LAYOUT A: Current 6-Tab Design                          -->
+<!-- ════════════════════════════════════════════════════════ -->
+
+<div id="panel-current" class="layout-panel active">
+  <div class="annotation">
+    <strong>Layout A: Current design.</strong> 6 tabs — select projects first, then browse by supply type. Cross-project supplies are aggregated (DMC 310 in 2 projects = one row showing combined total). Shopping List is a separate tab.
+  </div>
+
+  <div class="shopping-for-bar">
+    <span class="shopping-for-label">Shopping for:</span>
+    <span class="project-chip">Woodland Sampler <span class="chip-x">&times;</span></span>
+    <span class="project-chip">Highland Cow <span class="chip-x">&times;</span></span>
+  </div>
+
+  <div class="tab-bar" id="tabs-a">
+    <button class="tab-btn active" onclick="switchTabA('projects')">Projects <span class="tab-badge">4</span></button>
+    <button class="tab-btn" onclick="switchTabA('threads')">Threads <span class="tab-badge">8</span></button>
+    <button class="tab-btn" onclick="switchTabA('beads')">Beads <span class="tab-badge">2</span></button>
+    <button class="tab-btn" onclick="switchTabA('specialty')">Specialty <span class="tab-badge">1</span></button>
+    <button class="tab-btn" onclick="switchTabA('fabric')">Fabric <span class="tab-badge">1</span></button>
+    <button class="tab-btn" onclick="switchTabA('list')">Shopping List</button>
+  </div>
+
+  <!-- Projects tab -->
+  <div class="tab-content active" id="tab-a-projects">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-size:13px;color:var(--muted);">4 projects with unfulfilled supply needs</span>
+      <button class="select-all-link">Select all</button>
+    </div>
+
+    <div class="project-select-row selected" style="cursor:default;">
+      <div class="checkbox-icon">&#10003;</div>
+      <div class="project-thumb-placeholder" style="background:linear-gradient(135deg,#a7f3d0,#6ee7b7);"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="project-name">Woodland Sampler</span>
+          <span class="status-badge status-stitching">Stitching</span>
+        </div>
+        <div class="project-meta">Mill Hill &middot; 12 threads, 3 beads &middot; 15 items needed</div>
+      </div>
+    </div>
+
+    <div class="project-select-row selected" style="cursor:default;">
+      <div class="checkbox-icon">&#10003;</div>
+      <div class="project-thumb-placeholder" style="background:linear-gradient(135deg,#fde68a,#f59e0b);"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="project-name">Highland Cow</span>
+          <span class="status-badge status-kitting">Kitting</span>
+        </div>
+        <div class="project-meta">Dimensions &middot; 18 threads, 1 specialty &middot; 20 items needed</div>
+      </div>
+    </div>
+
+    <div class="project-select-row">
+      <div class="checkbox-icon"></div>
+      <div class="project-thumb-placeholder" style="background:linear-gradient(135deg,#c4b5fd,#8b5cf6);"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="project-name">Celestial Garden</span>
+          <span class="status-badge status-kitting">Kitting</span>
+        </div>
+        <div class="project-meta">HAED &middot; 95 threads &middot; 95 items needed</div>
+      </div>
+    </div>
+
+    <div class="project-select-row">
+      <div class="checkbox-icon"></div>
+      <div class="project-thumb-placeholder" style="background:var(--stone-200);"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="project-name">Autumn Leaves</span>
+          <span class="status-badge status-unstarted">Unstarted</span>
+        </div>
+        <div class="project-meta">Country Cottage &middot; 8 threads &middot; 9 items needed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Threads tab -->
+  <div class="tab-content" id="tab-a-threads">
+    <div class="compare-note">Threads from both selected projects, aggregated by supply. DMC 310 appears in both projects &rarr; shown once with combined quantities.</div>
+
+    <div class="supply-row">
+      <div class="color-dot" style="background:#000000;"></div>
+      <div class="supply-info">
+        <div class="supply-name">DMC 310</div>
+        <div class="supply-detail">Black &middot; Woodland Sampler, Highland Cow</div>
+      </div>
+      <div class="qty-badge">3/5 skeins</div>
+    </div>
+    <div class="supply-row">
+      <div class="color-dot" style="background:#c0392b;"></div>
+      <div class="supply-info">
+        <div class="supply-name">DMC 321</div>
+        <div class="supply-detail">Red &middot; Highland Cow</div>
+      </div>
+      <div class="qty-badge">0/2 skeins</div>
+    </div>
+    <div class="supply-row">
+      <div class="color-dot" style="background:#2ecc71;"></div>
+      <div class="supply-info">
+        <div class="supply-name">DMC 699</div>
+        <div class="supply-detail">Green &middot; Woodland Sampler</div>
+      </div>
+      <div class="qty-badge">1/2 skeins</div>
+    </div>
+    <div class="supply-row">
+      <div class="color-dot" style="background:#f39c12;"></div>
+      <div class="supply-info">
+        <div class="supply-name">DMC 742</div>
+        <div class="supply-detail">Tangerine &middot; Woodland Sampler, Highland Cow</div>
+      </div>
+      <div class="qty-badge">0/3 skeins</div>
+    </div>
+    <div class="supply-row fulfilled">
+      <div class="color-dot" style="background:#3498db;"></div>
+      <div class="supply-info">
+        <div class="supply-name">DMC 798</div>
+        <div class="supply-detail">Dark Delft Blue &middot; Highland Cow</div>
+      </div>
+      <div class="qty-badge complete">2/2 skeins</div>
+    </div>
+    <div class="supply-row">
+      <div class="color-dot" style="background:#ecf0f1;"></div>
+      <div class="supply-info">
+        <div class="supply-name">DMC B5200</div>
+        <div class="supply-detail">Snow White &middot; Woodland Sampler</div>
+      </div>
+      <div class="qty-badge">0/1 skeins</div>
+    </div>
+    <div class="supply-row">
+      <div class="color-dot" style="background:#8e44ad;"></div>
+      <div class="supply-info">
+        <div class="supply-name">DMC 550</div>
+        <div class="supply-detail">Very Dark Violet &middot; Woodland Sampler</div>
+      </div>
+      <div class="qty-badge">0/2 skeins</div>
+    </div>
+    <div class="supply-row">
+      <div class="color-dot" style="background:#d4a574;"></div>
+      <div class="supply-info">
+        <div class="supply-name">DMC 437</div>
+        <div class="supply-detail">Light Tan &middot; Highland Cow</div>
+      </div>
+      <div class="qty-badge">0/4 skeins</div>
+    </div>
+  </div>
+
+  <!-- Beads tab -->
+  <div class="tab-content" id="tab-a-beads">
+    <div class="supply-row">
+      <div class="color-dot" style="background:#e74c3c;border-radius:50%;"></div>
+      <div class="supply-info">
+        <div class="supply-name">Mill Hill 02013</div>
+        <div class="supply-detail">Red Red &middot; Woodland Sampler</div>
+      </div>
+      <div class="qty-badge">0/1 packs</div>
+    </div>
+    <div class="supply-row">
+      <div class="color-dot" style="background:#f1c40f;border-radius:50%;"></div>
+      <div class="supply-info">
+        <div class="supply-name">Mill Hill 00557</div>
+        <div class="supply-detail">Gold &middot; Woodland Sampler</div>
+      </div>
+      <div class="qty-badge">0/1 packs</div>
+    </div>
+  </div>
+
+  <!-- Specialty tab -->
+  <div class="tab-content" id="tab-a-specialty">
+    <div class="supply-row">
+      <div class="color-dot" style="background:linear-gradient(135deg,#f1c40f,#e67e22);border-radius:50%;"></div>
+      <div class="supply-info">
+        <div class="supply-name">Kreinik 002HL</div>
+        <div class="supply-detail">Gold Hi Lustre Braid &middot; Highland Cow</div>
+      </div>
+      <div class="qty-badge">0/1 spools</div>
+    </div>
+  </div>
+
+  <!-- Fabric tab -->
+  <div class="tab-content" id="tab-a-fabric">
+    <div class="supply-row">
+      <div class="supply-info">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="supply-name">Highland Cow</span>
+          <span style="font-size:11px;color:var(--amber-600);font-weight:600;">Needs fabric</span>
+        </div>
+        <div class="supply-detail">180 x 240 stitches</div>
+      </div>
+    </div>
+    <div class="supply-row fulfilled">
+      <div class="supply-info">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="supply-name">Woodland Sampler</span>
+          <span style="font-size:11px;color:var(--emerald-600);font-weight:600;">&#10003; Has fabric</span>
+        </div>
+        <div class="supply-detail">120 x 160 stitches &middot; 14ct White Aida</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shopping List tab -->
+  <div class="tab-content" id="tab-a-list">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:13px;color:var(--muted);">10 items to buy</span>
+    </div>
+
+    <div class="section-label">Threads</div>
+    <div style="margin-bottom:20px;">
+      <div class="checklist-item">
+        <div class="check-box"></div>
+        <div class="color-dot" style="width:18px;height:18px;background:#000;"></div>
+        <span class="checklist-label">DMC 310 Black</span>
+        <span class="checklist-qty">2 skeins</span>
+      </div>
+      <div class="checklist-item">
+        <div class="check-box"></div>
+        <div class="color-dot" style="width:18px;height:18px;background:#c0392b;"></div>
+        <span class="checklist-label">DMC 321 Red</span>
+        <span class="checklist-qty">2 skeins</span>
+      </div>
+      <div class="checklist-item">
+        <div class="check-box"></div>
+        <div class="color-dot" style="width:18px;height:18px;background:#2ecc71;"></div>
+        <span class="checklist-label">DMC 699 Green</span>
+        <span class="checklist-qty">1 skein</span>
+      </div>
+      <div class="checklist-item">
+        <div class="check-box"></div>
+        <div class="color-dot" style="width:18px;height:18px;background:#f39c12;"></div>
+        <span class="checklist-label">DMC 742 Tangerine</span>
+        <span class="checklist-qty">3 skeins</span>
+      </div>
+      <div class="checklist-item">
+        <div class="check-box"></div>
+        <div class="color-dot" style="width:18px;height:18px;background:#ecf0f1;"></div>
+        <span class="checklist-label">DMC B5200 Snow White</span>
+        <span class="checklist-qty">1 skein</span>
+      </div>
+      <div class="checklist-item">
+        <div class="check-box"></div>
+        <div class="color-dot" style="width:18px;height:18px;background:#8e44ad;"></div>
+        <span class="checklist-label">DMC 550 Very Dark Violet</span>
+        <span class="checklist-qty">2 skeins</span>
+      </div>
+      <div class="checklist-item">
+        <div class="check-box"></div>
+        <div class="color-dot" style="width:18px;height:18px;background:#d4a574;"></div>
+        <span class="checklist-label">DMC 437 Light Tan</span>
+        <span class="checklist-qty">4 skeins</span>
+      </div>
+    </div>
+
+    <div class="section-label">Beads</div>
+    <div style="margin-bottom:20px;">
+      <div class="checklist-item">
+        <div class="check-box"></div>
+        <div class="color-dot" style="width:18px;height:18px;background:#e74c3c;border-radius:50%;"></div>
+        <span class="checklist-label">Mill Hill 02013 Red Red</span>
+        <span class="checklist-qty">1 pack</span>
+      </div>
+      <div class="checklist-item">
+        <div class="check-box"></div>
+        <div class="color-dot" style="width:18px;height:18px;background:#f1c40f;border-radius:50%;"></div>
+        <span class="checklist-label">Mill Hill 00557 Gold</span>
+        <span class="checklist-qty">1 pack</span>
+      </div>
+    </div>
+
+    <div class="section-label">Specialty</div>
+    <div style="margin-bottom:20px;">
+      <div class="checklist-item">
+        <div class="check-box"></div>
+        <span class="checklist-label">Kreinik 002HL Gold Hi Lustre Braid</span>
+        <span class="checklist-qty">1 spool</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- LAYOUT B: Project-First Accordion                       -->
+<!-- ════════════════════════════════════════════════════════ -->
+
+<div id="panel-project-first" class="layout-panel">
+  <div class="annotation">
+    <strong>Layout B: Project-first.</strong> Each project expands to show ALL its supplies (threads + beads + specialty + fabric) inline. No supply-type tabs. Shopping List stays as a separate view via a button. <strong>Trade-off:</strong> DMC 310 now appears twice (once per project) instead of aggregated into one row.
+  </div>
+
+  <div class="shopping-for-bar">
+    <span class="shopping-for-label">Shopping for:</span>
+    <span class="project-chip">Woodland Sampler <span class="chip-x">&times;</span></span>
+    <span class="project-chip">Highland Cow <span class="chip-x">&times;</span></span>
+  </div>
+
+  <div class="tab-bar" id="tabs-b">
+    <button class="tab-btn active" onclick="switchTabB('browse')">Projects</button>
+    <button class="tab-btn" onclick="switchTabB('list')">Shopping List</button>
+  </div>
+
+  <!-- Browse tab -->
+  <div class="tab-content active" id="tab-b-browse">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-size:13px;color:var(--muted);">2 of 4 projects selected &middot; expand to see supply details</span>
+      <button class="select-all-link">Select all</button>
+    </div>
+
+    <!-- Woodland Sampler (expanded) -->
+    <div class="accordion-item open">
+      <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="checkbox-icon" style="background:var(--emerald-500);border-color:var(--emerald-500);color:white;font-size:14px;">&#10003;</div>
+        <div class="project-thumb-placeholder" style="background:linear-gradient(135deg,#a7f3d0,#6ee7b7);"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="project-name">Woodland Sampler</span>
+            <span class="status-badge status-stitching">Stitching</span>
+          </div>
+          <div class="project-meta">Mill Hill &middot; 7 items still needed</div>
+        </div>
+        <div class="accordion-chevron">&#9654;</div>
+      </div>
+      <div class="accordion-body">
+        <div class="supply-type-group">
+          <div class="supply-type-label">Threads (5 needed)</div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:#000;"></div>
+            <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 310</span> <span style="font-size:12px;color:var(--muted);">Black</span></div>
+            <div class="qty-badge" style="font-size:12px;padding:2px 8px;">1/3</div>
+          </div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:#2ecc71;"></div>
+            <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 699</span> <span style="font-size:12px;color:var(--muted);">Green</span></div>
+            <div class="qty-badge" style="font-size:12px;padding:2px 8px;">1/2</div>
+          </div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:#f39c12;"></div>
+            <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 742</span> <span style="font-size:12px;color:var(--muted);">Tangerine</span></div>
+            <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/1</div>
+          </div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:#ecf0f1;"></div>
+            <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC B5200</span> <span style="font-size:12px;color:var(--muted);">Snow White</span></div>
+            <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/1</div>
+          </div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:#8e44ad;"></div>
+            <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 550</span> <span style="font-size:12px;color:var(--muted);">Very Dark Violet</span></div>
+            <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/2</div>
+          </div>
+        </div>
+        <div class="supply-type-group">
+          <div class="supply-type-label">Beads (2 needed)</div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:#e74c3c;border-radius:50%;"></div>
+            <div class="supply-info"><span class="supply-name" style="font-size:13px;">Mill Hill 02013</span> <span style="font-size:12px;color:var(--muted);">Red Red</span></div>
+            <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/1</div>
+          </div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:#f1c40f;border-radius:50%;"></div>
+            <div class="supply-info"><span class="supply-name" style="font-size:13px;">Mill Hill 00557</span> <span style="font-size:12px;color:var(--muted);">Gold</span></div>
+            <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/1</div>
+          </div>
+        </div>
+        <div class="supply-type-group">
+          <div class="supply-type-label" style="display:flex;align-items:center;gap:8px;">Fabric <span style="font-size:11px;color:var(--emerald-600);font-weight:600;text-transform:none;letter-spacing:0;">&#10003; Has fabric</span></div>
+          <div style="font-size:12px;color:var(--muted);padding:4px 0;">14ct White Aida &middot; 120 x 160 stitches</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Highland Cow (expanded) -->
+    <div class="accordion-item open">
+      <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="checkbox-icon" style="background:var(--emerald-500);border-color:var(--emerald-500);color:white;font-size:14px;">&#10003;</div>
+        <div class="project-thumb-placeholder" style="background:linear-gradient(135deg,#fde68a,#f59e0b);"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="project-name">Highland Cow</span>
+            <span class="status-badge status-kitting">Kitting</span>
+          </div>
+          <div class="project-meta">Dimensions &middot; 8 items still needed</div>
+        </div>
+        <div class="accordion-chevron">&#9654;</div>
+      </div>
+      <div class="accordion-body">
+        <div class="supply-type-group">
+          <div class="supply-type-label">Threads (5 needed)</div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:#000;"></div>
+            <div class="supply-info">
+              <span class="supply-name" style="font-size:13px;">DMC 310</span> <span style="font-size:12px;color:var(--muted);">Black</span>
+              <div class="cross-project-note"><span class="cross-project-dot"></span> Also in Woodland Sampler</div>
+            </div>
+            <div class="qty-badge" style="font-size:12px;padding:2px 8px;">2/2</div>
+          </div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:#c0392b;"></div>
+            <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 321</span> <span style="font-size:12px;color:var(--muted);">Red</span></div>
+            <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/2</div>
+          </div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:#f39c12;"></div>
+            <div class="supply-info">
+              <span class="supply-name" style="font-size:13px;">DMC 742</span> <span style="font-size:12px;color:var(--muted);">Tangerine</span>
+              <div class="cross-project-note"><span class="cross-project-dot"></span> Also in Woodland Sampler</div>
+            </div>
+            <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/2</div>
+          </div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:#3498db;"></div>
+            <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 798</span> <span style="font-size:12px;color:var(--muted);">Dark Delft Blue</span></div>
+            <div class="qty-badge complete" style="font-size:12px;padding:2px 8px;">2/2 &#10003;</div>
+          </div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:#d4a574;"></div>
+            <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 437</span> <span style="font-size:12px;color:var(--muted);">Light Tan</span></div>
+            <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/4</div>
+          </div>
+        </div>
+        <div class="supply-type-group">
+          <div class="supply-type-label">Specialty (1 needed)</div>
+          <div class="inline-supply-row">
+            <div class="color-dot" style="width:20px;height:20px;background:linear-gradient(135deg,#f1c40f,#e67e22);border-radius:50%;"></div>
+            <div class="supply-info"><span class="supply-name" style="font-size:13px;">Kreinik 002HL</span> <span style="font-size:12px;color:var(--muted);">Gold Hi Lustre Braid</span></div>
+            <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/1</div>
+          </div>
+        </div>
+        <div class="supply-type-group">
+          <div class="supply-type-label" style="display:flex;align-items:center;gap:8px;">Fabric <span style="font-size:11px;color:var(--amber-600);font-weight:600;text-transform:none;letter-spacing:0;">Needs fabric</span></div>
+          <div style="font-size:12px;color:var(--muted);padding:4px 0;">180 x 240 stitches &middot; No fabric assigned</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unselected projects (collapsed) -->
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="checkbox-icon"></div>
+        <div class="project-thumb-placeholder" style="background:linear-gradient(135deg,#c4b5fd,#8b5cf6);"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="project-name">Celestial Garden</span>
+            <span class="status-badge status-kitting">Kitting</span>
+          </div>
+          <div class="project-meta">HAED &middot; 95 items needed</div>
+        </div>
+        <div class="accordion-chevron">&#9654;</div>
+      </div>
+      <div class="accordion-body">
+        <div style="padding:20px 16px; text-align:center; color:var(--muted); font-size:13px;">
+          Select this project to see supply details
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="checkbox-icon"></div>
+        <div class="project-thumb-placeholder" style="background:var(--stone-200);"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="project-name">Autumn Leaves</span>
+            <span class="status-badge status-unstarted">Unstarted</span>
+          </div>
+          <div class="project-meta">Country Cottage &middot; 9 items needed</div>
+        </div>
+        <div class="accordion-chevron">&#9654;</div>
+      </div>
+      <div class="accordion-body">
+        <div style="padding:20px 16px; text-align:center; color:var(--muted); font-size:13px;">
+          Select this project to see supply details
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shopping List (same as current) -->
+  <div class="tab-content" id="tab-b-list">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:13px;color:var(--muted);">10 items to buy &middot; aggregated across projects</span>
+    </div>
+    <div class="section-label">Threads</div>
+    <div style="margin-bottom:20px;">
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#000;"></div><span class="checklist-label">DMC 310 Black</span><span class="checklist-qty">2 skeins</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#c0392b;"></div><span class="checklist-label">DMC 321 Red</span><span class="checklist-qty">2 skeins</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#2ecc71;"></div><span class="checklist-label">DMC 699 Green</span><span class="checklist-qty">1 skein</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#f39c12;"></div><span class="checklist-label">DMC 742 Tangerine</span><span class="checklist-qty">3 skeins</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#ecf0f1;"></div><span class="checklist-label">DMC B5200 Snow White</span><span class="checklist-qty">1 skein</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#8e44ad;"></div><span class="checklist-label">DMC 550 Very Dark Violet</span><span class="checklist-qty">2 skeins</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#d4a574;"></div><span class="checklist-label">DMC 437 Light Tan</span><span class="checklist-qty">4 skeins</span></div>
+    </div>
+    <div class="section-label">Beads</div>
+    <div style="margin-bottom:20px;">
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#e74c3c;border-radius:50%;"></div><span class="checklist-label">Mill Hill 02013 Red Red</span><span class="checklist-qty">1 pack</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#f1c40f;border-radius:50%;"></div><span class="checklist-label">Mill Hill 00557 Gold</span><span class="checklist-qty">1 pack</span></div>
+    </div>
+    <div class="section-label">Specialty</div>
+    <div style="margin-bottom:20px;">
+      <div class="checklist-item"><div class="check-box"></div><span class="checklist-label">Kreinik 002HL Gold Hi Lustre Braid</span><span class="checklist-qty">1 spool</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- LAYOUT C: Consolidated Toggle                           -->
+<!-- ════════════════════════════════════════════════════════ -->
+
+<div id="panel-consolidated" class="layout-panel">
+  <div class="annotation">
+    <strong>Layout C: Hybrid with toggle.</strong> Two tabs (Projects + Shopping List), but within Projects you toggle between "By Project" (accordion) and "By Supply" (flat aggregated list). Best of both worlds — but adds a new UI concept (view toggle).
+  </div>
+
+  <div class="shopping-for-bar">
+    <span class="shopping-for-label">Shopping for:</span>
+    <span class="project-chip">Woodland Sampler <span class="chip-x">&times;</span></span>
+    <span class="project-chip">Highland Cow <span class="chip-x">&times;</span></span>
+  </div>
+
+  <div class="tab-bar" id="tabs-c">
+    <button class="tab-btn active" onclick="switchTabC('browse')">Projects</button>
+    <button class="tab-btn" onclick="switchTabC('list')">Shopping List</button>
+  </div>
+
+  <!-- Browse tab with toggle -->
+  <div class="tab-content active" id="tab-c-browse">
+    <div class="view-toggle" id="view-toggle">
+      <button class="view-toggle-btn active" onclick="switchView('by-project')">By Project</button>
+      <button class="view-toggle-btn" onclick="switchView('by-supply')">By Supply Type</button>
+    </div>
+
+    <!-- By Project view -->
+    <div id="view-by-project">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-size:13px;color:var(--muted);">2 of 4 projects selected</span>
+        <button class="select-all-link">Select all</button>
+      </div>
+
+      <div class="accordion-item open">
+        <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+          <div class="checkbox-icon" style="background:var(--emerald-500);border-color:var(--emerald-500);color:white;font-size:14px;">&#10003;</div>
+          <div class="project-thumb-placeholder" style="background:linear-gradient(135deg,#a7f3d0,#6ee7b7);"></div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="project-name">Woodland Sampler</span>
+              <span class="status-badge status-stitching">Stitching</span>
+            </div>
+            <div class="project-meta">Mill Hill &middot; 7 items still needed</div>
+          </div>
+          <div class="accordion-chevron">&#9654;</div>
+        </div>
+        <div class="accordion-body">
+          <div class="supply-type-group">
+            <div class="supply-type-label">Threads (5)</div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:#000;"></div>
+              <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 310</span> <span style="font-size:12px;color:var(--muted);">Black</span></div>
+              <div class="qty-badge" style="font-size:12px;padding:2px 8px;">1/3</div>
+            </div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:#2ecc71;"></div>
+              <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 699</span> <span style="font-size:12px;color:var(--muted);">Green</span></div>
+              <div class="qty-badge" style="font-size:12px;padding:2px 8px;">1/2</div>
+            </div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:#f39c12;"></div>
+              <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 742</span> <span style="font-size:12px;color:var(--muted);">Tangerine</span></div>
+              <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/1</div>
+            </div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:#ecf0f1;"></div>
+              <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC B5200</span> <span style="font-size:12px;color:var(--muted);">Snow White</span></div>
+              <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/1</div>
+            </div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:#8e44ad;"></div>
+              <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 550</span> <span style="font-size:12px;color:var(--muted);">V. Dk. Violet</span></div>
+              <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/2</div>
+            </div>
+          </div>
+          <div class="supply-type-group">
+            <div class="supply-type-label">Beads (2)</div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:#e74c3c;border-radius:50%;"></div>
+              <div class="supply-info"><span class="supply-name" style="font-size:13px;">Mill Hill 02013</span> <span style="font-size:12px;color:var(--muted);">Red Red</span></div>
+              <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/1</div>
+            </div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:#f1c40f;border-radius:50%;"></div>
+              <div class="supply-info"><span class="supply-name" style="font-size:13px;">Mill Hill 00557</span> <span style="font-size:12px;color:var(--muted);">Gold</span></div>
+              <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/1</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item open">
+        <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+          <div class="checkbox-icon" style="background:var(--emerald-500);border-color:var(--emerald-500);color:white;font-size:14px;">&#10003;</div>
+          <div class="project-thumb-placeholder" style="background:linear-gradient(135deg,#fde68a,#f59e0b);"></div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="project-name">Highland Cow</span>
+              <span class="status-badge status-kitting">Kitting</span>
+            </div>
+            <div class="project-meta">Dimensions &middot; 8 items still needed</div>
+          </div>
+          <div class="accordion-chevron">&#9654;</div>
+        </div>
+        <div class="accordion-body">
+          <div class="supply-type-group">
+            <div class="supply-type-label">Threads (5)</div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:#000;"></div>
+              <div class="supply-info">
+                <span class="supply-name" style="font-size:13px;">DMC 310</span> <span style="font-size:12px;color:var(--muted);">Black</span>
+                <div class="cross-project-note"><span class="cross-project-dot"></span> Also in Woodland Sampler</div>
+              </div>
+              <div class="qty-badge" style="font-size:12px;padding:2px 8px;">2/2</div>
+            </div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:#c0392b;"></div>
+              <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 321</span> <span style="font-size:12px;color:var(--muted);">Red</span></div>
+              <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/2</div>
+            </div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:#f39c12;"></div>
+              <div class="supply-info">
+                <span class="supply-name" style="font-size:13px;">DMC 742</span> <span style="font-size:12px;color:var(--muted);">Tangerine</span>
+                <div class="cross-project-note"><span class="cross-project-dot"></span> Also in Woodland Sampler</div>
+              </div>
+              <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/2</div>
+            </div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:#3498db;"></div>
+              <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 798</span> <span style="font-size:12px;color:var(--muted);">Dk. Delft Blue</span></div>
+              <div class="qty-badge complete" style="font-size:12px;padding:2px 8px;">2/2 &#10003;</div>
+            </div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:#d4a574;"></div>
+              <div class="supply-info"><span class="supply-name" style="font-size:13px;">DMC 437</span> <span style="font-size:12px;color:var(--muted);">Light Tan</span></div>
+              <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/4</div>
+            </div>
+          </div>
+          <div class="supply-type-group">
+            <div class="supply-type-label">Specialty (1)</div>
+            <div class="inline-supply-row">
+              <div class="color-dot" style="width:20px;height:20px;background:linear-gradient(135deg,#f1c40f,#e67e22);border-radius:50%;"></div>
+              <div class="supply-info"><span class="supply-name" style="font-size:13px;">Kreinik 002HL</span> <span style="font-size:12px;color:var(--muted);">Gold Braid</span></div>
+              <div class="qty-badge" style="font-size:12px;padding:2px 8px;">0/1</div>
+            </div>
+          </div>
+          <div class="supply-type-group">
+            <div class="supply-type-label" style="display:flex;align-items:center;gap:8px;">Fabric <span style="font-size:11px;color:var(--amber-600);font-weight:600;text-transform:none;letter-spacing:0;">Needs fabric</span></div>
+            <div style="font-size:12px;color:var(--muted);padding:4px 0;">180 x 240 stitches &middot; No fabric assigned</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- By Supply view -->
+    <div id="view-by-supply" style="display:none;">
+      <div class="consolidated-section">
+        <div class="section-label">Threads <span style="font-weight:400;font-size:13px;color:var(--muted);">(8 types, 6 still needed)</span></div>
+        <div class="supply-row">
+          <div class="color-dot" style="background:#000;"></div>
+          <div class="supply-info"><div class="supply-name">DMC 310</div><div class="supply-detail">Black &middot; Woodland Sampler, Highland Cow</div></div>
+          <div class="qty-badge">3/5 skeins</div>
+        </div>
+        <div class="supply-row">
+          <div class="color-dot" style="background:#c0392b;"></div>
+          <div class="supply-info"><div class="supply-name">DMC 321</div><div class="supply-detail">Red &middot; Highland Cow</div></div>
+          <div class="qty-badge">0/2 skeins</div>
+        </div>
+        <div class="supply-row">
+          <div class="color-dot" style="background:#2ecc71;"></div>
+          <div class="supply-info"><div class="supply-name">DMC 699</div><div class="supply-detail">Green &middot; Woodland Sampler</div></div>
+          <div class="qty-badge">1/2 skeins</div>
+        </div>
+        <div class="supply-row">
+          <div class="color-dot" style="background:#f39c12;"></div>
+          <div class="supply-info"><div class="supply-name">DMC 742</div><div class="supply-detail">Tangerine &middot; Woodland Sampler, Highland Cow</div></div>
+          <div class="qty-badge">0/3 skeins</div>
+        </div>
+        <div class="supply-row fulfilled">
+          <div class="color-dot" style="background:#3498db;"></div>
+          <div class="supply-info"><div class="supply-name">DMC 798</div><div class="supply-detail">Dark Delft Blue &middot; Highland Cow</div></div>
+          <div class="qty-badge complete">2/2 skeins</div>
+        </div>
+        <div class="supply-row">
+          <div class="color-dot" style="background:#ecf0f1;"></div>
+          <div class="supply-info"><div class="supply-name">DMC B5200</div><div class="supply-detail">Snow White &middot; Woodland Sampler</div></div>
+          <div class="qty-badge">0/1 skeins</div>
+        </div>
+        <div class="supply-row">
+          <div class="color-dot" style="background:#8e44ad;"></div>
+          <div class="supply-info"><div class="supply-name">DMC 550</div><div class="supply-detail">Very Dark Violet &middot; Woodland Sampler</div></div>
+          <div class="qty-badge">0/2 skeins</div>
+        </div>
+        <div class="supply-row">
+          <div class="color-dot" style="background:#d4a574;"></div>
+          <div class="supply-info"><div class="supply-name">DMC 437</div><div class="supply-detail">Light Tan &middot; Highland Cow</div></div>
+          <div class="qty-badge">0/4 skeins</div>
+        </div>
+      </div>
+
+      <div class="consolidated-section">
+        <div class="section-label">Beads <span style="font-weight:400;font-size:13px;color:var(--muted);">(2 types)</span></div>
+        <div class="supply-row">
+          <div class="color-dot" style="background:#e74c3c;border-radius:50%;"></div>
+          <div class="supply-info"><div class="supply-name">Mill Hill 02013</div><div class="supply-detail">Red Red &middot; Woodland Sampler</div></div>
+          <div class="qty-badge">0/1 packs</div>
+        </div>
+        <div class="supply-row">
+          <div class="color-dot" style="background:#f1c40f;border-radius:50%;"></div>
+          <div class="supply-info"><div class="supply-name">Mill Hill 00557</div><div class="supply-detail">Gold &middot; Woodland Sampler</div></div>
+          <div class="qty-badge">0/1 packs</div>
+        </div>
+      </div>
+
+      <div class="consolidated-section">
+        <div class="section-label">Specialty <span style="font-weight:400;font-size:13px;color:var(--muted);">(1 type)</span></div>
+        <div class="supply-row">
+          <div class="color-dot" style="background:linear-gradient(135deg,#f1c40f,#e67e22);border-radius:50%;"></div>
+          <div class="supply-info"><div class="supply-name">Kreinik 002HL</div><div class="supply-detail">Gold Hi Lustre Braid &middot; Highland Cow</div></div>
+          <div class="qty-badge">0/1 spools</div>
+        </div>
+      </div>
+
+      <div class="consolidated-section">
+        <div class="section-label">Fabric <span style="font-weight:400;font-size:13px;color:var(--muted);">(1 of 2 needs fabric)</span></div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div style="display:flex;align-items:center;gap:8px;"><span class="supply-name">Highland Cow</span><span style="font-size:11px;color:var(--amber-600);font-weight:600;">Needs fabric</span></div>
+            <div class="supply-detail">180 x 240 stitches</div>
+          </div>
+        </div>
+        <div class="supply-row fulfilled">
+          <div class="supply-info">
+            <div style="display:flex;align-items:center;gap:8px;"><span class="supply-name">Woodland Sampler</span><span style="font-size:11px;color:var(--emerald-600);font-weight:600;">&#10003; Has fabric</span></div>
+            <div class="supply-detail">120 x 160 stitches &middot; 14ct White Aida</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shopping List (same) -->
+  <div class="tab-content" id="tab-c-list">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:13px;color:var(--muted);">10 items to buy &middot; aggregated across projects</span>
+    </div>
+    <div class="section-label">Threads</div>
+    <div style="margin-bottom:20px;">
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#000;"></div><span class="checklist-label">DMC 310 Black</span><span class="checklist-qty">2 skeins</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#c0392b;"></div><span class="checklist-label">DMC 321 Red</span><span class="checklist-qty">2 skeins</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#2ecc71;"></div><span class="checklist-label">DMC 699 Green</span><span class="checklist-qty">1 skein</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#f39c12;"></div><span class="checklist-label">DMC 742 Tangerine</span><span class="checklist-qty">3 skeins</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#ecf0f1;"></div><span class="checklist-label">DMC B5200 Snow White</span><span class="checklist-qty">1 skein</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#8e44ad;"></div><span class="checklist-label">DMC 550 Very Dark Violet</span><span class="checklist-qty">2 skeins</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#d4a574;"></div><span class="checklist-label">DMC 437 Light Tan</span><span class="checklist-qty">4 skeins</span></div>
+    </div>
+    <div class="section-label">Beads</div>
+    <div style="margin-bottom:20px;">
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#e74c3c;border-radius:50%;"></div><span class="checklist-label">Mill Hill 02013 Red Red</span><span class="checklist-qty">1 pack</span></div>
+      <div class="checklist-item"><div class="check-box"></div><div class="color-dot" style="width:18px;height:18px;background:#f1c40f;border-radius:50%;"></div><span class="checklist-label">Mill Hill 00557 Gold</span><span class="checklist-qty">1 pack</span></div>
+    </div>
+    <div class="section-label">Specialty</div>
+    <div style="margin-bottom:20px;">
+      <div class="checklist-item"><div class="check-box"></div><span class="checklist-label">Kreinik 002HL Gold Hi Lustre Braid</span><span class="checklist-qty">1 spool</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Layout switcher
+  function switchLayout(id) {
+    document.querySelectorAll('.layout-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.layout-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // Tab switching for Layout A
+  function switchTabA(tab) {
+    document.querySelectorAll('#panel-current .tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('#tabs-a .tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-a-' + tab).classList.add('active');
+    event.target.closest('.tab-btn').classList.add('active');
+  }
+
+  // Tab switching for Layout B
+  function switchTabB(tab) {
+    document.querySelectorAll('#panel-project-first .tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('#tabs-b .tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-b-' + tab).classList.add('active');
+    event.target.closest('.tab-btn').classList.add('active');
+  }
+
+  // Tab switching for Layout C
+  function switchTabC(tab) {
+    document.querySelectorAll('#panel-consolidated .tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('#tabs-c .tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-c-' + tab).classList.add('active');
+    event.target.closest('.tab-btn').classList.add('active');
+  }
+
+  // View toggle for Layout C
+  function switchView(view) {
+    document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    if (view === 'by-project') {
+      document.getElementById('view-by-project').style.display = 'block';
+      document.getElementById('view-by-supply').style.display = 'none';
+    } else {
+      document.getElementById('view-by-project').style.display = 'none';
+      document.getElementById('view-by-supply').style.display = 'block';
+    }
+  }
+
+  // Checklist toggling
+  document.querySelectorAll('.checklist-item').forEach(item => {
+    item.addEventListener('click', () => item.classList.toggle('checked'));
+  });
+</script>
+
+</body>
+</html>

@@ -4,9 +4,9 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** v1.1 shipped | **Next:** v1.2 Track & Measure
-**Last Updated:** 2026-04-17
-**Roadmap:** 4 milestones / 11 phases — v1.0 + v1.1 shipped, v1.2 next (phases 8-9)
+**Milestone:** v1.2 Track & Measure (COMPLETE)
+**Last Updated:** 2026-04-18
+**Roadmap:** 4 milestones / 11 phases — v1.0 + v1.1 + v1.2 shipped, v1.3 next
 
 ### Done
 
@@ -19,15 +19,25 @@
   - Phase 7: Project detail hero, tabbed layout, skein calculator, supply redesign (PR #16)
   - Archived to: `.planning/milestones/v1.1-*`
   - Full details: `.planning/MILESTONES.md` and `.planning/RETROSPECTIVE.md`
+- **Phase 8: Session Logging & Pattern Dive** (2026-04-18): 11 plans, verified complete
+- **Phase 9: Dashboards & Shopping Cart** (2026-04-18): 9 plans, 1160 tests, verified complete
+  - Main Dashboard with Your Library + Progress tabs, Quick Add menu
+  - Project Dashboard with hero stats, progress buckets, finished tab
+  - Shopping Cart with project selection, tabbed supplies, quantity controls
 
 ### In Progress
 
-Phase 8 verified and complete. Phase 9 ready to plan.
+None — v1.2 milestone complete, PR #18 open.
+
+### Done This Session
+
+- Shipped Phase 9 as PR #18: https://github.com/Beth-Allan/cross-stitch-tracker/pull/18
 
 ### Next Up
 
-1. Phase 9 planning — `/gsd-discuss-phase 9` then `/gsd-plan-phase 9`
-2. `/gsd-explore` — discuss user feedback items before next milestone
+1. Review/merge PR #18
+2. `/gsd-complete-milestone` — archive v1.2
+3. `/gsd-explore` — discuss user feedback items before v1.3
 
 ### Backlog
 
@@ -54,6 +64,8 @@ Phase 8 verified and complete. Phase 9 ready to plan.
 - 999.8: What's Next card styling — use same/similar gallery cards as Browse tab for visual consistency
 - 999.9: What's Next kitting label at 0% — "Kitting" label misleading when no supplies tracked; consider "Not kitted" or hiding label
 - 999.10: Auto-status from kitting activity — consider auto-transitioning project status to "Kitting" when user starts adding supplies/fabric
+- **999.11: Shopping cart scaling for large collections (HIGH PRIORITY)** — search/filter in project list, status grouping (Kitting/Stitching/Unstarted), supply-type search in By Supply view. Real dataset is 75+ projects in kitting stages.
+- 999.12: Shopping-for bar pill styling — match mockup style (squared-off chips with border, contained card-like bar) instead of current full-round pills
 
 ### Blockers
 

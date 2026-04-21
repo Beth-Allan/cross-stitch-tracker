@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Track & Measure
-status: ready_to_plan
-stopped_at: Phase 8 complete, ready to plan Phase 9
-last_updated: "2026-04-18T02:00:00.000Z"
-last_activity: 2026-04-18
+status: milestone_complete
+stopped_at: Phase 9 shipped — PR #18
+last_updated: "2026-04-19T00:00:00.000Z"
+last_activity: 2026-04-18 -- Phase 09 shipped — PR #18
 progress:
   total_phases: 2
-  completed_phases: 1
-  total_plans: 11
-  completed_plans: 11
-  percent: 50
+  completed_phases: 2
+  total_plans: 20
+  completed_plans: 20
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 09 — Dashboards & Shopping Cart
+**Current focus:** v1.2 milestone complete — ready for archive
 
 ## Current Position
 
-Phase: 09
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-04-18
+Phase: 09 (dashboards-shopping-cart) — COMPLETE
+Plan: 9 of 9
+Status: Phase 09 complete, v1.2 milestone complete
+Last activity: 2026-04-18 -- Phase 09 complete
 
-Progress: [█████░░░░░] 50%
+Progress: [██████████] 100%
 
 ## Milestone Structure
 
@@ -78,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-18T02:00:00Z
-Stopped at: Phase 8 complete, ready to plan Phase 9
-Resume file: None
+Last session: 2026-04-17T20:10:00Z
+Stopped at: Phase 9 context gathered, ready to plan
+Resume file: .planning/phases/09-dashboards-shopping-cart/09-CONTEXT.md
