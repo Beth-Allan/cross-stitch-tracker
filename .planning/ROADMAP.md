@@ -72,7 +72,7 @@ Full details: `milestones/v1.2-ROADMAP.md`
 **Plans**: 2 plans
 Plans:
 - [x] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
-- [ ] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
+- [x] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
 **UI hint**: no
 
 ### Phase 10: Advanced Stats
@@ -85,7 +85,7 @@ Plans:
   3. Year in Review tab shows 8 stat sections with year selector
 **Plans**: 2 plans
 Plans:
-- [ ] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
+- [x] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
 - [ ] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
 **UI hint**: yes
 
