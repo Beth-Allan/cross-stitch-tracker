@@ -13,9 +13,39 @@ import {
   uploadRequestSchema,
   ALLOWED_IMAGE_TYPES,
   ALLOWED_FILE_TYPES,
+  OPTIMIZED_MAX_WIDTH,
+  OPTIMIZED_QUALITY,
+  THUMBNAIL_SIZE,
+  THUMBNAIL_QUALITY,
 } from "@/lib/validations/upload";
 
 const VALID_CHART_FIELDS = ["coverImageUrl", "coverThumbnailUrl", "digitalWorkingCopyUrl"] as const;
+
+/**
+ * Fetch an image from R2 and return it as a Buffer.
+ * Shared by processAndStoreImage and generateThumbnail.
+ */
+async function fetchImageBuffer(
+  key: string,
+): Promise<{ success: true; buffer: Buffer } | { success: false; error: string }> {
+  const r2 = getR2Client();
+  const getCommand = new GetObjectCommand({
+    Bucket: R2_BUCKET_NAME,
+    Key: key,
+  });
+  const response = await r2.send(getCommand);
+
+  if (!response.Body) {
+    return { success: false, error: "Original image not found in storage" };
+  }
+
+  const chunks: Uint8Array[] = [];
+  const stream = response.Body as AsyncIterable<Uint8Array>;
+  for await (const chunk of stream) {
+    chunks.push(chunk);
+  }
+  return { success: true, buffer: Buffer.concat(chunks) };
+}
 
 type ChartFileField = (typeof VALID_CHART_FIELDS)[number];
 
@@ -117,12 +147,23 @@ export async function confirmUpload(input: { chartId: string; field: string; key
       data: { [input.field]: input.key },
     });
 
-    // Auto-generate thumbnail when a cover image is confirmed
+    // Optimize cover image: produce 1200px WebP + 400x400 thumbnail, delete raw original
     if (input.field === "coverImageUrl") {
       try {
-        await generateThumbnail(input.chartId, input.key);
+        const result = await processAndStoreImage(input.chartId, input.key, "covers");
+        if (result.success) {
+          // Update DB with optimized key and thumbnail key (replaces the raw key saved above)
+          await prisma.chart.update({
+            where: { id: input.chartId },
+            data: {
+              coverImageUrl: result.optimizedKey,
+              coverThumbnailUrl: result.thumbnailKey,
+            },
+          });
+        }
+        // If processing failed, the raw key is already saved from the first update above
       } catch (err) {
-        console.warn("Thumbnail generation failed (upload confirmed without thumbnail):", err);
+        console.warn("Image optimization failed (upload confirmed with raw image):", err);
       }
     }
 
@@ -230,6 +271,86 @@ export async function deleteFile(key: string) {
 }
 
 /**
+ * Process a raw uploaded image: produce an optimized 1200px WebP and a 400x400 thumbnail,
+ * upload both to R2, then delete the raw original.
+ *
+ * Used by confirmUpload for cover images. Designed to be safe -- if processing fails,
+ * the raw original is preserved (not deleted) so the upload is still usable.
+ */
+export async function processAndStoreImage(
+  entityId: string,
+  rawKey: string,
+  category: "covers" | "sessions",
+): Promise<
+  | { success: true; optimizedKey: string; thumbnailKey: string }
+  | { success: false; error: string }
+> {
+  await requireAuth();
+
+  try {
+    const r2 = getR2Client();
+
+    // Fetch raw image from R2
+    const fetchResult = await fetchImageBuffer(rawKey);
+    if (!fetchResult.success) {
+      return { success: false as const, error: fetchResult.error };
+    }
+    const { buffer } = fetchResult;
+
+    // Process both optimized and thumbnail in parallel
+    const [optimizedBuffer, thumbnailBuffer] = await Promise.all([
+      sharp(buffer)
+        .resize(OPTIMIZED_MAX_WIDTH, null, { withoutEnlargement: true })
+        .webp({ quality: OPTIMIZED_QUALITY })
+        .toBuffer(),
+      sharp(buffer)
+        .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, { fit: "cover", withoutEnlargement: true })
+        .webp({ quality: THUMBNAIL_QUALITY })
+        .toBuffer(),
+    ]);
+
+    // Upload both processed images to R2
+    const optimizedKey = `${category}/${entityId}/opt-${nanoid()}.webp`;
+    const thumbnailKey = `${category}/${entityId}/thumb-${nanoid()}.webp`;
+
+    await Promise.all([
+      r2.send(
+        new PutObjectCommand({
+          Bucket: R2_BUCKET_NAME,
+          Key: optimizedKey,
+          Body: optimizedBuffer,
+          ContentType: "image/webp",
+        }),
+      ),
+      r2.send(
+        new PutObjectCommand({
+          Bucket: R2_BUCKET_NAME,
+          Key: thumbnailKey,
+          Body: thumbnailBuffer,
+          ContentType: "image/webp",
+        }),
+      ),
+    ]);
+
+    // Delete the raw original now that processed versions are stored
+    await r2.send(
+      new DeleteObjectCommand({
+        Bucket: R2_BUCKET_NAME,
+        Key: rawKey,
+      }),
+    );
+
+    return { success: true as const, optimizedKey, thumbnailKey };
+  } catch (error) {
+    console.error("processAndStoreImage error:", error);
+    return {
+      success: false as const,
+      error: "Failed to process image",
+    };
+  }
+}
+
+/**
  * Generate a 400x400 WebP thumbnail from a cover image stored in R2.
  * Fetches the original, processes with sharp, uploads thumbnail, updates DB.
  */
@@ -240,26 +361,11 @@ export async function generateThumbnail(chartId: string, coverKey: string) {
     const r2 = getR2Client();
 
     // Fetch the original image from R2
-    const getCommand = new GetObjectCommand({
-      Bucket: R2_BUCKET_NAME,
-      Key: coverKey,
-    });
-    const response = await r2.send(getCommand);
-
-    if (!response.Body) {
-      return {
-        success: false as const,
-        error: "Original image not found in storage",
-      };
+    const fetchResult = await fetchImageBuffer(coverKey);
+    if (!fetchResult.success) {
+      return { success: false as const, error: fetchResult.error };
     }
-
-    // Convert stream to buffer
-    const chunks: Uint8Array[] = [];
-    const stream = response.Body as AsyncIterable<Uint8Array>;
-    for await (const chunk of stream) {
-      chunks.push(chunk);
-    }
-    const buffer = Buffer.concat(chunks);
+    const { buffer } = fetchResult;
 
     // Generate thumbnail with sharp
     const thumbnailBuffer = await sharp(buffer)
