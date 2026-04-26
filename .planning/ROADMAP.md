@@ -69,7 +69,10 @@ Full details: `milestones/v1.2-ROADMAP.md`
   3. Existing thumbnail generation continues to work
   4. Working copy files (PDFs, .saga, .oxs, .xsd) are never modified
   5. Upload UX is unchanged (no visible delay or behavior change)
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
+- [ ] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
 **UI hint**: no
 
 ### Phase 10: Advanced Stats
@@ -80,7 +83,10 @@ Full details: `milestones/v1.2-ROADMAP.md`
   1. Monthly stitch bar charts visualize activity over time
   2. Stitching calendar shows daily activity by project in a monthly grid
   3. Year in Review tab shows 8 stat sections with year selector
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
+- [ ] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
 **UI hint**: yes
 
 ### Phase 11: Goals & Scheduling
@@ -92,7 +98,10 @@ Full details: `milestones/v1.2-ROADMAP.md`
   2. User can create scheduling plans for project start dates, recurring stitching days, and seasonal focus
   3. Multi-style rotation management available
   4. Achievement trophy case tracks milestones, streaks, and records
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
+- [ ] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
 **UI hint**: yes
 
 ## Execution Order
@@ -116,6 +125,6 @@ Full details: `milestones/v1.2-ROADMAP.md`
 | 7. Project Detail Experience | v1.1 | 8/8 | Complete | 2026-04-16 |
 | 8. Session Logging & Pattern Dive | v1.2 | 11/11 | Complete | 2026-04-18 |
 | 9. Dashboards & Shopping Cart | v1.2 | 9/9 | Complete | 2026-04-18 |
-| 9.1. Image Optimization on Upload | inserted | 0/TBD | Not started | - |
+| 9.1. Image Optimization on Upload | inserted | 0/2 | Planned | - |
 | 10. Advanced Stats | v1.3 | 0/TBD | Not started | - |
 | 11. Goals & Scheduling | v1.3 | 0/TBD | Not started | - |
