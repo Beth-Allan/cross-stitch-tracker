@@ -4,8 +4,8 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** v1.2 Track & Measure (COMPLETE)
-**Last Updated:** 2026-04-18
+**Milestone:** v1.2 Track & Measure (ARCHIVED)
+**Last Updated:** 2026-04-26
 **Roadmap:** 4 milestones / 11 phases — v1.0 + v1.1 + v1.2 shipped, v1.3 next
 
 ### Done
@@ -14,30 +14,26 @@
   - Archived to: `.planning/milestones/v1.0-*`
   - Live at: https://cross-stitch-tracker-adolwyn.vercel.app
 - **v1.1 Browse & Organize shipped** (2026-04-16): 3 phases, 20 plans, 867 tests, tagged `v1.1`
-  - Phase 5: Storage/app CRUD, fabric selector, DMC catalog, UX fixes (PR #7)
-  - Phase 6: Gallery cards, 3 view modes, sorting/search/filtering (PR #15)
-  - Phase 7: Project detail hero, tabbed layout, skein calculator, supply redesign (PR #16)
   - Archived to: `.planning/milestones/v1.1-*`
+- **v1.2 Track & Measure shipped** (2026-04-20): 2 phases, 20 plans, 1172 tests, tagged `v1.2`
+  - Phase 8: Session logging, Pattern Dive tabs, atomic progress tracking
+  - Phase 9: Main Dashboard, Project Dashboard, Shopping Cart upgrade (PR #18)
+  - Archived to: `.planning/milestones/v1.2-*`
   - Full details: `.planning/MILESTONES.md` and `.planning/RETROSPECTIVE.md`
-- **Phase 8: Session Logging & Pattern Dive** (2026-04-18): 11 plans, verified complete
-- **Phase 9: Dashboards & Shopping Cart** (2026-04-18): 9 plans, 1160 tests, verified complete
-  - Main Dashboard with Your Library + Progress tabs, Quick Add menu
-  - Project Dashboard with hero stats, progress buckets, finished tab
-  - Shopping Cart with project selection, tabbed supplies, quantity controls
 
 ### In Progress
 
-None — v1.2 milestone complete, PR #18 open.
+None — v1.2 archived, ready for v1.3.
 
 ### Done This Session
 
-- Shipped Phase 9 as PR #18: https://github.com/Beth-Allan/cross-stitch-tracker/pull/18
+- Ran `/gsd-audit-milestone` — 26/26 requirements satisfied, all integration verified
+- Ran `/gsd-complete-milestone 1.2` — archived roadmap, requirements, phases, updated PROJECT.md, tagged v1.2
 
 ### Next Up
 
-1. Review/merge PR #18
-2. `/gsd-complete-milestone` — archive v1.2
-3. `/gsd-explore` — discuss user feedback items before v1.3
+1. `/gsd-new-milestone` — start v1.3 Motivation & Planning (questioning → research → requirements → roadmap)
+2. Image optimization on upload (WebP conversion for covers/session photos via Sharp). See `.planning/research/image-optimization-on-upload.md`
 
 ### Backlog
 
