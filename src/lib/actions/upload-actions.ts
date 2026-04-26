@@ -156,12 +156,10 @@ export async function confirmUpload(input: { chartId: string; field: string; key
       data: { [input.field]: input.key },
     });
 
-    // Optimize cover image: produce 1200px WebP + 400x400 thumbnail, delete raw original
     if (input.field === "coverImageUrl") {
       try {
         const result = await processAndStoreImage(input.chartId, input.key, "covers");
         if (result.success) {
-          // Update DB with optimized key and thumbnail key (replaces the raw key saved above)
           await prisma.chart.update({
             where: { id: input.chartId },
             data: {
@@ -169,10 +167,12 @@ export async function confirmUpload(input: { chartId: string; field: string; key
               coverThumbnailUrl: result.thumbnailKey,
             },
           });
+          // DB write succeeded — safe to delete raw original
+          await deleteFile(input.key).catch(() => {});
         }
         // If processing failed, the raw key is already saved from the first update above
       } catch (err) {
-        console.warn("Image optimization failed (upload confirmed with raw image):", err);
+        console.error("Image optimization failed (upload confirmed with raw image):", err);
       }
     }
 
@@ -294,18 +294,15 @@ export async function processAndStoreImage(
   { success: true; optimizedKey: string; thumbnailKey: string } | { success: false; error: string }
 > {
   await requireAuth();
+  const r2 = getR2Client();
 
   try {
-    const r2 = getR2Client();
-
-    // Fetch raw image from R2
     const fetchResult = await fetchImageBuffer(rawKey);
     if (!fetchResult.success) {
       return { success: false as const, error: fetchResult.error };
     }
     const { buffer } = fetchResult;
 
-    // Process both optimized and thumbnail in parallel
     const [optimizedBuffer, thumbnailBuffer] = await Promise.all([
       sharp(buffer)
         .resize(OPTIMIZED_MAX_WIDTH, null, { withoutEnlargement: true })
@@ -317,7 +314,6 @@ export async function processAndStoreImage(
         .toBuffer(),
     ]);
 
-    // Upload both processed images to R2
     const optimizedKey = `${category}/${entityId}/opt-${nanoid()}.webp`;
     const thumbnailKey = `${category}/${entityId}/thumb-${nanoid()}.webp`;
 
@@ -340,14 +336,7 @@ export async function processAndStoreImage(
       ),
     ]);
 
-    // Delete the raw original now that processed versions are stored
-    await r2.send(
-      new DeleteObjectCommand({
-        Bucket: R2_BUCKET_NAME,
-        Key: rawKey,
-      }),
-    );
-
+    // Caller is responsible for deleting rawKey after confirming the DB write
     return { success: true as const, optimizedKey, thumbnailKey };
   } catch (error) {
     console.error("processAndStoreImage error:", error);

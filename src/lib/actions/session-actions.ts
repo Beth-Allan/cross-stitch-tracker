@@ -6,7 +6,7 @@ import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
-import { processAndStoreImage } from "@/lib/actions/upload-actions";
+import { processAndStoreImage, deleteFile } from "@/lib/actions/upload-actions";
 import { sessionFormSchema } from "@/lib/validations/session";
 import type {
   StitchSessionRow,
@@ -79,7 +79,6 @@ export async function createSession(formData: unknown) {
       return created;
     });
 
-    // Optimize session photo if present
     let returnSession = session;
     if (session.photoKey) {
       try {
@@ -89,11 +88,11 @@ export async function createSession(formData: unknown) {
             where: { id: session.id },
             data: { photoKey: result.optimizedKey },
           });
-          // Update the object we return to the client so it references the live key
           returnSession = { ...session, photoKey: result.optimizedKey };
+          await deleteFile(session.photoKey).catch(() => {});
         }
       } catch (err) {
-        console.warn("Session photo optimization failed:", err);
+        console.error("Session photo optimization failed:", err);
       }
     }
 
@@ -166,11 +165,11 @@ export async function updateSession(sessionId: string, formData: unknown) {
             where: { id: session.id },
             data: { photoKey: result.optimizedKey },
           });
-          // Update the object we return to the client so it references the live key
           returnSession = { ...session, photoKey: result.optimizedKey };
+          await deleteFile(session.photoKey).catch(() => {});
         }
       } catch (err) {
-        console.warn("Session photo optimization failed:", err);
+        console.error("Session photo optimization failed:", err);
       }
     }
 

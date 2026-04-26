@@ -18,8 +18,10 @@ vi.mock("next/cache", () => ({
 }));
 
 const mockProcessAndStoreImage = vi.fn();
+const mockDeleteFile = vi.fn().mockResolvedValue({ success: true });
 vi.mock("@/lib/actions/upload-actions", () => ({
   processAndStoreImage: (...args: unknown[]) => mockProcessAndStoreImage(...args),
+  deleteFile: (...args: unknown[]) => mockDeleteFile(...args),
 }));
 
 describe("session-actions", () => {
@@ -634,6 +636,42 @@ describe("session-actions", () => {
       expect(result.success).toBe(true);
       // photoKey update should NOT have been called since optimization failed
       expect(mockPrisma.stitchSession.update).not.toHaveBeenCalled();
+    });
+
+    it("does not optimize when photoKey is unchanged on update", async () => {
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
+        ...createMockStitchSession({ id: "session-1", photoKey: "sessions/p1/existing.webp" }),
+        project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 0 },
+      });
+
+      const updatedSession = createMockStitchSession({
+        id: "session-1",
+        photoKey: "sessions/p1/existing.webp",
+      });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            update: vi.fn().mockResolvedValue(updatedSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 200 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 200 }),
+          },
+        });
+      });
+
+      const { updateSession } = await import("./session-actions");
+      const result = await updateSession("session-1", {
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: 90,
+        photoKey: "sessions/p1/existing.webp",
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockProcessAndStoreImage).not.toHaveBeenCalled();
     });
 
     it("does not optimize when photoKey is null on update", async () => {

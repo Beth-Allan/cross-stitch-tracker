@@ -285,35 +285,72 @@ describe("upload-actions failure modes", () => {
 
     it("does NOT trigger processAndStoreImage for digitalWorkingCopyUrl", async () => {
       const { confirmUpload } = await import("./upload-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce({
+        id: "c1",
+        project: { userId: "user-1" },
+      });
       mockPrisma.chart.update.mockResolvedValue({});
 
-      await confirmUpload({
+      const result = await confirmUpload({
         chartId: "c1",
         field: "digitalWorkingCopyUrl",
         key: "files/c1/working-copy.pdf",
       });
 
-      // R2 send should NOT be called (no image processing)
+      expect(result.success).toBe(true);
       expect(mockSend).not.toHaveBeenCalled();
     });
 
     it("does NOT trigger processAndStoreImage for coverThumbnailUrl", async () => {
       const { confirmUpload } = await import("./upload-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce({
+        id: "c1",
+        project: { userId: "user-1" },
+      });
       mockPrisma.chart.update.mockResolvedValue({});
 
-      await confirmUpload({
+      const result = await confirmUpload({
         chartId: "c1",
         field: "coverThumbnailUrl",
         key: "covers/c1/thumb-existing.webp",
       });
 
-      // R2 send should NOT be called (no image processing)
+      expect(result.success).toBe(true);
       expect(mockSend).not.toHaveBeenCalled();
+    });
+
+    it("rejects when chart does not exist", async () => {
+      const { confirmUpload } = await import("./upload-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce(null);
+
+      const result = await confirmUpload({
+        chartId: "nonexistent",
+        field: "coverImageUrl",
+        key: "covers/c1/image.png",
+      });
+
+      expect(result).toEqual({ success: false, error: "Chart not found" });
+    });
+
+    it("rejects when chart belongs to different user", async () => {
+      const { confirmUpload } = await import("./upload-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce({
+        id: "c1",
+        project: { userId: "other-user" },
+      });
+
+      const result = await confirmUpload({
+        chartId: "c1",
+        field: "coverImageUrl",
+        key: "covers/c1/image.png",
+      });
+
+      expect(result).toEqual({ success: false, error: "Chart not found" });
     });
   });
 
   describe("processAndStoreImage", () => {
-    it("produces optimized and thumbnail WebP, uploads both to R2, deletes raw original, returns keys", async () => {
+    it("produces optimized and thumbnail WebP, uploads both to R2, returns keys without deleting raw", async () => {
       const { processAndStoreImage } = await import("./upload-actions");
       const mockBody = {
         [Symbol.asyncIterator]: async function* () {
@@ -323,8 +360,7 @@ describe("upload-actions failure modes", () => {
       mockSend
         .mockResolvedValueOnce({ Body: mockBody }) // GetObjectCommand
         .mockResolvedValueOnce({}) // PutObjectCommand (optimized)
-        .mockResolvedValueOnce({}) // PutObjectCommand (thumbnail)
-        .mockResolvedValueOnce({}); // DeleteObjectCommand
+        .mockResolvedValueOnce({}); // PutObjectCommand (thumbnail)
 
       const result = await processAndStoreImage("chart-1", "covers/chart-1/raw.png", "covers");
 
@@ -335,8 +371,8 @@ describe("upload-actions failure modes", () => {
         expect(result.thumbnailKey).toContain(".webp");
         expect(result.thumbnailKey).toContain("thumb-");
       }
-      // 4 R2 calls: 1 get + 2 puts + 1 delete
-      expect(mockSend).toHaveBeenCalledTimes(4);
+      // 3 R2 calls: 1 get + 2 puts (no delete — caller's responsibility)
+      expect(mockSend).toHaveBeenCalledTimes(3);
     });
 
     it("calls sharp with correct resize params for optimized version (1200px width)", async () => {
@@ -348,7 +384,6 @@ describe("upload-actions failure modes", () => {
       };
       mockSend
         .mockResolvedValueOnce({ Body: mockBody })
-        .mockResolvedValueOnce({})
         .mockResolvedValueOnce({})
         .mockResolvedValueOnce({});
 
@@ -406,7 +441,7 @@ describe("upload-actions failure modes", () => {
       expect(mockSend).toHaveBeenCalledTimes(1);
     });
 
-    it("calls DeleteObjectCommand with the original raw key after success", async () => {
+    it("does not delete raw original (caller responsibility)", async () => {
       const { processAndStoreImage } = await import("./upload-actions");
       const mockBody = {
         [Symbol.asyncIterator]: async function* () {
@@ -416,14 +451,15 @@ describe("upload-actions failure modes", () => {
       mockSend
         .mockResolvedValueOnce({ Body: mockBody })
         .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({})
         .mockResolvedValueOnce({});
 
       await processAndStoreImage("chart-1", "covers/chart-1/raw.png", "covers");
 
-      // Last R2 send call should be DeleteObjectCommand for the raw key
-      const lastCall = mockSend.mock.calls[3][0];
-      expect(lastCall.constructor.name).toBe("DeleteObjectCommand");
+      // No DeleteObjectCommand — only Get + 2 Puts
+      expect(mockSend).toHaveBeenCalledTimes(3);
+      for (const call of mockSend.mock.calls) {
+        expect(call[0].constructor.name).not.toBe("DeleteObjectCommand");
+      }
     });
   });
 
