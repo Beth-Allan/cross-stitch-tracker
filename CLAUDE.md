@@ -69,6 +69,8 @@ None — Phase 9.1 complete, ready for v1.3.
 - 999.10: Auto-status from kitting activity — consider auto-transitioning project status to "Kitting" when user starts adding supplies/fabric
 - **999.11: Shopping cart scaling for large collections (HIGH PRIORITY)** — search/filter in project list, status grouping (Kitting/Stitching/Unstarted), supply-type search in By Supply view. Real dataset is 75+ projects in kitting stages.
 - 999.12: Shopping-for bar pill styling — match mockup style (squared-off chips with border, contained card-like bar) instead of current full-round pills
+- 999.13: Per-brand skein length — add `skeinLengthMeters` to ThreadBrand (default 8m for DMC), use in skein calculator instead of hardcoded constant. Fixes inaccuracy for Weeks Dye Works/Gentle Art (5yd), Kreinik (10-11m), etc.
+- 999.14: Auto-infer overCount from fabric count — when fabric is linked to a project, auto-set overCount based on fabric count (≤25 → over 1, ≥28 → over 2). User can still override via settings bar toggle.
 
 ### Blockers
 
