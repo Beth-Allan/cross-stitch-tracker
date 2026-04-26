@@ -86,7 +86,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
-- [ ] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
+- [x] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
 **UI hint**: yes
 
 ### Phase 11: Goals & Scheduling
@@ -100,7 +100,7 @@ Plans:
   4. Achievement trophy case tracks milestones, streaks, and records
 **Plans**: 2 plans
 Plans:
-- [ ] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
+- [x] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
 - [ ] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
 **UI hint**: yes
 
