@@ -212,6 +212,10 @@ describe("upload-actions failure modes", () => {
 
     it("returns error on DB failure during update", async () => {
       const { confirmUpload } = await import("./upload-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce({
+        id: "c1",
+        project: { userId: "user-1" },
+      });
       mockPrisma.chart.update.mockRejectedValueOnce(new Error("DB error"));
 
       const result = await confirmUpload({
@@ -225,6 +229,10 @@ describe("upload-actions failure modes", () => {
 
     it("triggers processAndStoreImage for coverImageUrl and updates DB with optimized keys", async () => {
       const { confirmUpload } = await import("./upload-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce({
+        id: "c1",
+        project: { userId: "user-1" },
+      });
       // First call: initial DB update with raw key
       mockPrisma.chart.update.mockResolvedValue({});
       // Mock R2 to return an image body for processAndStoreImage
@@ -257,6 +265,10 @@ describe("upload-actions failure modes", () => {
 
     it("still succeeds when processAndStoreImage fails (graceful fallback with raw image)", async () => {
       const { confirmUpload } = await import("./upload-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce({
+        id: "c1",
+        project: { userId: "user-1" },
+      });
       mockPrisma.chart.update.mockResolvedValue({});
       // R2 GetObject fails -- processAndStoreImage will fail
       mockSend.mockRejectedValueOnce(new Error("R2 fetch failed"));
