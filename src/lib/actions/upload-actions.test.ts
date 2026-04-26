@@ -26,16 +26,30 @@ vi.mock("@aws-sdk/s3-request-presigner", () => ({
   getSignedUrl: vi.fn().mockResolvedValue("https://presigned.example.com/test"),
 }));
 
-vi.mock("sharp", () => ({ default: vi.fn() }));
+const mockToBuffer = vi.fn().mockResolvedValue(Buffer.from("processed-image-data"));
+const mockWebp = vi.fn().mockReturnValue({ toBuffer: mockToBuffer });
+const mockResize = vi.fn().mockReturnValue({ webp: mockWebp });
+const mockSharp = vi.fn().mockReturnValue({ resize: mockResize });
+vi.mock("sharp", () => ({ default: mockSharp }));
 
 vi.mock("nanoid", () => ({ nanoid: () => "test-nano-id" }));
 
 describe("upload-actions failure modes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Default: R2 client available and working
+    // Reset implementation queues (clearAllMocks only clears call history, not mockOnce queues)
+    mockSend.mockReset();
+    mockSharp.mockReset();
+    mockResize.mockReset();
+    mockWebp.mockReset();
+    mockToBuffer.mockReset();
+    // Restore default implementations
     mockGetR2Client.mockReturnValue({ send: mockSend });
     mockSend.mockResolvedValue({});
+    mockSharp.mockReturnValue({ resize: mockResize });
+    mockResize.mockReturnValue({ webp: mockWebp });
+    mockWebp.mockReturnValue({ toBuffer: mockToBuffer });
+    mockToBuffer.mockResolvedValue(Buffer.from("processed-image-data"));
   });
 
   describe("getPresignedUploadUrl", () => {
@@ -207,6 +221,197 @@ describe("upload-actions failure modes", () => {
       });
 
       expect(result).toEqual({ success: false, error: "Failed to confirm upload" });
+    });
+
+    it("triggers processAndStoreImage for coverImageUrl and updates DB with optimized keys", async () => {
+      const { confirmUpload } = await import("./upload-actions");
+      // First call: initial DB update with raw key
+      mockPrisma.chart.update.mockResolvedValue({});
+      // Mock R2 to return an image body for processAndStoreImage
+      const mockBody = {
+        [Symbol.asyncIterator]: async function* () {
+          yield Buffer.from("fake-image-data");
+        },
+      };
+      mockSend
+        .mockResolvedValueOnce({ Body: mockBody }) // GetObjectCommand (fetch original)
+        .mockResolvedValueOnce({}) // PutObjectCommand (upload optimized)
+        .mockResolvedValueOnce({}) // PutObjectCommand (upload thumbnail)
+        .mockResolvedValueOnce({}); // DeleteObjectCommand (delete raw)
+
+      const result = await confirmUpload({
+        chartId: "c1",
+        field: "coverImageUrl",
+        key: "covers/c1/raw-image.png",
+      });
+
+      expect(result.success).toBe(true);
+      // DB should be updated with optimized key (second call updates with processed keys)
+      const updateCalls = mockPrisma.chart.update.mock.calls;
+      expect(updateCalls.length).toBeGreaterThanOrEqual(2);
+      // Second update should have optimized keys containing .webp
+      const secondUpdate = updateCalls[1][0];
+      expect(secondUpdate.data.coverImageUrl).toContain(".webp");
+      expect(secondUpdate.data.coverThumbnailUrl).toContain("thumb-");
+    });
+
+    it("still succeeds when processAndStoreImage fails (graceful fallback with raw image)", async () => {
+      const { confirmUpload } = await import("./upload-actions");
+      mockPrisma.chart.update.mockResolvedValue({});
+      // R2 GetObject fails -- processAndStoreImage will fail
+      mockSend.mockRejectedValueOnce(new Error("R2 fetch failed"));
+
+      const result = await confirmUpload({
+        chartId: "c1",
+        field: "coverImageUrl",
+        key: "covers/c1/raw-image.png",
+      });
+
+      // Upload still confirmed -- raw key preserved in DB
+      expect(result.success).toBe(true);
+    });
+
+    it("does NOT trigger processAndStoreImage for digitalWorkingCopyUrl", async () => {
+      const { confirmUpload } = await import("./upload-actions");
+      mockPrisma.chart.update.mockResolvedValue({});
+
+      await confirmUpload({
+        chartId: "c1",
+        field: "digitalWorkingCopyUrl",
+        key: "files/c1/working-copy.pdf",
+      });
+
+      // R2 send should NOT be called (no image processing)
+      expect(mockSend).not.toHaveBeenCalled();
+    });
+
+    it("does NOT trigger processAndStoreImage for coverThumbnailUrl", async () => {
+      const { confirmUpload } = await import("./upload-actions");
+      mockPrisma.chart.update.mockResolvedValue({});
+
+      await confirmUpload({
+        chartId: "c1",
+        field: "coverThumbnailUrl",
+        key: "covers/c1/thumb-existing.webp",
+      });
+
+      // R2 send should NOT be called (no image processing)
+      expect(mockSend).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("processAndStoreImage", () => {
+    it("produces optimized and thumbnail WebP, uploads both to R2, deletes raw original, returns keys", async () => {
+      const { processAndStoreImage } = await import("./upload-actions");
+      const mockBody = {
+        [Symbol.asyncIterator]: async function* () {
+          yield Buffer.from("fake-image-data");
+        },
+      };
+      mockSend
+        .mockResolvedValueOnce({ Body: mockBody }) // GetObjectCommand
+        .mockResolvedValueOnce({}) // PutObjectCommand (optimized)
+        .mockResolvedValueOnce({}) // PutObjectCommand (thumbnail)
+        .mockResolvedValueOnce({}); // DeleteObjectCommand
+
+      const result = await processAndStoreImage("chart-1", "covers/chart-1/raw.png", "covers");
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.optimizedKey).toContain(".webp");
+        expect(result.optimizedKey).toContain("opt-");
+        expect(result.thumbnailKey).toContain(".webp");
+        expect(result.thumbnailKey).toContain("thumb-");
+      }
+      // 4 R2 calls: 1 get + 2 puts + 1 delete
+      expect(mockSend).toHaveBeenCalledTimes(4);
+    });
+
+    it("calls sharp with correct resize params for optimized version (1200px width)", async () => {
+      const { processAndStoreImage } = await import("./upload-actions");
+      const mockBody = {
+        [Symbol.asyncIterator]: async function* () {
+          yield Buffer.from("fake-image-data");
+        },
+      };
+      mockSend
+        .mockResolvedValueOnce({ Body: mockBody })
+        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce({});
+
+      await processAndStoreImage("chart-1", "covers/chart-1/raw.png", "covers");
+
+      // First sharp call: optimized (1200, null, { withoutEnlargement: true })
+      expect(mockResize).toHaveBeenCalledWith(1200, null, { withoutEnlargement: true });
+      // Second sharp call: thumbnail (400, 400, { fit: "cover", withoutEnlargement: true })
+      expect(mockResize).toHaveBeenCalledWith(400, 400, { fit: "cover", withoutEnlargement: true });
+      // Both should call webp with quality 80
+      expect(mockWebp).toHaveBeenCalledWith({ quality: 80 });
+    });
+
+    it("returns error when R2 GetObject fails (original not found)", async () => {
+      const { processAndStoreImage } = await import("./upload-actions");
+      mockSend.mockRejectedValueOnce(new Error("NoSuchKey"));
+
+      const result = await processAndStoreImage("chart-1", "covers/chart-1/missing.png", "covers");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBeDefined();
+      }
+    });
+
+    it("returns error when response.Body is null", async () => {
+      const { processAndStoreImage } = await import("./upload-actions");
+      mockSend.mockResolvedValueOnce({ Body: null });
+
+      const result = await processAndStoreImage("chart-1", "covers/chart-1/raw.png", "covers");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Original image not found in storage");
+      }
+    });
+
+    it("returns error when Sharp processing throws and does NOT delete original", async () => {
+      const { processAndStoreImage } = await import("./upload-actions");
+      const mockBody = {
+        [Symbol.asyncIterator]: async function* () {
+          yield Buffer.from("fake-image-data");
+        },
+      };
+      mockSend.mockResolvedValueOnce({ Body: mockBody }); // GetObjectCommand succeeds
+      // Sharp throws during processing
+      mockSharp.mockImplementationOnce(() => {
+        throw new Error("Sharp decode error: unsupported format");
+      });
+
+      const result = await processAndStoreImage("chart-1", "covers/chart-1/raw.png", "covers");
+
+      expect(result.success).toBe(false);
+      // Only 1 R2 call (get), no delete since processing failed
+      expect(mockSend).toHaveBeenCalledTimes(1);
+    });
+
+    it("calls DeleteObjectCommand with the original raw key after success", async () => {
+      const { processAndStoreImage } = await import("./upload-actions");
+      const mockBody = {
+        [Symbol.asyncIterator]: async function* () {
+          yield Buffer.from("fake-image-data");
+        },
+      };
+      mockSend
+        .mockResolvedValueOnce({ Body: mockBody })
+        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce({});
+
+      await processAndStoreImage("chart-1", "covers/chart-1/raw.png", "covers");
+
+      // Last R2 send call should be DeleteObjectCommand for the raw key
+      const lastCall = mockSend.mock.calls[3][0];
+      expect(lastCall.constructor.name).toBe("DeleteObjectCommand");
     });
   });
 

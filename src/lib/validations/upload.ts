@@ -12,6 +12,15 @@ export const ALLOWED_FILE_TYPES = [
 
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+// Image optimization settings
+export const OPTIMIZED_MAX_WIDTH = 1200;
+export const OPTIMIZED_QUALITY = 80;
+export const THUMBNAIL_SIZE = 400;
+export const THUMBNAIL_QUALITY = 80;
+
+// Categories that get image optimization on upload
+export const OPTIMIZABLE_CATEGORIES = ["covers", "sessions"] as const;
+
 export const uploadRequestSchema = z.object({
   fileName: z.string().min(1),
   contentType: z.string().min(1),
