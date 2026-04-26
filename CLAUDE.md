@@ -23,17 +23,26 @@
 
 ### In Progress
 
-None — v1.2 archived, ready for v1.3.
+None — Phase 9.1 complete, ready for v1.3.
 
 ### Done This Session
 
-- Ran `/gsd-audit-milestone` — 26/26 requirements satisfied, all integration verified
-- Ran `/gsd-complete-milestone 1.2` — archived roadmap, requirements, phases, updated PROJECT.md, tagged v1.2
+- Executed Phase 9.1 (Image Optimization on Upload) — 2 plans, 2 waves, all passing
+  - Plan 01: `processAndStoreImage` utility, cover optimization pipeline, 10 new tests
+  - Plan 02: Session photo optimization in create/update, 6 new tests
+  - Verification passed: 11/11 must-haves, 1188 total tests
+- Phase marked complete, PROJECT.md updated
+- Code review fix complete: 5/5 findings fixed (2 critical, 3 warning), 1188 tests passing
+  - CR-01: Skip re-optimization of unchanged photos
+  - CR-02: Return live optimized key instead of stale raw key
+  - WR-01: Chart ownership validation in confirmUpload
+  - WR-02: Shared constants in generateThumbnail
+  - WR-03: .trim() on uploadRequestSchema string fields
 
 ### Next Up
 
-1. `/gsd-new-milestone` — start v1.3 Motivation & Planning (questioning → research → requirements → roadmap)
-2. Image optimization on upload (WebP conversion for covers/session photos via Sharp). See `.planning/research/image-optimization-on-upload.md`
+1. `/gsd-ship 9.1` — create PR for image optimization branch
+2. `/gsd-new-milestone` — start v1.3 Motivation & Planning
 
 ### Backlog
 
