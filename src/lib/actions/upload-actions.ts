@@ -131,7 +131,7 @@ export async function getPresignedUploadUrl(input: unknown) {
  * Step 3: After client uploads to R2, save the key reference in the database.
  */
 export async function confirmUpload(input: { chartId: string; field: string; key: string }) {
-  await requireAuth();
+  const user = await requireAuth();
 
   try {
     // Validate field is one of the allowed chart file fields
@@ -140,6 +140,15 @@ export async function confirmUpload(input: { chartId: string; field: string; key
         success: false as const,
         error: `Invalid field. Allowed: ${VALID_CHART_FIELDS.join(", ")}`,
       };
+    }
+
+    // Verify chart ownership before allowing write
+    const chart = await prisma.chart.findUnique({
+      where: { id: input.chartId },
+      select: { id: true, project: { select: { userId: true } } },
+    });
+    if (!chart || chart.project?.userId !== user.id) {
+      return { success: false as const, error: "Chart not found" };
     }
 
     await prisma.chart.update({
@@ -282,8 +291,7 @@ export async function processAndStoreImage(
   rawKey: string,
   category: "covers" | "sessions",
 ): Promise<
-  | { success: true; optimizedKey: string; thumbnailKey: string }
-  | { success: false; error: string }
+  { success: true; optimizedKey: string; thumbnailKey: string } | { success: false; error: string }
 > {
   await requireAuth();
 
