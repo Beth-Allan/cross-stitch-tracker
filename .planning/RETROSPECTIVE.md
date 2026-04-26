@@ -1,5 +1,50 @@
 # Retrospective
 
+## Milestone: v1.2 — Track & Measure
+
+**Shipped:** 2026-04-20
+**Phases:** 2 | **Plans:** 20
+**Timeline:** 4 days (2026-04-16 → 2026-04-20)
+**Tests:** 1,172 | **PRs:** Phase 8 (merged), #18 (Phase 9)
+
+### What Was Built
+
+- Session logging: StitchSession model, LogSessionModal (create/edit/delete), atomic progress auto-update via $transaction, progress photo upload
+- Pattern Dive: Charts page evolved with 4 tabs — Browse, What's Next (kitting readiness), Fabric Requirements (stash matching + assign), Storage View (location grouping)
+- Main Dashboard: Currently Stitching (sorted by last session), Start Next, Buried Treasures, Spotlight with shuffle, Collection Stats sidebar (8 metrics), Quick Add menu (8 items)
+- Project Dashboard: HeroStats (6 metrics), CSS stacked bar, 5 progress buckets with sorting, Finished tab with 4 sort dimensions and expandable cards
+- Shopping Cart: project selection with localStorage, 6 supply tabs with badge counts, quantity +/- stepper, IDOR protection
+
+### What Worked
+
+- **Velocity acceleration** — ~5 plans/day (up from ~4 in v1.1, ~1 in v1.0). Phase familiarity + established patterns + parallel worktree execution for independent plans.
+- **TDD data layer** — Writing server action tests first caught edge cases early (IDOR bypass, empty collection handling, null session dates). 305 new tests added.
+- **Promise.all() pattern** — Dashboard parallel data fetching prevented Neon cold start waterfall. Established as standard pattern for multi-query pages.
+- **Gap closure from v1.1 lessons** — Explicitly budgeted gap closure plans (08-10, 08-11) caught the fabric assignment bug and fabric matching Catch-22 before Phase 9 started.
+- **Custom DOM event bridge** — Clean solution for QuickAddMenu → LogSessionModal without coupling Server and Client Components.
+
+### What Was Inefficient
+
+- **ROADMAP/REQUIREMENTS doc drift (again)** — Phase 9 plans still showed `[ ]` and "0/9 Not started" at milestone close. 24/26 requirement checkboxes stale. Third milestone with this issue.
+- **Phase 9 Nyquist validation skipped** — VALIDATION.md left in draft status (nyquist_compliant: false). Didn't block anything but breaks audit completeness.
+- **Dead code not cleaned** — Old shopping-list.tsx and shopping-actions.ts from v1.0 left in place when Phase 9 replaced them. Should have deleted during Phase 9 execution.
+
+### Patterns Established
+
+- **Custom DOM event for cross-component communication** — `dispatchEvent("open-log-session-modal")` with `useEffect` listener + cleanup. Clean alternative to prop drilling or context when Server/Client boundary prevents function passing.
+- **usePersistedSelection with stale ID filtering** — localStorage selection that auto-removes IDs for deleted records. Reusable for any multi-select persistence.
+- **CSS stacked bar chart** — Pure CSS with percentage widths + colored segments. No charting library dependency for simple visualizations.
+- **Single-query aggregation** — One Prisma findMany with all includes, in-memory bucketing/sorting. Avoids N+1 for dashboard-style data.
+
+### Key Lessons
+
+1. **Automate doc sync or make it blocking** — ROADMAP progress table and REQUIREMENTS checkboxes drifted in all 3 milestones. This needs to be fixed structurally (executor updates traceability on plan completion) or accepted as tech debt.
+2. **Delete replaced code during execution** — When a plan replaces an existing component, delete the old one in the same plan. Don't leave dead code for "later cleanup."
+3. **Nyquist validation is cheap** — Running it takes minutes. Skipping it saves nothing and creates audit noise.
+4. **Parallel worktrees pay off** — Independent plans (data layer + UI) can execute simultaneously. Plans 01-03 (data) ran parallel to UI planning.
+
+---
+
 ## Milestone: v1.0 — MVP "Replace Notion"
 
 **Shipped:** 2026-04-11
@@ -99,14 +144,13 @@
 
 ## Cross-Milestone Trends
 
-| Metric | v1.0 | v1.1 |
-|--------|------|------|
-| Phases | 4 | 3 |
-| Plans | 23 | 20 |
-| Tasks | 44 | 33 |
-| Tests | 395 | 867 |
-| Days | 22 | 5 |
-| Plans/day | ~1 | ~4 |
-| Quick tasks | 12 | 1 |
-| Backlog items | 15 | 25+ |
-| PRs | 6 | 3 |
+| Metric | v1.0 | v1.1 | v1.2 |
+|--------|------|------|------|
+| Phases | 4 | 3 | 2 |
+| Plans | 23 | 20 | 20 |
+| Tests | 395 | 867 | 1,172 |
+| Days | 22 | 5 | 4 |
+| Plans/day | ~1 | ~4 | ~5 |
+| Commits | 225+ | 225 | 153 |
+| PRs | 6 | 3 | 2 |
+| LOC | 48k | ~65k | 82k |

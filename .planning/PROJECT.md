@@ -8,23 +8,20 @@ A personal cross-stitch project management app that replaced a complex Notion sy
 
 A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
 
-## Current Milestone: v1.2 Track & Measure
+## Current Milestone: v1.3 Motivation & Planning
 
-**Goal:** Add dashboards for navigating the collection and tracking progress, plus session logging as the data foundation for future statistics.
+**Goal:** Comprehensive statistics that celebrate stitching progress over time, plus goal setting and rotation management.
 
 **Target features:**
-- Main Dashboard — curated home page (Currently Stitching, Start Next, Buried Treasures, Spotlight, Collection Stats)
-- Pattern Dive — evolve Charts page with What's Next, Fabric Requirements, Storage View tabs
-- Project Dashboard — progress buckets, hero stats, Finished projects tab
-- Shopping Cart — upgrade with project selection, tabbed supply types, fabric-to-stash matching
-- Session Logging — StitchSession model, Log Session modal, project detail Sessions tab, auto-updating progress
+- Advanced Stats — Year in Review, monthly stitch charts, stitching calendar, personal bests
+- Goals & Scheduling — Project-specific and global goals, milestone targets, rotation management, achievements
 
 ## Current State
 
-**Shipped:** v1.1 Browse & Organize (2026-04-16)
-**Active:** v1.2 Track & Measure — dashboards, session logging
+**Shipped:** v1.2 Track & Measure (2026-04-20)
+**Next:** v1.3 Motivation & Planning — statistics, goals, scheduling
 
-The app now has a browsable gallery experience with three view modes, a rich project detail page with tabbed layout and skein calculator, and proper storage/app management. 867 tests, deployed to Vercel.
+The app now has session logging with atomic progress tracking, Pattern Dive with 4 specialized collection tabs, a curated Main Dashboard, a Project Dashboard with progress buckets, and a Shopping Cart with project-based supply aggregation. 1,172 tests, deployed to Vercel.
 
 ## Requirements
 
@@ -57,16 +54,16 @@ The app now has a browsable gallery experience with three view modes, a rich pro
 - ✓ Thread colour picker scroll UX fix with viewport collision detection — v1.1
 - ✓ Project detail page with hero banner, tabbed layout, supplies tab — v1.1
 - ✓ Search and filter by name, designer, status, and size category — v1.1
-
-### Active — Milestone 3: Track & Measure (v1.2)
-
-- [ ] Main Dashboard (Currently Stitching, Start Next, Buried Treasures, Spotlight, Collection Stats)
-- ✓ Pattern Dive (evolve Charts page: rename + add What's Next, Fabric Requirements, Storage View tabs) — v1.2 Phase 8
-- [ ] Project Dashboard (progress buckets with hero stats, Finished projects tab)
-- [ ] Shopping Cart (upgrade: project selection, tabbed supply types, fabric-to-stash matching)
-- ✓ Quick stitch session logging (date, project, count, optional photo/time) — v1.2 Phase 8
-- ✓ Auto-updating project progress from logged sessions — v1.2 Phase 8
-- ✓ Project detail Sessions tab (per-project session history with mini stats) — v1.2 Phase 8
+- ✓ Quick stitch session logging (date, project, count, optional photo/time) — v1.2
+- ✓ Auto-updating project progress from logged sessions (atomic with session mutations) — v1.2
+- ✓ Project detail Sessions tab (per-project session history with mini stats) — v1.2
+- ✓ Session edit and delete with atomic progress recalculation — v1.2
+- ✓ Progress photo upload with sessions via R2 — v1.2
+- ✓ Log Session modal accessible from header, project detail, and dashboard — v1.2
+- ✓ Pattern Dive (Charts page with Browse, What's Next, Fabric Requirements, Storage View tabs) — v1.2
+- ✓ Main Dashboard (Currently Stitching, Start Next, Buried Treasures, Spotlight, Collection Stats, Quick Add) — v1.2
+- ✓ Project Dashboard (hero stats, 5 progress buckets with sorting, Finished tab with 4 sort dimensions) — v1.2
+- ✓ Shopping Cart upgrade (project selection, tabbed supply aggregation, quantity stepper, IDOR protection) — v1.2
 
 ### Active — Milestone 4: Motivation & Planning (v1.3)
 
@@ -101,15 +98,19 @@ The app now has a browsable gallery experience with three view modes, a rich pro
 
 ## Context
 
-**Current state (Phase 8 complete):**
-- 1022 tests, deployed to Vercel
+**Current state (v1.2 shipped):**
+- 1,172 tests, 82k LOC TypeScript, deployed to Vercel
 - Tech stack: Next.js 16, Prisma 7, Tailwind v4, Auth.js v5 beta, shadcn/ui v4 (Base UI)
 - Database: PostgreSQL on Neon (prod), Cloudflare R2 (file storage)
 - 25+ backlog items captured (see CLAUDE.md backlog section)
-- Gallery with 3 view modes, project detail with tabbed layout, skein calculator
+- Gallery with 3 view modes, project detail with tabbed layout (Overview + Supplies + Sessions), skein calculator
 - Storage location and stitching app management with CRUD + detail pages
 - DMC catalog complete at 495 threads
-- Session logging with auto-updating progress, Pattern Dive tabs (What's Next, Fabric Requirements, Storage View)
+- Session logging with atomic progress auto-update, LogSessionModal from header/project/dashboard
+- Pattern Dive with 4 tabs (Browse, What's Next, Fabric Requirements, Storage View)
+- Main Dashboard with Currently Stitching, Start Next, Buried Treasures, Spotlight, Collection Stats, Quick Add
+- Project Dashboard with hero stats, 5 progress buckets, sortable Finished tab
+- Shopping Cart with project selection (localStorage), tabbed supply aggregation, quantity stepper, IDOR protection
 
 **Design system:** Emerald/amber/stone palette. Fraunces headings, Source Sans 3 body, JetBrains Mono hero stats. 7 status colors. Full design token CSS. Semantic tokens used throughout (bg-card, text-muted-foreground, etc.).
 
@@ -144,7 +145,13 @@ The app now has a browsable gallery experience with three view modes, a rich pro
 | Designer/genre pages in MVP | User wants proper management, not just inline creation | ✓ Good |
 | Fabric bundled with supplies (Phase 4) | Both are "stuff linked to projects"; fabric needed for kitting assessment | ✓ Good |
 | Pre-seeded DMC catalog in MVP | Search-and-select is the Notion-beater, not manual entry | ✓ Good |
-| Sessions after browsing/dashboards | Collection-level stats don't need sessions; activity stats do | — Pending |
+| Sessions after browsing/dashboards | Collection-level stats don't need sessions; activity stats do | ✓ Good |
+| Throw-inside-$transaction for fabric guard | Keeps $transaction atomic while surfacing user-friendly errors | ✓ Good |
+| Custom DOM event for QuickAdd→LogSession | Server Component can't pass function children to Client; DOM event bridge avoids coupling | ✓ Good |
+| CSS stacked bar over charting library | Simpler, no dependency, matches design spec exactly | ✓ Good |
+| localStorage for shopping cart selection | Persists project selection across page refreshes without server state | ✓ Good |
+| Single Prisma query for project dashboard | findMany with all includes, in-memory aggregation — avoids N+1 | ✓ Good |
+| Promise.all for dashboard data fetching | Avoids Neon cold start waterfall on parallel queries | ✓ Good |
 | InlineNameEdit + DeleteEntityDialog reusable pattern | Storage/app pages share identical CRUD UX; extract once, reuse | ✓ Good |
 | SearchableSelect with inline "Add New" | Avoids navigating away from chart form to create new entities | ✓ Good |
 | Gallery view modes with URL state | nuqs for URL params, localStorage fallback for persistence | ✓ Good |
@@ -179,4 +186,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-15 after v1.2 milestone started*
+*Last updated: 2026-04-26 after v1.2 milestone completed*
