@@ -16,11 +16,7 @@ import type {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/**
- * Recalculate stitchesCompleted for a project inside a transaction.
- * Formula: stitchesCompleted = startingStitches + sum(session.stitchCount)
- * Per D-04, startingStitches is fetched inside the transaction to stay atomic.
- */
+// startingStitches fetched inside transaction to stay atomic with the sum
 async function recalculateProgress(tx: Prisma.TransactionClient, projectId: string): Promise<void> {
   const [aggregation, project] = await Promise.all([
     tx.stitchSession.aggregate({
@@ -92,7 +88,7 @@ export async function createSession(formData: unknown) {
           await deleteFile(session.photoKey).catch(() => {});
         }
       } catch (err) {
-        console.error("Session photo optimization failed:", err);
+        console.warn("Session photo optimization failed:", err);
       }
     }
 
@@ -116,7 +112,6 @@ export async function updateSession(sessionId: string, formData: unknown) {
   try {
     const validated = sessionFormSchema.parse(formData);
 
-    // Find session and verify ownership via project
     const existing = await prisma.stitchSession.findUnique({
       where: { id: sessionId },
       include: {
@@ -169,7 +164,7 @@ export async function updateSession(sessionId: string, formData: unknown) {
           await deleteFile(session.photoKey).catch(() => {});
         }
       } catch (err) {
-        console.error("Session photo optimization failed:", err);
+        console.warn("Session photo optimization failed:", err);
       }
     }
 
@@ -191,7 +186,6 @@ export async function deleteSession(sessionId: string) {
   const user = await requireAuth();
 
   try {
-    // Find session and verify ownership via project
     const existing = await prisma.stitchSession.findUnique({
       where: { id: sessionId },
       include: {

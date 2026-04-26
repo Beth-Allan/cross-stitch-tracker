@@ -18,9 +18,6 @@ export const OPTIMIZED_QUALITY = 80;
 export const THUMBNAIL_SIZE = 400;
 export const THUMBNAIL_QUALITY = 80;
 
-// Categories that get image optimization on upload
-export const OPTIMIZABLE_CATEGORIES = ["covers", "sessions"] as const;
-
 export const uploadRequestSchema = z.object({
   fileName: z.string().trim().min(1),
   contentType: z.string().trim().min(1),

@@ -455,11 +455,8 @@ describe("upload-actions failure modes", () => {
 
       await processAndStoreImage("chart-1", "covers/chart-1/raw.png", "covers");
 
-      // No DeleteObjectCommand — only Get + 2 Puts
+      // Get + 2 Puts = 3. A Delete would make it 4.
       expect(mockSend).toHaveBeenCalledTimes(3);
-      for (const call of mockSend.mock.calls) {
-        expect(call[0].constructor.name).not.toBe("DeleteObjectCommand");
-      }
     });
   });
 

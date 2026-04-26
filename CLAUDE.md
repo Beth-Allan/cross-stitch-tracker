@@ -27,21 +27,19 @@ None — Phase 9.1 complete, ready for v1.3.
 
 ### Done This Session
 
-- Executed Phase 9.1 (Image Optimization on Upload) — 2 plans, 2 waves, all passing
-  - Plan 01: `processAndStoreImage` utility, cover optimization pipeline, 10 new tests
-  - Plan 02: Session photo optimization in create/update, 6 new tests
-  - Verification passed: 11/11 must-haves, 1188 total tests
-- Phase marked complete, PROJECT.md updated
-- Code review fix complete: 5/5 findings fixed (2 critical, 3 warning), 1188 tests passing
-  - CR-01: Skip re-optimization of unchanged photos
-  - CR-02: Return live optimized key instead of stale raw key
-  - WR-01: Chart ownership validation in confirmUpload
-  - WR-02: Shared constants in generateThumbnail
-  - WR-03: .trim() on uploadRequestSchema string fields
+- Shipped Phase 9.1 — PR #25 created and pushed
+- PR review (4 parallel agents: code, tests, silent failures, comments) found 2 critical + 4 important
+- PR review fixes applied, 1191 tests passing:
+  - Restructured delete-after-DB-write: processAndStoreImage no longer deletes raw; callers delete after DB write succeeds (eliminates data corruption path)
+  - Narrowed catch block: auth/infra errors propagate instead of being swallowed
+  - Fixed 2 broken confirmUpload tests (were passing for wrong reason — missing ownership mock)
+  - Added ownership rejection tests for confirmUpload (chart not found, wrong user)
+  - Added "unchanged photoKey skips optimization" test for updateSession
+- Nice-to-have cleanup: removed narration comments/JSDoc, dead code (`OPTIMIZABLE_CATEGORIES`), log level upgrades (`error`→`warn` for graceful degradation), fragile `constructor.name` test assertion
 
 ### Next Up
 
-1. `/gsd-ship 9.1` — create PR for image optimization branch
+1. Merge PR #25 (waiting on CI)
 2. `/gsd-new-milestone` — start v1.3 Motivation & Planning
 
 ### Backlog

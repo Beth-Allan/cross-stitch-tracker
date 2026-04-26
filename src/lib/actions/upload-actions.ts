@@ -21,10 +21,6 @@ import {
 
 const VALID_CHART_FIELDS = ["coverImageUrl", "coverThumbnailUrl", "digitalWorkingCopyUrl"] as const;
 
-/**
- * Fetch an image from R2 and return it as a Buffer.
- * Shared by processAndStoreImage and generateThumbnail.
- */
 async function fetchImageBuffer(
   key: string,
 ): Promise<{ success: true; buffer: Buffer } | { success: false; error: string }> {
@@ -49,14 +45,9 @@ async function fetchImageBuffer(
 
 type ChartFileField = (typeof VALID_CHART_FIELDS)[number];
 
-/**
- * Step 1: Generate a presigned PUT URL for client-side upload to R2.
- * Returns the URL and the storage key to use in confirmUpload.
- */
 export async function getPresignedUploadUrl(input: unknown) {
   await requireAuth();
 
-  // Validate input separately so Zod errors get their own message
   let validated;
   try {
     validated = uploadRequestSchema.parse(input);
@@ -67,7 +58,6 @@ export async function getPresignedUploadUrl(input: unknown) {
     return { success: false as const, error: "Invalid upload request" };
   }
 
-  // Validate content type based on category
   if (
     validated.category === "covers" &&
     !ALLOWED_IMAGE_TYPES.includes(validated.contentType as (typeof ALLOWED_IMAGE_TYPES)[number])
@@ -96,7 +86,6 @@ export async function getPresignedUploadUrl(input: unknown) {
     };
   }
 
-  // R2 operations in separate try/catch
   try {
     const sanitizedName = validated.fileName.replace(/[/\\]/g, "-").slice(0, 100);
     const key = `${validated.category}/${validated.projectId}/${nanoid()}-${sanitizedName}`;
@@ -127,14 +116,10 @@ export async function getPresignedUploadUrl(input: unknown) {
   }
 }
 
-/**
- * Step 3: After client uploads to R2, save the key reference in the database.
- */
 export async function confirmUpload(input: { chartId: string; field: string; key: string }) {
   const user = await requireAuth();
 
   try {
-    // Validate field is one of the allowed chart file fields
     if (!VALID_CHART_FIELDS.includes(input.field as ChartFileField)) {
       return {
         success: false as const,
@@ -142,7 +127,6 @@ export async function confirmUpload(input: { chartId: string; field: string; key
       };
     }
 
-    // Verify chart ownership before allowing write
     const chart = await prisma.chart.findUnique({
       where: { id: input.chartId },
       select: { id: true, project: { select: { userId: true } } },
@@ -172,7 +156,7 @@ export async function confirmUpload(input: { chartId: string; field: string; key
         }
         // If processing failed, the raw key is already saved from the first update above
       } catch (err) {
-        console.error("Image optimization failed (upload confirmed with raw image):", err);
+        console.warn("Image optimization failed (raw image preserved):", err);
       }
     }
 
@@ -184,9 +168,6 @@ export async function confirmUpload(input: { chartId: string; field: string; key
   }
 }
 
-/**
- * Generate a presigned GET URL for viewing/downloading a file from R2.
- */
 export async function getPresignedDownloadUrl(key: string) {
   await requireAuth();
 
@@ -216,12 +197,6 @@ export async function getPresignedDownloadUrl(key: string) {
   }
 }
 
-/**
- * Generate presigned GET URLs for multiple R2 keys in batch.
- * Used by server pages to resolve R2 keys to displayable URLs before passing to client components.
- * Returns a Record mapping each valid key to its presigned URL.
- * Gracefully handles partial failures and R2-not-configured scenarios.
- */
 export async function getPresignedImageUrls(
   keys: (string | null | undefined)[],
 ): Promise<Record<string, string>> {
@@ -259,9 +234,6 @@ export async function getPresignedImageUrls(
   }
 }
 
-/**
- * Delete a file from R2 storage.
- */
 export async function deleteFile(key: string) {
   await requireAuth();
 
@@ -279,13 +251,7 @@ export async function deleteFile(key: string) {
   }
 }
 
-/**
- * Process a raw uploaded image: produce an optimized 1200px WebP and a 400x400 thumbnail,
- * upload both to R2, then delete the raw original.
- *
- * Used by confirmUpload for cover images. Designed to be safe -- if processing fails,
- * the raw original is preserved (not deleted) so the upload is still usable.
- */
+// On failure the raw original is preserved so the upload is still usable.
 export async function processAndStoreImage(
   entityId: string,
   rawKey: string,
@@ -347,30 +313,23 @@ export async function processAndStoreImage(
   }
 }
 
-/**
- * Generate a 400x400 WebP thumbnail from a cover image stored in R2.
- * Fetches the original, processes with sharp, uploads thumbnail, updates DB.
- */
 export async function generateThumbnail(chartId: string, coverKey: string) {
   await requireAuth();
 
   try {
     const r2 = getR2Client();
 
-    // Fetch the original image from R2
     const fetchResult = await fetchImageBuffer(coverKey);
     if (!fetchResult.success) {
       return { success: false as const, error: fetchResult.error };
     }
     const { buffer } = fetchResult;
 
-    // Generate thumbnail with sharp
     const thumbnailBuffer = await sharp(buffer)
       .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, { fit: "cover", withoutEnlargement: true })
       .webp({ quality: THUMBNAIL_QUALITY })
       .toBuffer();
 
-    // Upload thumbnail to R2
     const thumbnailKey = `covers/${chartId}/thumb-${nanoid()}.webp`;
     const putCommand = new PutObjectCommand({
       Bucket: R2_BUCKET_NAME,
@@ -380,7 +339,6 @@ export async function generateThumbnail(chartId: string, coverKey: string) {
     });
     await r2.send(putCommand);
 
-    // Update chart record with thumbnail key
     await prisma.chart.update({
       where: { id: chartId },
       data: { coverThumbnailUrl: thumbnailKey },
