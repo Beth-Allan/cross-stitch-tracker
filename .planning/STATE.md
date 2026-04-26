@@ -2,10 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Track & Measure
-status: archived
-stopped_at: v1.2 milestone archived
-last_updated: "2026-04-26T00:00:00.000Z"
-last_activity: 2026-04-26 -- v1.2 milestone archived
+current_phase: 9.1 — Image Optimization on Upload (INSERTED)
+status: Ready for `/gsd-plan-phase 9.1`
+last_updated: "2026-04-26T21:04:00.287Z"
 progress:
   total_phases: 2
   completed_phases: 2
@@ -26,7 +25,8 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 ## Current Position
 
 Milestone: v1.2 Track & Measure — ARCHIVED
-Status: Ready for `/gsd-new-milestone` to start v1.3
+Current Phase: 9.1 — Image Optimization on Upload (INSERTED)
+Status: Ready for `/gsd-plan-phase 9.1`
 
 ## Milestone Structure
 
@@ -58,6 +58,10 @@ Status: Ready for `/gsd-new-milestone` to start v1.3
 - Average: ~5 plans/day
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 9.1 inserted after Phase 9: Image Optimization on Upload — WebP conversion for covers/session photos via Sharp (URGENT)
 
 ### Decisions
 
