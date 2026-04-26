@@ -21,7 +21,7 @@ A stitcher can manage their entire chart collection and supplies faster and more
 **Shipped:** v1.2 Track & Measure (2026-04-20)
 **Next:** v1.3 Motivation & Planning — statistics, goals, scheduling
 
-The app now has session logging with atomic progress tracking, Pattern Dive with 4 specialized collection tabs, a curated Main Dashboard, a Project Dashboard with progress buckets, and a Shopping Cart with project-based supply aggregation. 1,172 tests, deployed to Vercel.
+The app now has session logging with atomic progress tracking, Pattern Dive with 4 specialized collection tabs, a curated Main Dashboard, a Project Dashboard with progress buckets, and a Shopping Cart with project-based supply aggregation. Phase 9.1 added image optimization on upload — covers and session photos are now converted to 1200px WebP via Sharp, reducing storage ~90%. 1,188 tests, deployed to Vercel.
 
 ## Requirements
 
@@ -64,6 +64,7 @@ The app now has session logging with atomic progress tracking, Pattern Dive with
 - ✓ Main Dashboard (Currently Stitching, Start Next, Buried Treasures, Spotlight, Collection Stats, Quick Add) — v1.2
 - ✓ Project Dashboard (hero stats, 5 progress buckets with sorting, Finished tab with 4 sort dimensions) — v1.2
 - ✓ Shopping Cart upgrade (project selection, tabbed supply aggregation, quantity stepper, IDOR protection) — v1.2
+- ✓ Image optimization on upload — covers and session photos converted to 1200px WebP q80 via Sharp, raw originals deleted from R2 — Phase 9.1
 
 ### Active — Milestone 4: Motivation & Planning (v1.3)
 

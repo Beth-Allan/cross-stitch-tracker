@@ -2,15 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Track & Measure
-status: archived
-stopped_at: v1.2 milestone archived
-last_updated: "2026-04-26T00:00:00.000Z"
-last_activity: 2026-04-26 -- v1.2 milestone archived
+current_phase: 10
+status: "Phase 09.1 shipped — PR #25"
+last_updated: "2026-04-26T21:59:18.890Z"
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 20
-  completed_plans: 20
+  total_phases: 3
+  completed_phases: 1
+  total_plans: 2
+  completed_plans: 2
   percent: 100
 ---
 
@@ -21,12 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** v1.2 archived — ready for v1.3 Motivation & Planning
+**Current focus:** Phase 09.1 — image-optimization-on-upload
 
 ## Current Position
 
+Phase: 09.1 (image-optimization-on-upload) — EXECUTING
+Plan: Not started
 Milestone: v1.2 Track & Measure — ARCHIVED
-Status: Ready for `/gsd-new-milestone` to start v1.3
+Current Phase: 10
+Status: Phase 09.1 shipped — PR #25
 
 ## Milestone Structure
 
@@ -41,7 +43,7 @@ Status: Ready for `/gsd-new-milestone` to start v1.3
 
 **Velocity (v1.0):**
 
-- Total plans completed: 23
+- Total plans completed: 25
 - Total execution time: 22 days
 - Average: ~1 plan/day
 
@@ -58,6 +60,10 @@ Status: Ready for `/gsd-new-milestone` to start v1.3
 - Average: ~5 plans/day
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 9.1 inserted after Phase 9: Image Optimization on Upload — WebP conversion for covers/session photos via Sharp (URGENT)
 
 ### Decisions
 

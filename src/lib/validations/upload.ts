@@ -12,16 +12,22 @@ export const ALLOWED_FILE_TYPES = [
 
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+// Image optimization settings
+export const OPTIMIZED_MAX_WIDTH = 1200;
+export const OPTIMIZED_QUALITY = 80;
+export const THUMBNAIL_SIZE = 400;
+export const THUMBNAIL_QUALITY = 80;
+
 export const uploadRequestSchema = z.object({
-  fileName: z.string().min(1),
-  contentType: z.string().min(1),
+  fileName: z.string().trim().min(1),
+  contentType: z.string().trim().min(1),
   fileSize: z
     .number()
     .int()
     .positive()
     .max(MAX_FILE_SIZE, "File is too large. Maximum size is 10MB."),
   category: z.enum(["covers", "files", "sessions"]),
-  projectId: z.string().min(1),
+  projectId: z.string().trim().min(1),
 });
 
 export type UploadRequestInput = z.infer<typeof uploadRequestSchema>;

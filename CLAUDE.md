@@ -23,17 +23,24 @@
 
 ### In Progress
 
-None — v1.2 archived, ready for v1.3.
+None — Phase 9.1 complete, ready for v1.3.
 
 ### Done This Session
 
-- Ran `/gsd-audit-milestone` — 26/26 requirements satisfied, all integration verified
-- Ran `/gsd-complete-milestone 1.2` — archived roadmap, requirements, phases, updated PROJECT.md, tagged v1.2
+- Shipped Phase 9.1 — PR #25 created and pushed
+- PR review (4 parallel agents: code, tests, silent failures, comments) found 2 critical + 4 important
+- PR review fixes applied, 1191 tests passing:
+  - Restructured delete-after-DB-write: processAndStoreImage no longer deletes raw; callers delete after DB write succeeds (eliminates data corruption path)
+  - Narrowed catch block: auth/infra errors propagate instead of being swallowed
+  - Fixed 2 broken confirmUpload tests (were passing for wrong reason — missing ownership mock)
+  - Added ownership rejection tests for confirmUpload (chart not found, wrong user)
+  - Added "unchanged photoKey skips optimization" test for updateSession
+- Nice-to-have cleanup: removed narration comments/JSDoc, dead code (`OPTIMIZABLE_CATEGORIES`), log level upgrades (`error`→`warn` for graceful degradation), fragile `constructor.name` test assertion
 
 ### Next Up
 
-1. `/gsd-new-milestone` — start v1.3 Motivation & Planning (questioning → research → requirements → roadmap)
-2. Image optimization on upload (WebP conversion for covers/session photos via Sharp). See `.planning/research/image-optimization-on-upload.md`
+1. Merge PR #25 (waiting on CI)
+2. `/gsd-new-milestone` — start v1.3 Motivation & Planning
 
 ### Backlog
 

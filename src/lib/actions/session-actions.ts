@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
+import { processAndStoreImage, deleteFile } from "@/lib/actions/upload-actions";
 import { sessionFormSchema } from "@/lib/validations/session";
 import type {
   StitchSessionRow,
@@ -15,11 +16,7 @@ import type {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/**
- * Recalculate stitchesCompleted for a project inside a transaction.
- * Formula: stitchesCompleted = startingStitches + sum(session.stitchCount)
- * Per D-04, startingStitches is fetched inside the transaction to stay atomic.
- */
+// startingStitches fetched inside transaction to stay atomic with the sum
 async function recalculateProgress(tx: Prisma.TransactionClient, projectId: string): Promise<void> {
   const [aggregation, project] = await Promise.all([
     tx.stitchSession.aggregate({
@@ -78,9 +75,26 @@ export async function createSession(formData: unknown) {
       return created;
     });
 
+    let returnSession = session;
+    if (session.photoKey) {
+      try {
+        const result = await processAndStoreImage(session.id, session.photoKey, "sessions");
+        if (result.success) {
+          await prisma.stitchSession.update({
+            where: { id: session.id },
+            data: { photoKey: result.optimizedKey },
+          });
+          returnSession = { ...session, photoKey: result.optimizedKey };
+          await deleteFile(session.photoKey).catch(() => {});
+        }
+      } catch (err) {
+        console.warn("Session photo optimization failed:", err);
+      }
+    }
+
     revalidatePath(`/charts/${project.chartId}`);
     revalidatePath("/sessions");
-    return { success: true as const, session };
+    return { success: true as const, session: returnSession };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };
@@ -98,7 +112,6 @@ export async function updateSession(sessionId: string, formData: unknown) {
   try {
     const validated = sessionFormSchema.parse(formData);
 
-    // Find session and verify ownership via project
     const existing = await prisma.stitchSession.findUnique({
       where: { id: sessionId },
       include: {
@@ -137,9 +150,27 @@ export async function updateSession(sessionId: string, formData: unknown) {
       return updated;
     });
 
+    // Optimize session photo only when it's a NEW photo (not already optimized)
+    let returnSession = session;
+    if (session.photoKey && session.photoKey !== existing.photoKey) {
+      try {
+        const result = await processAndStoreImage(session.id, session.photoKey, "sessions");
+        if (result.success) {
+          await prisma.stitchSession.update({
+            where: { id: session.id },
+            data: { photoKey: result.optimizedKey },
+          });
+          returnSession = { ...session, photoKey: result.optimizedKey };
+          await deleteFile(session.photoKey).catch(() => {});
+        }
+      } catch (err) {
+        console.warn("Session photo optimization failed:", err);
+      }
+    }
+
     revalidatePath(`/charts/${chartId}`);
     revalidatePath("/sessions");
-    return { success: true as const, session };
+    return { success: true as const, session: returnSession };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };
@@ -155,7 +186,6 @@ export async function deleteSession(sessionId: string) {
   const user = await requireAuth();
 
   try {
-    // Find session and verify ownership via project
     const existing = await prisma.stitchSession.findUnique({
       where: { id: sessionId },
       include: {

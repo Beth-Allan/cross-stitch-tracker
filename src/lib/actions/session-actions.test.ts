@@ -17,11 +17,23 @@ vi.mock("next/cache", () => ({
   revalidatePath: mockRevalidatePath,
 }));
 
+const mockProcessAndStoreImage = vi.fn();
+const mockDeleteFile = vi.fn().mockResolvedValue({ success: true });
+vi.mock("@/lib/actions/upload-actions", () => ({
+  processAndStoreImage: (...args: unknown[]) => mockProcessAndStoreImage(...args),
+  deleteFile: (...args: unknown[]) => mockDeleteFile(...args),
+}));
+
 describe("session-actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAuth.mockResolvedValue({
       user: { id: "user-1", name: "Test", email: "test@test.com" },
+    });
+    mockProcessAndStoreImage.mockResolvedValue({
+      success: true,
+      optimizedKey: "sessions/s1/opt-test.webp",
+      thumbnailKey: "sessions/s1/thumb-test.webp",
     });
   });
 
@@ -322,6 +334,130 @@ describe("session-actions", () => {
       expect(mockRevalidatePath).toHaveBeenCalledWith("/charts/chart-1");
       expect(mockRevalidatePath).toHaveBeenCalledWith("/sessions");
     });
+
+    it("optimizes session photo when photoKey is provided", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+      });
+
+      const mockSession = createMockStitchSession({
+        id: "session-1",
+        photoKey: "sessions/p1/raw-photo.jpg",
+      });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 100 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 100 }),
+          },
+        });
+      });
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 100,
+        timeSpentMinutes: 60,
+        photoKey: "sessions/p1/raw-photo.jpg",
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockProcessAndStoreImage).toHaveBeenCalledWith(
+        "session-1",
+        "sessions/p1/raw-photo.jpg",
+        "sessions",
+      );
+      expect(mockPrisma.stitchSession.update).toHaveBeenCalledWith({
+        where: { id: "session-1" },
+        data: { photoKey: "sessions/s1/opt-test.webp" },
+      });
+    });
+
+    it("returns success even when photo optimization fails on create", async () => {
+      mockProcessAndStoreImage.mockResolvedValueOnce({
+        success: false,
+        error: "Sharp failed",
+      });
+
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+      });
+
+      const mockSession = createMockStitchSession({
+        id: "session-1",
+        photoKey: "sessions/p1/raw-photo.jpg",
+      });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 100 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 100 }),
+          },
+        });
+      });
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 100,
+        timeSpentMinutes: 60,
+        photoKey: "sessions/p1/raw-photo.jpg",
+      });
+
+      expect(result.success).toBe(true);
+      // photoKey update should NOT have been called since optimization failed
+      expect(mockPrisma.stitchSession.update).not.toHaveBeenCalled();
+    });
+
+    it("does not optimize when photoKey is null on create", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+      });
+
+      const mockSession = createMockStitchSession({ id: "session-1", photoKey: null });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 100 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 100 }),
+          },
+        });
+      });
+
+      const { createSession } = await import("./session-actions");
+      await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 100,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(mockProcessAndStoreImage).not.toHaveBeenCalled();
+    });
   });
 
   // ─── updateSession ─────────────────────────────────────────────────────
@@ -414,6 +550,160 @@ describe("session-actions", () => {
 
       expect(mockRevalidatePath).toHaveBeenCalledWith("/charts/chart-1");
       expect(mockRevalidatePath).toHaveBeenCalledWith("/sessions");
+    });
+
+    it("optimizes new photo on update when photoKey is present", async () => {
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
+        ...createMockStitchSession({ id: "session-1" }),
+        project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 0 },
+      });
+
+      const updatedSession = createMockStitchSession({
+        id: "session-1",
+        photoKey: "sessions/p1/new-photo.jpg",
+      });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            update: vi.fn().mockResolvedValue(updatedSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 200 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 200 }),
+          },
+        });
+      });
+
+      const { updateSession } = await import("./session-actions");
+      const result = await updateSession("session-1", {
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: 90,
+        photoKey: "sessions/p1/new-photo.jpg",
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockProcessAndStoreImage).toHaveBeenCalledWith(
+        "session-1",
+        "sessions/p1/new-photo.jpg",
+        "sessions",
+      );
+      expect(mockPrisma.stitchSession.update).toHaveBeenCalledWith({
+        where: { id: "session-1" },
+        data: { photoKey: "sessions/s1/opt-test.webp" },
+      });
+    });
+
+    it("returns success even when photo optimization fails on update", async () => {
+      mockProcessAndStoreImage.mockResolvedValueOnce({
+        success: false,
+        error: "Sharp failed",
+      });
+
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
+        ...createMockStitchSession({ id: "session-1" }),
+        project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 0 },
+      });
+
+      const updatedSession = createMockStitchSession({
+        id: "session-1",
+        photoKey: "sessions/p1/new-photo.jpg",
+      });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            update: vi.fn().mockResolvedValue(updatedSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 200 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 200 }),
+          },
+        });
+      });
+
+      const { updateSession } = await import("./session-actions");
+      const result = await updateSession("session-1", {
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: 90,
+        photoKey: "sessions/p1/new-photo.jpg",
+      });
+
+      expect(result.success).toBe(true);
+      // photoKey update should NOT have been called since optimization failed
+      expect(mockPrisma.stitchSession.update).not.toHaveBeenCalled();
+    });
+
+    it("does not optimize when photoKey is unchanged on update", async () => {
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
+        ...createMockStitchSession({ id: "session-1", photoKey: "sessions/p1/existing.webp" }),
+        project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 0 },
+      });
+
+      const updatedSession = createMockStitchSession({
+        id: "session-1",
+        photoKey: "sessions/p1/existing.webp",
+      });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            update: vi.fn().mockResolvedValue(updatedSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 200 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 200 }),
+          },
+        });
+      });
+
+      const { updateSession } = await import("./session-actions");
+      const result = await updateSession("session-1", {
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: 90,
+        photoKey: "sessions/p1/existing.webp",
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockProcessAndStoreImage).not.toHaveBeenCalled();
+    });
+
+    it("does not optimize when photoKey is null on update", async () => {
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
+        ...createMockStitchSession({ id: "session-1" }),
+        project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 0 },
+      });
+
+      const updatedSession = createMockStitchSession({ id: "session-1", photoKey: null });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            update: vi.fn().mockResolvedValue(updatedSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 200 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 200 }),
+          },
+        });
+      });
+
+      const { updateSession } = await import("./session-actions");
+      await updateSession("session-1", {
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(mockProcessAndStoreImage).not.toHaveBeenCalled();
     });
   });
 
