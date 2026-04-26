@@ -22,15 +22,15 @@ export const THUMBNAIL_QUALITY = 80;
 export const OPTIMIZABLE_CATEGORIES = ["covers", "sessions"] as const;
 
 export const uploadRequestSchema = z.object({
-  fileName: z.string().min(1),
-  contentType: z.string().min(1),
+  fileName: z.string().trim().min(1),
+  contentType: z.string().trim().min(1),
   fileSize: z
     .number()
     .int()
     .positive()
     .max(MAX_FILE_SIZE, "File is too large. Maximum size is 10MB."),
   category: z.enum(["covers", "files", "sessions"]),
-  projectId: z.string().min(1),
+  projectId: z.string().trim().min(1),
 });
 
 export type UploadRequestInput = z.infer<typeof uploadRequestSchema>;
