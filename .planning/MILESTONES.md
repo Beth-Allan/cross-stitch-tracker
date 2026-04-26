@@ -1,5 +1,23 @@
 # Milestones
 
+## v1.2 Track & Measure (Shipped: 2026-04-20)
+
+**Delivered:** Session logging with atomic progress tracking, Pattern Dive collection browser, Main Dashboard with curated sections, Project Dashboard with progress buckets, and Shopping Cart with project selection and supply aggregation.
+
+**Stats:** 2 phases, 20 plans | 153 commits | 1,172 tests | 4 days (2026-04-16 → 2026-04-20)
+
+**Key accomplishments:**
+
+1. **Session logging** — StitchSession model with create/edit/delete from header, project detail, and dashboard; atomic progress auto-update via $transaction; progress photo upload to R2
+2. **Pattern Dive** — Charts page evolved with 4 specialized tabs: Browse, What's Next (kitting readiness), Fabric Requirements (stash matching + assignment), Storage View (location grouping)
+3. **Main Dashboard** — Currently Stitching, Start Next, Buried Treasures, Spotlight with shuffle, Collection Stats sidebar, Quick Add menu with 8 creation options
+4. **Project Dashboard** — Hero stats grid, CSS stacked bar chart, 5 progress buckets with sorting, Finished tab with 4 sort dimensions and expandable stat cards
+5. **Shopping Cart upgrade** — Project selection with localStorage persistence, tabbed supply aggregation with badge counts, quantity stepper with IDOR protection
+
+**PRs:** Phase 8 (merged), #18 (Phase 9)
+
+---
+
 ## v1.1 Browse & Organize (Shipped: 2026-04-16)
 
 **Delivered:** A browsable, visually rich collection experience with gallery views, project detail pages, and an integrated skein calculator.
