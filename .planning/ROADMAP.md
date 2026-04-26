@@ -71,7 +71,7 @@ Full details: `milestones/v1.2-ROADMAP.md`
   5. Upload UX is unchanged (no visible delay or behavior change)
 **Plans**: 2 plans
 Plans:
-- [ ] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
+- [x] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
 - [ ] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
 **UI hint**: no
 
