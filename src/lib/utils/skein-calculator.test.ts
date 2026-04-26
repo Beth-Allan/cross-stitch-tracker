@@ -154,6 +154,68 @@ describe("calculateSkeins", () => {
     ).toBe(2);
   });
 
+  it("returns 0 for fabricCount of 0", () => {
+    expect(
+      calculateSkeins({
+        stitchCount: 1000,
+        strandCount: 2,
+        fabricCount: 0,
+        overCount: 1,
+        wastePercent: 20,
+      }),
+    ).toBe(0);
+  });
+
+  it("returns 0 for negative fabricCount", () => {
+    expect(
+      calculateSkeins({
+        stitchCount: 1000,
+        strandCount: 2,
+        fabricCount: -14,
+        overCount: 1,
+        wastePercent: 20,
+      }),
+    ).toBe(0);
+  });
+
+  it("returns 0 for strandCount of 0", () => {
+    expect(
+      calculateSkeins({
+        stitchCount: 1000,
+        strandCount: 0,
+        fabricCount: 14,
+        overCount: 1,
+        wastePercent: 20,
+      }),
+    ).toBe(0);
+  });
+
+  it("calculates correct exact value at wastePercent 50", () => {
+    // rawSkeins = 10000 * 2 * 1.5 / (14 * 255) = 8.403 → ceil = 9
+    expect(
+      calculateSkeins({
+        stitchCount: 10000,
+        strandCount: 2,
+        fabricCount: 14,
+        overCount: 1,
+        wastePercent: 50,
+      }),
+    ).toBe(9);
+  });
+
+  it("scales correctly with 6 strands", () => {
+    // rawSkeins = 10000 * 6 * 1.2 / (14 * 255) = 20.168 → ceil = 21
+    expect(
+      calculateSkeins({
+        stitchCount: 10000,
+        strandCount: 6,
+        fabricCount: 14,
+        overCount: 1,
+        wastePercent: 20,
+      }),
+    ).toBe(21);
+  });
+
   it("over 2 uses exactly twice the thread per stitch as over 1", () => {
     const over1 = calculateSkeins({
       stitchCount: 10000,

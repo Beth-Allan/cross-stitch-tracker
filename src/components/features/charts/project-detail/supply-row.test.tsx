@@ -95,7 +95,7 @@ describe("SupplyRow", () => {
 
   it('shows "Calc: X" text when isNeedOverridden=true and calculatedNeed !== quantityRequired', () => {
     // With 1000 stitches, 2 strands, 14ct, over 2, 20% waste:
-    // calculateSkeins returns 2 (empirical constant 1.3: 1000 * 2*1.3/7 * 1.2 / 255 = 1.75 -> ceil 2)
+    // calculateSkeins returns 2 (1000 * 2 * 1.2 / (7 * 255) = 1.345 → ceil 2)
     // quantityRequired is 10 (manually set, differs from 2), so "Calc: 2" should show
     render(
       <SupplyRow

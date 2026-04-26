@@ -3,6 +3,7 @@
  *
  * Formula (CITED: mismatch.co.uk/cross.htm, thread-bare.com/tools):
  *   stitches_per_skein = 17 * (15 / (6/count)) * (6/strands)
+ *   where count = effectiveCount = fabricCount / overCount
  *
  * The two 6's (geometric thread path ≈ 6/count inches per stitch, and
  * 6 strands per DMC skein yielding 6/strands working lengths per cut)
@@ -11,7 +12,7 @@
  * Inverted: skeins = stitches * strands / (effectiveCount * 255) * wasteFactor
  *
  * Constants:
- * - 8m DMC skein → 17 usable segments of 18", each ~15" after tie-off = 255"
+ * - ~8m DMC skein (8.7yd / 313") → ~17 usable segments of 18", each ~15" after tie-off = 255"
  * - effectiveCount = fabricCount / overCount (over 2 for evenweave/linen)
  * - wasteFactor covers movement between areas and mistakes (user-configurable)
  */
@@ -26,7 +27,7 @@ export function calculateSkeins(params: {
   wastePercent: number; // 0-50, default 20
 }): number {
   const { stitchCount, strandCount, fabricCount, overCount, wastePercent } = params;
-  if (stitchCount <= 0 || fabricCount <= 0) return 0;
+  if (stitchCount <= 0 || fabricCount <= 0 || strandCount <= 0) return 0;
 
   const effectiveCount = fabricCount / overCount;
   const wasteFactor = 1 + wastePercent / 100;
