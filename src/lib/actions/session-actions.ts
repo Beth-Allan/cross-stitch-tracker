@@ -80,6 +80,7 @@ export async function createSession(formData: unknown) {
     });
 
     // Optimize session photo if present
+    let returnSession = session;
     if (session.photoKey) {
       try {
         const result = await processAndStoreImage(session.id, session.photoKey, "sessions");
@@ -88,6 +89,8 @@ export async function createSession(formData: unknown) {
             where: { id: session.id },
             data: { photoKey: result.optimizedKey },
           });
+          // Update the object we return to the client so it references the live key
+          returnSession = { ...session, photoKey: result.optimizedKey };
         }
       } catch (err) {
         console.warn("Session photo optimization failed:", err);
@@ -96,7 +99,7 @@ export async function createSession(formData: unknown) {
 
     revalidatePath(`/charts/${project.chartId}`);
     revalidatePath("/sessions");
-    return { success: true as const, session };
+    return { success: true as const, session: returnSession };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };
@@ -153,8 +156,9 @@ export async function updateSession(sessionId: string, formData: unknown) {
       return updated;
     });
 
-    // Optimize session photo if present
-    if (session.photoKey) {
+    // Optimize session photo only when it's a NEW photo (not already optimized)
+    let returnSession = session;
+    if (session.photoKey && session.photoKey !== existing.photoKey) {
       try {
         const result = await processAndStoreImage(session.id, session.photoKey, "sessions");
         if (result.success) {
@@ -162,6 +166,8 @@ export async function updateSession(sessionId: string, formData: unknown) {
             where: { id: session.id },
             data: { photoKey: result.optimizedKey },
           });
+          // Update the object we return to the client so it references the live key
+          returnSession = { ...session, photoKey: result.optimizedKey };
         }
       } catch (err) {
         console.warn("Session photo optimization failed:", err);
@@ -170,7 +176,7 @@ export async function updateSession(sessionId: string, formData: unknown) {
 
     revalidatePath(`/charts/${chartId}`);
     revalidatePath("/sessions");
-    return { success: true as const, session };
+    return { success: true as const, session: returnSession };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };
