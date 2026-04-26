@@ -377,8 +377,8 @@ export async function generateThumbnail(chartId: string, coverKey: string) {
 
     // Generate thumbnail with sharp
     const thumbnailBuffer = await sharp(buffer)
-      .resize(400, 400, { fit: "cover", withoutEnlargement: true })
-      .webp({ quality: 80 })
+      .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, { fit: "cover", withoutEnlargement: true })
+      .webp({ quality: THUMBNAIL_QUALITY })
       .toBuffer();
 
     // Upload thumbnail to R2
