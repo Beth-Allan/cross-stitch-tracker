@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
+import { processAndStoreImage } from "@/lib/actions/upload-actions";
 import { sessionFormSchema } from "@/lib/validations/session";
 import type {
   StitchSessionRow,
@@ -78,6 +79,21 @@ export async function createSession(formData: unknown) {
       return created;
     });
 
+    // Optimize session photo if present
+    if (session.photoKey) {
+      try {
+        const result = await processAndStoreImage(session.id, session.photoKey, "sessions");
+        if (result.success) {
+          await prisma.stitchSession.update({
+            where: { id: session.id },
+            data: { photoKey: result.optimizedKey },
+          });
+        }
+      } catch (err) {
+        console.warn("Session photo optimization failed:", err);
+      }
+    }
+
     revalidatePath(`/charts/${project.chartId}`);
     revalidatePath("/sessions");
     return { success: true as const, session };
@@ -136,6 +152,21 @@ export async function updateSession(sessionId: string, formData: unknown) {
 
       return updated;
     });
+
+    // Optimize session photo if present
+    if (session.photoKey) {
+      try {
+        const result = await processAndStoreImage(session.id, session.photoKey, "sessions");
+        if (result.success) {
+          await prisma.stitchSession.update({
+            where: { id: session.id },
+            data: { photoKey: result.optimizedKey },
+          });
+        }
+      } catch (err) {
+        console.warn("Session photo optimization failed:", err);
+      }
+    }
 
     revalidatePath(`/charts/${chartId}`);
     revalidatePath("/sessions");
