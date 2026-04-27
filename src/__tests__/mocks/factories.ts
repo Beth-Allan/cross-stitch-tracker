@@ -116,7 +116,7 @@ export function createMockProject(overrides?: Partial<Project>): Project {
     wantToStartNext: false,
     preferredStartSeason: null,
     strandCount: 2,
-    overCount: 2,
+    overCount: 1,
     wastePercent: 20,
     startingStitches: 0,
     stitchesCompleted: 0,
