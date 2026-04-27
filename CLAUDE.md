@@ -27,20 +27,14 @@ None — Phase 9.1 complete, ready for v1.3.
 
 ### Done This Session
 
-- Shipped Phase 9.1 — PR #25 created and pushed
-- PR review (4 parallel agents: code, tests, silent failures, comments) found 2 critical + 4 important
-- PR review fixes applied, 1191 tests passing:
-  - Restructured delete-after-DB-write: processAndStoreImage no longer deletes raw; callers delete after DB write succeeds (eliminates data corruption path)
-  - Narrowed catch block: auth/infra errors propagate instead of being swallowed
-  - Fixed 2 broken confirmUpload tests (were passing for wrong reason — missing ownership mock)
-  - Added ownership rejection tests for confirmUpload (chart not found, wrong user)
-  - Added "unchanged photoKey skips optimization" test for updateSession
-- Nice-to-have cleanup: removed narration comments/JSDoc, dead code (`OPTIMIZABLE_CATEGORIES`), log level upgrades (`error`→`warn` for graceful degradation), fragile `constructor.name` test assertion
+- Fixed skein calculator: removed bogus 1.3x constant, changed overCount default 2→1, added mismatch.co.uk validation tests (PR pending)
+- Added backlog items 999.13 (per-brand skein length) and 999.14 (auto-infer overCount from fabric)
 
 ### Next Up
 
-1. Merge PR #25 (waiting on CI)
-2. `/gsd-new-milestone` — start v1.3 Motivation & Planning
+1. Merge skein calculator fix PR
+2. Merge PR #25 (waiting on CI)
+3. `/gsd-new-milestone` — start v1.3 Motivation & Planning
 
 ### Backlog
 
@@ -69,6 +63,8 @@ None — Phase 9.1 complete, ready for v1.3.
 - 999.10: Auto-status from kitting activity — consider auto-transitioning project status to "Kitting" when user starts adding supplies/fabric
 - **999.11: Shopping cart scaling for large collections (HIGH PRIORITY)** — search/filter in project list, status grouping (Kitting/Stitching/Unstarted), supply-type search in By Supply view. Real dataset is 75+ projects in kitting stages.
 - 999.12: Shopping-for bar pill styling — match mockup style (squared-off chips with border, contained card-like bar) instead of current full-round pills
+- 999.13: Per-brand skein length — add `skeinLengthMeters` to ThreadBrand (default 8m for DMC), use in skein calculator instead of hardcoded constant. Fixes inaccuracy for Weeks Dye Works/Gentle Art (5yd), Kreinik (10-11m), etc.
+- 999.14: Auto-infer overCount from fabric count — when fabric is linked to a project, auto-set overCount based on fabric count (≤25 → over 1, ≥28 → over 2). User can still override via settings bar toggle.
 
 ### Blockers
 
