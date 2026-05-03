@@ -8,18 +8,21 @@ A personal cross-stitch project management app that replaced a complex Notion sy
 
 A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
 
-## Current Milestone: v1.3 Motivation & Planning
+## Current Milestone: v1.3 Form & Supply Overhaul
 
-**Goal:** Comprehensive statistics that celebrate stitching progress over time, plus goal setting and rotation management.
+**Goal:** Replace the chart creation/edit form and supply-adding experience with a fast, keyboard-driven single-page flow based on validated sketch findings.
 
 **Target features:**
-- Advanced Stats — Year in Review, monthly stitch charts, stitching calendar, personal bests
-- Goals & Scheduling — Project-specific and global goals, milestone targets, rotation management, achievements
+- Merged single-page form for chart+project creation and editing (no chart/project split, pattern type cards, sticky save bar)
+- Supply takeover mode with optional fabric assignment feeding skein calculator defaults
+- Unified supply table with grouped sections (Thread/Beads/Specialty), persistent add row, segmented type toggle, keyboard-first flow
+- Reusable supply table on project detail Supplies tab (view + add in one surface)
+- SVG donut status indicators for proportional have/need display
 
 ## Current State
 
 **Shipped:** v1.2 Track & Measure (2026-04-20)
-**Next:** v1.3 Motivation & Planning — statistics, goals, scheduling
+**Next:** v1.3 Form & Supply Overhaul — merged form, supply table, keyboard-driven entry
 
 The app now has session logging with atomic progress tracking, Pattern Dive with 4 specialized collection tabs, a curated Main Dashboard, a Project Dashboard with progress buckets, and a Shopping Cart with project-based supply aggregation. Phase 9.1 added image optimization on upload — covers and session photos are now converted to 1200px WebP via Sharp, reducing storage ~90%. 1,188 tests, deployed to Vercel.
 
@@ -66,7 +69,15 @@ The app now has session logging with atomic progress tracking, Pattern Dive with
 - ✓ Shopping Cart upgrade (project selection, tabbed supply aggregation, quantity stepper, IDOR protection) — v1.2
 - ✓ Image optimization on upload — covers and session photos converted to 1200px WebP q80 via Sharp, raw originals deleted from R2 — Phase 9.1
 
-### Active — Milestone 4: Motivation & Planning (v1.3)
+### Active — Milestone 4: Form & Supply Overhaul (v1.3)
+
+- [ ] Merged single-page form for chart+project creation and editing
+- [ ] Supply takeover mode with fabric assignment feeding skein calculator
+- [ ] Unified supply table with grouped sections and persistent add row
+- [ ] Reusable supply table on project detail Supplies tab
+- [ ] SVG donut status indicators for have/need display
+
+### Deferred — Milestone 5: Motivation & Planning (v1.4)
 
 - [ ] Comprehensive statistics engine (daily/weekly/monthly/yearly metrics)
 - [ ] Monthly stitch bar charts and stitching calendar view
@@ -187,4 +198,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-26 after v1.2 milestone completed*
+*Last updated: 2026-05-03 after v1.3 milestone started*

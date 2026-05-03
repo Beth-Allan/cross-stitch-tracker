@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: Track & Measure
-current_phase: 10
-status: "Phase 09.1 shipped — PR #25"
-last_updated: "2026-04-26T21:59:18.890Z"
+milestone: v1.3
+milestone_name: Form & Supply Overhaul
+status: planning
+last_updated: "2026-05-03T21:23:56.585Z"
+last_activity: 2026-05-03
 progress:
-  total_phases: 3
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,11 +24,10 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 
 ## Current Position
 
-Phase: 09.1 (image-optimization-on-upload) — EXECUTING
-Plan: Not started
-Milestone: v1.2 Track & Measure — ARCHIVED
-Current Phase: 10
-Status: Phase 09.1 shipped — PR #25
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-03 — Milestone v1.3 started
 
 ## Milestone Structure
 
