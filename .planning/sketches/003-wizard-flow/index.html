@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sketch 003: Wizard Flow & Layout</title>
+<link rel="stylesheet" href="../themes/default.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: var(--text-base);
+    line-height: 1.5;
+    padding-top: 48px;
+  }
+
+  /* ── Variant Nav ── */
+  #variant-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding: 8px 16px;
+    display: flex; gap: 8px; align-items: center;
+    font-family: var(--font-sans);
+  }
+  .variant-tab {
+    padding: 6px 14px; border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    font-size: var(--text-sm); font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+    color: var(--color-text-muted);
+  }
+  .variant-tab:hover { border-color: var(--color-primary); color: var(--color-primary); }
+  .variant-tab.active {
+    background: var(--color-primary); color: var(--color-primary-text);
+    border-color: var(--color-primary);
+  }
+  .variant { display: none; }
+  .variant.active { display: block; }
+
+  /* ── Shared form styles ── */
+  .page-wrap { max-width: 720px; margin: 0 auto; padding: var(--space-6) var(--space-4); }
+  .page-title { font-family: var(--font-heading); font-size: var(--text-2xl); font-weight: 600; color: var(--color-text); margin-bottom: var(--space-2); }
+  .page-subtitle { font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-8); }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: var(--text-sm); color: var(--color-text-muted);
+    text-decoration: none; margin-bottom: var(--space-4);
+    transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--color-text); }
+  .back-link svg { width: 16px; height: 16px; transition: transform 0.15s; }
+  .back-link:hover svg { transform: translateX(-2px); }
+
+  /* Cards / sections */
+  .section-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin-bottom: var(--space-4);
+  }
+  .section-header {
+    display: flex; align-items: center; gap: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
+  .section-number {
+    width: 28px; height: 28px; border-radius: var(--radius-full);
+    background: var(--color-primary); color: var(--color-primary-text);
+    display: flex; align-items: center; justify-content: center;
+    font-size: var(--text-sm); font-weight: 600; flex-shrink: 0;
+  }
+  .section-number.muted {
+    background: var(--color-border-light); color: var(--color-text-muted);
+  }
+  .section-number.done {
+    background: var(--color-success); color: white;
+  }
+  .section-title { font-family: var(--font-heading); font-size: var(--text-lg); font-weight: 600; }
+  .section-desc { font-size: var(--text-sm); color: var(--color-text-muted); margin-left: auto; }
+
+  /* Form fields */
+  .field-group { margin-bottom: var(--space-5); }
+  .field-group:last-child { margin-bottom: 0; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-4); }
+  .field-label {
+    display: block; font-size: var(--text-sm); font-weight: 500;
+    color: var(--color-text); margin-bottom: var(--space-1);
+  }
+  .field-label .optional {
+    font-weight: 400; color: var(--color-text-subtle); margin-left: 4px;
+  }
+  .field-input {
+    width: 100%; border: 1px solid var(--color-border);
+    border-radius: var(--radius-md); padding: 8px 12px;
+    font-size: var(--text-sm); font-family: var(--font-sans);
+    background: var(--color-surface); color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .field-input:focus {
+    outline: none; border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(5,150,105,0.15);
+  }
+  .field-input::placeholder { color: var(--color-text-subtle); }
+  select.field-input { cursor: pointer; }
+  textarea.field-input { resize: vertical; min-height: 72px; }
+
+  /* Chips / tags */
+  .chip-group { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .chip {
+    padding: 4px 12px; border-radius: var(--radius-full);
+    border: 1px solid var(--color-border); font-size: var(--text-sm);
+    cursor: pointer; transition: all 0.15s; background: var(--color-surface);
+    color: var(--color-text-muted);
+  }
+  .chip:hover { border-color: var(--color-primary); color: var(--color-primary); }
+  .chip.selected {
+    background: var(--color-primary-light); border-color: var(--color-primary);
+    color: var(--color-primary); font-weight: 500;
+  }
+
+  /* Toggle switches */
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-label { font-size: var(--text-sm); }
+  .toggle-label-sub { font-size: var(--text-xs); color: var(--color-text-muted); }
+  .toggle-switch {
+    width: 36px; height: 20px; border-radius: 10px;
+    background: var(--color-border); cursor: pointer;
+    position: relative; transition: background 0.15s;
+  }
+  .toggle-switch.on { background: var(--color-primary); }
+  .toggle-switch::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: white; transition: transform 0.15s;
+    box-shadow: var(--shadow-sm);
+  }
+  .toggle-switch.on::after { transform: translateX(16px); }
+
+  /* Image upload placeholder */
+  .upload-area {
+    width: 100%; height: 120px;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: var(--space-1); color: var(--color-text-muted);
+    font-size: var(--text-sm); cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .upload-area:hover {
+    border-color: var(--color-primary); background: rgba(5,150,105,0.02);
+  }
+  .upload-area svg { width: 24px; height: 24px; opacity: 0.5; }
+
+  /* Sticky bottom bar */
+  .sticky-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-3) var(--space-4);
+    display: flex; align-items: center; justify-content: flex-end; gap: var(--space-3);
+    z-index: 100;
+  }
+  .sticky-bar .save-hint {
+    margin-right: auto; font-size: var(--text-xs); color: var(--color-text-subtle);
+  }
+  .btn {
+    padding: 8px 20px; border-radius: var(--radius-md);
+    font-size: var(--text-sm); font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.15s;
+    font-family: var(--font-sans);
+  }
+  .btn-primary { background: var(--color-primary); color: white; }
+  .btn-primary:hover { background: var(--color-primary-hover); }
+  .btn-ghost { background: transparent; color: var(--color-text-muted); }
+  .btn-ghost:hover { background: var(--color-surface-hover); color: var(--color-text); }
+  .btn-outline {
+    background: var(--color-surface); color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+  .btn-outline:hover { border-color: var(--color-primary); color: var(--color-primary); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── Supply table (simplified preview from sketch-002) ── */
+  .supply-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); table-layout: fixed; }
+  .supply-table thead th {
+    text-align: left; padding: var(--space-2) var(--space-3);
+    font-size: 11px; font-weight: 600; color: var(--color-text-muted);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--color-border);
+    white-space: nowrap; background: var(--color-surface);
+  }
+  .supply-table tbody td {
+    padding: 5px var(--space-3);
+    border-bottom: 1px solid var(--color-border-light);
+    font-variant-numeric: tabular-nums; vertical-align: middle;
+  }
+  .supply-table tbody tr.add-row td {
+    background: rgba(5, 150, 105, 0.03);
+    border-bottom: 2px solid var(--color-primary-light);
+    padding-top: 6px; padding-bottom: 6px;
+  }
+  .tbl-input {
+    width: 100%; border: 1px solid var(--color-border); border-radius: 4px;
+    padding: 4px 8px; font-size: var(--text-sm); font-family: var(--font-sans);
+    background: var(--color-surface); color: var(--color-text); transition: border-color 0.15s;
+  }
+  .tbl-input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 2px rgba(5,150,105,0.15); }
+  .cell-colour { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+  .colour-swatch { width: 14px; height: 14px; border-radius: 2px; flex-shrink: 0; }
+  .tc-code { font-weight: 600; font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+  .tc-name { color: var(--color-text-muted); font-size: var(--text-xs); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .supply-tabs { display: flex; gap: 0; margin-bottom: 0; }
+  .supply-tab {
+    padding: 8px 16px; font-size: var(--text-sm); font-weight: 500;
+    cursor: pointer; border: none; background: none;
+    color: var(--color-text-muted); border-bottom: 2px solid transparent;
+    transition: all 0.15s; font-family: var(--font-sans);
+  }
+  .supply-tab:hover { color: var(--color-text); }
+  .supply-tab.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+  .supply-tab .count {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 18px; height: 18px; border-radius: var(--radius-full);
+    background: var(--color-border-light); font-size: 11px; font-weight: 600;
+    margin-left: 6px; padding: 0 5px;
+  }
+  .supply-tab.active .count { background: var(--color-primary-light); color: var(--color-primary); }
+  .settings-bar {
+    display: flex; align-items: center; gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-bg); border-radius: var(--radius-md);
+    margin-bottom: var(--space-4); font-size: var(--text-sm);
+  }
+  .settings-bar label { color: var(--color-text-muted); white-space: nowrap; }
+  .settings-bar select, .settings-bar input[type="number"] {
+    border: 1px solid var(--color-border); border-radius: 4px;
+    padding: 3px 8px; font-size: var(--text-sm); font-family: var(--font-sans);
+    width: 70px; background: var(--color-surface);
+  }
+  .sparkle { font-size: 10px; margin-left: 2px; }
+
+  /* ── Variant A specific ── */
+  .va-page { padding-bottom: 80px; }
+
+  /* ── Variant B specific ── */
+  .vb-page { padding-bottom: 80px; }
+  .milestone-marker {
+    display: flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    margin: var(--space-2) 0;
+    border-radius: var(--radius-lg);
+    background: var(--color-primary-light);
+    border: 1px solid rgba(5,150,105,0.15);
+  }
+  .milestone-check {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--color-primary); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .milestone-text { font-size: var(--text-sm); color: var(--color-primary-hover); font-weight: 500; }
+  .milestone-action {
+    margin-left: auto; font-size: var(--text-sm); font-weight: 500;
+    color: var(--color-primary); cursor: pointer;
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+  .reveal-section {
+    overflow: hidden; transition: max-height 0.4s ease, opacity 0.3s ease;
+  }
+  .reveal-section.collapsed { max-height: 0; opacity: 0; pointer-events: none; }
+  .reveal-section.expanded { max-height: 3000px; opacity: 1; }
+  .section-divider {
+    border: none; border-top: 1px solid var(--color-border-light);
+    margin: var(--space-6) 0;
+  }
+
+  /* ── Variant C specific ── */
+  .vc-layout { display: flex; gap: var(--space-8); max-width: 960px; margin: 0 auto; padding: var(--space-6) var(--space-4); padding-bottom: 80px; }
+  .vc-sidebar {
+    width: 200px; flex-shrink: 0; position: sticky; top: 64px; align-self: flex-start;
+  }
+  .vc-nav { list-style: none; }
+  .vc-nav-item {
+    display: flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm); color: var(--color-text-muted);
+    cursor: pointer; transition: all 0.15s;
+    text-decoration: none; margin-bottom: 2px;
+  }
+  .vc-nav-item:hover { background: var(--color-surface-hover); color: var(--color-text); }
+  .vc-nav-item.active { background: var(--color-primary-light); color: var(--color-primary); font-weight: 500; }
+  .vc-nav-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    border: 2px solid var(--color-border); flex-shrink: 0;
+  }
+  .vc-nav-dot.partial { border-color: var(--color-warning); background: var(--color-warning); }
+  .vc-nav-dot.complete { border-color: var(--color-success); background: var(--color-success); }
+  .vc-nav-progress {
+    font-size: 11px; color: var(--color-text-subtle); margin-left: auto;
+  }
+  .vc-main { flex: 1; min-width: 0; }
+  .vc-section { margin-bottom: var(--space-8); scroll-margin-top: 64px; }
+  .vc-section-head {
+    font-family: var(--font-heading); font-size: var(--text-lg); font-weight: 600;
+    margin-bottom: var(--space-5); padding-bottom: var(--space-3);
+    border-bottom: 2px solid var(--color-border-light);
+  }
+
+  @media (max-width: 768px) {
+    .vc-layout { flex-direction: column; }
+    .vc-sidebar {
+      position: fixed; top: 48px; left: 0; right: 0;
+      width: 100%; z-index: 99; background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border-light);
+      padding: var(--space-2) var(--space-4);
+    }
+    .vc-nav { display: flex; gap: var(--space-2); overflow-x: auto; }
+    .vc-nav-item { white-space: nowrap; padding: var(--space-2) var(--space-3); }
+    .vc-nav-progress { display: none; }
+    .vc-main { padding-top: 48px; }
+  }
+
+  /* ── Variant D: Synthesis ── */
+  .vd-page { padding-bottom: 80px; }
+
+  /* Required field dot */
+  .req::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    margin-right: 6px;
+    vertical-align: middle;
+    position: relative; top: -1px;
+  }
+
+  /* Pattern type cards */
+  .pattern-cards { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+  .pattern-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    cursor: pointer; transition: all 0.15s;
+    background: var(--color-surface);
+    position: relative;
+  }
+  .pattern-card:hover { border-color: var(--color-primary); }
+  .pattern-card.selected {
+    border-color: var(--color-primary);
+    background: rgba(5,150,105,0.03);
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+  .pattern-card-header {
+    display: flex; align-items: center; gap: var(--space-2);
+  }
+  .pattern-card-icon { font-size: 18px; line-height: 1; }
+  .pattern-card-name { font-size: var(--text-sm); font-weight: 600; }
+  .pattern-card-desc { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 2px; }
+  .pattern-card-check {
+    position: absolute; top: 8px; right: 8px;
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--color-border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; transition: all 0.15s;
+  }
+  .pattern-card.selected .pattern-card-check {
+    border-color: var(--color-primary); background: var(--color-primary); color: white;
+  }
+  .pattern-card-expand {
+    overflow: hidden; max-height: 0; opacity: 0;
+    transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
+    margin-top: 0;
+  }
+  .pattern-card.selected .pattern-card-expand {
+    max-height: 80px; opacity: 1; margin-top: var(--space-3);
+  }
+
+  /* Summary bar (supply takeover mode) */
+  .summary-bar {
+    position: sticky; top: 48px; z-index: 90;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border-light);
+    padding: var(--space-3) var(--space-4);
+    display: flex; align-items: center; gap: var(--space-3);
+    margin: 0 calc(-1 * var(--space-4));
+    transition: all 0.3s ease;
+  }
+  .summary-bar .back-to-details {
+    font-size: var(--text-sm); color: var(--color-primary);
+    cursor: pointer; text-decoration: none;
+    display: flex; align-items: center; gap: 4px;
+    white-space: nowrap;
+    transition: color 0.15s;
+  }
+  .summary-bar .back-to-details:hover { color: var(--color-primary-hover); }
+  .summary-bar .summary-text {
+    font-size: var(--text-sm); color: var(--color-text);
+    display: flex; align-items: center; gap: var(--space-2);
+    flex: 1; min-width: 0;
+  }
+  .summary-bar .summary-name {
+    font-weight: 600; font-family: var(--font-heading);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .summary-bar .summary-sep { color: var(--color-text-subtle); }
+  .summary-bar .summary-detail { color: var(--color-text-muted); white-space: nowrap; }
+
+  /* Form/supply mode transitions */
+  .vd-form-sections { transition: max-height 0.4s ease, opacity 0.3s ease; overflow: hidden; }
+  .vd-form-sections.hidden { max-height: 0; opacity: 0; pointer-events: none; }
+  .vd-supply-section { transition: all 0.3s ease; }
+  .vd-supply-section.fullscreen { margin-top: 0; }
+
+  /* Supply section in takeover gets wider */
+  .vd-page.supply-mode { max-width: 900px; }
+
+  /* ── Sketch Toolbar ── */
+  #sketch-tools {
+    position: fixed; bottom: 12px; left: 12px; z-index: 9999;
+    font-family: system-ui; font-size: 12px;
+    background: rgba(0,0,0,0.7); color: white;
+    padding: 8px 12px; border-radius: 8px;
+    opacity: 0.4; transition: opacity 0.2s;
+    display: flex; gap: 8px; align-items: center;
+  }
+  #sketch-tools:hover { opacity: 1; }
+  #sketch-tools select, #sketch-tools button {
+    font-size: 11px; padding: 2px 6px; border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1);
+    color: white; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Variant Navigation ── -->
+<div id="variant-nav">
+  <button class="variant-tab" onclick="showVariant('a')">A: Section Cards</button>
+  <button class="variant-tab" onclick="showVariant('b')">B: Progressive Reveal</button>
+  <button class="variant-tab" onclick="showVariant('c')">C: Sidebar Nav</button>
+  <button class="variant-tab active" onclick="showVariant('d')">Synthesis: Reveal + Takeover</button>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- VARIANT A: Section Cards — all visible, scroll through, sticky save    -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div id="variant-a" class="variant">
+  <div class="page-wrap va-page">
+    <a href="#" class="back-link" onclick="return false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Charts
+    </a>
+    <h1 class="page-title">Add New Chart</h1>
+    <p class="page-subtitle">Fill in what you know — you can always come back to add more.</p>
+
+    <!-- Section 1: The Chart -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <div class="section-title">The Chart</div>
+        <div class="section-desc">What is it?</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Chart Name</label>
+        <input type="text" class="field-input" placeholder="e.g. Peacock Tapestry" value="Woodland Sampler">
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Designer</label>
+          <select class="field-input">
+            <option>Ink Circles</option>
+            <option>Chatelaine</option>
+            <option>Long Dog Samplers</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Cover Image<span class="optional">optional</span></label>
+          <div class="upload-area" style="height: 38px; border-width: 1px; border-style: solid; flex-direction: row; gap: 8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <span>Upload</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Genres</label>
+        <div class="chip-group">
+          <span class="chip selected">Sampler</span>
+          <span class="chip">Animals</span>
+          <span class="chip selected">Nature</span>
+          <span class="chip">Holiday</span>
+          <span class="chip">Geometric</span>
+          <span class="chip">Fantasy</span>
+          <span class="chip" style="border-style:dashed; color: var(--color-text-subtle);">+ Add</span>
+        </div>
+      </div>
+
+      <div class="field-row-3">
+        <div class="field-group">
+          <label class="field-label">Width</label>
+          <input type="number" class="field-input" placeholder="stitches" value="280">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Height</label>
+          <input type="number" class="field-input" placeholder="stitches" value="350">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Stitch Count</label>
+          <input type="number" class="field-input" placeholder="total" value="54800">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="chip-group" style="gap: var(--space-3);">
+          <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-sm);cursor:pointer;">
+            <input type="checkbox"> Paper chart
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-sm);cursor:pointer;">
+            <input type="checkbox" checked> Digital
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-sm);cursor:pointer;">
+            <input type="checkbox"> Formal kit
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-sm);cursor:pointer;">
+            <input type="checkbox"> SAL
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: The Project -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <div class="section-title">The Project</div>
+        <div class="section-desc">Where is it in your workflow?</div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Status</label>
+          <select class="field-input">
+            <option>Unstarted</option>
+            <option selected>Kitting</option>
+            <option>Kitted</option>
+            <option>In Progress</option>
+            <option>On Hold</option>
+            <option>Finished</option>
+            <option>FFO</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Storage Location<span class="optional">optional</span></label>
+          <select class="field-input">
+            <option value="">—</option>
+            <option>Project Drawer A</option>
+            <option selected>Stash Shelf 2</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Stitching App<span class="optional">optional</span></label>
+          <select class="field-input">
+            <option value="">—</option>
+            <option selected>Pattern Keeper</option>
+            <option>Markup R-XP</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Digital File<span class="optional">optional</span></label>
+          <div class="upload-area" style="height: 38px; border-width: 1px; border-style: solid; flex-direction: row; gap: 8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <span>Upload PDF</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-row-3">
+        <div class="field-group">
+          <label class="field-label">Start Date<span class="optional">optional</span></label>
+          <input type="date" class="field-input">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Finish Date<span class="optional">optional</span></label>
+          <input type="date" class="field-input">
+        </div>
+        <div class="field-group">
+          <label class="field-label">FFO Date<span class="optional">optional</span></label>
+          <input type="date" class="field-input">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Notes<span class="optional">optional</span></label>
+        <textarea class="field-input" placeholder="Anything to remember about this project..." rows="2"></textarea>
+      </div>
+
+      <div style="padding-top: var(--space-3); border-top: 1px solid var(--color-border-light);">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Want to start next</div>
+            <div class="toggle-label-sub">Shows in your "up next" queue</div>
+          </div>
+          <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Needs onion skinning</div>
+          </div>
+          <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Supplies -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <div class="section-title">Supplies</div>
+        <div class="section-desc">What does it need?</div>
+      </div>
+
+      <!-- Calculator settings bar -->
+      <div class="settings-bar">
+        <label>Strands: <select><option>1</option><option selected>2</option><option>3</option></select></label>
+        <label>Over: <select><option selected>1</option><option>2</option></select></label>
+        <label>Fabric ct: <input type="number" value="14" style="width:50px"></label>
+        <label>Waste: <input type="number" value="20" style="width:50px">%</label>
+        <span style="font-size:11px; color: var(--color-text-subtle); margin-left: auto;">Feeds auto-calc ✨</span>
+      </div>
+
+      <!-- Supply type tabs -->
+      <div class="supply-tabs" style="border-bottom: 1px solid var(--color-border-light); margin-bottom: var(--space-4);">
+        <button class="supply-tab active">Threads <span class="count">4</span></button>
+        <button class="supply-tab">Beads <span class="count">0</span></button>
+        <button class="supply-tab">Specialty <span class="count">0</span></button>
+      </div>
+
+      <!-- Thread table (from sketch-002) -->
+      <table class="supply-table">
+        <thead>
+          <tr>
+            <th style="width:44%">Colour</th>
+            <th style="width:14%">Stitches</th>
+            <th style="width:24px"></th>
+            <th style="width:13%">Need</th>
+            <th style="width:10%">Have</th>
+            <th style="width:6%"></th>
+            <th style="width:32px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="add-row">
+            <td><input type="text" class="tbl-input" placeholder="Search DMC..." style="font-family:var(--font-mono);font-size:12px;"></td>
+            <td><input type="number" class="tbl-input" placeholder="—"></td>
+            <td></td>
+            <td><input type="number" class="tbl-input" placeholder="1" disabled></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><div class="cell-colour"><div class="colour-swatch" style="background:#C72D34"></div><span class="tc-code">321</span><span class="tc-name">Red</span></div></td>
+            <td style="font-family:var(--font-mono);font-size:12px;">2,450</td>
+            <td style="color:var(--color-text-subtle);font-size:11px;">→</td>
+            <td><span style="font-family:var(--font-mono);font-size:12px;">2 sk</span> <span class="sparkle">✨</span></td>
+            <td style="color:var(--color-text-subtle);font-size:12px;">0</td>
+            <td>
+              <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/></svg>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><div class="cell-colour"><div class="colour-swatch" style="background:#1B6B3A"></div><span class="tc-code">699</span><span class="tc-name">Green</span></div></td>
+            <td style="font-family:var(--font-mono);font-size:12px;">5,200</td>
+            <td style="color:var(--color-text-subtle);font-size:11px;">→</td>
+            <td><span style="font-family:var(--font-mono);font-size:12px;">4 sk</span> <span class="sparkle">✨</span></td>
+            <td style="color:var(--color-text-subtle);font-size:12px;">2</td>
+            <td>
+              <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-warning)" stroke-width="2" stroke-dasharray="37.7" stroke-dashoffset="18.85" transform="rotate(-90 8 8)" stroke-linecap="round"/></svg>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><div class="cell-colour"><div class="colour-swatch" style="background:#8B6834"></div><span class="tc-code">434</span><span class="tc-name">Lt Brown</span></div></td>
+            <td style="font-family:var(--font-mono);font-size:12px;">1,800</td>
+            <td style="color:var(--color-text-subtle);font-size:11px;">→</td>
+            <td><span style="font-family:var(--font-mono);font-size:12px;">2 sk</span> <span class="sparkle">✨</span></td>
+            <td style="color:var(--color-text-subtle);font-size:12px;">2</td>
+            <td>
+              <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-success)" stroke-width="2" stroke-dasharray="37.7" stroke-dashoffset="0" transform="rotate(-90 8 8)" stroke-linecap="round"/></svg>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><div class="cell-colour"><div class="colour-swatch" style="background:#D4AF37"></div><span class="tc-code">783</span><span class="tc-name">Med Topaz</span></div></td>
+            <td style="font-family:var(--font-mono);font-size:12px;">900</td>
+            <td style="color:var(--color-text-subtle);font-size:11px;">→</td>
+            <td><span style="font-family:var(--font-mono);font-size:12px;">1 sk</span> <span class="sparkle">✨</span></td>
+            <td style="color:var(--color-text-subtle);font-size:12px;">0</td>
+            <td>
+              <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/></svg>
+            </td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) var(--space-3) 0;font-size:var(--text-xs);color:var(--color-text-muted);">
+        <span>4 colours added</span>
+        <span>Total: 9 skeins needed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky save bar -->
+  <div class="sticky-bar">
+    <span class="save-hint">Name entered — ready to save at any point</span>
+    <button class="btn btn-ghost">Cancel</button>
+    <button class="btn btn-primary">Save Chart</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- VARIANT B: Progressive Reveal — milestones between sections            -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div id="variant-b" class="variant">
+  <div class="page-wrap vb-page">
+    <a href="#" class="back-link" onclick="return false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Charts
+    </a>
+    <h1 class="page-title">Add New Chart</h1>
+    <p class="page-subtitle">Start with the basics. Go deeper when you're ready.</p>
+
+    <!-- Section 1: The Chart (always visible) -->
+    <div style="margin-bottom: var(--space-4);">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
+        <div class="section-number done">✓</div>
+        <div class="section-title">The Chart</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Chart Name</label>
+        <input type="text" class="field-input" value="Woodland Sampler">
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Designer</label>
+          <select class="field-input"><option>Ink Circles</option></select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Cover Image<span class="optional">optional</span></label>
+          <div class="upload-area" style="height: 38px; border-width: 1px; border-style: solid; flex-direction: row; gap: 8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <span>Upload</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Genres</label>
+        <div class="chip-group">
+          <span class="chip selected">Sampler</span>
+          <span class="chip">Animals</span>
+          <span class="chip selected">Nature</span>
+          <span class="chip">Holiday</span>
+          <span class="chip">Geometric</span>
+          <span class="chip">Fantasy</span>
+          <span class="chip" style="border-style:dashed; color: var(--color-text-subtle);">+ Add</span>
+        </div>
+      </div>
+
+      <div class="field-row-3">
+        <div class="field-group">
+          <label class="field-label">Width</label>
+          <input type="number" class="field-input" value="280">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Height</label>
+          <input type="number" class="field-input" value="350">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Stitch Count</label>
+          <input type="number" class="field-input" value="54800">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="chip-group" style="gap: var(--space-3);">
+          <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-sm);cursor:pointer;"><input type="checkbox"> Paper</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-sm);cursor:pointer;"><input type="checkbox" checked> Digital</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-sm);cursor:pointer;"><input type="checkbox"> Kit</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-sm);cursor:pointer;"><input type="checkbox"> SAL</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Milestone 1 -->
+    <div class="milestone-marker" id="vb-milestone-1">
+      <div class="milestone-check">✓</div>
+      <div class="milestone-text">Chart basics complete — you can save now, or keep going.</div>
+      <span class="milestone-action" onclick="toggleReveal('vb-section-2')">Add project details →</span>
+    </div>
+
+    <!-- Section 2: The Project (revealed) -->
+    <div id="vb-section-2" class="reveal-section expanded">
+      <hr class="section-divider">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
+        <div class="section-number">2</div>
+        <div class="section-title">The Project</div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Status</label>
+          <select class="field-input">
+            <option>Unstarted</option>
+            <option selected>Kitting</option>
+            <option>Kitted</option>
+            <option>In Progress</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Storage Location<span class="optional">optional</span></label>
+          <select class="field-input"><option value="">—</option><option selected>Stash Shelf 2</option></select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Stitching App<span class="optional">optional</span></label>
+          <select class="field-input"><option value="">—</option><option selected>Pattern Keeper</option></select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Digital File<span class="optional">optional</span></label>
+          <div class="upload-area" style="height: 38px; border-width: 1px; border-style: solid; flex-direction: row; gap: 8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <span>Upload PDF</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-row-3">
+        <div class="field-group">
+          <label class="field-label">Start Date<span class="optional">optional</span></label>
+          <input type="date" class="field-input">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Finish Date<span class="optional">optional</span></label>
+          <input type="date" class="field-input">
+        </div>
+        <div class="field-group">
+          <label class="field-label">FFO Date<span class="optional">optional</span></label>
+          <input type="date" class="field-input">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Notes<span class="optional">optional</span></label>
+        <textarea class="field-input" rows="2" placeholder="Anything to remember..."></textarea>
+      </div>
+
+      <!-- Milestone 2 -->
+      <div class="milestone-marker" id="vb-milestone-2" style="margin-top: var(--space-6);">
+        <div class="milestone-check">✓</div>
+        <div class="milestone-text">Project details added. Ready for supplies?</div>
+        <span class="milestone-action" onclick="toggleReveal('vb-section-3')">Add supplies →</span>
+      </div>
+    </div>
+
+    <!-- Section 3: Supplies (revealed) -->
+    <div id="vb-section-3" class="reveal-section expanded">
+      <hr class="section-divider">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
+        <div class="section-number">3</div>
+        <div class="section-title">Supplies</div>
+      </div>
+
+      <div class="settings-bar">
+        <label>Strands: <select><option selected>2</option></select></label>
+        <label>Over: <select><option selected>1</option></select></label>
+        <label>Fabric ct: <input type="number" value="14" style="width:50px"></label>
+        <label>Waste: <input type="number" value="20" style="width:50px">%</label>
+        <span style="font-size:11px; color: var(--color-text-subtle); margin-left: auto;">Feeds auto-calc ✨</span>
+      </div>
+
+      <div class="supply-tabs" style="border-bottom: 1px solid var(--color-border-light); margin-bottom: var(--space-4);">
+        <button class="supply-tab active">Threads <span class="count">3</span></button>
+        <button class="supply-tab">Beads <span class="count">0</span></button>
+        <button class="supply-tab">Specialty <span class="count">0</span></button>
+      </div>
+
+      <table class="supply-table">
+        <thead>
+          <tr>
+            <th style="width:44%">Colour</th>
+            <th style="width:14%">Stitches</th>
+            <th style="width:24px"></th>
+            <th style="width:13%">Need</th>
+            <th style="width:10%">Have</th>
+            <th style="width:6%"></th>
+            <th style="width:32px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="add-row">
+            <td><input type="text" class="tbl-input" placeholder="Search DMC..." style="font-family:var(--font-mono);font-size:12px;"></td>
+            <td><input type="number" class="tbl-input" placeholder="—"></td>
+            <td></td>
+            <td><input type="number" class="tbl-input" placeholder="1" disabled></td>
+            <td></td><td></td><td></td>
+          </tr>
+          <tr>
+            <td><div class="cell-colour"><div class="colour-swatch" style="background:#C72D34"></div><span class="tc-code">321</span><span class="tc-name">Red</span></div></td>
+            <td style="font-family:var(--font-mono);font-size:12px;">2,450</td>
+            <td style="color:var(--color-text-subtle);font-size:11px;">→</td>
+            <td><span style="font-family:var(--font-mono);font-size:12px;">2 sk</span> <span class="sparkle">✨</span></td>
+            <td style="color:var(--color-text-subtle);font-size:12px;">0</td>
+            <td><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/></svg></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><div class="cell-colour"><div class="colour-swatch" style="background:#1B6B3A"></div><span class="tc-code">699</span><span class="tc-name">Green</span></div></td>
+            <td style="font-family:var(--font-mono);font-size:12px;">5,200</td>
+            <td style="color:var(--color-text-subtle);font-size:11px;">→</td>
+            <td><span style="font-family:var(--font-mono);font-size:12px;">4 sk</span> <span class="sparkle">✨</span></td>
+            <td style="color:var(--color-text-subtle);font-size:12px;">0</td>
+            <td><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/></svg></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><div class="cell-colour"><div class="colour-swatch" style="background:#8B6834"></div><span class="tc-code">434</span><span class="tc-name">Lt Brown</span></div></td>
+            <td style="font-family:var(--font-mono);font-size:12px;">1,800</td>
+            <td style="color:var(--color-text-subtle);font-size:11px;">→</td>
+            <td><span style="font-family:var(--font-mono);font-size:12px;">2 sk</span> <span class="sparkle">✨</span></td>
+            <td style="color:var(--color-text-subtle);font-size:12px;">0</td>
+            <td><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/></svg></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) var(--space-3) 0;font-size:var(--text-xs);color:var(--color-text-muted);">
+        <span>3 colours added</span>
+        <span>Total: 8 skeins needed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky save bar -->
+  <div class="sticky-bar">
+    <span class="save-hint">All sections complete — ready to save</span>
+    <button class="btn btn-ghost">Cancel</button>
+    <button class="btn btn-outline" onclick="alert('Chart saved as draft! You can come back to add more details later.')">Save &amp; Exit</button>
+    <button class="btn btn-primary">Save Chart</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- VARIANT C: Sidebar Navigation — sticky TOC with progress dots          -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div id="variant-c" class="variant">
+  <div class="vc-layout">
+
+    <!-- Sidebar -->
+    <nav class="vc-sidebar">
+      <div style="margin-bottom: var(--space-4);">
+        <a href="#" class="back-link" onclick="return false" style="margin-bottom:var(--space-4);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Charts
+        </a>
+        <div style="font-family:var(--font-heading);font-size:var(--text-lg);font-weight:600;margin-top:var(--space-3);">Add Chart</div>
+      </div>
+
+      <ul class="vc-nav">
+        <li>
+          <a class="vc-nav-item active" href="#vc-chart" onclick="scrollToSection(event, 'vc-chart')">
+            <span class="vc-nav-dot partial"></span>
+            The Chart
+            <span class="vc-nav-progress">5/7</span>
+          </a>
+        </li>
+        <li>
+          <a class="vc-nav-item" href="#vc-project" onclick="scrollToSection(event, 'vc-project')">
+            <span class="vc-nav-dot partial"></span>
+            The Project
+            <span class="vc-nav-progress">2/8</span>
+          </a>
+        </li>
+        <li>
+          <a class="vc-nav-item" href="#vc-supplies" onclick="scrollToSection(event, 'vc-supplies')">
+            <span class="vc-nav-dot"></span>
+            Supplies
+            <span class="vc-nav-progress">0</span>
+          </a>
+        </li>
+      </ul>
+
+      <div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--color-border-light);">
+        <button class="btn btn-primary" style="width:100%; margin-bottom: var(--space-2);">Save Chart</button>
+        <button class="btn btn-ghost" style="width:100%;">Cancel</button>
+      </div>
+
+      <div style="margin-top: var(--space-3); font-size: 11px; color: var(--color-text-subtle); text-align: center;">
+        Only chart name is required.<br>Fill in what you know now.
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <div class="vc-main">
+      <!-- Section 1: The Chart -->
+      <div class="vc-section" id="vc-chart">
+        <div class="vc-section-head">The Chart</div>
+
+        <div class="field-group">
+          <label class="field-label">Chart Name</label>
+          <input type="text" class="field-input" value="Woodland Sampler">
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">Designer</label>
+            <select class="field-input"><option>Ink Circles</option></select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Cover Image<span class="optional">optional</span></label>
+            <div class="upload-area" style="height: 38px; border-width: 1px; border-style: solid; flex-direction: row; gap: 8px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              <span>Upload</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Genres</label>
+          <div class="chip-group">
+            <span class="chip selected">Sampler</span>
+            <span class="chip">Animals</span>
+            <span class="chip selected">Nature</span>
+            <span class="chip">Holiday</span>
+            <span class="chip">Geometric</span>
+            <span class="chip">Fantasy</span>
+            <span class="chip" style="border-style:dashed; color: var(--color-text-subtle);">+ Add</span>
+          </div>
+        </div>
+
+        <div class="field-row-3">
+          <div class="field-group">
+            <label class="field-label">Width</label>
+            <input type="number" class="field-input" value="280">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Height</label>
+            <input type="number" class="field-input" value="350">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Stitch Count</label>
+            <input type="number" class="field-input" value="54800">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="chip-group" style="gap: var(--space-3);">
+            <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-sm);cursor:pointer;"><input type="checkbox"> Paper</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-sm);cursor:pointer;"><input type="checkbox" checked> Digital</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-sm);cursor:pointer;"><input type="checkbox"> Kit</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:var(--text-sm);cursor:pointer;"><input type="checkbox"> SAL</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: The Project -->
+      <div class="vc-section" id="vc-project">
+        <div class="vc-section-head">The Project</div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">Status</label>
+            <select class="field-input">
+              <option>Unstarted</option>
+              <option selected>Kitting</option>
+              <option>Kitted</option>
+              <option>In Progress</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Storage Location<span class="optional">optional</span></label>
+            <select class="field-input"><option value="">—</option><option selected>Stash Shelf 2</option></select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">Stitching App<span class="optional">optional</span></label>
+            <select class="field-input"><option value="">—</option><option selected>Pattern Keeper</option></select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Digital File<span class="optional">optional</span></label>
+            <div class="upload-area" style="height: 38px; border-width: 1px; border-style: solid; flex-direction: row; gap: 8px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              <span>Upload PDF</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-row-3">
+          <div class="field-group">
+            <label class="field-label">Start Date<span class="optional">optional</span></label>
+            <input type="date" class="field-input">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Finish Date<span class="optional">optional</span></label>
+            <input type="date" class="field-input">
+          </div>
+          <div class="field-group">
+            <label class="field-label">FFO Date<span class="optional">optional</span></label>
+            <input type="date" class="field-input">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Notes<span class="optional">optional</span></label>
+          <textarea class="field-input" rows="2" placeholder="Anything to remember..."></textarea>
+        </div>
+
+        <div style="padding-top: var(--space-3); border-top: 1px solid var(--color-border-light);">
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Want to start next</div>
+              <div class="toggle-label-sub">Shows in your "up next" queue</div>
+            </div>
+            <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Needs onion skinning</div></div>
+            <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Supplies -->
+      <div class="vc-section" id="vc-supplies">
+        <div class="vc-section-head">Supplies</div>
+
+        <div class="settings-bar">
+          <label>Strands: <select><option selected>2</option></select></label>
+          <label>Over: <select><option selected>1</option></select></label>
+          <label>Fabric ct: <input type="number" value="14" style="width:50px"></label>
+          <label>Waste: <input type="number" value="20" style="width:50px">%</label>
+          <span style="font-size:11px; color: var(--color-text-subtle); margin-left: auto;">Feeds auto-calc ✨</span>
+        </div>
+
+        <div class="supply-tabs" style="border-bottom: 1px solid var(--color-border-light); margin-bottom: var(--space-4);">
+          <button class="supply-tab active">Threads <span class="count">0</span></button>
+          <button class="supply-tab">Beads <span class="count">0</span></button>
+          <button class="supply-tab">Specialty <span class="count">0</span></button>
+        </div>
+
+        <table class="supply-table">
+          <thead>
+            <tr>
+              <th style="width:44%">Colour</th>
+              <th style="width:14%">Stitches</th>
+              <th style="width:24px"></th>
+              <th style="width:13%">Need</th>
+              <th style="width:10%">Have</th>
+              <th style="width:6%"></th>
+              <th style="width:32px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="add-row">
+              <td><input type="text" class="tbl-input" placeholder="Search DMC..." style="font-family:var(--font-mono);font-size:12px;"></td>
+              <td><input type="number" class="tbl-input" placeholder="—"></td>
+              <td></td>
+              <td><input type="number" class="tbl-input" placeholder="1" disabled></td>
+              <td></td><td></td><td></td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding: var(--space-8) var(--space-4); text-align:center; color: var(--color-text-subtle); font-size: var(--text-sm);">
+          No supplies added yet. Search for a DMC colour above to get started.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- VARIANT D: Synthesis — Progressive Reveal + Supply Takeover            -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div id="variant-d" class="variant active">
+  <div class="page-wrap vd-page" id="vd-page">
+
+    <!-- Summary bar (hidden in form mode, shown in supply mode) -->
+    <div class="summary-bar" id="vd-summary" style="display:none;">
+      <a class="back-to-details" onclick="exitSupplyMode()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Details
+      </a>
+      <div class="summary-text">
+        <span class="summary-name">Woodland Sampler</span>
+        <span class="summary-sep">&middot;</span>
+        <span class="summary-detail">Ink Circles</span>
+        <span class="summary-sep">&middot;</span>
+        <span class="summary-detail">Kitting</span>
+        <span class="summary-sep">&middot;</span>
+        <span class="summary-detail">54,800 stitches</span>
+      </div>
+      <button class="btn btn-primary" style="padding: 6px 16px;">Save Chart</button>
+    </div>
+
+    <!-- Form sections (visible in form mode) -->
+    <div class="vd-form-sections" id="vd-form">
+      <a href="#" class="back-link" onclick="return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Charts
+      </a>
+      <h1 class="page-title">Add New Chart</h1>
+      <p class="page-subtitle">Start with the basics. Go deeper when you're ready.</p>
+
+      <!-- ─── Section 1: The Chart ─── -->
+      <div style="margin-bottom: var(--space-4);">
+        <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
+          <div class="section-number done">&#10003;</div>
+          <div class="section-title">The Chart</div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label req">Chart Name</label>
+          <input type="text" class="field-input" value="Woodland Sampler">
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">Designer<span class="optional">optional</span></label>
+            <select class="field-input">
+              <option value="">—</option>
+              <option selected>Ink Circles</option>
+              <option>Chatelaine</option>
+              <option>Long Dog Samplers</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Cover Image<span class="optional">optional</span></label>
+            <div class="upload-area" style="height: 38px; border-width: 1px; border-style: solid; flex-direction: row; gap: 8px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              <span>Upload</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Genres<span class="optional">optional</span></label>
+          <div class="chip-group">
+            <span class="chip selected">Sampler</span>
+            <span class="chip">Animals</span>
+            <span class="chip selected">Nature</span>
+            <span class="chip">Holiday</span>
+            <span class="chip">Geometric</span>
+            <span class="chip">Fantasy</span>
+            <span class="chip" style="border-style:dashed; color: var(--color-text-subtle);">+ Add</span>
+          </div>
+        </div>
+
+        <div class="field-row-3">
+          <div class="field-group">
+            <label class="field-label">Width<span class="optional">optional</span></label>
+            <input type="number" class="field-input" placeholder="stitches" value="280">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Height<span class="optional">optional</span></label>
+            <input type="number" class="field-input" placeholder="stitches" value="350">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Stitch Count<span class="optional">optional</span></label>
+            <input type="number" class="field-input" placeholder="total" value="54800">
+          </div>
+        </div>
+
+        <!-- Pattern type cards -->
+        <div class="field-group">
+          <label class="field-label">Pattern Type<span class="optional">optional</span></label>
+          <div class="pattern-cards">
+            <div class="pattern-card" onclick="togglePatternCard(this)">
+              <div class="pattern-card-check"></div>
+              <div class="pattern-card-header">
+                <span class="pattern-card-icon">&#128196;</span>
+                <span class="pattern-card-name">Paper Chart</span>
+              </div>
+              <div class="pattern-card-desc">Physical printed pattern</div>
+            </div>
+            <div class="pattern-card selected" onclick="togglePatternCard(this)">
+              <div class="pattern-card-check">&#10003;</div>
+              <div class="pattern-card-header">
+                <span class="pattern-card-icon">&#128187;</span>
+                <span class="pattern-card-name">Digital</span>
+              </div>
+              <div class="pattern-card-desc">PDF or app-based pattern</div>
+            </div>
+            <div class="pattern-card" onclick="togglePatternCard(this)" id="kit-card">
+              <div class="pattern-card-check"></div>
+              <div class="pattern-card-header">
+                <span class="pattern-card-icon">&#127873;</span>
+                <span class="pattern-card-name">Formal Kit</span>
+              </div>
+              <div class="pattern-card-desc">Pre-packaged with supplies</div>
+              <div class="pattern-card-expand">
+                <label class="field-label" style="font-size:var(--text-xs);margin-top:0;">Colours in kit</label>
+                <input type="number" class="field-input" placeholder="e.g. 45" style="font-size: var(--text-sm); padding: 4px 8px;" onclick="event.stopPropagation()">
+                <div style="font-size:11px;color:var(--color-text-subtle);margin-top:4px;">Used for stats when you won't list supplies individually</div>
+              </div>
+            </div>
+            <div class="pattern-card" onclick="togglePatternCard(this)">
+              <div class="pattern-card-check"></div>
+              <div class="pattern-card-header">
+                <span class="pattern-card-icon">&#128101;</span>
+                <span class="pattern-card-name">SAL</span>
+              </div>
+              <div class="pattern-card-desc">Stitch-Along with a group</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Milestone 1 -->
+      <div class="milestone-marker">
+        <div class="milestone-check">&#10003;</div>
+        <div class="milestone-text">Chart basics filled in — you can save now, or keep going.</div>
+        <span class="milestone-action" onclick="toggleReveal('vd-section-2')">Add project details &rarr;</span>
+      </div>
+
+      <!-- ─── Section 2: The Project ─── -->
+      <div id="vd-section-2" class="reveal-section expanded">
+        <hr class="section-divider">
+        <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
+          <div class="section-number">2</div>
+          <div class="section-title">The Project</div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label req">Status</label>
+            <select class="field-input">
+              <option>Unstarted</option>
+              <option selected>Kitting</option>
+              <option>Kitted</option>
+              <option>In Progress</option>
+              <option>On Hold</option>
+              <option>Finished</option>
+              <option>FFO</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Storage Location<span class="optional">optional</span></label>
+            <select class="field-input">
+              <option value="">—</option>
+              <option>Project Drawer A</option>
+              <option selected>Stash Shelf 2</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">Stitching App<span class="optional">optional</span></label>
+            <select class="field-input">
+              <option value="">—</option>
+              <option selected>Pattern Keeper</option>
+              <option>Markup R-XP</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Digital File<span class="optional">optional</span></label>
+            <div class="upload-area" style="height: 38px; border-width: 1px; border-style: solid; flex-direction: row; gap: 8px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              <span>Upload PDF</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-row-3">
+          <div class="field-group">
+            <label class="field-label">Start Date<span class="optional">optional</span></label>
+            <input type="date" class="field-input">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Finish Date<span class="optional">optional</span></label>
+            <input type="date" class="field-input">
+          </div>
+          <div class="field-group">
+            <label class="field-label">FFO Date<span class="optional">optional</span></label>
+            <input type="date" class="field-input">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Notes<span class="optional">optional</span></label>
+          <textarea class="field-input" rows="2" placeholder="Anything to remember about this project..."></textarea>
+        </div>
+
+        <div style="padding-top: var(--space-3); border-top: 1px solid var(--color-border-light);">
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Want to start next</div>
+              <div class="toggle-label-sub">Shows in your "up next" queue</div>
+            </div>
+            <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Needs onion skinning</div>
+            </div>
+            <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+
+        <!-- Milestone 2 — triggers supply takeover -->
+        <div class="milestone-marker" style="margin-top: var(--space-6);">
+          <div class="milestone-check">&#10003;</div>
+          <div class="milestone-text">Project details added. Ready for supplies?</div>
+          <span class="milestone-action" onclick="enterSupplyMode()">Add supplies &rarr;</span>
+        </div>
+      </div>
+    </div><!-- end vd-form-sections -->
+
+    <!-- ─── Section 3: Supplies (takes over the page) ─── -->
+    <div class="vd-supply-section" id="vd-supplies" style="display:none;">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
+        <div class="section-number">3</div>
+        <div class="section-title">Supplies</div>
+        <div class="section-desc">What does this project need?</div>
+      </div>
+
+      <!-- Calculator settings bar -->
+      <div class="settings-bar">
+        <label>Strands: <select><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+        <label>Over: <select><option selected>1</option><option>2</option></select></label>
+        <label>Fabric ct: <input type="number" value="14" style="width:50px"></label>
+        <label>Waste: <input type="number" value="20" style="width:50px">%</label>
+        <span style="font-size:11px; color: var(--color-text-subtle); margin-left: auto;">Feeds auto-calc &#10024;</span>
+      </div>
+
+      <!-- Supply type tabs -->
+      <div class="supply-tabs" style="border-bottom: 1px solid var(--color-border-light); margin-bottom: var(--space-4);">
+        <button class="supply-tab active">Threads <span class="count">4</span></button>
+        <button class="supply-tab">Beads <span class="count">0</span></button>
+        <button class="supply-tab">Specialty <span class="count">0</span></button>
+      </div>
+
+      <!-- Thread table -->
+      <table class="supply-table">
+        <thead>
+          <tr>
+            <th style="width:44%">Colour</th>
+            <th style="width:14%">Stitches</th>
+            <th style="width:24px"></th>
+            <th style="width:13%">Need</th>
+            <th style="width:10%">Have</th>
+            <th style="width:6%"></th>
+            <th style="width:32px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="add-row">
+            <td><input type="text" class="tbl-input" placeholder="Search DMC..." style="font-family:var(--font-mono);font-size:12px;" id="vd-supply-input"></td>
+            <td><input type="number" class="tbl-input" placeholder="—"></td>
+            <td></td>
+            <td><input type="number" class="tbl-input" placeholder="1" disabled></td>
+            <td></td><td></td><td></td>
+          </tr>
+          <tr>
+            <td><div class="cell-colour"><div class="colour-swatch" style="background:#C72D34"></div><span class="tc-code">321</span><span class="tc-name">Red</span></div></td>
+            <td style="font-family:var(--font-mono);font-size:12px;">2,450</td>
+            <td style="color:var(--color-text-subtle);font-size:11px;">&rarr;</td>
+            <td><span style="font-family:var(--font-mono);font-size:12px;">2 sk</span> <span class="sparkle">&#10024;</span></td>
+            <td style="color:var(--color-text-subtle);font-size:12px;">0</td>
+            <td><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/></svg></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><div class="cell-colour"><div class="colour-swatch" style="background:#1B6B3A"></div><span class="tc-code">699</span><span class="tc-name">Green</span></div></td>
+            <td style="font-family:var(--font-mono);font-size:12px;">5,200</td>
+            <td style="color:var(--color-text-subtle);font-size:11px;">&rarr;</td>
+            <td><span style="font-family:var(--font-mono);font-size:12px;">4 sk</span> <span class="sparkle">&#10024;</span></td>
+            <td style="color:var(--color-text-subtle);font-size:12px;">2</td>
+            <td><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-warning)" stroke-width="2" stroke-dasharray="37.7" stroke-dashoffset="18.85" transform="rotate(-90 8 8)" stroke-linecap="round"/></svg></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><div class="cell-colour"><div class="colour-swatch" style="background:#8B6834"></div><span class="tc-code">434</span><span class="tc-name">Lt Brown</span></div></td>
+            <td style="font-family:var(--font-mono);font-size:12px;">1,800</td>
+            <td style="color:var(--color-text-subtle);font-size:11px;">&rarr;</td>
+            <td><span style="font-family:var(--font-mono);font-size:12px;">2 sk</span> <span class="sparkle">&#10024;</span></td>
+            <td style="color:var(--color-text-subtle);font-size:12px;">2</td>
+            <td><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-success)" stroke-width="2" stroke-dasharray="37.7" stroke-dashoffset="0" transform="rotate(-90 8 8)" stroke-linecap="round"/></svg></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><div class="cell-colour"><div class="colour-swatch" style="background:#D4AF37"></div><span class="tc-code">783</span><span class="tc-name">Med Topaz</span></div></td>
+            <td style="font-family:var(--font-mono);font-size:12px;">900</td>
+            <td style="color:var(--color-text-subtle);font-size:11px;">&rarr;</td>
+            <td><span style="font-family:var(--font-mono);font-size:12px;">1 sk</span> <span class="sparkle">&#10024;</span></td>
+            <td style="color:var(--color-text-subtle);font-size:12px;">0</td>
+            <td><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/></svg></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) var(--space-3) 0;font-size:var(--text-xs);color:var(--color-text-muted);">
+        <span>4 colours added</span>
+        <span>Total: 9 skeins needed</span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-4);padding:var(--space-3);background:var(--color-bg);border-radius:var(--radius-md);font-size:var(--text-xs);color:var(--color-text-muted);">
+        <span>&#9000;</span> <strong>&#8593;&#8595;</strong> navigate &nbsp; <strong>Enter</strong> select/add &nbsp; <strong>Tab</strong> next field &nbsp; <strong>Esc</strong> clear
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky save bar -->
+  <div class="sticky-bar" id="vd-sticky">
+    <span class="save-hint">Name entered — ready to save at any point</span>
+    <button class="btn btn-ghost">Cancel</button>
+    <button class="btn btn-primary">Save Chart</button>
+  </div>
+</div>
+
+<!-- ── Sketch Toolbar ── -->
+<div id="sketch-tools" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'">
+  <span>003</span>
+  <select onchange="document.querySelector('link[href*=themes]').href='../themes/'+this.value+'.css'">
+    <option value="default">Default</option>
+  </select>
+  <button onclick="setViewport(375)">📱</button>
+  <button onclick="setViewport(768)">📱↔</button>
+  <button onclick="setViewport(0)">🖥</button>
+</div>
+
+<script>
+// Variant switching
+function showVariant(id) {
+  document.querySelectorAll('.variant').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('variant-' + id).style.display = 'block';
+  // Find the clicked tab
+  const tabs = document.querySelectorAll('.variant-tab');
+  const labels = { a: 0, b: 1, c: 2 };
+  tabs[labels[id]].classList.add('active');
+}
+
+// Progressive reveal for Variant B
+function toggleReveal(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (section.classList.contains('collapsed')) {
+    section.classList.remove('collapsed');
+    section.classList.add('expanded');
+    setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  } else {
+    section.classList.remove('expanded');
+    section.classList.add('collapsed');
+  }
+}
+
+// Sidebar nav scroll for Variant C
+function scrollToSection(e, id) {
+  e.preventDefault();
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+  // Update active state
+  document.querySelectorAll('.vc-nav-item').forEach(item => item.classList.remove('active'));
+  e.target.closest('.vc-nav-item').classList.add('active');
+}
+
+// Viewport preview
+function setViewport(width) {
+  const variants = document.querySelectorAll('.variant');
+  variants.forEach(v => {
+    if (width === 0) {
+      v.style.maxWidth = '';
+      v.style.margin = '';
+    } else {
+      v.style.maxWidth = width + 'px';
+      v.style.margin = '0 auto';
+    }
+  });
+}
+
+// Chip toggle
+document.querySelectorAll('.chip:not([style*="dashed"])').forEach(chip => {
+  chip.addEventListener('click', () => chip.classList.toggle('selected'));
+});
+
+// Supply tab switching
+document.querySelectorAll('.supply-tabs').forEach(tabGroup => {
+  tabGroup.querySelectorAll('.supply-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabGroup.querySelectorAll('.supply-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+});
+
+// Pattern card toggle (Variant D)
+function togglePatternCard(card) {
+  card.classList.toggle('selected');
+  const check = card.querySelector('.pattern-card-check');
+  check.textContent = card.classList.contains('selected') ? '✓' : '';
+}
+
+// Supply mode takeover (Variant D)
+function enterSupplyMode() {
+  const page = document.getElementById('vd-page');
+  const form = document.getElementById('vd-form');
+  const supplies = document.getElementById('vd-supplies');
+  const summary = document.getElementById('vd-summary');
+  const sticky = document.getElementById('vd-sticky');
+
+  form.style.maxHeight = form.scrollHeight + 'px';
+  requestAnimationFrame(function() {
+    form.style.transition = 'max-height 0.4s ease, opacity 0.3s ease';
+    form.style.maxHeight = '0';
+    form.style.opacity = '0';
+    form.style.overflow = 'hidden';
+  });
+
+  setTimeout(function() {
+    form.style.display = 'none';
+    summary.style.display = 'flex';
+    supplies.style.display = 'block';
+    page.classList.add('supply-mode');
+    sticky.style.display = 'none';
+
+    supplies.style.opacity = '0';
+    supplies.style.transform = 'translateY(12px)';
+    requestAnimationFrame(function() {
+      supplies.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      supplies.style.opacity = '1';
+      supplies.style.transform = 'translateY(0)';
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(function() {
+      var input = document.getElementById('vd-supply-input');
+      if (input) input.focus();
+    }, 400);
+  }, 350);
+}
+
+function exitSupplyMode() {
+  var page = document.getElementById('vd-page');
+  var form = document.getElementById('vd-form');
+  var supplies = document.getElementById('vd-supplies');
+  var summary = document.getElementById('vd-summary');
+  var sticky = document.getElementById('vd-sticky');
+
+  supplies.style.opacity = '0';
+  supplies.style.transform = 'translateY(12px)';
+
+  setTimeout(function() {
+    supplies.style.display = 'none';
+    summary.style.display = 'none';
+    page.classList.remove('supply-mode');
+    sticky.style.display = 'flex';
+
+    form.style.display = 'block';
+    form.style.maxHeight = '0';
+    form.style.opacity = '0';
+    requestAnimationFrame(function() {
+      form.style.maxHeight = '5000px';
+      form.style.opacity = '1';
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 250);
+}
+
+// Scroll spy for Variant C
+if (window.IntersectionObserver) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        document.querySelectorAll('.vc-nav-item').forEach(item => {
+          item.classList.toggle('active', item.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '-64px 0px 0px 0px' });
+
+  document.querySelectorAll('.vc-section').forEach(section => observer.observe(section));
+}
+</script>
+</body>
+</html>
