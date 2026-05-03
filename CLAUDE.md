@@ -27,21 +27,21 @@ None — ready for v1.3.
 
 ### Done This Session
 
-- Sketch 003 (wizard flow): explored 3 variants + synthesis for project creation wizard
-- Winner: **Synthesis: Merged Form + Supply Takeover**
-  - Single form with dividers (no Chart/Project split)
-  - Pattern type cards with Kit → colour count expansion
-  - Required dot indicator (green), no "optional" tags
-  - One milestone before supply entry
-  - Supply takeover: form collapses to summary bar, supply table fills page
-  - Styled calc panel with segmented controls
-  - Autocomplete: reuse sketch-002 portal pattern (not re-implemented)
+- Sketch 004 (multi-supply-types): explored 3 variants for beads + specialty joining the thread table
+- Winner: **C: Grouped + Top Add Row**
+  - One persistent add row with segmented type toggle (🧵/📿/✦)
+  - Sticky type — stays on Thread until you switch, blast through 30+ codes
+  - Visual section grouping (Thread/Beads/Specialty) with divider headers + counts
+  - Items auto-sort into correct section
+  - Live auto-calc for threads (stitches → skeins, editable for override)
+  - Beads: bead count → manual package need (default 1)
+  - Specialty: just need (default 1)
+  - Same keyboard loop across all types
 
 ### Next Up
 
-1. `/gsd-sketch` — sketch 004: bead + specialty supply type entry (how do they join the thread table?)
-2. Then `/gsd-sketch-wrap-up` to package all wizard findings
-3. Then `/gsd-new-milestone` — start v1.3
+1. `/gsd-sketch-wrap-up` — package all sketch findings (001-004) into reusable skill
+2. Then `/gsd-new-milestone` — start v1.3
 
 ### Backlog
 
@@ -131,7 +131,7 @@ Conventions auto-load via `.claude/rules/` glob patterns when touching relevant 
 - **Auth/sessions** — `auth-patterns.md`, `server-actions.md`
 - **Forms/validation** — `form-patterns.md`, `server-actions.md`
 - **Feature UI** — `.planning/DESIGN-REFERENCE.md` + `product-plan/sections/`
-- **Sketch findings** (supply data entry design decisions, CSS patterns, visual direction) — `.claude/skills/sketch-findings-cross-stitch-tracker/`
+- **Sketch findings** (supply data entry, project creation form, multi-supply types — design decisions, CSS patterns, visual direction) — `.claude/skills/sketch-findings-cross-stitch-tracker/`
 
 ### Core rules (always apply)
 

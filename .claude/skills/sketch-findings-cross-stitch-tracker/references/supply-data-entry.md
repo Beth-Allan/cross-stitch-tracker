@@ -140,6 +140,78 @@ section-card
 <!-- ratio = have/need, circumference = 2*PI*6 = 37.7, dashoffset = circ * (1 - ratio) -->
 ```
 
+## Multi-Supply Types (Sketch 004)
+
+### Winner: C — Grouped Sections + Sticky Top Add Row
+
+Three supply types (thread, beads, specialty) share one unified table surface. Items are visually grouped by type with section dividers. One persistent add row at the top adapts its fields based on a segmented type toggle.
+
+**Section structure:** Thread, Beads, Specialty sections with divider headers showing icon + label + count badge. New items auto-sort into their correct section.
+
+**Segmented type toggle:** Three-button control (🧵/📿/✦) in the add row's first cell. The toggle is **sticky** — stays on the current type between adds. User blasts through all threads, then clicks 📿 once and does beads.
+
+**Column adaptation per type:**
+| Type | Column 1 | Column 2 | Arrow | Column 3 | Column 4 | Column 5 | Column 6 |
+|------|----------|----------|-------|----------|----------|----------|----------|
+| Thread | Search (code/name) | Stitches | → | Need (auto-calc, sk) | Have | Status donut | Delete |
+| Bead | Search (code/name) | Bead count | → | Need (manual, pkg, default 1) | Have | Status donut | Delete |
+| Specialty | Search (code/name) | — | — | Need (manual, item, default 1) | Have | Status donut | Delete |
+
+**Live auto-calc for threads:** As user types stitch count, Need auto-fills (stitches ÷ 3000, rounded up). Displayed in primary colour to indicate auto-calc. User can manually override (value sticks; `isNeedOverridden` flag in schema).
+
+**Bead/specialty need defaults:** Need defaults to 1 package (beads) or 1 item (specialty). Editable. Future: bead auto-calc from package size.
+
+**Same keyboard loop across all types:** search → Enter (autocomplete select) → qty field → Enter (commit row) → search refocuses. Type toggle stays sticky.
+
+### Section Divider CSS
+```css
+.section-divider td {
+  background: var(--color-bg);
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  border-bottom: 2px solid var(--color-border);
+}
+.section-divider-content {
+  display: flex; align-items: center; gap: var(--space-2);
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--color-text-muted);
+}
+.section-count {
+  font-size: 10px; font-weight: 600;
+  background: var(--color-border-light); color: var(--color-text-muted);
+  padding: 1px 7px; border-radius: var(--radius-full);
+}
+```
+
+### Segmented Type Toggle CSS
+```css
+.type-selector {
+  display: inline-flex; border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.type-option {
+  padding: 4px 10px; cursor: pointer; border: none;
+  background: var(--color-surface); color: var(--color-text-muted);
+  font-family: var(--font-sans); font-size: 11px; font-weight: 600;
+  transition: all 0.15s; border-right: 1px solid var(--color-border);
+}
+.type-option:last-child { border-right: none; }
+.type-option:hover { background: var(--color-surface-hover); }
+.type-option.active { background: var(--color-primary); color: var(--color-primary-text); }
+```
+
+### Section Divider HTML
+```
+table.supply-table
+  tbody:
+    tr.add-row (top — segmented toggle + search + qty/need fields)
+    tr.section-divider (icon + "Thread" + count badge)
+    tr.data-row (thread items...)
+    tr.section-divider (icon + "Beads" + count badge)
+    tr.data-row (bead items...)
+    tr.section-divider (icon + "Specialty" + count badge)
+    tr.data-row (specialty items...)
+```
+
 ## What to Avoid
 
 - **Progressive reveal / step indicators** — felt too guided for bulk data entry. Users transcribing from a pattern want all fields visible immediately.
@@ -148,7 +220,11 @@ section-card
 - **`position: absolute` on autocomplete inside tables** — z-index on `<tr>` doesn't create stacking contexts. Must use `position: fixed` with JS positioning (portal pattern).
 - **"Have" field in the add flow** — when transcribing from a pattern, you don't know what you have yet. That's a separate (shopping) workflow.
 - **Obscuring the existing list with a picker/modal** — the user needs to see what they've already added to avoid duplicates.
+- **Per-section add buttons** (Variant A) — having to click "+ Add" on each section header breaks the keyboard flow. One persistent add row with a type toggle is faster.
+- **Flat mixed list with type badges** (Variant B) — no visual grouping makes scanning by type impossible. Type badges on every row add noise.
+- **Tabs for supply types** — forces switching views. All types should be visible in one scrolling surface.
+- **Disabled Need field** — even for auto-calc types, the Need field should be editable for manual override.
 
 ## Origin
-Synthesized from sketches: 001, 002
-Source files available in: sources/001-supply-add-interaction/, sources/002-supply-add-synthesis/
+Synthesized from sketches: 001, 002, 004
+Source files available in: sources/001-supply-add-interaction/, sources/002-supply-add-synthesis/, sources/004-multi-supply-types/
