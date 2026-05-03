@@ -140,6 +140,57 @@ describe("ProgressBreakdownTab", () => {
     expect(options[4]).toHaveTextContent("Recently Stitched");
   });
 
+  it("shows 'in [stage name]' when projects span only 1 stage", () => {
+    const singleStageBuckets: ProgressBucket[] = [
+      {
+        id: "50-75",
+        label: "Over Halfway",
+        range: "50% – 74.9%",
+        count: 3,
+        projects: [
+          createMockProject({ projectId: "p1", progressPercent: 55 }),
+          createMockProject({ projectId: "p2", progressPercent: 60 }),
+          createMockProject({ projectId: "p3", progressPercent: 70 }),
+        ],
+      },
+      { id: "unstarted", label: "Unstarted", range: "Not yet started", count: 0, projects: [] },
+      { id: "0-25", label: "Just Getting Started", range: "0.1% – 24.9%", count: 0, projects: [] },
+      { id: "25-50", label: "Making Progress", range: "25% – 49.9%", count: 0, projects: [] },
+      { id: "75-100", label: "Almost There", range: "75% – 99.9%", count: 0, projects: [] },
+    ];
+
+    render(<ProgressBreakdownTab buckets={singleStageBuckets} imageUrls={{}} />);
+
+    expect(screen.getByText(/3 projects in Over Halfway/)).toBeInTheDocument();
+    expect(screen.queryByText(/across/)).not.toBeInTheDocument();
+  });
+
+  it("shows 'across N stages' when projects span multiple stages", () => {
+    render(<ProgressBreakdownTab buckets={createMockBuckets()} imageUrls={{}} />);
+
+    expect(screen.getByText(/5 projects across 4 stages/)).toBeInTheDocument();
+  });
+
+  it("shows singular 'project' when only 1 project exists", () => {
+    const singleProjectBuckets: ProgressBucket[] = [
+      {
+        id: "50-75",
+        label: "Over Halfway",
+        range: "50% – 74.9%",
+        count: 1,
+        projects: [createMockProject({ projectId: "p1", progressPercent: 55 })],
+      },
+      { id: "unstarted", label: "Unstarted", range: "Not yet started", count: 0, projects: [] },
+      { id: "0-25", label: "Just Getting Started", range: "0.1% – 24.9%", count: 0, projects: [] },
+      { id: "25-50", label: "Making Progress", range: "25% – 49.9%", count: 0, projects: [] },
+      { id: "75-100", label: "Almost There", range: "75% – 99.9%", count: 0, projects: [] },
+    ];
+
+    render(<ProgressBreakdownTab buckets={singleProjectBuckets} imageUrls={{}} />);
+
+    expect(screen.getByText(/1 project in Over Halfway/)).toBeInTheDocument();
+  });
+
   it("changing sort reorders projects within buckets", async () => {
     const user = userEvent.setup();
     const buckets = createMockBuckets();

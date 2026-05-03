@@ -124,8 +124,15 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-1.5">
           <p className="text-muted-foreground text-sm">
-            {totalProjects} project{totalProjects !== 1 ? "s" : ""} across{" "}
-            {buckets.filter((b) => b.count > 0).length} stages
+            {(() => {
+              const activeBuckets = buckets.filter((b) => b.count > 0);
+              const stageCount = activeBuckets.length;
+              const projectLabel = totalProjects === 1 ? "project" : "projects";
+              if (stageCount === 1) {
+                return `${totalProjects} ${projectLabel} in ${activeBuckets[0].label}`;
+              }
+              return `${totalProjects} ${projectLabel} across ${stageCount} stages`;
+            })()}
           </p>
           <Tooltip>
             <TooltipTrigger

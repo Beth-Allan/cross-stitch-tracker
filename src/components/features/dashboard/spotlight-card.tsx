@@ -40,7 +40,7 @@ export function SpotlightCard({
           return;
         }
         setProject(newProject);
-        const key = newProject.coverImageUrl ?? newProject.coverThumbnailUrl;
+        const key = newProject.coverThumbnailUrl ?? newProject.coverImageUrl;
         if (key) {
           const urls = await getPresignedImageUrls([key]);
           setImageUrl(urls[key] ?? null);
@@ -55,7 +55,7 @@ export function SpotlightCard({
 
   return (
     <div className="border-border bg-card relative overflow-hidden rounded-2xl border shadow-sm">
-      <div className="grid min-h-[260px] grid-cols-1 md:grid-cols-2">
+      <div className="grid max-h-[360px] min-h-[260px] grid-cols-1 md:grid-cols-2">
         {/* Image half -- hidden on mobile */}
         <div className="bg-muted relative overflow-hidden max-md:hidden">
           {imageUrl ? (
@@ -138,7 +138,7 @@ export function SpotlightCard({
               onClick={handleShuffle}
               disabled={isPending}
               type="button"
-              className="border-border bg-card text-muted-foreground hover:bg-muted inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
+              className="border-border bg-card text-muted-foreground hover:bg-muted inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
               aria-label="Shuffle spotlight project"
             >
               <RefreshCw className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`} strokeWidth={2} />

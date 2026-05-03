@@ -112,9 +112,10 @@ type FabricFilter = "needs" | "all";
 
 interface FabricRequirementsTabProps {
   rows: FabricRequirementRow[];
+  imageUrls: Record<string, string>;
 }
 
-export function FabricRequirementsTab({ rows }: FabricRequirementsTabProps) {
+export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTabProps) {
   const [filter, setFilter] = useState<FabricFilter>("needs");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showSizeRef, setShowSizeRef] = useState<Set<string>>(new Set());
@@ -213,7 +214,15 @@ export function FabricRequirementsTab({ rows }: FabricRequirementsTabProps) {
                   onClick={() => setExpandedId(isExpanded ? null : row.chartId)}
                   className="hover:bg-muted/50 flex w-full cursor-pointer items-center gap-4 p-4 transition-colors"
                 >
-                  <StatusIcon row={row} />
+                  {imageUrls[row.coverThumbnailUrl ?? ""] ? (
+                    <img
+                      src={imageUrls[row.coverThumbnailUrl ?? ""]}
+                      alt={row.chartName}
+                      className="h-10 w-10 shrink-0 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <StatusIcon row={row} />
+                  )}
 
                   <div className="min-w-0 flex-1 text-left">
                     <p className="font-heading text-foreground truncate text-sm font-semibold">

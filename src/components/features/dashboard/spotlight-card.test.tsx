@@ -91,6 +91,25 @@ describe("SpotlightCard", () => {
     expect(screen.getByText("Shuffle Spotlight")).toBeInTheDocument();
   });
 
+  it("renders both buttons with matching padding", () => {
+    render(<SpotlightCard project={createMockSpotlight()} imageUrl={null} />);
+
+    const checkItOut = screen.getByText("Check It Out").closest("a");
+    const shuffle = screen.getByText("Shuffle Spotlight").closest("button");
+
+    expect(checkItOut?.className).toContain("px-5");
+    expect(shuffle?.className).toContain("px-5");
+  });
+
+  it("constrains image container height", () => {
+    const { container } = render(
+      <SpotlightCard project={createMockSpotlight()} imageUrl="https://example.com/thumb.jpg" />,
+    );
+
+    const grid = container.querySelector(".grid");
+    expect(grid?.className).toContain("max-h-");
+  });
+
   it("returns null when project is null", () => {
     const { container } = render(<SpotlightCard project={null} imageUrl={null} />);
 
