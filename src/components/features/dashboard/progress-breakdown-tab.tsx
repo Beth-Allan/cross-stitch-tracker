@@ -91,6 +91,13 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
 
   const totalProjects = buckets.reduce((sum, b) => sum + b.count, 0);
+  const activeBuckets = buckets.filter((b) => b.count > 0);
+  const stageCount = activeBuckets.length;
+  const projectLabel = totalProjects === 1 ? "project" : "projects";
+  const summaryLabel =
+    stageCount === 1
+      ? `${totalProjects} ${projectLabel} in ${activeBuckets[0].label}`
+      : `${totalProjects} ${projectLabel} across ${stageCount} stages`;
 
   const sortedBuckets = useMemo(() => {
     return buckets.map((bucket) => ({
@@ -123,17 +130,7 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
       {/* Sort bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-1.5">
-          <p className="text-muted-foreground text-sm">
-            {(() => {
-              const activeBuckets = buckets.filter((b) => b.count > 0);
-              const stageCount = activeBuckets.length;
-              const projectLabel = totalProjects === 1 ? "project" : "projects";
-              if (stageCount === 1) {
-                return `${totalProjects} ${projectLabel} in ${activeBuckets[0].label}`;
-              }
-              return `${totalProjects} ${projectLabel} across ${stageCount} stages`;
-            })()}
-          </p>
+          <p className="text-muted-foreground text-sm">{summaryLabel}</p>
           <Tooltip>
             <TooltipTrigger
               className="text-muted-foreground/50 hover:text-muted-foreground transition-colors"

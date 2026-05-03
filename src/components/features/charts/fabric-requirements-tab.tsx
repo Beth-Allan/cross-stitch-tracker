@@ -223,6 +223,7 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                         src={thumbnailUrl}
                         alt={row.chartName}
                         className="h-10 w-10 shrink-0 rounded-lg object-cover"
+                        loading="lazy"
                       />
                     ) : (
                       <StatusIcon row={row} />
