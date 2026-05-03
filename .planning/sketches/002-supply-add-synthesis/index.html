@@ -83,6 +83,9 @@
     }
     .supply-table tbody tr:hover td { background: var(--color-surface-hover); }
     .supply-table tbody tr.data-row { animation: slideIn 0.2s ease; }
+    .supply-table tbody tr.add-row {
+      position: relative; z-index: 30;
+    }
     .supply-table tbody tr.add-row td {
       background: rgba(5, 150, 105, 0.03);
       border-bottom: 2px solid var(--color-primary-light);
@@ -118,12 +121,12 @@
     .tbl-input::placeholder { color: var(--color-text-subtle); font-size: var(--text-xs); }
 
     /* Autocomplete */
-    .ac-wrap { position: relative; }
+    .ac-wrap { position: relative; z-index: 40; }
     .ac-dropdown {
       position: absolute; top: calc(100% + 2px); left: 0; width: 320px;
       background: var(--color-surface); border: 1px solid var(--color-border);
       border-radius: 8px; box-shadow: var(--shadow-lg);
-      max-height: 240px; overflow-y: auto; z-index: 20; display: none;
+      max-height: 240px; overflow-y: auto; z-index: 50; display: none;
     }
     .ac-dropdown.open { display: block; }
     .ac-item {
