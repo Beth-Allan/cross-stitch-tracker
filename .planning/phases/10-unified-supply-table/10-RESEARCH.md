@@ -181,7 +181,9 @@ src/components/features/supply-table/
   supply-table-data-row.tsx         # Single supply row (client)
   supply-table-data-row.test.tsx    # Row rendering, inline edit, delete tests
   supply-table-section-divider.tsx  # Section header row
+  supply-table-section-divider.test.tsx  # Section divider rendering tests
   supply-table-footer.tsx           # Running totals + keyboard hints
+  supply-table-footer.test.tsx      # Footer copy logic tests
   portal-autocomplete.tsx           # Fixed-position portal dropdown (client)
   portal-autocomplete.test.tsx      # Search, keyboard nav, disabled items tests
   status-donut.tsx                  # 16x16 SVG donut (server-compatible)
@@ -606,22 +608,25 @@ function SupplyTableSectionDivider({
 | A2 | `createPortal` to `document.body` is sufficient for the fixed dropdown; no need for a dedicated portal container | Architecture Patterns | LOW -- standard React pattern, works in all environments |
 | A3 | 150ms debounce is adequate for the autocomplete search UX | Common Pitfalls | LOW -- matches existing SearchToAdd; adjustable if too fast/slow |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **EditableNumber extraction approach**
    - What we know: The pattern exists in `project-supplies-tab.tsx` (lines 40-97). D-09 says "import existing primitives" but D-10 says "do NOT touch existing components."
    - What's unclear: Should we copy the component into the new directory (creating a temporary duplicate), or extract it to a truly shared location like `src/components/ui/editable-number.tsx`?
    - Recommendation: Extract to `src/components/features/supply-table/editable-number.tsx` within the new directory. This avoids modifying existing files (D-10) while avoiding a shared extraction that might break existing imports. Phase 14 cleanup can consolidate.
+   - RESOLVED: Plan 10-01 creates `src/components/features/supply-table/editable-number.tsx` as a fresh implementation within the new directory, following the recommendation. Existing `project-supplies-tab.tsx` is untouched per D-10.
 
 2. **Adapter method signatures for local-state adapter**
    - What we know: The adapter interface is defined in UI-SPEC. Phase 10 builds a local-state adapter.
    - What's unclear: Should `searchSupplies` in the local-state adapter search a hardcoded fixture set (e.g., subset of DMC threads), or accept initial data as constructor params?
    - Recommendation: Constructor params approach -- `new LocalStateAdapter(initialThreads, initialBeads, initialSpecialty)` -- so tests can control exactly what data is available.
+   - RESOLVED: Plan 10-01 builds `LocalStateAdapter` with constructor params accepting initial supply data, following the recommendation. Tests control fixture data directly.
 
 3. **Where to render the SupplyTable for Phase 10 (no page integration yet)**
    - What we know: Phase 11 integrates into project detail. Phase 13 integrates into creation form.
    - What's unclear: Phase 10 builds the component but where does it get rendered/tested visually during development?
    - Recommendation: Build a temporary test page or storybook-like route (e.g., `/dev/supply-table`) that renders the component with the local-state adapter and fixture data. Remove in Phase 14 cleanup. Alternatively, rely purely on test assertions without a visual dev route.
+   - RESOLVED: Phase 10 relies on comprehensive Vitest + RTL test assertions without a visual dev route. Plan 10-06 includes a human-verify checkpoint where the developer visually inspects the component. No temporary dev route needed.
 
 ## Validation Architecture
 
