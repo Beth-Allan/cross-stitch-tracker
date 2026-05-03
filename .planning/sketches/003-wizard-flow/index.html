@@ -489,6 +489,21 @@
     margin-left: 4px;
   }
 
+  /* Autocomplete dropdown items */
+  .ac-item {
+    display: flex; align-items: center; gap: var(--space-2);
+    padding: 8px 12px; cursor: pointer; transition: background 0.1s;
+    font-size: var(--text-sm);
+  }
+  .ac-item:hover, .ac-item.ac-highlighted {
+    background: var(--color-surface-hover);
+  }
+  .ac-item.ac-disabled {
+    opacity: 0.4; cursor: not-allowed;
+  }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+  .data-row { animation: slideIn 0.2s ease; }
+
   /* ── Sketch Toolbar ── */
   #sketch-tools {
     position: fixed; bottom: 12px; left: 12px; z-index: 9999;
@@ -1266,7 +1281,7 @@
 </div>
 
 <!-- ════════════════════════════════════════════════════════════════════════ -->
-<!-- VARIANT D: Synthesis — Progressive Reveal + Supply Takeover            -->
+<!-- VARIANT D: Synthesis — Merged Form + Supply Takeover + Live Search    -->
 <!-- ════════════════════════════════════════════════════════════════════════ -->
 <div id="variant-d" class="variant active">
   <div class="page-wrap vd-page" id="vd-page">
@@ -1289,7 +1304,7 @@
       <button class="btn btn-primary" style="padding: 6px 16px;">Save Chart</button>
     </div>
 
-    <!-- Form sections (visible in form mode) -->
+    <!-- Form section (visible in form mode) -->
     <div class="vd-form-sections" id="vd-form">
       <a href="#" class="back-link" onclick="return false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -1298,13 +1313,10 @@
       <h1 class="page-title">Add New Chart</h1>
       <p class="page-subtitle">Start with the basics. Go deeper when you're ready.</p>
 
-      <!-- ─── Section 1: The Chart ─── -->
+      <!-- ─── Single unified section: Your Project ─── -->
       <div style="margin-bottom: var(--space-4);">
-        <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
-          <div class="section-number done">&#10003;</div>
-          <div class="section-title">The Chart</div>
-        </div>
 
+        <!-- Identity -->
         <div class="field-group">
           <label class="field-label req">Chart Name</label>
           <input type="text" class="field-input" value="Woodland Sampler">
@@ -1342,6 +1354,9 @@
           </div>
         </div>
 
+        <!-- ── divider: pattern details ── -->
+        <hr style="border:none;border-top:1px solid var(--color-border-light);margin:var(--space-6) 0;">
+
         <div class="field-row-3">
           <div class="field-group">
             <label class="field-label">Width</label>
@@ -1357,7 +1372,6 @@
           </div>
         </div>
 
-        <!-- Pattern type cards -->
         <div class="field-group">
           <label class="field-label">Pattern Type</label>
           <div class="pattern-cards">
@@ -1377,7 +1391,7 @@
               </div>
               <div class="pattern-card-desc">PDF or app-based pattern</div>
             </div>
-            <div class="pattern-card" onclick="togglePatternCard(this)" id="kit-card">
+            <div class="pattern-card" onclick="togglePatternCard(this)">
               <div class="pattern-card-check"></div>
               <div class="pattern-card-header">
                 <span class="pattern-card-icon">&#127873;</span>
@@ -1386,7 +1400,7 @@
               <div class="pattern-card-desc">Pre-packaged with supplies</div>
               <div class="pattern-card-expand">
                 <label class="field-label" style="font-size:var(--text-xs);margin-top:0;">Colours in kit</label>
-                <input type="number" class="field-input" placeholder="e.g. 45" style="font-size: var(--text-sm); padding: 4px 8px;" onclick="event.stopPropagation()">
+                <input type="number" class="field-input" placeholder="e.g. 45" style="font-size:var(--text-sm);padding:4px 8px;" onclick="event.stopPropagation()">
                 <div style="font-size:11px;color:var(--color-text-subtle);margin-top:4px;">Used for stats when you won't list supplies individually</div>
               </div>
             </div>
@@ -1401,8 +1415,7 @@
           </div>
         </div>
 
-        <!-- Onion skinning toggle (chart property) -->
-        <div class="field-group" style="padding-top: var(--space-3); border-top: 1px solid var(--color-border-light);">
+        <div class="field-group">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <div>
               <div style="font-size:var(--text-sm);font-weight:500;">Needs onion skinning</div>
@@ -1411,22 +1424,9 @@
             <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
           </div>
         </div>
-      </div>
 
-      <!-- Milestone 1 -->
-      <div class="milestone-marker">
-        <div class="milestone-check">&#10003;</div>
-        <div class="milestone-text">Chart basics filled in — you can save now, or keep going.</div>
-        <span class="milestone-action" onclick="toggleReveal('vd-section-2')">Add project details &rarr;</span>
-      </div>
-
-      <!-- ─── Section 2: The Project ─── -->
-      <div id="vd-section-2" class="reveal-section expanded">
-        <hr class="section-divider">
-        <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
-          <div class="section-number">2</div>
-          <div class="section-title">The Project</div>
-        </div>
+        <!-- ── divider: workflow ── -->
+        <hr style="border:none;border-top:1px solid var(--color-border-light);margin:var(--space-6) 0;">
 
         <div class="field-row">
           <div class="field-group">
@@ -1469,6 +1469,9 @@
           </div>
         </div>
 
+        <!-- ── divider: timeline ── -->
+        <hr style="border:none;border-top:1px solid var(--color-border-light);margin:var(--space-6) 0;">
+
         <div class="field-row-3">
           <div class="field-group">
             <label class="field-label">Start Date</label>
@@ -1489,32 +1492,27 @@
           <textarea class="field-input" rows="2" placeholder="Anything to remember about this project..."></textarea>
         </div>
 
-        <div style="padding-top: var(--space-3); border-top: 1px solid var(--color-border-light);">
-          <div class="toggle-row" style="border-bottom:none;">
+        <div class="field-group">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
             <div>
-              <div class="toggle-label">Want to start next</div>
-              <div class="toggle-label-sub">Shows in your "up next" queue</div>
+              <div style="font-size:var(--text-sm);font-weight:500;">Want to start next</div>
+              <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Shows in your "up next" queue</div>
             </div>
             <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
           </div>
         </div>
+      </div>
 
-        <!-- Milestone 2 — triggers supply takeover -->
-        <div class="milestone-marker" style="margin-top: var(--space-6);">
-          <div class="milestone-check">&#10003;</div>
-          <div class="milestone-text">Project details added. Ready for supplies?</div>
-          <span class="milestone-action" onclick="enterSupplyMode()">Add supplies &rarr;</span>
-        </div>
+      <!-- Milestone — triggers supply takeover -->
+      <div class="milestone-marker">
+        <div class="milestone-check">&#10003;</div>
+        <div class="milestone-text">Project details filled in. Ready for supplies?</div>
+        <span class="milestone-action" onclick="enterSupplyMode()">Add supplies &rarr;</span>
       </div>
     </div><!-- end vd-form-sections -->
 
-    <!-- ─── Section 3: Supplies (takes over the page) ─── -->
+    <!-- ─── Supplies (takes over the page) ─── -->
     <div class="vd-supply-section" id="vd-supplies" style="display:none;">
-      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
-        <div class="section-number">3</div>
-        <div class="section-title">Supplies</div>
-        <div class="section-desc">What does this project need?</div>
-      </div>
 
       <!-- Skein Calculator Settings -->
       <div class="calc-panel">
@@ -1559,84 +1557,54 @@
 
       <!-- Supply type tabs -->
       <div class="supply-tabs" style="border-bottom: 1px solid var(--color-border-light); margin-bottom: var(--space-4);">
-        <button class="supply-tab active">Threads <span class="count">4</span></button>
+        <button class="supply-tab active">Threads <span class="count" id="vd-thread-count">0</span></button>
         <button class="supply-tab">Beads <span class="count">0</span></button>
         <button class="supply-tab">Specialty <span class="count">0</span></button>
       </div>
 
-      <!-- Thread table -->
-      <table class="supply-table">
-        <thead>
-          <tr>
-            <th style="width:44%">Colour</th>
-            <th style="width:14%">Stitches</th>
-            <th style="width:24px"></th>
-            <th style="width:13%">Need</th>
-            <th style="width:10%">Have</th>
-            <th style="width:6%"></th>
-            <th style="width:32px"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="add-row">
-            <td><input type="text" class="tbl-input" placeholder="Search DMC..." style="font-family:var(--font-mono);font-size:12px;" id="vd-supply-input"></td>
-            <td><input type="number" class="tbl-input" placeholder="—"></td>
-            <td></td>
-            <td><input type="number" class="tbl-input" placeholder="1" disabled></td>
-            <td></td><td></td><td></td>
-          </tr>
-          <tr>
-            <td><div class="cell-colour"><div class="colour-swatch" style="background:#C72D34"></div><span class="tc-code">321</span><span class="tc-name">Red</span></div></td>
-            <td style="font-family:var(--font-mono);font-size:12px;">2,450</td>
-            <td style="color:var(--color-text-subtle);font-size:11px;">&rarr;</td>
-            <td><span style="font-family:var(--font-mono);font-size:12px;">2 sk</span> <span class="sparkle">&#10024;</span></td>
-            <td style="color:var(--color-text-subtle);font-size:12px;">0</td>
-            <td><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/></svg></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td><div class="cell-colour"><div class="colour-swatch" style="background:#1B6B3A"></div><span class="tc-code">699</span><span class="tc-name">Green</span></div></td>
-            <td style="font-family:var(--font-mono);font-size:12px;">5,200</td>
-            <td style="color:var(--color-text-subtle);font-size:11px;">&rarr;</td>
-            <td><span style="font-family:var(--font-mono);font-size:12px;">4 sk</span> <span class="sparkle">&#10024;</span></td>
-            <td style="color:var(--color-text-subtle);font-size:12px;">2</td>
-            <td><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-warning)" stroke-width="2" stroke-dasharray="37.7" stroke-dashoffset="18.85" transform="rotate(-90 8 8)" stroke-linecap="round"/></svg></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td><div class="cell-colour"><div class="colour-swatch" style="background:#8B6834"></div><span class="tc-code">434</span><span class="tc-name">Lt Brown</span></div></td>
-            <td style="font-family:var(--font-mono);font-size:12px;">1,800</td>
-            <td style="color:var(--color-text-subtle);font-size:11px;">&rarr;</td>
-            <td><span style="font-family:var(--font-mono);font-size:12px;">2 sk</span> <span class="sparkle">&#10024;</span></td>
-            <td style="color:var(--color-text-subtle);font-size:12px;">2</td>
-            <td><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-success)" stroke-width="2" stroke-dasharray="37.7" stroke-dashoffset="0" transform="rotate(-90 8 8)" stroke-linecap="round"/></svg></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td><div class="cell-colour"><div class="colour-swatch" style="background:#D4AF37"></div><span class="tc-code">783</span><span class="tc-name">Med Topaz</span></div></td>
-            <td style="font-family:var(--font-mono);font-size:12px;">900</td>
-            <td style="color:var(--color-text-subtle);font-size:11px;">&rarr;</td>
-            <td><span style="font-family:var(--font-mono);font-size:12px;">1 sk</span> <span class="sparkle">&#10024;</span></td>
-            <td style="color:var(--color-text-subtle);font-size:12px;">0</td>
-            <td><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/></svg></td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Thread table with working autocomplete -->
+      <div style="position:relative;">
+        <table class="supply-table" id="vd-thread-table">
+          <thead>
+            <tr>
+              <th style="width:44%">Colour</th>
+              <th style="width:14%">Stitches</th>
+              <th style="width:24px"></th>
+              <th style="width:13%">Need</th>
+              <th style="width:10%">Have</th>
+              <th style="width:6%"></th>
+              <th style="width:32px"></th>
+            </tr>
+          </thead>
+          <tbody id="vd-thread-tbody">
+            <tr class="add-row">
+              <td style="position:relative;">
+                <input type="text" class="tbl-input" placeholder="Search DMC..." style="font-family:var(--font-mono);font-size:12px;" id="vd-colour-input" autocomplete="off">
+                <div class="ac-dropdown" id="vd-ac-dropdown" style="display:none;"></div>
+              </td>
+              <td><input type="number" class="tbl-input" placeholder="—" id="vd-stitch-input"></td>
+              <td></td>
+              <td><input type="number" class="tbl-input" placeholder="1" id="vd-need-input" disabled></td>
+              <td></td><td></td><td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) var(--space-3) 0;font-size:var(--text-xs);color:var(--color-text-muted);">
-        <span>4 colours added</span>
-        <span>Total: 9 skeins needed</span>
+        <span id="vd-colour-count">0 colours added</span>
+        <span id="vd-skein-total">Total: 0 skeins needed</span>
       </div>
 
       <div style="display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-4);padding:var(--space-3);background:var(--color-bg);border-radius:var(--radius-md);font-size:var(--text-xs);color:var(--color-text-muted);">
-        <span>&#9000;</span> <strong>&#8593;&#8595;</strong> navigate &nbsp; <strong>Enter</strong> select/add &nbsp; <strong>Tab</strong> next field &nbsp; <strong>Esc</strong> clear
+        <strong>&#8593;&#8595;</strong> navigate &nbsp; <strong>Enter</strong> select/add &nbsp; <strong>Tab</strong> next field &nbsp; <strong>Esc</strong> clear
       </div>
     </div>
   </div>
 
   <!-- Sticky save bar -->
   <div class="sticky-bar" id="vd-sticky">
-    <span class="save-hint">Name entered — ready to save at any point</span>
+    <span class="save-hint">Name entered &mdash; ready to save at any point</span>
     <button class="btn btn-ghost">Cancel</button>
     <button class="btn btn-primary">Save Chart</button>
   </div>
@@ -1723,13 +1691,34 @@ function togglePatternCard(card) {
   check.textContent = card.classList.contains('selected') ? '✓' : '';
 }
 
-// Supply mode takeover (Variant D)
+// ─── DMC Colour Data ───
+var dmcColours = [
+  {code:'150',name:'Dusty Rose Vy Dk',hex:'#AB3472'},{code:'208',name:'Lavender Vy Dk',hex:'#835B9C'},
+  {code:'310',name:'Black',hex:'#2C2C2C'},{code:'321',name:'Red',hex:'#C72D34'},
+  {code:'349',name:'Coral Dk',hex:'#D12D3B'},{code:'433',name:'Brown Med',hex:'#7A5228'},
+  {code:'434',name:'Lt Brown',hex:'#8B6834'},{code:'498',name:'Red Dk',hex:'#A7132A'},
+  {code:'500',name:'Blue Green Vy Dk',hex:'#054B3E'},{code:'550',name:'Violet Vy Dk',hex:'#5C2D72'},
+  {code:'600',name:'Cranberry Vy Dk',hex:'#C6295A'},{code:'666',name:'Red Bright',hex:'#E3212B'},
+  {code:'699',name:'Green',hex:'#1B6B3A'},{code:'720',name:'Orange Spice Dk',hex:'#E0602A'},
+  {code:'740',name:'Tangerine',hex:'#FF8F00'},{code:'783',name:'Med Topaz',hex:'#D4AF37'},
+  {code:'797',name:'Royal Blue',hex:'#2E5FA1'},{code:'815',name:'Garnet Med',hex:'#871622'},
+  {code:'825',name:'Blue Dk',hex:'#2B5E88'},{code:'838',name:'Beige Brown Vy Dk',hex:'#4A3728'},
+  {code:'869',name:'Hazel Nut Brown Vy Dk',hex:'#6B4B2A'},{code:'blanc',name:'White',hex:'#FDFDFD'},
+  {code:'ecru',name:'Ecru',hex:'#F0E6D0'},{code:'3345',name:'Hunter Green Dk',hex:'#28502C'},
+  {code:'3371',name:'Black Brown',hex:'#2E1F11'},{code:'3799',name:'Pewter Gray Vy Dk',hex:'#424242'},
+  {code:'3865',name:'Winter White',hex:'#FAF8F0'}
+];
+var addedCodes = [];
+var acHighlight = -1;
+var selectedColour = null;
+
+// ─── Supply mode takeover ───
 function enterSupplyMode() {
-  const page = document.getElementById('vd-page');
-  const form = document.getElementById('vd-form');
-  const supplies = document.getElementById('vd-supplies');
-  const summary = document.getElementById('vd-summary');
-  const sticky = document.getElementById('vd-sticky');
+  var page = document.getElementById('vd-page');
+  var form = document.getElementById('vd-form');
+  var supplies = document.getElementById('vd-supplies');
+  var summary = document.getElementById('vd-summary');
+  var sticky = document.getElementById('vd-sticky');
 
   form.style.maxHeight = form.scrollHeight + 'px';
   requestAnimationFrame(function() {
@@ -1756,7 +1745,7 @@ function enterSupplyMode() {
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(function() {
-      var input = document.getElementById('vd-supply-input');
+      var input = document.getElementById('vd-colour-input');
       if (input) input.focus();
     }, 400);
   }, 350);
@@ -1782,12 +1771,239 @@ function exitSupplyMode() {
     form.style.maxHeight = '0';
     form.style.opacity = '0';
     requestAnimationFrame(function() {
-      form.style.maxHeight = '5000px';
+      form.style.maxWidth = '5000px';
       form.style.opacity = '1';
     });
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 250);
+}
+
+// ─── Autocomplete ───
+(function() {
+  var colourInput = document.getElementById('vd-colour-input');
+  var acDropdown = document.getElementById('vd-ac-dropdown');
+  var stitchInput = document.getElementById('vd-stitch-input');
+  var needInput = document.getElementById('vd-need-input');
+  if (!colourInput) return;
+
+  colourInput.addEventListener('input', function() {
+    var q = this.value.trim().toLowerCase();
+    selectedColour = null;
+    if (q.length === 0) { acDropdown.style.display = 'none'; return; }
+    var matches = dmcColours.filter(function(c) {
+      return c.code.toLowerCase().indexOf(q) !== -1 || c.name.toLowerCase().indexOf(q) !== -1;
+    }).slice(0, 8);
+    if (matches.length === 0) { acDropdown.style.display = 'none'; return; }
+
+    var rect = colourInput.getBoundingClientRect();
+    acDropdown.style.position = 'fixed';
+    acDropdown.style.top = (rect.bottom + 4) + 'px';
+    acDropdown.style.left = rect.left + 'px';
+    acDropdown.style.width = Math.max(320, rect.width) + 'px';
+    acDropdown.style.display = 'block';
+    acHighlight = -1;
+
+    // Build dropdown items
+    while (acDropdown.firstChild) acDropdown.removeChild(acDropdown.firstChild);
+    matches.forEach(function(c, i) {
+      var isAdded = addedCodes.indexOf(c.code) !== -1;
+      var item = document.createElement('div');
+      item.className = isAdded ? 'ac-item ac-disabled' : 'ac-item';
+      item.setAttribute('data-code', c.code);
+
+      var swatch = document.createElement('div');
+      swatch.style.cssText = 'width:16px;height:16px;border-radius:2px;flex-shrink:0;background:' + c.hex + ';border:1px solid rgba(0,0,0,0.08);';
+      item.appendChild(swatch);
+
+      var codeSpan = document.createElement('span');
+      codeSpan.style.cssText = 'font-family:var(--font-mono);font-size:12px;font-weight:600;';
+      codeSpan.textContent = c.code;
+      item.appendChild(codeSpan);
+
+      var nameSpan = document.createElement('span');
+      nameSpan.style.cssText = 'color:var(--color-text-muted);font-size:var(--text-xs);';
+      nameSpan.textContent = c.name;
+      item.appendChild(nameSpan);
+
+      if (isAdded) {
+        var addedLabel = document.createElement('span');
+        addedLabel.style.cssText = 'margin-left:auto;font-size:11px;color:var(--color-text-subtle);';
+        addedLabel.textContent = 'Added';
+        item.appendChild(addedLabel);
+      }
+
+      if (!isAdded) {
+        item.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          selectColourByCode(c.code);
+        });
+      }
+      acDropdown.appendChild(item);
+    });
+  });
+
+  colourInput.addEventListener('keydown', function(e) {
+    var items = acDropdown.querySelectorAll('.ac-item:not(.ac-disabled)');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      acHighlight = Math.min(acHighlight + 1, items.length - 1);
+      updateHighlight(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      acHighlight = Math.max(acHighlight - 1, 0);
+      updateHighlight(items);
+    } else if (e.key === 'Enter' && acHighlight >= 0 && items[acHighlight]) {
+      e.preventDefault();
+      selectColourByCode(items[acHighlight].getAttribute('data-code'));
+    } else if (e.key === 'Escape') {
+      acDropdown.style.display = 'none';
+      colourInput.value = '';
+      selectedColour = null;
+      acHighlight = -1;
+    }
+  });
+
+  colourInput.addEventListener('blur', function() {
+    setTimeout(function() { acDropdown.style.display = 'none'; }, 150);
+  });
+
+  function selectColourByCode(code) {
+    var c = dmcColours.find(function(d) { return d.code === code; });
+    if (!c) return;
+    selectedColour = c;
+    colourInput.value = c.code + ' ' + c.name;
+    acDropdown.style.display = 'none';
+    acHighlight = -1;
+    needInput.disabled = true;
+    needInput.value = '';
+    needInput.placeholder = '1';
+    stitchInput.focus();
+  }
+
+  function updateHighlight(items) {
+    items.forEach(function(item, i) {
+      item.classList.toggle('ac-highlighted', i === acHighlight);
+    });
+  }
+
+  stitchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && selectedColour) {
+      e.preventDefault(); addSupplyRow(colourInput, stitchInput, needInput);
+    } else if (e.key === 'Tab' && !e.shiftKey && selectedColour) {
+      e.preventDefault(); needInput.disabled = false; needInput.focus();
+    }
+  });
+
+  needInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && selectedColour) {
+      e.preventDefault(); addSupplyRow(colourInput, stitchInput, needInput);
+    }
+  });
+})();
+
+function addSupplyRow(colourInput, stitchInput, needInput) {
+  if (!selectedColour) return;
+  var stitches = parseInt(stitchInput.value) || 0;
+  var need = needInput.disabled ? (stitches > 0 ? calcSkeins(stitches) : 1) : (parseInt(needInput.value) || 1);
+  var isAutoCalc = needInput.disabled && stitches > 0;
+
+  addedCodes.push(selectedColour.code);
+
+  var tbody = document.getElementById('vd-thread-tbody');
+  var addRow = tbody.querySelector('.add-row');
+  var tr = document.createElement('tr');
+  tr.className = 'data-row';
+  tr.style.animation = 'slideIn 0.2s ease';
+
+  var stitchStr = stitches > 0 ? stitches.toLocaleString() : '—';
+
+  // Build cells with DOM methods
+  var td1 = document.createElement('td');
+  var cellDiv = document.createElement('div');
+  cellDiv.className = 'cell-colour';
+  var sw = document.createElement('div');
+  sw.className = 'colour-swatch';
+  sw.style.background = selectedColour.hex;
+  cellDiv.appendChild(sw);
+  var codeEl = document.createElement('span');
+  codeEl.className = 'tc-code';
+  codeEl.textContent = selectedColour.code;
+  cellDiv.appendChild(codeEl);
+  var nameEl = document.createElement('span');
+  nameEl.className = 'tc-name';
+  nameEl.textContent = selectedColour.name;
+  cellDiv.appendChild(nameEl);
+  td1.appendChild(cellDiv);
+
+  var td2 = document.createElement('td');
+  td2.style.cssText = 'font-family:var(--font-mono);font-size:12px;';
+  td2.textContent = stitchStr;
+
+  var td3 = document.createElement('td');
+  td3.style.cssText = 'color:var(--color-text-subtle);font-size:11px;';
+  td3.textContent = '→';
+
+  var td4 = document.createElement('td');
+  var needSpan = document.createElement('span');
+  needSpan.style.cssText = 'font-family:var(--font-mono);font-size:12px;';
+  needSpan.textContent = need + ' sk';
+  td4.appendChild(needSpan);
+  if (isAutoCalc) {
+    var sp = document.createElement('span');
+    sp.className = 'sparkle';
+    sp.textContent = '✨';
+    td4.appendChild(sp);
+  }
+
+  var td5 = document.createElement('td');
+  td5.style.cssText = 'color:var(--color-text-subtle);font-size:12px;';
+  td5.textContent = '0';
+
+  var td6 = document.createElement('td');
+  td6.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-border-light)" stroke-width="2"/></svg>';
+
+  var td7 = document.createElement('td');
+
+  tr.appendChild(td1);
+  tr.appendChild(td2);
+  tr.appendChild(td3);
+  tr.appendChild(td4);
+  tr.appendChild(td5);
+  tr.appendChild(td6);
+  tr.appendChild(td7);
+
+  addRow.parentNode.insertBefore(tr, addRow.nextSibling);
+
+  colourInput.value = '';
+  stitchInput.value = '';
+  needInput.value = '';
+  needInput.disabled = true;
+  needInput.placeholder = '1';
+  selectedColour = null;
+  colourInput.focus();
+  updateCounts();
+}
+
+function calcSkeins(stitches) {
+  var lengthPerStitch = (2 * 2 * 0.018 * 1) / 100;
+  var totalLength = stitches * lengthPerStitch * 1.2;
+  return Math.max(1, Math.ceil(totalLength / 8));
+}
+
+function updateCounts() {
+  var rows = document.querySelectorAll('#vd-thread-tbody .data-row');
+  var totalSkeins = 0;
+  rows.forEach(function(r) {
+    var match = r.cells[3].textContent.match(/(\d+)/);
+    if (match) totalSkeins += parseInt(match[1]);
+  });
+  var countEl = document.getElementById('vd-colour-count');
+  var totalEl = document.getElementById('vd-skein-total');
+  var tabCount = document.getElementById('vd-thread-count');
+  if (countEl) countEl.textContent = rows.length + ' colour' + (rows.length !== 1 ? 's' : '') + ' added';
+  if (totalEl) totalEl.textContent = 'Total: ' + totalSkeins + ' skeins needed';
+  if (tabCount) tabCount.textContent = rows.length;
 }
 
 // Segmented control selection
