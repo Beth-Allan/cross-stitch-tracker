@@ -23,18 +23,18 @@
 
 ### In Progress
 
-None — Phase 9.1 complete, ready for v1.3.
+None — ready for v1.3.
 
 ### Done This Session
 
-- Fixed skein calculator: removed bogus 1.3x constant, changed overCount default 2→1, added mismatch.co.uk validation tests (PR pending)
-- Added backlog items 999.13 (per-brand skein length) and 999.14 (auto-infer overCount from fabric)
+- UX quick fixes merged (PR #29): pluralization, fabric thumbnails, spotlight card, shopping cart thumbnails
+- Skein calculator fix merged (PR #25)
+- Cleaned up local branches
 
 ### Next Up
 
-1. Merge skein calculator fix PR
-2. Merge PR #25 (waiting on CI)
-3. `/gsd-new-milestone` — start v1.3 Motivation & Planning
+1. Supply adding UX overhaul — design exploration for the workflow described in `.planning/notes/ux-bug-triage-2026-05-03.md` (Large Work section)
+2. `/gsd-new-milestone` — start v1.3 Motivation & Planning
 
 ### Backlog
 
