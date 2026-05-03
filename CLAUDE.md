@@ -27,17 +27,21 @@ None — ready for v1.3.
 
 ### Done This Session
 
-- Fixed sketch 002 dropdown z-index bug (portal pattern: `position: fixed` + `getBoundingClientRect()`)
-- Fixed add flow: Need defaults to 1 on colour selection, Enter on stitches adds row directly
-- Added proportional SVG donut status indicators (have/need ratio)
-- Added "Status" column header
-- Replaced placeholder skein calc with real formula (2 strands, 14ct, over 1, 20% waste)
-- Winner chosen: **Synthesis: Table + Auto-Calc** (sketch 002, variant 1)
-- Sketch wrap-up complete: skill at `.claude/skills/sketch-findings-cross-stitch-tracker/`
+- Sketch 003 (wizard flow): explored 3 variants + synthesis for project creation wizard
+- Winner: **Synthesis: Merged Form + Supply Takeover**
+  - Single form with dividers (no Chart/Project split)
+  - Pattern type cards with Kit → colour count expansion
+  - Required dot indicator (green), no "optional" tags
+  - One milestone before supply entry
+  - Supply takeover: form collapses to summary bar, supply table fills page
+  - Styled calc panel with segmented controls
+  - Autocomplete: reuse sketch-002 portal pattern (not re-implemented)
 
 ### Next Up
 
-1. `/gsd-new-milestone` — start v1.3 Motivation & Planning
+1. `/gsd-sketch` — sketch 004: bead + specialty supply type entry (how do they join the thread table?)
+2. Then `/gsd-sketch-wrap-up` to package all wizard findings
+3. Then `/gsd-new-milestone` — start v1.3
 
 ### Backlog
 
