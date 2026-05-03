@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sketch 001: Supply Add Interaction</title>
+  <link rel="stylesheet" href="../themes/default.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-text);
+      padding-top: 52px;
+      line-height: 1.5;
+    }
+
+    /* ─── Variant Nav ─────────────────────────────────────── */
+    #variant-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 8px 16px;
+      display: flex; gap: 8px; align-items: center;
+      font-family: var(--font-sans);
+    }
+    .variant-tab {
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .variant-tab:hover { background: var(--color-surface-hover); color: var(--color-text); }
+    .variant-tab.active {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+    .variant-label {
+      margin-left: auto;
+      font-size: var(--text-xs);
+      color: var(--color-text-subtle);
+    }
+
+    .variant { display: none; max-width: 800px; margin: 0 auto; padding: var(--space-6); }
+    .variant.active { display: block; }
+
+    /* ─── Shared Styles ───────────────────────────────────── */
+    h2 { font-family: var(--font-heading); font-size: var(--text-xl); font-weight: 600; margin-bottom: var(--space-4); }
+    h3 { font-family: var(--font-heading); font-size: var(--text-lg); font-weight: 600; }
+
+    .section-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: visible;
+    }
+    .section-header {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-3) var(--space-5);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .section-header:hover { background: var(--color-surface-hover); }
+    .section-body { border-top: 1px solid var(--color-border); }
+
+    .colour-swatch {
+      width: 20px; height: 20px; border-radius: 3px; flex-shrink: 0;
+      display: inline-block;
+    }
+    .colour-swatch.light { box-shadow: inset 0 0 0 1px var(--color-border); }
+
+    .count-badge {
+      font-size: var(--text-sm); font-weight: 400;
+      color: var(--color-text-muted); margin-left: var(--space-2);
+    }
+
+    .status-icon { font-size: 14px; }
+    .status-fulfilled { color: var(--color-success); }
+    .status-partial { color: var(--color-warning); }
+
+    .description-block {
+      background: var(--color-surface-hover);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin-bottom: var(--space-6);
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      line-height: 1.6;
+    }
+    .description-block strong { color: var(--color-text); }
+    .description-block kbd {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-size: 0.8em;
+      font-family: var(--font-mono);
+    }
+
+    .state-controls {
+      display: flex; gap: var(--space-2); margin-bottom: var(--space-4);
+    }
+    .state-btn {
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text-muted);
+      font-size: var(--text-xs);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .state-btn:hover { background: var(--color-surface-hover); }
+    .state-btn.active { background: var(--color-primary-light); border-color: var(--color-primary); color: var(--color-primary); }
+
+    /* ═══ VARIANT A: Sticky Add Row ═══ */
+    .add-row-container {
+      position: sticky; top: 52px; z-index: 10;
+      background: var(--color-surface);
+      padding: var(--space-3) var(--space-5);
+      border-bottom: 2px solid var(--color-primary-light);
+    }
+    .add-row {
+      display: flex; align-items: center; gap: var(--space-2);
+    }
+    .add-row-input-wrap {
+      position: relative; flex: 1; min-width: 0;
+    }
+    .add-row input[type="text"], .add-row input[type="number"] {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-family: var(--font-sans);
+      background: var(--color-surface);
+      color: var(--color-text);
+      transition: border-color 0.15s ease;
+    }
+    .add-row input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+    }
+    .add-row .swatch-preview {
+      width: 28px; height: 28px; border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+      background: repeating-conic-gradient(#e5e5e5 0% 25%, #fff 0% 50%) 50% / 8px 8px;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .add-row .num-field { width: 72px; flex-shrink: 0; }
+    .add-row .num-field-sm { width: 56px; flex-shrink: 0; }
+
+    .autocomplete-dropdown {
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      max-height: 220px; overflow-y: auto;
+      z-index: 20;
+      display: none;
+    }
+    .autocomplete-dropdown.open { display: block; }
+    .autocomplete-item {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: 6px var(--space-3);
+      cursor: pointer;
+      font-size: var(--text-sm);
+      transition: background 0.1s ease;
+      border: none; background: none; width: 100%; text-align: left;
+      color: var(--color-text);
+      font-family: var(--font-sans);
+    }
+    .autocomplete-item:hover, .autocomplete-item.highlighted {
+      background: var(--color-surface-hover);
+    }
+    .autocomplete-item.disabled { opacity: 0.4; cursor: default; }
+    .autocomplete-item .ac-code { font-weight: 600; font-family: var(--font-mono); font-size: var(--text-xs); }
+    .autocomplete-item .ac-name { color: var(--color-text-muted); }
+    .autocomplete-item .ac-already { font-size: var(--text-xs); color: var(--color-text-subtle); font-style: italic; margin-left: auto; }
+
+    .supply-list-a { padding: 0 var(--space-5); }
+    .supply-row-a {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--color-border-light);
+      font-size: var(--text-sm);
+      animation: slideIn 0.2s ease;
+    }
+    .supply-row-a:last-child { border-bottom: none; }
+    .supply-row-a .sr-code { font-weight: 600; font-family: var(--font-mono); white-space: nowrap; }
+    .supply-row-a .sr-name { color: var(--color-text-muted); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .supply-row-a .sr-stat { font-size: var(--text-xs); color: var(--color-text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .supply-row-a .sr-stat strong { color: var(--color-text); font-weight: 600; }
+    .supply-row-a .sr-delete {
+      border: none; background: none; cursor: pointer;
+      color: var(--color-text-subtle); padding: 4px;
+      border-radius: var(--radius-sm);
+      opacity: 0; transition: all 0.15s ease;
+      font-size: 14px;
+    }
+    .supply-row-a:hover .sr-delete { opacity: 1; }
+    .supply-row-a .sr-delete:hover { color: var(--color-danger); background: rgba(220,38,38,0.08); }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══ VARIANT B: Continuous Flow Pipeline ═══ */
+    .pipeline-container {
+      position: sticky; top: 52px; z-index: 10;
+      background: var(--color-surface);
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 2px solid var(--color-primary-light);
+    }
+    .pipeline-progress {
+      display: flex; align-items: center; gap: var(--space-2);
+      margin-bottom: var(--space-3);
+      font-size: var(--text-xs);
+      color: var(--color-text-subtle);
+    }
+    .pipeline-step {
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      transition: all 0.2s ease;
+    }
+    .pipeline-step.active { background: var(--color-primary); color: var(--color-primary-text); font-weight: 600; }
+    .pipeline-step.done { background: var(--color-primary-light); color: var(--color-primary); }
+    .pipeline-arrow { color: var(--color-border); }
+
+    .pipeline-input-area {
+      display: flex; align-items: center; gap: var(--space-3);
+      min-height: 40px;
+    }
+    .pipeline-field {
+      display: flex; align-items: center; gap: var(--space-2);
+      transition: all 0.25s ease;
+    }
+    .pipeline-field.hidden { display: none; }
+    .pipeline-field input {
+      padding: 7px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-family: var(--font-sans);
+      background: var(--color-surface);
+      color: var(--color-text);
+      transition: border-color 0.15s ease;
+    }
+    .pipeline-field input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+    }
+    .pipeline-field label { font-size: var(--text-xs); color: var(--color-text-muted); white-space: nowrap; }
+    .pipeline-locked-value {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: 5px 10px;
+      background: var(--color-primary-light);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--color-primary-hover);
+      white-space: nowrap;
+    }
+    .pipeline-locked-value .colour-swatch { width: 16px; height: 16px; border-radius: 2px; }
+
+    .supply-list-b { padding: 0 var(--space-5); }
+    .supply-row-b {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--color-border-light);
+      font-size: var(--text-sm);
+      animation: slideIn 0.2s ease;
+    }
+    .supply-row-b:last-child { border-bottom: none; }
+    .supply-row-b .sr-code { font-weight: 600; font-family: var(--font-mono); white-space: nowrap; }
+    .supply-row-b .sr-name { color: var(--color-text-muted); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .supply-row-b .sr-stat { font-size: var(--text-xs); color: var(--color-text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .supply-row-b .sr-stat strong { color: var(--color-text); font-weight: 600; }
+    .supply-row-b .sr-delete {
+      border: none; background: none; cursor: pointer;
+      color: var(--color-text-subtle); padding: 4px;
+      border-radius: var(--radius-sm);
+      opacity: 0; transition: all 0.15s ease; font-size: 14px;
+    }
+    .supply-row-b:hover .sr-delete { opacity: 1; }
+    .supply-row-b .sr-delete:hover { color: var(--color-danger); }
+
+    /* ═══ VARIANT C: Smart Table Mode ═══ */
+    .table-container { overflow-x: auto; }
+    .supply-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+    .supply-table thead th {
+      text-align: left;
+      padding: var(--space-2) var(--space-3);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border-bottom: 2px solid var(--color-border);
+      white-space: nowrap;
+      position: sticky; top: 52px;
+      background: var(--color-surface);
+      z-index: 5;
+    }
+    .supply-table tbody td {
+      padding: var(--space-1) var(--space-3);
+      border-bottom: 1px solid var(--color-border-light);
+      font-variant-numeric: tabular-nums;
+      vertical-align: middle;
+      height: 36px;
+    }
+    .supply-table tbody tr:hover td { background: var(--color-surface-hover); }
+    .supply-table tbody tr.add-row-c td {
+      background: rgba(5, 150, 105, 0.03);
+      border-bottom: 2px solid var(--color-primary-light);
+    }
+    .supply-table .cell-colour {
+      display: flex; align-items: center; gap: var(--space-2);
+    }
+    .supply-table .cell-colour .colour-swatch { width: 16px; height: 16px; border-radius: 2px; }
+    .supply-table .tc-code { font-weight: 600; font-family: var(--font-mono); font-size: var(--text-xs); }
+    .supply-table .arrow-cell { color: var(--color-text-subtle); font-size: var(--text-xs); text-align: center; width: 24px; }
+    .supply-table .editable-cell {
+      cursor: text;
+      border-radius: var(--radius-sm);
+      padding: 2px 6px;
+      transition: background 0.1s ease;
+      min-width: 48px;
+      display: inline-block;
+    }
+    .supply-table .editable-cell:hover { background: rgba(5, 150, 105, 0.08); }
+    .supply-table .editable-cell:focus {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 1px;
+      background: var(--color-surface);
+    }
+    .supply-table input.table-input {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 3px 6px;
+      font-size: var(--text-sm);
+      font-family: var(--font-sans);
+      width: 100%;
+      background: var(--color-surface);
+      color: var(--color-text);
+    }
+    .supply-table input.table-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.15);
+    }
+    .supply-table .code-input-wrap { position: relative; }
+    .supply-table .table-autocomplete {
+      position: absolute; top: 100%; left: 0;
+      width: 280px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      max-height: 200px; overflow-y: auto;
+      z-index: 20; display: none;
+    }
+    .supply-table .table-autocomplete.open { display: block; }
+    .supply-table .delete-cell { text-align: center; width: 32px; }
+    .supply-table .delete-btn-c {
+      border: none; background: none; cursor: pointer;
+      color: var(--color-text-subtle); padding: 2px;
+      border-radius: var(--radius-sm);
+      opacity: 0; transition: all 0.15s ease; font-size: 13px;
+    }
+    .supply-table tbody tr:hover .delete-btn-c { opacity: 1; }
+    .supply-table .delete-btn-c:hover { color: var(--color-danger); }
+    .supply-table tbody tr { animation: slideIn 0.2s ease; }
+
+    /* ─── Progress footer ─────────────────────────────────── */
+    .progress-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-3) var(--space-5);
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      border-top: 1px solid var(--color-border);
+    }
+    .progress-footer strong { color: var(--color-text); }
+
+    .keyboard-hints {
+      display: flex; gap: var(--space-4);
+      padding: var(--space-2) var(--space-5);
+      font-size: var(--text-xs);
+      color: var(--color-text-subtle);
+      border-top: 1px solid var(--color-border-light);
+    }
+    .keyboard-hints kbd {
+      background: var(--color-surface-hover);
+      border: 1px solid var(--color-border);
+      border-radius: 3px;
+      padding: 0 4px;
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+    }
+
+    /* ─── Sketch toolbar ──────────────────────────────────── */
+    #sketch-tools {
+      position: fixed; bottom: 12px; right: 12px; z-index: 9999;
+      font-family: system-ui; font-size: 12px;
+      background: rgba(0,0,0,0.75); color: white;
+      padding: 8px 14px; border-radius: 8px;
+      opacity: 0.35; transition: opacity 0.2s;
+      display: flex; gap: 10px; align-items: center;
+    }
+    #sketch-tools:hover { opacity: 1; }
+    #sketch-tools select, #sketch-tools button {
+      font-size: 11px; padding: 2px 6px;
+      border-radius: 4px; border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1); color: white; cursor: pointer;
+    }
+    #sketch-tools button:hover { background: rgba(255,255,255,0.2); }
+  </style>
+</head>
+<body>
+
+<div id="variant-nav">
+  <button class="variant-tab active" onclick="showVariant('a', this)">A: Sticky Add Row</button>
+  <button class="variant-tab" onclick="showVariant('b', this)">B: Continuous Flow</button>
+  <button class="variant-tab" onclick="showVariant('c', this)">C: Smart Table</button>
+  <span class="variant-label">Sketch 001 — Supply Add Interaction</span>
+</div>
+
+<!-- ═══ VARIANT A ═══ -->
+<div id="variant-a" class="variant active">
+  <div class="description-block">
+    <strong>Variant A: Sticky Add Row</strong> — A permanent input row at the top of the supply list.
+    Type a colour code, pick from the compact dropdown, <kbd>Tab</kbd> to stitches, <kbd>Tab</kbd> to need,
+    <kbd>Enter</kbd> to add. New entries appear at the top. The picker never covers the list.
+  </div>
+  <div class="state-controls" id="a-states"></div>
+  <div class="section-card">
+    <div class="section-header">
+      <span>&#9662;</span>
+      <span style="font-size:16px">&#127912;</span>
+      <h3>Threads <span class="count-badge" id="a-count"></span></h3>
+      <span class="count-badge" style="margin-left:auto" id="a-stitches"></span>
+    </div>
+    <div class="add-row-container">
+      <div class="add-row">
+        <div class="swatch-preview" id="a-swatch"></div>
+        <div class="add-row-input-wrap">
+          <input type="text" id="a-search" placeholder="Type colour code or name..." autocomplete="off">
+          <div class="autocomplete-dropdown" id="a-dropdown"></div>
+        </div>
+        <div class="num-field">
+          <input type="number" id="a-stitches-input" placeholder="Stitches" min="0">
+        </div>
+        <div class="num-field-sm">
+          <input type="number" id="a-need-input" placeholder="Need" min="0">
+        </div>
+        <div class="num-field-sm">
+          <input type="number" id="a-have-input" placeholder="Have" min="0">
+        </div>
+      </div>
+    </div>
+    <div class="supply-list-a" id="a-list"></div>
+    <div class="progress-footer">
+      <span><strong id="a-total-colours">0</strong> colours added</span>
+      <span>Total: <strong id="a-total-skeins">0</strong> skeins needed</span>
+    </div>
+    <div class="keyboard-hints">
+      <span><kbd>&#8593;&#8595;</kbd> navigate</span>
+      <span><kbd>Enter</kbd> select / add</span>
+      <span><kbd>Tab</kbd> next field</span>
+      <span><kbd>Esc</kbd> clear</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VARIANT B ═══ -->
+<div id="variant-b" class="variant">
+  <div class="description-block">
+    <strong>Variant B: Continuous Flow Pipeline</strong> — A single-line input with step indicators.
+    Fields reveal as you progress: pick colour, type stitches, confirm need, <kbd>Enter</kbd> to add.
+    The completed entry slides into the list. Very guided, very keyboard-friendly.
+  </div>
+  <div class="state-controls" id="b-states"></div>
+  <div class="section-card">
+    <div class="section-header">
+      <span>&#9662;</span>
+      <span style="font-size:16px">&#127912;</span>
+      <h3>Threads <span class="count-badge" id="b-count"></span></h3>
+      <span class="count-badge" style="margin-left:auto" id="b-stitches"></span>
+    </div>
+    <div class="pipeline-container">
+      <div class="pipeline-progress">
+        <span class="pipeline-step active" id="b-step-1">1. Colour</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-step" id="b-step-2">2. Stitches</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-step" id="b-step-3">3. Need</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-step" id="b-step-4">&#10003; Add</span>
+      </div>
+      <div class="pipeline-input-area">
+        <div class="pipeline-field" id="b-field-search">
+          <div class="add-row-input-wrap" style="width:260px">
+            <input type="text" id="b-search" placeholder="Type colour code or name..." autocomplete="off"
+              style="padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:var(--text-sm);width:100%;font-family:var(--font-sans)">
+            <div class="autocomplete-dropdown" id="b-dropdown"></div>
+          </div>
+        </div>
+        <div class="pipeline-field hidden" id="b-locked-colour">
+          <div class="pipeline-locked-value" id="b-locked-value"></div>
+          <button onclick="resetPipelineB()" style="border:none;background:none;cursor:pointer;color:var(--color-text-subtle);font-size:14px;padding:4px" title="Change colour">&#10005;</button>
+        </div>
+        <div class="pipeline-field hidden" id="b-field-stitches">
+          <label>Stitches:</label>
+          <input type="number" id="b-stitches-input" style="width:80px" placeholder="0" min="0">
+        </div>
+        <div class="pipeline-field hidden" id="b-field-need">
+          <label>Need:</label>
+          <input type="number" id="b-need-input" style="width:64px" placeholder="1" min="0">
+          <span style="font-size:var(--text-xs);color:var(--color-text-subtle)">skeins</span>
+        </div>
+        <div class="pipeline-field hidden" id="b-field-confirm">
+          <button id="b-confirm-btn" style="padding:6px 14px;background:var(--color-primary);color:white;border:none;border-radius:var(--radius-md);font-size:var(--text-sm);cursor:pointer;font-weight:500;transition:background 0.15s">Add &#8629;</button>
+        </div>
+      </div>
+    </div>
+    <div class="supply-list-b" id="b-list"></div>
+    <div class="progress-footer">
+      <span><strong id="b-total-colours">0</strong> colours added</span>
+      <span>Total: <strong id="b-total-skeins">0</strong> skeins needed</span>
+    </div>
+    <div class="keyboard-hints">
+      <span><kbd>&#8593;&#8595;</kbd> navigate dropdown</span>
+      <span><kbd>Enter</kbd> select / confirm</span>
+      <span><kbd>Tab</kbd> next step</span>
+      <span><kbd>Esc</kbd> reset pipeline</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VARIANT C ═══ -->
+<div id="variant-c" class="variant">
+  <div class="description-block">
+    <strong>Variant C: Smart Table Mode</strong> — The whole supply list is a compact spreadsheet.
+    Each row is one line. The first row is always an empty "add" row. <kbd>Tab</kbd> between cells,
+    <kbd>Enter</kbd> to add. Click any cell to edit. Half the vertical space, all inline.
+  </div>
+  <div class="state-controls" id="c-states"></div>
+  <div class="section-card">
+    <div class="section-header">
+      <span>&#9662;</span>
+      <span style="font-size:16px">&#127912;</span>
+      <h3>Threads <span class="count-badge" id="c-count"></span></h3>
+      <span class="count-badge" style="margin-left:auto" id="c-stitches"></span>
+    </div>
+    <div class="section-body">
+      <div class="table-container">
+        <table class="supply-table">
+          <thead>
+            <tr>
+              <th style="width:40%">Colour</th>
+              <th style="width:14%">Stitches</th>
+              <th style="width:3%"></th>
+              <th style="width:12%">Need</th>
+              <th style="width:12%">Have</th>
+              <th style="width:10%">Status</th>
+              <th style="width:32px"></th>
+            </tr>
+          </thead>
+          <tbody id="c-tbody"></tbody>
+        </table>
+      </div>
+      <div class="progress-footer">
+        <span><strong id="c-total-colours">0</strong> colours added</span>
+        <span>Total: <strong id="c-total-skeins">0</strong> skeins needed</span>
+      </div>
+      <div class="keyboard-hints">
+        <span><kbd>Tab</kbd> next cell</span>
+        <span><kbd>Enter</kbd> add row / confirm</span>
+        <span><kbd>Esc</kbd> cancel</span>
+        <span><kbd>Click</kbd> edit any cell</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Sketch Toolbar ──── -->
+<div id="sketch-tools" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.35'">
+  <span>&#128295;</span>
+  <select onchange="document.querySelector('link[href*=themes]').href='../themes/'+this.value+'.css'">
+    <option value="default">Default Theme</option>
+  </select>
+  <button onclick="setViewport(375)">375</button>
+  <button onclick="setViewport(768)">768</button>
+  <button onclick="setViewport(null)">Full</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+var DMC = [
+  {code:"310",name:"Black",hex:"#000000"},{code:"blanc",name:"White",hex:"#FFFFFF"},
+  {code:"ecru",name:"Ecru",hex:"#F0E6D0"},{code:"321",name:"Red",hex:"#C72D34"},
+  {code:"349",name:"Dark Coral",hex:"#C23B44"},{code:"414",name:"Dark Steel Gray",hex:"#8C8C8C"},
+  {code:"415",name:"Pearl Gray",hex:"#B4B4B4"},{code:"433",name:"Medium Brown",hex:"#864A2C"},
+  {code:"434",name:"Light Brown",hex:"#985C3C"},{code:"435",name:"Very Light Brown",hex:"#B07840"},
+  {code:"436",name:"Tan",hex:"#C49458"},{code:"437",name:"Light Tan",hex:"#D4A86A"},
+  {code:"498",name:"Dark Red",hex:"#982230"},{code:"550",name:"Very Dark Violet",hex:"#5C2866"},
+  {code:"552",name:"Medium Violet",hex:"#8050A0"},{code:"666",name:"Bright Red",hex:"#E21830"},
+  {code:"699",name:"Green",hex:"#1C6828"},{code:"700",name:"Bright Green",hex:"#228B22"},
+  {code:"701",name:"Light Green",hex:"#2E9E36"},{code:"702",name:"Kelly Green",hex:"#38A840"},
+  {code:"725",name:"Medium Light Topaz",hex:"#E8C050"},{code:"726",name:"Light Topaz",hex:"#F0D060"},
+  {code:"727",name:"Very Light Topaz",hex:"#F8E080"},{code:"762",name:"Very Light Pearl Gray",hex:"#D8D8D8"},
+  {code:"798",name:"Dark Delft Blue",hex:"#4070A0"},{code:"799",name:"Medium Delft Blue",hex:"#5088B8"},
+  {code:"800",name:"Pale Delft Blue",hex:"#C0D0E8"},{code:"815",name:"Medium Garnet",hex:"#881828"},
+  {code:"816",name:"Garnet",hex:"#782030"},{code:"817",name:"Very Dark Coral Red",hex:"#C81818"},
+  {code:"838",name:"Very Dark Beige Brown",hex:"#5C3C28"},{code:"839",name:"Dark Beige Brown",hex:"#6C4C38"},
+  {code:"840",name:"Medium Beige Brown",hex:"#907050"},{code:"898",name:"Very Dark Coffee Brown",hex:"#5C3018"},
+  {code:"938",name:"Ultra Dark Coffee Brown",hex:"#4A2810"},{code:"3371",name:"Black Brown",hex:"#2A1810"},
+  {code:"3799",name:"Very Dark Pewter Gray",hex:"#4A4F55"},{code:"3865",name:"Winter White",hex:"#FAF8F0"}
+];
+
+var PRESET_FEW = [
+  {code:"310",name:"Black",hex:"#000000",stitches:450,need:2,have:2},
+  {code:"321",name:"Red",hex:"#C72D34",stitches:280,need:2,have:1},
+  {code:"762",name:"Very Light Pearl Gray",hex:"#D8D8D8",stitches:200,need:1,have:0}
+];
+var PRESET_MANY = [
+  {code:"310",name:"Black",hex:"#000000",stitches:450,need:2,have:2},
+  {code:"321",name:"Red",hex:"#C72D34",stitches:280,need:2,have:1},
+  {code:"762",name:"Very Light Pearl Gray",hex:"#D8D8D8",stitches:200,need:1,have:0},
+  {code:"blanc",name:"White",hex:"#FFFFFF",stitches:380,need:2,have:2},
+  {code:"3799",name:"Very Dark Pewter Gray",hex:"#4A4F55",stitches:95,need:1,have:0},
+  {code:"415",name:"Pearl Gray",hex:"#B4B4B4",stitches:160,need:1,have:1},
+  {code:"699",name:"Green",hex:"#1C6828",stitches:520,need:3,have:0},
+  {code:"725",name:"Medium Light Topaz",hex:"#E8C050",stitches:110,need:1,have:1},
+  {code:"898",name:"Very Dark Coffee Brown",hex:"#5C3018",stitches:75,need:1,have:0},
+  {code:"550",name:"Very Dark Violet",hex:"#5C2866",stitches:340,need:2,have:0},
+  {code:"798",name:"Dark Delft Blue",hex:"#4070A0",stitches:190,need:1,have:1},
+  {code:"838",name:"Very Dark Beige Brown",hex:"#5C3C28",stitches:130,need:1,have:0}
+];
+
+function isLight(h){var r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return(0.299*r+0.587*g+0.114*b)/255>0.85}
+function statusHtml(n,h){if(h>=n)return'<span class="status-icon status-fulfilled">&#10003;</span>';if(h>0)return'<span class="status-icon status-partial">&#9684;</span>';return'<span class="status-icon" style="color:var(--color-text-subtle)">&#9675;</span>'}
+function filterDMC(q){var s=q.toLowerCase().trim();if(!s)return DMC.slice(0,8);return DMC.filter(function(c){return c.code.toLowerCase().indexOf(s)>=0||c.name.toLowerCase().indexOf(s)>=0}).slice(0,8)}
+function swatchClass(h){return'colour-swatch'+(isLight(h)?' light':'')}
+
+function buildDropdownItems(results, existingCodes, selectFn, highlightIdx) {
+  var ex = {};
+  existingCodes.forEach(function(c){ex[c]=true});
+  var el = document.createElement('div');
+  results.forEach(function(c, i) {
+    var btn = document.createElement('button');
+    btn.className = 'autocomplete-item' + (ex[c.code]?' disabled':'') + (i===highlightIdx?' highlighted':'');
+    if (ex[c.code]) btn.disabled = true;
+    var sw = document.createElement('div');
+    sw.className = swatchClass(c.hex);
+    sw.style.cssText = 'background:'+c.hex+';width:16px;height:16px;border-radius:2px';
+    btn.appendChild(sw);
+    var codeSpan = document.createElement('span');
+    codeSpan.className = 'ac-code';
+    codeSpan.textContent = 'DMC ' + c.code;
+    btn.appendChild(codeSpan);
+    var nameSpan = document.createElement('span');
+    nameSpan.className = 'ac-name';
+    nameSpan.textContent = ' — ' + c.name;
+    btn.appendChild(nameSpan);
+    if (ex[c.code]) {
+      var al = document.createElement('span');
+      al.className = 'ac-already';
+      al.textContent = 'Added';
+      btn.appendChild(al);
+    }
+    if (!ex[c.code]) {
+      btn.addEventListener('click', function(){selectFn(c.code)});
+    }
+    el.appendChild(btn);
+  });
+  return el;
+}
+
+// ─── Variant switching ───
+function showVariant(id, btn) {
+  document.querySelectorAll('.variant').forEach(function(v){v.classList.remove('active');v.style.display='none'});
+  document.querySelectorAll('.variant-tab').forEach(function(t){t.classList.remove('active')});
+  var el = document.getElementById('variant-' + id);
+  el.style.display = 'block';
+  el.classList.add('active');
+  btn.classList.add('active');
+}
+function setViewport(w) {
+  document.querySelectorAll('.variant').forEach(function(v){v.style.maxWidth=w?w+'px':'800px'});
+}
+
+// ─── State button builder ───
+function buildStateButtons(containerId, setFn) {
+  var c = document.getElementById(containerId);
+  [['few','Few items (3)'],['many','Many items (12)'],['empty','Empty']].forEach(function(s, i) {
+    var btn = document.createElement('button');
+    btn.className = 'state-btn' + (i===0?' active':'');
+    btn.textContent = s[1];
+    btn.addEventListener('click', function() {
+      c.querySelectorAll('.state-btn').forEach(function(b){b.classList.remove('active')});
+      btn.classList.add('active');
+      setFn(s[0]);
+    });
+    c.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// VARIANT A
+// ═══════════════════════════════════════════════════════════
+var aItems = PRESET_FEW.slice(), aHL = -1, aSel = null;
+
+function renderA() {
+  var list = document.getElementById('a-list');
+  var ts = 0, tn = 0;
+  list.textContent = '';
+  aItems.forEach(function(item) {
+    ts += item.stitches; tn += item.need;
+    var row = document.createElement('div');
+    row.className = 'supply-row-a';
+
+    var sw = document.createElement('div');
+    sw.className = swatchClass(item.hex);
+    sw.style.background = item.hex;
+    row.appendChild(sw);
+
+    var code = document.createElement('span');
+    code.className = 'sr-code';
+    code.textContent = 'DMC ' + item.code;
+    row.appendChild(code);
+
+    var name = document.createElement('span');
+    name.className = 'sr-name';
+    name.textContent = '— ' + item.name;
+    row.appendChild(name);
+
+    var st = document.createElement('span');
+    st.className = 'sr-stat';
+    var stB = document.createElement('strong');
+    stB.textContent = item.stitches.toLocaleString();
+    st.appendChild(stB);
+    st.appendChild(document.createTextNode(' st'));
+    row.appendChild(st);
+
+    var arr = document.createElement('span');
+    arr.className = 'sr-stat';
+    arr.style.color = 'var(--color-text-subtle)';
+    arr.textContent = '→';
+    row.appendChild(arr);
+
+    var nd = document.createElement('span');
+    nd.className = 'sr-stat';
+    nd.textContent = 'Need ';
+    var ndB = document.createElement('strong');
+    ndB.textContent = item.need;
+    nd.appendChild(ndB);
+    row.appendChild(nd);
+
+    var hv = document.createElement('span');
+    hv.className = 'sr-stat';
+    hv.textContent = 'Have ';
+    var hvB = document.createElement('strong');
+    hvB.textContent = item.have;
+    if(item.have>=item.need) hvB.style.color='var(--color-success)';
+    hv.appendChild(hvB);
+    row.appendChild(hv);
+
+    var si = document.createElement('span');
+    si.innerHTML = statusHtml(item.need, item.have);
+    row.appendChild(si);
+
+    var del = document.createElement('button');
+    del.className = 'sr-delete';
+    del.title = 'Remove';
+    del.textContent = '✕';
+    del.addEventListener('click', function(){aItems=aItems.filter(function(x){return x.code!==item.code});renderA()});
+    row.appendChild(del);
+
+    list.appendChild(row);
+  });
+  document.getElementById('a-count').textContent = '(' + aItems.length + ' colour' + (aItems.length!==1?'s':'') + ')';
+  document.getElementById('a-stitches').textContent = ts.toLocaleString() + ' stitches total';
+  document.getElementById('a-total-colours').textContent = aItems.length;
+  document.getElementById('a-total-skeins').textContent = tn;
+}
+
+function showADropdown(q) {
+  var dd = document.getElementById('a-dropdown');
+  var ex = aItems.map(function(i){return i.code});
+  var res = filterDMC(q);
+  if(!q.trim()){dd.classList.remove('open');return}
+  dd.textContent = '';
+  dd.appendChild(buildDropdownItems(res, ex, selectA, aHL));
+  dd.classList.add('open');
+}
+function selectA(code) {
+  var c = DMC.filter(function(x){return x.code===code})[0];
+  if(!c) return;
+  aSel = c;
+  var sw = document.getElementById('a-swatch');
+  sw.style.background = c.hex;
+  sw.style.boxShadow = isLight(c.hex)?'inset 0 0 0 1px var(--color-border)':'none';
+  document.getElementById('a-search').value = 'DMC ' + c.code + ' — ' + c.name;
+  document.getElementById('a-dropdown').classList.remove('open');
+  aHL = -1;
+  var si = document.getElementById('a-stitches-input');
+  si.value = '';
+  si.focus();
+}
+
+document.getElementById('a-search').addEventListener('input', function(){showADropdown(this.value)});
+document.getElementById('a-search').addEventListener('keydown', function(e) {
+  var dd = document.getElementById('a-dropdown');
+  var items = dd.querySelectorAll('.autocomplete-item');
+  if(e.key==='ArrowDown'){e.preventDefault();aHL=Math.min(aHL+1,items.length-1);while(aHL<items.length&&items[aHL]&&items[aHL].disabled)aHL++;items.forEach(function(el,i){el.classList.toggle('highlighted',i===aHL)})}
+  else if(e.key==='ArrowUp'){e.preventDefault();aHL=Math.max(aHL-1,0);while(aHL>=0&&items[aHL]&&items[aHL].disabled)aHL--;items.forEach(function(el,i){el.classList.toggle('highlighted',i===aHL)})}
+  else if(e.key==='Enter'){e.preventDefault();if(aHL>=0&&items[aHL]&&!items[aHL].disabled)items[aHL].click()}
+  else if(e.key==='Escape'){dd.classList.remove('open');aHL=-1}
+});
+
+function aFieldKD(e, field) {
+  if(e.key==='Enter'){
+    e.preventDefault();
+    if(field==='stitches')document.getElementById('a-need-input').focus();
+    else if(field==='need')document.getElementById('a-have-input').focus();
+    else if(field==='have')addA();
+  }
+}
+document.getElementById('a-stitches-input').addEventListener('keydown',function(e){aFieldKD(e,'stitches')});
+document.getElementById('a-need-input').addEventListener('keydown',function(e){aFieldKD(e,'need')});
+document.getElementById('a-have-input').addEventListener('keydown',function(e){aFieldKD(e,'have')});
+
+function addA() {
+  if(!aSel) return;
+  aItems.unshift({code:aSel.code,name:aSel.name,hex:aSel.hex,
+    stitches:parseInt(document.getElementById('a-stitches-input').value)||0,
+    need:parseInt(document.getElementById('a-need-input').value)||1,
+    have:parseInt(document.getElementById('a-have-input').value)||0});
+  aSel=null;
+  document.getElementById('a-search').value='';
+  document.getElementById('a-stitches-input').value='';
+  document.getElementById('a-need-input').value='';
+  document.getElementById('a-have-input').value='';
+  var sw=document.getElementById('a-swatch');
+  sw.style.background='repeating-conic-gradient(#e5e5e5 0% 25%, #fff 0% 50%) 50% / 8px 8px';
+  sw.style.boxShadow='none';
+  document.getElementById('a-search').focus();
+  renderA();
+}
+
+buildStateButtons('a-states', function(s){
+  if(s==='few')aItems=PRESET_FEW.slice();else if(s==='many')aItems=PRESET_MANY.slice();else aItems=[];
+  renderA();
+});
+
+// ═══════════════════════════════════════════════════════════
+// VARIANT B
+// ═══════════════════════════════════════════════════════════
+var bItems = PRESET_FEW.slice(), bHL = -1, bSel = null, bStep = 1;
+
+function renderB() {
+  var list = document.getElementById('b-list');
+  var ts=0,tn=0;
+  list.textContent='';
+  bItems.forEach(function(item){
+    ts+=item.stitches;tn+=item.need;
+    var row=document.createElement('div');row.className='supply-row-b';
+    var sw=document.createElement('div');sw.className=swatchClass(item.hex);sw.style.background=item.hex;row.appendChild(sw);
+    var cd=document.createElement('span');cd.className='sr-code';cd.textContent='DMC '+item.code;row.appendChild(cd);
+    var nm=document.createElement('span');nm.className='sr-name';nm.textContent='— '+item.name;row.appendChild(nm);
+    var st=document.createElement('span');st.className='sr-stat';var stB=document.createElement('strong');stB.textContent=item.stitches.toLocaleString();st.appendChild(stB);st.appendChild(document.createTextNode(' st'));row.appendChild(st);
+    var ar=document.createElement('span');ar.className='sr-stat';ar.style.color='var(--color-text-subtle)';ar.textContent='→';row.appendChild(ar);
+    var nd=document.createElement('span');nd.className='sr-stat';nd.textContent='Need ';var ndB=document.createElement('strong');ndB.textContent=item.need;nd.appendChild(ndB);row.appendChild(nd);
+    var hv=document.createElement('span');hv.className='sr-stat';hv.textContent='Have ';var hvB=document.createElement('strong');hvB.textContent=item.have;if(item.have>=item.need)hvB.style.color='var(--color-success)';hv.appendChild(hvB);row.appendChild(hv);
+    var si=document.createElement('span');si.innerHTML=statusHtml(item.need,item.have);row.appendChild(si);
+    var del=document.createElement('button');del.className='sr-delete';del.textContent='✕';del.addEventListener('click',function(){bItems=bItems.filter(function(x){return x.code!==item.code});renderB()});row.appendChild(del);
+    list.appendChild(row);
+  });
+  document.getElementById('b-count').textContent='('+bItems.length+' colour'+(bItems.length!==1?'s':'')+')';
+  document.getElementById('b-stitches').textContent=ts.toLocaleString()+' stitches total';
+  document.getElementById('b-total-colours').textContent=bItems.length;
+  document.getElementById('b-total-skeins').textContent=tn;
+}
+
+function setPStep(s){
+  bStep=s;
+  ['b-step-1','b-step-2','b-step-3','b-step-4'].forEach(function(id,i){
+    var el=document.getElementById(id);el.classList.remove('active','done');
+    if(i+1<s)el.classList.add('done');if(i+1===s)el.classList.add('active');
+  });
+  document.getElementById('b-field-search').classList.toggle('hidden',s>1);
+  document.getElementById('b-locked-colour').classList.toggle('hidden',s<=1);
+  document.getElementById('b-field-stitches').classList.toggle('hidden',s<2);
+  document.getElementById('b-field-need').classList.toggle('hidden',s<3);
+  document.getElementById('b-field-confirm').classList.toggle('hidden',s<3);
+}
+
+function showBDropdown(q){
+  var dd=document.getElementById('b-dropdown');
+  var ex=bItems.map(function(i){return i.code});
+  var res=filterDMC(q);
+  if(!q.trim()){dd.classList.remove('open');return}
+  dd.textContent='';
+  dd.appendChild(buildDropdownItems(res,ex,selectB,bHL));
+  dd.classList.add('open');
+}
+function selectB(code){
+  var c=DMC.filter(function(x){return x.code===code})[0];
+  if(!c)return;
+  bSel=c;
+  var lv=document.getElementById('b-locked-value');
+  lv.textContent='';
+  var sw=document.createElement('div');sw.className=swatchClass(c.hex);sw.style.cssText='background:'+c.hex+';width:16px;height:16px;border-radius:2px';lv.appendChild(sw);
+  lv.appendChild(document.createTextNode('DMC '+c.code+' — '+c.name));
+  document.getElementById('b-dropdown').classList.remove('open');
+  document.getElementById('b-search').value='';bHL=-1;
+  setPStep(2);
+  setTimeout(function(){document.getElementById('b-stitches-input').focus()},50);
+}
+
+document.getElementById('b-search').addEventListener('input',function(){showBDropdown(this.value)});
+document.getElementById('b-search').addEventListener('keydown',function(e){
+  var dd=document.getElementById('b-dropdown');var items=dd.querySelectorAll('.autocomplete-item');
+  if(e.key==='ArrowDown'){e.preventDefault();bHL=Math.min(bHL+1,items.length-1);while(bHL<items.length&&items[bHL]&&items[bHL].disabled)bHL++;items.forEach(function(el,i){el.classList.toggle('highlighted',i===bHL)})}
+  else if(e.key==='ArrowUp'){e.preventDefault();bHL=Math.max(bHL-1,0);while(bHL>=0&&items[bHL]&&items[bHL].disabled)bHL--;items.forEach(function(el,i){el.classList.toggle('highlighted',i===bHL)})}
+  else if(e.key==='Enter'){e.preventDefault();if(bHL>=0&&items[bHL]&&!items[bHL].disabled)items[bHL].click()}
+  else if(e.key==='Escape'){dd.classList.remove('open');bHL=-1}
+});
+
+document.getElementById('b-stitches-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();setPStep(3);var ni=document.getElementById('b-need-input');ni.value=ni.value||'1';setTimeout(function(){ni.focus()},50)}
+  else if(e.key==='Escape')resetPipelineB();
+});
+document.getElementById('b-need-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){e.preventDefault();confirmAddB()}
+  else if(e.key==='Escape')resetPipelineB();
+});
+document.getElementById('b-confirm-btn').addEventListener('click',confirmAddB);
+
+function confirmAddB(){
+  if(!bSel)return;
+  bItems.unshift({code:bSel.code,name:bSel.name,hex:bSel.hex,
+    stitches:parseInt(document.getElementById('b-stitches-input').value)||0,
+    need:parseInt(document.getElementById('b-need-input').value)||1,have:0});
+  resetPipelineB();renderB();
+}
+function resetPipelineB(){
+  bSel=null;bHL=-1;
+  document.getElementById('b-search').value='';
+  document.getElementById('b-stitches-input').value='';
+  document.getElementById('b-need-input').value='';
+  setPStep(1);
+  setTimeout(function(){document.getElementById('b-search').focus()},50);
+}
+
+buildStateButtons('b-states',function(s){
+  if(s==='few')bItems=PRESET_FEW.slice();else if(s==='many')bItems=PRESET_MANY.slice();else bItems=[];
+  renderB();
+});
+
+// ═══════════════════════════════════════════════════════════
+// VARIANT C
+// ═══════════════════════════════════════════════════════════
+var cItems = PRESET_FEW.slice(), cHL = -1, cSel = null;
+
+function renderC() {
+  var tbody = document.getElementById('c-tbody');
+  var ts=0,tn=0;
+  tbody.textContent='';
+
+  // Add row first
+  var addTr = document.createElement('tr');
+  addTr.className = 'add-row-c';
+  addTr.innerHTML = '<td><div class="code-input-wrap"><input class="table-input" type="text" id="c-code-input" placeholder="Type code or name..." autocomplete="off" style="width:100%"><div class="table-autocomplete" id="c-dropdown"></div></div></td>'
+    + '<td><input class="table-input" type="number" id="c-st-input" placeholder="—" min="0" style="width:70px" disabled></td>'
+    + '<td class="arrow-cell" style="color:var(--color-border)">→</td>'
+    + '<td><input class="table-input" type="number" id="c-nd-input" placeholder="—" min="0" style="width:56px" disabled></td>'
+    + '<td><input class="table-input" type="number" id="c-hv-input" placeholder="—" min="0" style="width:56px" disabled></td>'
+    + '<td></td><td></td>';
+  tbody.appendChild(addTr);
+
+  cItems.forEach(function(item){
+    ts+=item.stitches;tn+=item.need;
+    var tr=document.createElement('tr');
+
+    var tdC=document.createElement('td');
+    var dv=document.createElement('div');dv.className='cell-colour';
+    var sw=document.createElement('div');sw.className=swatchClass(item.hex);sw.style.background=item.hex;sw.style.cssText+='width:16px;height:16px;border-radius:2px';dv.appendChild(sw);
+    var cd=document.createElement('span');cd.className='tc-code';cd.textContent='DMC '+item.code;dv.appendChild(cd);
+    var nm=document.createElement('span');nm.style.cssText='color:var(--color-text-muted);font-size:var(--text-xs)';nm.textContent=' — '+item.name;dv.appendChild(nm);
+    tdC.appendChild(dv);tr.appendChild(tdC);
+
+    var tdSt=document.createElement('td');
+    var ec1=document.createElement('span');ec1.className='editable-cell';ec1.tabIndex=0;ec1.title='Click to edit';ec1.textContent=item.stitches.toLocaleString();tdSt.appendChild(ec1);tr.appendChild(tdSt);
+
+    var tdAr=document.createElement('td');tdAr.className='arrow-cell';tdAr.textContent='→';tr.appendChild(tdAr);
+
+    var tdNd=document.createElement('td');
+    var ec2=document.createElement('span');ec2.className='editable-cell';ec2.tabIndex=0;ec2.title='Click to edit';ec2.textContent=item.need;tdNd.appendChild(ec2);
+    var sk=document.createElement('span');sk.style.cssText='font-size:var(--text-xs);color:var(--color-text-subtle);margin-left:2px';sk.textContent='sk';tdNd.appendChild(sk);tr.appendChild(tdNd);
+
+    var tdHv=document.createElement('td');
+    var ec3=document.createElement('span');ec3.className='editable-cell';ec3.tabIndex=0;ec3.title='Click to edit';ec3.textContent=item.have;if(item.have>=item.need)ec3.style.color='var(--color-success)';tdHv.appendChild(ec3);tr.appendChild(tdHv);
+
+    var tdSi=document.createElement('td');tdSi.innerHTML=statusHtml(item.need,item.have);tr.appendChild(tdSi);
+
+    var tdDel=document.createElement('td');tdDel.className='delete-cell';
+    var db=document.createElement('button');db.className='delete-btn-c';db.title='Remove';db.textContent='✕';
+    db.addEventListener('click',function(){cItems=cItems.filter(function(x){return x.code!==item.code});renderC()});
+    tdDel.appendChild(db);tr.appendChild(tdDel);
+
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('c-count').textContent='('+cItems.length+' colour'+(cItems.length!==1?'s':'')+')';
+  document.getElementById('c-stitches').textContent=ts.toLocaleString()+' stitches total';
+  document.getElementById('c-total-colours').textContent=cItems.length;
+  document.getElementById('c-total-skeins').textContent=tn;
+
+  // Rebind events on new inputs
+  var ci=document.getElementById('c-code-input');
+  if(ci){
+    ci.addEventListener('input',function(){showCDropdown(this.value)});
+    ci.addEventListener('keydown',function(e){
+      var dd=document.getElementById('c-dropdown');var items=dd.querySelectorAll('.autocomplete-item');
+      if(e.key==='ArrowDown'){e.preventDefault();cHL=Math.min(cHL+1,items.length-1);while(cHL<items.length&&items[cHL]&&items[cHL].disabled)cHL++;items.forEach(function(el,i){el.classList.toggle('highlighted',i===cHL)})}
+      else if(e.key==='ArrowUp'){e.preventDefault();cHL=Math.max(cHL-1,0);while(cHL>=0&&items[cHL]&&items[cHL].disabled)cHL--;items.forEach(function(el,i){el.classList.toggle('highlighted',i===cHL)})}
+      else if(e.key==='Enter'){e.preventDefault();if(cHL>=0&&items[cHL]&&!items[cHL].disabled)items[cHL].click()}
+      else if(e.key==='Escape'){dd.classList.remove('open');cHL=-1}
+    });
+  }
+  bindCFields();
+}
+
+function showCDropdown(q){
+  var dd=document.getElementById('c-dropdown');
+  var ex=cItems.map(function(i){return i.code});
+  var res=filterDMC(q);
+  if(!q.trim()){dd.classList.remove('open');return}
+  dd.textContent='';
+  dd.appendChild(buildDropdownItems(res,ex,selectC,cHL));
+  dd.classList.add('open');
+}
+function selectC(code){
+  var c=DMC.filter(function(x){return x.code===code})[0];
+  if(!c)return;
+  cSel=c;
+  var ci=document.getElementById('c-code-input');
+  ci.value='DMC '+c.code;ci.style.fontWeight='600';
+  document.getElementById('c-dropdown').classList.remove('open');cHL=-1;
+  var si=document.getElementById('c-st-input');si.disabled=false;si.placeholder='0';
+  var ni=document.getElementById('c-nd-input');ni.disabled=false;ni.placeholder='1';
+  var hi=document.getElementById('c-hv-input');hi.disabled=false;hi.placeholder='0';
+  setTimeout(function(){si.focus()},50);
+}
+
+function bindCFields(){
+  var si=document.getElementById('c-st-input');
+  var ni=document.getElementById('c-nd-input');
+  var hi=document.getElementById('c-hv-input');
+  if(!si)return;
+  si.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){e.preventDefault();ni.focus()}
+    else if(e.key==='Escape')resetAddC();
+  });
+  ni.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){e.preventDefault();hi.focus()}
+    else if(e.key==='Escape')resetAddC();
+  });
+  hi.addEventListener('keydown',function(e){
+    if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();addItemC()}
+    else if(e.key==='Escape')resetAddC();
+  });
+}
+
+function addItemC(){
+  if(!cSel)return;
+  cItems.unshift({code:cSel.code,name:cSel.name,hex:cSel.hex,
+    stitches:parseInt(document.getElementById('c-st-input').value)||0,
+    need:parseInt(document.getElementById('c-nd-input').value)||1,
+    have:parseInt(document.getElementById('c-hv-input').value)||0});
+  cSel=null;cHL=-1;
+  renderC();
+  setTimeout(function(){var ci=document.getElementById('c-code-input');if(ci)ci.focus()},50);
+}
+function resetAddC(){
+  cSel=null;cHL=-1;renderC();
+}
+
+buildStateButtons('c-states',function(s){
+  if(s==='few')cItems=PRESET_FEW.slice();else if(s==='many')cItems=PRESET_MANY.slice();else cItems=[];
+  renderC();
+});
+
+// ─── Init ───
+renderA();renderB();renderC();
+</script>
+</body>
+</html>

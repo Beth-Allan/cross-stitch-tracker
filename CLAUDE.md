@@ -27,17 +27,17 @@ None — ready for v1.3.
 
 ### Done This Session
 
-- Supply-adding UX sketch exploration (2 sketches, 5 variants)
-  - Sketch 001: 3 variants (Sticky Add Row, Continuous Flow, Smart Table)
-  - Sketch 002: Synthesis + Ultra-Compact refinement
-  - Direction chosen: table layout + auto-calc need + all fields visible + no "have" in add flow
-  - **BLOCKING BUG**: autocomplete dropdown renders behind data rows in both sketch 002 variants (z-index stacking context issue in HTML table — attempted fix didn't resolve)
+- Fixed sketch 002 dropdown z-index bug (portal pattern: `position: fixed` + `getBoundingClientRect()`)
+- Fixed add flow: Need defaults to 1 on colour selection, Enter on stitches adds row directly
+- Added proportional SVG donut status indicators (have/need ratio)
+- Added "Status" column header
+- Replaced placeholder skein calc with real formula (2 strands, 14ct, over 1, 20% waste)
+- Winner chosen: **Synthesis: Table + Auto-Calc** (sketch 002, variant 1)
+- Sketch wrap-up complete: skill at `.claude/skills/sketch-findings-cross-stitch-tracker/`
 
 ### Next Up
 
-1. **Fix sketch 002 dropdown z-index bug** — see handoff prompt in `.planning/notes/sketch-002-handoff.md`
-2. Finalize sketch 002 winner, then `/gsd-sketch-wrap-up`
-3. `/gsd-new-milestone` — start v1.3 Motivation & Planning
+1. `/gsd-new-milestone` — start v1.3 Motivation & Planning
 
 ### Backlog
 
@@ -127,6 +127,7 @@ Conventions auto-load via `.claude/rules/` glob patterns when touching relevant 
 - **Auth/sessions** — `auth-patterns.md`, `server-actions.md`
 - **Forms/validation** — `form-patterns.md`, `server-actions.md`
 - **Feature UI** — `.planning/DESIGN-REFERENCE.md` + `product-plan/sections/`
+- **Sketch findings** (supply data entry design decisions, CSS patterns, visual direction) — `.claude/skills/sketch-findings-cross-stitch-tracker/`
 
 ### Core rules (always apply)
 

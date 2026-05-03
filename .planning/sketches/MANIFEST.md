@@ -14,5 +14,5 @@ Quick, efficient, spreadsheet-like supply entry. The user transcribes colour lis
 
 | # | Name | Design Question | Winner | Tags |
 |---|------|----------------|--------|------|
-| 001 | supply-add-interaction | Which interaction model makes transcribing a 30+ colour list feel fast and trackable? | null | supply, data-entry, keyboard, ux |
-| 002 | supply-add-synthesis | Does the synthesized table + auto-calc feel right for transcribing? | null | supply, data-entry, table, synthesis |
+| 001 | supply-add-interaction | Which interaction model makes transcribing a 30+ colour list feel fast and trackable? | None (exploratory) | supply, data-entry, keyboard, ux |
+| 002 | supply-add-synthesis | Does the synthesized table + auto-calc feel right for transcribing? | Synthesis: Table + Auto-Calc | supply, data-entry, table, synthesis |

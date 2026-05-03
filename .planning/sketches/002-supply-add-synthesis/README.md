@@ -2,7 +2,7 @@
 sketch: 002
 name: supply-add-synthesis
 question: "Does the synthesized table layout with auto-calc need feel right for transcribing colour lists?"
-winner: null
+winner: "Synthesis: Table + Auto-Calc"
 tags: [supply, data-entry, keyboard, table, synthesis]
 ---
 
