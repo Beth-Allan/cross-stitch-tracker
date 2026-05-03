@@ -90,8 +90,10 @@ export function MainDashboard({ data, startNextCards, imageUrls }: MainDashboard
       <SpotlightCard
         project={data.spotlightProject}
         imageUrl={
-          imageUrls[data.spotlightProject?.coverImageUrl ?? ""] ??
-          imageUrls[data.spotlightProject?.coverThumbnailUrl ?? ""] ??
+          (data.spotlightProject?.coverThumbnailUrl &&
+            imageUrls[data.spotlightProject.coverThumbnailUrl]) ??
+          (data.spotlightProject?.coverImageUrl &&
+            imageUrls[data.spotlightProject.coverImageUrl]) ??
           null
         }
       />

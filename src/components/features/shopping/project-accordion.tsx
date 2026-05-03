@@ -133,6 +133,7 @@ export function ProjectAccordion({
                     height={40}
                     className="shrink-0 rounded object-cover"
                     loading="lazy"
+                    unoptimized
                   />
                 ) : (
                   <div className="bg-muted h-10 w-10 shrink-0 rounded" />

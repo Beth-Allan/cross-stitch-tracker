@@ -49,14 +49,14 @@ function makeRow(overrides: Partial<FabricRequirementRow> = {}): FabricRequireme
 describe("FabricRequirementsTab", () => {
   it("renders project rows with fabric size requirements", () => {
     const rows = [makeRow()];
-    render(<FabricRequirementsTab rows={rows} />);
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
 
     expect(screen.getByText("Test Pattern")).toBeInTheDocument();
     expect(screen.getByText("200 x 300 stitches")).toBeInTheDocument();
   });
 
   it("shows info banner about 3 inch margins", () => {
-    render(<FabricRequirementsTab rows={[makeRow()]} />);
+    render(<FabricRequirementsTab rows={[makeRow()]} imageUrls={{}} />);
 
     expect(screen.getByText(/3" margins/)).toBeInTheDocument();
     expect(screen.getByText(/framing allowance/)).toBeInTheDocument();
@@ -78,7 +78,7 @@ describe("FabricRequirementsTab", () => {
         },
       }),
     ];
-    render(<FabricRequirementsTab rows={rows} />);
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
 
     // "Needs Fabric" is active so only unassigned projects show
     expect(screen.getByText("Test Pattern")).toBeInTheDocument();
@@ -101,7 +101,7 @@ describe("FabricRequirementsTab", () => {
         },
       }),
     ];
-    render(<FabricRequirementsTab rows={rows} />);
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
 
     fireEvent.click(screen.getByText("All Projects"));
 
@@ -123,7 +123,7 @@ describe("FabricRequirementsTab", () => {
       }),
     ];
     // Show "All Projects" to see assigned ones
-    render(<FabricRequirementsTab rows={rows} />);
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
     fireEvent.click(screen.getByText("All Projects"));
 
     const icon = screen.getByTestId("status-icon-chart-1");
@@ -147,7 +147,7 @@ describe("FabricRequirementsTab", () => {
         },
       }),
     ];
-    render(<FabricRequirementsTab rows={rows} />);
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
     fireEvent.click(screen.getByText("All Projects"));
 
     const icon = screen.getByTestId("status-icon-chart-1");
@@ -156,7 +156,7 @@ describe("FabricRequirementsTab", () => {
 
   it("shows Package icon (stone) when no fabric", () => {
     const rows = [makeRow({ assignedFabric: null })];
-    render(<FabricRequirementsTab rows={rows} />);
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
 
     const icon = screen.getByTestId("status-icon-chart-1");
     expect(icon.getAttribute("class")).toContain("text-stone");
@@ -179,7 +179,7 @@ describe("FabricRequirementsTab", () => {
         ],
       }),
     ];
-    render(<FabricRequirementsTab rows={rows} />);
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
 
     // Click to expand
     fireEvent.click(screen.getByText("Test Pattern"));
@@ -207,7 +207,7 @@ describe("FabricRequirementsTab", () => {
         ],
       }),
     ];
-    render(<FabricRequirementsTab rows={rows} />);
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
 
     // Click to expand
     fireEvent.click(screen.getByText("Test Pattern"));
@@ -240,7 +240,7 @@ describe("FabricRequirementsTab", () => {
         ],
       }),
     ];
-    render(<FabricRequirementsTab rows={rows} />);
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
 
     fireEvent.click(screen.getByText("Test Pattern"));
     fireEvent.click(screen.getByText("Assign"));
@@ -251,14 +251,36 @@ describe("FabricRequirementsTab", () => {
     });
   });
 
+  it("renders chart thumbnail when imageUrls provides a URL", () => {
+    const rows = [makeRow({ coverThumbnailUrl: "thumb-key-123" })];
+    render(
+      <FabricRequirementsTab
+        rows={rows}
+        imageUrls={{ "thumb-key-123": "https://example.com/thumb.jpg" }}
+      />,
+    );
+
+    const img = screen.getByRole("img", { name: "Test Pattern" });
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute("src", "https://example.com/thumb.jpg");
+    expect(screen.queryByTestId("status-icon-chart-1")).not.toBeInTheDocument();
+  });
+
+  it("does not render thumbnail when no image URL available", () => {
+    const rows = [makeRow({ coverThumbnailUrl: null })];
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
+
+    expect(screen.queryByRole("img", { name: "Test Pattern" })).not.toBeInTheDocument();
+  });
+
   it("renders empty state", () => {
-    render(<FabricRequirementsTab rows={[]} />);
+    render(<FabricRequirementsTab rows={[]} imageUrls={{}} />);
 
     expect(screen.getByText(/All projects have fabric assigned/)).toBeInTheDocument();
   });
 
   it("shows formula hint text", () => {
-    render(<FabricRequirementsTab rows={[makeRow()]} />);
+    render(<FabricRequirementsTab rows={[makeRow()]} imageUrls={{}} />);
 
     expect(screen.getByText(/Formula:/)).toBeInTheDocument();
   });
