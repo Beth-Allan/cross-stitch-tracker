@@ -27,14 +27,17 @@ None — ready for v1.3.
 
 ### Done This Session
 
-- UX quick fixes merged (PR #29): pluralization, fabric thumbnails, spotlight card, shopping cart thumbnails
-- Skein calculator fix merged (PR #25)
-- Cleaned up local branches
+- Supply-adding UX sketch exploration (2 sketches, 5 variants)
+  - Sketch 001: 3 variants (Sticky Add Row, Continuous Flow, Smart Table)
+  - Sketch 002: Synthesis + Ultra-Compact refinement
+  - Direction chosen: table layout + auto-calc need + all fields visible + no "have" in add flow
+  - **BLOCKING BUG**: autocomplete dropdown renders behind data rows in both sketch 002 variants (z-index stacking context issue in HTML table — attempted fix didn't resolve)
 
 ### Next Up
 
-1. Supply adding UX overhaul — design exploration for the workflow described in `.planning/notes/ux-bug-triage-2026-05-03.md` (Large Work section)
-2. `/gsd-new-milestone` — start v1.3 Motivation & Planning
+1. **Fix sketch 002 dropdown z-index bug** — see handoff prompt in `.planning/notes/sketch-002-handoff.md`
+2. Finalize sketch 002 winner, then `/gsd-sketch-wrap-up`
+3. `/gsd-new-milestone` — start v1.3 Motivation & Planning
 
 ### Backlog
 
