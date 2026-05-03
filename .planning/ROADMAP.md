@@ -79,7 +79,7 @@ Full details: `milestones/v1.2-ROADMAP.md`
   5. User can delete a supply row via a hover-revealed button without a confirmation modal
 **Plans**: 6 plans
 Plans:
-- [ ] 10-01-PLAN.md -- Types, adapter interface, StatusDonut, EditableNumber
+- [x] 10-01-PLAN.md -- Types, adapter interface, StatusDonut, EditableNumber
 - [ ] 10-02-PLAN.md -- PortalAutocomplete, SegmentedTypeToggle, InlineCreateDialog
 - [ ] 10-03-PLAN.md -- DataRow, SectionDivider, Footer, slideIn animation
 - [ ] 10-04-PLAN.md -- useSupplyTable hook, SupplyTableAddRow
@@ -155,7 +155,7 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 8. Session Logging & Pattern Dive | v1.2 | 11/11 | Complete | 2026-04-18 |
 | 9. Dashboards & Shopping Cart | v1.2 | 9/9 | Complete | 2026-04-18 |
 | 9.1. Image Optimization on Upload | v1.2 | 2/2 | Complete | 2026-04-26 |
-| 10. Unified Supply Table | v1.3 | 0/6 | Planned | - |
+| 10. Unified Supply Table | v1.3 | 1/6 | In Progress|  |
 | 11. Supply Table on Project Detail | v1.3 | 0/? | Not started | - |
 | 12. Merged Form | v1.3 | 0/? | Not started | - |
 | 13. Supply Takeover | v1.3 | 0/? | Not started | - |
