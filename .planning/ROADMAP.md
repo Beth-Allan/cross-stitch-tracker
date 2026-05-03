@@ -8,109 +8,131 @@ Design components from `product-plan/sections/` are imported and adapted as each
 
 ## Milestones
 
-- ✅ **v1.0 MVP — "Replace Notion"** — Phases 1-4 (shipped 2026-04-11)
-- ✅ **v1.1 Browse & Organize** — Phases 5-7 (shipped 2026-04-16)
-- ✅ **v1.2 Track & Measure** — Phases 8-9 (shipped 2026-04-20)
-- 📋 **v1.3 Motivation & Planning** — Phases 10-11 (planned)
+- ✅ **v1.0 MVP -- "Replace Notion"** -- Phases 1-4 (shipped 2026-04-11)
+- ✅ **v1.1 Browse & Organize** -- Phases 5-7 (shipped 2026-04-16)
+- ✅ **v1.2 Track & Measure** -- Phases 8-9.1 (shipped 2026-04-20)
+- 🚧 **v1.3 Form & Supply Overhaul** -- Phases 10-14 (in progress)
+- 📋 **v1.4 Motivation & Planning** -- Phases TBD (planned)
 
 ## Phases
 
 <details>
-<summary>✅ v1.0 MVP (Phases 1-4) — SHIPPED 2026-04-11</summary>
+<summary>✅ v1.0 MVP (Phases 1-4) -- SHIPPED 2026-04-11</summary>
 
-- [x] Phase 1: Foundation & Infrastructure (3/3 plans) — completed 2026-03-28
-- [x] Phase 2: Core Project Management (5/5 plans) — completed 2026-04-06
-- [x] Phase 3: Designer & Genre Pages (5/5 plans) — completed 2026-04-08
-- [x] Phase 4: Supplies & Fabric (10/10 plans) — completed 2026-04-10
+- [x] Phase 1: Foundation & Infrastructure (3/3 plans) -- completed 2026-03-28
+- [x] Phase 2: Core Project Management (5/5 plans) -- completed 2026-04-06
+- [x] Phase 3: Designer & Genre Pages (5/5 plans) -- completed 2026-04-08
+- [x] Phase 4: Supplies & Fabric (10/10 plans) -- completed 2026-04-10
 
 Full details: `milestones/v1.0-ROADMAP.md`
 
 </details>
 
 <details>
-<summary>✅ v1.1 Browse & Organize (Phases 5-7) — SHIPPED 2026-04-16</summary>
+<summary>✅ v1.1 Browse & Organize (Phases 5-7) -- SHIPPED 2026-04-16</summary>
 
-- [x] Phase 5: Foundation & Quick Wins (8/8 plans) — completed 2026-04-13
-- [x] Phase 6: Gallery Cards & View Modes (4/4 plans) — completed 2026-04-15
-- [x] Phase 7: Project Detail Experience (8/8 plans) — completed 2026-04-16
+- [x] Phase 5: Foundation & Quick Wins (8/8 plans) -- completed 2026-04-13
+- [x] Phase 6: Gallery Cards & View Modes (4/4 plans) -- completed 2026-04-15
+- [x] Phase 7: Project Detail Experience (8/8 plans) -- completed 2026-04-16
 
 Full details: `milestones/v1.1-ROADMAP.md`
 
 </details>
 
 <details>
-<summary>✅ v1.2 Track & Measure (Phases 8-9) — SHIPPED 2026-04-20</summary>
+<summary>✅ v1.2 Track & Measure (Phases 8-9.1) -- SHIPPED 2026-04-20</summary>
 
-- [x] Phase 8: Session Logging & Pattern Dive (11/11 plans) — completed 2026-04-18
-- [x] Phase 9: Dashboards & Shopping Cart (9/9 plans) — completed 2026-04-18
+- [x] Phase 8: Session Logging & Pattern Dive (11/11 plans) -- completed 2026-04-18
+- [x] Phase 9: Dashboards & Shopping Cart (9/9 plans) -- completed 2026-04-18
+- [x] Phase 9.1: Image Optimization on Upload (2/2 plans) -- completed 2026-04-26
 
 Full details: `milestones/v1.2-ROADMAP.md`
 
 </details>
 
-### 🔧 Inserted Phase
+### 🚧 v1.3 Form & Supply Overhaul (In Progress)
 
-- [ ] **Phase 9.1: Image Optimization on Upload** (INSERTED) - WebP conversion for covers/session photos via Sharp
+**Milestone Goal:** Replace the chart creation/edit form and supply-adding experience with a fast, keyboard-driven single-page flow. Unified supply table with grouped sections, persistent add row, and portal autocomplete. Merged form with supply takeover mode. Reusable on project detail.
 
-### 📋 v1.3 Motivation & Planning
+- [ ] **Phase 10: Unified Supply Table** - Shared supply table component with grouped sections, persistent add row, keyboard-first entry, portal autocomplete, SVG donuts, and inline editing
+- [ ] **Phase 11: Supply Table on Project Detail** - Wire unified table into project detail Supplies tab with server-action persistence
+- [ ] **Phase 12: Merged Form** - Single-page chart+project creation form with pattern type cards, required dot indicators, sticky save bar, and digital working copy upload
+- [ ] **Phase 13: Supply Takeover** - Form-to-supply transition with sticky summary bar, fabric assignment, skein calculator card, and two-phase save
+- [ ] **Phase 14: Edit Mode & Cleanup** - Full-page edit route using merged form layout, removal of all deprecated components
 
-- [ ] **Phase 10: Advanced Stats** - Year in Review, monthly charts, stitching calendar
-- [ ] **Phase 11: Goals & Scheduling** - Goal setting, rotation management, achievements
+### 📋 v1.4 Motivation & Planning (Planned)
+
+- [ ] **Phase 15: Advanced Stats** - Year in Review, monthly charts, stitching calendar
+- [ ] **Phase 16: Goals & Scheduling** - Goal setting, rotation management, achievements
 
 ## Phase Details
 
-### Phase 9.1: Image Optimization on Upload (INSERTED)
-**Goal**: Convert display images (covers, session photos) to optimized WebP on upload, reducing storage ~90% and bandwidth ~12x per gallery page
-**Depends on**: Phase 4 (upload pipeline exists)
-**Requirements**: See `.planning/research/image-optimization-on-upload.md`
+### Phase 10: Unified Supply Table
+**Goal**: Users can view and add supplies in a fast, keyboard-driven table with grouped sections and proportional status indicators
+**Depends on**: Nothing (first phase of v1.3 -- foundational component)
+**Requirements**: SUPTBL-01, SUPTBL-02, SUPTBL-03, SUPTBL-04, SUPENT-01, SUPENT-02, SUPENT-03, SUPENT-04
 **Success Criteria** (what must be TRUE):
-  1. Cover uploads are converted to 1200px WebP q80 and raw original deleted from R2
-  2. Session photo uploads are converted to optimized WebP
-  3. Existing thumbnail generation continues to work
-  4. Working copy files (PDFs, .saga, .oxs, .xsd) are never modified
-  5. Upload UX is unchanged (no visible delay or behavior change)
-**Plans**: 2 plans
-Plans:
-- [x] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
-- [x] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
-**UI hint**: no
-
-### Phase 10: Advanced Stats
-**Goal**: Comprehensive statistical views that celebrate stitching progress over time
-**Depends on**: Phase 9 (needs session data)
-**Requirements**: TBD (v1.3 milestone)
-**Success Criteria** (what must be TRUE):
-  1. Monthly stitch bar charts visualize activity over time
-  2. Stitching calendar shows daily activity by project in a monthly grid
-  3. Year in Review tab shows 8 stat sections with year selector
-**Plans**: 2 plans
-Plans:
-- [x] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
-- [x] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
+  1. User sees supplies organized in Thread, Beads, and Specialty sections with divider headers showing per-section counts
+  2. User can type a supply code in the persistent add row, see portal autocomplete results (with already-added items disabled), select via keyboard, fill quantity, and commit with Enter -- repeating without re-selecting supply type
+  3. User sees thread need auto-calculated from stitch count with a visual indicator, and can override any need/have/stitches value by clicking the cell inline
+  4. User sees proportional SVG donut rings on each row showing have/need ratio
+  5. User can delete a supply row via a hover-revealed button without a confirmation modal
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 11: Goals & Scheduling
-**Goal**: Users can set goals with milestone targets and deadlines, manage rotations, and earn achievements
-**Depends on**: Phase 9 (goals reference session data and progress)
-**Requirements**: TBD (v1.3 milestone)
+### Phase 11: Supply Table on Project Detail
+**Goal**: Users can manage supplies on an existing project's detail page using the same unified table -- view and add in one surface
+**Depends on**: Phase 10
+**Requirements**: DETAIL-01, DETAIL-02
 **Success Criteria** (what must be TRUE):
-  1. User can set project-specific and global goals with milestone targets, frequency goals, and deadlines
-  2. User can create scheduling plans for project start dates, recurring stitching days, and seasonal focus
-  3. Multi-style rotation management available
-  4. Achievement trophy case tracks milestones, streaks, and records
-**Plans**: 2 plans
-Plans:
-- [x] 09.1-01-PLAN.md — Cover image optimization (processAndStoreImage + confirmUpload refactor)
-- [ ] 09.1-02-PLAN.md — Session photo optimization (createSession + updateSession integration)
+  1. User sees the unified supply table (grouped sections, donuts, inline editing) on the project detail Supplies tab, replacing the old supply section
+  2. User can add missed supplies via the persistent add row on project detail without navigating away, with changes persisted immediately via server actions
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 12: Merged Form
+**Goal**: Users can create a chart+project through a single continuous page with clear field grouping and a polished form experience
+**Depends on**: Nothing (independent of Phases 10-11; composes with Phase 13)
+**Requirements**: FORM-01, FORM-02, FORM-03, FORM-04, FORM-05
+**Success Criteria** (what must be TRUE):
+  1. User fills out chart+project fields on a single scrolling page (720px max-width) with field groups separated by dividers -- no chart/project split
+  2. User selects pattern type via a 2x2 card grid and sees relevant sub-fields expand based on selection
+  3. User sees green dot indicators on required fields (Chart Name, Status) and a sticky save bar at the bottom with Save Draft and Create buttons
+  4. User can upload a digital working copy in the Workflow section of the form
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 13: Supply Takeover
+**Goal**: Users can transition from form entry into a dedicated supply-adding mode that fills the page, with fabric assignment feeding the skein calculator
+**Depends on**: Phase 10, Phase 12
+**Requirements**: TAKE-01, TAKE-02, TAKE-03, TAKE-04
+**Success Criteria** (what must be TRUE):
+  1. User reaches the milestone marker in the form and transitions to supply mode -- the form collapses to a sticky summary bar and the supply table fills the page
+  2. User can return to form details via a "Details" link in the summary bar with all form state preserved (no data loss)
+  3. User can optionally assign fabric as the first step in supply takeover, which auto-populates the skein calculator's fabric count default
+  4. User can configure skein calculation parameters (Strands Over, Fabric Count, Waste %) via a styled card with segmented controls in the supply area
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 14: Edit Mode & Cleanup
+**Goal**: Users can edit existing charts/projects through the same merged form layout, and all deprecated components are removed
+**Depends on**: Phase 12, Phase 13
+**Requirements**: EDIT-01, EDIT-02, CLEAN-01
+**Success Criteria** (what must be TRUE):
+  1. User edits an existing chart/project via a full-page merged form (same layout as creation) -- not a modal
+  2. User can navigate to the edit form from the project detail page and from the gallery card kebab menu
+  3. Old chart form, old supply tab, old supply row components, and the edit modal are fully removed from the codebase
+**Plans**: TBD
 **UI hint**: yes
 
 ## Execution Order
 
-- v1.0: 1 → 2 → 3 → 4
-- v1.1: 5 → 6 → 7
-- v1.2: 8 → 9
-- inserted: 9.1
-- v1.3: 10 → 11
+- v1.0: 1 -> 2 -> 3 -> 4
+- v1.1: 5 -> 6 -> 7
+- v1.2: 8 -> 9 -> 9.1
+- v1.3: 10 -> 11 -> 12 -> 13 -> 14
+
+Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoretically execute in parallel, but is sequenced after Phase 11 to keep a single execution stream. Phase 13 requires both Phase 10 and Phase 12.
 
 ## Progress
 
@@ -125,6 +147,9 @@ Plans:
 | 7. Project Detail Experience | v1.1 | 8/8 | Complete | 2026-04-16 |
 | 8. Session Logging & Pattern Dive | v1.2 | 11/11 | Complete | 2026-04-18 |
 | 9. Dashboards & Shopping Cart | v1.2 | 9/9 | Complete | 2026-04-18 |
-| 9.1. Image Optimization on Upload | inserted | 0/2 | Planned | - |
-| 10. Advanced Stats | v1.3 | 0/TBD | Not started | - |
-| 11. Goals & Scheduling | v1.3 | 0/TBD | Not started | - |
+| 9.1. Image Optimization on Upload | v1.2 | 2/2 | Complete | 2026-04-26 |
+| 10. Unified Supply Table | v1.3 | 0/? | Not started | - |
+| 11. Supply Table on Project Detail | v1.3 | 0/? | Not started | - |
+| 12. Merged Form | v1.3 | 0/? | Not started | - |
+| 13. Supply Takeover | v1.3 | 0/? | Not started | - |
+| 14. Edit Mode & Cleanup | v1.3 | 0/? | Not started | - |

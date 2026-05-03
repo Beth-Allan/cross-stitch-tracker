@@ -75,7 +75,7 @@ Explicitly excluded from v1.3. Documented to prevent scope creep.
 | Auto-save | Explicit save via sticky bar; auto-save complicates error recovery |
 | "Have" quantity in add row | Adding is for transcription from pattern; "have" is a separate shopping workflow |
 | Tabs for supply types | All types must be visible in one scrolling surface per sketch findings |
-| Progressive reveal / step indicators | Rejected in sketch 001 — too guided for bulk data entry |
+| Progressive reveal / step indicators | Rejected in sketch 001 -- too guided for bulk data entry |
 | Supply takeover in edit mode | Edit form uses merged layout; supply management for existing projects lives on project detail Supplies tab |
 | Mobile-specific supply table layout | Desktop-first for v1.3; mobile supply entry continues via existing patterns until future milestone |
 
@@ -85,34 +85,34 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SUPTBL-01 | — | Pending |
-| SUPTBL-02 | — | Pending |
-| SUPTBL-03 | — | Pending |
-| SUPTBL-04 | — | Pending |
-| SUPENT-01 | — | Pending |
-| SUPENT-02 | — | Pending |
-| SUPENT-03 | — | Pending |
-| SUPENT-04 | — | Pending |
-| FORM-01 | — | Pending |
-| FORM-02 | — | Pending |
-| FORM-03 | — | Pending |
-| FORM-04 | — | Pending |
-| FORM-05 | — | Pending |
-| TAKE-01 | — | Pending |
-| TAKE-02 | — | Pending |
-| TAKE-03 | — | Pending |
-| TAKE-04 | — | Pending |
-| DETAIL-01 | — | Pending |
-| DETAIL-02 | — | Pending |
-| EDIT-01 | — | Pending |
-| EDIT-02 | — | Pending |
-| CLEAN-01 | — | Pending |
+| SUPTBL-01 | Phase 10 | Pending |
+| SUPTBL-02 | Phase 10 | Pending |
+| SUPTBL-03 | Phase 10 | Pending |
+| SUPTBL-04 | Phase 10 | Pending |
+| SUPENT-01 | Phase 10 | Pending |
+| SUPENT-02 | Phase 10 | Pending |
+| SUPENT-03 | Phase 10 | Pending |
+| SUPENT-04 | Phase 10 | Pending |
+| FORM-01 | Phase 12 | Pending |
+| FORM-02 | Phase 12 | Pending |
+| FORM-03 | Phase 12 | Pending |
+| FORM-04 | Phase 12 | Pending |
+| FORM-05 | Phase 12 | Pending |
+| TAKE-01 | Phase 13 | Pending |
+| TAKE-02 | Phase 13 | Pending |
+| TAKE-03 | Phase 13 | Pending |
+| TAKE-04 | Phase 13 | Pending |
+| DETAIL-01 | Phase 11 | Pending |
+| DETAIL-02 | Phase 11 | Pending |
+| EDIT-01 | Phase 14 | Pending |
+| EDIT-02 | Phase 14 | Pending |
+| CLEAN-01 | Phase 14 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22 ⚠️
+- Mapped to phases: 22
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-03*
-*Last updated: 2026-05-03 after initial definition*
+*Last updated: 2026-05-03 after roadmap creation*
