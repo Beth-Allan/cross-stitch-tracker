@@ -428,6 +428,67 @@
   /* Supply section in takeover gets wider */
   .vd-page.supply-mode { max-width: 900px; }
 
+  /* Calculator panel */
+  .calc-panel {
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
+    margin-bottom: var(--space-5);
+    background: var(--color-surface);
+  }
+  .calc-panel-header {
+    display: flex; align-items: center; gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+  .calc-panel-title {
+    font-size: var(--text-sm); font-weight: 600;
+  }
+  .calc-panel-hint {
+    font-size: var(--text-xs); color: var(--color-text-muted); margin-left: auto;
+  }
+  .calc-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: var(--space-4);
+    align-items: end;
+  }
+  .calc-field-label {
+    display: block; font-size: 11px; font-weight: 500;
+    color: var(--color-text-muted); text-transform: uppercase;
+    letter-spacing: 0.04em; margin-bottom: var(--space-1);
+  }
+  /* Segmented control */
+  .seg-control {
+    display: flex; border: 1px solid var(--color-border);
+    border-radius: var(--radius-md); overflow: hidden;
+  }
+  .seg-btn {
+    flex: 1; padding: 5px 0; text-align: center;
+    font-size: var(--text-sm); font-family: var(--font-sans);
+    border: none; background: var(--color-surface);
+    cursor: pointer; transition: all 0.15s;
+    color: var(--color-text-muted);
+    border-right: 1px solid var(--color-border);
+  }
+  .seg-btn:last-child { border-right: none; }
+  .seg-btn:hover { background: var(--color-surface-hover); color: var(--color-text); }
+  .seg-btn.active {
+    background: var(--color-primary); color: white; font-weight: 500;
+  }
+  .calc-input {
+    width: 100%; border: 1px solid var(--color-border);
+    border-radius: var(--radius-md); padding: 5px 10px;
+    font-size: var(--text-sm); font-family: var(--font-mono);
+    text-align: center; background: var(--color-surface);
+    color: var(--color-text); transition: border-color 0.15s;
+  }
+  .calc-input:focus {
+    outline: none; border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(5,150,105,0.15);
+  }
+  .calc-unit {
+    font-size: 11px; color: var(--color-text-subtle);
+    margin-left: 4px;
+  }
+
   /* ── Sketch Toolbar ── */
   #sketch-tools {
     position: fixed; bottom: 12px; left: 12px; z-index: 9999;
@@ -1251,7 +1312,7 @@
 
         <div class="field-row">
           <div class="field-group">
-            <label class="field-label">Designer<span class="optional">optional</span></label>
+            <label class="field-label">Designer</label>
             <select class="field-input">
               <option value="">—</option>
               <option selected>Ink Circles</option>
@@ -1260,7 +1321,7 @@
             </select>
           </div>
           <div class="field-group">
-            <label class="field-label">Cover Image<span class="optional">optional</span></label>
+            <label class="field-label">Cover Image</label>
             <div class="upload-area" style="height: 38px; border-width: 1px; border-style: solid; flex-direction: row; gap: 8px;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
               <span>Upload</span>
@@ -1269,7 +1330,7 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label">Genres<span class="optional">optional</span></label>
+          <label class="field-label">Genres</label>
           <div class="chip-group">
             <span class="chip selected">Sampler</span>
             <span class="chip">Animals</span>
@@ -1283,22 +1344,22 @@
 
         <div class="field-row-3">
           <div class="field-group">
-            <label class="field-label">Width<span class="optional">optional</span></label>
+            <label class="field-label">Width</label>
             <input type="number" class="field-input" placeholder="stitches" value="280">
           </div>
           <div class="field-group">
-            <label class="field-label">Height<span class="optional">optional</span></label>
+            <label class="field-label">Height</label>
             <input type="number" class="field-input" placeholder="stitches" value="350">
           </div>
           <div class="field-group">
-            <label class="field-label">Stitch Count<span class="optional">optional</span></label>
+            <label class="field-label">Stitch Count</label>
             <input type="number" class="field-input" placeholder="total" value="54800">
           </div>
         </div>
 
         <!-- Pattern type cards -->
         <div class="field-group">
-          <label class="field-label">Pattern Type<span class="optional">optional</span></label>
+          <label class="field-label">Pattern Type</label>
           <div class="pattern-cards">
             <div class="pattern-card" onclick="togglePatternCard(this)">
               <div class="pattern-card-check"></div>
@@ -1339,6 +1400,17 @@
             </div>
           </div>
         </div>
+
+        <!-- Onion skinning toggle (chart property) -->
+        <div class="field-group" style="padding-top: var(--space-3); border-top: 1px solid var(--color-border-light);">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:var(--text-sm);font-weight:500;">Needs onion skinning</div>
+              <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Pattern requires layered tracing setup</div>
+            </div>
+            <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Milestone 1 -->
@@ -1370,7 +1442,7 @@
             </select>
           </div>
           <div class="field-group">
-            <label class="field-label">Storage Location<span class="optional">optional</span></label>
+            <label class="field-label">Storage Location</label>
             <select class="field-input">
               <option value="">—</option>
               <option>Project Drawer A</option>
@@ -1381,7 +1453,7 @@
 
         <div class="field-row">
           <div class="field-group">
-            <label class="field-label">Stitching App<span class="optional">optional</span></label>
+            <label class="field-label">Stitching App</label>
             <select class="field-input">
               <option value="">—</option>
               <option selected>Pattern Keeper</option>
@@ -1389,7 +1461,7 @@
             </select>
           </div>
           <div class="field-group">
-            <label class="field-label">Digital File<span class="optional">optional</span></label>
+            <label class="field-label">Digital File</label>
             <div class="upload-area" style="height: 38px; border-width: 1px; border-style: solid; flex-direction: row; gap: 8px;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
               <span>Upload PDF</span>
@@ -1399,35 +1471,29 @@
 
         <div class="field-row-3">
           <div class="field-group">
-            <label class="field-label">Start Date<span class="optional">optional</span></label>
+            <label class="field-label">Start Date</label>
             <input type="date" class="field-input">
           </div>
           <div class="field-group">
-            <label class="field-label">Finish Date<span class="optional">optional</span></label>
+            <label class="field-label">Finish Date</label>
             <input type="date" class="field-input">
           </div>
           <div class="field-group">
-            <label class="field-label">FFO Date<span class="optional">optional</span></label>
+            <label class="field-label">FFO Date</label>
             <input type="date" class="field-input">
           </div>
         </div>
 
         <div class="field-group">
-          <label class="field-label">Notes<span class="optional">optional</span></label>
+          <label class="field-label">Notes</label>
           <textarea class="field-input" rows="2" placeholder="Anything to remember about this project..."></textarea>
         </div>
 
         <div style="padding-top: var(--space-3); border-top: 1px solid var(--color-border-light);">
-          <div class="toggle-row">
+          <div class="toggle-row" style="border-bottom:none;">
             <div>
               <div class="toggle-label">Want to start next</div>
               <div class="toggle-label-sub">Shows in your "up next" queue</div>
-            </div>
-            <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
-          </div>
-          <div class="toggle-row">
-            <div>
-              <div class="toggle-label">Needs onion skinning</div>
             </div>
             <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
           </div>
@@ -1450,13 +1516,45 @@
         <div class="section-desc">What does this project need?</div>
       </div>
 
-      <!-- Calculator settings bar -->
-      <div class="settings-bar">
-        <label>Strands: <select><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
-        <label>Over: <select><option selected>1</option><option>2</option></select></label>
-        <label>Fabric ct: <input type="number" value="14" style="width:50px"></label>
-        <label>Waste: <input type="number" value="20" style="width:50px">%</label>
-        <span style="font-size:11px; color: var(--color-text-subtle); margin-left: auto;">Feeds auto-calc &#10024;</span>
+      <!-- Skein Calculator Settings -->
+      <div class="calc-panel">
+        <div class="calc-panel-header">
+          <span style="font-size:16px;">&#10024;</span>
+          <span class="calc-panel-title">Skein Calculator</span>
+          <span class="calc-panel-hint">Auto-calculates how many skeins you need</span>
+        </div>
+        <div class="calc-row">
+          <div>
+            <span class="calc-field-label">Strands</span>
+            <div class="seg-control">
+              <button class="seg-btn" onclick="selectSeg(this)">1</button>
+              <button class="seg-btn active" onclick="selectSeg(this)">2</button>
+              <button class="seg-btn" onclick="selectSeg(this)">3</button>
+              <button class="seg-btn" onclick="selectSeg(this)">4</button>
+            </div>
+          </div>
+          <div>
+            <span class="calc-field-label">Over</span>
+            <div class="seg-control">
+              <button class="seg-btn active" onclick="selectSeg(this)">1</button>
+              <button class="seg-btn" onclick="selectSeg(this)">2</button>
+            </div>
+          </div>
+          <div>
+            <span class="calc-field-label">Fabric Count</span>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <input type="number" class="calc-input" value="14">
+              <span class="calc-unit">ct</span>
+            </div>
+          </div>
+          <div>
+            <span class="calc-field-label">Waste</span>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <input type="number" class="calc-input" value="20">
+              <span class="calc-unit">%</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Supply type tabs -->
@@ -1690,6 +1788,13 @@ function exitSupplyMode() {
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 250);
+}
+
+// Segmented control selection
+function selectSeg(btn) {
+  var siblings = btn.parentElement.querySelectorAll('.seg-btn');
+  siblings.forEach(function(s) { s.classList.remove('active'); });
+  btn.classList.add('active');
 }
 
 // Scroll spy for Variant C
