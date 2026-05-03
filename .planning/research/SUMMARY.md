@@ -1,100 +1,99 @@
-# Research Summary: v1.2 Track & Measure
+# Research Summary: v1.3 Form & Supply Overhaul
 
-**Project:** Cross-Stitch Tracker — Milestone 3
-**Domain:** Dashboards, session logging, progress tracking
-**Researched:** 2026-04-16
+**Project:** Cross-Stitch Tracker — Milestone 4
+**Domain:** Form architecture overhaul, unified supply table, keyboard-first data entry
+**Researched:** 2026-05-03
 **Confidence:** HIGH
 
 ## Executive Summary
 
-v1.2 requires **one new Prisma model** (StitchSession) and **zero new npm dependencies**. The entire milestone builds on established patterns — `$transaction`, R2 presigned URLs, Server Component pages + Client Component wrappers, `nuqs` tab state. Comparable app analysis (Ravelry, StitchStreak, Cross Stitch Journal, StitchPal, Loopsy) confirmed the feature scope: session logging, auto-updating progress, and dashboard pages are table stakes; Buried Treasures, Spotlight, and progress buckets are genuine differentiators.
+v1.3 is a component architecture overhaul, not a backend or data model overhaul. The core challenge is replacing two disconnected experiences (chart creation form + supplies tab) with a single unified flow: a merged form that transitions into a supply table without losing state. Zero new npm dependencies are needed — every capability (portal autocomplete, state preservation, SVG progress indicators) is already available in the installed stack (`@base-ui/react` Combobox, React 19 `<Activity>`, inline SVG).
 
-The three real architectural risks are:
-1. **Progress data diverging** if session mutations aren't atomic with `stitchesCompleted` updates
-2. **Dashboard queries waterfalling** against Neon cold starts (6+ queries, 300-500ms penalty)
-3. **Route rename blast radius** — 50+ hardcoded `/charts` references across 30+ files
+The highest-risk areas are the form/supply-takeover state transition and keyboard navigation in the heterogeneous table. Both require architectural decisions before UI code is written.
 
 ## Stack Additions
 
-**Zero new dependencies.** Recharts, TanStack Table, and dnd-kit are NOT needed for v1.2:
-- Bar charts and calendar views are v1.3 features
-- Dashboard layouts are fixed sections (not draggable widgets)
-- Existing table components suffice
+**Zero new dependencies.** The installed stack handles every v1.3 requirement:
 
-**One schema addition:** `StitchSession` model with `@db.Date`, compound index on `[projectId, date]`.
+- **Base UI Combobox** (`@base-ui/react` 1.4.1, installed): `Combobox.Portal` + `Combobox.Positioner` escape table stacking context — replaces hand-rolled portal in SearchToAdd
+- **React Activity** (`react` 19.2.5, installed): `<Activity mode="visible"|"hidden">` preserves form state during takeover mode without unmounting
+- **Inline SVG**: 16x16px donuts using `stroke-dasharray`/`stroke-dashoffset` — 8 lines of code, no library needed
+- **Existing `useChartForm` hook** (~393 lines): extend with supply accumulator, not replace
+- **Existing `calculateSkeins()` utility**: reuse directly for live auto-calc in add row
 
-**Reused patterns:** Prisma `aggregate()`/`groupBy()` for dashboard queries, existing R2 presigned URL pattern for session photos, existing gallery infrastructure for Pattern Dive Browse tab.
+**What NOT to add:** react-hook-form, TanStack Table, react-circular-progressbar, any virtualization library.
+
+**Minor schema additions:** `isNeedOverridden` on `ProjectBead`/`ProjectSpecialty` for consistency with `ProjectThread`.
 
 ## Feature Table Stakes vs Differentiators
 
 ### Table Stakes (must have)
-- Quick session logging (< 15 seconds, 2 required fields)
-- Auto-updating project progress from sessions
-- Project detail Sessions tab
-- Home dashboard with Currently Stitching
-- Collection stats at a glance
-- Progress visualization (bars/percentages)
-- Shopping list with mark-as-acquired workflow
-- Project Dashboard with progress overview
+- Single-page merged form for chart+project creation and editing
+- Required field indicators (green dot)
+- Sticky save bar with action buttons
+- Keyboard-first supply entry: Tab/Enter/Escape flow, portal autocomplete
+- Already-added items disabled in autocomplete
+- Inline editable cells (stitches, need, have)
+- SVG donut status indicators (proportional have/need)
+- Delete supply with hover-reveal button
+- Supply count footer with per-section totals
 
 ### Differentiators (unique value)
-- **Buried Treasures** — surfaces forgotten charts; no comparable app does this
-- **Spotlight / Rediscover** — random featured project; makes dashboard feel alive
-- **Progress buckets** — collection-wide progress distribution; novel visualization
-- **Pattern Dive tabs** — What's Next + Fabric Requirements + Storage View in one place
-- **Fabric Requirements cross-project view** — "what fabric do I need across all projects with stash matching"
-- **Shopping Cart project selection** — "shopping trip planner" vs flat list
+- **Supply takeover mode**: form collapses to sticky summary bar, table fills page, React Activity preserves state
+- **Segmented type toggle**: sticky between adds — blast through 30+ codes without re-selecting type
+- **Auto-calculated skein need**: live inline calculation with primary-color auto indicator
+- **Fabric assignment feeding calculator**: optional, skippable, auto-populates fabric count
+- **Grouped sections**: three supply types in one table with divider headers + count badges
+- **Persistent add row**: zero clicks to start adding
+- **Pattern type cards**: 2x2 grid with expandable sub-fields
 
 ### Anti-Features (explicitly avoid)
-- Drag-and-drop dashboard widgets — no craft app uses these; fixed layouts
-- Built-in stitching timer — user stitches on iPad apps, logs afterward
-- Achievement/badge system — v1.3 scope
-- Full statistics engine — v1.3 scope
-- Negative stitch counts / frogging — allow edit/delete instead
+- Drag-and-drop row reordering
+- Auto-save (explicit save action via sticky bar)
+- "Have" quantity in the add row (separate shopping workflow)
+- Tabs for supply types (all types visible in one surface)
+- Progressive reveal / step indicators
 
 ## Architecture Approach
 
-- **StitchSession model** with compound index `[projectId, date]`; no userId (auth scoped through Project ownership)
-- **Progress auto-update:** `stitchesCompleted = startingStitches + SUM(sessions.stitchCount)` recalculated atomically in `$transaction` on every session CRUD
-- **Dashboard queries:** Fetch full project dataset once (~500 rows), compute sections in TypeScript; session stats use Prisma `groupBy`. Use `Promise.all()` for parallel queries.
-- **LogSessionModal:** React context at `(dashboard)/layout.tsx` level — accessed from TopBar, FAB, and project detail
-- **Pattern Dive:** Reuses existing gallery infrastructure for Browse tab; three new tabs are independent Client Components with server-side data queries
-- **Route strategy:** Keep `/charts` URL path, change nav label only — avoids 50+ file changes
+The overhaul centers on one new abstraction: **UnifiedSupplyTable** — a dual-mode table component with a supply adapter interface. In local mode (creation flow), it accumulates supplies in React state and batches them on form submit. In persisted mode (project detail), it calls server actions on each mutation.
+
+**Key architectural decisions:**
+- **CSS visibility toggle** (not conditional rendering) for form/supply-takeover transition — preserves `useChartForm` state
+- **SupplyTableAdapter interface**: server-action adapter vs. local-state adapter — defined before any table UI is built
+- **Two-phase save on create**: `createChart` first, then `batchAddSuppliesToProject` in one `$transaction`
+- **PortalAutocomplete extraction** from existing `SearchToAdd` — decoupled from server actions
+
+**Deprecated after milestone:** `chart-add-form.tsx`, `project-supplies-tab.tsx`, `project-detail/supply-section.tsx`, `project-detail/supply-row.tsx`, `project-detail/supply-footer-totals.tsx`.
 
 ## Critical Pitfalls
 
-1. **Route rename blast radius** — 50+ `/charts` refs in 30+ files. Prevention: label change only.
-2. **Dashboard query waterfall** — 6+ queries + Neon cold start = 2+ second loads. Prevention: `Promise.all()`, consolidated queries, Suspense boundaries.
-3. **Progress divergence** — Two sources of truth (`stitchesCompleted` field vs session sum). Prevention: atomic `$transaction` updates, never allow direct edit once sessions exist.
-4. **Division-by-zero in progress** — `stitchCount = 0` on some charts. Prevention: shared `calculateProgress()` utility with null-safe checks.
-5. **Session logging friction** — 5-field modal but daily use requires only 2 actions. Prevention: auto-select recent project, default today's date, optional fields collapsed.
-6. **R2 upload category** — Existing validation only accepts "covers" and "files". Prevention: extend upload schema for "sessions" category.
+1. **Form state destroyed during takeover (HIGH)** — Conditional rendering unmounts the form. Use CSS visibility toggle or React Activity so form never unmounts.
+2. **Supply table data contract mismatch (HIGH)** — Existing supply system requires `projectId`; during creation, none exists. Design adapter interface before writing table UI.
+3. **Keyboard trap in heterogeneous table (HIGH)** — Mixed row types + autocomplete capturing arrow keys. Implement roving tabindex from the start with separate keyboard contexts.
+4. **Portal autocomplete detaches on scroll (LOW)** — `position: fixed` dropdown doesn't reposition. Close dropdown on scroll.
+5. **Dual-mode form initialization (LOW)** — `useState` doesn't reinitialize on prop change. Add `key={chartId ?? "new"}`.
 
 ## Suggested Build Order
 
-**Phase 8: Session Logging + Pattern Dive**
-- StitchSession model + CRUD + photo uploads
-- LogSessionModal (global context)
-- Project detail Sessions tab
-- Auto-updating progress (`$transaction` pattern)
-- Pattern Dive tabs (What's Next, Fabric Requirements, Storage View)
-- Charts page nav label rename
+**Phase 1: Unified Supply Table Foundation** — Build the shared component and adapter interface before anything depends on it. StatusDonut, SupplyDataRow, PortalAutocomplete, useSupplyTable keyboard hook.
 
-**Phase 9: Dashboards + Shopping Cart**
-- Main Dashboard (all sections)
-- Project Dashboard (progress buckets, finished tab)
-- Shopping Cart upgrade (project selection, tabbed types, mark-as-acquired)
-- Shared `dashboard-queries.ts` infrastructure
+**Phase 2: Supply Table on Project Detail** — Wire into existing project detail (persisted mode). Validates with real server data before complex creation flow.
 
-**Rationale:** Sessions must precede dashboards because "last stitched" sort, stitching-day counts, and progress aggregations require real session records.
+**Phase 3: Merged Form Details View** — Regroup existing section components with HR dividers. PatternTypeCards, MilestoneMarker, StickyFormBar, RequiredDot.
+
+**Phase 4: Supply Takeover + Creation Flow** — CSS visibility toggle, SummaryBar, SkeinCalculatorCard, fabric assignment, batchAddSuppliesToProject.
+
+**Phase 5: Edit Mode + Cleanup** — Full-page edit route using MergedForm, remove all deprecated components.
+
+**Rationale:** Table first because everything composes it. Project detail before creation because persisted mode is simpler. Form before takeover because form must exist before the transition is wired. Edit + cleanup last because existing modal works as fallback.
 
 ## Open Questions for Planning
 
-- `@db.Date` vs `DateTime` with midnight convention on `StitchSession.date` — verify Prisma 7 support
-- Session pagination strategy for projects with 100+ sessions
-- Goals Summary section on Main Dashboard — omit vs placeholder (depends on v1.3 Goal model)
-- Estimated completion dates — low complexity, high value; include or defer?
+- Fabric cascade behavior: when fabric changes after manual override of `fabricCount` in calculator, overwrite or preserve?
+- `beadCount` on `ProjectBead`: add now for future auto-calc (low cost) or defer?
+- Edit mode: full-page route or modal remains as lightweight quick-edit option?
 
 ---
-*Research completed: 2026-04-16*
+*Research completed: 2026-05-03*
 *Ready for requirements: yes*

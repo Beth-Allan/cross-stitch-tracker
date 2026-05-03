@@ -1,660 +1,482 @@
-# Architecture Research
+# Architecture Research: v1.3 Form & Supply Overhaul
 
-**Domain:** Cross-stitch project management -- Milestone 3 (Track & Measure)
-**Researched:** 2026-04-16
+**Domain:** Cross-stitch project management -- Milestone 4 (Form & Supply Overhaul)
+**Researched:** 2026-05-03
 **Confidence:** HIGH
 
 ## System Overview
 
-Milestone 3 adds session logging, dashboards, and progress tracking to the existing codebase. This is the first milestone that introduces a **write-heavy interactive model** (StitchSession) alongside **aggregation-heavy read pages** (dashboards). The architecture must handle:
+v1.3 replaces the chart creation/edit flow and supply-adding experience with a merged single-page form, supply takeover transition, and unified supply table. This is primarily a **component architecture overhaul** -- the data model and server actions change minimally. The challenge is reorganizing client-side state management across a form that transitions between two visual modes (details vs. supply takeover) while preserving form state bidirectionally.
 
-1. A new Prisma model (StitchSession) with CRUD + aggregation queries
-2. A global-access modal (Log Session) triggered from multiple locations
-3. Three new dashboard pages with complex multi-table read queries
-4. Auto-updating progress on Project when sessions are logged
-5. Pattern Dive: evolving the existing Charts page with additional tabs
+Key architectural concerns:
+1. State preservation across form/supply-takeover mode transitions
+2. A unified supply table component shared between creation flow and project detail page
+3. Keyboard-driven interaction across heterogeneous row types in a single table
+4. Portal autocomplete reuse from existing SearchToAdd pattern
+5. Two-phase save: chart+project creation first, then supply linking to the new projectId
 
-```
-+------------------------------------------------------------------------+
-|                        Route Layer (App Router)                         |
-+------------------------------------------------------------------------+
-| +-------------+ +----------+ +----------+ +----------+ +-------------+ |
-| | / (home)    | | /charts  | | /charts/ | | /projects| | /shopping   | |
-| | page.tsx    | | page.tsx | | [id]     | | page.tsx | | page.tsx    | |
-| | REPLACE:    | | RENAME:  | | MODIFY:  | | NEW:     | | MODIFY:     | |
-| | MainDash    | | Pattern  | | Sessions | | Project  | | Shopping    | |
-| |             | | Dive     | | tab      | | Dash     | | Cart v2     | |
-| +------+------+ +-----+----+ +----+-----+ +----+-----+ +------+------+ |
-|        |              |            |            |              |        |
-+--------+--------------+------------+------------+--------------+--------+
-|                   Feature Components Layer                              |
-+------------------------------------------------------------------------+
-| NEW:                          | MODIFIED:         | REUSED:             |
-| +------------------+          | +-----------+     | +---------------+   |
-| | MainDashboard    |          | | project-  |     | | GalleryGrid   |   |
-| | (Server+Client)  |          | | detail    |     | | GalleryCard   |   |
-| +------------------+          | | page.tsx  |     | | FilterBar     |   |
-| | PatternDiveTabs  |          | +-----------+     | | ViewToggle    |   |
-| | (Client)         |          | | project-  |     | | gallery-utils |   |
-| +------------------+          | | gallery   |     | +---------------+   |
-| | ProjectDashboard |          | | .tsx      |     |                     |
-| | (Server+Client)  |          | +-----------+     |                     |
-| +------------------+          | | shopping- |     |                     |
-| | LogSessionModal  |          | | list.tsx  |     |                     |
-| | (Client, global) |          | +-----------+     |                     |
-| +------------------+          |                   |                     |
-| | SessionsTab      |          |                   |                     |
-| | (Client)         |          |                   |                     |
-| +------------------+          |                   |                     |
-| | WhatsNextTab     |          |                   |                     |
-| | FabricReqTab     |          |                   |                     |
-| | StorageViewTab   |          |                   |                     |
-| +------------------+          |                   |                     |
-+------------------------------------------------------------------------+
-|                   Server Actions Layer                                  |
-+------------------------------------------------------------------------+
-| NEW:                          | MODIFIED:                              |
-| +------------------+          | +-----------------+                    |
-| | session-actions  |          | | chart-actions   |                    |
-| | .ts (CRUD +      |          | | .ts (progress   |                    |
-| | aggregation)     |          | | update, new     |                    |
-| +------------------+          | | query fns)      |                    |
-| | dashboard-       |          | +-----------------+                    |
-| | queries.ts       |          | | shopping-       |                    |
-| | (read-only       |          | | actions.ts      |                    |
-| | aggregations)    |          | | (upgrade)       |                    |
-| +------------------+          | +-----------------+                    |
-+------------------------------------------------------------------------+
-|                   Database (Prisma 7 / Neon)                           |
-+------------------------------------------------------------------------+
-| NEW:                          | MODIFIED:                              |
-| +------------------+          | +------------------+                   |
-| | StitchSession    |          | | Project          |                   |
-| | (write-heavy)    |          | | (stitchesComp-   |                   |
-| +------------------+          | |  leted updated   |                   |
-|                               | |  by session sum) |                   |
-|                               | +------------------+                   |
-+------------------------------------------------------------------------+
-```
+---
 
-### Component Responsibilities
+## Current Architecture (What Exists)
 
-| Component | Responsibility | New vs Modified |
-|-----------|----------------|-----------------|
-| `/ (dashboard page)` | Server Component: fetch dashboard data, render MainDashboard | **REPLACE** placeholder |
-| `/charts` (Pattern Dive) | Server Component: fetch gallery + tab-specific data; rename route display | **MODIFY** heavily |
-| `/projects` (Project Dashboard) | Server Component: fetch hero stats + progress buckets + finished | **NEW route** |
-| `/charts/[id]` Sessions tab | Client Component: session table + mini stats inside project tabs | **MODIFY** add tab |
-| `/shopping` | Server Component: upgrade to ShoppingCart v2 with tabs | **MODIFY** |
-| `LogSessionModal` | Client Component: global modal accessible from header, FAB, project detail | **NEW** (global) |
-| `session-actions.ts` | Server Actions: create/update/delete session + progress recalculation | **NEW** |
-| `dashboard-queries.ts` | Read-only query functions: collection stats, progress buckets, etc. | **NEW** |
-| `MainDashboard` | Client Component: Currently Stitching, Start Next, Buried Treasures, Spotlight | **NEW** |
-| `PatternDiveTabs` | Client Component: Browse (existing gallery), What's Next, Fabric Reqs, Storage | **NEW** wrapping existing |
-| `ProjectDashboard` | Client Component: hero stats, progress breakdown, finished tab | **NEW** |
-| `WhatsNextTab` | Client Component: pre-filtered project list for kitted/flagged projects | **NEW** |
-| `FabricRequirementsTab` | Client Component: fabric size calculator per project | **NEW** |
-| `StorageViewTab` | Client Component: projects grouped by storage location | **NEW** |
-| `SessionsTab` | Client Component: per-project session history with mini stats | **NEW** |
-
-## Data Model Changes
-
-### New Model: StitchSession
-
-```prisma
-model StitchSession {
-  id               String   @id @default(cuid())
-  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId        String
-  date             DateTime
-  stitchCount      Int
-  photoUrl         String?
-  timeSpentMinutes Int?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  @@index([projectId, date])
-}
-```
-
-**Key decisions:**
-
-- **`date` as DateTime (not String):** Prisma/Postgres date comparisons and groupBy work natively. The design shows `date` as a date-only string in the UI, but we store as `DateTime` with time zeroed for aggregation performance. Alternatively, store as `@db.Date` if Prisma 7 supports it (needs verification) -- otherwise `DateTime` with midnight convention works.
-- **`@@index([projectId, date])`:** Every dashboard query either filters by projectId or groups by date. This compound index covers the two hottest access patterns.
-- **`onDelete: Cascade`:** When a project is deleted, its sessions should go too.
-- **No `userId` on StitchSession:** The project already has `userId`. Sessions are scoped through the project's ownership. All session queries should join through Project for auth.
-- **`photoUrl` is R2 key:** Same pattern as cover images -- presigned URLs resolved server-side.
-
-### Modified Model: Project
-
-```prisma
-model Project {
-  // ... existing fields ...
-  sessions StitchSession[]  // NEW relation
-  // stitchesCompleted remains Int @default(0) -- updated when sessions change
-}
-```
-
-**Progress update strategy:** `stitchesCompleted` on Project is recalculated as `startingStitches + SUM(sessions.stitchCount)` after every session create/update/delete. This keeps the "calculated at query time" principle while avoiding expensive aggregation in every gallery card render. The recalculation happens inside the session server action's transaction.
-
-## Integration Patterns
-
-### 1. Log Session Modal -- Global State Access
-
-The LogSessionModal needs to be accessible from 3+ locations:
-- TopBar "Log Stitches" button (already exists as toast placeholder)
-- FAB (floating action button) on mobile
-- Project detail page Sessions tab
-
-**Implementation approach: Context provider at dashboard layout level.**
+### Component Map
 
 ```
-src/app/(dashboard)/layout.tsx
-  -> <SessionModalProvider>     // NEW context provider
-       <AppShell>
-         {children}
-       </AppShell>
-     </SessionModalProvider>
+src/app/(dashboard)/charts/new/page.tsx          Server: fetches designers, genres, etc.
+  -> ChartAddForm (client)                        Full-page form, uses useChartForm hook
+     -> sections/basic-info-section.tsx            Name, designer, cover, digital file
+     -> sections/stitch-count-section.tsx          Width, height, stitch count
+     -> sections/genre-section.tsx                 Genre chip picker
+     -> sections/pattern-type-section.tsx          Paper/Kit/SAL toggles
+     -> sections/project-setup-section.tsx         Status, storage, app, fabric, onion skinning
+     -> sections/dates-section.tsx                 Start/finish/FFO dates
+     -> sections/goals-section.tsx                 Want to start next, season preference
+     -> sections/notes-section.tsx                 Notes textarea
+
+src/app/(dashboard)/charts/[id]/page.tsx          Server: fetches chart + supplies + sessions
+  -> ProjectDetailPage (client)
+     -> ProjectTabs -> SuppliesTab                 Manages supply sections + SearchToAdd
+        -> SupplySection x3 (thread/bead/specialty) Collapsible sections with supply rows
+           -> SupplyRow                            Inline-editable numbers, delete, status
+        -> CalculatorSettingsBar                   Strand/over/fabric/waste controls
+        -> InlineSupplyCreate                      Dialog for creating new catalog items
+
+src/app/(dashboard)/charts/[id]/edit/page.tsx     Server: fetches chart + reference data
+  -> ChartEditModal (client)                       Dialog with tabs, reuses useChartForm
+
+src/components/features/supplies/search-to-add.tsx  Absolute-positioned dropdown
+                                                   Fetches items, keyboard nav, adds to project
 ```
 
-The `SessionModalProvider` manages:
-- `isOpen` state
-- `preselectedProjectId` (when opened from project detail)
-- `activeProjects` list (fetched once, passed down)
-- `openModal(projectId?: string)` function exposed via context
+### Data Flow
 
-**Why context over URL state:** The modal is an overlay, not a route. URL state (nuqs) would pollute the URL and cause unnecessary page transitions. Context is the correct pattern for transient UI state that doesn't need to survive page reloads.
+```
+Server Component (page.tsx)
+  -> Promise.all([getDesigners(), getGenres(), ...])
+  -> Pass data as props to Client Component
 
-**Why not a global store (zustand/jotai):** Single-user app with one modal. React context is sufficient and avoids a new dependency.
+Client Component (ChartAddForm / ProjectDetailPage)
+  -> useChartForm hook manages form state
+  -> Server action calls: createChart, updateChart
+  -> Server action calls: addThreadToProject, updateProjectSupplyQuantity
+  -> revalidatePath + router.refresh() for data refresh
+```
+
+### Key Observations
+
+1. **Two separate supply systems exist.** `ProjectSuppliesTab` (in project-supplies-tab.tsx) is an older implementation with its own inline SupplyRow and EditableNumber. `SuppliesTab` (in project-detail/supplies-tab.tsx) is the newer version with CalculatorSettingsBar, useMemo-derived sections, and the shared EditableNumber component. Both render on the project detail page via different code paths -- this is technical debt from iterative development.
+
+2. **SearchToAdd is tightly coupled to projectId.** It calls `addThreadToProject({ projectId, threadId, ... })` directly. The new creation flow needs SearchToAdd to work **before** a project exists -- supplies must be accumulated in local state, then batch-persisted after chart+project creation.
+
+3. **useChartForm owns all form state.** Clean hook-based architecture. Returns values, setField, handlers, errors. The merged form can extend this hook rather than replacing it.
+
+4. **Form sections are cleanly decomposed.** Each section is a pure presentational component receiving values + onChange handlers. They can be regrouped with different visual treatment (HR dividers instead of section cards) without changing their APIs.
+
+5. **The edit flow uses a modal.** `ChartEditModal` wraps the same sections in a Dialog with tabs. The v1.3 redesign should also provide a full-page edit route (not a modal) for consistency with the creation flow, but this can be deferred.
+
+---
+
+## Recommended Architecture (What to Build)
+
+### Component Boundaries
+
+| Component | Location | Responsibility | New/Modified |
+|-----------|----------|----------------|--------------|
+| `MergedFormPage` | `charts/new/page.tsx` | Server data fetch (unchanged route) | **Modified** |
+| `MergedForm` | `features/charts/merged-form.tsx` | Top-level client orchestrator -- manages form mode (details vs. supply takeover) | **New** |
+| `useChartForm` | `features/charts/use-chart-form.ts` | Form state hook (extended with supply accumulator) | **Modified** |
+| `DetailsView` | `features/charts/merged-form/details-view.tsx` | Renders field groups with HR dividers, milestone marker | **New** |
+| `SupplyTakeoverView` | `features/charts/merged-form/supply-takeover-view.tsx` | Summary bar + skein calc card + UnifiedSupplyTable | **New** |
+| `StickyFormBar` | `features/charts/merged-form/sticky-form-bar.tsx` | Fixed bottom bar with save hint + Save Draft + Create | **New** |
+| `SummaryBar` | `features/charts/merged-form/summary-bar.tsx` | Sticky bar showing collapsed form summary | **New** |
+| `PatternTypeCards` | `features/charts/merged-form/pattern-type-cards.tsx` | 2x2 card grid replacing current toggles | **New** |
+| `RequiredDot` | `features/charts/form-primitives/required-dot.tsx` | Green dot indicator for required fields | **New** |
+| `MilestoneMarker` | `features/charts/merged-form/milestone-marker.tsx` | "Ready for supplies?" transition element | **New** |
+| `SkeinCalculatorCard` | `features/charts/merged-form/skein-calculator-card.tsx` | Styled card with segmented controls (replaces flat settings bar) | **New** |
+| `UnifiedSupplyTable` | `features/charts/supply-table/unified-supply-table.tsx` | Table with grouped sections, add row, type toggle | **New** |
+| `SupplyAddRow` | `features/charts/supply-table/supply-add-row.tsx` | Persistent top row with type toggle + search + qty | **New** |
+| `SupplyDataRow` | `features/charts/supply-table/supply-data-row.tsx` | Single supply item row with inline editing | **New** |
+| `SectionDivider` | `features/charts/supply-table/section-divider.tsx` | Type group header row (icon + label + count) | **New** |
+| `SupplyTypeToggle` | `features/charts/supply-table/supply-type-toggle.tsx` | Segmented 3-button control | **New** |
+| `StatusDonut` | `features/charts/supply-table/status-donut.tsx` | SVG proportional have/need ring | **New** |
+| `PortalAutocomplete` | `features/charts/supply-table/portal-autocomplete.tsx` | Extracted portal dropdown from SearchToAdd pattern | **New** |
+| `useSupplyTable` | `features/charts/supply-table/use-supply-table.ts` | Keyboard navigation, add/remove/edit state, type toggle | **New** |
+
+### Directory Structure
+
+```
+src/components/features/charts/
+  merged-form/
+    merged-form.tsx              Main orchestrator
+    details-view.tsx             Form fields with HR dividers
+    supply-takeover-view.tsx     Supply takeover mode wrapper
+    sticky-form-bar.tsx          Bottom save bar
+    summary-bar.tsx              Collapsed form summary
+    pattern-type-cards.tsx       Selectable pattern type grid
+    milestone-marker.tsx         Transition CTA
+    skein-calculator-card.tsx    Calc settings as styled card
+  supply-table/
+    unified-supply-table.tsx     Shared table component
+    supply-add-row.tsx           Persistent add row
+    supply-data-row.tsx          Individual item row
+    section-divider.tsx          Group header
+    supply-type-toggle.tsx       Segmented type control
+    status-donut.tsx             SVG have/need indicator
+    portal-autocomplete.tsx      Extracted portal dropdown
+    use-supply-table.ts          Table state + keyboard hook
+  form-primitives/
+    required-dot.tsx             NEW: green dot
+    (existing files stay)
+```
+
+### What Changes vs. What Stays
+
+**Modified (not deleted):**
+- `charts/new/page.tsx` -- Same Server Component fetch, but renders `MergedForm` instead of `ChartAddForm`. Needs additional fetch for supply catalogs (threads, beads, specialty items) to support offline-first autocomplete.
+- `use-chart-form.ts` -- Extended to include local supply accumulator state (`pendingSupplies: SupplyRowData[]`) and supply takeover mode flag. Form submission now includes a second pass for supply linking after chart+project creation.
+- `form-primitives/form-field.tsx` -- Possibly swap "optional" label pattern for RequiredDot pattern.
+
+**Kept as-is (no changes needed):**
+- `sections/basic-info-section.tsx` -- Reused inside DetailsView
+- `sections/stitch-count-section.tsx` -- Reused inside DetailsView
+- `sections/genre-section.tsx` -- Reused inside DetailsView (chips stay the same)
+- `sections/dates-section.tsx` -- Reused inside DetailsView
+- `sections/goals-section.tsx` -- Reused inside DetailsView
+- `sections/notes-section.tsx` -- Reused inside DetailsView
+- `form-primitives/searchable-select.tsx` -- Still used for designer/storage/app selects
+- `form-primitives/cover-image-upload.tsx` -- Still used in DetailsView
+- `editable-number.tsx` -- Reused in SupplyDataRow and SkeinCalculatorCard
+- `lib/utils/skein-calculator.ts` -- Pure function, no changes
+- `lib/actions/supply-actions.ts` -- Existing add/remove/update actions stay for project detail page. New batch-add action needed for creation flow.
+
+**Deprecated (eventually removed):**
+- `chart-add-form.tsx` -- Replaced by MergedForm. Delete after MergedForm ships.
+- `chart-add-form.test.tsx` -- Tests rewritten for MergedForm.
+- `project-supplies-tab.tsx` -- Older supply view. The project detail `SuppliesTab` (in project-detail/) stays but evolves to use UnifiedSupplyTable.
+- `project-detail/supply-section.tsx` -- Replaced by UnifiedSupplyTable's SectionDivider rows.
+- `project-detail/supply-row.tsx` -- Replaced by SupplyDataRow.
+- `project-detail/supply-footer-totals.tsx` -- Integrated into UnifiedSupplyTable footer.
+
+**New server actions needed:**
+- `batchAddSuppliesToProject(projectId, supplies[])` -- Creates all three junction table rows in a single $transaction after chart+project creation. Avoids N individual server action calls.
+
+### Data Flow: Creation with Supply Takeover
+
+This is the most complex flow and the architectural centerpiece.
+
+```
+1. USER fills form fields (details mode)
+   -> useChartForm manages values in React state
+   -> No server calls yet
+
+2. USER clicks "Add Supplies" (milestone marker)
+   -> MergedForm sets mode = "supply-takeover"
+   -> Form fields collapse into SummaryBar (data preserved in useChartForm state)
+   -> UnifiedSupplyTable renders with empty supply list
+
+3. USER adds supplies in table
+   -> useSupplyTable manages pendingSupplies[] in local state
+   -> Each "add" appends to local array (NO server call -- no projectId yet)
+   -> Auto-calc runs locally using skein calculator
+   -> User can edit stitchCount, need, have in local state
+
+4. USER clicks "Details" link in SummaryBar
+   -> MergedForm sets mode = "details"
+   -> Form fields expand, supply data preserved in useSupplyTable state
+   -> Bidirectional transition preserves both states
+
+5. USER clicks "Create" in StickyFormBar
+   -> useChartForm.handleSubmit():
+     a. Validate form fields (Zod)
+     b. Call createChart() server action -> returns { chartId, projectId }
+     c. If pendingSupplies.length > 0:
+        Call batchAddSuppliesToProject(projectId, pendingSupplies)
+     d. Navigate to /charts/[id]
+```
+
+### Data Flow: Project Detail Supplies Tab
+
+```
+1. SERVER fetches chart + project + supplies (existing)
+   -> Passes to ProjectDetailPage
+
+2. UnifiedSupplyTable renders with server data (not local state)
+   -> Grouped by type (Thread/Beads/Specialty)
+   -> Add row available at top
+
+3. USER adds supply via add row
+   -> PortalAutocomplete shows catalog items
+   -> On select: IMMEDIATE server action (addThreadToProject etc.)
+   -> router.refresh() updates data
+   -> (This is the existing pattern, keeps working)
+
+4. USER edits inline values (stitches, need, have)
+   -> Optimistic update + server action (existing updateProjectSupplyQuantity)
+```
+
+### Key Architectural Decision: Local State vs. Server State
+
+The UnifiedSupplyTable must work in TWO modes:
+
+| Aspect | Creation Flow | Project Detail |
+|--------|--------------|----------------|
+| Data source | Local React state (pendingSupplies[]) | Server-fetched (Prisma query) |
+| Add action | Append to local array | Server action + refresh |
+| Edit action | Mutate local array | Optimistic + server action |
+| Delete action | Remove from local array | Server action + refresh |
+| Save | Batch persist on form submit | Already persisted on each action |
+| projectId available? | NO (not created yet) | YES |
+| Calculator settings | Local state (defaults or from fabric) | Project.strandCount/overCount/wastePercent |
+
+**Implementation:** UnifiedSupplyTable accepts a `mode` prop (`"local" | "persisted"`) and a `supplies` prop interface:
 
 ```typescript
-// src/components/features/sessions/session-modal-context.tsx
-"use client";
+interface SupplyTableProps {
+  mode: "local" | "persisted";
+  supplies: SupplyRowData[];
+  calculatorSettings: CalculatorSettings;
 
-const SessionModalContext = createContext<{
-  openLogSession: (projectId?: string) => void;
-} | null>(null);
+  // Local mode: parent manages array
+  onAddLocal?: (item: SupplyRowData) => void;
+  onUpdateLocal?: (id: string, updates: Partial<SupplyRowData>) => void;
+  onRemoveLocal?: (id: string) => void;
 
-export function useLogSession() {
-  const ctx = useContext(SessionModalContext);
-  if (!ctx) throw new Error("useLogSession must be used within SessionModalProvider");
-  return ctx;
+  // Persisted mode: direct server actions
+  projectId?: string;
+  onServerAdd?: () => void;   // triggers router.refresh
+  onServerUpdate?: () => void;
+  onServerRemove?: () => void;
+
+  // Shared
+  onSettingsChange?: (settings: CalculatorSettings) => void;
 }
 ```
 
-The TopBar and FAB call `openLogSession()`. The project detail Sessions tab calls `openLogSession(projectId)`.
+This keeps the table component pure -- it renders data and emits events. The parent (MergedForm or SuppliesTab) decides whether those events go to local state or server actions.
 
-### 2. Session Create Flow -- Data Flow
+---
 
-```
-User fills LogSessionModal
-  -> Client calls createSession(formData) server action
-  -> Server action:
-     1. requireAuth()
-     2. Validate with Zod (projectId, date, stitchCount, optional time/photo)
-     3. Verify project ownership (project.userId === user.id)
-     4. prisma.$transaction:
-        a. Create StitchSession record
-        b. Recalculate stitchesCompleted:
-           SUM = await prisma.stitchSession.aggregate({
-             _sum: { stitchCount: true },
-             where: { projectId }
-           })
-           await prisma.project.update({
-             where: { id: projectId },
-             data: { stitchesCompleted: startingStitches + sum }
-           })
-     5. revalidatePath("/charts/[chartId]")
-     6. revalidatePath("/")  // dashboard
-     7. revalidatePath("/projects")  // project dashboard
-     8. Return { success: true }
-  -> Client: close modal, toast success
-```
+## PortalAutocomplete Extraction
 
-**Why transaction:** The session creation and progress recalculation must be atomic. If the sum update fails, the session shouldn't exist.
+The existing SearchToAdd component at `supplies/search-to-add.tsx` does too many things:
+1. Manages search state
+2. Fetches catalog items via server action
+3. Renders a positioned dropdown
+4. Handles keyboard navigation
+5. Calls server action to add item to project
 
-**Why revalidatePath over revalidateTag:** The existing codebase uses `revalidatePath` consistently. Switching to tags would require refactoring all existing actions. Stay consistent.
-
-### 3. Pattern Dive -- Evolving the Charts Page
-
-The existing `/charts/page.tsx` renders `ProjectGallery` with gallery/list/table views. Pattern Dive adds 3 new tabs (What's Next, Fabric Requirements, Storage View) while keeping Browse as the default tab.
-
-**Route structure stays the same:** `/charts` is the route. The page title and subtitle change to "Pattern Dive". The existing `ProjectGallery` becomes the Browse tab content.
-
-**Tab implementation:**
-```
-/charts/page.tsx (Server Component)
-  -> Fetch gallery data (existing getChartsForGallery)
-  -> Fetch What's Next data (new query)
-  -> Fetch Fabric Requirements data (new query)
-  -> Fetch Storage View data (new query)
-  -> Pass all data to PatternDiveClient
-
-PatternDiveClient (Client Component)
-  -> URL-persisted tab state via nuqs: ?tab=browse|whats-next|fabric|storage
-  -> Browse tab renders existing ProjectGallery internals
-  -> Other tabs render new components
-```
-
-**Reuse strategy:**
-- `GalleryCard`, `GalleryGrid`, `ViewToggleBar`, `FilterBar`, `FilterChips` -- reused directly for Browse tab
-- `gallery-utils.ts` (`transformToGalleryCard`, `SIZE_CATEGORIES`, etc.) -- reused
-- `use-gallery-filters.ts` -- reused within Browse tab
-- `gallery-types.ts` (`GalleryCardData`, `ViewMode`, `SortField`) -- reused
-
-**New components needed:**
-- `PatternDiveClient` -- tab container with nuqs-driven tab state
-- `WhatsNextTab` -- filtered/sorted list of kitted + flagged projects
-- `FabricRequirementsTab` -- fabric calculator per project with stash matching
-- `StorageViewTab` -- collapsible groups by storage location
-
-### 4. Dashboard Pages -- Query Strategy for Neon Free Tier
-
-**Constraint:** Neon free tier has 0.25 vCPU, 512MB RAM, and cold starts after 5 minutes of inactivity. Dashboard queries must be efficient.
-
-**Strategy: Fetch-and-compute in Server Components.**
-
-All dashboard data is derived from existing tables (Chart, Project, Fabric, StorageLocation) plus the new StitchSession table. Rather than running many small queries, use a small number of comprehensive queries and compute derived values in TypeScript.
-
-#### Main Dashboard Query Plan
+For v1.3, extract the **search + dropdown + keyboard** part into a reusable `PortalAutocomplete`:
 
 ```typescript
-// dashboard-queries.ts
-
-export async function getMainDashboardData(userId: string) {
-  // Query 1: All projects with chart info (single query, ~20 entities for 500 charts)
-  const projects = await prisma.project.findMany({
-    where: { userId },
-    include: {
-      chart: {
-        select: {
-          id: true, name: true, stitchCount: true,
-          coverImageUrl: true, coverThumbnailUrl: true,
-          designerId: true, designer: { select: { name: true } },
-          genres: { select: { name: true } },
-          dateAdded: true, stitchesWide: true, stitchesHigh: true,
-        },
-      },
-      storageLocation: { select: { name: true } },
-      fabric: { select: { id: true } },
-      projectThreads: { select: { quantityRequired: true, quantityAcquired: true } },
-      projectBeads: { select: { quantityRequired: true, quantityAcquired: true } },
-      projectSpecialty: { select: { quantityRequired: true, quantityAcquired: true } },
-    },
-  });
-
-  // Compute all dashboard sections from the single result set:
-  // - currentlyStitching: status === IN_PROGRESS
-  // - startNext: wantToStartNext === true
-  // - buriedTreasures: status === UNSTARTED, ordered by dateAdded ASC, limit 5
-  // - spotlight: random from collection (Math.random() on the array)
-  // - collectionStats: counts by status, SUM of stitchesCompleted
-  // - recentCharts: ordered by dateAdded DESC, limit 8
-
-  return { currentlyStitching, startNext, buriedTreasures, ... };
+interface PortalAutocompleteProps {
+  supplyType: "thread" | "bead" | "specialty";
+  existingIds: string[];          // Items already added (shown as disabled)
+  anchorRef: React.RefObject<HTMLInputElement>;  // Position relative to this
+  onSelect: (item: CatalogItem) => void;        // Parent decides what to do
+  onClose: () => void;
+  onCreateNew?: (searchText: string) => void;
 }
 ```
 
-**Why one big query:** For 500 charts, this is ~500 rows with joins. PostgreSQL handles this in <100ms. Multiple small queries (one per section) would cause 6+ round trips to Neon, which is expensive after cold start (~100ms per query). Single query + JS computation is faster and uses fewer connection pool slots.
+Key change: `onSelect` returns the catalog item data. In persisted mode, the parent calls `addThreadToProject()`. In local mode, the parent builds a `SupplyRowData` and appends to local state. The portal pattern (`position: fixed` + `getBoundingClientRect()`) stays identical.
 
-**Caveat:** The `getChartsForGallery` query already fetches similar data. For Pattern Dive, we can reuse or extend it. For Main Dashboard, we need slightly different includes (genres for buried treasures, dateAdded for recently added).
+---
 
-#### Project Dashboard Query Plan
+## Keyboard Navigation Architecture
 
-```typescript
-export async function getProjectDashboardData(userId: string) {
-  // Query 1: All projects with progress data
-  const projects = await prisma.project.findMany({
-    where: { userId },
-    include: {
-      chart: {
-        select: {
-          name: true, stitchCount: true, coverImageUrl: true, coverThumbnailUrl: true,
-          designer: { select: { name: true } },
-          genres: { select: { name: true } },
-        },
-      },
-      fabric: { select: { name: true, brand: { select: { name: true } }, count: true } },
-    },
-  });
-
-  // Query 2: Session aggregates per project (for stitching days, last stitched date)
-  const sessionStats = await prisma.stitchSession.groupBy({
-    by: ["projectId"],
-    _count: { id: true },            // stitching days (approximate)
-    _sum: { stitchCount: true },
-    _max: { date: true },            // last stitched date
-  });
-
-  // Merge and compute:
-  // - heroStats (totalWIPs, averageProgress, closestToCompletion, etc.)
-  // - progressBuckets (0%, 0-25%, 25-50%, 50-75%, 75-100%, finished)
-  // - finishedProjects with expanded stats
-}
-```
-
-**Why groupBy for sessions:** `groupBy` pushes aggregation to PostgreSQL. Fetching all sessions and computing in JS would be wasteful (could be thousands of rows over time). The `groupBy` returns one row per project.
-
-**Note on "stitching days":** The `_count` on sessions gives session count, not unique days. For accurate "stitching days," we'd need `SELECT COUNT(DISTINCT date) FROM StitchSession WHERE projectId = ?`. Prisma doesn't support `COUNT(DISTINCT)` in `groupBy`. Options:
-1. Use raw SQL: `prisma.$queryRaw` for this specific metric
-2. Approximate with session count (good enough for v1.2, refine in v1.3 stats engine)
-3. Add a computed `uniqueDays` in application code after fetching sessions
-
-**Recommendation:** Use session count as "stitching sessions" for v1.2. Reserve accurate "stitching days" for v1.3 when the full statistics engine is built. This avoids raw SQL in v1.2.
-
-#### Pattern Dive Tab Queries
-
-```typescript
-// What's Next: reuses the main project query, filters to kitting/kitted/flagged
-// Fabric Requirements: projects + fabric stash
-export async function getFabricRequirements(userId: string) {
-  const [projects, fabrics] = await Promise.all([
-    prisma.project.findMany({
-      where: { userId, chart: { stitchesWide: { gt: 0 }, stitchesHigh: { gt: 0 } } },
-      include: {
-        chart: { select: { name: true, stitchesWide: true, stitchesHigh: true } },
-        fabric: { select: { id: true } },
-      },
-    }),
-    prisma.fabric.findMany({
-      where: { linkedProjectId: null },  // unlinked fabric = available stash
-      include: { brand: true },
-    }),
-  ]);
-  // Compute matches in JS (fabric size >= required size for each count)
-}
-
-// Storage View: projects + fabrics grouped by storage location
-export async function getStorageGroups(userId: string) {
-  return prisma.storageLocation.findMany({
-    where: { userId },
-    include: {
-      projects: {
-        include: {
-          chart: { select: { name: true, coverThumbnailUrl: true } },
-          fabric: { select: { name: true } },
-        },
-      },
-    },
-  });
-}
-```
-
-### 5. Progress Auto-Update Strategy
-
-When a session is created/updated/deleted, `Project.stitchesCompleted` must be recalculated.
-
-**Formula:** `stitchesCompleted = startingStitches + SUM(all sessions' stitchCount)`
-
-**Implementation in session-actions.ts:**
-
-```typescript
-async function recalculateProgress(tx: PrismaClient, projectId: string) {
-  const { _sum } = await tx.stitchSession.aggregate({
-    _sum: { stitchCount: true },
-    where: { projectId },
-  });
-  const project = await tx.project.findUnique({
-    where: { id: projectId },
-    select: { startingStitches: true },
-  });
-  await tx.project.update({
-    where: { id: projectId },
-    data: {
-      stitchesCompleted: (project?.startingStitches ?? 0) + (_sum.stitchCount ?? 0),
-    },
-  });
-}
-```
-
-This runs inside the same `$transaction` as the session create/update/delete, ensuring consistency.
-
-**What about gallery cards?** Gallery cards show `stitchesCompleted` and calculate progress percentage client-side. Since `stitchesCompleted` is always up-to-date after session mutations, gallery cards automatically reflect the latest progress after revalidation.
-
-### 6. Shopping Cart Upgrade
-
-The existing shopping page fetches unfulfilled supplies grouped by project. The v1.2 upgrade adds:
-- Project selection sidebar
-- Tabbed supply types (threads, beads, specialty, fabric)
-- Fabric-to-stash matching
-
-**Architectural change:** The existing `getShoppingList()` returns project-grouped data. The new ShoppingCart design wants supply-type-grouped data with cross-project aggregation.
-
-**New query approach:**
-
-```typescript
-export async function getShoppingCartData(userId: string) {
-  // Reuse existing getShoppingList() for the project list
-  // Add: aggregate by supply across projects for the supply-type tabs
-  const [threads, beads, specialty] = await Promise.all([
-    prisma.projectThread.findMany({
-      where: {
-        project: { userId },
-        quantityAcquired: { lt: prisma.projectThread.fields.quantityRequired },
-      },
-      include: {
-        thread: { include: { brand: true } },
-        project: { select: { chart: { select: { name: true } } } },
-      },
-    }),
-    // Similar for beads and specialty
-  ]);
-
-  // Group threads by threadId, aggregate quantities across projects
-}
-```
-
-**Note:** The `quantityAcquired < quantityRequired` filter is not directly supported in Prisma `where` as a field comparison. The existing approach fetches all and filters in JS. This is fine for the data volumes (hundreds of supply links, not thousands).
-
-## New File Organization
+The unified supply table needs keyboard flow across heterogeneous content:
 
 ```
-src/
-  app/(dashboard)/
-    page.tsx                           # REPLACE: Main Dashboard (was placeholder)
-    charts/
-      page.tsx                         # MODIFY: Pattern Dive (was ProjectGallery)
-    projects/
-      page.tsx                         # NEW: Project Dashboard
-      loading.tsx                      # NEW: skeleton
-    shopping/
-      page.tsx                         # MODIFY: Shopping Cart v2
-    sessions/
-      page.tsx                         # KEEP: placeholder for now (full stats in v1.3)
-  components/features/
-    dashboard/
-      main-dashboard.tsx               # NEW: Main Dashboard page component
-      currently-stitching-card.tsx      # NEW: WIP card for dashboard
-      buried-treasures-section.tsx      # NEW: longest-waiting unstarted
-      spotlight-card.tsx               # NEW: random project spotlight
-      collection-stats-sidebar.tsx     # NEW: stat summary
-      scrollable-row.tsx               # NEW: horizontal scroll with arrows
-      quick-add-menu.tsx               # NEW: dropdown for quick actions
-    pattern-dive/
-      pattern-dive-client.tsx          # NEW: tab container
-      whats-next-tab.tsx               # NEW
-      fabric-requirements-tab.tsx      # NEW
-      storage-view-tab.tsx             # NEW
-    project-dashboard/
-      project-dashboard.tsx            # NEW: page component
-      hero-stats.tsx                   # NEW: stat cards row
-      progress-breakdown-tab.tsx       # NEW: buckets
-      finished-tab.tsx                 # NEW: completed projects
-    sessions/
-      session-modal-context.tsx        # NEW: React context provider
-      log-session-modal.tsx            # NEW: modal component
-      sessions-tab.tsx                 # NEW: project detail tab
-    shopping/
-      shopping-cart.tsx                # NEW: upgraded shopping page (replaces shopping-list.tsx)
-  lib/actions/
-    session-actions.ts                 # NEW: StitchSession CRUD
-    dashboard-queries.ts              # NEW: read-only aggregation functions
+[Type Toggle] Tab -> [Search Input] type+Enter -> [Stitches/Qty Input] Enter ->
+  (row added, search refocuses)
+
+Within data rows:
+  Click cell -> inline edit -> Tab to next editable cell -> Enter to confirm
 ```
 
-## Patterns to Follow
+**useSupplyTable hook responsibilities:**
+1. Track `activeType` (thread/bead/specialty) -- sticky between adds
+2. Track `focusedElement` (search input, stitch input, need input)
+3. Handle Enter key chain: autocomplete select -> qty field -> commit row -> refocus search
+4. Handle Escape: reset add row fields
+5. Handle Tab: move between editable cells in data rows
+6. Manage `pendingSupplies` array (local mode) or delegate to parent (persisted mode)
 
-### Pattern 1: Server Component Page + Client Feature Component
+The hook does NOT manage autocomplete keyboard nav (ArrowUp/ArrowDown) -- that stays in PortalAutocomplete which handles its own focus trap.
 
-The v1.1 pattern that works well: Server Component page fetches data, passes as props to a Client Component that handles interactivity.
+---
 
-```typescript
-// page.tsx (Server Component)
-export default async function DashboardPage() {
-  const data = await getMainDashboardData();
-  const imageUrls = await getPresignedImageUrls(imageKeys);
-  return <MainDashboard {...data} imageUrls={imageUrls} />;
-}
+## Pattern Type Cards Architecture
 
-// main-dashboard.tsx (Client Component)
-"use client";
-export function MainDashboard({ ... }: MainDashboardProps) {
-  // All interactivity here
-}
+Current implementation uses boolean toggles (isPaperChart, isFormalKit, isSAL) which don't map cleanly to the sketch-designed card grid (Chart Only, Kit, Digital Only, Subscription). The sketch shows mutually exclusive cards with radio-style selection.
+
+**Decision: Keep existing schema fields.** The card selection is a UI affordance that maps to the existing booleans:
+- "Chart Only" = isPaperChart: true, isFormalKit: false
+- "Kit" = isFormalKit: true (expands to show kitColorCount)
+- "Digital Only" = isPaperChart: false, isFormalKit: false
+- "Subscription" = isSAL: true
+
+This avoids a schema migration. The PatternTypeCards component translates card selection to boolean field updates.
+
+---
+
+## Form Edit Mode Integration
+
+The current edit flow uses `ChartEditModal` (dialog with tabs). For v1.3 consistency, the edit page (`charts/[id]/edit/page.tsx`) should render the same `MergedForm` in edit mode, pre-populated with existing data and existing supplies.
+
+In edit mode:
+- DetailsView pre-fills all fields from existing chart+project
+- Supply takeover shows existing supplies (fetched from server) as initial state
+- Changes save via `updateChart()` + individual supply mutations (existing pattern)
+- No batch-add needed -- supplies are already persisted
+
+The `ChartEditModal` can stay as a lightweight quick-edit option (accessible from project detail hero kebab menu), but the full edit page becomes the canonical editing surface.
+
+---
+
+## Component Boundaries: What Talks to What
+
+```
+MergedForm (orchestrator)
+  |
+  |-- [mode === "details"]
+  |     DetailsView
+  |       BasicInfoSection (existing, reused)
+  |       StitchCountSection (existing, reused)
+  |       GenreSection (existing, reused as chips)
+  |       PatternTypeCards (NEW)
+  |       ProjectSetupSection (existing, reused)
+  |       DatesSection (existing, reused)
+  |       GoalsSection (existing, reused)
+  |       NotesSection (existing, reused)
+  |       MilestoneMarker (NEW)
+  |
+  |-- [mode === "supply-takeover"]
+  |     SummaryBar (NEW)
+  |     SupplyTakeoverView
+  |       SkeinCalculatorCard (NEW)
+  |       UnifiedSupplyTable (NEW, mode="local")
+  |         SupplyAddRow (NEW)
+  |           SupplyTypeToggle (NEW)
+  |           PortalAutocomplete (NEW, extracted from SearchToAdd)
+  |         SectionDivider (NEW) x3
+  |         SupplyDataRow (NEW) xN
+  |         StatusDonut (NEW)
+  |
+  |-- StickyFormBar (always visible)
+
+SuppliesTab (project detail, existing but modified)
+  |-- CalculatorSettingsBar (existing) OR SkeinCalculatorCard (if redesigned)
+  |-- UnifiedSupplyTable (NEW, mode="persisted")
+        (same component tree, different data source)
 ```
 
-### Pattern 2: Optimistic Update for Session Logging
-
-Session logging should feel instant. Use `useTransition` + optimistic state:
-
-```typescript
-const [isPending, startTransition] = useTransition();
-
-function handleSave(session: SessionFormData) {
-  startTransition(async () => {
-    try {
-      const result = await createSession(session);
-      if (result.success) {
-        toast.success("Session logged!");
-        closeModal();
-      } else {
-        toast.error(result.error);
-      }
-    } catch {
-      toast.error("Something went wrong.");
-    }
-  });
-}
-```
-
-### Pattern 3: Shared Image Resolution
-
-Cover images need presigned URLs. Dashboard queries fetch image keys; the page.tsx resolves them before passing to components. Same pattern as `/charts/page.tsx`:
-
-```typescript
-const imageKeys = projects.flatMap(p => [
-  p.chart.coverImageUrl,
-  p.chart.coverThumbnailUrl,
-]);
-const imageUrls = await getPresignedImageUrls(imageKeys);
-```
-
-### Pattern 4: Tab State via nuqs
-
-Pattern Dive uses URL-persisted tab state (consistent with project detail tabs):
-
-```typescript
-import { useQueryState } from "nuqs";
-
-const [tab, setTab] = useQueryState("tab", {
-  defaultValue: "browse",
-  parse: (v) => ["browse", "whats-next", "fabric", "storage"].includes(v) ? v : "browse",
-});
-```
-
-## Anti-Patterns to Avoid
-
-### Anti-Pattern 1: Client-Side Aggregation for Dashboard Stats
-
-**What:** Fetching all sessions client-side and computing stats in the browser.
-**Why bad:** Session count grows unboundedly. With daily logging for 2+ years, that's 700+ sessions. Sending all of them to the client wastes bandwidth and battery.
-**Instead:** Compute aggregates server-side with Prisma `aggregate`/`groupBy`, send only the results.
-
-### Anti-Pattern 2: Separate Prisma Queries per Dashboard Section
-
-**What:** Running 6+ individual `findMany` calls for each dashboard section.
-**Why bad:** Each query is a round trip to Neon. After cold start (5min idle), that's 6x100ms+ = 600ms+ before any rendering.
-**Instead:** Fetch the full project dataset once, compute sections in TypeScript. One round trip.
-
-### Anti-Pattern 3: Storing Computed Progress Redundantly
-
-**What:** Adding `progressPercent` as a stored field on Project.
-**Why bad:** Must be kept in sync with `stitchesCompleted` and chart's `stitchCount`. Double bookkeeping.
-**Instead:** `stitchesCompleted` is the stored value (updated via session sum). Percentage is calculated at display time: `Math.round((stitchesCompleted / stitchCount) * 100)`.
-
-### Anti-Pattern 4: LogSessionModal as a Route
-
-**What:** Making `/log-session` a page or parallel route.
-**Why bad:** It's a modal overlay, not a destination. Opening it from the header shouldn't navigate away from the current page.
-**Instead:** React context at the layout level with a portal-rendered Dialog.
-
-### Anti-Pattern 5: Raw SQL for Simple Aggregations
-
-**What:** Using `$queryRaw` for counts and sums that Prisma supports natively.
-**Why bad:** Loses type safety, must maintain raw SQL strings.
-**Instead:** Use Prisma's `aggregate`, `groupBy`, and `count`. Reserve `$queryRaw` only for `COUNT(DISTINCT)` if/when needed in v1.3.
-
-## Build Order (Dependency-Informed)
-
-The build order must respect data dependencies: sessions must exist before dashboards can show session-derived data.
-
-### Phase 8: Session Logging + Pattern Dive
-
-1. **StitchSession schema** -- `prisma db push` + `prisma generate`
-2. **Session server actions** -- CRUD + progress recalculation
-3. **LogSessionModal** -- UI component + Zod validation
-4. **SessionModalProvider** -- context at layout level
-5. **Wire TopBar button** -- replace toast placeholder with `openLogSession()`
-6. **Sessions tab on project detail** -- add third tab to project-detail-page
-7. **Pattern Dive tabs** -- refactor /charts to Pattern Dive with Browse + 3 new tabs
-   - Browse reuses existing gallery infrastructure
-   - What's Next, Fabric Requirements, Storage View are new
-
-**Why sessions first:** Pattern Dive doesn't depend on sessions, but building sessions first establishes the data foundation. The dashboard (Phase 9) depends on both sessions and the query patterns established here.
-
-### Phase 9: Dashboards + Shopping Cart Upgrade
-
-1. **Dashboard query functions** -- `dashboard-queries.ts`
-2. **Main Dashboard** -- replace placeholder / page
-3. **Project Dashboard** -- new /projects route
-4. **Shopping Cart upgrade** -- tabbed supply types, fabric matching
-5. **Nav updates** -- add /projects to nav, rename /charts label
-
-**Why dashboards after sessions:** Main Dashboard shows "Currently Stitching" cards with last-session info. Project Dashboard shows progress buckets with stitching-day counts. Both depend on StitchSession data.
-
-## Navigation Changes
-
-Current nav structure needs updates:
-
-```typescript
-// nav-items.ts changes:
-{
-  label: "Projects",
-  items: [
-    { label: "Dashboard", href: "/", icon: LayoutDashboard },        // KEEP (new content)
-    { label: "Pattern Dive", href: "/charts", icon: Scissors },      // RENAME from "Projects"
-    { label: "Project Dashboard", href: "/projects", icon: BarChart3 },  // NEW
-    { label: "Shopping", href: "/shopping", icon: ShoppingCart },     // KEEP
-  ],
-},
-```
-
-**Note:** The "Statistics" nav item (`/stats`) remains as a placeholder for v1.3. The "Sessions" nav item (`/sessions`) could be repurposed as a standalone session log viewer or kept as placeholder.
+---
 
 ## Scalability Considerations
 
-| Concern | At 500 charts (now) | At 1,000 sessions | At 5,000 sessions |
-|---------|---------------------|--------------------|--------------------|
-| Dashboard load | <200ms (single query) | <200ms (aggregate only) | <200ms (aggregate only) |
-| Session list load | N/A | 50 rows paginated | 50 rows paginated |
-| Gallery load | ~200ms (existing) | No change | No change |
-| Progress recalc | <50ms | <50ms (single aggregate) | <50ms (single aggregate) |
-| Neon cold start | +200ms first query | Same | Same |
+| Concern | At 10 supplies | At 50 supplies | At 200 supplies |
+|---------|---------------|----------------|-----------------|
+| Table render | No issue | No issue | Consider virtualization (unlikely needed -- most projects have <80 threads) |
+| Add row autocomplete | 495 DMC threads, fast search | Same catalog | Same catalog |
+| Local state (creation) | Trivial | Trivial | Array operations fine at this scale |
+| Keyboard nav | Smooth | Smooth | Section dividers help scannability |
+| Batch save | Single $transaction | Single $transaction | May need chunking at 200+ but unlikely |
 
-**Key insight:** The aggregation strategy (server-side `aggregate`/`groupBy`) scales well because PostgreSQL handles the heavy lifting. The main risk is Neon cold starts, which affect the first page load after 5 minutes of inactivity. This is a hosting constraint, not an architecture one.
+---
+
+## Suggested Build Order
+
+Based on dependency analysis, the recommended phase structure:
+
+### Phase 1: Foundation -- Unified Supply Table Components
+Build the reusable table first because both creation flow and project detail depend on it.
+
+1. StatusDonut (SVG component, pure, no dependencies)
+2. SupplyTypeToggle (segmented control, pure)
+3. SectionDivider (table row component, pure)
+4. SupplyDataRow (table row with inline editing -- reuses EditableNumber)
+5. PortalAutocomplete (extract from SearchToAdd -- search + dropdown + keyboard)
+6. SupplyAddRow (combines toggle + search + qty inputs + keyboard chain)
+7. useSupplyTable (state hook: pending supplies, active type, keyboard flow)
+8. UnifiedSupplyTable (assembles all above into grouped table with footer)
+
+### Phase 2: Supply Table Integration on Project Detail
+Wire the new table into the existing project detail page (persisted mode).
+
+1. Adapt SuppliesTab to use UnifiedSupplyTable instead of SupplySection/SupplyRow
+2. Wire server actions (add/update/remove) through table callbacks
+3. Integrate CalculatorSettingsBar (or replace with SkeinCalculatorCard)
+4. Remove deprecated components (supply-section.tsx, supply-row.tsx, supply-footer-totals.tsx)
+
+### Phase 3: Merged Form -- Details View
+Build the new creation form layout.
+
+1. RequiredDot (tiny component)
+2. PatternTypeCards (card grid mapping to booleans)
+3. MilestoneMarker (transition CTA)
+4. StickyFormBar (fixed bottom bar)
+5. DetailsView (regroups existing sections with HR dividers + new components)
+
+### Phase 4: Merged Form -- Supply Takeover
+Wire the form-to-supply transition.
+
+1. SummaryBar (sticky collapsed form summary)
+2. SkeinCalculatorCard (styled calc settings -- defaults from fabric)
+3. SupplyTakeoverView (summary bar + calc card + table in local mode)
+4. Extend useChartForm with supply accumulator + mode toggle
+5. MergedForm orchestrator (details <-> supply-takeover transitions)
+6. New server action: batchAddSuppliesToProject
+7. Wire creation submit: createChart -> batchAddSupplies -> navigate
+
+### Phase 5: Edit Mode + Cleanup
+Make the edit page use MergedForm too, clean up deprecated code.
+
+1. Wire MergedForm in edit mode (pre-populated, persisted supplies)
+2. Update charts/[id]/edit/page.tsx
+3. Delete chart-add-form.tsx, project-supplies-tab.tsx, and other deprecated files
+4. Update tests for all modified components
+
+**Phase ordering rationale:**
+- Table first (Phase 1) because both creation (Phase 4) and project detail (Phase 2) need it
+- Project detail integration (Phase 2) validates the table works with real server data before the more complex creation flow
+- Details view (Phase 3) before supply takeover (Phase 4) because the form fields must exist before the transition between modes
+- Edit mode + cleanup (Phase 5) last because it's additive -- existing edit modal still works as fallback
+
+---
+
+## Anti-Patterns to Avoid
+
+### Anti-Pattern 1: Nested Forms
+**What:** Wrapping the supply table inside the chart form's `<form>` element.
+**Why bad:** HTML forbids nested forms. Enter key in supply search would submit the outer form.
+**Instead:** The supply table uses `<div>` with `type="button"` handlers and explicit keyboard event handling. StickyFormBar's Create button submits via the useChartForm.handleSubmit callback, not a form submit event.
+
+### Anti-Pattern 2: Server Actions During Creation Flow
+**What:** Calling addThreadToProject() while adding supplies in creation mode.
+**Why bad:** No projectId exists yet. Would require creating the project first, then managing partial creation state.
+**Instead:** Accumulate supplies in local state. Batch-persist after chart+project creation succeeds.
+
+### Anti-Pattern 3: SearchToAdd Fork
+**What:** Duplicating SearchToAdd to make a "creation mode" version.
+**Why bad:** Two components to maintain. Bugs fixed in one, not the other.
+**Instead:** Extract PortalAutocomplete as a shared primitive. Both the creation flow add row and any future search-to-add usage compose from it.
+
+### Anti-Pattern 4: Global Form State for Supplies
+**What:** Putting supply array into useChartForm's values object.
+**Why bad:** Couples form validation with supply state. Zod schema would need to understand supply rows. Form dirty tracking gets confused.
+**Instead:** useSupplyTable manages supply state independently. MergedForm reads both states at submit time and orchestrates the two-phase save.
+
+### Anti-Pattern 5: Table Layout with CSS Grid
+**What:** Using CSS Grid instead of `<table>` for the supply table.
+**Why bad:** The sketch explicitly uses `table-layout: fixed` for column alignment. Section dividers use `colspan`. Semantic table markup aids accessibility.
+**Instead:** Use actual `<table>` element with `table-layout: fixed`, as designed in the sketches.
+
+---
 
 ## Sources
 
-- Prisma 7 aggregate/groupBy docs: Context7 (HIGH confidence)
-- Existing codebase patterns: direct code inspection (HIGH confidence)
-- Design components: `product-plan/sections/dashboards-and-views/` and `product-plan/sections/stitching-sessions-and-statistics/` (HIGH confidence)
-- Neon free tier specs: verified from existing deployment constraints (HIGH confidence)
+- Sketch findings: `.claude/skills/sketch-findings-cross-stitch-tracker/`
+- Existing codebase analysis (HIGH confidence -- direct code reading)
+- Prisma schema: `prisma/schema.prisma`
+- Existing components: `src/components/features/charts/`, `src/components/features/supplies/`
