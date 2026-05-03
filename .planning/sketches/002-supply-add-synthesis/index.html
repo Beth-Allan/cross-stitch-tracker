@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sketch 002: Supply Add — Synthesis</title>
+  <link rel="stylesheet" href="../themes/default.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-text);
+      padding-top: 52px;
+      line-height: 1.5;
+    }
+
+    /* Variant Nav */
+    #variant-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 8px 16px;
+      display: flex; gap: 8px; align-items: center;
+      font-family: var(--font-sans);
+    }
+    .variant-tab {
+      padding: 6px 14px; border-radius: 6px;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text-muted);
+      font-size: var(--text-sm); font-weight: 500;
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .variant-tab:hover { background: var(--color-surface-hover); color: var(--color-text); }
+    .variant-tab.active { background: var(--color-primary); color: var(--color-primary-text); border-color: var(--color-primary); }
+    .variant-label { margin-left: auto; font-size: var(--text-xs); color: var(--color-text-subtle); }
+
+    .variant { display: none; max-width: 860px; margin: 0 auto; padding: var(--space-6); }
+    .variant.active { display: block; }
+
+    h3 { font-family: var(--font-heading); font-size: var(--text-lg); font-weight: 600; }
+    .section-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: visible;
+    }
+    .section-header {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-3) var(--space-5);
+    }
+    .count-badge { font-size: var(--text-sm); font-weight: 400; color: var(--color-text-muted); margin-left: var(--space-2); }
+    .colour-swatch { display: inline-block; flex-shrink: 0; border-radius: 3px; }
+    .colour-swatch.light { box-shadow: inset 0 0 0 1px var(--color-border); }
+    .description-block {
+      background: var(--color-surface-hover);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4); margin-bottom: var(--space-6);
+      font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.6;
+    }
+    .description-block strong { color: var(--color-text); }
+    .description-block kbd {
+      background: var(--color-surface); border: 1px solid var(--color-border);
+      border-radius: 3px; padding: 1px 5px; font-size: 0.8em; font-family: var(--font-mono);
+    }
+
+    /* Table */
+    .supply-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); table-layout: fixed; }
+    .supply-table thead th {
+      text-align: left; padding: var(--space-2) var(--space-3);
+      font-size: 11px; font-weight: 600; color: var(--color-text-muted);
+      text-transform: uppercase; letter-spacing: 0.04em;
+      border-bottom: 2px solid var(--color-border);
+      white-space: nowrap; background: var(--color-surface);
+    }
+    .supply-table tbody td {
+      padding: 5px var(--space-3);
+      border-bottom: 1px solid var(--color-border-light);
+      font-variant-numeric: tabular-nums; vertical-align: middle; overflow: hidden;
+    }
+    .supply-table tbody tr:hover td { background: var(--color-surface-hover); }
+    .supply-table tbody tr.data-row { animation: slideIn 0.2s ease; }
+    .supply-table tbody tr.add-row td {
+      background: rgba(5, 150, 105, 0.03);
+      border-bottom: 2px solid var(--color-primary-light);
+      padding-top: 6px; padding-bottom: 6px;
+    }
+    .cell-colour { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+    .tc-code { font-weight: 600; font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+    .tc-name { color: var(--color-text-muted); font-size: var(--text-xs); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .arrow-cell { color: var(--color-text-subtle); font-size: var(--text-xs); text-align: center; }
+    .editable-cell { cursor: text; border-radius: 3px; padding: 2px 6px; transition: background 0.1s; display: inline-block; }
+    .editable-cell:hover { background: rgba(5,150,105,0.08); }
+    .status-cell { text-align: center; font-size: 14px; }
+    .status-fulfilled { color: var(--color-success); }
+    .status-partial { color: var(--color-warning); }
+    .status-none { color: var(--color-text-subtle); }
+    .del-cell { text-align: center; }
+    .del-btn {
+      border: none; background: none; cursor: pointer;
+      color: var(--color-text-subtle); padding: 2px 4px; border-radius: 3px;
+      opacity: 0; transition: all 0.15s; font-size: 13px;
+    }
+    tr:hover .del-btn { opacity: 1; }
+    .del-btn:hover { color: var(--color-danger); background: rgba(220,38,38,0.08); }
+
+    /* Inputs */
+    .tbl-input {
+      width: 100%; border: 1px solid var(--color-border); border-radius: 4px;
+      padding: 4px 8px; font-size: var(--text-sm); font-family: var(--font-sans);
+      background: var(--color-surface); color: var(--color-text); transition: border-color 0.15s;
+    }
+    .tbl-input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 2px rgba(5,150,105,0.15); }
+    .tbl-input:disabled { background: var(--color-bg); color: var(--color-text-subtle); cursor: not-allowed; }
+    .tbl-input::placeholder { color: var(--color-text-subtle); font-size: var(--text-xs); }
+
+    /* Autocomplete */
+    .ac-wrap { position: relative; }
+    .ac-dropdown {
+      position: absolute; top: calc(100% + 2px); left: 0; width: 320px;
+      background: var(--color-surface); border: 1px solid var(--color-border);
+      border-radius: 8px; box-shadow: var(--shadow-lg);
+      max-height: 240px; overflow-y: auto; z-index: 20; display: none;
+    }
+    .ac-dropdown.open { display: block; }
+    .ac-item {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: 6px var(--space-3); cursor: pointer; font-size: var(--text-sm);
+      transition: background 0.1s; border: none; background: none; width: 100%;
+      text-align: left; color: var(--color-text); font-family: var(--font-sans);
+    }
+    .ac-item:hover, .ac-item.hl { background: var(--color-surface-hover); }
+    .ac-item.disabled { opacity: 0.4; cursor: default; }
+    .ac-swatch { width: 16px; height: 16px; border-radius: 2px; flex-shrink: 0; }
+    .ac-code { font-weight: 600; font-family: var(--font-mono); font-size: 12px; }
+    .ac-name { color: var(--color-text-muted); }
+    .ac-added { font-size: 11px; color: var(--color-text-subtle); font-style: italic; margin-left: auto; }
+
+    .calc-badge {
+      font-size: 11px; color: var(--color-primary); margin-left: 2px;
+      display: none; cursor: help;
+    }
+
+    .progress-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-3) var(--space-5);
+      font-size: var(--text-sm); color: var(--color-text-muted);
+      border-top: 1px solid var(--color-border);
+    }
+    .progress-footer strong { color: var(--color-text); }
+    .keyboard-hints {
+      display: flex; gap: var(--space-4); flex-wrap: wrap;
+      padding: var(--space-2) var(--space-5);
+      font-size: var(--text-xs); color: var(--color-text-subtle);
+      border-top: 1px solid var(--color-border-light);
+    }
+    .keyboard-hints kbd {
+      background: var(--color-surface-hover); border: 1px solid var(--color-border);
+      border-radius: 3px; padding: 0 4px; font-family: var(--font-mono); font-size: 0.85em;
+    }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+    #sketch-tools {
+      position: fixed; bottom: 12px; right: 12px; z-index: 9999;
+      font-family: system-ui; font-size: 12px;
+      background: rgba(0,0,0,0.75); color: white;
+      padding: 8px 14px; border-radius: 8px;
+      opacity: 0.35; transition: opacity 0.2s;
+      display: flex; gap: 10px; align-items: center;
+    }
+    #sketch-tools:hover { opacity: 1; }
+    #sketch-tools button {
+      font-size: 11px; padding: 2px 6px; border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1); color: white; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div id="variant-nav">
+  <button class="variant-tab active" onclick="showV('synth',this)">Synthesis: Table + Auto-Calc</button>
+  <button class="variant-tab" onclick="showV('compact',this)">Refinement: Ultra-Compact</button>
+  <span class="variant-label">Sketch 002 — Supply Add Synthesis</span>
+</div>
+
+<!-- ═══ SYNTHESIS ═══ -->
+<div id="variant-synth" class="variant active">
+  <div class="description-block">
+    <strong>Synthesis: Table layout + all fields visible + auto-calc need</strong><br>
+    Compact table. Add row at top with all fields visible at once. Type code &rarr; autocomplete &rarr;
+    <kbd>Tab</kbd> to stitches &rarr; need auto-calculates from skein calculator &rarr; <kbd>Enter</kbd> to add.
+    Need is pre-filled but editable. No "have" during add &mdash; that's for later when you're shopping.
+  </div>
+  <div class="section-card">
+    <div class="section-header">
+      <span>&#9662;</span><span style="font-size:16px">&#127912;</span>
+      <h3>Threads <span class="count-badge" id="s-count"></span></h3>
+      <span class="count-badge" style="margin-left:auto" id="s-stitches"></span>
+    </div>
+    <div style="border-top:1px solid var(--color-border)">
+      <table class="supply-table">
+        <thead><tr>
+          <th style="width:44%">Colour</th>
+          <th style="width:14%">Stitches</th>
+          <th style="width:24px"></th>
+          <th style="width:13%">Need</th>
+          <th style="width:10%">Have</th>
+          <th style="width:6%;text-align:center"></th>
+          <th style="width:32px"></th>
+        </tr></thead>
+        <tbody id="s-tbody"></tbody>
+      </table>
+      <div class="progress-footer">
+        <span><strong id="s-total">0</strong> colours added</span>
+        <span>Total: <strong id="s-skeins">0</strong> skeins needed</span>
+      </div>
+      <div class="keyboard-hints">
+        <span><kbd>&#8593;&#8595;</kbd> navigate dropdown</span>
+        <span><kbd>Enter</kbd> select / add row</span>
+        <span><kbd>Tab</kbd> next field</span>
+        <span><kbd>Esc</kbd> clear</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ULTRA-COMPACT ═══ -->
+<div id="variant-compact" class="variant">
+  <div class="description-block">
+    <strong>Refinement: Ultra-Compact</strong><br>
+    Same interaction but tighter &mdash; smaller swatches, narrower padding, Need/Have merged
+    into one column (<strong>2</strong>/<span style="color:var(--color-text-muted)">1</span>).
+    Compare density with the synthesis when you have 8+ items.
+  </div>
+  <div class="section-card">
+    <div class="section-header">
+      <span>&#9662;</span><span style="font-size:16px">&#127912;</span>
+      <h3>Threads <span class="count-badge" id="u-count"></span></h3>
+      <span class="count-badge" style="margin-left:auto" id="u-stitches"></span>
+    </div>
+    <div style="border-top:1px solid var(--color-border)">
+      <table class="supply-table" style="font-size:13px">
+        <thead><tr>
+          <th style="width:46%">Colour</th>
+          <th style="width:14%">Stitches</th>
+          <th style="width:24px"></th>
+          <th style="width:16%">Need / Have</th>
+          <th style="width:6%;text-align:center"></th>
+          <th style="width:28px"></th>
+        </tr></thead>
+        <tbody id="u-tbody"></tbody>
+      </table>
+      <div class="progress-footer">
+        <span><strong id="u-total">0</strong> colours added</span>
+        <span>Total: <strong id="u-skeins">0</strong> skeins needed</span>
+      </div>
+      <div class="keyboard-hints">
+        <span><kbd>&#8593;&#8595;</kbd> navigate</span>
+        <span><kbd>Enter</kbd> select / add</span>
+        <span><kbd>Tab</kbd> next field</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="sketch-tools" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.35'">
+  <span>&#128295;</span>
+  <button onclick="setVP(375)">375</button>
+  <button onclick="setVP(768)">768</button>
+  <button onclick="setVP(null)">Full</button>
+</div>
+
+<script>
+var DMC=[
+{code:"310",name:"Black",hex:"#000000"},{code:"blanc",name:"White",hex:"#FFFFFF"},
+{code:"ecru",name:"Ecru",hex:"#F0E6D0"},{code:"321",name:"Red",hex:"#C72D34"},
+{code:"349",name:"Dark Coral",hex:"#C23B44"},{code:"414",name:"Dark Steel Gray",hex:"#8C8C8C"},
+{code:"415",name:"Pearl Gray",hex:"#B4B4B4"},{code:"433",name:"Medium Brown",hex:"#864A2C"},
+{code:"434",name:"Light Brown",hex:"#985C3C"},{code:"435",name:"Very Light Brown",hex:"#B07840"},
+{code:"436",name:"Tan",hex:"#C49458"},{code:"437",name:"Light Tan",hex:"#D4A86A"},
+{code:"498",name:"Dark Red",hex:"#982230"},{code:"550",name:"Very Dark Violet",hex:"#5C2866"},
+{code:"552",name:"Medium Violet",hex:"#8050A0"},{code:"666",name:"Bright Red",hex:"#E21830"},
+{code:"699",name:"Green",hex:"#1C6828"},{code:"700",name:"Bright Green",hex:"#228B22"},
+{code:"701",name:"Light Green",hex:"#2E9E36"},{code:"702",name:"Kelly Green",hex:"#38A840"},
+{code:"725",name:"Medium Light Topaz",hex:"#E8C050"},{code:"726",name:"Light Topaz",hex:"#F0D060"},
+{code:"727",name:"Very Light Topaz",hex:"#F8E080"},{code:"762",name:"Very Light Pearl Gray",hex:"#D8D8D8"},
+{code:"798",name:"Dark Delft Blue",hex:"#4070A0"},{code:"799",name:"Medium Delft Blue",hex:"#5088B8"},
+{code:"800",name:"Pale Delft Blue",hex:"#C0D0E8"},{code:"815",name:"Medium Garnet",hex:"#881828"},
+{code:"816",name:"Garnet",hex:"#782030"},{code:"817",name:"Very Dark Coral Red",hex:"#C81818"},
+{code:"838",name:"Very Dark Beige Brown",hex:"#5C3C28"},{code:"839",name:"Dark Beige Brown",hex:"#6C4C38"},
+{code:"840",name:"Medium Beige Brown",hex:"#907050"},{code:"898",name:"Very Dark Coffee Brown",hex:"#5C3018"},
+{code:"938",name:"Ultra Dark Coffee Brown",hex:"#4A2810"},{code:"3371",name:"Black Brown",hex:"#2A1810"},
+{code:"3799",name:"Very Dark Pewter Gray",hex:"#4A4F55"},{code:"3865",name:"Winter White",hex:"#FAF8F0"}
+];
+var INIT=[
+{code:"310",name:"Black",hex:"#000000",stitches:450,need:2,have:2},
+{code:"321",name:"Red",hex:"#C72D34",stitches:280,need:2,have:1},
+{code:"762",name:"Very Light Pearl Gray",hex:"#D8D8D8",stitches:200,need:1,have:0},
+{code:"blanc",name:"White",hex:"#FFFFFF",stitches:380,need:2,have:2},
+{code:"3799",name:"Very Dark Pewter Gray",hex:"#4A4F55",stitches:95,need:1,have:0},
+{code:"415",name:"Pearl Gray",hex:"#B4B4B4",stitches:160,need:1,have:1},
+{code:"699",name:"Green",hex:"#1C6828",stitches:520,need:3,have:0},
+{code:"725",name:"Medium Light Topaz",hex:"#E8C050",stitches:110,need:1,have:1}
+];
+
+function isL(h){var r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return(.299*r+.587*g+.114*b)/255>.85}
+function swC(h){return'colour-swatch'+(isL(h)?' light':'')}
+function calc(st){return st>0?Math.ceil(st/200):0}
+function stH(n,h){if(h>=n)return '<span class="status-fulfilled">&#10003;</span>';if(h>0)return '<span class="status-partial">&#9684;</span>';return '<span class="status-none">&#9675;</span>'}
+function fDMC(q){var s=q.toLowerCase().trim();if(!s)return DMC.slice(0,8);return DMC.filter(function(c){return c.code.toLowerCase().indexOf(s)>=0||c.name.toLowerCase().indexOf(s)>=0}).slice(0,8)}
+function showV(id,b){document.querySelectorAll('.variant').forEach(function(v){v.classList.remove('active');v.style.display='none'});document.querySelectorAll('.variant-tab').forEach(function(t){t.classList.remove('active')});var e=document.getElementById('variant-'+id);e.style.display='block';e.classList.add('active');b.classList.add('active')}
+function setVP(w){document.querySelectorAll('.variant').forEach(function(v){v.style.maxWidth=w?w+'px':'860px'})}
+
+function mkAC(res,exCodes,selFn,hl){
+  var ex={};exCodes.forEach(function(c){ex[c]=true});
+  var f=document.createDocumentFragment();
+  res.forEach(function(c,i){
+    var b=document.createElement('button');
+    b.className='ac-item'+(ex[c.code]?' disabled':'')+(i===hl?' hl':'');
+    if(ex[c.code])b.disabled=true;
+    var s=document.createElement('div');s.className='ac-swatch '+swC(c.hex);s.style.background=c.hex;b.appendChild(s);
+    var cd=document.createElement('span');cd.className='ac-code';cd.textContent='DMC '+c.code;b.appendChild(cd);
+    var nm=document.createElement('span');nm.className='ac-name';nm.textContent=' — '+c.name;b.appendChild(nm);
+    if(ex[c.code]){var a=document.createElement('span');a.className='ac-added';a.textContent='Added';b.appendChild(a)}
+    if(!ex[c.code])b.addEventListener('click',function(){selFn(c.code)});
+    f.appendChild(b);
+  });
+  return f;
+}
+
+// ═══ SYNTHESIS ═══
+var sI=INIT.slice(),sHL=-1,sS=null;
+function rS(){
+  var tb=document.getElementById('s-tbody'),ts=0,tn=0;
+  tb.textContent='';
+  // Add row
+  var ar=document.createElement('tr');ar.className='add-row';
+  var t1=document.createElement('td');
+  var w=document.createElement('div');w.className='ac-wrap';
+  var ip=document.createElement('input');ip.type='text';ip.className='tbl-input';ip.id='s-c';ip.placeholder='Type code or name...';ip.autocomplete='off';w.appendChild(ip);
+  var dd=document.createElement('div');dd.className='ac-dropdown';dd.id='s-dd';w.appendChild(dd);
+  t1.appendChild(w);ar.appendChild(t1);
+
+  var t2=document.createElement('td');
+  var si=document.createElement('input');si.type='number';si.className='tbl-input';si.id='s-s';si.placeholder='Stitches';si.min='0';si.disabled=true;t2.appendChild(si);ar.appendChild(t2);
+
+  var t3=document.createElement('td');t3.className='arrow-cell';t3.style.color='var(--color-border)';t3.textContent='→';ar.appendChild(t3);
+
+  var t4=document.createElement('td');
+  var nw=document.createElement('div');nw.style.cssText='display:flex;align-items:center;gap:4px';
+  var ni=document.createElement('input');ni.type='number';ni.className='tbl-input';ni.id='s-n';ni.placeholder='Auto';ni.min='0';ni.disabled=true;ni.style.flex='1';nw.appendChild(ni);
+  var cb=document.createElement('span');cb.className='calc-badge';cb.id='s-cb';cb.title='Auto-calculated from stitches';cb.textContent='✨';nw.appendChild(cb);
+  t4.appendChild(nw);ar.appendChild(t4);
+
+  var t5=document.createElement('td');t5.style.cssText='color:var(--color-text-subtle);font-size:12px';t5.textContent='—';ar.appendChild(t5);
+  ar.appendChild(document.createElement('td'));
+  ar.appendChild(document.createElement('td'));
+  tb.appendChild(ar);
+
+  // Data
+  sI.forEach(function(it){
+    ts+=it.stitches;tn+=it.need;
+    var tr=document.createElement('tr');tr.className='data-row';
+    var d1=document.createElement('td');var cc=document.createElement('div');cc.className='cell-colour';
+    var sw=document.createElement('div');sw.className=swC(it.hex);sw.style.cssText='background:'+it.hex+';width:16px;height:16px;border-radius:2px';cc.appendChild(sw);
+    var cd=document.createElement('span');cd.className='tc-code';cd.textContent='DMC '+it.code;cc.appendChild(cd);
+    var nm=document.createElement('span');nm.className='tc-name';nm.textContent='— '+it.name;cc.appendChild(nm);
+    d1.appendChild(cc);tr.appendChild(d1);
+
+    var d2=document.createElement('td');var e1=document.createElement('span');e1.className='editable-cell';e1.textContent=it.stitches.toLocaleString();d2.appendChild(e1);tr.appendChild(d2);
+    var d3=document.createElement('td');d3.className='arrow-cell';d3.textContent='→';tr.appendChild(d3);
+    var d4=document.createElement('td');var e2=document.createElement('span');e2.className='editable-cell';e2.textContent=it.need;d4.appendChild(e2);
+    var sk=document.createElement('span');sk.style.cssText='font-size:11px;color:var(--color-text-subtle);margin-left:3px';sk.textContent='sk';d4.appendChild(sk);tr.appendChild(d4);
+
+    var d5=document.createElement('td');var e3=document.createElement('span');e3.className='editable-cell';e3.textContent=it.have;if(it.have>=it.need)e3.style.color='var(--color-success)';d5.appendChild(e3);tr.appendChild(d5);
+
+    var d6=document.createElement('td');d6.className='status-cell';d6.innerHTML=stH(it.need,it.have);tr.appendChild(d6);
+
+    var d7=document.createElement('td');d7.className='del-cell';
+    var db=document.createElement('button');db.className='del-btn';db.textContent='✕';
+    db.addEventListener('click',function(){sI=sI.filter(function(x){return x.code!==it.code});rS()});
+    d7.appendChild(db);tr.appendChild(d7);
+    tb.appendChild(tr);
+  });
+
+  document.getElementById('s-count').textContent='('+sI.length+' colour'+(sI.length!==1?'s':'')+')';
+  document.getElementById('s-stitches').textContent=ts.toLocaleString()+' stitches total';
+  document.getElementById('s-total').textContent=sI.length;
+  document.getElementById('s-skeins').textContent=tn;
+  bS();
+}
+
+function bS(){
+  var ci=document.getElementById('s-c'),si=document.getElementById('s-s'),ni=document.getElementById('s-n');
+  if(!ci)return;
+  ci.addEventListener('input',function(){
+    var dd=document.getElementById('s-dd'),q=this.value,ex=sI.map(function(i){return i.code}),r=fDMC(q);
+    if(!q.trim()){dd.classList.remove('open');return}
+    dd.textContent='';dd.appendChild(mkAC(r,ex,selS,sHL));dd.classList.add('open');
+  });
+  ci.addEventListener('keydown',function(e){
+    var dd=document.getElementById('s-dd'),its=dd.querySelectorAll('.ac-item');
+    if(e.key==='ArrowDown'){e.preventDefault();sHL=Math.min(sHL+1,its.length-1);while(sHL<its.length&&its[sHL]&&its[sHL].disabled)sHL++;its.forEach(function(el,i){el.classList.toggle('hl',i===sHL)})}
+    else if(e.key==='ArrowUp'){e.preventDefault();sHL=Math.max(sHL-1,0);while(sHL>=0&&its[sHL]&&its[sHL].disabled)sHL--;its.forEach(function(el,i){el.classList.toggle('hl',i===sHL)})}
+    else if(e.key==='Enter'){e.preventDefault();if(sHL>=0&&its[sHL]&&!its[sHL].disabled)its[sHL].click()}
+    else if(e.key==='Escape'){dd.classList.remove('open');sHL=-1}
+  });
+  si.addEventListener('input',function(){
+    var st=parseInt(this.value)||0,c=calc(st);
+    if(c>0){ni.value=c;document.getElementById('s-cb').style.display='inline'}
+    else{ni.value='';ni.placeholder='Auto';document.getElementById('s-cb').style.display='none'}
+  });
+  si.addEventListener('keydown',function(e){
+    if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();ni.focus();ni.select()}
+    else if(e.key==='Escape'){sS=null;sHL=-1;rS()}
+  });
+  ni.addEventListener('input',function(){document.getElementById('s-cb').style.display='none'});
+  ni.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){e.preventDefault();addS()}
+    else if(e.key==='Escape'){sS=null;sHL=-1;rS()}
+  });
+}
+
+function selS(code){
+  var c=DMC.filter(function(x){return x.code===code})[0];if(!c)return;
+  sS=c;var ci=document.getElementById('s-c');ci.value='DMC '+c.code+' — '+c.name;ci.style.fontWeight='600';
+  document.getElementById('s-dd').classList.remove('open');sHL=-1;
+  var si=document.getElementById('s-s');si.disabled=false;si.placeholder='0';
+  document.getElementById('s-n').disabled=false;
+  setTimeout(function(){si.focus()},30);
+}
+
+function addS(){
+  if(!sS)return;
+  var st=parseInt(document.getElementById('s-s').value)||0;
+  var nd=parseInt(document.getElementById('s-n').value)||calc(st)||1;
+  sI.unshift({code:sS.code,name:sS.name,hex:sS.hex,stitches:st,need:nd,have:0});
+  sS=null;sHL=-1;rS();
+  setTimeout(function(){var c=document.getElementById('s-c');if(c)c.focus()},50);
+}
+
+// ═══ ULTRA-COMPACT ═══
+var uI=INIT.slice(),uHL=-1,uS=null;
+function rU(){
+  var tb=document.getElementById('u-tbody'),ts=0,tn=0;
+  tb.textContent='';
+  var ar=document.createElement('tr');ar.className='add-row';
+  var t1=document.createElement('td');var w=document.createElement('div');w.className='ac-wrap';
+  var ip=document.createElement('input');ip.type='text';ip.className='tbl-input';ip.id='u-c';ip.placeholder='Code or name...';ip.autocomplete='off';ip.style.fontSize='13px';w.appendChild(ip);
+  var dd=document.createElement('div');dd.className='ac-dropdown';dd.id='u-dd';w.appendChild(dd);
+  t1.appendChild(w);ar.appendChild(t1);
+
+  var t2=document.createElement('td');var si=document.createElement('input');si.type='number';si.className='tbl-input';si.id='u-s';si.placeholder='St.';si.min='0';si.disabled=true;si.style.fontSize='13px';t2.appendChild(si);ar.appendChild(t2);
+  var t3=document.createElement('td');t3.className='arrow-cell';t3.style.color='var(--color-border)';t3.textContent='→';ar.appendChild(t3);
+  var t4=document.createElement('td');var ni=document.createElement('input');ni.type='number';ni.className='tbl-input';ni.id='u-n';ni.placeholder='Auto';ni.min='0';ni.disabled=true;ni.style.fontSize='13px';t4.appendChild(ni);ar.appendChild(t4);
+  ar.appendChild(document.createElement('td'));ar.appendChild(document.createElement('td'));
+  tb.appendChild(ar);
+
+  uI.forEach(function(it){
+    ts+=it.stitches;tn+=it.need;
+    var tr=document.createElement('tr');tr.className='data-row';
+    var d1=document.createElement('td');var cc=document.createElement('div');cc.className='cell-colour';
+    var sw=document.createElement('div');sw.className=swC(it.hex);sw.style.cssText='background:'+it.hex+';width:14px;height:14px;border-radius:2px';cc.appendChild(sw);
+    var cd=document.createElement('span');cd.className='tc-code';cd.style.fontSize='11px';cd.textContent=it.code;cc.appendChild(cd);
+    var nm=document.createElement('span');nm.className='tc-name';nm.style.fontSize='11px';nm.textContent=it.name;cc.appendChild(nm);
+    d1.appendChild(cc);tr.appendChild(d1);
+
+    var d2=document.createElement('td');d2.style.fontSize='13px';d2.textContent=it.stitches.toLocaleString();tr.appendChild(d2);
+    var d3=document.createElement('td');d3.className='arrow-cell';d3.textContent='→';tr.appendChild(d3);
+
+    var d4=document.createElement('td');d4.style.fontSize='13px';
+    var nb=document.createElement('strong');nb.textContent=it.need;d4.appendChild(nb);
+    d4.appendChild(document.createTextNode(' / '));
+    var hv=document.createElement('span');hv.textContent=it.have;
+    hv.style.color=it.have>=it.need?'var(--color-success)':'var(--color-text-muted)';
+    d4.appendChild(hv);tr.appendChild(d4);
+
+    var d5=document.createElement('td');d5.className='status-cell';d5.innerHTML=stH(it.need,it.have);tr.appendChild(d5);
+    var d6=document.createElement('td');d6.className='del-cell';
+    var db=document.createElement('button');db.className='del-btn';db.textContent='✕';
+    db.addEventListener('click',function(){uI=uI.filter(function(x){return x.code!==it.code});rU()});
+    d6.appendChild(db);tr.appendChild(d6);
+    tb.appendChild(tr);
+  });
+
+  document.getElementById('u-count').textContent='('+uI.length+' colour'+(uI.length!==1?'s':'')+')';
+  document.getElementById('u-stitches').textContent=ts.toLocaleString()+' stitches total';
+  document.getElementById('u-total').textContent=uI.length;
+  document.getElementById('u-skeins').textContent=tn;
+  bU();
+}
+
+function bU(){
+  var ci=document.getElementById('u-c'),si=document.getElementById('u-s'),ni=document.getElementById('u-n');
+  if(!ci)return;
+  ci.addEventListener('input',function(){
+    var dd=document.getElementById('u-dd'),q=this.value,ex=uI.map(function(i){return i.code}),r=fDMC(q);
+    if(!q.trim()){dd.classList.remove('open');return}
+    dd.textContent='';dd.appendChild(mkAC(r,ex,selU,uHL));dd.classList.add('open');
+  });
+  ci.addEventListener('keydown',function(e){
+    var dd=document.getElementById('u-dd'),its=dd.querySelectorAll('.ac-item');
+    if(e.key==='ArrowDown'){e.preventDefault();uHL=Math.min(uHL+1,its.length-1);while(uHL<its.length&&its[uHL]&&its[uHL].disabled)uHL++;its.forEach(function(el,i){el.classList.toggle('hl',i===uHL)})}
+    else if(e.key==='ArrowUp'){e.preventDefault();uHL=Math.max(uHL-1,0);while(uHL>=0&&its[uHL]&&its[uHL].disabled)uHL--;its.forEach(function(el,i){el.classList.toggle('hl',i===uHL)})}
+    else if(e.key==='Enter'){e.preventDefault();if(uHL>=0&&its[uHL]&&!its[uHL].disabled)its[uHL].click()}
+    else if(e.key==='Escape'){dd.classList.remove('open');uHL=-1}
+  });
+  si.addEventListener('input',function(){var st=parseInt(this.value)||0,c=calc(st);if(c>0)ni.value=c;else{ni.value='';ni.placeholder='Auto'}});
+  si.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();ni.focus();ni.select()}else if(e.key==='Escape'){uS=null;uHL=-1;rU()}});
+  ni.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addU()}else if(e.key==='Escape'){uS=null;uHL=-1;rU()}});
+}
+
+function selU(code){
+  var c=DMC.filter(function(x){return x.code===code})[0];if(!c)return;
+  uS=c;var ci=document.getElementById('u-c');ci.value=c.code+' '+c.name;ci.style.fontWeight='600';
+  document.getElementById('u-dd').classList.remove('open');uHL=-1;
+  document.getElementById('u-s').disabled=false;document.getElementById('u-s').placeholder='0';
+  document.getElementById('u-n').disabled=false;
+  setTimeout(function(){document.getElementById('u-s').focus()},30);
+}
+
+function addU(){
+  if(!uS)return;
+  var st=parseInt(document.getElementById('u-s').value)||0;
+  var nd=parseInt(document.getElementById('u-n').value)||calc(st)||1;
+  uI.unshift({code:uS.code,name:uS.name,hex:uS.hex,stitches:st,need:nd,have:0});
+  uS=null;uHL=-1;rU();
+  setTimeout(function(){var c=document.getElementById('u-c');if(c)c.focus()},50);
+}
+
+rS();rU();
+</script>
+</body>
+</html>
