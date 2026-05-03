@@ -47,7 +47,8 @@ export function SpotlightCard({
         } else {
           setImageUrl(null);
         }
-      } catch {
+      } catch (error) {
+        console.error("Spotlight shuffle failed:", error);
         toast.error("Could not load a new spotlight project. Try again.");
       }
     });

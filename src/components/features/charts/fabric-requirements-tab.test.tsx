@@ -263,6 +263,7 @@ describe("FabricRequirementsTab", () => {
     const img = screen.getByRole("img", { name: "Test Pattern" });
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute("src", "https://example.com/thumb.jpg");
+    expect(screen.queryByTestId("status-icon-chart-1")).not.toBeInTheDocument();
   });
 
   it("does not render thumbnail when no image URL available", () => {

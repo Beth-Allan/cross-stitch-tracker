@@ -214,15 +214,20 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                   onClick={() => setExpandedId(isExpanded ? null : row.chartId)}
                   className="hover:bg-muted/50 flex w-full cursor-pointer items-center gap-4 p-4 transition-colors"
                 >
-                  {imageUrls[row.coverThumbnailUrl ?? ""] ? (
-                    <img
-                      src={imageUrls[row.coverThumbnailUrl ?? ""]}
-                      alt={row.chartName}
-                      className="h-10 w-10 shrink-0 rounded-lg object-cover"
-                    />
-                  ) : (
-                    <StatusIcon row={row} />
-                  )}
+                  {(() => {
+                    const thumbnailUrl = row.coverThumbnailUrl
+                      ? imageUrls[row.coverThumbnailUrl]
+                      : undefined;
+                    return thumbnailUrl ? (
+                      <img
+                        src={thumbnailUrl}
+                        alt={row.chartName}
+                        className="h-10 w-10 shrink-0 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <StatusIcon row={row} />
+                    );
+                  })()}
 
                   <div className="min-w-0 flex-1 text-left">
                     <p className="font-heading text-foreground truncate text-sm font-semibold">
