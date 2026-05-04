@@ -43,10 +43,7 @@ export function SupplyTable({
   const [newRowIds, setNewRowIds] = useState<Set<string>>(new Set());
   const [, startTransition] = useTransition();
 
-  const mergedCalcParams = useMemo(
-    () => ({ ...DEFAULT_CALC_PARAMS, ...calcParams }),
-    [calcParams],
-  );
+  const mergedCalcParams = useMemo(() => ({ ...DEFAULT_CALC_PARAMS, ...calcParams }), [calcParams]);
 
   // Derive existing supply IDs from all sections for add-row disabled items
   const existingIds = useMemo(() => {
@@ -70,7 +67,12 @@ export function SupplyTable({
   }, []);
 
   const handleUpdateQuantity = useCallback(
-    async (type: SupplyType, junctionId: string, field: string, value: number) => {
+    async (
+      type: SupplyType,
+      junctionId: string,
+      field: "stitchCount" | "need" | "have",
+      value: number,
+    ) => {
       startTransition(async () => {
         try {
           const result = await adapter.updateQuantity(type, junctionId, field, value);
@@ -102,13 +104,10 @@ export function SupplyTable({
   );
 
   const totalSkeinsNeeded = threads.reduce((sum, t) => sum + t.need, 0);
-  const totalItemsNeeded = [...threads, ...beads, ...specialty].reduce(
-    (sum, s) => sum + s.need,
-    0,
-  );
+  const totalItemsNeeded = [...threads, ...beads, ...specialty].reduce((sum, s) => sum + s.need, 0);
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-card">
+    <div className="border-border bg-card overflow-hidden rounded-lg border">
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm" style={{ tableLayout: "fixed" }}>
           <thead>
@@ -141,11 +140,7 @@ export function SupplyTable({
             />
 
             {/* Thread section */}
-            <SupplyTableSectionDivider
-              icon={CircleDot}
-              label="Thread"
-              count={threads.length}
-            />
+            <SupplyTableSectionDivider icon={CircleDot} label="Thread" count={threads.length} />
             {threads.map((row) => (
               <SupplyTableDataRow
                 key={row.id}
@@ -157,11 +152,7 @@ export function SupplyTable({
             ))}
 
             {/* Beads section */}
-            <SupplyTableSectionDivider
-              icon={Gem}
-              label="Beads"
-              count={beads.length}
-            />
+            <SupplyTableSectionDivider icon={Gem} label="Beads" count={beads.length} />
             {beads.map((row) => (
               <SupplyTableDataRow
                 key={row.id}
@@ -173,11 +164,7 @@ export function SupplyTable({
             ))}
 
             {/* Specialty section */}
-            <SupplyTableSectionDivider
-              icon={Sparkles}
-              label="Specialty"
-              count={specialty.length}
-            />
+            <SupplyTableSectionDivider icon={Sparkles} label="Specialty" count={specialty.length} />
             {specialty.map((row) => (
               <SupplyTableDataRow
                 key={row.id}
@@ -206,27 +193,27 @@ export function SupplyTable({
               <>
                 {[1, 2, 3].map((i) => (
                   <tr key={`skeleton-${i}`}>
-                    <td className="border-b border-muted px-3 py-[5px]">
+                    <td className="border-muted border-b px-3 py-[5px]">
                       <div className="flex items-center gap-2">
-                        <div className="h-4 w-4 rounded animate-skeleton-pulse bg-muted" />
-                        <div className="h-3 w-12 rounded animate-skeleton-pulse bg-muted" />
-                        <div className="h-3 w-20 rounded animate-skeleton-pulse bg-muted" />
+                        <div className="animate-skeleton-pulse bg-muted h-4 w-4 rounded" />
+                        <div className="animate-skeleton-pulse bg-muted h-3 w-12 rounded" />
+                        <div className="animate-skeleton-pulse bg-muted h-3 w-20 rounded" />
                       </div>
                     </td>
-                    <td className="border-b border-muted px-3 py-[5px]">
-                      <div className="h-3 w-8 rounded animate-skeleton-pulse bg-muted" />
+                    <td className="border-muted border-b px-3 py-[5px]">
+                      <div className="animate-skeleton-pulse bg-muted h-3 w-8 rounded" />
                     </td>
-                    <td className="border-b border-muted w-6 py-[5px]" />
-                    <td className="border-b border-muted px-3 py-[5px]">
-                      <div className="h-3 w-8 rounded animate-skeleton-pulse bg-muted" />
+                    <td className="border-muted w-6 border-b py-[5px]" />
+                    <td className="border-muted border-b px-3 py-[5px]">
+                      <div className="animate-skeleton-pulse bg-muted h-3 w-8 rounded" />
                     </td>
-                    <td className="border-b border-muted px-3 py-[5px]">
-                      <div className="h-3 w-6 rounded animate-skeleton-pulse bg-muted" />
+                    <td className="border-muted border-b px-3 py-[5px]">
+                      <div className="animate-skeleton-pulse bg-muted h-3 w-6 rounded" />
                     </td>
-                    <td className="border-b border-muted px-3 py-[5px]">
-                      <div className="h-4 w-4 rounded-full animate-skeleton-pulse bg-muted" />
+                    <td className="border-muted border-b px-3 py-[5px]">
+                      <div className="animate-skeleton-pulse bg-muted h-4 w-4 rounded-full" />
                     </td>
-                    <td className="border-b border-muted w-8 py-[5px]" />
+                    <td className="border-muted w-8 border-b py-[5px]" />
                   </tr>
                 ))}
               </>
