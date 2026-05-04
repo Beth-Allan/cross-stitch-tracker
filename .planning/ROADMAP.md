@@ -83,7 +83,7 @@ Plans:
 - [x] 10-02-PLAN.md -- PortalAutocomplete, SegmentedTypeToggle, InlineCreateDialog
 - [x] 10-03-PLAN.md -- DataRow, SectionDivider, Footer, slideIn animation
 - [x] 10-04-PLAN.md -- useSupplyTable hook, SupplyTableAddRow
-- [ ] 10-05-PLAN.md -- Root SupplyTable assembly, index.ts exports
+- [x] 10-05-PLAN.md -- Root SupplyTable assembly, index.ts exports
 - [ ] 10-06-PLAN.md -- Verification suite and visual checkpoint
 **UI hint**: yes
 
@@ -155,7 +155,7 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 8. Session Logging & Pattern Dive | v1.2 | 11/11 | Complete | 2026-04-18 |
 | 9. Dashboards & Shopping Cart | v1.2 | 9/9 | Complete | 2026-04-18 |
 | 9.1. Image Optimization on Upload | v1.2 | 2/2 | Complete | 2026-04-26 |
-| 10. Unified Supply Table | v1.3 | 4/6 | In Progress|  |
+| 10. Unified Supply Table | v1.3 | 5/6 | In Progress|  |
 | 11. Supply Table on Project Detail | v1.3 | 0/? | Not started | - |
 | 12. Merged Form | v1.3 | 0/? | Not started | - |
 | 13. Supply Takeover | v1.3 | 0/? | Not started | - |
