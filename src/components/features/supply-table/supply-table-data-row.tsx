@@ -15,7 +15,12 @@ const UNIT_LABELS: Record<SupplyType, string> = {
 
 interface SupplyTableDataRowProps {
   row: SupplyRow;
-  onUpdateQuantity: (type: SupplyType, junctionId: string, field: string, value: number) => void;
+  onUpdateQuantity: (
+    type: SupplyType,
+    junctionId: string,
+    field: "stitchCount" | "need" | "have",
+    value: number,
+  ) => void;
   onDelete: (type: SupplyType, junctionId: string) => void;
   isNew?: boolean;
 }
