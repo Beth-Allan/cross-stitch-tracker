@@ -364,6 +364,31 @@ describe("SupplyTable", () => {
       );
     });
 
+    // When adapter returns an error string, it's used in the toast
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith("DB error");
+    });
+  });
+
+  it("handles update quantity -- uses fallback message when no error string", async () => {
+    const { toast } = await import("sonner");
+    (adapter.updateQuantity as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      success: false,
+    });
+
+    render(
+      <SupplyTable
+        threads={[makeThread()]}
+        beads={[]}
+        specialty={[]}
+        adapter={adapter}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("update-qty-t1"));
+    });
+
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(
         "Couldn't update value. Try again.",
@@ -393,6 +418,31 @@ describe("SupplyTable", () => {
 
     await waitFor(() => {
       expect(adapter.remove).toHaveBeenCalledWith("THREAD", "t1");
+    });
+
+    // When adapter returns an error string, it's used in the toast
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith("Not found");
+    });
+  });
+
+  it("handles delete -- uses fallback message when no error string", async () => {
+    const { toast } = await import("sonner");
+    (adapter.remove as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      success: false,
+    });
+
+    render(
+      <SupplyTable
+        threads={[makeThread()]}
+        beads={[]}
+        specialty={[]}
+        adapter={adapter}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("delete-t1"));
     });
 
     await waitFor(() => {
