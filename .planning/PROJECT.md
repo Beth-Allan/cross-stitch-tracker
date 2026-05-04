@@ -22,9 +22,9 @@ A stitcher can manage their entire chart collection and supplies faster and more
 ## Current State
 
 **Shipped:** v1.2 Track & Measure (2026-04-20)
-**Next:** v1.3 Form & Supply Overhaul — merged form, supply table, keyboard-driven entry
+**In Progress:** v1.3 Form & Supply Overhaul — Phase 10 complete, Phases 11-14 remaining
 
-The app now has session logging with atomic progress tracking, Pattern Dive with 4 specialized collection tabs, a curated Main Dashboard, a Project Dashboard with progress buckets, and a Shopping Cart with project-based supply aggregation. Phase 9.1 added image optimization on upload — covers and session photos are now converted to 1200px WebP via Sharp, reducing storage ~90%. 1,188 tests, deployed to Vercel.
+The app now has session logging with atomic progress tracking, Pattern Dive with 4 specialized collection tabs, a curated Main Dashboard, a Project Dashboard with progress buckets, and a Shopping Cart with project-based supply aggregation. Phase 9.1 added image optimization on upload — covers and session photos are now converted to 1200px WebP via Sharp, reducing storage ~90%. Phase 10 added the Unified Supply Table component system — 20 source files, 162 tests, keyboard-driven entry with portal autocomplete, grouped sections, SVG status donuts, and inline editing. 1,369 tests, deployed to Vercel.
 
 ## Requirements
 
@@ -198,4 +198,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-03 after v1.3 milestone started*
+*Last updated: 2026-05-04 after Phase 10 complete*
