@@ -126,7 +126,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
       return { success: false, error: "Supply not found" };
     }
     if (field in row) {
-      (row as Record<string, unknown>)[field] = value;
+      (row as unknown as Record<string, unknown>)[field] = value;
     }
     return { success: true };
   }
