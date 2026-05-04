@@ -4,9 +4,9 @@
 
 <!-- UPDATE THIS SECTION at the end of every work session -->
 
-**Milestone:** v1.2 Track & Measure (ARCHIVED)
-**Last Updated:** 2026-04-26
-**Roadmap:** 4 milestones / 11 phases — v1.0 + v1.1 + v1.2 shipped, v1.3 next
+**Milestone:** v1.3 Form & Supply Overhaul
+**Last Updated:** 2026-05-03
+**Roadmap:** 5 milestones / 16 phases — v1.0 + v1.1 + v1.2 shipped, v1.3 in progress
 
 ### Done
 
@@ -23,25 +23,19 @@
 
 ### In Progress
 
-None — ready for v1.3.
+- **Phase 11: Supply Table on Project Detail** — not yet planned
 
 ### Done This Session
 
-- Sketch 004 (multi-supply-types): explored 3 variants for beads + specialty joining the thread table
-- Winner: **C: Grouped + Top Add Row**
-  - One persistent add row with segmented type toggle (🧵/📿/✦)
-  - Sticky type — stays on Thread until you switch, blast through 30+ codes
-  - Visual section grouping (Thread/Beads/Specialty) with divider headers + counts
-  - Items auto-sort into correct section
-  - Live auto-calc for threads (stitches → skeins, editable for override)
-  - Beads: bead count → manual package need (default 1)
-  - Specialty: just need (default 1)
-  - Same keyboard loop across all types
+- **Phase 10: Unified Supply Table executed** — 6 plans, 5 waves, 1,369 tests (162 new)
+  - 20 source files: types, adapters, 10 UI components, hook, barrel export
+  - Code review: 8 findings found and fixed (2 critical, 4 warning, 2 info)
+  - Verification: 5/5 must-haves verified, 8/8 requirements accounted for
+  - Deferred: slideIn animation wiring (needs adapter interface change in Phase 11)
 
 ### Next Up
 
-1. `/gsd-sketch-wrap-up` — package all sketch findings (001-004) into reusable skill
-2. Then `/gsd-new-milestone` — start v1.3
+1. `/gsd-discuss-phase 11` — discuss Supply Table on Project Detail
 
 ### Backlog
 
@@ -196,14 +190,6 @@ Prisma MCP tools are also available in-conversation: `Prisma-Studio`, `migrate-d
 
 ---
 
-<!-- GSD:conventions-start source:CONVENTIONS.md -->
-<!-- GSD:conventions-end -->
-
-<!-- GSD:architecture-start source:ARCHITECTURE.md -->
-<!-- GSD:architecture-end -->
-
-<!-- GSD:workflow-start source:GSD defaults -->
-
 ## GSD Workflow Enforcement
 
 Use GSD entry points for repo changes:
@@ -213,10 +199,6 @@ Use GSD entry points for repo changes:
 - `/gsd:execute-phase` for planned work
 
 Do not make direct repo edits outside GSD unless explicitly asked.
-
-<!-- GSD:workflow-end -->
-
-<!-- GSD:profile-start -->
 
 ## Developer Profile
 
@@ -243,4 +225,3 @@ Do not make direct repo edits outside GSD unless explicitly asked.
 - **Vendor Choices:** When recommending tools or libraries, provide thorough justification. This developer does their own research and will push back if recommendations feel under-evaluated. Compare alternatives when relevant, cite reasons for the recommendation, and acknowledge trade-offs. Do not dismiss their research or suggestions as 'overkill' without strong reasoning.
 - **Frustrations:** Follow documented designs, conventions, and prior instructions precisely. When designs exist, use them -- never build from scratch. If deviating from any stated instruction, flag it explicitly and explain why. This developer will invest time creating rules and guardrails; respect that investment by adhering to them carefully. After fixing bugs, verify no regressions were introduced.
 - **Learning:** Proactively explain how things fit together when introducing new concepts or tools. When this developer asks 'should we do X?', explain the what, why, and where-it-fits before proceeding. Provide guided context rather than assuming they will read through code independently. For tooling decisions, respect their independent research and engage with their findings.
-<!-- GSD:profile-end -->
