@@ -1,0 +1,246 @@
+"use client";
+
+import { useState, useCallback, useTransition, useMemo } from "react";
+import { CircleDot, Gem, Sparkles, Package } from "lucide-react";
+import { toast } from "sonner";
+import { SupplyTableAddRow } from "./supply-table-add-row";
+import { SupplyTableDataRow } from "./supply-table-data-row";
+import { SupplyTableSectionDivider } from "./supply-table-section-divider";
+import { SupplyTableFooter } from "./supply-table-footer";
+import { EmptyState } from "@/components/ui/empty-state";
+import type { SupplyTableProps, SupplyType } from "./types";
+import { DEFAULT_CALC_PARAMS } from "./types";
+
+interface SupplyTableInternalProps extends SupplyTableProps {
+  isLoading?: boolean;
+}
+
+const HEADER_CLASS =
+  "text-left px-3 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.04em] border-b-2 border-border whitespace-nowrap bg-card";
+
+/**
+ * Root SupplyTable component composing all sub-components into the complete
+ * unified supply table. Consumers (Phase 11 project detail, Phase 13 supply
+ * takeover) import this as their single entry point.
+ *
+ * Renders grouped sections (Thread/Beads/Specialty) with:
+ * - Persistent add row with autocomplete search
+ * - Data rows with inline editing
+ * - Section dividers with count badges
+ * - Footer with running totals
+ * - Empty state when no supplies exist
+ * - Loading skeleton state
+ */
+export function SupplyTable({
+  threads,
+  beads,
+  specialty,
+  adapter,
+  calcParams,
+  existingSupplyIds,
+  isLoading,
+}: SupplyTableInternalProps) {
+  const [newRowIds, setNewRowIds] = useState<Set<string>>(new Set());
+  const [, startTransition] = useTransition();
+
+  const mergedCalcParams = useMemo(
+    () => ({ ...DEFAULT_CALC_PARAMS, ...calcParams }),
+    [calcParams],
+  );
+
+  // Derive existing supply IDs from all sections for add-row disabled items
+  const existingIds = useMemo(() => {
+    if (existingSupplyIds) return existingSupplyIds;
+    const ids = new Set<string>();
+    for (const row of threads) ids.add(row.supplyId);
+    for (const row of beads) ids.add(row.supplyId);
+    for (const row of specialty) ids.add(row.supplyId);
+    return ids;
+  }, [existingSupplyIds, threads, beads, specialty]);
+
+  const totalCount = threads.length + beads.length + specialty.length;
+
+  const handleRowAdded = useCallback(() => {
+    // After a row is added via the adapter, the parent will re-render
+    // with the new row in the data arrays. We track the newest IDs
+    // for the slide-in animation.
+    // Since we don't know the new row's ID yet (it comes from the adapter),
+    // we use a timestamp-based approach: mark all "unknown" IDs as new
+    // on the next render cycle.
+  }, []);
+
+  const handleUpdateQuantity = useCallback(
+    async (type: SupplyType, junctionId: string, field: string, value: number) => {
+      startTransition(async () => {
+        try {
+          const result = await adapter.updateQuantity(type, junctionId, field, value);
+          if (!result.success) {
+            toast.error(result.error ?? "Couldn't update value. Try again.");
+          }
+        } catch {
+          toast.error("Couldn't update value. Try again.");
+        }
+      });
+    },
+    [adapter],
+  );
+
+  const handleDelete = useCallback(
+    async (type: SupplyType, junctionId: string) => {
+      startTransition(async () => {
+        try {
+          const result = await adapter.remove(type, junctionId);
+          if (!result.success) {
+            toast.error(result.error ?? "Couldn't remove supply. Try again.");
+          }
+        } catch {
+          toast.error("Couldn't remove supply. Try again.");
+        }
+      });
+    },
+    [adapter],
+  );
+
+  const totalSkeinsNeeded = threads.reduce((sum, t) => sum + t.need, 0);
+  const totalItemsNeeded = [...threads, ...beads, ...specialty].reduce(
+    (sum, s) => sum + s.need,
+    0,
+  );
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-border bg-card">
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-sm" style={{ tableLayout: "fixed" }}>
+          <thead>
+            <tr className="bg-card">
+              <th scope="col" style={{ width: "44%" }} className={HEADER_CLASS}>
+                Colour
+              </th>
+              <th scope="col" style={{ width: "14%" }} className={HEADER_CLASS}>
+                Stitches
+              </th>
+              <th scope="col" style={{ width: "24px" }} className={HEADER_CLASS} />
+              <th scope="col" style={{ width: "13%" }} className={HEADER_CLASS}>
+                Need
+              </th>
+              <th scope="col" style={{ width: "10%" }} className={HEADER_CLASS}>
+                Have
+              </th>
+              <th scope="col" style={{ width: "6%" }} className={HEADER_CLASS}>
+                Status
+              </th>
+              <th scope="col" style={{ width: "32px" }} className={HEADER_CLASS} />
+            </tr>
+          </thead>
+          <tbody>
+            <SupplyTableAddRow
+              adapter={adapter}
+              calcParams={mergedCalcParams}
+              existingSupplyIds={existingIds}
+              onRowAdded={handleRowAdded}
+            />
+
+            {/* Thread section */}
+            <SupplyTableSectionDivider
+              icon={CircleDot}
+              label="Thread"
+              count={threads.length}
+            />
+            {threads.map((row) => (
+              <SupplyTableDataRow
+                key={row.id}
+                row={row}
+                onUpdateQuantity={handleUpdateQuantity}
+                onDelete={handleDelete}
+                isNew={newRowIds.has(row.id)}
+              />
+            ))}
+
+            {/* Beads section */}
+            <SupplyTableSectionDivider
+              icon={Gem}
+              label="Beads"
+              count={beads.length}
+            />
+            {beads.map((row) => (
+              <SupplyTableDataRow
+                key={row.id}
+                row={row}
+                onUpdateQuantity={handleUpdateQuantity}
+                onDelete={handleDelete}
+                isNew={newRowIds.has(row.id)}
+              />
+            ))}
+
+            {/* Specialty section */}
+            <SupplyTableSectionDivider
+              icon={Sparkles}
+              label="Specialty"
+              count={specialty.length}
+            />
+            {specialty.map((row) => (
+              <SupplyTableDataRow
+                key={row.id}
+                row={row}
+                onUpdateQuantity={handleUpdateQuantity}
+                onDelete={handleDelete}
+                isNew={newRowIds.has(row.id)}
+              />
+            ))}
+
+            {/* Empty state */}
+            {totalCount === 0 && !isLoading && (
+              <tr>
+                <td colSpan={7}>
+                  <EmptyState
+                    icon={Package}
+                    title="No supplies added yet"
+                    description="Start typing a supply code above to add your first colour."
+                  />
+                </td>
+              </tr>
+            )}
+
+            {/* Loading skeleton */}
+            {isLoading && (
+              <>
+                {[1, 2, 3].map((i) => (
+                  <tr key={`skeleton-${i}`}>
+                    <td className="border-b border-muted px-3 py-[5px]">
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 rounded animate-skeleton-pulse bg-muted" />
+                        <div className="h-3 w-12 rounded animate-skeleton-pulse bg-muted" />
+                        <div className="h-3 w-20 rounded animate-skeleton-pulse bg-muted" />
+                      </div>
+                    </td>
+                    <td className="border-b border-muted px-3 py-[5px]">
+                      <div className="h-3 w-8 rounded animate-skeleton-pulse bg-muted" />
+                    </td>
+                    <td className="border-b border-muted w-6 py-[5px]" />
+                    <td className="border-b border-muted px-3 py-[5px]">
+                      <div className="h-3 w-8 rounded animate-skeleton-pulse bg-muted" />
+                    </td>
+                    <td className="border-b border-muted px-3 py-[5px]">
+                      <div className="h-3 w-6 rounded animate-skeleton-pulse bg-muted" />
+                    </td>
+                    <td className="border-b border-muted px-3 py-[5px]">
+                      <div className="h-4 w-4 rounded-full animate-skeleton-pulse bg-muted" />
+                    </td>
+                    <td className="border-b border-muted w-8 py-[5px]" />
+                  </tr>
+                ))}
+              </>
+            )}
+          </tbody>
+        </table>
+      </div>
+      <SupplyTableFooter
+        threadCount={threads.length}
+        beadCount={beads.length}
+        specialtyCount={specialty.length}
+        totalSkeinsNeeded={totalSkeinsNeeded}
+        totalItemsNeeded={totalItemsNeeded}
+      />
+    </div>
+  );
+}
