@@ -81,7 +81,7 @@ export interface SupplyTableAdapter {
   updateQuantity(
     type: SupplyType,
     junctionId: string,
-    field: string,
+    field: "stitchCount" | "need" | "have",
     value: number,
   ): Promise<Result>;
   remove(type: SupplyType, junctionId: string): Promise<Result>;

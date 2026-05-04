@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { toast } from "sonner";
 import { calculateSkeins } from "@/lib/utils/skein-calculator";
 import type {
   SupplyType,
@@ -28,9 +29,7 @@ export function useSupplyTable(
   const [searchText, setSearchTextRaw] = useState("");
   const [searchResults, setSearchResults] = useState<SupplySearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<SupplySearchResult | null>(
-    null,
-  );
+  const [selectedItem, setSelectedItem] = useState<SupplySearchResult | null>(null);
   const [stitchCount, setStitchCountRaw] = useState(0);
   const [need, setNeed] = useState(1);
   const [isAutoCalc, setIsAutoCalc] = useState(true);
@@ -143,18 +142,10 @@ export function useSupplyTable(
 
     switch (supplyType) {
       case "THREAD":
-        result = await adapter.addThread(
-          selectedItem.id,
-          safeStitchCount,
-          effectiveNeed,
-        );
+        result = await adapter.addThread(selectedItem.id, safeStitchCount, effectiveNeed);
         break;
       case "BEAD":
-        result = await adapter.addBead(
-          selectedItem.id,
-          safeStitchCount,
-          effectiveNeed,
-        );
+        result = await adapter.addBead(selectedItem.id, safeStitchCount, effectiveNeed);
         break;
       case "SPECIALTY":
         result = await adapter.addSpecialty(selectedItem.id, effectiveNeed);
@@ -187,9 +178,13 @@ export function useSupplyTable(
   // --- Handle inline create (D-03: auto-add + refocus) ---
   const handleCreateSupply = useCallback(
     async (data: CreateSupplyData): Promise<void> => {
-      const created = await adapter.createSupply(supplyType, data);
-      selectItem(created);
-      setShowCreateDialog(false);
+      try {
+        const created = await adapter.createSupply(supplyType, data);
+        selectItem(created);
+        setShowCreateDialog(false);
+      } catch {
+        toast.error("Couldn't create supply. Try again.");
+      }
     },
     [adapter, supplyType, selectItem],
   );

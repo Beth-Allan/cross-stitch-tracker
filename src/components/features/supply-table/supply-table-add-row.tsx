@@ -136,26 +136,26 @@ export function SupplyTableAddRow({
     <>
       <tr
         data-testid="supply-table-add-row"
-        className="bg-[rgba(5,150,105,0.03)] border-b-2 border-emerald-200"
+        className="bg-primary/[0.03] border-primary/20 border-b-2"
       >
         {/* Cell 1: Type toggle + Search/Selected item (44%) */}
         <td className="px-2 py-1.5" style={{ width: "44%" }}>
           <div className="flex items-center gap-2">
             <SegmentedTypeToggle value={supplyType} onChange={setSupplyType} />
 
-            <div className="relative flex-1 min-w-0">
+            <div className="relative min-w-0 flex-1">
               {selectedItem ? (
                 <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-xs font-semibold text-foreground">
+                  <span className="text-foreground font-mono text-xs font-semibold">
                     {selectedItem.code}
                   </span>
-                  <span className="text-xs text-muted-foreground truncate">
+                  <span className="text-muted-foreground truncate text-xs">
                     {selectedItem.name}
                   </span>
                   <button
                     type="button"
                     onClick={handleClearSelection}
-                    className="ml-auto shrink-0 rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted ml-auto shrink-0 rounded p-0.5 transition-colors"
                     aria-label="Clear selection"
                   >
                     <X className="h-3 w-3" />
@@ -211,7 +211,7 @@ export function SupplyTableAddRow({
         {/* Cell 3: Arrow (24px) */}
         <td className="px-1 py-1.5" style={{ width: "24px" }}>
           {selectedItem && supplyType !== "SPECIALTY" ? (
-            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            <ArrowRight className="text-muted-foreground h-3 w-3" />
           ) : null}
         </td>
 
@@ -229,12 +229,12 @@ export function SupplyTableAddRow({
                 className={inputClassName}
                 aria-label="Need"
               />
-              <span className="text-xs text-muted-foreground shrink-0">
+              <span className="text-muted-foreground shrink-0 text-xs">
                 {UNIT_LABELS[supplyType]}
               </span>
               {isAutoCalc && supplyType === "THREAD" && (
                 <SparklesIcon
-                  className="h-3 w-3 text-primary shrink-0"
+                  className="text-primary h-3 w-3 shrink-0"
                   data-testid="auto-calc-sparkle"
                 />
               )}

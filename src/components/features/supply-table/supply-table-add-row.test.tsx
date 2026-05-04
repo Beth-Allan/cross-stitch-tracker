@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act, waitFor } from "@/__tests__/test-utils";
 import { SupplyTableAddRow } from "./supply-table-add-row";
 import type { SupplyTableAdapter, CalcParams, SupplySearchResult } from "./types";
@@ -6,13 +6,7 @@ import { DEFAULT_CALC_PARAMS } from "./types";
 
 // Mock child components to isolate add-row behavior
 vi.mock("./segmented-type-toggle", () => ({
-  SegmentedTypeToggle: ({
-    value,
-    onChange,
-  }: {
-    value: string;
-    onChange: (t: string) => void;
-  }) => (
+  SegmentedTypeToggle: ({ value, onChange }: { value: string; onChange: (t: string) => void }) => (
     <div data-testid="segmented-type-toggle" data-value={value}>
       <button onClick={() => onChange("THREAD")}>Thread</button>
       <button onClick={() => onChange("BEAD")}>Beads</button>
@@ -44,10 +38,7 @@ vi.mock("./portal-autocomplete", () => ({
             {item.code}
           </button>
         ))}
-        <button
-          data-testid="create-request"
-          onClick={() => onCreateRequest("test")}
-        >
+        <button data-testid="create-request" onClick={() => onCreateRequest("test")}>
           Create
         </button>
       </div>
@@ -79,9 +70,7 @@ vi.mock("./inline-create-dialog", () => ({
     ) : null,
 }));
 
-function makeSearchResult(
-  overrides: Partial<SupplySearchResult> = {},
-): SupplySearchResult {
+function makeSearchResult(overrides: Partial<SupplySearchResult> = {}): SupplySearchResult {
   return {
     id: "sr-1",
     type: "THREAD",
@@ -102,9 +91,7 @@ function createMockAdapter(): SupplyTableAdapter {
     updateQuantity: vi.fn().mockResolvedValue({ success: true }),
     remove: vi.fn().mockResolvedValue({ success: true }),
     searchSupplies: vi.fn().mockResolvedValue([]),
-    createSupply: vi
-      .fn()
-      .mockResolvedValue(makeSearchResult({ id: "new-1", code: "999" })),
+    createSupply: vi.fn().mockResolvedValue(makeSearchResult({ id: "new-1", code: "999" })),
   };
 }
 
@@ -154,9 +141,7 @@ describe("SupplyTableAddRow", () => {
 
   it("renders search input when no item is selected", () => {
     renderAddRow();
-    expect(
-      screen.getByPlaceholderText("Search by code or name..."),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Search by code or name...")).toBeInTheDocument();
   });
 
   it("renders selected item name when an item is selected", async () => {
@@ -386,9 +371,7 @@ describe("SupplyTableAddRow", () => {
     });
 
     // Should reset back to search input
-    expect(
-      screen.getByPlaceholderText("Search by code or name..."),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Search by code or name...")).toBeInTheDocument();
   });
 
   it("PortalAutocomplete opens when search input has text and results", async () => {
@@ -435,13 +418,13 @@ describe("SupplyTableAddRow", () => {
   it("add row has green tint background", () => {
     renderAddRow();
     const row = screen.getByTestId("supply-table-add-row");
-    expect(row.className).toContain("bg-[rgba(5,150,105,0.03)]");
+    expect(row.className).toContain("bg-primary/[0.03]");
   });
 
   it("add row has primary bottom border", () => {
     renderAddRow();
     const row = screen.getByTestId("supply-table-add-row");
-    expect(row.className).toContain("border-emerald-200");
+    expect(row.className).toContain("border-primary/20");
   });
 
   it("renders auto-calc sparkle indicator for THREAD type", async () => {

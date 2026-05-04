@@ -37,16 +37,38 @@ export function PortalAutocomplete({
   const [highlightIndex, setHighlightIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Calculate position from anchor element
+  // Calculate position from anchor element, recalculate on scroll/resize
   useEffect(() => {
     if (!isOpen || !anchorRef.current) return;
-    const rect = anchorRef.current.getBoundingClientRect();
-    setCoords({
-      top: rect.bottom + 4,
-      left: rect.left,
-      width: Math.max(320, rect.width),
-    });
+    function updatePosition() {
+      const rect = anchorRef.current!.getBoundingClientRect();
+      setCoords({
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: Math.max(320, rect.width),
+      });
+    }
+    updatePosition();
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
   }, [isOpen, anchorRef]);
+
+  // Click-outside to dismiss dropdown
+  useEffect(() => {
+    if (!isOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      const target = e.target as Node;
+      if (anchorRef.current && !anchorRef.current.contains(target)) {
+        onClose();
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, anchorRef, onClose]);
 
   // Reset highlight when items change
   useEffect(() => {
@@ -130,7 +152,7 @@ export function PortalAutocomplete({
         width: coords.width,
         zIndex: 9000,
       }}
-      className="rounded-lg border border-border bg-card shadow-lg"
+      className="border-border bg-card rounded-lg border shadow-lg"
     >
       {/* Search input */}
       <div className="p-2">
@@ -141,7 +163,7 @@ export function PortalAutocomplete({
           onChange={(e) => onSearchChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Search by code or name..."
-          className="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-ring/40 w-full rounded border py-1.5 px-3 text-sm transition-colors focus:ring-2 focus:outline-none"
+          className="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-ring/40 w-full rounded border px-3 py-1.5 text-sm transition-colors focus:ring-2 focus:outline-none"
           role="combobox"
           aria-expanded={true}
           aria-controls="portal-autocomplete-listbox"
@@ -154,12 +176,10 @@ export function PortalAutocomplete({
       <div
         id="portal-autocomplete-listbox"
         role="listbox"
-        className="max-h-60 overflow-y-auto border-t border-border"
+        className="border-border max-h-60 overflow-y-auto border-t"
       >
         {isLoading ? (
-          <p className="text-muted-foreground px-3 py-4 text-center text-sm">
-            Searching...
-          </p>
+          <p className="text-muted-foreground px-3 py-4 text-center text-sm">Searching...</p>
         ) : displayItems.length > 0 ? (
           displayItems.map((item, index) => {
             const disabled = isDisabled(item);
@@ -180,23 +200,19 @@ export function PortalAutocomplete({
                 className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-colors ${
                   disabled
                     ? "cursor-default opacity-50"
-                    : `cursor-pointer hover:bg-muted ${highlighted ? "bg-muted" : ""}`
+                    : `hover:bg-muted cursor-pointer ${highlighted ? "bg-muted" : ""}`
                 }`}
               >
                 <ColorSwatch hexColor={item.hexColor} size="sm" />
-                <span className="flex-1 min-w-0">
-                  <span className="font-mono text-xs font-semibold text-foreground">
+                <span className="min-w-0 flex-1">
+                  <span className="text-foreground font-mono text-xs font-semibold">
                     {item.code}
                   </span>{" "}
-                  <span className="text-xs text-muted-foreground truncate">
+                  <span className="text-muted-foreground truncate text-xs">
                     {disabled ? "" : item.name}
                   </span>
                 </span>
-                {disabled && (
-                  <span className="text-muted-foreground text-xs shrink-0">
-                    Added
-                  </span>
-                )}
+                {disabled && <span className="text-muted-foreground shrink-0 text-xs">Added</span>}
               </div>
             );
           })
@@ -210,9 +226,7 @@ export function PortalAutocomplete({
             Create &quot;{searchText.trim()}&quot;
           </button>
         ) : hasSearchText ? (
-          <p className="text-muted-foreground px-3 py-4 text-center text-sm">
-            No matches found
-          </p>
+          <p className="text-muted-foreground px-3 py-4 text-center text-sm">No matches found</p>
         ) : null}
       </div>
     </div>

@@ -52,7 +52,7 @@ export function SupplyTableDataRow({
         {row.type === "BEAD" && (
           <EditableNumber
             value={row.stitchCount}
-            onSave={(v) => onUpdateQuantity(row.type, row.id, "quantity", v)}
+            onSave={(v) => onUpdateQuantity(row.type, row.id, "stitchCount", v)}
             ariaLabel={`Bead count for ${row.code}`}
           />
         )}
@@ -71,7 +71,7 @@ export function SupplyTableDataRow({
         <div className="flex items-center gap-1">
           <EditableNumber
             value={row.need}
-            onSave={(v) => onUpdateQuantity(row.type, row.id, "quantityRequired", v)}
+            onSave={(v) => onUpdateQuantity(row.type, row.id, "need", v)}
             ariaLabel={`Need for ${row.code}`}
           />
           <span className="text-muted-foreground text-xs">{UNIT_LABELS[row.type]}</span>
@@ -85,7 +85,7 @@ export function SupplyTableDataRow({
       <td className="border-muted border-b px-3 py-[5px] [font-variant-numeric:tabular-nums]">
         <EditableNumber
           value={row.have}
-          onSave={(v) => onUpdateQuantity(row.type, row.id, "quantityAcquired", v)}
+          onSave={(v) => onUpdateQuantity(row.type, row.id, "have", v)}
           ariaLabel={`Have for ${row.code}`}
         />
       </td>

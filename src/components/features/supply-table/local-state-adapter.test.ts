@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { LocalStateAdapter } from "./local-state-adapter";
 import type { SupplySearchResult } from "./types";
-import { createMockSupplyBrand, createMockThread, createMockBead, createMockSpecialtyItem } from "@/__tests__/mocks/factories";
 
 function makeSearchResult(overrides: Partial<SupplySearchResult>): SupplySearchResult {
   return {
@@ -30,11 +29,32 @@ describe("LocalStateAdapter", () => {
       makeSearchResult({ id: "t4", type: "THREAD", code: "Blanc", name: "White" }),
     ];
     beads = [
-      makeSearchResult({ id: "b1", type: "BEAD", code: "00123", name: "Red", brandName: "Mill Hill", brandId: "brand-2" }),
-      makeSearchResult({ id: "b2", type: "BEAD", code: "00456", name: "Blue", brandName: "Mill Hill", brandId: "brand-2" }),
+      makeSearchResult({
+        id: "b1",
+        type: "BEAD",
+        code: "00123",
+        name: "Red",
+        brandName: "Mill Hill",
+        brandId: "brand-2",
+      }),
+      makeSearchResult({
+        id: "b2",
+        type: "BEAD",
+        code: "00456",
+        name: "Blue",
+        brandName: "Mill Hill",
+        brandId: "brand-2",
+      }),
     ];
     specialty = [
-      makeSearchResult({ id: "s1", type: "SPECIALTY", code: "K001", name: "Gold Braid", brandName: "Kreinik", brandId: "brand-3" }),
+      makeSearchResult({
+        id: "s1",
+        type: "SPECIALTY",
+        code: "K001",
+        name: "Gold Braid",
+        brandName: "Kreinik",
+        brandId: "brand-3",
+      }),
     ];
     adapter = new LocalStateAdapter(threads, beads, specialty);
   });

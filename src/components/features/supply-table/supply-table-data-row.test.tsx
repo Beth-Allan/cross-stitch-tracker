@@ -185,7 +185,7 @@ describe("SupplyTableDataRow", () => {
     fireEvent.change(input, { target: { value: "5" } });
     fireEvent.keyDown(input, { key: "Enter" });
 
-    expect(onUpdateQuantity).toHaveBeenCalledWith("THREAD", "junc-1", "quantityAcquired", 5);
+    expect(onUpdateQuantity).toHaveBeenCalledWith("THREAD", "junc-1", "have", 5);
   });
 
   it("does not render Sparkles for BEAD type regardless of isNeedOverridden", () => {
