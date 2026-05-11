@@ -26,3 +26,4 @@ export { DEFAULT_CALC_PARAMS } from "./types";
 
 // Adapters
 export { LocalStateAdapter } from "./local-state-adapter";
+export { ServerActionAdapter } from "./server-action-adapter";
