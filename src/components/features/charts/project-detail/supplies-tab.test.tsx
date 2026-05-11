@@ -159,9 +159,10 @@ describe("SuppliesTab", () => {
         />,
       );
       // The SupplyTable renders section dividers with labels
-      expect(screen.getByText("Thread")).toBeInTheDocument();
-      expect(screen.getByText("Beads")).toBeInTheDocument();
-      expect(screen.getByText("Specialty")).toBeInTheDocument();
+      // "Thread" appears in both section divider and type toggle, so use getAllByText
+      expect(screen.getAllByText("Thread").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText("Beads").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText("Specialty").length).toBeGreaterThanOrEqual(1);
     });
 
     it("renders empty state when no supplies exist", () => {
@@ -190,7 +191,7 @@ describe("SuppliesTab", () => {
         />,
       );
       // Component should render without error -- fabricCount=18 used internally
-      expect(screen.getByText("Thread")).toBeInTheDocument();
+      expect(screen.getByTestId("supply-table-add-row")).toBeInTheDocument();
     });
 
     it("uses default fabricCount=14 when project.fabric is null", () => {
@@ -202,7 +203,7 @@ describe("SuppliesTab", () => {
         />,
       );
       // Component renders with default -- no crash
-      expect(screen.getByText("Thread")).toBeInTheDocument();
+      expect(screen.getByTestId("supply-table-add-row")).toBeInTheDocument();
     });
 
     it("passes strandCount, overCount, wastePercent from project", () => {
@@ -220,7 +221,7 @@ describe("SuppliesTab", () => {
         />,
       );
       // Renders correctly with custom calcParams
-      expect(screen.getByText("Thread")).toBeInTheDocument();
+      expect(screen.getByTestId("supply-table-add-row")).toBeInTheDocument();
     });
   });
 
