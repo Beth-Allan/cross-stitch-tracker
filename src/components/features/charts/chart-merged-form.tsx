@@ -94,6 +94,7 @@ export function ChartMergedForm({
     const designerIds = designers.map((d) => d.id);
     const storageIds = storageLocations.map((s) => s.id);
     const appIds = stitchingApps.map((a) => a.id);
+    const fabricIds = unassignedFabrics.map((f) => f.id);
 
     const defaultValues = {
       name: "",
@@ -124,7 +125,7 @@ export function ChartMergedForm({
       startingStitches: 0,
     };
 
-    const draft = loadDraft(defaultValues, designerIds, storageIds, appIds);
+    const draft = loadDraft(defaultValues, designerIds, storageIds, appIds, fabricIds);
     if (!draft) return;
 
     // Hydrate each field from draft

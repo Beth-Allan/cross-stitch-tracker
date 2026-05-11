@@ -101,12 +101,7 @@ describe("use-draft-persistence", () => {
       const draft = createDraftValues();
       localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
 
-      const result = loadDraft(
-        createDefaultValues(),
-        ["designer-1"],
-        ["storage-1"],
-        ["app-1"],
-      );
+      const result = loadDraft(createDefaultValues(), ["designer-1"], ["storage-1"], ["app-1"]);
 
       expect(result).not.toBeNull();
       expect(result!.name).toBe("My Test Chart");
@@ -160,6 +155,23 @@ describe("use-draft-persistence", () => {
 
       expect(result).not.toBeNull();
       expect(result!.stitchingAppId).toBeNull();
+    });
+
+    it("nulls out fabricId when ID is not in validFabricIds", async () => {
+      const { loadDraft } = await import("./use-draft-persistence");
+      const draft = createDraftValues({ fabricId: "deleted-fabric" });
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+
+      const result = loadDraft(
+        createDefaultValues(),
+        ["designer-1"],
+        ["storage-1"],
+        ["app-1"],
+        ["fabric-1", "fabric-2"],
+      );
+
+      expect(result).not.toBeNull();
+      expect(result!.fabricId).toBeNull();
     });
 
     it("preserves designerId when ID IS in validDesignerIds", async () => {

@@ -25,6 +25,7 @@ export function loadDraft(
   validDesignerIds: string[],
   validStorageIds: string[],
   validAppIds: string[],
+  validFabricIds: string[] = [],
 ): ChartFormValues | null {
   try {
     const raw = localStorage.getItem(DRAFT_KEY);
@@ -44,6 +45,9 @@ export function loadDraft(
     }
     if (merged.stitchingAppId && !validAppIds.includes(merged.stitchingAppId)) {
       merged.stitchingAppId = null;
+    }
+    if (merged.fabricId && !validFabricIds.includes(merged.fabricId)) {
+      merged.fabricId = null;
     }
 
     return merged;
