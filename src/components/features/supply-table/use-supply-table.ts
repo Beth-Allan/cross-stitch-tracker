@@ -129,6 +129,7 @@ export function useSupplyTable(
   const commitRow = useCallback(async (): Promise<{
     success: boolean;
     focusTarget: "search";
+    newId?: string;
   }> => {
     if (!selectedItem) {
       return { success: false, focusTarget: "search" };
@@ -159,7 +160,7 @@ export function useSupplyTable(
       setStitchCountRaw(0);
       setNeed(1);
       setIsAutoCalc(true);
-      return { success: true, focusTarget: "search" };
+      return { success: true, focusTarget: "search", newId: result.id };
     }
 
     return { success: false, focusTarget: "search" };

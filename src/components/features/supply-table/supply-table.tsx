@@ -57,13 +57,17 @@ export function SupplyTable({
 
   const totalCount = threads.length + beads.length + specialty.length;
 
-  const handleRowAdded = useCallback(() => {
-    // After a row is added via the adapter, the parent will re-render
-    // with the new row in the data arrays. We track the newest IDs
-    // for the slide-in animation.
-    // Since we don't know the new row's ID yet (it comes from the adapter),
-    // we use a timestamp-based approach: mark all "unknown" IDs as new
-    // on the next render cycle.
+  const handleRowAdded = useCallback((newId?: string) => {
+    if (newId) {
+      setNewRowIds((prev) => new Set(prev).add(newId));
+      setTimeout(() => {
+        setNewRowIds((prev) => {
+          const next = new Set(prev);
+          next.delete(newId);
+          return next;
+        });
+      }, 250); // 200ms animation + 50ms buffer (per D-09: 0.2s ease)
+    }
   }, []);
 
   const handleUpdateQuantity = useCallback(
