@@ -55,7 +55,7 @@ Full details: `milestones/v1.2-ROADMAP.md`
 **Milestone Goal:** Replace the chart creation/edit form and supply-adding experience with a fast, keyboard-driven single-page flow. Unified supply table with grouped sections, persistent add row, and portal autocomplete. Merged form with supply takeover mode. Reusable on project detail.
 
 - [x] **Phase 10: Unified Supply Table** - Shared supply table component with grouped sections, persistent add row, keyboard-first entry, portal autocomplete, SVG donuts, and inline editing (completed 2026-05-04)
-- [ ] **Phase 11: Supply Table on Project Detail** - Wire unified table into project detail Supplies tab with server-action persistence
+- [x] **Phase 11: Supply Table on Project Detail** - Wire unified table into project detail Supplies tab with server-action persistence (completed 2026-05-11)
 - [ ] **Phase 12: Merged Form** - Single-page chart+project creation form with pattern type cards, required dot indicators, sticky save bar, and digital working copy upload
 - [ ] **Phase 13: Supply Takeover** - Form-to-supply transition with sticky summary bar, fabric assignment, skein calculator card, and two-phase save
 - [ ] **Phase 14: Edit Mode & Cleanup** - Full-page edit route using merged form layout, removal of all deprecated components
@@ -100,7 +100,7 @@ Plans:
 - [x] 11-01-PLAN.md -- ServerActionAdapter foundation (Result type extension, adapter class, tests, barrel export)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 11-02-PLAN.md -- Animation wiring + SuppliesTab integration (newRowId chain, tab replacement, visual checkpoint)
+- [x] 11-02-PLAN.md -- Animation wiring + SuppliesTab integration (newRowId chain, tab replacement, visual checkpoint)
 **UI hint**: yes
 
 ### Phase 12: Merged Form
@@ -162,7 +162,7 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 9. Dashboards & Shopping Cart | v1.2 | 9/9 | Complete | 2026-04-18 |
 | 9.1. Image Optimization on Upload | v1.2 | 2/2 | Complete | 2026-04-26 |
 | 10. Unified Supply Table | v1.3 | 6/6 | Complete    | 2026-05-04 |
-| 11. Supply Table on Project Detail | v1.3 | 1/2 | In Progress|  |
+| 11. Supply Table on Project Detail | v1.3 | 2/2 | Complete   | 2026-05-11 |
 | 12. Merged Form | v1.3 | 0/? | Not started | - |
 | 13. Supply Takeover | v1.3 | 0/? | Not started | - |
 | 14. Edit Mode & Cleanup | v1.3 | 0/? | Not started | - |
