@@ -29,7 +29,15 @@ export function EditableNumber({
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(value));
+  const [optimistic, setOptimistic] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Clear optimistic value once the prop catches up
+  useEffect(() => {
+    if (optimistic !== null && value === optimistic) {
+      setOptimistic(null);
+    }
+  }, [value, optimistic]);
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -37,6 +45,8 @@ export function EditableNumber({
       inputRef.current.select();
     }
   }, [editing]);
+
+  const displayValue = optimistic ?? value;
 
   if (editing) {
     return (
@@ -49,16 +59,17 @@ export function EditableNumber({
         onBlur={() => {
           const num = parseInt(draft);
           if (!isNaN(num) && num >= 0) {
+            setOptimistic(num);
             onSave(num);
           } else {
-            setDraft(String(value));
+            setDraft(String(displayValue));
           }
           setEditing(false);
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") (e.target as HTMLInputElement).blur();
           if (e.key === "Escape") {
-            setDraft(String(value));
+            setDraft(String(displayValue));
             setEditing(false);
           }
         }}
@@ -71,14 +82,14 @@ export function EditableNumber({
   return (
     <button
       onClick={() => {
-        setDraft(String(value));
+        setDraft(String(displayValue));
         setEditing(true);
       }}
-      className={`hover:bg-primary/5 cursor-text rounded px-1.5 py-0.5 transition-colors [font-variant-numeric:tabular-nums] ${className ?? ""}`}
+      className={`hover:bg-primary/5 cursor-text rounded px-1.5 py-0.5 [font-variant-numeric:tabular-nums] transition-colors ${className ?? ""}`}
       title="Click to edit"
       aria-label={ariaLabel}
     >
-      {value}
+      {displayValue}
     </button>
   );
 }
