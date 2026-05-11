@@ -3,7 +3,7 @@ import { getGenres } from "@/lib/actions/genre-actions";
 import { getStorageLocationsWithStats } from "@/lib/actions/storage-location-actions";
 import { getStitchingAppsWithStats } from "@/lib/actions/stitching-app-actions";
 import { getUnassignedFabrics } from "@/lib/actions/fabric-actions";
-import { ChartAddForm } from "@/components/features/charts/chart-add-form";
+import { ChartMergedForm } from "@/components/features/charts/chart-merged-form";
 
 export default async function NewChartPage() {
   const [designers, genres, storageLocations, stitchingApps, unassignedFabrics] = await Promise.all(
@@ -17,7 +17,7 @@ export default async function NewChartPage() {
   );
 
   return (
-    <ChartAddForm
+    <ChartMergedForm
       designers={designers}
       genres={genres}
       storageLocations={storageLocations}
