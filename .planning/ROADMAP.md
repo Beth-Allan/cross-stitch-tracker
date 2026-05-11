@@ -96,7 +96,10 @@ Plans:
   2. User can add missed supplies via the persistent add row on project detail without navigating away, with changes persisted immediately via server actions
 **Plans**: 2 plans
 Plans:
+**Wave 1**
 - [ ] 11-01-PLAN.md -- ServerActionAdapter foundation (Result type extension, adapter class, tests, barrel export)
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 11-02-PLAN.md -- Animation wiring + SuppliesTab integration (newRowId chain, tab replacement, visual checkpoint)
 **UI hint**: yes
 
