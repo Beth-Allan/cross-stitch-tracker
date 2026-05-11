@@ -56,7 +56,7 @@ Full details: `milestones/v1.2-ROADMAP.md`
 
 - [x] **Phase 10: Unified Supply Table** - Shared supply table component with grouped sections, persistent add row, keyboard-first entry, portal autocomplete, SVG donuts, and inline editing (completed 2026-05-04)
 - [x] **Phase 11: Supply Table on Project Detail** - Wire unified table into project detail Supplies tab with server-action persistence (completed 2026-05-11)
-- [ ] **Phase 12: Merged Form** - Single-page chart+project creation form with pattern type cards, required dot indicators, sticky save bar, and digital working copy upload
+- [x] **Phase 12: Merged Form** - Single-page chart+project creation form with pattern type cards, required dot indicators, sticky save bar, and digital working copy upload (completed 2026-05-11)
 - [ ] **Phase 13: Supply Takeover** - Form-to-supply transition with sticky summary bar, fabric assignment, skein calculator card, and two-phase save
 - [ ] **Phase 14: Edit Mode & Cleanup** - Full-page edit route using merged form layout, removal of all deprecated components
 
@@ -119,7 +119,7 @@ Plans:
 - [x] 12-02-PLAN.md -- Draft persistence utility (saveDraft, loadDraft, clearDraft)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 12-03-PLAN.md -- ChartMergedForm shell assembly, page wiring, visual checkpoint
+- [x] 12-03-PLAN.md -- ChartMergedForm shell assembly, page wiring, visual checkpoint
 **UI hint**: yes
 
 ### Phase 13: Supply Takeover
@@ -170,6 +170,6 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 9.1. Image Optimization on Upload | v1.2 | 2/2 | Complete | 2026-04-26 |
 | 10. Unified Supply Table | v1.3 | 6/6 | Complete    | 2026-05-04 |
 | 11. Supply Table on Project Detail | v1.3 | 2/2 | Complete    | 2026-05-11 |
-| 12. Merged Form | v1.3 | 2/3 | In Progress|  |
+| 12. Merged Form | v1.3 | 3/3 | Complete   | 2026-05-11 |
 | 13. Supply Takeover | v1.3 | 0/? | Not started | - |
 | 14. Edit Mode & Cleanup | v1.3 | 0/? | Not started | - |
