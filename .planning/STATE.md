@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Form & Supply Overhaul
 status: completed
-stopped_at: Phase 11 context gathered
-last_updated: "2026-05-11T00:14:50.384Z"
+stopped_at: Phase 11 UI-SPEC approved
+last_updated: "2026-05-11T00:23:42.070Z"
 last_activity: 2026-05-04
 progress:
   total_phases: 2
@@ -72,6 +72,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-11T00:14:50.378Z
-Stopped at: Phase 11 context gathered
-Resume file: .planning/phases/11-supply-table-on-project-detail/11-CONTEXT.md
+Last session: 2026-05-11T00:23:42.064Z
+Stopped at: Phase 11 UI-SPEC approved
+Resume file: .planning/phases/11-supply-table-on-project-detail/11-UI-SPEC.md
