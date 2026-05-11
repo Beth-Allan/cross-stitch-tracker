@@ -100,34 +100,38 @@ export function SearchToAdd({
   // Fetch items on mount and when search changes
   useEffect(() => {
     let cancelled = false;
-    setIsLoading(true);
-    setFetchError(false);
 
-    async function fetchItems() {
-      try {
-        let results: SupplyItem[];
-        if (supplyType === "thread") {
-          results = await getThreads(undefined, colorFamily || undefined, search || undefined);
-        } else if (supplyType === "bead") {
-          results = await getBeads(search || undefined);
-        } else {
-          results = await getSpecialtyItems(search || undefined);
-        }
-        if (!cancelled) {
-          setItems(results);
-          setHighlightIndex(-1);
-          setIsLoading(false);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          console.error("SearchToAdd fetch failed:", error);
-          setFetchError(true);
-          setIsLoading(false);
+    const timer = setTimeout(() => {
+      setIsLoading(true);
+      setFetchError(false);
+
+      async function fetchItems() {
+        try {
+          let results: SupplyItem[];
+          if (supplyType === "thread") {
+            results = await getThreads(undefined, colorFamily || undefined, search || undefined);
+          } else if (supplyType === "bead") {
+            results = await getBeads(search || undefined);
+          } else {
+            results = await getSpecialtyItems(search || undefined);
+          }
+          if (!cancelled) {
+            setItems(results);
+            setHighlightIndex(-1);
+            setIsLoading(false);
+          }
+        } catch (error) {
+          if (!cancelled) {
+            console.error("SearchToAdd fetch failed:", error);
+            setFetchError(true);
+            setIsLoading(false);
+          }
         }
       }
-    }
 
-    const timer = setTimeout(fetchItems, 150);
+      fetchItems();
+    }, 150);
+
     return () => {
       cancelled = true;
       clearTimeout(timer);
