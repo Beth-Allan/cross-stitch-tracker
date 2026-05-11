@@ -115,8 +115,8 @@ Plans:
 **Plans**: 3 plans
 Plans:
 **Wave 1** *(parallel)*
-- [ ] 12-01-PLAN.md -- PatternTypeCards, StickySaveBar, FormField green dot, GenrePicker font-medium
-- [ ] 12-02-PLAN.md -- Draft persistence utility (saveDraft, loadDraft, clearDraft)
+- [x] 12-01-PLAN.md -- PatternTypeCards, StickySaveBar, FormField green dot, GenrePicker font-medium
+- [x] 12-02-PLAN.md -- Draft persistence utility (saveDraft, loadDraft, clearDraft)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 12-03-PLAN.md -- ChartMergedForm shell assembly, page wiring, visual checkpoint
@@ -170,6 +170,6 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 9.1. Image Optimization on Upload | v1.2 | 2/2 | Complete | 2026-04-26 |
 | 10. Unified Supply Table | v1.3 | 6/6 | Complete    | 2026-05-04 |
 | 11. Supply Table on Project Detail | v1.3 | 2/2 | Complete    | 2026-05-11 |
-| 12. Merged Form | v1.3 | 0/3 | Not started | - |
+| 12. Merged Form | v1.3 | 2/3 | In Progress|  |
 | 13. Supply Takeover | v1.3 | 0/? | Not started | - |
 | 14. Edit Mode & Cleanup | v1.3 | 0/? | Not started | - |
