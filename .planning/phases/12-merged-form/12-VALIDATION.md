@@ -17,9 +17,9 @@ created: 2026-05-10
 
 | Property | Value |
 |----------|-------|
-| **Framework** | jest 29.x (via next/jest) |
-| **Config file** | jest.config.ts |
-| **Quick run command** | `npm test -- --testPathPattern="merged-form\|pattern-type\|sticky-save\|draft"` |
+| **Framework** | Vitest 3.1.1 (via next/vitest) |
+| **Config file** | vitest.config.ts |
+| **Quick run command** | `npx vitest run --testPathPattern="merged-form\|pattern-type\|sticky-save\|draft"` |
 | **Full suite command** | `npm test` |
 | **Estimated runtime** | ~30 seconds |
 
@@ -27,7 +27,7 @@ created: 2026-05-10
 
 ## Sampling Rate
 
-- **After every task commit:** Run `npm test -- --testPathPattern="merged-form\|pattern-type\|sticky-save\|draft"`
+- **After every task commit:** Run `npx vitest run --testPathPattern="merged-form\|pattern-type\|sticky-save\|draft"`
 - **After every plan wave:** Run `npm test`
 - **Before `/gsd-verify-work`:** Full suite must be green
 - **Max feedback latency:** 30 seconds
