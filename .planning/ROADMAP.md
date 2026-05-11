@@ -170,6 +170,6 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 9.1. Image Optimization on Upload | v1.2 | 2/2 | Complete | 2026-04-26 |
 | 10. Unified Supply Table | v1.3 | 6/6 | Complete    | 2026-05-04 |
 | 11. Supply Table on Project Detail | v1.3 | 2/2 | Complete    | 2026-05-11 |
-| 12. Merged Form | v1.3 | 3/3 | Complete   | 2026-05-11 |
+| 12. Merged Form | v1.3 | 3/3 | Complete    | 2026-05-11 |
 | 13. Supply Takeover | v1.3 | 0/? | Not started | - |
 | 14. Edit Mode & Cleanup | v1.3 | 0/? | Not started | - |
