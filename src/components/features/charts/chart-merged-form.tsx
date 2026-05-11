@@ -48,6 +48,7 @@ export function ChartMergedForm({
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const hydratedRef = useRef(false);
+  const redirectToSuppliesRef = useRef(false);
 
   // Draft state for save button feedback
   const [saveDraftLabel, setSaveDraftLabel] = useState("Save Draft");
@@ -61,12 +62,20 @@ export function ChartMergedForm({
 
   const onSuccess = useCallback(
     (chartId: string) => {
-      void chartId;
       clearDraft();
-      router.push("/charts");
+      if (redirectToSuppliesRef.current) {
+        router.push(`/charts/${chartId}?tab=supplies`);
+      } else {
+        router.push("/charts");
+      }
     },
     [router],
   );
+
+  const handleAddSupplies = useCallback(() => {
+    redirectToSuppliesRef.current = true;
+    formRef.current?.requestSubmit();
+  }, []);
 
   const form = useChartForm({
     mode: "create",
@@ -412,12 +421,14 @@ export function ChartMergedForm({
           <p className="flex-1 text-sm font-medium">
             Project details filled in. Ready for supplies?
           </p>
-          <span
-            className="text-muted-foreground cursor-default text-sm opacity-40 select-none"
-            title="Available after creating the chart"
+          <button
+            type="button"
+            disabled={!form.values.name || form.isPending}
+            onClick={handleAddSupplies}
+            className="text-primary text-sm font-medium hover:underline disabled:cursor-default disabled:no-underline disabled:opacity-40"
           >
-            Add supplies
-          </span>
+            {form.isPending && redirectToSuppliesRef.current ? "Creating..." : "Add supplies →"}
+          </button>
         </div>
 
         {/* === FORM-LEVEL ERROR === */}
