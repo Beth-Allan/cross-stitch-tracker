@@ -4,8 +4,8 @@ milestone: v1.3
 milestone_name: Form & Supply Overhaul
 status: executing
 stopped_at: Phase 11 UI-SPEC approved
-last_updated: "2026-05-11T00:53:58.953Z"
-last_activity: 2026-05-11 -- Phase 11 planning complete
+last_updated: "2026-05-11T00:55:42.261Z"
+last_activity: 2026-05-11 -- Phase 11 execution started
 progress:
   total_phases: 2
   completed_phases: 1
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-03)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 10 — unified-supply-table
+**Current focus:** Phase 11 — supply-table-on-project-detail
 
 ## Current Position
 
-Phase: 10
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-05-11 -- Phase 11 planning complete
+Phase: 11 (supply-table-on-project-detail) — EXECUTING
+Plan: 1 of 2
+Status: Executing Phase 11
+Last activity: 2026-05-11 -- Phase 11 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
