@@ -7,7 +7,13 @@ import { ArrowLeft, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { Designer, Fabric, FabricBrand, Genre, ProjectStatus } from "@/generated/prisma/client";
+import type {
+  Designer,
+  Fabric,
+  FabricBrand,
+  Genre,
+  ProjectStatus,
+} from "@/generated/prisma/client";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { PROJECT_STATUSES, STATUS_CONFIG } from "@/lib/utils/status";
 import { useChartForm } from "./use-chart-form";
@@ -159,7 +165,7 @@ export function ChartMergedForm({
   }));
 
   return (
-    <div className="mx-auto max-w-[720px] px-5 lg:px-8 pt-12 pb-20">
+    <div className="mx-auto max-w-[720px] px-5 pt-12 pb-20 lg:px-8">
       <Link
         href="/charts"
         className="group text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1 text-sm transition-colors"
@@ -171,12 +177,8 @@ export function ChartMergedForm({
         Charts
       </Link>
 
-      <h1 className="font-heading text-foreground mb-1 text-2xl font-semibold">
-        Add New Chart
-      </h1>
-      <p className="text-muted-foreground text-sm mb-8">
-        Create a chart and set up your project
-      </p>
+      <h1 className="font-heading text-foreground mb-1 text-2xl font-semibold">Add New Chart</h1>
+      <p className="text-muted-foreground mb-8 text-sm">Create a chart and set up your project</p>
 
       <form ref={formRef} onSubmit={form.handleSubmit} className="space-y-5">
         {/* === IDENTITY GROUP === */}
@@ -232,7 +234,7 @@ export function ChartMergedForm({
         </FormField>
 
         {/* === SECTION DIVIDER === */}
-        <hr className="border-none border-t border-border/50 my-6" />
+        <hr className="border-border/50 my-6 border-t border-none" />
 
         {/* === PATTERN GROUP === */}
         <StitchCountFields
@@ -268,7 +270,7 @@ export function ChartMergedForm({
         />
 
         {/* === SECTION DIVIDER === */}
-        <hr className="border-none border-t border-border/50 my-6" />
+        <hr className="border-border/50 my-6 border-t border-none" />
 
         {/* === WORKFLOW GROUP === */}
         <FormField
@@ -343,10 +345,10 @@ export function ChartMergedForm({
         </FormField>
 
         {/* === SECTION DIVIDER === */}
-        <hr className="border-none border-t border-border/50 my-6" />
+        <hr className="border-border/50 my-6 border-t border-none" />
 
         {/* === TIMELINE GROUP === */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <FormField label="Start Date" htmlFor="start-date">
             <Input
               id="start-date"
@@ -400,17 +402,20 @@ export function ChartMergedForm({
         )}
 
         {/* === SECTION DIVIDER === */}
-        <hr className="border-none border-t border-border/50 my-6" />
+        <hr className="border-border/50 my-6 border-t border-none" />
 
         {/* === MILESTONE MARKER === */}
-        <div className="rounded-lg bg-primary/5 border border-primary/15 p-4 px-6 flex items-center gap-3">
-          <div className="size-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+        <div className="bg-primary/5 border-primary/15 flex items-center gap-3 rounded-lg border p-4 px-6">
+          <div className="bg-primary text-primary-foreground flex size-6 shrink-0 items-center justify-center rounded-full">
             <Check className="size-3.5" />
           </div>
-          <p className="text-sm font-medium flex-1">
+          <p className="flex-1 text-sm font-medium">
             Project details filled in. Ready for supplies?
           </p>
-          <span className="text-primary text-sm font-medium opacity-50 cursor-default">
+          <span
+            className="text-muted-foreground cursor-default text-sm opacity-40 select-none"
+            title="Available after creating the chart"
+          >
             Add supplies
           </span>
         </div>

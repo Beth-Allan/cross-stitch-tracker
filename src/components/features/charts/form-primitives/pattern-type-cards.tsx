@@ -84,7 +84,11 @@ export function PatternTypeCards({
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      <div role="radiogroup" aria-label="Chart format" className="col-span-2 grid grid-cols-2 gap-3">
+      <div
+        role="radiogroup"
+        aria-label="Chart format"
+        className="col-span-2 grid grid-cols-2 gap-3"
+      >
         {radioCards.map((card) => (
           <SelectionCard key={card.key} card={card} />
         ))}
@@ -95,16 +99,13 @@ export function PatternTypeCards({
           {card.key === "kit" && (
             <div
               className={cn(
-                "overflow-hidden transition-all",
+                "transition-all",
                 isFormalKit
-                  ? "max-h-20 opacity-100 mt-3 duration-250 ease-in"
-                  : "max-h-0 opacity-0 duration-200 ease-out",
+                  ? "mt-3 max-h-20 overflow-visible opacity-100 duration-250 ease-in"
+                  : "max-h-0 overflow-hidden opacity-0 duration-200 ease-out",
               )}
             >
-              <label
-                htmlFor="kit-color-count"
-                className="text-xs text-muted-foreground mb-1 block"
-              >
+              <label htmlFor="kit-color-count" className="text-muted-foreground mb-1 block text-xs">
                 Colours in kit
               </label>
               <Input
@@ -117,7 +118,7 @@ export function PatternTypeCards({
                 className="max-w-[200px]"
               />
               {errors?.kitColorCount && (
-                <p className="text-destructive text-xs mt-1">{errors.kitColorCount}</p>
+                <p className="text-destructive mt-1 text-xs">{errors.kitColorCount}</p>
               )}
             </div>
           )}
@@ -136,24 +137,20 @@ function SelectionCard({ card }: { card: CardConfig }) {
       aria-label={card.accessibleName}
       onClick={card.onClick}
       className={cn(
-        "border rounded-md py-3 px-4 bg-card cursor-pointer transition-all duration-150 text-left w-full",
+        "bg-card w-full cursor-pointer rounded-md border px-4 py-3 text-left transition-all duration-150",
         "hover:border-primary/30",
-        card.isSelected
-          ? "border-primary bg-primary/[0.03] ring-1 ring-primary"
-          : "border-border",
+        card.isSelected ? "border-primary bg-primary/[0.03] ring-primary ring-1" : "border-border",
       )}
     >
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="text-sm font-medium">{card.title}</div>
-          <div className="text-xs text-muted-foreground">{card.description}</div>
+          <div className="text-muted-foreground text-xs">{card.description}</div>
         </div>
         <div
           className={cn(
-            "size-[18px] rounded-full border-2 flex items-center justify-center shrink-0",
-            card.isSelected
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border",
+            "flex size-[18px] shrink-0 items-center justify-center rounded-full border-2",
+            card.isSelected ? "border-primary bg-primary text-primary-foreground" : "border-border",
           )}
         >
           {card.isSelected && <Check className="size-3" />}
