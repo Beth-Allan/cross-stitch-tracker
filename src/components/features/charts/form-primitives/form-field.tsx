@@ -23,15 +23,16 @@ export function FormField({ label, hint, error, required, htmlFor, children }: F
           error && "text-destructive",
         )}
       >
-        {label}
         {required && (
           <>
-            <span className="text-destructive ml-0.5" aria-hidden="true">
-              *
-            </span>
+            <span
+              className="bg-primary mr-1.5 inline-block size-1.5 rounded-full align-middle relative -top-px"
+              aria-hidden="true"
+            />
             <span className="sr-only"> (required)</span>
           </>
         )}
+        {label}
       </Label>
       <div className="mt-1.5">{children}</div>
       {error ? (
