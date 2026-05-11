@@ -94,7 +94,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User sees the unified supply table (grouped sections, donuts, inline editing) on the project detail Supplies tab, replacing the old supply section
   2. User can add missed supplies via the persistent add row on project detail without navigating away, with changes persisted immediately via server actions
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 11-01-PLAN.md -- ServerActionAdapter foundation (Result type extension, adapter class, tests, barrel export)
+- [ ] 11-02-PLAN.md -- Animation wiring + SuppliesTab integration (newRowId chain, tab replacement, visual checkpoint)
 **UI hint**: yes
 
 ### Phase 12: Merged Form
@@ -156,7 +159,7 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 9. Dashboards & Shopping Cart | v1.2 | 9/9 | Complete | 2026-04-18 |
 | 9.1. Image Optimization on Upload | v1.2 | 2/2 | Complete | 2026-04-26 |
 | 10. Unified Supply Table | v1.3 | 6/6 | Complete    | 2026-05-04 |
-| 11. Supply Table on Project Detail | v1.3 | 0/? | Not started | - |
+| 11. Supply Table on Project Detail | v1.3 | 0/2 | Not started | - |
 | 12. Merged Form | v1.3 | 0/? | Not started | - |
 | 13. Supply Takeover | v1.3 | 0/? | Not started | - |
 | 14. Edit Mode & Cleanup | v1.3 | 0/? | Not started | - |
