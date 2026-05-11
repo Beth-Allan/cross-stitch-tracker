@@ -12,7 +12,7 @@ interface SupplyTableAddRowProps {
   adapter: SupplyTableAdapter;
   calcParams: CalcParams;
   existingSupplyIds: Set<string>;
-  onRowAdded: () => void;
+  onRowAdded: (newId?: string) => void;
 }
 
 const UNIT_LABELS: Record<string, string> = {
@@ -72,7 +72,7 @@ export function SupplyTableAddRow({
   async function handleCommit() {
     const result = await commitRow();
     if (result.success) {
-      onRowAdded();
+      onRowAdded(result.newId);
       requestAnimationFrame(() => {
         searchInputRef.current?.focus();
       });
