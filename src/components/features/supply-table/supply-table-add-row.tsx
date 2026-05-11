@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import { toast } from "sonner";
 import { ArrowRight, Sparkles as SparklesIcon, X } from "lucide-react";
 import { SegmentedTypeToggle } from "./segmented-type-toggle";
 import { PortalAutocomplete } from "./portal-autocomplete";
@@ -70,12 +71,18 @@ export function SupplyTableAddRow({
   }, [selectedItem, getFocusTarget]);
 
   async function handleCommit() {
-    const result = await commitRow();
-    if (result.success) {
-      onRowAdded(result.newId);
+    try {
+      const result = await commitRow();
+      if (result.success) {
+        onRowAdded(result.newId);
+      } else if (result.error) {
+        toast.error(result.error);
+      }
       requestAnimationFrame(() => {
         searchInputRef.current?.focus();
       });
+    } catch {
+      toast.error("Couldn't add supply. Try again.");
     }
   }
 

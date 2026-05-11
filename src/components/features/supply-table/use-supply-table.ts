@@ -65,6 +65,10 @@ export function useSupplyTable(
         if (!cancelledRef.current) {
           setSearchResults(results);
         }
+      } catch {
+        if (!cancelledRef.current) {
+          setSearchResults([]);
+        }
       } finally {
         if (!cancelledRef.current) {
           setIsSearching(false);
@@ -130,6 +134,7 @@ export function useSupplyTable(
     success: boolean;
     focusTarget: "search";
     newId?: string;
+    error?: string;
   }> => {
     if (!selectedItem) {
       return { success: false, focusTarget: "search" };
@@ -163,7 +168,7 @@ export function useSupplyTable(
       return { success: true, focusTarget: "search", newId: result.id };
     }
 
-    return { success: false, focusTarget: "search" };
+    return { success: false, focusTarget: "search", error: result.error };
   }, [selectedItem, stitchCount, need, supplyType, adapter]);
 
   // --- Reset all add-row state ---
