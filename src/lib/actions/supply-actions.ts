@@ -700,6 +700,7 @@ export async function createAndAddThread(formData: unknown) {
           brandId: resolvedBrandId,
           colorFamily: validated.colorFamily,
         },
+        include: { brand: true },
       });
       const link = await tx.projectThread.create({
         data: {
@@ -751,6 +752,7 @@ export async function createAndAddBead(formData: unknown) {
           brandId: resolvedBrandId,
           colorFamily: "NEUTRAL",
         },
+        include: { brand: true },
       });
       const link = await tx.projectBead.create({
         data: {
@@ -800,6 +802,7 @@ export async function createAndAddSpecialty(formData: unknown) {
           hexColor: "#808080",
           brandId: resolvedBrandId,
         },
+        include: { brand: true },
       });
       const link = await tx.projectSpecialty.create({
         data: {
