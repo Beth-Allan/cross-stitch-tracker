@@ -44,7 +44,12 @@ export function StitchCountFields({
 
   return (
     <div className="space-y-4">
-      <FormField label="Dimensions (stitches)" htmlFor="stitches-wide" error={errors?.stitchesWide}>
+      <FormField
+        label="Dimensions (stitches)"
+        htmlFor="stitches-wide"
+        required
+        error={errors?.stitchesWide}
+      >
         <div className="flex items-center gap-2">
           <Input
             id="stitches-wide"
