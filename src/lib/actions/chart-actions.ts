@@ -5,7 +5,7 @@ import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { generateThumbnail } from "@/lib/actions/upload-actions";
-import { chartFormSchema } from "@/lib/validations/chart";
+import { chartFormSchema, batchSupplySchema } from "@/lib/validations/chart";
 import { updateProjectSettingsSchema } from "@/lib/validations/supply";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
 
@@ -101,6 +101,151 @@ export async function createChart(formData: unknown) {
       return { success: false as const, error: error.errors[0].message };
     }
     console.error("createChart error:", error);
+    return { success: false as const, error: "Failed to create chart" };
+  }
+}
+
+/**
+ * Creates a chart with project and batch supply records in a single $transaction.
+ *
+ * Combines chart+project creation (same as createChart) with bulk supply junction
+ * inserts across all three tables: ProjectThread, ProjectBead, ProjectSpecialty.
+ * Per D-03/D-06: nothing is persisted until this atomic operation succeeds.
+ */
+export async function createChartWithSupplies(formData: unknown, supplyPayload: unknown) {
+  const user = await requireAuth();
+
+  try {
+    const validated = chartFormSchema.parse(formData);
+    const supplies = batchSupplySchema.parse(supplyPayload);
+    const { chart, project } = validated;
+
+    // Auto-calculate stitch count from dimensions when not provided directly
+    let effectiveStitchCount = chart.stitchCount;
+    let effectiveApproximate = chart.stitchCountApproximate;
+    if (effectiveStitchCount === 0 && chart.stitchesWide > 0 && chart.stitchesHigh > 0) {
+      effectiveStitchCount = chart.stitchesWide * chart.stitchesHigh;
+      effectiveApproximate = true;
+    }
+
+    const created = await prisma.$transaction(async (tx) => {
+      // 1. Create chart + project (same as createChart)
+      const result = await tx.chart.create({
+        data: {
+          name: chart.name,
+          designerId: chart.designerId,
+          coverImageUrl: chart.coverImageUrl,
+          coverThumbnailUrl: chart.coverThumbnailUrl,
+          digitalWorkingCopyUrl: chart.digitalFileUrl,
+          stitchCount: effectiveStitchCount,
+          stitchCountApproximate: effectiveApproximate,
+          stitchesWide: chart.stitchesWide,
+          stitchesHigh: chart.stitchesHigh,
+          genres: {
+            connect: chart.genreIds.map((id) => ({ id })),
+          },
+          isPaperChart: chart.isPaperChart,
+          isFormalKit: chart.isFormalKit,
+          isSAL: chart.isSAL,
+          kitColorCount: chart.kitColorCount,
+          notes: chart.notes,
+          project: {
+            create: {
+              userId: user.id,
+              status: project.status,
+              storageLocationId: project.storageLocationId,
+              stitchingAppId: project.stitchingAppId,
+              needsOnionSkinning: project.needsOnionSkinning,
+              startDate: project.startDate ? new Date(project.startDate) : null,
+              finishDate: project.finishDate ? new Date(project.finishDate) : null,
+              ffoDate: project.ffoDate ? new Date(project.ffoDate) : null,
+              wantToStartNext: project.wantToStartNext,
+              preferredStartSeason: project.preferredStartSeason,
+              startingStitches: project.startingStitches,
+            },
+          },
+        },
+        include: { project: true, designer: true, genres: true },
+      });
+
+      // 2. Link fabric to the new project if provided
+      if (project.fabricId && result.project) {
+        const targetFabric = await tx.fabric.findUnique({
+          where: { id: project.fabricId },
+          select: { linkedProject: { select: { userId: true } } },
+        });
+        if (targetFabric?.linkedProject && targetFabric.linkedProject.userId !== user.id) {
+          throw new Error("Fabric not found");
+        }
+        await tx.fabric.update({
+          where: { id: project.fabricId },
+          data: { linkedProjectId: result.project.id },
+        });
+      }
+
+      // 3. Batch insert supply junction records (D-06, D-07)
+      const projectId = result.project!.id;
+
+      if (supplies.threads.length > 0) {
+        await tx.projectThread.createMany({
+          data: supplies.threads.map((t) => ({
+            projectId,
+            threadId: t.supplyId,
+            stitchCount: t.stitchCount,
+            quantityRequired: t.need,
+            quantityAcquired: 0,
+            isNeedOverridden: t.isNeedOverridden,
+          })),
+          skipDuplicates: true,
+        });
+      }
+
+      if (supplies.beads.length > 0) {
+        await tx.projectBead.createMany({
+          data: supplies.beads.map((b) => ({
+            projectId,
+            beadId: b.supplyId,
+            quantityRequired: b.need,
+            quantityAcquired: 0,
+          })),
+          skipDuplicates: true,
+        });
+      }
+
+      if (supplies.specialty.length > 0) {
+        await tx.projectSpecialty.createMany({
+          data: supplies.specialty.map((s) => ({
+            projectId,
+            specialtyItemId: s.supplyId,
+            quantityRequired: s.need,
+            quantityAcquired: 0,
+          })),
+          skipDuplicates: true,
+        });
+      }
+
+      return result;
+    });
+
+    // Generate thumbnail if a cover image was uploaded (outside transaction)
+    let thumbnailWarning: string | undefined;
+    if (chart.coverImageUrl) {
+      try {
+        await generateThumbnail(created.id, chart.coverImageUrl);
+      } catch (err) {
+        console.error("Thumbnail generation failed (chart saved without thumbnail):", err);
+        thumbnailWarning = "Thumbnail could not be generated";
+      }
+    }
+
+    revalidatePath("/charts");
+    revalidatePath("/fabric");
+    return { success: true as const, chartId: created.id, warning: thumbnailWarning };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false as const, error: error.errors[0].message };
+    }
+    console.error("createChartWithSupplies error:", error);
     return { success: false as const, error: "Failed to create chart" };
   }
 }

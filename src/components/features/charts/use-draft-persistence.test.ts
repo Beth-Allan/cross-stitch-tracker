@@ -266,4 +266,146 @@ describe("use-draft-persistence", () => {
       expect(key).toBe("chart-draft");
     });
   });
+
+  // ─── saveDraftV2 ──────────────────────────────────────────────────────
+
+  describe("saveDraftV2", () => {
+    it("stores version 2 format with form + supplies + calcParams", async () => {
+      const { saveDraftV2 } = await import("./use-draft-persistence");
+      const form = createDraftValues();
+      const supplies = [
+        {
+          id: "row-1",
+          supplyId: "t1",
+          type: "THREAD" as const,
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 500,
+          need: 2,
+          have: 0,
+          isNeedOverridden: false,
+        },
+      ];
+      const calcParams = { fabricCount: 16, strandCount: 2, overCount: 1 as const, wastePercent: 20 };
+
+      saveDraftV2(form, supplies, calcParams);
+
+      const stored = localStorage.getItem(DRAFT_KEY);
+      expect(stored).not.toBeNull();
+      const parsed = JSON.parse(stored!);
+      expect(parsed.version).toBe(2);
+      expect(parsed.form).toEqual(form);
+      expect(parsed.supplies).toEqual(supplies);
+      expect(parsed.calcParams).toEqual(calcParams);
+    });
+  });
+
+  // ─── loadDraftV2 ──────────────────────────────────────────────────────
+
+  describe("loadDraftV2", () => {
+    it("returns null when no draft exists", async () => {
+      const { loadDraftV2 } = await import("./use-draft-persistence");
+      const result = loadDraftV2(createDefaultValues(), [], [], []);
+      expect(result).toBeNull();
+    });
+
+    it("returns DraftV2 shape when v2 draft exists", async () => {
+      const { loadDraftV2 } = await import("./use-draft-persistence");
+      const form = createDraftValues();
+      const supplies = [
+        {
+          id: "row-1",
+          supplyId: "t1",
+          type: "THREAD",
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 500,
+          need: 2,
+          have: 0,
+          isNeedOverridden: false,
+        },
+      ];
+      const calcParams = { fabricCount: 16, strandCount: 2, overCount: 1, wastePercent: 20 };
+      const draft = { version: 2, form, supplies, calcParams };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+
+      const result = loadDraftV2(
+        createDefaultValues(),
+        ["designer-1"],
+        ["storage-1"],
+        ["app-1"],
+      );
+
+      expect(result).not.toBeNull();
+      expect(result!.form.name).toBe("My Test Chart");
+      expect(result!.supplies).toHaveLength(1);
+      expect(result!.supplies[0].code).toBe("310");
+      expect(result!.calcParams.fabricCount).toBe(16);
+    });
+
+    it("handles v1 format (no version field) by wrapping in v2 shape with empty supplies", async () => {
+      const { loadDraftV2 } = await import("./use-draft-persistence");
+      const v1Draft = createDraftValues();
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(v1Draft));
+
+      const result = loadDraftV2(
+        createDefaultValues(),
+        ["designer-1"],
+        ["storage-1"],
+        ["app-1"],
+      );
+
+      expect(result).not.toBeNull();
+      expect(result!.form.name).toBe("My Test Chart");
+      expect(result!.supplies).toEqual([]);
+      expect(result!.calcParams).toEqual({
+        fabricCount: 14,
+        strandCount: 2,
+        overCount: 1,
+        wastePercent: 20,
+      });
+    });
+
+    it("nulls stale fabricId not in validFabricIds list", async () => {
+      const { loadDraftV2 } = await import("./use-draft-persistence");
+      const form = createDraftValues({ fabricId: "deleted-fabric" });
+      const draft = { version: 2, form, supplies: [], calcParams: { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 } };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+
+      const result = loadDraftV2(
+        createDefaultValues(),
+        ["designer-1"],
+        ["storage-1"],
+        ["app-1"],
+        ["fabric-1", "fabric-2"],
+      );
+
+      expect(result).not.toBeNull();
+      expect(result!.form.fabricId).toBeNull();
+    });
+
+    it("returns null for invalid JSON", async () => {
+      const { loadDraftV2 } = await import("./use-draft-persistence");
+      localStorage.setItem(DRAFT_KEY, "not valid json {{{");
+      const result = loadDraftV2(createDefaultValues(), [], [], []);
+      expect(result).toBeNull();
+    });
+  });
+
+  // ─── clearDraft also clears v2 ────────────────────────────────────────
+
+  describe("clearDraft with v2", () => {
+    it("removes storage item regardless of format", async () => {
+      const { clearDraft } = await import("./use-draft-persistence");
+      const draft = { version: 2, form: createDraftValues(), supplies: [], calcParams: { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 } };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+
+      clearDraft();
+      expect(localStorage.getItem(DRAFT_KEY)).toBeNull();
+    });
+  });
 });

@@ -56,6 +56,45 @@ export const chartFormSchema = z.object({
 
 export type ChartFormInput = z.infer<typeof chartFormSchema>;
 
+/**
+ * Validates the batch supply payload for createChartWithSupplies.
+ * Each array is capped at 500 items to prevent oversized payloads (T-13-03).
+ * supplyId must be non-empty to prevent phantom junction records (T-13-02).
+ */
+export const batchSupplySchema = z.object({
+  threads: z
+    .array(
+      z.object({
+        supplyId: z.string().min(1, "Supply ID required"),
+        stitchCount: z.number().int().min(0),
+        need: z.number().int().min(1),
+        isNeedOverridden: z.boolean(),
+      }),
+    )
+    .max(500)
+    .default([]),
+  beads: z
+    .array(
+      z.object({
+        supplyId: z.string().min(1, "Supply ID required"),
+        need: z.number().int().min(1),
+      }),
+    )
+    .max(500)
+    .default([]),
+  specialty: z
+    .array(
+      z.object({
+        supplyId: z.string().min(1, "Supply ID required"),
+        need: z.number().int().min(1),
+      }),
+    )
+    .max(500)
+    .default([]),
+});
+
+export type BatchSupplyInput = z.infer<typeof batchSupplySchema>;
+
 export const designerSchema = z.object({
   name: z.string().trim().min(1, "Designer name is required").max(200, "Designer name too long"),
   website: z.string().url("Must be a valid URL").nullable().default(null),
