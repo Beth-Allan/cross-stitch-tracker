@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { createMockPrisma } from "@/__tests__/mocks";
 
 // Mock auth to return null (unauthenticated)
@@ -8,6 +8,10 @@ vi.mock("@/lib/auth", () => ({
 
 // Mock prisma to prevent actual DB calls
 const mockPrisma = createMockPrisma();
+// Add createMany to junction table mocks (not in shared factory yet)
+mockPrisma.projectThread.createMany = vi.fn();
+mockPrisma.projectBead.createMany = vi.fn();
+mockPrisma.projectSpecialty.createMany = vi.fn();
 vi.mock("@/lib/db", () => ({
   prisma: mockPrisma,
 }));
@@ -85,13 +89,17 @@ describe("createChartWithSupplies", () => {
     },
   };
 
-  it("with empty supplies creates chart without supply inserts", async () => {
-    // Re-mock auth to return a valid user
+  beforeEach(async () => {
+    // Reset all mocks (clears implementations + call counts) to prevent leaking
+    vi.resetAllMocks();
+    // Set auth to return a valid user for all tests in this describe block
     const auth = await import("@/lib/auth");
-    (auth.auth as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    (auth.auth as ReturnType<typeof vi.fn>).mockResolvedValue({
       user: { id: "user-1", email: "test@test.com" },
     });
+  });
 
+  it("with empty supplies creates chart without supply inserts", async () => {
     const createdChart = {
       id: "chart-new",
       project: { id: "proj-new" },
@@ -117,11 +125,6 @@ describe("createChartWithSupplies", () => {
   });
 
   it("with thread supplies calls createMany with correct data shape", async () => {
-    const auth = await import("@/lib/auth");
-    (auth.auth as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      user: { id: "user-1", email: "test@test.com" },
-    });
-
     const createdChart = {
       id: "chart-new",
       project: { id: "proj-new" },
@@ -160,11 +163,6 @@ describe("createChartWithSupplies", () => {
   });
 
   it("with mixed supplies creates all three junction types", async () => {
-    const auth = await import("@/lib/auth");
-    (auth.auth as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      user: { id: "user-1", email: "test@test.com" },
-    });
-
     const createdChart = {
       id: "chart-new",
       project: { id: "proj-new" },
@@ -193,11 +191,6 @@ describe("createChartWithSupplies", () => {
   });
 
   it("returns chartId on success", async () => {
-    const auth = await import("@/lib/auth");
-    (auth.auth as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      user: { id: "user-1", email: "test@test.com" },
-    });
-
     const createdChart = {
       id: "chart-abc",
       project: { id: "proj-abc" },
@@ -219,11 +212,6 @@ describe("createChartWithSupplies", () => {
   });
 
   it("returns error on ZodError (invalid form data)", async () => {
-    const auth = await import("@/lib/auth");
-    (auth.auth as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      user: { id: "user-1", email: "test@test.com" },
-    });
-
     const { createChartWithSupplies } = await import("./chart-actions");
     // Pass invalid chart data (missing name)
     const result = await createChartWithSupplies(
