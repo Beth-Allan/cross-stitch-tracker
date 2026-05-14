@@ -7,7 +7,8 @@ import type { SizeCategory } from "@/lib/utils/size-category";
 import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
 import { chartFormSchema } from "@/lib/validations/chart";
 import { toast } from "sonner";
-import { createChart, updateChart } from "@/lib/actions/chart-actions";
+import { createChart, createChartWithSupplies, updateChart } from "@/lib/actions/chart-actions";
+import type { SupplyRow } from "@/components/features/supply-table/types";
 import { createDesigner } from "@/lib/actions/designer-actions";
 import { createGenre } from "@/lib/actions/genre-actions";
 import { createStorageLocation } from "@/lib/actions/storage-location-actions";
@@ -52,6 +53,7 @@ interface UseChartFormOptions {
   storageLocations?: StorageLocationWithStats[];
   stitchingApps?: StitchingAppWithStats[];
   onSuccess: (chartId: string) => void;
+  getSupplyRows?: () => SupplyRow[];
 }
 
 const ERROR_MAP: Record<string, string> = {
@@ -144,6 +146,7 @@ export function useChartForm({
   storageLocations: initialStorageLocations = [],
   stitchingApps: initialStitchingApps = [],
   onSuccess,
+  getSupplyRows,
 }: UseChartFormOptions) {
   const initial = useMemo(() => buildInitialValues(initialData), [initialData]);
   const [values, setValues] = useState<ChartFormValues>(initial);
@@ -238,7 +241,35 @@ export function useChartForm({
       suppressUnloadRef.current = true;
       try {
         if (mode === "create") {
-          const response = await createChart(formData);
+          const supplyRows = getSupplyRows?.() ?? [];
+          let response;
+          if (supplyRows.length > 0) {
+            const supplyPayload = {
+              threads: supplyRows
+                .filter((r) => r.type === "THREAD")
+                .map((r) => ({
+                  supplyId: r.supplyId,
+                  stitchCount: r.stitchCount,
+                  need: r.need,
+                  isNeedOverridden: r.isNeedOverridden,
+                })),
+              beads: supplyRows
+                .filter((r) => r.type === "BEAD")
+                .map((r) => ({
+                  supplyId: r.supplyId,
+                  need: r.need,
+                })),
+              specialty: supplyRows
+                .filter((r) => r.type === "SPECIALTY")
+                .map((r) => ({
+                  supplyId: r.supplyId,
+                  need: r.need,
+                })),
+            };
+            response = await createChartWithSupplies(formData, supplyPayload);
+          } else {
+            response = await createChart(formData);
+          }
           if (!response.success) {
             setErrors({ _form: response.error });
             suppressUnloadRef.current = false;
@@ -270,7 +301,7 @@ export function useChartForm({
         setIsPending(false);
       }
     },
-    [values, mode, initialData, onSuccess],
+    [values, mode, initialData, onSuccess, getSupplyRows],
   );
 
   // Inline entity creation
