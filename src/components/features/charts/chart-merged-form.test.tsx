@@ -13,9 +13,20 @@ vi.mock("next/navigation", () => ({
 
 const mockCreateChart = vi.fn();
 const mockUpdateChart = vi.fn();
+const mockCreateChartWithSupplies = vi.fn();
 vi.mock("@/lib/actions/chart-actions", () => ({
   createChart: (...args: unknown[]) => mockCreateChart(...args),
   updateChart: (...args: unknown[]) => mockUpdateChart(...args),
+  createChartWithSupplies: (...args: unknown[]) => mockCreateChartWithSupplies(...args),
+}));
+
+vi.mock("@/lib/actions/supply-actions", () => ({
+  getThreads: vi.fn().mockResolvedValue([]),
+  getBeads: vi.fn().mockResolvedValue([]),
+  getSpecialtyItems: vi.fn().mockResolvedValue([]),
+  createThread: vi.fn(),
+  createBead: vi.fn(),
+  createSpecialtyItem: vi.fn(),
 }));
 
 vi.mock("@/lib/actions/designer-actions", () => ({
@@ -248,7 +259,8 @@ describe("ChartMergedForm", () => {
     const stored = localStorage.getItem(DRAFT_KEY);
     expect(stored).toBeTruthy();
     const parsed = JSON.parse(stored!);
-    expect(parsed.name).toBe("Draft Chart");
+    expect(parsed.version).toBe(2);
+    expect(parsed.form.name).toBe("Draft Chart");
   });
 
   it("form hydrates from localStorage draft on mount", async () => {
@@ -346,5 +358,415 @@ describe("ChartMergedForm", () => {
         screen.getByText("Failed to create chart"),
       ).toBeInTheDocument();
     });
+  });
+
+  // --- Supply takeover mode tests ---
+
+  it("renders in form mode by default (form visible, no summary bar)", () => {
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    // Form is visible
+    expect(screen.getByLabelText(/chart name/i)).toBeInTheDocument();
+    // Summary bar should not be visible
+    expect(screen.queryByRole("banner", { name: /project summary/i })).not.toBeVisible();
+  });
+
+  it("clicking 'Add supplies' when name is filled sets mode to supply (summary bar visible)", async () => {
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "My Chart");
+
+    // Click "Add supplies" button
+    const addSuppliesBtn = screen.getByRole("button", { name: /add supplies/i });
+    await user.click(addSuppliesBtn);
+
+    // Summary bar should now be visible
+    expect(screen.getByRole("banner", { name: /project summary/i })).toBeVisible();
+  });
+
+  it("'Add supplies' button is disabled when chart name is empty", () => {
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    const addSuppliesBtn = screen.getByRole("button", { name: /add supplies/i });
+    expect(addSuppliesBtn).toBeDisabled();
+  });
+
+  it("in supply mode, summary bar shows chart name and status", async () => {
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "Enchanted Forest");
+
+    await user.click(screen.getByRole("button", { name: /add supplies/i }));
+
+    // The summary bar should contain the chart name
+    const banner = screen.getByRole("banner", { name: /project summary/i });
+    expect(banner).toHaveTextContent("Enchanted Forest");
+    expect(banner).toHaveTextContent("Unstarted");
+  });
+
+  it("clicking 'Details' in summary bar returns to form mode (form visible again)", async () => {
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "My Chart");
+
+    // Enter supply mode
+    await user.click(screen.getByRole("button", { name: /add supplies/i }));
+    expect(screen.getByRole("banner", { name: /project summary/i })).toBeVisible();
+
+    // Click "Details" to go back
+    const detailsBtn = screen.getByRole("button", { name: /return to form details/i });
+    await user.click(detailsBtn);
+
+    // Form should be visible again
+    expect(screen.getByLabelText(/chart name/i)).toBeVisible();
+  });
+
+  it("form state is preserved after toggling to supply mode and back", async () => {
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    // Fill in some form data
+    await user.type(screen.getByLabelText(/chart name/i), "Preserved Chart");
+    await user.type(screen.getByLabelText(/total stitch count/i), "12345");
+
+    // Toggle to supply mode and back
+    await user.click(screen.getByRole("button", { name: /add supplies/i }));
+    await user.click(screen.getByRole("button", { name: /return to form details/i }));
+
+    // Values should be preserved
+    expect(screen.getByLabelText(/chart name/i)).toHaveValue("Preserved Chart");
+    expect(screen.getByLabelText(/total stitch count/i)).toHaveValue(12345);
+  });
+
+  it("in supply mode, calculator card is rendered", async () => {
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "My Chart");
+    await user.click(screen.getByRole("button", { name: /add supplies/i }));
+
+    // CalculatorCard renders with aria label "Skein calculator settings"
+    expect(screen.getByRole("group", { name: /skein calculator settings/i })).toBeVisible();
+  });
+
+  it("in supply mode, supply table is rendered", async () => {
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "My Chart");
+    await user.click(screen.getByRole("button", { name: /add supplies/i }));
+
+    // SupplyTable renders a table
+    expect(screen.getByRole("table")).toBeVisible();
+  });
+
+  it("Create button calls createChartWithSupplies when supplies exist", async () => {
+    // Pre-populate a V2 draft with supply rows, which will be loaded into
+    // the adapter on mount, then submit.
+    const v2Draft = {
+      version: 2,
+      form: {
+        name: "Chart With Supplies",
+        designerId: null,
+        coverImageUrl: null,
+        coverThumbnailUrl: null,
+        digitalFileUrl: null,
+        stitchesWide: 0,
+        stitchesHigh: 0,
+        stitchCount: 10000,
+        stitchCountApproximate: false,
+        genreIds: [],
+        isPaperChart: false,
+        isFormalKit: false,
+        kitColorCount: null,
+        isSAL: false,
+        notes: "",
+        status: "KITTING",
+        storageLocationId: null,
+        stitchingAppId: null,
+        fabricId: null,
+        needsOnionSkinning: false,
+        startDate: "",
+        finishDate: "",
+        ffoDate: "",
+        wantToStartNext: false,
+        preferredStartSeason: null,
+        startingStitches: 0,
+      },
+      supplies: [
+        {
+          id: "row-1",
+          supplyId: "thread-1",
+          type: "THREAD",
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 500,
+          need: 2,
+          have: 0,
+          isNeedOverridden: false,
+        },
+      ],
+      calcParams: { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 },
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(v2Draft));
+
+    mockCreateChartWithSupplies.mockResolvedValue({
+      success: true,
+      chartId: "new-chart-id",
+    });
+
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    // Wait for draft hydration
+    await waitFor(() => {
+      expect(screen.getByLabelText(/chart name/i)).toHaveValue("Chart With Supplies");
+    });
+
+    // Submit via Create button
+    await user.click(screen.getByRole("button", { name: "Create" }));
+
+    await waitFor(() => {
+      expect(mockCreateChartWithSupplies).toHaveBeenCalledTimes(1);
+    });
+
+    // Verify the supply payload was passed
+    const supplyPayload = mockCreateChartWithSupplies.mock.calls[0][1];
+    expect(supplyPayload.threads).toHaveLength(1);
+    expect(supplyPayload.threads[0].supplyId).toBe("thread-1");
+  });
+
+  it("Create button calls createChart (original) when no supplies buffered", async () => {
+    mockCreateChart.mockResolvedValue({
+      success: true,
+      chartId: "new-id",
+    });
+
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "No Supplies Chart");
+    await user.type(screen.getByLabelText(/total stitch count/i), "5000");
+
+    await user.click(screen.getByRole("button", { name: "Create" }));
+
+    await waitFor(() => {
+      expect(mockCreateChart).toHaveBeenCalledTimes(1);
+    });
+    expect(mockCreateChartWithSupplies).not.toHaveBeenCalled();
+  });
+
+  it("draft save includes supply rows via saveDraftV2", async () => {
+    // Pre-populate a V2 draft with supplies to test that saving preserves them
+    const v2Draft = {
+      version: 2,
+      form: {
+        name: "Draft With Supplies",
+        designerId: null,
+        coverImageUrl: null,
+        coverThumbnailUrl: null,
+        digitalFileUrl: null,
+        stitchesWide: 0,
+        stitchesHigh: 0,
+        stitchCount: 5000,
+        stitchCountApproximate: false,
+        genreIds: [],
+        isPaperChart: false,
+        isFormalKit: false,
+        kitColorCount: null,
+        isSAL: false,
+        notes: "",
+        status: "UNSTARTED",
+        storageLocationId: null,
+        stitchingAppId: null,
+        fabricId: null,
+        needsOnionSkinning: false,
+        startDate: "",
+        finishDate: "",
+        ffoDate: "",
+        wantToStartNext: false,
+        preferredStartSeason: null,
+        startingStitches: 0,
+      },
+      supplies: [
+        {
+          id: "row-1",
+          supplyId: "thread-1",
+          type: "THREAD",
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 500,
+          need: 2,
+          have: 0,
+          isNeedOverridden: false,
+        },
+      ],
+      calcParams: { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 },
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(v2Draft));
+
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    // Wait for draft hydration
+    await waitFor(() => {
+      expect(screen.getByLabelText(/chart name/i)).toHaveValue("Draft With Supplies");
+    });
+
+    // Click Save Draft
+    const saveDraftButton = screen.getByRole("button", { name: "Save Draft" });
+    await user.click(saveDraftButton);
+
+    // The saved draft should be V2 format with supply rows
+    const stored = localStorage.getItem(DRAFT_KEY);
+    expect(stored).toBeTruthy();
+    const parsed = JSON.parse(stored!);
+    expect(parsed.version).toBe(2);
+    expect(parsed.supplies).toHaveLength(1);
+    expect(parsed.supplies[0].supplyId).toBe("thread-1");
+  });
+
+  it("draft restore loads supply rows into adapter via loadRows", async () => {
+    const v2Draft = {
+      version: 2,
+      form: {
+        name: "Restored Supply Draft",
+        designerId: null,
+        coverImageUrl: null,
+        coverThumbnailUrl: null,
+        digitalFileUrl: null,
+        stitchesWide: 0,
+        stitchesHigh: 0,
+        stitchCount: 8000,
+        stitchCountApproximate: false,
+        genreIds: [],
+        isPaperChart: false,
+        isFormalKit: false,
+        kitColorCount: null,
+        isSAL: false,
+        notes: "",
+        status: "UNSTARTED",
+        storageLocationId: null,
+        stitchingAppId: null,
+        fabricId: null,
+        needsOnionSkinning: false,
+        startDate: "",
+        finishDate: "",
+        ffoDate: "",
+        wantToStartNext: false,
+        preferredStartSeason: null,
+        startingStitches: 0,
+      },
+      supplies: [
+        {
+          id: "row-1",
+          supplyId: "thread-1",
+          type: "THREAD",
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 500,
+          need: 2,
+          have: 0,
+          isNeedOverridden: false,
+        },
+        {
+          id: "row-2",
+          supplyId: "bead-1",
+          type: "BEAD",
+          code: "00001",
+          name: "Red Glass",
+          brandName: "Mill Hill",
+          hexColor: "#FF0000",
+          stitchCount: 0,
+          need: 1,
+          have: 0,
+          isNeedOverridden: false,
+        },
+      ],
+      calcParams: { fabricCount: 16, strandCount: 2, overCount: 2, wastePercent: 25 },
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(v2Draft));
+
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    // Wait for draft hydration
+    await waitFor(() => {
+      expect(screen.getByLabelText(/chart name/i)).toHaveValue("Restored Supply Draft");
+    });
+
+    // Switch to supply mode to see the supplies
+    await user.click(screen.getByRole("button", { name: /add supplies/i }));
+
+    // The supply table should show our restored rows (thread "310" text)
+    await waitFor(() => {
+      expect(screen.getByText("310")).toBeInTheDocument();
+    });
+  });
+
+  it("draft restore with stale fabricId shows toast about fabric unavailable", async () => {
+    const { toast } = await import("sonner");
+    const warningSpy = vi.spyOn(toast, "warning");
+
+    const v2Draft = {
+      version: 2,
+      form: {
+        name: "Stale Fabric Draft",
+        designerId: null,
+        coverImageUrl: null,
+        coverThumbnailUrl: null,
+        digitalFileUrl: null,
+        stitchesWide: 0,
+        stitchesHigh: 0,
+        stitchCount: 5000,
+        stitchCountApproximate: false,
+        genreIds: [],
+        isPaperChart: false,
+        isFormalKit: false,
+        kitColorCount: null,
+        isSAL: false,
+        notes: "",
+        status: "UNSTARTED",
+        storageLocationId: null,
+        stitchingAppId: null,
+        fabricId: "stale-fabric-id",
+        needsOnionSkinning: false,
+        startDate: "",
+        finishDate: "",
+        ffoDate: "",
+        wantToStartNext: false,
+        preferredStartSeason: null,
+        startingStitches: 0,
+      },
+      supplies: [],
+      calcParams: { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 },
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(v2Draft));
+
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    // Wait for hydration
+    await waitFor(() => {
+      expect(screen.getByLabelText(/chart name/i)).toHaveValue("Stale Fabric Draft");
+    });
+
+    // The fabricId "stale-fabric-id" is not in unassignedFabrics (empty),
+    // so it should be nulled and a toast warning shown about fabric unavailability
+    await waitFor(() => {
+      expect(warningSpy).toHaveBeenCalledWith(
+        expect.stringContaining("fabric"),
+      );
+    });
+
+    warningSpy.mockRestore();
   });
 });
