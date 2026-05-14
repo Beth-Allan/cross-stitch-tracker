@@ -35,15 +35,17 @@ Declared values (must be multiples of 4):
 |-------|-------|-------|
 | xs | 4px | Icon gaps, inline padding, chip inline padding |
 | sm | 8px | Compact element spacing, table cell gaps |
+| sm+ | 12px | Compact sticky bar vertical padding (StickySaveBar, SummaryBar) |
 | md | 16px | Default element spacing, card internal padding |
 | lg | 24px | Section padding, card outer padding, summary bar horizontal padding |
 | xl | 32px | Layout gaps |
 | 2xl | 48px | Page top padding |
 | 3xl | 64px | Not used in this phase |
 
+12px justification: Both StickySaveBar (Phase 12, `py-3`) and the new SummaryBar use 12px vertical padding. This value provides the correct visual density for persistent sticky chrome -- 8px is too cramped for bars containing text + icons, while 16px wastes vertical space on always-visible elements. Added to the standard set as `sm+` to formalize this established pattern.
+
 Exceptions:
-- Table cell vertical padding: 5px (established in Phase 10 supply table, not a multiple of 4)
-- Summary bar vertical padding: 12px (`py-3`, established pattern from sticky save bar)
+- Table cell vertical padding: 5px (`py-[5px]`). **Intentional design exception overriding the standard grid.** The SupplyTable component (Phase 10) uses `py-[5px]` for data rows to achieve the correct visual density in dense tabular data. This phase reuses SupplyTable as-is with no modifications. The 5px value was chosen in Phase 10 because 4px produced rows that felt too tight with the 14px body text + donut indicators, while 8px made the table excessively tall for 20+ supply rows. This is a deliberate deviation from the 4px grid, not an oversight.
 - Touch targets: 44px minimum for segmented control buttons in calc card (accessibility)
 
 ---
@@ -53,13 +55,16 @@ Exceptions:
 | Role | Size | Weight | Line Height | Font |
 |------|------|--------|-------------|------|
 | Body | 14px (text-sm) | 400 (normal) | 1.5 | Source Sans 3 |
-| Label | 14px (text-sm) | 500 (medium) | 1.5 | Source Sans 3 |
+| Label | 14px (text-sm) | 600 (semibold) | 1.5 | Source Sans 3 |
 | Section label | 11px | 600 (semibold) | 1.2 | Source Sans 3 |
 | Heading | 24px (text-2xl) | 600 (semibold) | 1.2 | Fraunces |
+
+Two weights used: 400 (normal) for body text and 600 (semibold) for labels, section labels, and headings. Where visual distinction between body text and labels is needed at the same 14px size, semibold weight provides the contrast. Section labels additionally use uppercase tracking-wider for emphasis.
 
 Notes:
 - Summary bar tokens use 14px body weight 400 with dot separators
 - Calculator card labels use 11px semibold uppercase tracking-wider (matching existing CalculatorSettingsBar pattern)
+- Summary bar "Details" link uses 14px semibold (label weight) with primary color for emphasis
 - Fabric dropdown uses 14px body
 - Page heading ("Add New Chart") already exists from Phase 12, unchanged
 
@@ -125,9 +130,9 @@ Accent reserved for:
 - Position: `sticky top-14 z-[90]` (below top-bar h-14, above content, below sticky save bar z-100)
 - Background: `bg-card`
 - Border: `border-b border-border`
-- Padding: `py-3 px-4` inside a `max-w-[720px] mx-auto` wrapper
+- Padding: `py-3 px-4` inside a `max-w-[720px] mx-auto` wrapper (12px vertical per sm+ token)
 - Layout: `flex items-center gap-3`
-- "Details" link: `text-primary text-sm font-medium hover:underline`, with ArrowLeft icon (size-4)
+- "Details" link: `text-primary text-sm font-semibold hover:underline`, with ArrowLeft icon (size-4)
 - Token text: `text-sm text-foreground` for values, dot separator `text-muted-foreground mx-1`
 
 **Data binding:** Live from `form.values` (D-14). Tokens built as `[name, designerName, statusLabel, stitchCountFormatted].filter(Boolean).join(" . ")`. Chart name and status always present (D-16).
