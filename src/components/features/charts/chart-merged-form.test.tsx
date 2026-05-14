@@ -367,8 +367,14 @@ describe("ChartMergedForm", () => {
 
     // Form is visible
     expect(screen.getByLabelText(/chart name/i)).toBeInTheDocument();
-    // Summary bar should not be visible
-    expect(screen.queryByRole("banner", { name: /project summary/i })).not.toBeVisible();
+    // Summary bar should not be visible (Activity hides it -- may be null or hidden)
+    const banner = screen.queryByRole("banner", { name: /project summary/i });
+    if (banner) {
+      expect(banner).not.toBeVisible();
+    } else {
+      // Activity hides children completely in jsdom -- banner not in DOM at all
+      expect(banner).toBeNull();
+    }
   });
 
   it("clicking 'Add supplies' when name is filled sets mode to supply (summary bar visible)", async () => {
