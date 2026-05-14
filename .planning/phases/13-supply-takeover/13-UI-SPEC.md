@@ -35,17 +35,17 @@ Declared values (must be multiples of 4):
 |-------|-------|-------|
 | xs | 4px | Icon gaps, inline padding, chip inline padding |
 | sm | 8px | Compact element spacing, table cell gaps |
-| sm+ | 12px | Compact sticky bar vertical padding (StickySaveBar, SummaryBar) |
 | md | 16px | Default element spacing, card internal padding |
-| lg | 24px | Section padding, card outer padding, summary bar horizontal padding |
+| lg | 24px | Section padding, card outer padding |
 | xl | 32px | Layout gaps |
 | 2xl | 48px | Page top padding |
 | 3xl | 64px | Not used in this phase |
 
-12px justification: Both StickySaveBar (Phase 12, `py-3`) and the new SummaryBar use 12px vertical padding. This value provides the correct visual density for persistent sticky chrome -- 8px is too cramped for bars containing text + icons, while 16px wastes vertical space on always-visible elements. Added to the standard set as `sm+` to formalize this established pattern.
+Inherited component constants (not part of this phase's spacing scale):
+- **SupplyTable row padding:** SupplyTable is a reused Phase 10 component embedded as-is. Its internal cell padding (`py-[5px]`) is an established component constant from Phase 10, not subject to this phase's spacing scale.
+- **SummaryBar / StickySaveBar vertical padding:** SummaryBar reuses the same sticky chrome padding pattern (`py-3` / 12px) established by StickySaveBar in Phase 12. This is an inherited constant from the existing sticky bar pattern, not part of this phase's spacing scale.
 
 Exceptions:
-- Table cell vertical padding: 5px (`py-[5px]`). **Intentional design exception overriding the standard grid.** The SupplyTable component (Phase 10) uses `py-[5px]` for data rows to achieve the correct visual density in dense tabular data. This phase reuses SupplyTable as-is with no modifications. The 5px value was chosen in Phase 10 because 4px produced rows that felt too tight with the 14px body text + donut indicators, while 8px made the table excessively tall for 20+ supply rows. This is a deliberate deviation from the 4px grid, not an oversight.
 - Touch targets: 44px minimum for segmented control buttons in calc card (accessibility)
 
 ---
@@ -103,14 +103,14 @@ Accent reserved for:
 
 ### Reused Components (from prior phases)
 
-| Component | Source Phase | Modifications |
-|-----------|-------------|---------------|
-| `SupplyTable` | Phase 10 | None -- embedded as-is in supply takeover area |
-| `StickySaveBar` | Phase 12 | CTA label changes to "Create" in supply mode (unchanged component, props vary) |
-| `ChartMergedForm` | Phase 12 | Adds Activity mode toggle, summary bar, calculator card, supply table embedding |
-| `SegmentedTypeToggle` | Phase 10 | None -- reused in supply table add row |
-| `SearchableSelect` | Phase 12 | Reused for fabric dropdown in calculator card |
-| `FormField` | Phase 12 | Reused for fabric dropdown label in calc card |
+| Component | Source Phase | Modifications | Inherited Constants |
+|-----------|-------------|---------------|---------------------|
+| `SupplyTable` | Phase 10 | None -- embedded as-is in supply takeover area | Row cell padding (`py-[5px]`) is Phase 10's established constant |
+| `StickySaveBar` | Phase 12 | CTA label changes to "Create" in supply mode (unchanged component, props vary) | Vertical padding (`py-3` / 12px) is Phase 12's established sticky chrome pattern |
+| `ChartMergedForm` | Phase 12 | Adds Activity mode toggle, summary bar, calculator card, supply table embedding | |
+| `SegmentedTypeToggle` | Phase 10 | None -- reused in supply table add row | |
+| `SearchableSelect` | Phase 12 | Reused for fabric dropdown in calculator card | |
+| `FormField` | Phase 12 | Reused for fabric dropdown label in calc card | |
 
 ### Component Specifications
 
@@ -130,7 +130,7 @@ Accent reserved for:
 - Position: `sticky top-14 z-[90]` (below top-bar h-14, above content, below sticky save bar z-100)
 - Background: `bg-card`
 - Border: `border-b border-border`
-- Padding: `py-3 px-4` inside a `max-w-[720px] mx-auto` wrapper (12px vertical per sm+ token)
+- Padding: `py-3 px-4` inside a `max-w-[720px] mx-auto` wrapper (inherits sticky chrome padding pattern from StickySaveBar, Phase 12)
 - Layout: `flex items-center gap-3`
 - "Details" link: `text-primary text-sm font-semibold hover:underline`, with ArrowLeft icon (size-4)
 - Token text: `text-sm text-foreground` for values, dot separator `text-muted-foreground mx-1`
