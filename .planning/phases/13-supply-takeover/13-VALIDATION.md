@@ -2,8 +2,8 @@
 phase: 13
 slug: supply-takeover
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-13
 ---
 
@@ -17,9 +17,9 @@ created: 2026-05-13
 
 | Property | Value |
 |----------|-------|
-| **Framework** | jest 29.x (via next/jest) |
-| **Config file** | jest.config.ts |
-| **Quick run command** | `npm test -- --testPathPattern="supply-takeover\|creation-flow-adapter\|batch-add\|calculator-card\|summary-bar"` |
+| **Framework** | Vitest 3.x |
+| **Config file** | vitest.config.ts |
+| **Quick run command** | `npm test -- src/components/features/charts/creation-flow-adapter src/components/features/charts/summary-bar src/components/features/charts/calculator-card src/lib/actions/chart-actions` |
 | **Full suite command** | `npm test` |
 | **Estimated runtime** | ~45 seconds |
 
@@ -38,12 +38,12 @@ created: 2026-05-13
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 13-01-01 | 01 | 1 | TAKE-01 | — | N/A | unit | `npm test -- --testPathPattern="creation-flow-adapter"` | ❌ W0 | ⬜ pending |
-| 13-01-02 | 01 | 1 | TAKE-01 | — | N/A | unit | `npm test -- --testPathPattern="summary-bar"` | ❌ W0 | ⬜ pending |
-| 13-02-01 | 02 | 1 | TAKE-03 | — | N/A | unit | `npm test -- --testPathPattern="calculator-card"` | ❌ W0 | ⬜ pending |
-| 13-02-02 | 02 | 1 | TAKE-03 | — | N/A | unit | `npm test -- --testPathPattern="fabric-picker"` | ❌ W0 | ⬜ pending |
-| 13-03-01 | 03 | 2 | TAKE-04 | — | Atomic save prevents orphan records | integration | `npm test -- --testPathPattern="batch-add-supplies"` | ❌ W0 | ⬜ pending |
-| 13-03-02 | 03 | 2 | TAKE-02 | — | N/A | unit | `npm test -- --testPathPattern="supply-takeover"` | ❌ W0 | ⬜ pending |
+| 13-01-01 | 01 | 1 | TAKE-03 | — | N/A | unit | `npm test -- src/components/features/charts/creation-flow-adapter` | TDD creates | ⬜ pending |
+| 13-01-02 | 01 | 1 | TAKE-04 | — | Atomic save prevents orphan records | integration | `npm test -- src/lib/actions/chart-actions` | TDD creates | ⬜ pending |
+| 13-02-01 | 02 | 1 | TAKE-02 | — | N/A | unit | `npm test -- src/components/features/charts/summary-bar` | TDD creates | ⬜ pending |
+| 13-02-02 | 02 | 1 | TAKE-03 | — | N/A | unit | `npm test -- src/components/features/charts/calculator-card` | TDD creates | ⬜ pending |
+| 13-03-01 | 03 | 2 | TAKE-01 | — | N/A | integration | `npm test -- src/components/features/charts/chart-merged-form` | TDD creates | ⬜ pending |
+| 13-03-02 | 03 | 2 | TAKE-02 | — | N/A | visual | Manual checkpoint | N/A | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -51,13 +51,7 @@ created: 2026-05-13
 
 ## Wave 0 Requirements
 
-- [ ] Test stubs for CreationFlowAdapter (implements SupplyTableAdapter interface)
-- [ ] Test stubs for SummaryBar component (live form binding)
-- [ ] Test stubs for CalculatorCard component (fabric assignment + segmented controls)
-- [ ] Test stubs for batchAddSupplies server action (atomic $transaction)
-- [ ] Test stubs for draft persistence v2 (supply row backup + restore)
-
-*Existing infrastructure (jest, test-utils, shared mocks) covers framework needs.*
+*No Wave 0 stubs needed — all plans use TDD (tests written before implementation within each task). Existing infrastructure (Vitest, test-utils, shared mocks) covers framework needs.*
 
 ---
 

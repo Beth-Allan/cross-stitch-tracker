@@ -134,8 +134,8 @@ Plans:
 **Plans**: 3 plans
 Plans:
 **Wave 1** *(parallel)*
-- [ ] 13-01-PLAN.md -- CreationFlowAdapter, createChartWithSupplies server action, batchSupplySchema, draft persistence V2
-- [ ] 13-02-PLAN.md -- SummaryBar and CalculatorCard UI components
+- [x] 13-01-PLAN.md -- CreationFlowAdapter, createChartWithSupplies server action, batchSupplySchema, draft persistence V2
+- [x] 13-02-PLAN.md -- SummaryBar and CalculatorCard UI components
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 13-03-PLAN.md -- Activity mode toggle wiring, supply table embedding, visual checkpoint
@@ -178,5 +178,5 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 10. Unified Supply Table | v1.3 | 6/6 | Complete    | 2026-05-04 |
 | 11. Supply Table on Project Detail | v1.3 | 2/2 | Complete    | 2026-05-11 |
 | 12. Merged Form | v1.3 | 3/3 | Complete    | 2026-05-11 |
-| 13. Supply Takeover | v1.3 | 0/3 | Not started | - |
+| 13. Supply Takeover | v1.3 | 2/3 | In Progress|  |
 | 14. Edit Mode & Cleanup | v1.3 | 0/? | Not started | - |
