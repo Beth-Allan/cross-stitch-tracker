@@ -2,10 +2,8 @@
 
 ## Current Status
 
-<!-- UPDATE THIS SECTION at the end of every work session -->
-
 **Milestone:** v1.3 Form & Supply Overhaul
-**Last Updated:** 2026-05-03
+**Last Updated:** 2026-05-13
 **Roadmap:** 5 milestones / 16 phases — v1.0 + v1.1 + v1.2 shipped, v1.3 in progress
 
 ### Done
@@ -23,19 +21,38 @@
 
 ### In Progress
 
-- **Phase 11: Supply Table on Project Detail** — not yet planned
+- **v1.3 Form & Supply Overhaul** — Phases 11-12 complete, Phase 13 nearly done, Phase 14 remaining
 
 ### Done This Session
 
-- **Phase 10: Unified Supply Table executed** — 6 plans, 5 waves, 1,369 tests (162 new)
-  - 20 source files: types, adapters, 10 UI components, hook, barrel export
-  - Code review: 8 findings found and fixed (2 critical, 4 warning, 2 info)
-  - Verification: 5/5 must-haves verified, 8/8 requirements accounted for
-  - Deferred: slideIn animation wiring (needs adapter interface change in Phase 11)
+- **Phase 13 Wave 1 executed** (parallel) — 2 plans, 1,541 tests passing
+  - 13-01: CreationFlowAdapter, createChartWithSupplies ($transaction), batchSupplySchema, DraftV2 persistence
+  - 13-02: SummaryBar (sticky dot-separated tokens), CalculatorCard (fabric + calc params)
+- **Phase 13 Wave 2 Task 1 executed** — Activity mode toggle wired into ChartMergedForm
+  - React Activity for instant form/supply mode toggle
+  - handleSubmit routes to createChartWithSupplies when supplies exist
+  - Draft persistence upgraded to V2 (supply rows + calcParams)
 
-### Next Up
+### Done This Session (cont.)
 
-1. `/gsd-discuss-phase 11` — discuss Supply Table on Project Detail
+- **Phase 13-03 bug fixes committed** (81ef2ff):
+  - Fixed searchFn in creation flow — was returning raw Prisma objects instead of mapped SupplySearchResult (caused "Unknown" names, missing brand/code in dropdown)
+  - Added brand name display to dropdown ("DMC 310 — Black"), selected item, and data rows
+  - Restructured add-row layout: toggle stacks above input when searching, hides when item selected (fixes alignment with stitches/need columns)
+  - Added toast + `onValidationError` callback for validation failures in supply mode
+
+### Next Up — RESUME HERE
+
+1. **BUG: Create button does not work from supply mode** — `/gsd-debug` needed
+   - Clicking Create in supply mode produces no visible result (no toast, no redirect, no error)
+   - `onValidationError` callback (added this session) does NOT fire — so validation is passing
+   - `requestSubmit()` on a `<form>` inside React 19 `<Activity mode="hidden">` may silently fail
+   - Hypothesis: Activity hides the form with `display: none`, and `requestSubmit()` might not fire the `submit` event on hidden forms, or the event doesn't reach `handleSubmit`
+   - Terminal only shows `getThreads` search calls, never `createChartWithSupplies`
+   - User confirmed they entered chart name, stitch count, and dimensions (all required fields)
+2. After Create bug is fixed: visual retest of full supply takeover flow
+3. Then: `/gsd-execute-phase 13` to finish Phase 13 (SUMMARY, code review, verification)
+4. Then: `/gsd-discuss-phase 14` for the final v1.3 phase
 
 ### Backlog
 
@@ -66,6 +83,8 @@
 - 999.12: Shopping-for bar pill styling — match mockup style (squared-off chips with border, contained card-like bar) instead of current full-round pills
 - 999.13: Per-brand skein length — add `skeinLengthMeters` to ThreadBrand (default 8m for DMC), use in skein calculator instead of hardcoded constant. Fixes inaccuracy for Weeks Dye Works/Gentle Art (5yd), Kreinik (10-11m), etc.
 - 999.14: Auto-infer overCount from fabric count — when fabric is linked to a project, auto-set overCount based on fabric count (≤25 → over 1, ≥28 → over 2). User can still override via settings bar toggle.
+- 999.15: Add visual commit button (checkmark) to supply table add row — keyboard Enter works but no visible affordance for mouse-first users
+- 999.16: SearchToAdd drops keystrokes on fast typing — typing "310" registers as "30". Needs investigation: likely server action re-renders during typing, not just debounce timing
 
 ### Blockers
 
