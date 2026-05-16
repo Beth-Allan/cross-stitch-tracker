@@ -666,7 +666,7 @@ export function ChartMergedForm({
       <StickySaveBar
         chartName={form.values.name}
         onSaveDraft={handleSaveDraft}
-        onSubmit={() => formRef.current?.requestSubmit()}
+        onSubmit={form.submitForm}
         isSubmitting={form.isPending}
         isSavingDraft={isSavingDraft}
         saveDraftLabel={saveDraftLabel}

@@ -75,12 +75,8 @@ describe("ChartMergedForm", () => {
   it("renders page title and subtitle", () => {
     render(<ChartMergedForm {...defaultFormProps} />);
 
-    expect(
-      screen.getByRole("heading", { name: "Add New Chart" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Create a chart and set up your project"),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Add New Chart" })).toBeInTheDocument();
+    expect(screen.getByText("Create a chart and set up your project")).toBeInTheDocument();
   });
 
   it("renders back link to /charts", () => {
@@ -130,25 +126,19 @@ describe("ChartMergedForm", () => {
     render(<ChartMergedForm {...defaultFormProps} />);
 
     // FileUpload renders a button "Upload Working Copy"
-    expect(
-      screen.getByRole("button", { name: /upload working copy/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /upload working copy/i })).toBeInTheDocument();
   });
 
   it("renders milestone marker text", () => {
     render(<ChartMergedForm {...defaultFormProps} />);
 
-    expect(
-      screen.getByText("Project details filled in. Ready for supplies?"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Project details filled in. Ready for supplies?")).toBeInTheDocument();
   });
 
   it("renders StickySaveBar with correct initial hint", () => {
     render(<ChartMergedForm {...defaultFormProps} />);
 
-    expect(
-      screen.getByText("Enter a chart name to enable saving"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Enter a chart name to enable saving")).toBeInTheDocument();
   });
 
   // --- Form behavior tests ---
@@ -214,9 +204,7 @@ describe("ChartMergedForm", () => {
     await user.click(screen.getByRole("button", { name: "Create" }));
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /creating/i }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /creating/i })).toBeInTheDocument();
     });
   });
 
@@ -251,9 +239,7 @@ describe("ChartMergedForm", () => {
     await user.click(saveDraftButton);
 
     // Button should show "Saved!" feedback
-    expect(
-      screen.getByRole("button", { name: "Saved!" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Saved!" })).toBeInTheDocument();
 
     // localStorage should have the draft
     const stored = localStorage.getItem(DRAFT_KEY);
@@ -299,18 +285,13 @@ describe("ChartMergedForm", () => {
 
     // Wait for draft hydration effect to run
     await waitFor(() => {
-      expect(screen.getByLabelText(/chart name/i)).toHaveValue(
-        "Restored Draft",
-      );
+      expect(screen.getByLabelText(/chart name/i)).toHaveValue("Restored Draft");
     });
   });
 
   it("successful creation calls clearDraft", async () => {
     // Pre-populate a draft
-    localStorage.setItem(
-      DRAFT_KEY,
-      JSON.stringify({ name: "Will Be Cleared" }),
-    );
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ name: "Will Be Cleared" }));
 
     mockCreateChart.mockResolvedValue({
       success: true,
@@ -354,9 +335,7 @@ describe("ChartMergedForm", () => {
     await user.click(screen.getByRole("button", { name: "Create" }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Failed to create chart"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Failed to create chart")).toBeInTheDocument();
     });
   });
 
@@ -545,6 +524,92 @@ describe("ChartMergedForm", () => {
     const supplyPayload = mockCreateChartWithSupplies.mock.calls[0][1];
     expect(supplyPayload.threads).toHaveLength(1);
     expect(supplyPayload.threads[0].supplyId).toBe("thread-1");
+  });
+
+  // Regression test: Create button works from supply mode (form hidden in Activity)
+  // Previously, requestSubmit() failed silently because React 19 Activity blocks
+  // event delegation for hidden subtrees. Fix: call submitForm() directly.
+  it("Create button submits from supply mode (form hidden in Activity)", async () => {
+    const v2Draft = {
+      version: 2,
+      form: {
+        name: "Supply Mode Submit",
+        designerId: null,
+        coverImageUrl: null,
+        coverThumbnailUrl: null,
+        digitalFileUrl: null,
+        stitchesWide: 0,
+        stitchesHigh: 0,
+        stitchCount: 8000,
+        stitchCountApproximate: false,
+        genreIds: [],
+        isPaperChart: false,
+        isFormalKit: false,
+        kitColorCount: null,
+        isSAL: false,
+        notes: "",
+        status: "KITTING",
+        storageLocationId: null,
+        stitchingAppId: null,
+        fabricId: null,
+        needsOnionSkinning: false,
+        startDate: "",
+        finishDate: "",
+        ffoDate: "",
+        wantToStartNext: false,
+        preferredStartSeason: null,
+        startingStitches: 0,
+      },
+      supplies: [
+        {
+          id: "row-1",
+          supplyId: "thread-1",
+          type: "THREAD",
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 500,
+          need: 2,
+          have: 0,
+          isNeedOverridden: false,
+        },
+      ],
+      calcParams: { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 },
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(v2Draft));
+
+    mockCreateChartWithSupplies.mockResolvedValue({
+      success: true,
+      chartId: "supply-mode-chart",
+    });
+
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    // Wait for draft hydration
+    await waitFor(() => {
+      expect(screen.getByLabelText(/chart name/i)).toHaveValue("Supply Mode Submit");
+    });
+
+    // Switch to supply mode -- this hides the form inside Activity
+    await user.click(screen.getByRole("button", { name: /add supplies/i }));
+
+    // Verify we're in supply mode (summary bar visible)
+    expect(screen.getByRole("banner", { name: /project summary/i })).toBeVisible();
+
+    // Click Create while in supply mode (form is hidden)
+    await user.click(screen.getByRole("button", { name: "Create" }));
+
+    // Should still submit successfully
+    await waitFor(() => {
+      expect(mockCreateChartWithSupplies).toHaveBeenCalledTimes(1);
+    });
+
+    // Verify redirect happened
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith("/charts");
+    });
   });
 
   it("Create button calls createChart (original) when no supplies buffered", async () => {
@@ -768,9 +833,7 @@ describe("ChartMergedForm", () => {
     // The fabricId "stale-fabric-id" is not in unassignedFabrics (empty),
     // so it should be nulled and a toast warning shown about fabric unavailability
     await waitFor(() => {
-      expect(warningSpy).toHaveBeenCalledWith(
-        expect.stringContaining("fabric"),
-      );
+      expect(warningSpy).toHaveBeenCalledWith(expect.stringContaining("fabric"));
     });
 
     warningSpy.mockRestore();
