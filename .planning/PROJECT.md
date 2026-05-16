@@ -8,23 +8,12 @@ A personal cross-stitch project management app that replaced a complex Notion sy
 
 A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
 
-## Current Milestone: v1.3 Form & Supply Overhaul
-
-**Goal:** Replace the chart creation/edit form and supply-adding experience with a fast, keyboard-driven single-page flow based on validated sketch findings.
-
-**Target features:**
-- Merged single-page form for chart+project creation and editing (no chart/project split, pattern type cards, sticky save bar)
-- Supply takeover mode with optional fabric assignment feeding skein calculator defaults
-- Unified supply table with grouped sections (Thread/Beads/Specialty), persistent add row, segmented type toggle, keyboard-first flow
-- Reusable supply table on project detail Supplies tab (view + add in one surface)
-- SVG donut status indicators for proportional have/need display
-
 ## Current State
 
-**Shipped:** v1.3 Form & Supply Overhaul (2026-05-16)
-**In Progress:** None — v1.3 milestone complete
+**Last shipped:** v1.3 Form & Supply Overhaul (2026-05-16)
+**Next milestone:** v1.4 Motivation & Planning (not yet started)
 
-The app now has session logging with atomic progress tracking, Pattern Dive with 4 specialized collection tabs, a curated Main Dashboard, a Project Dashboard with progress buckets, and a Shopping Cart with project-based supply aggregation. Phase 9.1 added image optimization on upload — covers and session photos are now converted to 1200px WebP via Sharp, reducing storage ~90%. Phase 10 added the Unified Supply Table component system — 20 source files, 162 tests, keyboard-driven entry with portal autocomplete, grouped sections, SVG status donuts, and inline editing. Phase 11 wired the supply table into the project detail Supplies tab with ServerActionAdapter for persistence, slide-in animation, and sort toggle — replacing the old 457-line component. Phase 12 built the merged single-page chart creation form with pattern type cards, sticky save bar, and milestone markers. Phase 13 added supply takeover mode — React Activity toggles from form to full-page supply entry, CreationFlowAdapter buffers rows locally, and createChartWithSupplies saves chart+supplies atomically. Phase 14 completed the edit-mode cleanup — full-page edit form at /charts/[id]/edit using the merged form layout, list-row kebab menus, and removal of 23 deprecated files (3,700+ lines of dead code). 1,522 tests.
+The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project selection, and image optimization. 1,535 tests, ~90k LOC TypeScript.
 
 ## Requirements
 
@@ -68,16 +57,14 @@ The app now has session logging with atomic progress tracking, Pattern Dive with
 - ✓ Project Dashboard (hero stats, 5 progress buckets with sorting, Finished tab with 4 sort dimensions) — v1.2
 - ✓ Shopping Cart upgrade (project selection, tabbed supply aggregation, quantity stepper, IDOR protection) — v1.2
 - ✓ Image optimization on upload — covers and session photos converted to 1200px WebP q80 via Sharp, raw originals deleted from R2 — Phase 9.1
+- ✓ Unified supply table with grouped sections, SVG donuts, keyboard-first persistent add row, portal autocomplete, inline editing — v1.3
+- ✓ Supply table reusable on project detail Supplies tab with server-action persistence — v1.3
+- ✓ Single-page merged form for chart+project creation with pattern type cards, draft persistence, sticky save bar �� v1.3
+- ✓ Supply takeover mode with fabric assignment, skein calculator card, two-phase atomic save — v1.3
+- ✓ Full-page edit mode using merged form layout, accessible from project detail and gallery kebab menu — v1.3
+- ✓ Deprecated component cleanup (21 files, 3,700+ lines removed) — v1.3
 
-### Active — Milestone 4: Form & Supply Overhaul (v1.3)
-
-- [ ] Merged single-page form for chart+project creation and editing
-- [ ] Supply takeover mode with fabric assignment feeding skein calculator
-- [ ] Unified supply table with grouped sections and persistent add row
-- [ ] Reusable supply table on project detail Supplies tab
-- [ ] SVG donut status indicators for have/need display
-
-### Deferred — Milestone 5: Motivation & Planning (v1.4)
+### Active — Milestone 5: Motivation & Planning (v1.4)
 
 - [ ] Comprehensive statistics engine (daily/weekly/monthly/yearly metrics)
 - [ ] Monthly stitch bar charts and stitching calendar view
@@ -110,29 +97,25 @@ The app now has session logging with atomic progress tracking, Pattern Dive with
 
 ## Context
 
-**Current state (v1.2 shipped):**
-- 1,172 tests, 82k LOC TypeScript, deployed to Vercel
+**Current state (v1.3 shipped):**
+- 1,535 tests, ~90k LOC TypeScript, deployed to Vercel
 - Tech stack: Next.js 16, Prisma 7, Tailwind v4, Auth.js v5 beta, shadcn/ui v4 (Base UI)
 - Database: PostgreSQL on Neon (prod), Cloudflare R2 (file storage)
 - 25+ backlog items captured (see CLAUDE.md backlog section)
-- Gallery with 3 view modes, project detail with tabbed layout (Overview + Supplies + Sessions), skein calculator
-- Storage location and stitching app management with CRUD + detail pages
+- Unified supply table shared across creation form and project detail (adapter pattern)
+- Single-page chart creation/edit form with supply takeover mode
+- Gallery with 3 view modes, project detail with tabbed layout (Overview + Supplies + Sessions)
+- Pattern Dive, Main Dashboard, Project Dashboard, Shopping Cart — all shipped in v1.2
+- Image optimization (Sharp WebP conversion) on all uploads
 - DMC catalog complete at 495 threads
-- Session logging with atomic progress auto-update, LogSessionModal from header/project/dashboard
-- Pattern Dive with 4 tabs (Browse, What's Next, Fabric Requirements, Storage View)
-- Main Dashboard with Currently Stitching, Start Next, Buried Treasures, Spotlight, Collection Stats, Quick Add
-- Project Dashboard with hero stats, 5 progress buckets, sortable Finished tab
-- Shopping Cart with project selection (localStorage), tabbed supply aggregation, quantity stepper, IDOR protection
 
-**Design system:** Emerald/amber/stone palette. Fraunces headings, Source Sans 3 body, JetBrains Mono hero stats. 7 status colors. Full design token CSS. Semantic tokens used throughout (bg-card, text-muted-foreground, etc.).
+**Design system:** Emerald/amber/stone palette. Fraunces headings, Source Sans 3 body, JetBrains Mono hero stats. 7 status colors. Full semantic design tokens (bg-card, text-muted-foreground, etc.). 44px+ touch targets on interactive elements.
 
 **50+ components designed:** All sections in `product-plan/` with screenshots. Components map to phases via `.claude/rules/ui-design-reference.md`.
 
 **Data model:** ~20 entities including 9 supply/fabric models. Three separate junction tables (ProjectThread, ProjectBead, ProjectSpecialty). Calculated fields at query time. Per-colour stitch counts with skein calculator formula.
 
 **User context:** Power user replacing Notion. 500+ charts. Mac + iPhone. Stitches on iPad apps (Markup R-XP, Saga). Wants speed, comprehensive stats, polished UX.
-
-**User feedback from v1.1 UAT:** Genre pills on project detail, clickable genres/designers, project setup content, kitting checklist, storage location on detail page, edit modal redesign — all deferred to future milestones.
 
 ## Constraints
 
@@ -180,6 +163,12 @@ The app now has session logging with atomic progress tracking, Pattern Dive with
 | Three junction tables for supplies | Prisma-idiomatic; polymorphic tables add complexity without benefit | ✓ Good |
 | Presigned URLs resolved server-side | R2 credentials stay server-only; avoids client waterfall | ✓ Good |
 | Always use PRs for code changes | Branch protection requires CI; never push directly to main | ✓ Good |
+| React Activity for form/supply toggle | Preserves form state without unmounting; CSS visibility swap | ✓ Good |
+| SupplyTableAdapter interface | Server-action vs. local-state adapters; same table component in both contexts | ✓ Good |
+| Two-phase atomic save on create | createChart first, then batchAddSuppliesToProject in $transaction | ✓ Good |
+| PortalAutocomplete from Base UI Combobox | Escapes table stacking context; extracted from existing SearchToAdd | ✓ Good |
+| Zero new npm dependencies for v1.3 | Everything built with installed stack; no bundle growth | ✓ Good |
+| Draft persistence in localStorage | saveDraft/loadDraft/clearDraft with stale ID detection and schema evolution | ✓ Good |
 
 ## Evolution
 
@@ -198,4 +187,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-16 after Phase 14 complete (v1.3 milestone done)*
+*Last updated: 2026-05-16 after v1.3 milestone archived*

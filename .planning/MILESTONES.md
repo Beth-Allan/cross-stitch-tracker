@@ -1,5 +1,24 @@
 # Milestones
 
+## v1.3 Form & Supply Overhaul (Shipped: 2026-05-16)
+
+**Delivered:** Keyboard-driven unified supply table, single-page chart+project creation form, supply takeover mode with skein calculator, full edit mode, and removal of all deprecated components.
+
+**Stats:** 5 phases, 19 plans | 190 commits | 1,535 tests | 13 days (2026-05-03 → 2026-05-16)
+
+**Key accomplishments:**
+
+1. **Unified Supply Table** — Keyboard-first supply entry with grouped Thread/Beads/Specialty sections, SVG donut indicators, portal autocomplete, inline editing, and persistent add row
+2. **Project Detail integration** — Supply table reused on project detail Supplies tab with server-action adapter for immediate persistence
+3. **Merged Form** — Single-page chart+project creation (720px max-width) with pattern type card grid, green dot required indicators, draft persistence, and sticky save bar
+4. **Supply Takeover** — Form-to-supply transition with sticky summary bar, fabric assignment feeding skein calculator, segmented calc parameter controls, and two-phase save
+5. **Edit Mode & Cleanup** — Full-page edit route reusing merged form, list-row kebab menu navigation, 21 deprecated components removed from codebase
+
+**Known deferred items at close:** 23 (see STATE.md Deferred Items)
+**PR:** #32
+
+---
+
 ## v1.2 Track & Measure (Shipped: 2026-04-20)
 
 **Delivered:** Session logging with atomic progress tracking, Pattern Dive collection browser, Main Dashboard with curated sections, Project Dashboard with progress buckets, and Shopping Cart with project selection and supply aggregation.
