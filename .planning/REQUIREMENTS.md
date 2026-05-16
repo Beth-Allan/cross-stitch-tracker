@@ -58,20 +58,20 @@ Deferred to subsequent milestones. See PROJECT.md Deferred section.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FILE-01 | TBD | Pending |
-| FILE-02 | TBD | Pending |
-| FILE-03 | TBD | Pending |
-| INPUT-01 | TBD | Pending |
-| DASH-01 | TBD | Pending |
-| DASH-02 | TBD | Pending |
-| IMG-01 | TBD | Pending |
-| IMG-02 | TBD | Pending |
+| FILE-01 | Phase 15 | Pending |
+| FILE-02 | Phase 15 | Pending |
+| FILE-03 | Phase 15 | Pending |
+| INPUT-01 | Phase 16 | Pending |
+| DASH-01 | Phase 16 | Pending |
+| DASH-02 | Phase 16 | Pending |
+| IMG-01 | Phase 17 | Pending |
+| IMG-02 | Phase 17 | Pending |
 
 **Coverage:**
 - v1.4 requirements: 8 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 8
+- Mapped to phases: 8/8
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-16*
-*Last updated: 2026-05-16 after initial definition*
+*Last updated: 2026-05-16 after roadmap creation*
