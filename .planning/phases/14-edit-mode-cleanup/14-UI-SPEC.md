@@ -50,11 +50,11 @@ Exceptions: 44px min touch target on kebab menu trigger (matches HeroKebabMenu p
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 14px (text-sm) | 400 (normal) | 1.5 |
-| Label | 14px (text-sm) | 500 (medium) | 1.4 |
+| Label | 14px (text-sm) | 400 (normal) | 1.4 |
 | Heading | 24px (text-2xl) | 600 (semibold) | 1.2 |
 | Caption | 12px (text-xs) | 400 (normal) | 1.5 |
 
-Notes: Heading uses `font-heading` (Fraunces). All other text uses `font-body` (Source Sans 3). Matches existing page-title pattern.
+Notes: Heading uses `font-heading` (Fraunces). All other text uses `font-body` (Source Sans 3). Matches existing page-title pattern. Labels differentiate from body text via `text-muted-foreground` color rather than font weight.
 
 ---
 
@@ -66,14 +66,20 @@ Notes: Heading uses `font-heading` (Fraunces). All other text uses `font-body` (
 | Secondary (30%) | bg-card (white) | Form surface, table rows, sticky save bar |
 | Accent (10%) | text-primary / bg-primary (emerald-600) | Save Changes button, required field dots, focus rings, "Manage Supplies" link |
 | Destructive | text-destructive / bg-destructive (red-600) | Delete menu item, delete confirmation button |
-| Muted | text-muted-foreground (stone-500) | Hint text, timestamps, disabled state text |
+| Muted | text-muted-foreground (stone-500) | Hint text, timestamps, disabled state text, field labels |
 
 Accent reserved for:
 - Primary CTA button ("Save Changes")
 - Required field green dots (6px)
 - Input focus ring (ring-ring)
-- "Manage Supplies" link text
+- "Go to Supplies" link text
 - Active nav indicators
+
+---
+
+## Focal Point
+
+Primary focal point: page heading ("Edit [Chart Name]") + sticky save bar CTA ("Save Changes"). The heading anchors the user's context (what am I editing), while the persistent save bar provides constant action affordance.
 
 ---
 
@@ -135,7 +141,7 @@ All deprecated components listed in 14-CONTEXT.md canonical_refs section.
 | Trigger | MoreHorizontal icon (20px), 44px min touch target, same styling as HeroKebabMenu trigger |
 | Visibility | Desktop: opacity-40 on row, opacity-100 on hover/focus-within. Mobile card: always visible |
 | Menu width | w-48 (matches HeroKebabMenu) |
-| Items | "Edit" (Pencil icon, navigates to `/charts/[id]/edit`) + "Delete" (Trash2 icon, variant destructive, opens confirm dialog) |
+| Items | "Edit Project" (Pencil icon, navigates to `/charts/[id]/edit`) + "Delete Project" (Trash2 icon, variant destructive, opens confirm dialog) |
 | Align | align="end", sideOffset={8} |
 | Delete confirmation | Reuses existing dialog pattern from chart-list.tsx (DialogTitle + DialogDescription + Cancel/Delete buttons) |
 
@@ -153,7 +159,7 @@ All deprecated components listed in 14-CONTEXT.md canonical_refs section.
 | Entry Point | Behavior |
 |-------------|----------|
 | Project detail hero Edit button | Already exists (`LinkButton href="/charts/[id]/edit"`). No changes. |
-| List-row kebab "Edit" | `router.push(/charts/[id]/edit)` |
+| List-row kebab "Edit Project" | `router.push(/charts/[id]/edit)` |
 | Gallery card grid | No kebab menu (D-08). Click card -> project detail -> Edit button. |
 
 ---
@@ -172,7 +178,7 @@ All deprecated components listed in 14-CONTEXT.md canonical_refs section.
 | Save hint (valid) | "Ready to save at any point" |
 | Save hint (invalid) | "Enter a chart name to enable saving" |
 | Toast on success | "Changes saved" |
-| Kebab "Edit" label | "Edit" (with Pencil icon) |
+| Kebab "Edit" label | "Edit Project" (with Pencil icon) |
 | Kebab "Delete" label | "Delete Project" (with Trash2 icon, variant destructive) |
 | Delete confirmation title | "Delete [Chart Name]?" |
 | Delete confirmation body | "This will permanently delete this project and all its supplies. This cannot be undone." |
@@ -221,7 +227,7 @@ All deprecated components listed in 14-CONTEXT.md canonical_refs section.
 
 | Concern | Implementation |
 |---------|----------------|
-| Kebab trigger | `aria-label="Chart actions"` on DropdownMenuTrigger |
+| Kebab trigger | `aria-label="Project actions"` on DropdownMenuTrigger |
 | Edit button (hero) | Existing LinkButton with visible "Edit" text |
 | Delete dialog | Focus trap via Dialog component, `autoFocus` on Cancel button |
 | Form labels | All inputs labeled via FormField component (existing) |
