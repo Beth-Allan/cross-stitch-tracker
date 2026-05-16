@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: Form & Supply Overhaul
-status: completed
-stopped_at: Phase 14 context gathered
-last_updated: "2026-05-16T23:08:21.848Z"
+milestone: v1.4
+milestone_name: Fixes & Polish
+status: planning
+last_updated: "2026-05-16T23:27:10.178Z"
 last_activity: 2026-05-16
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 19
-  completed_plans: 19
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,12 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-16)
 
 ## Current Position
 
-Phase: —
+Phase: Not started (defining requirements)
 Plan: —
-Status: Between milestones (v1.3 archived, v1.4 not started)
-Last activity: 2026-05-16
-
-Progress: [░░░░░░░░░░] 0%
+Status: Defining requirements
+Last activity: 2026-05-16 — Milestone v1.4 started
 
 ## Milestone Structure
 
