@@ -1,10 +1,11 @@
 ---
 phase: 15
 slug: chart-file-management
-status: draft
+status: approved
 shadcn_initialized: true
 preset: base-nova
 created: 2026-05-16
+reviewed_at: 2026-05-16
 ---
 
 # Phase 15 — UI Design Contract
@@ -247,11 +248,11 @@ No third-party registries declared for this phase.
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: FLAG (icon-only buttons lack tooltip; non-blocking)
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: FLAG (14/16px gap tight; weight differentiation compensates)
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-05-16
