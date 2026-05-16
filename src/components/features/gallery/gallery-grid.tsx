@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Scissors, ChevronUp, ChevronDown } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { LinkButton } from "@/components/ui/link-button";
+import { ListRowKebabMenu } from "@/components/features/charts/list-row-kebab-menu";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { STATUS_CONFIG } from "@/lib/utils/status";
 import { STATUS_GRADIENT_CLASSES } from "./gallery-utils";
@@ -246,7 +247,7 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
         <div
           key={card.chartId}
           role="listitem"
-          className="bg-card border-border hover:bg-muted/50 grid grid-cols-[40px_8px_1fr_auto] items-center gap-x-4 border-b px-4 py-2 transition-colors sm:grid-cols-[40px_8px_minmax(180px,2fr)_minmax(120px,1fr)_minmax(100px,120px)_64px_56px]"
+          className="group bg-card border-border hover:bg-muted/50 grid grid-cols-[40px_8px_1fr_auto_44px] items-center gap-x-4 border-b px-4 py-2 transition-colors sm:grid-cols-[40px_8px_minmax(180px,2fr)_minmax(120px,1fr)_minmax(100px,120px)_64px_56px_44px]"
         >
           {/* 1. Thumbnail */}
           <SmallThumbnail card={card} />
@@ -295,6 +296,11 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
               </TooltipTrigger>
               <TooltipContent>{SIZE_TOOLTIP_TEXT[card.sizeCategory]}</TooltipContent>
             </Tooltip>
+          </div>
+
+          {/* 8. Kebab menu */}
+          <div className="flex items-center justify-end transition-opacity group-focus-within:opacity-100 sm:opacity-40 sm:group-hover:opacity-100">
+            <ListRowKebabMenu chartId={card.chartId} chartName={card.name} />
           </div>
         </div>
       ))}
@@ -387,13 +393,14 @@ function TableView({
                 </th>
               );
             })}
+            <th className="w-12" />
           </tr>
         </thead>
         <tbody>
           {cards.map((card) => (
             <tr
               key={card.chartId}
-              className="bg-card hover:bg-muted/50 border-border border-b transition-colors"
+              className="group bg-card hover:bg-muted/50 border-border border-b transition-colors"
             >
               {/* Project */}
               <td className="px-4 py-2.5">
@@ -471,6 +478,12 @@ function TableView({
                 <span className="text-muted-foreground text-xs tabular-nums">
                   {card.threadColourCount}
                 </span>
+              </td>
+              {/* Kebab menu */}
+              <td className="px-2 py-2.5">
+                <div className="flex items-center justify-end opacity-40 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+                  <ListRowKebabMenu chartId={card.chartId} chartName={card.name} />
+                </div>
               </td>
             </tr>
           ))}
