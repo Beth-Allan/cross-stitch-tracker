@@ -192,4 +192,4 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 11. Supply Table on Project Detail | v1.3 | 2/2 | Complete    | 2026-05-11 |
 | 12. Merged Form | v1.3 | 3/3 | Complete    | 2026-05-11 |
 | 13. Supply Takeover | v1.3 | 5/5 | Complete   | 2026-05-16 |
-| 14. Edit Mode & Cleanup | v1.3 | 3/3 | Complete   | 2026-05-16 |
+| 14. Edit Mode & Cleanup | v1.3 | 3/3 | Complete    | 2026-05-16 |
