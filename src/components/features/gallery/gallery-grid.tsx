@@ -124,7 +124,9 @@ function ListContextStats({ card }: { card: GalleryCardData }) {
         <p>
           {formatNumber(card.stitchesCompleted)} / {formatNumber(card.stitchCount)} stitches
         </p>
-        <p>{card.threadColourCount} colours</p>
+        <p>
+          {card.threadColourCount} {card.threadColourCount === 1 ? "colour" : "colours"}
+        </p>
       </div>
     );
   }
@@ -133,7 +135,9 @@ function ListContextStats({ card }: { card: GalleryCardData }) {
     return (
       <div className="text-muted-foreground text-[11px]">
         <p>{formatNumber(card.stitchCount)} stitches</p>
-        <p>{card.threadColourCount} colours</p>
+        <p>
+          {card.threadColourCount} {card.threadColourCount === 1 ? "colour" : "colours"}
+        </p>
       </div>
     );
   }
@@ -142,7 +146,8 @@ function ListContextStats({ card }: { card: GalleryCardData }) {
   return (
     <div className="text-muted-foreground text-[11px]">
       <p>
-        {formatNumber(card.stitchCount)} stitches &middot; {card.threadColourCount} colours
+        {formatNumber(card.stitchCount)} stitches &middot; {card.threadColourCount}{" "}
+        {card.threadColourCount === 1 ? "colour" : "colours"}
       </p>
       {card.finishDate && <p>{formatDate(card.finishDate)}</p>}
     </div>
@@ -228,7 +233,8 @@ function ListMobileStat({ card }: { card: GalleryCardData }) {
   }
   return (
     <span className="text-muted-foreground text-[11px] sm:hidden">
-      {formatNumber(card.stitchCount)} stitches &middot; {card.threadColourCount} colours
+      {formatNumber(card.stitchCount)} stitches &middot; {card.threadColourCount}{" "}
+      {card.threadColourCount === 1 ? "colour" : "colours"}
     </span>
   );
 }

@@ -14,7 +14,9 @@ import { formatNumber, formatDate } from "./gallery-format";
 import type { GalleryCardData } from "./gallery-types";
 
 function buildSupplySummary(card: GalleryCardData): string {
-  const parts: string[] = [`${card.threadColourCount} colours`];
+  const parts: string[] = [
+    `${card.threadColourCount} ${card.threadColourCount === 1 ? "colour" : "colours"}`,
+  ];
   if (card.beadTypeCount > 0) parts.push(`${card.beadTypeCount} bead types`);
   if (card.specialtyItemCount > 0) parts.push(`${card.specialtyItemCount} specialty`);
   return parts.join(" \u00B7 ");
