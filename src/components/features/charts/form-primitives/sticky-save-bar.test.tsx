@@ -75,4 +75,34 @@ describe("StickySaveBar", () => {
     const toolbar = screen.getByRole("toolbar", { name: /form actions/i });
     expect(toolbar).toBeInTheDocument();
   });
+
+  describe("edit mode", () => {
+    it('when mode="edit", primary button shows "Save Changes"', () => {
+      render(<StickySaveBar {...defaultProps} chartName="Test" mode="edit" />);
+      expect(screen.getByRole("button", { name: /save changes/i })).toBeInTheDocument();
+    });
+
+    it('when mode="edit" and isSubmitting, shows "Saving..."', () => {
+      render(
+        <StickySaveBar
+          {...defaultProps}
+          chartName="Test"
+          mode="edit"
+          isSubmitting={true}
+        />,
+      );
+      expect(screen.getByRole("button", { name: /saving/i })).toBeInTheDocument();
+    });
+
+    it('when mode="edit", Save Draft button is not rendered', () => {
+      render(<StickySaveBar {...defaultProps} chartName="Test" mode="edit" />);
+      expect(screen.queryByText("Save Draft")).not.toBeInTheDocument();
+    });
+
+    it("when mode is undefined (default), renders as before with Create and Save Draft", () => {
+      render(<StickySaveBar {...defaultProps} chartName="Test" />);
+      expect(screen.getByRole("button", { name: /create/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /save draft/i })).toBeInTheDocument();
+    });
+  });
 });
