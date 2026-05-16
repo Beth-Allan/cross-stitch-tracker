@@ -59,7 +59,10 @@ export async function createThread(formData: unknown) {
 
   try {
     const validated = threadSchema.parse(formData);
-    const thread = await prisma.thread.create({ data: validated });
+    const resolvedBrandId = await resolveDefaultBrandId(validated.brandId, "THREAD");
+    const thread = await prisma.thread.create({
+      data: { ...validated, brandId: resolvedBrandId },
+    });
     revalidatePath("/supplies");
     return { success: true as const, thread };
   } catch (error) {
@@ -143,7 +146,10 @@ export async function createBead(formData: unknown) {
 
   try {
     const validated = beadSchema.parse(formData);
-    const bead = await prisma.bead.create({ data: validated });
+    const resolvedBrandId = await resolveDefaultBrandId(validated.brandId, "BEAD");
+    const bead = await prisma.bead.create({
+      data: { ...validated, brandId: resolvedBrandId },
+    });
     revalidatePath("/supplies");
     return { success: true as const, bead };
   } catch (error) {
@@ -225,8 +231,9 @@ export async function createSpecialtyItem(formData: unknown) {
 
   try {
     const validated = specialtyItemSchema.parse(formData);
+    const resolvedBrandId = await resolveDefaultBrandId(validated.brandId, "SPECIALTY");
     const specialtyItem = await prisma.specialtyItem.create({
-      data: validated,
+      data: { ...validated, brandId: resolvedBrandId },
     });
     revalidatePath("/supplies");
     return { success: true as const, specialtyItem };
@@ -700,6 +707,7 @@ export async function createAndAddThread(formData: unknown) {
           brandId: resolvedBrandId,
           colorFamily: validated.colorFamily,
         },
+        include: { brand: true },
       });
       const link = await tx.projectThread.create({
         data: {
@@ -751,6 +759,7 @@ export async function createAndAddBead(formData: unknown) {
           brandId: resolvedBrandId,
           colorFamily: "NEUTRAL",
         },
+        include: { brand: true },
       });
       const link = await tx.projectBead.create({
         data: {
@@ -800,6 +809,7 @@ export async function createAndAddSpecialty(formData: unknown) {
           hexColor: "#808080",
           brandId: resolvedBrandId,
         },
+        include: { brand: true },
       });
       const link = await tx.projectSpecialty.create({
         data: {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { chartFormSchema } from "./chart";
+import { chartFormSchema, batchSupplySchema } from "./chart";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
 
 const validChartBase = {
@@ -173,5 +173,76 @@ describe("chartFormSchema", () => {
 
       expect(result.success).toBe(false);
     });
+  });
+});
+
+describe("batchSupplySchema", () => {
+  it("validates correct input with threads, beads, and specialty arrays", () => {
+    const result = batchSupplySchema.safeParse({
+      threads: [
+        { supplyId: "t1", stitchCount: 500, need: 2, isNeedOverridden: false },
+        { supplyId: "t2", stitchCount: 100, need: 1, isNeedOverridden: true },
+      ],
+      beads: [{ supplyId: "b1", need: 1 }],
+      specialty: [{ supplyId: "s1", need: 1 }],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects empty supplyId strings", () => {
+    const result = batchSupplySchema.safeParse({
+      threads: [{ supplyId: "", stitchCount: 100, need: 1, isNeedOverridden: false }],
+      beads: [],
+      specialty: [],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("enforces max 500 items per type", () => {
+    const tooManyThreads = Array.from({ length: 501 }, (_, i) => ({
+      supplyId: `t-${i}`,
+      stitchCount: 100,
+      need: 1,
+      isNeedOverridden: false,
+    }));
+    const result = batchSupplySchema.safeParse({
+      threads: tooManyThreads,
+      beads: [],
+      specialty: [],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("allows empty arrays (no supplies is valid)", () => {
+    const result = batchSupplySchema.safeParse({
+      threads: [],
+      beads: [],
+      specialty: [],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("defaults missing arrays to empty", () => {
+    const result = batchSupplySchema.safeParse({});
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.threads).toEqual([]);
+      expect(result.data.beads).toEqual([]);
+      expect(result.data.specialty).toEqual([]);
+    }
+  });
+
+  it("rejects need < 1 for threads", () => {
+    const result = batchSupplySchema.safeParse({
+      threads: [{ supplyId: "t1", stitchCount: 100, need: 0, isNeedOverridden: false }],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects negative stitchCount for threads", () => {
+    const result = batchSupplySchema.safeParse({
+      threads: [{ supplyId: "t1", stitchCount: -1, need: 1, isNeedOverridden: false }],
+    });
+    expect(result.success).toBe(false);
   });
 });

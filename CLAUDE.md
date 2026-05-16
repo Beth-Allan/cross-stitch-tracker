@@ -2,10 +2,8 @@
 
 ## Current Status
 
-<!-- UPDATE THIS SECTION at the end of every work session -->
-
 **Milestone:** v1.3 Form & Supply Overhaul
-**Last Updated:** 2026-05-03
+**Last Updated:** 2026-05-16
 **Roadmap:** 5 milestones / 16 phases — v1.0 + v1.1 + v1.2 shipped, v1.3 in progress
 
 ### Done
@@ -23,19 +21,18 @@
 
 ### In Progress
 
-- **Phase 11: Supply Table on Project Detail** — not yet planned
+- **v1.3 Form & Supply Overhaul** — All 5 phases (10-14) complete. Milestone ready to ship.
 
 ### Done This Session
 
-- **Phase 10: Unified Supply Table executed** — 6 plans, 5 waves, 1,369 tests (162 new)
-  - 20 source files: types, adapters, 10 UI components, hook, barrel export
-  - Code review: 8 findings found and fixed (2 critical, 4 warning, 2 info)
-  - Verification: 5/5 must-haves verified, 8/8 requirements accounted for
-  - Deferred: slideIn animation wiring (needs adapter interface change in Phase 11)
+- **Impeccable audit** (full app): Score 16/20, 0 P0/P1, 4 P2/3 P3 issues
+- **Harden pass** (`0af6d1c`): focus-visible rings on all custom interactive elements, 44px touch targets on scroll arrows, motion-reduce on card hover transforms
+- **Polish pass** (`0af6d1c`): 5 new semantic tokens (progress, selected families), 44 hardcoded emerald instances converted across gallery/shopping/dashboard
 
-### Next Up
+### Next Up — RESUME HERE
 
-1. `/gsd-discuss-phase 11` — discuss Supply Table on Project Detail
+1. `/gsd-complete-milestone` — archive v1.3 and prepare for v1.4
+2. Or: `/gsd-ship` — create PR for v1.3 changes
 
 ### Backlog
 
@@ -66,6 +63,9 @@
 - 999.12: Shopping-for bar pill styling — match mockup style (squared-off chips with border, contained card-like bar) instead of current full-round pills
 - 999.13: Per-brand skein length — add `skeinLengthMeters` to ThreadBrand (default 8m for DMC), use in skein calculator instead of hardcoded constant. Fixes inaccuracy for Weeks Dye Works/Gentle Art (5yd), Kreinik (10-11m), etc.
 - 999.14: Auto-infer overCount from fabric count — when fabric is linked to a project, auto-set overCount based on fabric count (≤25 → over 1, ≥28 → over 2). User can still override via settings bar toggle.
+- 999.15: Add visual commit button (checkmark) to supply table add row — keyboard Enter works but no visible affordance for mouse-first users
+- 999.16: SearchToAdd drops keystrokes on fast typing — typing "310" registers as "30". Needs investigation: likely server action re-renders during typing, not just debounce timing
+- 999.17: InlineCreateDialog UX clarity — field labels (Name/Code) are generic across supply types; should contextualize per type (e.g., "Color Name" for beads, "Product Name" for specialty) and clarify what's optional
 
 ### Blockers
 

@@ -33,13 +33,13 @@ export function ShoppingForBar({ selectedProjects, onRemove, onClearAll }: Shopp
           {selectedProjects.map((project) => (
             <span
               key={project.projectId}
-              className="flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-sm text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200"
+              className="bg-selected text-selected-foreground flex items-center gap-1 rounded-full px-3 py-1 text-sm"
             >
               {project.projectName}
               <button
                 type="button"
                 onClick={() => onRemove(project.projectId)}
-                className="text-emerald-600 transition-colors hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-200"
+                className="text-selected-foreground hover:text-foreground focus-visible:ring-ring rounded-full transition-colors outline-none focus-visible:ring-2"
                 aria-label={`Remove ${project.projectName}`}
               >
                 <X className="h-3.5 w-3.5" />
@@ -49,7 +49,7 @@ export function ShoppingForBar({ selectedProjects, onRemove, onClearAll }: Shopp
           <button
             type="button"
             onClick={onClearAll}
-            className="text-muted-foreground hover:text-foreground ml-1 text-sm underline transition-colors"
+            className="text-muted-foreground hover:text-foreground focus-visible:ring-ring ml-1 rounded-sm text-sm underline transition-colors outline-none focus-visible:ring-2"
           >
             Clear all
           </button>

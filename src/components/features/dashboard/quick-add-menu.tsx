@@ -25,60 +25,80 @@ interface QuickAddItem {
   iconColor: string;
   href?: string;
   action?: "logStitches";
-  separator?: boolean;
 }
 
-const QUICK_ADD_ITEMS: QuickAddItem[] = [
+interface QuickAddGroup {
+  label: string;
+  items: QuickAddItem[];
+}
+
+const QUICK_ADD_GROUPS: QuickAddGroup[] = [
   {
-    label: "Log Stitches",
-    icon: Scissors,
-    iconColor: "text-emerald-600 dark:text-emerald-400",
-    action: "logStitches",
-    separator: true,
+    label: "Quick Actions",
+    items: [
+      {
+        label: "Log Stitches",
+        icon: Scissors,
+        iconColor: "text-progress-foreground",
+        action: "logStitches",
+      },
+    ],
   },
   {
-    label: "New Chart",
-    icon: BookOpen,
-    iconColor: "text-muted-foreground",
-    href: "/charts/new",
+    label: "Create",
+    items: [
+      {
+        label: "New Chart",
+        icon: BookOpen,
+        iconColor: "text-muted-foreground",
+        href: "/charts/new",
+      },
+      {
+        label: "New Thread",
+        icon: Palette,
+        iconColor: "text-muted-foreground",
+        href: "/supplies?tab=threads&add=true",
+      },
+      {
+        label: "New Bead",
+        icon: Gem,
+        iconColor: "text-muted-foreground",
+        href: "/supplies?tab=beads&add=true",
+      },
+      {
+        label: "New Specialty",
+        icon: Star,
+        iconColor: "text-muted-foreground",
+        href: "/supplies?tab=specialty&add=true",
+      },
+      {
+        label: "New Fabric",
+        icon: Package,
+        iconColor: "text-muted-foreground",
+        href: "/supplies?tab=fabric&add=true",
+      },
+    ],
   },
   {
-    label: "New Thread",
-    icon: Palette,
-    iconColor: "text-muted-foreground",
-    href: "/supplies?tab=threads&add=true",
-  },
-  {
-    label: "New Bead",
-    icon: Gem,
-    iconColor: "text-muted-foreground",
-    href: "/supplies?tab=beads&add=true",
-  },
-  {
-    label: "New Specialty",
-    icon: Star,
-    iconColor: "text-muted-foreground",
-    href: "/supplies?tab=specialty&add=true",
-  },
-  {
-    label: "New Fabric",
-    icon: Package,
-    iconColor: "text-muted-foreground",
-    href: "/supplies?tab=fabric&add=true",
-  },
-  {
-    label: "New Designer",
-    icon: PenTool,
-    iconColor: "text-muted-foreground",
-    href: "/designers",
-  },
-  {
-    label: "New Genre",
-    icon: Hash,
-    iconColor: "text-muted-foreground",
-    href: "/genres",
+    label: "Reference",
+    items: [
+      {
+        label: "New Designer",
+        icon: PenTool,
+        iconColor: "text-muted-foreground",
+        href: "/designers",
+      },
+      {
+        label: "New Genre",
+        icon: Hash,
+        iconColor: "text-muted-foreground",
+        href: "/genres",
+      },
+    ],
   },
 ];
+
+const ALL_ITEMS = QUICK_ADD_GROUPS.flatMap((group) => group.items);
 
 export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
   const [open, setOpen] = useState(false);
@@ -126,13 +146,18 @@ export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
         e.preventDefault();
         closeMenu();
         break;
+      case "Enter":
+      case " ":
+        e.preventDefault();
+        if (focusedIndex >= 0) handleItemClick(ALL_ITEMS[focusedIndex]);
+        break;
       case "ArrowDown":
         e.preventDefault();
-        setFocusedIndex((i) => (i + 1) % QUICK_ADD_ITEMS.length);
+        setFocusedIndex((i) => (i + 1) % ALL_ITEMS.length);
         break;
       case "ArrowUp":
         e.preventDefault();
-        setFocusedIndex((i) => (i <= 0 ? QUICK_ADD_ITEMS.length - 1 : i - 1));
+        setFocusedIndex((i) => (i <= 0 ? ALL_ITEMS.length - 1 : i - 1));
         break;
       case "Tab":
         setOpen(false);
@@ -157,10 +182,10 @@ export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
-        className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+        className={`focus-visible:ring-ring inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
           open
-            ? "border-emerald-600 bg-emerald-600 text-white dark:border-emerald-500 dark:bg-emerald-500"
-            : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-300 dark:hover:bg-emerald-950/50"
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-selected-border bg-selected text-selected-foreground hover:bg-selected/80"
         }`}
       >
         <Plus
@@ -178,33 +203,55 @@ export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
         <>
           <div className="fixed inset-0 z-40" onClick={closeMenu} />
 
-          {}
           <div
             role="menu"
             aria-label="Quick Add"
             onKeyDown={handleMenuKeyDown}
             className="border-border bg-card absolute top-full right-0 z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl border shadow-xl"
           >
-            <div className="p-1">
-              {QUICK_ADD_ITEMS.map((item, index) => {
-                const Icon = item.icon;
+            <div className="py-1.5">
+              {QUICK_ADD_GROUPS.map((group, groupIndex) => {
+                const groupStartIndex = QUICK_ADD_GROUPS.slice(0, groupIndex).reduce(
+                  (sum, g) => sum + g.items.length,
+                  0,
+                );
+
                 return (
-                  <button
-                    key={item.label}
-                    ref={(el) => {
-                      itemRefs.current[index] = el;
-                    }}
-                    type="button"
-                    role="menuitem"
-                    tabIndex={focusedIndex === index ? 0 : -1}
-                    onClick={() => handleItemClick(item)}
-                    className={`hover:bg-muted focus:bg-muted flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors focus:outline-none ${
-                      item.separator ? "border-border border-b" : ""
-                    }`}
+                  <div
+                    key={group.label}
+                    role="group"
+                    aria-labelledby={`quick-add-group-${group.label.toLowerCase().replace(/\s+/g, "-")}`}
+                    className={groupIndex > 0 ? "border-border mt-1.5 border-t pt-1.5" : ""}
                   >
-                    <Icon className={`h-4 w-4 ${item.iconColor}`} strokeWidth={1.5} />
-                    {item.label}
-                  </button>
+                    <span
+                      id={`quick-add-group-${group.label.toLowerCase().replace(/\s+/g, "-")}`}
+                      className="text-muted-foreground px-3 pb-1 text-[11px] font-semibold tracking-wider uppercase"
+                    >
+                      {group.label}
+                    </span>
+                    <div className="mt-1 px-1">
+                      {group.items.map((item, itemIndex) => {
+                        const flatIndex = groupStartIndex + itemIndex;
+                        const Icon = item.icon;
+                        return (
+                          <button
+                            key={item.label}
+                            ref={(el) => {
+                              itemRefs.current[flatIndex] = el;
+                            }}
+                            type="button"
+                            role="menuitem"
+                            tabIndex={focusedIndex === flatIndex ? 0 : -1}
+                            onClick={() => handleItemClick(item)}
+                            className="hover:bg-muted focus-visible:bg-muted focus-visible:ring-ring flex w-full items-center gap-3 rounded-lg px-3 py-1.5 text-sm transition-colors outline-none focus-visible:ring-2"
+                          >
+                            <Icon className={`h-4 w-4 ${item.iconColor}`} strokeWidth={1.5} />
+                            {item.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 );
               })}
             </div>

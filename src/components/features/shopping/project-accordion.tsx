@@ -29,7 +29,7 @@ interface ProjectAccordionProps {
     junctionId: string,
     quantity: number,
   ) => void;
-  isPending: boolean;
+  pendingIds: Set<string>;
   failedIds: Set<string>;
 }
 
@@ -44,7 +44,7 @@ export function ProjectAccordion({
   onToggle,
   onSelectAll,
   onUpdateAcquired,
-  isPending,
+  pendingIds,
   failedIds,
 }: ProjectAccordionProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
@@ -70,7 +70,7 @@ export function ProjectAccordion({
         <button
           type="button"
           onClick={onSelectAll}
-          className="text-xs font-medium text-emerald-600 transition-colors hover:text-emerald-700"
+          className="text-progress-foreground hover:text-selected-foreground text-xs font-medium transition-colors"
         >
           Select all
         </button>
@@ -98,7 +98,7 @@ export function ProjectAccordion({
               key={project.projectId}
               className={cn(
                 "overflow-hidden rounded-xl border",
-                isSelected ? "border-emerald-200 dark:border-emerald-800" : "border-border",
+                isSelected ? "border-selected-border" : "border-border",
               )}
             >
               {/* Header */}
@@ -110,9 +110,7 @@ export function ProjectAccordion({
                   aria-checked={isSelected}
                   className={cn(
                     "shrink-0",
-                    isSelected
-                      ? "text-emerald-600 dark:text-emerald-400"
-                      : "text-stone-300 dark:text-stone-600",
+                    isSelected ? "text-progress-foreground" : "text-muted-foreground/40",
                   )}
                   aria-label={
                     isSelected ? `Deselect ${project.projectName}` : `Select ${project.projectName}`
@@ -180,7 +178,7 @@ export function ProjectAccordion({
                       allSelectedProjectIds={allSelectedProjectIds}
                       allSupplies={threads}
                       onUpdateAcquired={onUpdateAcquired}
-                      isPending={isPending}
+                      pendingIds={pendingIds}
                       failedIds={failedIds}
                     />
                   )}
@@ -193,7 +191,7 @@ export function ProjectAccordion({
                       allSelectedProjectIds={allSelectedProjectIds}
                       allSupplies={beads}
                       onUpdateAcquired={onUpdateAcquired}
-                      isPending={isPending}
+                      pendingIds={pendingIds}
                       failedIds={failedIds}
                     />
                   )}
@@ -206,7 +204,7 @@ export function ProjectAccordion({
                       allSelectedProjectIds={allSelectedProjectIds}
                       allSupplies={specialty}
                       onUpdateAcquired={onUpdateAcquired}
-                      isPending={isPending}
+                      pendingIds={pendingIds}
                       failedIds={failedIds}
                     />
                   )}
@@ -217,7 +215,7 @@ export function ProjectAccordion({
                       </div>
                       <div className="text-sm">
                         {projectFabric.hasFabric ? (
-                          <span className="text-emerald-600 dark:text-emerald-400">
+                          <span className="text-progress-foreground">
                             ✓ {projectFabric.fabricName ?? "Has fabric"}{" "}
                             <span className="text-muted-foreground">
                               · {projectFabric.stitchesWide} × {projectFabric.stitchesHigh} stitches
@@ -269,7 +267,7 @@ function SupplyGroup({
   allSelectedProjectIds,
   allSupplies,
   onUpdateAcquired,
-  isPending,
+  pendingIds,
   failedIds,
 }: {
   label: string;
@@ -283,7 +281,7 @@ function SupplyGroup({
     junctionId: string,
     quantity: number,
   ) => void;
-  isPending: boolean;
+  pendingIds: Set<string>;
   failedIds: Set<string>;
 }) {
   return (
@@ -311,8 +309,8 @@ function SupplyGroup({
                 </span>{" "}
                 <span className="text-muted-foreground text-xs">{supply.colorName}</span>
                 {otherProjects.length > 0 && (
-                  <div className="mt-0.5 flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400">
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  <div className="text-progress-foreground mt-0.5 flex items-center gap-1 text-[11px]">
+                    <span className="bg-progress inline-block h-1.5 w-1.5 rounded-full" />
                     Also in {otherProjects.join(", ")}
                   </div>
                 )}
@@ -320,7 +318,7 @@ function SupplyGroup({
               <QuantityControl
                 acquired={supply.quantityAcquired}
                 required={supply.quantityRequired}
-                isPending={isPending}
+                isPending={pendingIds.has(supply.junctionId)}
                 hasError={failedIds.has(supply.junctionId)}
                 onChange={(newValue) => onUpdateAcquired(type, supply.junctionId, newValue)}
               />

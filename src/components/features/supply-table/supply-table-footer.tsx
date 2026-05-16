@@ -19,16 +19,20 @@ export function SupplyTableFooter({
     (beadCount > 0 && specialtyCount > 0);
 
   return (
-    <div className="flex items-center justify-between border-t border-border px-4 py-3 text-sm text-muted-foreground">
+    <div className="border-border text-muted-foreground flex items-center justify-between border-t px-4 py-3 text-sm">
       <div className="flex items-center gap-4">
-        <span>{isMixed ? `${totalCount} supplies added` : `${totalCount} colours added`}</span>
+        <span>
+          {isMixed
+            ? `${totalCount} ${totalCount === 1 ? "supply" : "supplies"} added`
+            : `${totalCount} ${totalCount === 1 ? "colour" : "colours"} added`}
+        </span>
         <span>
           {isMixed
             ? `Total: ${totalItemsNeeded} items needed`
             : `Total: ${totalSkeinsNeeded} skeins needed`}
         </span>
       </div>
-      <span className="text-xs text-muted-foreground/70">
+      <span className="text-muted-foreground/70 text-xs">
         Enter add &middot; Tab override &middot; Esc clear
       </span>
     </div>

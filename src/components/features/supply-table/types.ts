@@ -65,7 +65,7 @@ export interface CreateSupplyData {
   hexColor?: string;
 }
 
-export type Result = { success: true } | { success: false; error: string };
+export type Result = { success: true; id?: string } | { success: false; error: string };
 
 /**
  * Adapter interface abstracting data operations for the supply table.

@@ -7,7 +7,8 @@ import type { SizeCategory } from "@/lib/utils/size-category";
 import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
 import { chartFormSchema } from "@/lib/validations/chart";
 import { toast } from "sonner";
-import { createChart, updateChart } from "@/lib/actions/chart-actions";
+import { createChart, createChartWithSupplies, updateChart } from "@/lib/actions/chart-actions";
+import type { SupplyRow } from "@/components/features/supply-table/types";
 import { createDesigner } from "@/lib/actions/designer-actions";
 import { createGenre } from "@/lib/actions/genre-actions";
 import { createStorageLocation } from "@/lib/actions/storage-location-actions";
@@ -52,6 +53,8 @@ interface UseChartFormOptions {
   storageLocations?: StorageLocationWithStats[];
   stitchingApps?: StitchingAppWithStats[];
   onSuccess: (chartId: string) => void;
+  getSupplyRows?: () => SupplyRow[];
+  onValidationError?: () => void;
 }
 
 const ERROR_MAP: Record<string, string> = {
@@ -114,7 +117,12 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
     digitalFileUrl: data.digitalWorkingCopyUrl,
     stitchesWide: data.stitchesWide,
     stitchesHigh: data.stitchesHigh,
-    stitchCount: data.stitchCount,
+    stitchCount:
+      data.stitchesWide > 0 &&
+      data.stitchesHigh > 0 &&
+      data.stitchCount === data.stitchesWide * data.stitchesHigh
+        ? 0
+        : data.stitchCount,
     stitchCountApproximate: data.stitchCountApproximate,
     genreIds: data.genres.map((g) => g.id),
     isPaperChart: data.isPaperChart,
@@ -144,6 +152,8 @@ export function useChartForm({
   storageLocations: initialStorageLocations = [],
   stitchingApps: initialStitchingApps = [],
   onSuccess,
+  getSupplyRows,
+  onValidationError,
 }: UseChartFormOptions) {
   const initial = useMemo(() => buildInitialValues(initialData), [initialData]);
   const [values, setValues] = useState<ChartFormValues>(initial);
@@ -189,88 +199,126 @@ export function useChartForm({
     [],
   );
 
-  // Submit
+  // Core submission logic — callable without a DOM event.
+  // This bypasses requestSubmit() which fails inside React 19 <Activity mode="hidden">
+  // because React's event delegation blocks synthetic events from hidden Activity subtrees.
+  const submitForm = useCallback(async () => {
+    const formData = {
+      chart: {
+        name: values.name,
+        designerId: values.designerId,
+        coverImageUrl: values.coverImageUrl,
+        coverThumbnailUrl: values.coverThumbnailUrl,
+        digitalFileUrl: values.digitalFileUrl,
+        stitchCount: values.stitchCount,
+        stitchCountApproximate: values.stitchCountApproximate,
+        stitchesWide: values.stitchesWide,
+        stitchesHigh: values.stitchesHigh,
+        genreIds: values.genreIds,
+        isPaperChart: values.isPaperChart,
+        isFormalKit: values.isFormalKit,
+        isSAL: values.isSAL,
+        kitColorCount: values.isFormalKit ? values.kitColorCount : null,
+        notes: values.notes || null,
+      },
+      project: {
+        status: values.status,
+        storageLocationId: values.storageLocationId,
+        stitchingAppId: values.stitchingAppId,
+        fabricId: values.fabricId,
+        needsOnionSkinning: values.needsOnionSkinning,
+        startDate: values.startDate || null,
+        finishDate: values.finishDate || null,
+        ffoDate: values.ffoDate || null,
+        wantToStartNext: values.wantToStartNext,
+        preferredStartSeason: values.preferredStartSeason,
+        startingStitches: values.startingStitches,
+      },
+    };
+
+    // Client-side validation
+    const result = chartFormSchema.safeParse(formData);
+    if (!result.success) {
+      const formatted = formatErrors(result.error);
+      setErrors(formatted);
+      const firstError = Object.values(formatted)[0];
+      if (firstError) toast.error(firstError);
+      onValidationError?.();
+      return;
+    }
+
+    setIsPending(true);
+    suppressUnloadRef.current = true;
+    try {
+      if (mode === "create") {
+        const supplyRows = getSupplyRows?.() ?? [];
+        let response;
+        if (supplyRows.length > 0) {
+          const supplyPayload = {
+            threads: supplyRows
+              .filter((r) => r.type === "THREAD")
+              .map((r) => ({
+                supplyId: r.supplyId,
+                stitchCount: r.stitchCount,
+                need: r.need,
+                isNeedOverridden: r.isNeedOverridden,
+              })),
+            beads: supplyRows
+              .filter((r) => r.type === "BEAD")
+              .map((r) => ({
+                supplyId: r.supplyId,
+                need: r.need,
+              })),
+            specialty: supplyRows
+              .filter((r) => r.type === "SPECIALTY")
+              .map((r) => ({
+                supplyId: r.supplyId,
+                need: r.need,
+              })),
+          };
+          response = await createChartWithSupplies(formData, supplyPayload);
+        } else {
+          response = await createChart(formData);
+        }
+        if (!response.success) {
+          setErrors({ _form: response.error });
+          suppressUnloadRef.current = false;
+          return;
+        }
+        if (response.warning) {
+          toast.warning(response.warning);
+        }
+        setIsSuccess(true);
+        onSuccess(response.chartId);
+      } else {
+        const response = await updateChart(initialData!.id, formData);
+        if (!response.success) {
+          setErrors({ _form: response.error });
+          suppressUnloadRef.current = false;
+          return;
+        }
+        if (response.warning) {
+          toast.warning(response.warning);
+        }
+        setIsSuccess(true);
+        onSuccess(initialData!.id);
+      }
+    } catch (error) {
+      console.error("Chart form submission error:", error);
+      setErrors({ _form: "An unexpected error occurred" });
+      suppressUnloadRef.current = false;
+    } finally {
+      setIsPending(false);
+    }
+  }, [values, mode, initialData, onSuccess, getSupplyRows, onValidationError]);
+
+  // Form onSubmit handler — wraps submitForm with preventDefault for native form events
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
-
-      const formData = {
-        chart: {
-          name: values.name,
-          designerId: values.designerId,
-          coverImageUrl: values.coverImageUrl,
-          coverThumbnailUrl: values.coverThumbnailUrl,
-          digitalFileUrl: values.digitalFileUrl,
-          stitchCount: values.stitchCount,
-          stitchCountApproximate: values.stitchCountApproximate,
-          stitchesWide: values.stitchesWide,
-          stitchesHigh: values.stitchesHigh,
-          genreIds: values.genreIds,
-          isPaperChart: values.isPaperChart,
-          isFormalKit: values.isFormalKit,
-          isSAL: values.isSAL,
-          kitColorCount: values.isFormalKit ? values.kitColorCount : null,
-          notes: values.notes || null,
-        },
-        project: {
-          status: values.status,
-          storageLocationId: values.storageLocationId,
-          stitchingAppId: values.stitchingAppId,
-          fabricId: values.fabricId,
-          needsOnionSkinning: values.needsOnionSkinning,
-          startDate: values.startDate || null,
-          finishDate: values.finishDate || null,
-          ffoDate: values.ffoDate || null,
-          wantToStartNext: values.wantToStartNext,
-          preferredStartSeason: values.preferredStartSeason,
-          startingStitches: values.startingStitches,
-        },
-      };
-
-      // Client-side validation
-      const result = chartFormSchema.safeParse(formData);
-      if (!result.success) {
-        setErrors(formatErrors(result.error));
-        return;
-      }
-
-      setIsPending(true);
-      suppressUnloadRef.current = true;
-      try {
-        if (mode === "create") {
-          const response = await createChart(formData);
-          if (!response.success) {
-            setErrors({ _form: response.error });
-            suppressUnloadRef.current = false;
-            return;
-          }
-          if (response.warning) {
-            toast.warning(response.warning);
-          }
-          setIsSuccess(true);
-          onSuccess(response.chartId);
-        } else {
-          const response = await updateChart(initialData!.id, formData);
-          if (!response.success) {
-            setErrors({ _form: response.error });
-            suppressUnloadRef.current = false;
-            return;
-          }
-          if (response.warning) {
-            toast.warning(response.warning);
-          }
-          setIsSuccess(true);
-          onSuccess(initialData!.id);
-        }
-      } catch (error) {
-        console.error("Chart form submission error:", error);
-        setErrors({ _form: "An unexpected error occurred" });
-        suppressUnloadRef.current = false;
-      } finally {
-        setIsPending(false);
-      }
+      await submitForm();
     },
-    [values, mode, initialData, onSuccess],
+    [submitForm],
   );
 
   // Inline entity creation
@@ -381,6 +429,7 @@ export function useChartForm({
     isSubmitDisabled,
     isDirty,
     handleSubmit,
+    submitForm,
     designers,
     genres,
     handleAddDesigner,

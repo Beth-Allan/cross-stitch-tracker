@@ -112,7 +112,8 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
 
   const [selectedIds, setSelectedIds] = usePersistedSelection(validProjectIds);
   const [viewMode, setViewMode] = usePersistedViewMode();
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const [failedIds, setFailedIds] = useState<Set<string>>(new Set());
 
   /* ── Selection handlers ─────────────────────────────────── */
@@ -181,6 +182,8 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
         return next;
       });
 
+      setPendingIds((prev) => new Set(prev).add(junctionId));
+
       startTransition(async () => {
         try {
           const result = await updateSupplyAcquired(type, junctionId, quantity);
@@ -193,6 +196,12 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
         } catch {
           setFailedIds((prev) => new Set(prev).add(junctionId));
           toast.error("Something went wrong. Try again.");
+        } finally {
+          setPendingIds((prev) => {
+            const next = new Set(prev);
+            next.delete(junctionId);
+            return next;
+          });
         }
       });
     },
@@ -257,7 +266,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
                 aria-pressed={viewMode === "by-project"}
                 onClick={() => setViewMode("by-project")}
                 className={cn(
-                  "rounded-md px-3.5 py-1.5 text-sm font-medium transition-all",
+                  "focus-visible:ring-ring rounded-md px-3.5 py-1.5 text-sm font-medium transition-all outline-none focus-visible:ring-2",
                   viewMode === "by-project"
                     ? "bg-card text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground",
@@ -270,7 +279,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
                 aria-pressed={viewMode === "by-supply"}
                 onClick={() => setViewMode("by-supply")}
                 className={cn(
-                  "rounded-md px-3.5 py-1.5 text-sm font-medium transition-all",
+                  "focus-visible:ring-ring rounded-md px-3.5 py-1.5 text-sm font-medium transition-all outline-none focus-visible:ring-2",
                   viewMode === "by-supply"
                     ? "bg-card text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground",
@@ -292,7 +301,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
                 onToggle={toggleProject}
                 onSelectAll={selectAll}
                 onUpdateAcquired={handleUpdateAcquired}
-                isPending={isPending}
+                pendingIds={pendingIds}
                 failedIds={failedIds}
               />
             ) : (
@@ -302,7 +311,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
                 specialty={filteredSpecialty}
                 fabrics={filteredFabrics}
                 onUpdateAcquired={handleUpdateAcquired}
-                isPending={isPending}
+                pendingIds={pendingIds}
                 failedIds={failedIds}
               />
             )}

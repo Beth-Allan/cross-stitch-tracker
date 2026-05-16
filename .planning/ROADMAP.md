@@ -55,10 +55,10 @@ Full details: `milestones/v1.2-ROADMAP.md`
 **Milestone Goal:** Replace the chart creation/edit form and supply-adding experience with a fast, keyboard-driven single-page flow. Unified supply table with grouped sections, persistent add row, and portal autocomplete. Merged form with supply takeover mode. Reusable on project detail.
 
 - [x] **Phase 10: Unified Supply Table** - Shared supply table component with grouped sections, persistent add row, keyboard-first entry, portal autocomplete, SVG donuts, and inline editing (completed 2026-05-04)
-- [ ] **Phase 11: Supply Table on Project Detail** - Wire unified table into project detail Supplies tab with server-action persistence
-- [ ] **Phase 12: Merged Form** - Single-page chart+project creation form with pattern type cards, required dot indicators, sticky save bar, and digital working copy upload
-- [ ] **Phase 13: Supply Takeover** - Form-to-supply transition with sticky summary bar, fabric assignment, skein calculator card, and two-phase save
-- [ ] **Phase 14: Edit Mode & Cleanup** - Full-page edit route using merged form layout, removal of all deprecated components
+- [x] **Phase 11: Supply Table on Project Detail** - Wire unified table into project detail Supplies tab with server-action persistence (completed 2026-05-11)
+- [x] **Phase 12: Merged Form** - Single-page chart+project creation form with pattern type cards, required dot indicators, sticky save bar, and digital working copy upload (completed 2026-05-11)
+- [x] **Phase 13: Supply Takeover** - Form-to-supply transition with sticky summary bar, fabric assignment, skein calculator card, and two-phase save (completed 2026-05-16)
+- [x] **Phase 14: Edit Mode & Cleanup** - Full-page edit route using merged form layout, removal of all deprecated components (completed 2026-05-16)
 
 ### 📋 v1.4 Motivation & Planning (Planned)
 
@@ -94,7 +94,13 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User sees the unified supply table (grouped sections, donuts, inline editing) on the project detail Supplies tab, replacing the old supply section
   2. User can add missed supplies via the persistent add row on project detail without navigating away, with changes persisted immediately via server actions
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+**Wave 1**
+- [x] 11-01-PLAN.md -- ServerActionAdapter foundation (Result type extension, adapter class, tests, barrel export)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [x] 11-02-PLAN.md -- Animation wiring + SuppliesTab integration (newRowId chain, tab replacement, visual checkpoint)
 **UI hint**: yes
 
 ### Phase 12: Merged Form
@@ -106,7 +112,14 @@ Plans:
   2. User selects pattern type via a 2x2 card grid and sees relevant sub-fields expand based on selection
   3. User sees green dot indicators on required fields (Chart Name, Status) and a sticky save bar at the bottom with Save Draft and Create buttons
   4. User can upload a digital working copy in the Workflow section of the form
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1** *(parallel)*
+- [x] 12-01-PLAN.md -- PatternTypeCards, StickySaveBar, FormField green dot, GenrePicker font-medium
+- [x] 12-02-PLAN.md -- Draft persistence utility (saveDraft, loadDraft, clearDraft)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [x] 12-03-PLAN.md -- ChartMergedForm shell assembly, page wiring, visual checkpoint
 **UI hint**: yes
 
 ### Phase 13: Supply Takeover
@@ -118,7 +131,18 @@ Plans:
   2. User can return to form details via a "Details" link in the summary bar with all form state preserved (no data loss)
   3. User can optionally assign fabric as the first step in supply takeover, which auto-populates the skein calculator's fabric count default
   4. User can configure skein calculation parameters (Strands Over, Fabric Count, Waste %) via a styled card with segmented controls in the supply area
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+**Wave 1** *(parallel)*
+- [x] 13-01-PLAN.md -- CreationFlowAdapter, createChartWithSupplies server action, batchSupplySchema, draft persistence V2
+- [x] 13-02-PLAN.md -- SummaryBar and CalculatorCard UI components
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [x] 13-03-PLAN.md -- Activity mode toggle wiring, supply table embedding, visual checkpoint
+
+**Wave 3 — Gap Closure** *(parallel, from UAT)*
+- [x] 13-04-PLAN.md -- Fix createFn field mismatches, Activity-to-conditional for fabric dropdown, draft auto-save on unmount
+- [x] 13-05-PLAN.md -- Wire skein recalculation through adapters and SupplyTable on stitchCount/calcParams change
 **UI hint**: yes
 
 ### Phase 14: Edit Mode & Cleanup
@@ -127,9 +151,18 @@ Plans:
 **Requirements**: EDIT-01, EDIT-02, CLEAN-01
 **Success Criteria** (what must be TRUE):
   1. User edits an existing chart/project via a full-page merged form (same layout as creation) -- not a modal
-  2. User can navigate to the edit form from the project detail page and from the gallery card kebab menu
+  2. User can navigate to the edit form from the project detail page and from the list-row kebab menu
   3. Old chart form, old supply tab, old supply row components, and the edit modal are fully removed from the codebase
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1**
+- [x] 14-01-PLAN.md -- Remove 9 deprecated files with zero live importers
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [x] 14-02-PLAN.md -- Edit mode for merged form, list-row kebab menu, edit route rewire
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [x] 14-03-PLAN.md -- Remove 12 post-rewire deprecated files, ROADMAP update
 **UI hint**: yes
 
 ## Execution Order
@@ -156,7 +189,7 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 9. Dashboards & Shopping Cart | v1.2 | 9/9 | Complete | 2026-04-18 |
 | 9.1. Image Optimization on Upload | v1.2 | 2/2 | Complete | 2026-04-26 |
 | 10. Unified Supply Table | v1.3 | 6/6 | Complete    | 2026-05-04 |
-| 11. Supply Table on Project Detail | v1.3 | 0/? | Not started | - |
-| 12. Merged Form | v1.3 | 0/? | Not started | - |
-| 13. Supply Takeover | v1.3 | 0/? | Not started | - |
-| 14. Edit Mode & Cleanup | v1.3 | 0/? | Not started | - |
+| 11. Supply Table on Project Detail | v1.3 | 2/2 | Complete    | 2026-05-11 |
+| 12. Merged Form | v1.3 | 3/3 | Complete    | 2026-05-11 |
+| 13. Supply Takeover | v1.3 | 5/5 | Complete   | 2026-05-16 |
+| 14. Edit Mode & Cleanup | v1.3 | 3/3 | Complete    | 2026-05-16 |

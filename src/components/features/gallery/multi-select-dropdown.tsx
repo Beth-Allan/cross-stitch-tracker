@@ -118,15 +118,15 @@ export function MultiSelectDropdown({
         aria-haspopup="listbox"
         aria-controls={isOpen ? listboxId : undefined}
         className={cn(
-          "flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm whitespace-nowrap transition-colors",
+          "focus-visible:ring-ring flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm whitespace-nowrap transition-colors outline-none focus-visible:ring-2",
           hasSelection
-            ? "text-foreground border-emerald-300 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-950/30"
+            ? "text-foreground border-selected-border bg-selected"
             : "border-border text-muted-foreground hover:border-foreground/25",
         )}
       >
         <span>{label}</span>
         {hasSelection && (
-          <span className="min-w-[1.25rem] rounded-full bg-emerald-200 px-1.5 text-center text-xs text-emerald-800 dark:bg-emerald-800 dark:text-emerald-200">
+          <span className="bg-selected-border text-selected-foreground min-w-[1.25rem] rounded-full px-1.5 text-center text-xs">
             {selected.length}
           </span>
         )}
@@ -167,7 +167,7 @@ export function MultiSelectDropdown({
                   aria-hidden="true"
                   className={cn(
                     "flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border",
-                    isSelected ? "border-emerald-500 bg-emerald-500 text-white" : "border-border",
+                    isSelected ? "border-progress bg-progress text-white" : "border-border",
                   )}
                 >
                   {isSelected && <Check className="h-3 w-3" />}

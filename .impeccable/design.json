@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-16T00:00:00Z",
+  "title": "Design System: Cross Stitch Tracker",
+  "extensions": {
+    "colorMeta": {
+      "emerald-600": {
+        "role": "primary",
+        "displayName": "Emerald Canopy",
+        "canonical": "oklch(0.596 0.145 163.23)",
+        "tonalRamp": [
+          "oklch(0.20 0.05 163)",
+          "oklch(0.30 0.08 163)",
+          "oklch(0.43 0.10 163)",
+          "oklch(0.51 0.12 163)",
+          "oklch(0.60 0.145 163)",
+          "oklch(0.72 0.13 163)",
+          "oklch(0.85 0.08 164)",
+          "oklch(0.96 0.03 166)"
+        ]
+      },
+      "amber-500": {
+        "role": "secondary",
+        "displayName": "Amber Thread",
+        "canonical": "oklch(0.769 0.188 70.08)",
+        "tonalRamp": [
+          "oklch(0.20 0.05 70)",
+          "oklch(0.33 0.09 70)",
+          "oklch(0.46 0.13 70)",
+          "oklch(0.58 0.16 70)",
+          "oklch(0.77 0.188 70)",
+          "oklch(0.84 0.14 75)",
+          "oklch(0.91 0.10 84)",
+          "oklch(0.97 0.04 95)"
+        ]
+      },
+      "stone-50": {
+        "role": "neutral",
+        "displayName": "Linen",
+        "canonical": "oklch(0.985 0.002 75.3)",
+        "tonalRamp": [
+          "oklch(0.147 0.004 49)",
+          "oklch(0.216 0.006 56)",
+          "oklch(0.374 0.01 67)",
+          "oklch(0.553 0.013 58)",
+          "oklch(0.709 0.01 56)",
+          "oklch(0.869 0.005 56)",
+          "oklch(0.971 0.007 74)",
+          "oklch(0.985 0.002 75)"
+        ]
+      },
+      "sky-500": {
+        "role": "tertiary",
+        "displayName": "Sky Thread",
+        "canonical": "oklch(0.609 0.191 231.73)",
+        "tonalRamp": [
+          "oklch(0.20 0.06 232)",
+          "oklch(0.30 0.10 232)",
+          "oklch(0.40 0.14 232)",
+          "oklch(0.50 0.17 232)",
+          "oklch(0.61 0.191 232)",
+          "oklch(0.72 0.15 232)",
+          "oklch(0.84 0.09 232)",
+          "oklch(0.95 0.03 232)"
+        ]
+      },
+      "violet-600": {
+        "role": "tertiary",
+        "displayName": "Violet Silk",
+        "canonical": "oklch(0.536 0.245 293.54)",
+        "tonalRamp": [
+          "oklch(0.18 0.08 294)",
+          "oklch(0.28 0.14 294)",
+          "oklch(0.38 0.18 294)",
+          "oklch(0.46 0.22 294)",
+          "oklch(0.54 0.245 294)",
+          "oklch(0.65 0.20 294)",
+          "oklch(0.78 0.12 294)",
+          "oklch(0.92 0.04 294)"
+        ]
+      },
+      "rose-600": {
+        "role": "tertiary",
+        "displayName": "Rose Floss",
+        "canonical": "oklch(0.592 0.249 0.58)",
+        "tonalRamp": [
+          "oklch(0.18 0.08 1)",
+          "oklch(0.28 0.14 1)",
+          "oklch(0.38 0.19 1)",
+          "oklch(0.48 0.22 1)",
+          "oklch(0.59 0.249 1)",
+          "oklch(0.70 0.19 1)",
+          "oklch(0.82 0.11 1)",
+          "oklch(0.94 0.04 1)"
+        ]
+      },
+      "red-600": {
+        "role": "neutral",
+        "displayName": "Destructive Red",
+        "canonical": "oklch(0.577 0.245 27.33)",
+        "tonalRamp": [
+          "oklch(0.18 0.08 27)",
+          "oklch(0.28 0.14 27)",
+          "oklch(0.38 0.18 27)",
+          "oklch(0.48 0.22 27)",
+          "oklch(0.58 0.245 27)",
+          "oklch(0.68 0.19 27)",
+          "oklch(0.80 0.11 27)",
+          "oklch(0.93 0.04 27)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page titles. One per page. The primary visual anchor."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section headings, card titles, dialog titles. The workhorse heading."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All prose, descriptions, table cells. Capped at 75ch for readability."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Form labels, metadata, badge text, chip text."
+      },
+      "mono": {
+        "displayName": "Data",
+        "purpose": "Thread codes, stitch counts, quantities, percentages. Tabular-nums always."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ambient-hover",
+        "value": "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
+        "purpose": "Gallery card hover lift. Signals interactivity."
+      },
+      {
+        "name": "overlay",
+        "value": "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)",
+        "purpose": "Popovers, dropdowns, select menus. Functional float."
+      },
+      {
+        "name": "panel",
+        "value": "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
+        "purpose": "Sheet/drawer overlays, mobile nav."
+      },
+      {
+        "name": "subtle-rest",
+        "value": "0 1px 2px 0 rgba(0,0,0,0.05)",
+        "purpose": "Active tab indicators, error cards. Barely perceptible."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Default easing for state transitions (hover, focus, active)."
+      },
+      {
+        "name": "ease-decelerate",
+        "value": "cubic-bezier(0.0, 0, 0.2, 1)",
+        "purpose": "Elements entering view (slide-in, fade-in)."
+      },
+      {
+        "name": "skeleton-pulse",
+        "value": "1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "purpose": "Loading skeleton animation."
+      },
+      {
+        "name": "shake",
+        "value": "0.4s ease-in-out",
+        "purpose": "Validation error feedback on inputs."
+      },
+      {
+        "name": "slide-in",
+        "value": "0.2s ease",
+        "purpose": "New elements entering (toast, row insertion)."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary action button. Emerald background, compact 32px height, press-down active state.",
+      "html": "<button class=\"ds-btn-primary\">Add Project</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 10px; gap: 6px; background: oklch(0.596 0.145 163.23); color: #fff; font-family: 'Source Sans 3', sans-serif; font-size: 0.875rem; font-weight: 500; border: 1px solid transparent; border-radius: 8px; white-space: nowrap; transition: background 0.15s, transform 0.1s; cursor: pointer; } .ds-btn-primary:hover { background: oklch(0.52 0.13 163); } .ds-btn-primary:focus-visible { border-color: oklch(0.596 0.145 163.23); box-shadow: 0 0 0 3px oklch(0.596 0.145 163.23 / 0.5); outline: none; } .ds-btn-primary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action button. Border stroke, transparent background, muted hover fill.",
+      "html": "<button class=\"ds-btn-outline\">Cancel</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 10px; gap: 6px; background: transparent; color: oklch(0.216 0.006 56.04); font-family: 'Source Sans 3', sans-serif; font-size: 0.875rem; font-weight: 500; border: 1px solid oklch(0.869 0.005 56.37); border-radius: 8px; white-space: nowrap; transition: background 0.15s, color 0.15s; cursor: pointer; } .ds-btn-outline:hover { background: oklch(0.971 0.007 73.68); } .ds-btn-outline:focus-visible { border-color: oklch(0.596 0.145 163.23); box-shadow: 0 0 0 3px oklch(0.596 0.145 163.23 / 0.5); outline: none; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Tertiary/toolbar action. No border or background until hover.",
+      "html": "<button class=\"ds-btn-ghost\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 5v14M5 12h14\"/></svg> Add</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 10px; gap: 6px; background: transparent; color: oklch(0.216 0.006 56.04); font-family: 'Source Sans 3', sans-serif; font-size: 0.875rem; font-weight: 500; border: 1px solid transparent; border-radius: 8px; white-space: nowrap; transition: background 0.15s; cursor: pointer; } .ds-btn-ghost:hover { background: oklch(0.971 0.007 73.68); } .ds-btn-ghost:focus-visible { border-color: oklch(0.596 0.145 163.23); box-shadow: 0 0 0 3px oklch(0.596 0.145 163.23 / 0.5); outline: none; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Standard text input. Minimal stroke, emerald focus ring, 32px height.",
+      "html": "<input class=\"ds-input\" placeholder=\"Search patterns...\" />",
+      "css": ".ds-input { height: 32px; width: 100%; padding: 4px 10px; background: transparent; color: oklch(0.216 0.006 56.04); font-family: 'Source Sans 3', sans-serif; font-size: 0.875rem; border: 1px solid oklch(0.869 0.005 56.37); border-radius: 8px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; } .ds-input::placeholder { color: oklch(0.553 0.013 58.07); } .ds-input:focus-visible { border-color: oklch(0.596 0.145 163.23); box-shadow: 0 0 0 3px oklch(0.596 0.145 163.23 / 0.5); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Primary container. White background, subtle ring border, rounded-xl. Flat at rest.",
+      "html": "<div class=\"ds-card\"><h3 class=\"ds-card-title\">Summer Garden SAL</h3><p class=\"ds-card-desc\">Dimensions Gold Collection</p></div>",
+      "css": ".ds-card { display: flex; flex-direction: column; gap: 16px; padding: 16px; background: oklch(1 0 0); color: oklch(0.216 0.006 56.04); border-radius: 11.2px; box-shadow: inset 0 0 0 1px oklch(0.216 0.006 56.04 / 0.1); font-family: 'Source Sans 3', sans-serif; font-size: 0.875rem; } .ds-card-title { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 500; line-height: 1.3; margin: 0; } .ds-card-desc { color: oklch(0.553 0.013 58.07); font-size: 0.875rem; margin: 0; }"
+    },
+    {
+      "name": "Badge (Status)",
+      "kind": "chip",
+      "refersTo": "badge-default",
+      "description": "Status indicator pill. Full-round, compact 20px height. Emerald for primary status.",
+      "html": "<span class=\"ds-badge\">Kitted</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; justify-content: center; height: 20px; padding: 2px 8px; background: oklch(0.596 0.145 163.23); color: #fff; font-family: 'Source Sans 3', sans-serif; font-size: 0.75rem; font-weight: 500; border-radius: 9999px; white-space: nowrap; }"
+    },
+    {
+      "name": "Nav Item",
+      "kind": "nav",
+      "refersTo": null,
+      "description": "Sidebar navigation link. Icon + label, emerald tint on active.",
+      "html": "<a class=\"ds-nav-item ds-nav-item--active\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\"/></svg><span>Browse</span></a>",
+      "css": ".ds-nav-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; color: oklch(0.216 0.006 56.04 / 0.7); font-family: 'Source Sans 3', sans-serif; font-size: 0.875rem; font-weight: 400; border-radius: 8px; text-decoration: none; transition: background 0.15s, color 0.15s; } .ds-nav-item:hover { background: oklch(0.971 0.007 73.68); color: oklch(0.216 0.006 56.04); } .ds-nav-item--active { background: oklch(0.979 0.021 166.11); color: oklch(0.508 0.118 165.61); font-weight: 500; } .ds-nav-item--active:hover { background: oklch(0.979 0.021 166.11); color: oklch(0.508 0.118 165.61); }"
+    },
+    {
+      "name": "Gallery Card",
+      "kind": "card",
+      "refersTo": null,
+      "description": "Chart browsing card. Image-forward, hover-lifts with shadow. The signature interaction pattern.",
+      "html": "<div class=\"ds-gallery-card\"><div class=\"ds-gallery-card-img\"></div><div class=\"ds-gallery-card-content\"><h3 class=\"ds-gallery-card-title\">Autumn Leaves</h3><span class=\"ds-badge\">In Progress</span></div></div>",
+      "css": ".ds-gallery-card { display: flex; flex-direction: column; overflow: hidden; background: oklch(1 0 0); border-radius: 11.2px; transition: box-shadow 0.2s, transform 0.2s; cursor: pointer; } .ds-gallery-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px oklch(0.216 0.006 56.04 / 0.08); } .ds-gallery-card-img { width: 100%; aspect-ratio: 4/3; background: oklch(0.971 0.007 73.68); } .ds-gallery-card-content { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; } .ds-gallery-card-title { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 500; margin: 0; color: oklch(0.216 0.006 56.04); } .ds-badge { display: inline-flex; align-items: center; height: 20px; padding: 2px 8px; background: oklch(0.609 0.191 231.73); color: #fff; font-family: 'Source Sans 3', sans-serif; font-size: 0.75rem; font-weight: 500; border-radius: 9999px; width: fit-content; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Craft Room Ledger",
+    "overview": "A beautifully organized notebook in a tidy craft room. Warm, precise, personal. The system celebrates the act of tracking as part of the craft itself, where recording progress is rewarding, not administrative.\n\nThe aesthetic is understated elegance with organic warmth. The emerald and amber palette feels natural and craft-adjacent without being literal or twee. Typography carries character through Fraunces headings (serif with optical sizing), while Source Sans 3 keeps body text clean and workmanlike. Data is rich but never overwhelming; hierarchy and whitespace create breathing room.\n\nThis system explicitly rejects: generic SaaS dashboard aesthetics, enterprise gray, overwhelming data density without hierarchy, anything childish or scrapbook-themed, and cold analytical interfaces.",
+    "keyCharacteristics": [
+      "Data-rich without data-heavy: progressive disclosure, clear hierarchy",
+      "Quiet until it matters: color and emphasis reserved for meaning",
+      "Warm neutrals tinted toward stone (never pure gray)",
+      "Serif headings bring character; sans body stays workmanlike",
+      "Monospace reserved exclusively for numeric data"
+    ],
+    "rules": [
+      {
+        "name": "The Quiet Accent Rule",
+        "body": "Emerald appears on primary actions and active states only. Its rarity is what makes it feel intentional. If emerald is everywhere, nothing is primary.",
+        "section": "colors"
+      },
+      {
+        "name": "The Warm Neutral Doctrine",
+        "body": "Every neutral is tinted toward the stone hue (oklch hue 50-75, chroma 0.002-0.013). Pure gray is forbidden. The warmth is subtle but structural.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mono Discipline Rule",
+        "body": "JetBrains Mono is used exclusively for numeric data that benefits from tabular alignment: thread codes, stitch counts, session durations, percentages. Never in headings, navigation, or prose.",
+        "section": "typography"
+      },
+      {
+        "name": "The Heading Font Rule",
+        "body": "Every h1-h6 and every card title uses Fraunces (font-heading). Source Sans handles everything else. No exceptions.",
+        "section": "typography"
+      },
+      {
+        "name": "The Earned Shadow Rule",
+        "body": "Surfaces are flat at rest. Shadows appear only as a response to state (hover, focus, open) or for elements that genuinely float above the page. A shadow without a trigger is decorative and forbidden.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use oklch for all color definitions",
+      "Do tint neutrals toward stone hue (oklch hue 50-75)",
+      "Do use Fraunces for every heading element",
+      "Do use JetBrains Mono exclusively for numeric/code data",
+      "Do use semantic color tokens (bg-card, text-muted-foreground, border-border)",
+      "Do celebrate progress moments with visual acknowledgment",
+      "Do respect the status color vocabulary: seven colors, seven states, no repurposing"
+    ],
+    "donts": [
+      "Don't use pure black (#000) or pure white (#fff)",
+      "Don't make it look like a generic SaaS dashboard",
+      "Don't use JetBrains Mono outside of numeric data contexts",
+      "Don't add shadows to elements at rest",
+      "Don't use border-left or border-right as colored accent stripes",
+      "Don't use gradient text",
+      "Don't create overwhelming data density without hierarchy",
+      "Don't make it childish or scrapbook-themed",
+      "Don't use identical card grids"
+    ]
+  }
+}

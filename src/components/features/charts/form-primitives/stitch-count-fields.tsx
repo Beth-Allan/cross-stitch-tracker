@@ -44,7 +44,12 @@ export function StitchCountFields({
 
   return (
     <div className="space-y-4">
-      <FormField label="Dimensions (stitches)" htmlFor="stitches-wide" error={errors?.stitchesWide}>
+      <FormField
+        label="Dimensions (stitches)"
+        htmlFor="stitches-wide"
+        required
+        error={errors?.stitchesWide}
+      >
         <div className="flex items-center gap-2">
           <Input
             id="stitches-wide"
@@ -56,7 +61,7 @@ export function StitchCountFields({
             className="flex-1"
             aria-describedby={errors?.stitchesWide ? "stitches-wide-error" : undefined}
           />
-          <span className="text-muted-foreground shrink-0 px-2 text-sm">w ×</span>
+          <span className="text-muted-foreground shrink-0 px-1 text-sm">×</span>
           <Input
             id="stitches-high"
             type="number"
@@ -67,7 +72,6 @@ export function StitchCountFields({
             aria-label="Height (stitches)"
             className="flex-1"
           />
-          <span className="text-muted-foreground shrink-0 px-2 text-sm">h</span>
         </div>
       </FormField>
 

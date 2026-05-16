@@ -18,6 +18,13 @@ vi.mock("@/components/ui/link-button", () => ({
   ),
 }));
 
+// Mock ListRowKebabMenu to avoid auth chain dependency (next-auth -> next/server)
+vi.mock("@/components/features/charts/list-row-kebab-menu", () => ({
+  ListRowKebabMenu: ({ chartId }: { chartId: string; chartName: string }) => (
+    <div aria-label="Project actions" data-testid={`kebab-${chartId}`} />
+  ),
+}));
+
 const defaultProps = {
   cards: [
     createMockGalleryCard({ chartId: "c1", name: "Project Alpha" }),

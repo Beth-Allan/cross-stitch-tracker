@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Form & Supply Overhaul
-status: milestone_complete
-stopped_at: Phase 10 UI-SPEC approved
-last_updated: "2026-05-03T23:33:30.466Z"
-last_activity: 2026-05-03 -- Phase 10 execution started
+status: shipped
+stopped_at: v1.3 shipped — PR #32
+last_updated: "2026-05-16"
+last_activity: 2026-05-16 -- v1.3 shipped — PR #32
 progress:
-  total_phases: 1
-  completed_phases: 1
-  total_plans: 6
-  completed_plans: 0
+  total_phases: 5
+  completed_phases: 5
+  total_plans: 19
+  completed_plans: 16
   percent: 100
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-03)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 10 — unified-supply-table
+**Current focus:** Phase 14 — edit-mode-cleanup
 
 ## Current Position
 
-Phase: 10
+Phase: 14
 Plan: Not started
 Status: Milestone complete
-Last activity: 2026-05-04
+Last activity: 2026-05-16
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -72,6 +72,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-03T22:17:30.384Z
-Stopped at: Phase 10 UI-SPEC approved
-Resume file: .planning/phases/10-unified-supply-table/10-UI-SPEC.md
+Last session: 2026-05-16T18:56:08.149Z
+Stopped at: Phase 14 context gathered
+Resume file: .planning/phases/14-edit-mode-cleanup/14-CONTEXT.md

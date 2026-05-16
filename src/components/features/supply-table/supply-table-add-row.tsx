@@ -1,10 +1,12 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import { toast } from "sonner";
 import { ArrowRight, Sparkles as SparklesIcon, X } from "lucide-react";
 import { SegmentedTypeToggle } from "./segmented-type-toggle";
 import { PortalAutocomplete } from "./portal-autocomplete";
 import { InlineCreateDialog } from "./inline-create-dialog";
+import { ColorSwatch } from "@/components/features/supplies/color-swatch";
 import { useSupplyTable } from "./use-supply-table";
 import type { SupplyTableAdapter, CalcParams } from "./types";
 
@@ -12,7 +14,7 @@ interface SupplyTableAddRowProps {
   adapter: SupplyTableAdapter;
   calcParams: CalcParams;
   existingSupplyIds: Set<string>;
-  onRowAdded: () => void;
+  onRowAdded: (newId?: string) => void;
 }
 
 const UNIT_LABELS: Record<string, string> = {
@@ -70,12 +72,18 @@ export function SupplyTableAddRow({
   }, [selectedItem, getFocusTarget]);
 
   async function handleCommit() {
-    const result = await commitRow();
-    if (result.success) {
-      onRowAdded();
+    try {
+      const result = await commitRow();
+      if (result.success) {
+        onRowAdded(result.newId);
+      } else if (result.error) {
+        toast.error(result.error);
+      }
       requestAnimationFrame(() => {
         searchInputRef.current?.focus();
       });
+    } catch {
+      toast.error("Couldn't add supply. Try again.");
     }
   }
 
@@ -140,28 +148,29 @@ export function SupplyTableAddRow({
       >
         {/* Cell 1: Type toggle + Search/Selected item (44%) */}
         <td className="px-2 py-1.5" style={{ width: "44%" }}>
-          <div className="flex items-center gap-2">
-            <SegmentedTypeToggle value={supplyType} onChange={setSupplyType} />
-
-            <div className="relative min-w-0 flex-1">
-              {selectedItem ? (
-                <div className="flex items-center gap-1.5">
-                  <span className="text-foreground font-mono text-xs font-semibold">
-                    {selectedItem.code}
-                  </span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    {selectedItem.name}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleClearSelection}
-                    className="text-muted-foreground hover:text-foreground hover:bg-muted ml-auto shrink-0 rounded p-0.5 transition-colors"
-                    aria-label="Clear selection"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ) : (
+          {selectedItem ? (
+            <div className="flex items-center gap-2">
+              <ColorSwatch hexColor={selectedItem.hexColor} size="sm" />
+              {selectedItem.brandName && (
+                <span className="text-muted-foreground text-xs">{selectedItem.brandName}</span>
+              )}
+              <span className="text-foreground font-mono text-xs font-semibold">
+                {selectedItem.code}
+              </span>
+              <span className="text-muted-foreground truncate text-xs">{selectedItem.name}</span>
+              <button
+                type="button"
+                onClick={handleClearSelection}
+                className="text-muted-foreground hover:text-foreground hover:bg-muted ml-auto shrink-0 rounded p-0.5 transition-colors"
+                aria-label="Clear selection"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              <SegmentedTypeToggle value={supplyType} onChange={setSupplyType} />
+              <div className="relative min-w-0">
                 <input
                   ref={searchInputRef}
                   type="text"
@@ -172,9 +181,9 @@ export function SupplyTableAddRow({
                   className={inputClassName}
                   autoComplete="off"
                 />
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
           <PortalAutocomplete
             isOpen={isAutocompleteOpen}

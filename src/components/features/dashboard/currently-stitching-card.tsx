@@ -37,7 +37,7 @@ export function CurrentlyStitchingCard({ project, imageUrl }: CurrentlyStitching
   return (
     <Link
       href={`/charts/${project.chartId}`}
-      className="group border-border block w-[280px] flex-shrink-0 overflow-hidden rounded-xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+      className="group border-border block w-[280px] flex-shrink-0 overflow-hidden rounded-xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none"
       style={{ scrollSnapAlign: "start" }}
     >
       {/* Cover area */}
@@ -59,7 +59,7 @@ export function CurrentlyStitchingCard({ project, imageUrl }: CurrentlyStitching
           <div className="flex items-center gap-2">
             <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/30 backdrop-blur-sm">
               <div
-                className="h-full rounded-full bg-emerald-400"
+                className="bg-progress h-full rounded-full"
                 style={{ width: `${project.progressPercent}%` }}
               />
             </div>
@@ -72,7 +72,7 @@ export function CurrentlyStitchingCard({ project, imageUrl }: CurrentlyStitching
 
       {/* Card body */}
       <div className="bg-card flex flex-col gap-1.5 p-3.5">
-        <p className="font-heading text-foreground line-clamp-1 text-sm leading-snug font-semibold transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+        <p className="font-heading text-foreground group-hover:text-selected-foreground line-clamp-1 text-sm leading-snug font-semibold transition-colors">
           {project.projectName}
         </p>
         <p className="text-muted-foreground truncate text-xs">{project.designerName}</p>

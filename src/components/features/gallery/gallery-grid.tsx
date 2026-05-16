@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Scissors, ChevronUp, ChevronDown } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { LinkButton } from "@/components/ui/link-button";
+import { ListRowKebabMenu } from "@/components/features/charts/list-row-kebab-menu";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { STATUS_CONFIG } from "@/lib/utils/status";
 import { STATUS_GRADIENT_CLASSES } from "./gallery-utils";
@@ -71,7 +72,7 @@ function EmptyFilterState({ onClearFilters }: { onClearFilters?: () => void }) {
         <button
           type="button"
           onClick={onClearFilters}
-          className="mt-4 text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+          className="text-progress-foreground hover:text-selected-foreground mt-4 text-sm font-medium transition-colors"
         >
           Clear all filters
         </button>
@@ -124,7 +125,9 @@ function ListContextStats({ card }: { card: GalleryCardData }) {
         <p>
           {formatNumber(card.stitchesCompleted)} / {formatNumber(card.stitchCount)} stitches
         </p>
-        <p>{card.threadColourCount} colours</p>
+        <p>
+          {card.threadColourCount} {card.threadColourCount === 1 ? "colour" : "colours"}
+        </p>
       </div>
     );
   }
@@ -133,7 +136,9 @@ function ListContextStats({ card }: { card: GalleryCardData }) {
     return (
       <div className="text-muted-foreground text-[11px]">
         <p>{formatNumber(card.stitchCount)} stitches</p>
-        <p>{card.threadColourCount} colours</p>
+        <p>
+          {card.threadColourCount} {card.threadColourCount === 1 ? "colour" : "colours"}
+        </p>
       </div>
     );
   }
@@ -142,7 +147,8 @@ function ListContextStats({ card }: { card: GalleryCardData }) {
   return (
     <div className="text-muted-foreground text-[11px]">
       <p>
-        {formatNumber(card.stitchCount)} stitches &middot; {card.threadColourCount} colours
+        {formatNumber(card.stitchCount)} stitches &middot; {card.threadColourCount}{" "}
+        {card.threadColourCount === 1 ? "colour" : "colours"}
       </p>
       {card.finishDate && <p>{formatDate(card.finishDate)}</p>}
     </div>
@@ -182,11 +188,11 @@ function ListProgressCell({ card }: { card: GalleryCardData }) {
       <div className="flex items-center gap-2">
         <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
           <div
-            className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400"
+            className="bg-progress h-full rounded-full"
             style={{ width: `${card.progressPercent}%` }}
           />
         </div>
-        <span className="font-mono text-xs text-emerald-600 tabular-nums dark:text-emerald-400">
+        <span className="text-progress-foreground font-mono text-xs tabular-nums">
           {card.progressPercent}%
         </span>
       </div>
@@ -228,7 +234,8 @@ function ListMobileStat({ card }: { card: GalleryCardData }) {
   }
   return (
     <span className="text-muted-foreground text-[11px] sm:hidden">
-      {formatNumber(card.stitchCount)} stitches &middot; {card.threadColourCount} colours
+      {formatNumber(card.stitchCount)} stitches &middot; {card.threadColourCount}{" "}
+      {card.threadColourCount === 1 ? "colour" : "colours"}
     </span>
   );
 }
@@ -240,7 +247,7 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
         <div
           key={card.chartId}
           role="listitem"
-          className="bg-card border-border hover:bg-muted/50 grid grid-cols-[40px_8px_1fr_auto] items-center gap-x-4 border-b px-4 py-2 transition-colors sm:grid-cols-[40px_8px_minmax(180px,2fr)_minmax(120px,1fr)_minmax(100px,120px)_64px_56px]"
+          className="group bg-card border-border hover:bg-muted/50 grid grid-cols-[40px_8px_1fr_auto_44px] items-center gap-x-4 border-b px-4 py-2 transition-colors sm:grid-cols-[40px_8px_minmax(180px,2fr)_minmax(120px,1fr)_minmax(100px,120px)_64px_56px_44px]"
         >
           {/* 1. Thumbnail */}
           <SmallThumbnail card={card} />
@@ -252,7 +259,7 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
           <div className="min-w-0">
             <Link
               href={`/charts/${card.chartId}`}
-              className="font-heading text-foreground decoration-border block truncate text-sm font-semibold underline underline-offset-2 transition-colors hover:text-emerald-700 hover:decoration-emerald-500 dark:hover:text-emerald-400"
+              className="font-heading text-foreground decoration-border hover:text-selected-foreground hover:decoration-progress block truncate text-sm font-semibold underline underline-offset-2 transition-colors"
             >
               {card.name}
             </Link>
@@ -289,6 +296,11 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
               </TooltipTrigger>
               <TooltipContent>{SIZE_TOOLTIP_TEXT[card.sizeCategory]}</TooltipContent>
             </Tooltip>
+          </div>
+
+          {/* 8. Kebab menu */}
+          <div className="flex items-center justify-end transition-opacity group-focus-within:opacity-100 sm:opacity-40 sm:group-hover:opacity-100">
+            <ListRowKebabMenu chartId={card.chartId} chartName={card.name} />
           </div>
         </div>
       ))}
@@ -381,13 +393,14 @@ function TableView({
                 </th>
               );
             })}
+            <th className="w-12" />
           </tr>
         </thead>
         <tbody>
           {cards.map((card) => (
             <tr
               key={card.chartId}
-              className="bg-card hover:bg-muted/50 border-border border-b transition-colors"
+              className="group bg-card hover:bg-muted/50 border-border border-b transition-colors"
             >
               {/* Project */}
               <td className="px-4 py-2.5">
@@ -396,7 +409,7 @@ function TableView({
                   <div className="min-w-0">
                     <Link
                       href={`/charts/${card.chartId}`}
-                      className="font-heading text-foreground decoration-border block truncate text-sm font-semibold underline underline-offset-2 transition-colors hover:text-emerald-700 hover:decoration-emerald-500 dark:hover:text-emerald-400"
+                      className="font-heading text-foreground decoration-border hover:text-selected-foreground hover:decoration-progress block truncate text-sm font-semibold underline underline-offset-2 transition-colors"
                     >
                       {card.name}
                     </Link>
@@ -432,11 +445,11 @@ function TableView({
                   <div className="flex max-w-[100px] items-center gap-2">
                     <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
                       <div
-                        className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400"
+                        className="bg-progress h-full rounded-full"
                         style={{ width: `${card.progressPercent}%` }}
                       />
                     </div>
-                    <span className="font-mono text-xs text-emerald-600 tabular-nums dark:text-emerald-400">
+                    <span className="text-progress-foreground font-mono text-xs tabular-nums">
                       {card.progressPercent}%
                     </span>
                   </div>
@@ -465,6 +478,12 @@ function TableView({
                 <span className="text-muted-foreground text-xs tabular-nums">
                   {card.threadColourCount}
                 </span>
+              </td>
+              {/* Kebab menu */}
+              <td className="px-2 py-2.5">
+                <div className="flex items-center justify-end opacity-40 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+                  <ListRowKebabMenu chartId={card.chartId} chartName={card.name} />
+                </div>
               </td>
             </tr>
           ))}

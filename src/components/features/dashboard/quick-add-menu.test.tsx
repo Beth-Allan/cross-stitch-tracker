@@ -32,13 +32,14 @@ describe("QuickAddMenu", () => {
     expect(screen.getByText("New Genre")).toBeInTheDocument();
   });
 
-  it("'Log Stitches' item has a border-b separator", () => {
+  it("renders group labels for menu sections", () => {
     render(<QuickAddMenu onLogStitches={vi.fn()} />);
 
     fireEvent.click(screen.getByText("Quick Add"));
 
-    const logStitchesButton = screen.getByText("Log Stitches").closest("button");
-    expect(logStitchesButton?.className).toContain("border-b");
+    expect(screen.getByText("Quick Actions")).toBeInTheDocument();
+    expect(screen.getByText("Create")).toBeInTheDocument();
+    expect(screen.getByText("Reference")).toBeInTheDocument();
   });
 
   it("calls onLogStitches callback when 'Log Stitches' is clicked", () => {
@@ -88,5 +89,70 @@ describe("QuickAddMenu", () => {
 
     fireEvent.click(trigger);
     expect(trigger).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("wraps ArrowDown from last item back to first", async () => {
+    const user = userEvent.setup();
+    render(<QuickAddMenu onLogStitches={vi.fn()} />);
+
+    await user.click(screen.getByText("Quick Add"));
+    const items = screen.getAllByRole("menuitem");
+
+    for (let i = 0; i < items.length - 1; i++) {
+      await user.keyboard("{ArrowDown}");
+    }
+    expect(items[items.length - 1]).toHaveFocus();
+
+    await user.keyboard("{ArrowDown}");
+    expect(items[0]).toHaveFocus();
+  });
+
+  it("wraps ArrowUp from first item to last", async () => {
+    const user = userEvent.setup();
+    render(<QuickAddMenu onLogStitches={vi.fn()} />);
+
+    await user.click(screen.getByText("Quick Add"));
+    const items = screen.getAllByRole("menuitem");
+
+    expect(items[0]).toHaveFocus();
+    await user.keyboard("{ArrowUp}");
+    expect(items[items.length - 1]).toHaveFocus();
+  });
+
+  it("opens menu via ArrowDown on trigger and focuses first item", async () => {
+    const user = userEvent.setup();
+    render(<QuickAddMenu onLogStitches={vi.fn()} />);
+
+    const trigger = screen.getByText("Quick Add").closest("button")!;
+    trigger.focus();
+    await user.keyboard("{ArrowDown}");
+
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+    const items = screen.getAllByRole("menuitem");
+    expect(items[0]).toHaveFocus();
+  });
+
+  it("opens menu via Enter on trigger", async () => {
+    const user = userEvent.setup();
+    render(<QuickAddMenu onLogStitches={vi.fn()} />);
+
+    const trigger = screen.getByText("Quick Add").closest("button")!;
+    trigger.focus();
+    await user.keyboard("{Enter}");
+
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+  });
+
+  it("renders ARIA groups with labelledby references", () => {
+    render(<QuickAddMenu onLogStitches={vi.fn()} />);
+    fireEvent.click(screen.getByText("Quick Add"));
+
+    const groups = screen.getAllByRole("group");
+    expect(groups).toHaveLength(3);
+    groups.forEach((group) => {
+      const labelId = group.getAttribute("aria-labelledby");
+      expect(labelId).toBeTruthy();
+      expect(document.getElementById(labelId!)).toBeInTheDocument();
+    });
   });
 });

@@ -19,7 +19,7 @@ export function SegmentedTypeToggle({ value, onChange }: SegmentedTypeToggleProp
     <div
       role="radiogroup"
       aria-label="Supply type"
-      className="inline-flex rounded-md border border-border overflow-hidden"
+      className="border-border inline-flex w-fit overflow-hidden rounded-md border"
     >
       {SEGMENTS.map(({ type, label, icon: Icon }, index) => {
         const isActive = value === type;
@@ -33,7 +33,7 @@ export function SegmentedTypeToggle({ value, onChange }: SegmentedTypeToggleProp
             aria-checked={isActive}
             onClick={() => onChange(type)}
             className={`flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold transition-colors ${
-              !isLast ? "border-r border-border" : ""
+              !isLast ? "border-border border-r" : ""
             } ${
               isActive
                 ? "bg-primary text-primary-foreground"

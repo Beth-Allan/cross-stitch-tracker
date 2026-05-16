@@ -60,7 +60,7 @@ export function GenrePicker({ genres, selectedIds, onToggle, onAddGenre }: Genre
             className={cn(
               "focus-visible:ring-ring rounded-full border px-3 py-1.5 text-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
               selected
-                ? "border-primary/30 bg-primary/10 text-primary"
+                ? "border-primary/30 bg-primary/10 text-primary font-medium"
                 : "border-border bg-muted text-muted-foreground hover:border-border/80",
             )}
           >

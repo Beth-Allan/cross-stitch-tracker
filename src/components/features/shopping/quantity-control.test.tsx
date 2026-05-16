@@ -46,16 +46,16 @@ describe("QuantityControl", () => {
     expect(onChange).toHaveBeenCalledWith(1);
   });
 
-  it("shows emerald-100 background when fully fulfilled", () => {
+  it("shows selected background when fully fulfilled", () => {
     const { container } = render(<QuantityControl {...defaultProps} acquired={3} required={3} />);
     const wrapper = container.firstElementChild as HTMLElement;
-    expect(wrapper.className).toContain("bg-emerald-100");
+    expect(wrapper.className).toContain("bg-selected");
   });
 
-  it("does not show emerald-100 background when not fully fulfilled", () => {
+  it("does not show selected background when not fully fulfilled", () => {
     const { container } = render(<QuantityControl {...defaultProps} />);
     const wrapper = container.firstElementChild as HTMLElement;
-    expect(wrapper.className).not.toContain("bg-emerald-100");
+    expect(wrapper.className).not.toContain("bg-selected");
   });
 
   it("disables buttons when isPending is true", () => {
