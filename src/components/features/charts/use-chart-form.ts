@@ -117,7 +117,12 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
     digitalFileUrl: data.digitalWorkingCopyUrl,
     stitchesWide: data.stitchesWide,
     stitchesHigh: data.stitchesHigh,
-    stitchCount: data.stitchCount,
+    stitchCount:
+      data.stitchesWide > 0 &&
+      data.stitchesHigh > 0 &&
+      data.stitchCount === data.stitchesWide * data.stitchesHigh
+        ? 0
+        : data.stitchCount,
     stitchCountApproximate: data.stitchCountApproximate,
     genreIds: data.genres.map((g) => g.id),
     isPaperChart: data.isPaperChart,
