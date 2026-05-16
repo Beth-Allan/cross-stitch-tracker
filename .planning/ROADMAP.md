@@ -162,7 +162,7 @@ Plans:
 - [x] 14-02-PLAN.md -- Edit mode for merged form, list-row kebab menu, edit route rewire
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 14-03-PLAN.md -- Remove 12 post-rewire deprecated files, ROADMAP update
+- [x] 14-03-PLAN.md -- Remove 12 post-rewire deprecated files, ROADMAP update
 **UI hint**: yes
 
 ## Execution Order
@@ -192,4 +192,4 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 11. Supply Table on Project Detail | v1.3 | 2/2 | Complete    | 2026-05-11 |
 | 12. Merged Form | v1.3 | 3/3 | Complete    | 2026-05-11 |
 | 13. Supply Takeover | v1.3 | 5/5 | Complete   | 2026-05-16 |
-| 14. Edit Mode & Cleanup | v1.3 | 2/3 | In Progress|  |
+| 14. Edit Mode & Cleanup | v1.3 | 3/3 | Complete   | 2026-05-16 |
