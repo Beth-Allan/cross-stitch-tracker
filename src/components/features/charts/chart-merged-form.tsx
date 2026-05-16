@@ -59,14 +59,11 @@ import {
  * Extracted as a named export so it can be tested in isolation.
  */
 export function buildCreateFn() {
-  return async (
-    type: SupplyType,
-    data: CreateSupplyData,
-  ): Promise<SupplySearchResult> => {
+  return async (type: SupplyType, data: CreateSupplyData): Promise<SupplySearchResult> => {
     if (type === "THREAD") {
       const result = await createThread({
         colorName: data.name,
-        colorCode: data.code ?? "",
+        colorCode: data.code || "CUSTOM",
         brandId: data.brandId,
         hexColor: data.hexColor ?? "#808080",
         colorFamily: "NEUTRAL" as const,
@@ -85,7 +82,7 @@ export function buildCreateFn() {
     if (type === "BEAD") {
       const result = await createBead({
         colorName: data.name,
-        productCode: data.code ?? "",
+        productCode: data.code || "CUSTOM",
         brandId: data.brandId,
         hexColor: data.hexColor ?? "#808080",
         colorFamily: "NEUTRAL" as const,
@@ -103,7 +100,7 @@ export function buildCreateFn() {
     }
     const result = await createSpecialtyItem({
       colorName: data.name,
-      productCode: data.code ?? "",
+      productCode: data.code || "CUSTOM",
       brandId: data.brandId,
       hexColor: data.hexColor ?? "#808080",
     });
@@ -239,7 +236,7 @@ export function ChartMergedForm({
         saveDraftV2(formValuesRef.current, supplyRowsRef.current, calcParamsRef.current);
       }
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- intentionally empty: only fires on unmount
+  }, []);  
 
   // Derived values for SummaryBar
   const resolvedDesignerName = useMemo(() => {

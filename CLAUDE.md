@@ -3,7 +3,7 @@
 ## Current Status
 
 **Milestone:** v1.3 Form & Supply Overhaul
-**Last Updated:** 2026-05-13
+**Last Updated:** 2026-05-15
 **Roadmap:** 5 milestones / 16 phases — v1.0 + v1.1 + v1.2 shipped, v1.3 in progress
 
 ### Done
@@ -21,38 +21,18 @@
 
 ### In Progress
 
-- **v1.3 Form & Supply Overhaul** — Phases 11-12 complete, Phase 13 nearly done, Phase 14 remaining
+- **v1.3 Form & Supply Overhaul** — Phases 11-12 complete, Phase 13 gap closure in progress, Phase 14 remaining
 
 ### Done This Session
 
-- **Phase 13 Wave 1 executed** (parallel) — 2 plans, 1,541 tests passing
-  - 13-01: CreationFlowAdapter, createChartWithSupplies ($transaction), batchSupplySchema, DraftV2 persistence
-  - 13-02: SummaryBar (sticky dot-separated tokens), CalculatorCard (fabric + calc params)
-- **Phase 13 Wave 2 Task 1 executed** — Activity mode toggle wired into ChartMergedForm
-  - React Activity for instant form/supply mode toggle
-  - handleSubmit routes to createChartWithSupplies when supplies exist
-  - Draft persistence upgraded to V2 (supply rows + calcParams)
-
-### Done This Session (cont.)
-
-- **Phase 13-03 bug fixes committed** (81ef2ff):
-  - Fixed searchFn in creation flow — was returning raw Prisma objects instead of mapped SupplySearchResult (caused "Unknown" names, missing brand/code in dropdown)
-  - Added brand name display to dropdown ("DMC 310 — Black"), selected item, and data rows
-  - Restructured add-row layout: toggle stacks above input when searching, hides when item selected (fixes alignment with stitches/need columns)
-  - Added toast + `onValidationError` callback for validation failures in supply mode
+- **Code review fixes applied** (5 commits): Fixed all 6 critical+warning findings from Phase 13 code review — fabric ownership guard (CR-01), localStorage supply validation (WR-01), duplicate fabricCount update (WR-02), type-unsafe cast (WR-03), non-null assertion (WR-04), code duplication extraction (WR-05). 60 tests pass.
+- **UAT gap closure plans created** (2 plans): 13-04-PLAN (createFn field mismatches, Activity-to-conditional for fabric dropdown, draft auto-save on unmount) and 13-05-PLAN (skein recalculation wiring through adapters). Both Wave 1 (parallel).
 
 ### Next Up — RESUME HERE
 
-1. **BUG: Create button does not work from supply mode** — `/gsd-debug` needed
-   - Clicking Create in supply mode produces no visible result (no toast, no redirect, no error)
-   - `onValidationError` callback (added this session) does NOT fire — so validation is passing
-   - `requestSubmit()` on a `<form>` inside React 19 `<Activity mode="hidden">` may silently fail
-   - Hypothesis: Activity hides the form with `display: none`, and `requestSubmit()` might not fire the `submit` event on hidden forms, or the event doesn't reach `handleSubmit`
-   - Terminal only shows `getThreads` search calls, never `createChartWithSupplies`
-   - User confirmed they entered chart name, stitch count, and dimensions (all required fields)
-2. After Create bug is fixed: visual retest of full supply takeover flow
-3. Then: `/gsd-execute-phase 13` to finish Phase 13 (SUMMARY, code review, verification)
-4. Then: `/gsd-discuss-phase 14` for the final v1.3 phase
+1. `/gsd-execute-phase 13 --gaps-only` to execute gap closure plans 04 and 05
+2. Re-run UAT to verify all 4 gaps are closed
+3. `/gsd-discuss-phase 14` for the final v1.3 phase
 
 ### Backlog
 
@@ -85,6 +65,7 @@
 - 999.14: Auto-infer overCount from fabric count — when fabric is linked to a project, auto-set overCount based on fabric count (≤25 → over 1, ≥28 → over 2). User can still override via settings bar toggle.
 - 999.15: Add visual commit button (checkmark) to supply table add row — keyboard Enter works but no visible affordance for mouse-first users
 - 999.16: SearchToAdd drops keystrokes on fast typing — typing "310" registers as "30". Needs investigation: likely server action re-renders during typing, not just debounce timing
+- 999.17: InlineCreateDialog UX clarity — field labels (Name/Code) are generic across supply types; should contextualize per type (e.g., "Color Name" for beads, "Product Name" for specialty) and clarify what's optional
 
 ### Blockers
 
