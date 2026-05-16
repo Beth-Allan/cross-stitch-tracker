@@ -88,9 +88,7 @@ describe("PortalAutocomplete", () => {
   });
 
   it("does not render when isOpen is false", () => {
-    render(
-      <PortalAutocomplete {...defaultProps} isOpen={false} anchorRef={anchorRef} />,
-    );
+    render(<PortalAutocomplete {...defaultProps} isOpen={false} anchorRef={anchorRef} />);
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
 
@@ -141,11 +139,7 @@ describe("PortalAutocomplete", () => {
   it("Enter on disabled (already-added) item does nothing", () => {
     const existingIds = new Set(["t-1", "t-2", "t-3", "t-4"]);
     render(
-      <PortalAutocomplete
-        {...defaultProps}
-        existingIds={existingIds}
-        anchorRef={anchorRef}
-      />,
+      <PortalAutocomplete {...defaultProps} existingIds={existingIds} anchorRef={anchorRef} />,
     );
     const input = screen.getByPlaceholderText("Search by code or name...");
 
@@ -167,11 +161,7 @@ describe("PortalAutocomplete", () => {
   it("already-added items render with 'Added' label and disabled appearance", () => {
     const existingIds = new Set(["t-2"]);
     render(
-      <PortalAutocomplete
-        {...defaultProps}
-        existingIds={existingIds}
-        anchorRef={anchorRef}
-      />,
+      <PortalAutocomplete {...defaultProps} existingIds={existingIds} anchorRef={anchorRef} />,
     );
 
     expect(screen.getByText("Added")).toBeInTheDocument();
@@ -209,12 +199,13 @@ describe("PortalAutocomplete", () => {
     expect(defaultProps.onCreateRequest).toHaveBeenCalledWith("NewThread");
   });
 
-  it("items display code and name", () => {
+  it("items display brand, code, and name", () => {
     render(<PortalAutocomplete {...defaultProps} anchorRef={anchorRef} />);
     expect(screen.getByText("310")).toBeInTheDocument();
-    expect(screen.getByText("Black")).toBeInTheDocument();
+    expect(screen.getByText(/Black/)).toBeInTheDocument();
     expect(screen.getByText("321")).toBeInTheDocument();
-    expect(screen.getByText("Red")).toBeInTheDocument();
+    expect(screen.getByText(/Red/)).toBeInTheDocument();
+    expect(screen.getAllByText("DMC").length).toBeGreaterThan(0);
   });
 
   it("max 8 items displayed with addable first, then already-added", () => {

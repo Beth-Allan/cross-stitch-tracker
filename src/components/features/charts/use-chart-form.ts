@@ -54,6 +54,7 @@ interface UseChartFormOptions {
   stitchingApps?: StitchingAppWithStats[];
   onSuccess: (chartId: string) => void;
   getSupplyRows?: () => SupplyRow[];
+  onValidationError?: () => void;
 }
 
 const ERROR_MAP: Record<string, string> = {
@@ -147,6 +148,7 @@ export function useChartForm({
   stitchingApps: initialStitchingApps = [],
   onSuccess,
   getSupplyRows,
+  onValidationError,
 }: UseChartFormOptions) {
   const initial = useMemo(() => buildInitialValues(initialData), [initialData]);
   const [values, setValues] = useState<ChartFormValues>(initial);
@@ -233,7 +235,11 @@ export function useChartForm({
       // Client-side validation
       const result = chartFormSchema.safeParse(formData);
       if (!result.success) {
-        setErrors(formatErrors(result.error));
+        const formatted = formatErrors(result.error);
+        setErrors(formatted);
+        const firstError = Object.values(formatted)[0];
+        if (firstError) toast.error(firstError);
+        onValidationError?.();
         return;
       }
 

@@ -40,6 +40,9 @@ export function SupplyTableDataRow({
       <td className="border-muted border-b px-3 py-[5px]">
         <div className="flex items-center gap-2">
           <ColorSwatch hexColor={row.hexColor} size="sm" />
+          {row.brandName && (
+            <span className="text-muted-foreground text-xs whitespace-nowrap">{row.brandName}</span>
+          )}
           <span className="font-mono text-xs font-semibold whitespace-nowrap">{row.code}</span>
           <span className="text-muted-foreground truncate text-xs">{row.name}</span>
         </div>

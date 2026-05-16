@@ -212,12 +212,15 @@ export function PortalAutocomplete({
               >
                 <ColorSwatch hexColor={item.hexColor} size="sm" />
                 <span className="min-w-0 flex-1">
+                  {item.brandName && (
+                    <span className="text-muted-foreground text-xs">{item.brandName}</span>
+                  )}{" "}
                   <span className="text-foreground font-mono text-xs font-semibold">
                     {item.code}
-                  </span>{" "}
-                  <span className="text-muted-foreground truncate text-xs">
-                    {disabled ? "" : item.name}
                   </span>
+                  {!disabled && item.name && (
+                    <span className="text-muted-foreground text-xs"> &mdash; {item.name}</span>
+                  )}
                 </span>
                 {disabled && <span className="text-muted-foreground shrink-0 text-xs">Added</span>}
               </div>

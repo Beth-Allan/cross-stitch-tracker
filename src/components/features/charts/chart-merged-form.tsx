@@ -92,13 +92,41 @@ export function ChartMergedForm({
 
   // Instantiate adapter once via ref
   if (!adapterRef.current) {
-    const searchFn = async (
-      type: SupplyType,
-      query: string,
-    ): Promise<SupplySearchResult[]> => {
-      if (type === "THREAD") return getThreads(undefined, undefined, query);
-      if (type === "BEAD") return getBeads(query);
-      return getSpecialtyItems(query);
+    const searchFn = async (type: SupplyType, query: string): Promise<SupplySearchResult[]> => {
+      if (type === "THREAD") {
+        const threads = await getThreads(undefined, undefined, query);
+        return threads.map((t) => ({
+          id: t.id,
+          type: "THREAD" as const,
+          code: t.colorCode,
+          name: t.colorName,
+          brandName: t.brand.name,
+          brandId: t.brandId,
+          hexColor: t.hexColor ?? "",
+        }));
+      }
+      if (type === "BEAD") {
+        const beads = await getBeads(query);
+        return beads.map((b) => ({
+          id: b.id,
+          type: "BEAD" as const,
+          code: b.productCode,
+          name: b.colorName,
+          brandName: b.brand.name,
+          brandId: b.brandId,
+          hexColor: b.hexColor ?? "",
+        }));
+      }
+      const items = await getSpecialtyItems(query);
+      return items.map((s) => ({
+        id: s.id,
+        type: "SPECIALTY" as const,
+        code: s.productCode,
+        name: s.colorName,
+        brandName: s.brand.name,
+        brandId: s.brandId,
+        hexColor: s.hexColor ?? "",
+      }));
     };
     const createFn = async (
       type: SupplyType,
@@ -174,6 +202,7 @@ export function ChartMergedForm({
     stitchingApps,
     onSuccess,
     getSupplyRows: () => adapterRef.current?.getRows() ?? [],
+    onValidationError: () => setMode("form"),
   });
 
   // Derived values for SummaryBar
@@ -238,8 +267,7 @@ export function ChartMergedForm({
         return null;
       }
     })();
-    const rawFabricId =
-      rawDraft?.version === 2 ? rawDraft.form?.fabricId : rawDraft?.fabricId;
+    const rawFabricId = rawDraft?.version === 2 ? rawDraft.form?.fabricId : rawDraft?.fabricId;
 
     const draft = loadDraftV2(defaultValues, designerIds, storageIds, appIds, fabricIds);
     if (!draft) return;
