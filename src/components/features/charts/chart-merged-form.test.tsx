@@ -2,7 +2,11 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { ChartMergedForm } from "./chart-merged-form";
-import { createMockDesigner, createMockGenre } from "@/__tests__/mocks";
+import {
+  createMockDesigner,
+  createMockGenre,
+  createMockChartWithRelations,
+} from "@/__tests__/mocks";
 import { DRAFT_KEY } from "./use-draft-persistence";
 
 const mockPush = vi.fn();
@@ -1015,6 +1019,110 @@ describe("ChartMergedForm", () => {
 
       // No draft should be saved (empty form)
       expect(localStorage.getItem(DRAFT_KEY)).toBeNull();
+    });
+  });
+
+  // --- Edit mode tests ---
+
+  describe("edit mode", () => {
+    const mockChart = createMockChartWithRelations({
+      id: "c1",
+      name: "My Test Chart",
+      stitchCount: 25000,
+      stitchesWide: 200,
+      stitchesHigh: 125,
+    });
+
+    const editFormProps = {
+      ...defaultFormProps,
+      mode: "edit" as const,
+      initialData: mockChart,
+    };
+
+    it('renders heading "Edit {chart.name}" instead of "Add New Chart"', async () => {
+      render(<ChartMergedForm {...editFormProps} />);
+      await waitFor(() => {
+        expect(
+          screen.getByRole("heading", { name: "Edit My Test Chart" }),
+        ).toBeInTheDocument();
+      });
+      expect(screen.queryByText("Add New Chart")).not.toBeInTheDocument();
+    });
+
+    it('renders subtitle "Update your chart and project details"', () => {
+      render(<ChartMergedForm {...editFormProps} />);
+      expect(
+        screen.getByText("Update your chart and project details"),
+      ).toBeInTheDocument();
+    });
+
+    it("renders ManageSuppliesLink instead of milestone marker", () => {
+      render(<ChartMergedForm {...editFormProps} />);
+      expect(
+        screen.getByText("Supplies are managed on the project page"),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText("Project details filled in. Ready for supplies?"),
+      ).not.toBeInTheDocument();
+    });
+
+    it('StickySaveBar shows "Save Changes" (not "Create")', () => {
+      render(<ChartMergedForm {...editFormProps} />);
+      expect(
+        screen.getByRole("button", { name: /save changes/i }),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Create" })).not.toBeInTheDocument();
+    });
+
+    it("does NOT render Save Draft button", () => {
+      render(<ChartMergedForm {...editFormProps} />);
+      expect(screen.queryByText("Save Draft")).not.toBeInTheDocument();
+    });
+
+    it("does NOT call saveDraftV2 on unmount", async () => {
+      const user = userEvent.setup();
+      const { unmount } = render(<ChartMergedForm {...editFormProps} />);
+
+      // Make a change so form is dirty
+      const nameInput = screen.getByLabelText(/chart name/i);
+      await user.clear(nameInput);
+      await user.type(nameInput, "Edited Name");
+
+      unmount();
+
+      // No draft should have been saved (edit mode skips auto-save)
+      expect(localStorage.getItem(DRAFT_KEY)).toBeNull();
+    });
+
+    it("does NOT call loadDraftV2 on mount (no draft hydration)", () => {
+      // Pre-populate localStorage to verify it is NOT read
+      localStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify({
+          version: 2,
+          form: { name: "Stale Draft" },
+          supplies: [],
+          calcParams: { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 },
+        }),
+      );
+
+      render(<ChartMergedForm {...editFormProps} />);
+
+      // Chart name should be from initialData, not from the draft
+      expect(screen.getByLabelText(/chart name/i)).toHaveValue("My Test Chart");
+      expect(screen.queryByText("Draft restored")).not.toBeInTheDocument();
+    });
+
+    it("chart name field is pre-populated with initialData.name", () => {
+      render(<ChartMergedForm {...editFormProps} />);
+      expect(screen.getByLabelText(/chart name/i)).toHaveValue("My Test Chart");
+    });
+
+    it('default mode (no mode prop) still renders "Add New Chart" heading', () => {
+      render(<ChartMergedForm {...defaultFormProps} />);
+      expect(
+        screen.getByRole("heading", { name: "Add New Chart" }),
+      ).toBeInTheDocument();
     });
   });
 

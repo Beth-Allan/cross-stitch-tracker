@@ -1,29 +1,15 @@
 "use client";
 
-import { useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Pencil, Plus, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { LinkButton } from "@/components/ui/link-button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { ChartEditModal } from "./chart-edit-modal";
+import { ListRowKebabMenu } from "./list-row-kebab-menu";
 import { CoverThumbnail } from "./cover-thumbnail";
 import { StatusBadge } from "./status-badge";
 import { SizeBadge } from "./size-badge";
 import { getEffectiveStitchCount } from "@/lib/utils/size-category";
-import { deleteChart } from "@/lib/actions/chart-actions";
 import type { ChartWithProject } from "@/types/chart";
-import type { Designer, Fabric, FabricBrand, Genre } from "@/generated/prisma/client";
-import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
+import type { Designer, Genre } from "@/generated/prisma/client";
 
 /* ---- Types ---- */
 
@@ -32,9 +18,6 @@ interface ChartListProps {
   designers: Designer[];
   genres: Genre[];
   imageUrls?: Record<string, string>;
-  storageLocations?: StorageLocationWithStats[];
-  stitchingApps?: StitchingAppWithStats[];
-  unassignedFabrics?: (Fabric & { brand: FabricBrand })[];
 }
 
 /* ---- Main Component ---- */
@@ -44,37 +27,7 @@ export function ChartList({
   designers,
   genres,
   imageUrls = {},
-  storageLocations = [],
-  stitchingApps = [],
-  unassignedFabrics = [],
 }: ChartListProps) {
-  const router = useRouter();
-  const [editingChart, setEditingChart] = useState<ChartWithProject | null>(null);
-  const [deletingChart, setDeletingChart] = useState<ChartWithProject | null>(null);
-  const [isPending, startTransition] = useTransition();
-
-  async function handleDelete() {
-    if (!deletingChart) return;
-    startTransition(async () => {
-      try {
-        const result = await deleteChart(deletingChart.id);
-        if (result.success) {
-          toast.success("Chart deleted");
-          setDeletingChart(null);
-          router.refresh();
-        } else {
-          toast.error(result.error ?? "Something went wrong. Please try again.");
-        }
-      } catch {
-        toast.error("Something went wrong. Please try again.");
-      }
-    });
-  }
-
-  function handleEditSuccess() {
-    router.refresh();
-  }
-
   // No charts at all — empty state
   if (charts.length === 0) {
     return (
@@ -179,8 +132,6 @@ export function ChartList({
                   (chart.coverThumbnailUrl ? (imageUrls[chart.coverThumbnailUrl] ?? null) : null) ??
                   (chart.coverImageUrl ? (imageUrls[chart.coverImageUrl] ?? null) : null)
                 }
-                onEdit={() => setEditingChart(chart)}
-                onDelete={() => setDeletingChart(chart)}
               />
             ))}
           </tbody>
@@ -190,62 +141,9 @@ export function ChartList({
       {/* Mobile cards */}
       <div className="space-y-3 md:hidden">
         {charts.map((chart) => (
-          <ChartCard
-            key={chart.id}
-            chart={chart}
-            onEdit={() => setEditingChart(chart)}
-            onDelete={() => setDeletingChart(chart)}
-          />
+          <ChartCard key={chart.id} chart={chart} />
         ))}
       </div>
-
-      {/* Edit modal */}
-      {editingChart && (
-        <ChartEditModal
-          chart={editingChart}
-          designers={designers}
-          genres={genres}
-          storageLocations={storageLocations}
-          stitchingApps={stitchingApps}
-          unassignedFabrics={
-            editingChart.project?.fabric &&
-            !unassignedFabrics.some((f) => f.id === editingChart.project?.fabric?.id)
-              ? [editingChart.project.fabric, ...unassignedFabrics]
-              : unassignedFabrics
-          }
-          open={!!editingChart}
-          onOpenChange={(open) => {
-            if (!open) setEditingChart(null);
-          }}
-          onSuccess={handleEditSuccess}
-        />
-      )}
-
-      {/* Delete confirmation dialog */}
-      <Dialog
-        open={!!deletingChart}
-        onOpenChange={(open) => {
-          if (!open) setDeletingChart(null);
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Chart</DialogTitle>
-            <DialogDescription>
-              This will permanently delete {deletingChart?.name} and all associated project data.
-              This cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeletingChart(null)} autoFocus>
-              Keep Chart
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
-              {isPending ? "Deleting..." : "Delete Chart"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
@@ -255,13 +153,9 @@ export function ChartList({
 function ChartRow({
   chart,
   imageUrl,
-  onEdit,
-  onDelete,
 }: {
   chart: ChartWithProject;
   imageUrl: string | null;
-  onEdit: () => void;
-  onDelete: () => void;
 }) {
   const status = chart.project?.status ?? "UNSTARTED";
   const { count } = getEffectiveStitchCount(
@@ -304,23 +198,8 @@ function ChartRow({
         <span className="text-muted-foreground text-sm">{dateAdded}</span>
       </td>
       <td className="px-4 py-3">
-        <div className="flex items-center justify-end gap-1 transition-opacity group-focus-within:opacity-100 md:opacity-40 md:group-hover:opacity-100">
-          <button
-            type="button"
-            onClick={onEdit}
-            className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-md p-1.5 transition-colors"
-            aria-label={`Edit ${chart.name}`}
-          >
-            <Pencil className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={onDelete}
-            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md p-1.5 transition-colors"
-            aria-label={`Delete ${chart.name}`}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+        <div className="flex items-center justify-end transition-opacity group-focus-within:opacity-100 md:opacity-40 md:group-hover:opacity-100">
+          <ListRowKebabMenu chartId={chart.id} chartName={chart.name} />
         </div>
       </td>
     </tr>
@@ -329,15 +208,7 @@ function ChartRow({
 
 /* ---- Chart Card (Mobile) ---- */
 
-function ChartCard({
-  chart,
-  onEdit,
-  onDelete,
-}: {
-  chart: ChartWithProject;
-  onEdit: () => void;
-  onDelete: () => void;
-}) {
+function ChartCard({ chart }: { chart: ChartWithProject }) {
   const status = chart.project?.status ?? "UNSTARTED";
   const { count } = getEffectiveStitchCount(
     chart.stitchCount,
@@ -357,23 +228,8 @@ function ChartCard({
             {chart.name}
           </Link>
         </div>
-        <div className="ml-2 flex shrink-0 items-center gap-1">
-          <button
-            type="button"
-            onClick={onEdit}
-            className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-md p-1.5 transition-colors"
-            aria-label={`Edit ${chart.name}`}
-          >
-            <Pencil className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={onDelete}
-            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md p-1.5 transition-colors"
-            aria-label={`Delete ${chart.name}`}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+        <div className="ml-2 shrink-0">
+          <ListRowKebabMenu chartId={chart.id} chartName={chart.name} />
         </div>
       </div>
       <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-xs">

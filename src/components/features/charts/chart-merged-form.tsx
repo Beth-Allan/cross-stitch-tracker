@@ -14,6 +14,7 @@ import type {
   Genre,
   ProjectStatus,
 } from "@/generated/prisma/client";
+import type { ChartWithProject } from "@/types/chart";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { PROJECT_STATUSES, STATUS_CONFIG } from "@/lib/utils/status";
 import { useChartForm } from "./use-chart-form";
@@ -28,6 +29,7 @@ import { StyledCheckbox } from "./form-primitives/styled-checkbox";
 import { StartPreferenceFields } from "./form-primitives/start-preference-fields";
 import { PatternTypeCards } from "./form-primitives/pattern-type-cards";
 import { StickySaveBar } from "./form-primitives/sticky-save-bar";
+import { ManageSuppliesLink } from "./manage-supplies-link";
 import { SummaryBar } from "./form-primitives/summary-bar";
 import { CalculatorCard } from "./form-primitives/calculator-card";
 import { InlineNameDialog } from "./inline-name-dialog";
@@ -123,6 +125,8 @@ interface ChartMergedFormProps {
   storageLocations: StorageLocationWithStats[];
   stitchingApps: StitchingAppWithStats[];
   unassignedFabrics: (Fabric & { brand: FabricBrand })[];
+  mode?: "create" | "edit";
+  initialData?: ChartWithProject;
 }
 
 export function ChartMergedForm({
@@ -131,10 +135,15 @@ export function ChartMergedForm({
   storageLocations,
   stitchingApps,
   unassignedFabrics,
+  mode: modeProp,
+  initialData,
 }: ChartMergedFormProps) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const hydratedRef = useRef(false);
+
+  const formMode = modeProp ?? "create";
+  const isEdit = formMode === "edit";
 
   // Mode toggle: "form" shows the creation form, "supply" shows summary bar + supply table
   const [mode, setMode] = useState<"form" | "supply">("form");
@@ -201,23 +210,29 @@ export function ChartMergedForm({
   }
 
   const onSuccess = useCallback(
-    (_chartId: string) => {
+    (chartId: string) => {
       submittedRef.current = true;
-      clearDraft();
-      router.push("/charts");
+      if (isEdit) {
+        router.push(`/charts/${chartId}`);
+        toast.success("Changes saved");
+      } else {
+        clearDraft();
+        router.push("/charts");
+      }
     },
-    [router],
+    [router, isEdit],
   );
 
   const form = useChartForm({
-    mode: "create",
+    mode: formMode,
+    initialData: isEdit ? initialData : undefined,
     designers,
     genres,
     storageLocations,
     stitchingApps,
     onSuccess,
-    getSupplyRows: () => adapterRef.current?.getRows() ?? [],
-    onValidationError: () => setMode("form"),
+    getSupplyRows: isEdit ? undefined : () => adapterRef.current?.getRows() ?? [],
+    onValidationError: isEdit ? undefined : () => setMode("form"),
   });
 
   // Keep refs in sync with latest values for unmount auto-save (GAP 10).
@@ -230,13 +245,14 @@ export function ChartMergedForm({
   calcParamsRef.current = calcParams;
 
   // Auto-save draft on unmount (handles client-side navigation via Next.js Link)
+  // Only fires in create mode -- edit mode works on real server data, not local storage
   useEffect(() => {
     return () => {
-      if (!submittedRef.current && formValuesRef.current.name) {
+      if (formMode === "create" && !submittedRef.current && formValuesRef.current.name) {
         saveDraftV2(formValuesRef.current, supplyRowsRef.current, calcParamsRef.current);
       }
     };
-  }, []);  
+  }, [formMode]);
 
   // Derived values for SummaryBar
   const resolvedDesignerName = useMemo(() => {
@@ -252,9 +268,12 @@ export function ChartMergedForm({
   }, [form.values.stitchCount, form.values.stitchesWide, form.values.stitchesHigh]);
 
   // Draft hydration on mount -- uses V2 format (D-07)
+  // Only fires in create mode -- edit mode loads from initialData via useChartForm
   useEffect(() => {
     if (hydratedRef.current) return;
     hydratedRef.current = true;
+
+    if (formMode !== "create") return;
 
     const designerIds = designers.map((d) => d.id);
     const storageIds = storageLocations.map((s) => s.id);
@@ -381,24 +400,36 @@ export function ChartMergedForm({
   return (
     <>
       {/* === FORM MODE === */}
-      <Activity mode={mode === "form" ? "visible" : "hidden"}>
+      <Activity mode={isEdit || mode === "form" ? "visible" : "hidden"}>
         <div className="mx-auto max-w-[720px] px-5 pt-12 pb-20 lg:px-8">
-          <Link
-            href="/charts"
-            className="group text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1 text-sm transition-colors"
-          >
-            <ArrowLeft
-              className="size-4 transition-transform group-hover:-translate-x-0.5"
-              aria-hidden="true"
-            />
-            Charts
-          </Link>
+          {isEdit && initialData ? (
+            <Link
+              href={`/charts/${initialData.id}`}
+              className="text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1 text-sm transition-colors"
+            >
+              <ArrowLeft className="size-4" />
+              Back to project
+            </Link>
+          ) : (
+            <Link
+              href="/charts"
+              className="group text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1 text-sm transition-colors"
+            >
+              <ArrowLeft
+                className="size-4 transition-transform group-hover:-translate-x-0.5"
+                aria-hidden="true"
+              />
+              Charts
+            </Link>
+          )}
 
           <h1 className="font-heading text-foreground mb-1 text-2xl font-semibold">
-            Add New Chart
+            {isEdit ? `Edit ${initialData!.name}` : "Add New Chart"}
           </h1>
           <p className="text-muted-foreground mb-8 text-sm">
-            Create a chart and set up your project
+            {isEdit
+              ? "Update your chart and project details"
+              : "Create a chart and set up your project"}
           </p>
 
           <form
@@ -632,23 +663,27 @@ export function ChartMergedForm({
             {/* === SECTION DIVIDER === */}
             <hr className="border-border/50 my-6 border-t border-none" />
 
-            {/* === MILESTONE MARKER === */}
-            <div className="bg-primary/5 border-primary/15 flex items-center gap-3 rounded-lg border p-4 px-6">
-              <div className="bg-primary text-primary-foreground flex size-6 shrink-0 items-center justify-center rounded-full">
-                <Check className="size-3.5" />
+            {/* === MILESTONE MARKER / MANAGE SUPPLIES LINK === */}
+            {isEdit ? (
+              <ManageSuppliesLink chartId={initialData!.id} />
+            ) : (
+              <div className="bg-primary/5 border-primary/15 flex items-center gap-3 rounded-lg border p-4 px-6">
+                <div className="bg-primary text-primary-foreground flex size-6 shrink-0 items-center justify-center rounded-full">
+                  <Check className="size-3.5" />
+                </div>
+                <p className="flex-1 text-sm font-medium">
+                  Project details filled in. Ready for supplies?
+                </p>
+                <button
+                  type="button"
+                  disabled={!form.values.name || form.isPending}
+                  onClick={handleAddSuppliesClick}
+                  className="text-primary text-sm font-medium hover:underline disabled:cursor-default disabled:no-underline disabled:opacity-40"
+                >
+                  Add supplies &rarr;
+                </button>
               </div>
-              <p className="flex-1 text-sm font-medium">
-                Project details filled in. Ready for supplies?
-              </p>
-              <button
-                type="button"
-                disabled={!form.values.name || form.isPending}
-                onClick={handleAddSuppliesClick}
-                className="text-primary text-sm font-medium hover:underline disabled:cursor-default disabled:no-underline disabled:opacity-40"
-              >
-                Add supplies &rarr;
-              </button>
-            </div>
+            )}
 
             {/* === FORM-LEVEL ERROR === */}
             {form.errors._form && (
@@ -666,7 +701,7 @@ export function ChartMergedForm({
           FloatingRootContext init to OffscreenLane, leaving fabric dropdown broken
           on first click (GAP 5). CalcParams state lives in the parent, so remounting
           CalculatorCard on mode switch is safe. */}
-      {mode === "supply" && (
+      {!isEdit && mode === "supply" && (
         <>
           <SummaryBar
             name={form.values.name || "Untitled"}
@@ -705,11 +740,14 @@ export function ChartMergedForm({
       {/* === STICKY SAVE BAR === */}
       <StickySaveBar
         chartName={form.values.name}
-        onSaveDraft={handleSaveDraft}
         onSubmit={form.submitForm}
         isSubmitting={form.isPending}
-        isSavingDraft={isSavingDraft}
-        saveDraftLabel={saveDraftLabel}
+        mode={formMode}
+        {...(!isEdit && {
+          onSaveDraft: handleSaveDraft,
+          isSavingDraft: isSavingDraft,
+          saveDraftLabel: saveDraftLabel,
+        })}
       />
     </>
   );
