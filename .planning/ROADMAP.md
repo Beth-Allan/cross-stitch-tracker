@@ -58,7 +58,7 @@ Full details: `milestones/v1.2-ROADMAP.md`
 - [x] **Phase 11: Supply Table on Project Detail** - Wire unified table into project detail Supplies tab with server-action persistence (completed 2026-05-11)
 - [x] **Phase 12: Merged Form** - Single-page chart+project creation form with pattern type cards, required dot indicators, sticky save bar, and digital working copy upload (completed 2026-05-11)
 - [x] **Phase 13: Supply Takeover** - Form-to-supply transition with sticky summary bar, fabric assignment, skein calculator card, and two-phase save (completed 2026-05-16)
-- [ ] **Phase 14: Edit Mode & Cleanup** - Full-page edit route using merged form layout, removal of all deprecated components
+- [x] **Phase 14: Edit Mode & Cleanup** - Full-page edit route using merged form layout, removal of all deprecated components (completed 2026-05-16)
 
 ### 📋 v1.4 Motivation & Planning (Planned)
 
