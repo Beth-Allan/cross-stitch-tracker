@@ -65,12 +65,15 @@ export async function createChart(formData: unknown) {
 
       // Link fabric to the new project if provided
       if (project.fabricId && result.project) {
-        // Verify the fabric belongs to this user (unlinked or linked to their project)
+        // Verify the fabric exists and belongs to this user (unlinked or linked to their project)
         const targetFabric = await tx.fabric.findUnique({
           where: { id: project.fabricId },
           select: { linkedProject: { select: { userId: true } } },
         });
-        if (targetFabric?.linkedProject && targetFabric.linkedProject.userId !== user.id) {
+        if (
+          !targetFabric ||
+          (targetFabric.linkedProject && targetFabric.linkedProject.userId !== user.id)
+        ) {
           throw new Error("Fabric not found");
         }
         await tx.fabric.update({
@@ -170,11 +173,15 @@ export async function createChartWithSupplies(formData: unknown, supplyPayload: 
 
       // 2. Link fabric to the new project if provided
       if (project.fabricId && result.project) {
+        // Verify the fabric exists and belongs to this user (unlinked or linked to their project)
         const targetFabric = await tx.fabric.findUnique({
           where: { id: project.fabricId },
           select: { linkedProject: { select: { userId: true } } },
         });
-        if (targetFabric?.linkedProject && targetFabric.linkedProject.userId !== user.id) {
+        if (
+          !targetFabric ||
+          (targetFabric.linkedProject && targetFabric.linkedProject.userId !== user.id)
+        ) {
           throw new Error("Fabric not found");
         }
         await tx.fabric.update({
@@ -184,7 +191,10 @@ export async function createChartWithSupplies(formData: unknown, supplyPayload: 
       }
 
       // 3. Batch insert supply junction records (D-06, D-07)
-      const projectId = result.project!.id;
+      if (!result.project) {
+        throw new Error("Project creation failed");
+      }
+      const projectId = result.project.id;
 
       if (supplies.threads.length > 0) {
         await tx.projectThread.createMany({
@@ -329,12 +339,15 @@ export async function updateChart(chartId: string, formData: unknown) {
 
       // Link new fabric if provided and different from current
       if (project.fabricId && project.fabricId !== currentFabric?.id) {
-        // Verify the fabric belongs to this user (unlinked or linked to their project)
+        // Verify the fabric exists and belongs to this user (unlinked or linked to their project)
         const targetFabric = await tx.fabric.findUnique({
           where: { id: project.fabricId },
           select: { linkedProject: { select: { userId: true } } },
         });
-        if (targetFabric?.linkedProject && targetFabric.linkedProject.userId !== user.id) {
+        if (
+          !targetFabric ||
+          (targetFabric.linkedProject && targetFabric.linkedProject.userId !== user.id)
+        ) {
           throw new Error("Fabric not found");
         }
         await tx.fabric.update({
