@@ -109,7 +109,7 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
     if (!row) {
       return { success: false, error: "Supply not found" };
     }
-    (row as Record<string, unknown>)[field] = value;
+    (row as unknown as Record<string, unknown>)[field] = value;
     this.onRowsChange(this.getRows());
     return { success: true };
   }
