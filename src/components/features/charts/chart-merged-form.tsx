@@ -148,6 +148,10 @@ export function ChartMergedForm({
   const lastFocusedRef = useRef<HTMLElement | null>(null);
   const adapterRef = useRef<CreationFlowAdapter | null>(null);
 
+  // Draft auto-save on unmount: track submission state and current values via refs
+  // to avoid stale closures in the cleanup function (GAP 10)
+  const submittedRef = useRef(false);
+
   // Draft state for save button feedback
   const [saveDraftLabel, setSaveDraftLabel] = useState("Save Draft");
   const [isSavingDraft, setIsSavingDraft] = useState(false);
@@ -201,6 +205,7 @@ export function ChartMergedForm({
 
   const onSuccess = useCallback(
     (_chartId: string) => {
+      submittedRef.current = true;
       clearDraft();
       router.push("/charts");
     },
@@ -217,6 +222,24 @@ export function ChartMergedForm({
     getSupplyRows: () => adapterRef.current?.getRows() ?? [],
     onValidationError: () => setMode("form"),
   });
+
+  // Keep refs in sync with latest values for unmount auto-save (GAP 10).
+  // Using refs avoids stale closures in the cleanup function.
+  const formValuesRef = useRef(form.values);
+  const supplyRowsRef = useRef(supplyRows);
+  const calcParamsRef = useRef(calcParams);
+  formValuesRef.current = form.values;
+  supplyRowsRef.current = supplyRows;
+  calcParamsRef.current = calcParams;
+
+  // Auto-save draft on unmount (handles client-side navigation via Next.js Link)
+  useEffect(() => {
+    return () => {
+      if (!submittedRef.current && formValuesRef.current.name) {
+        saveDraftV2(formValuesRef.current, supplyRowsRef.current, calcParamsRef.current);
+      }
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- intentionally empty: only fires on unmount
 
   // Derived values for SummaryBar
   const resolvedDesignerName = useMemo(() => {
@@ -641,39 +664,46 @@ export function ChartMergedForm({
       </Activity>
 
       {/* === SUPPLY MODE === */}
-      <Activity mode={mode === "supply" ? "visible" : "hidden"}>
-        <SummaryBar
-          name={form.values.name || "Untitled"}
-          designerName={resolvedDesignerName}
-          statusLabel={STATUS_CONFIG[form.values.status]?.label ?? "Unstarted"}
-          stitchCount={effectiveStitchCount}
-          onDetailsClick={handleDetailsClick}
-        />
-        <div className="mx-auto max-w-[720px] px-5 pb-20">
-          <div className="mt-4">
-            <CalculatorCard
-              calcParams={calcParams}
-              onCalcParamsChange={setCalcParams}
-              fabricId={form.values.fabricId}
-              onFabricChange={(id, count) => {
-                form.setField("fabricId", id);
-                if (count) setCalcParams((prev) => ({ ...prev, fabricCount: count }));
-              }}
-              fabricOptions={fabricOptions}
-            />
+      {/* Conditional rendering (not Activity) so CalculatorCard's Base UI Popover
+          initializes fresh when supply mode activates. Activity mode="hidden" defers
+          FloatingRootContext init to OffscreenLane, leaving fabric dropdown broken
+          on first click (GAP 5). CalcParams state lives in the parent, so remounting
+          CalculatorCard on mode switch is safe. */}
+      {mode === "supply" && (
+        <>
+          <SummaryBar
+            name={form.values.name || "Untitled"}
+            designerName={resolvedDesignerName}
+            statusLabel={STATUS_CONFIG[form.values.status]?.label ?? "Unstarted"}
+            stitchCount={effectiveStitchCount}
+            onDetailsClick={handleDetailsClick}
+          />
+          <div className="mx-auto max-w-[720px] px-5 pb-20">
+            <div className="mt-4">
+              <CalculatorCard
+                calcParams={calcParams}
+                onCalcParamsChange={setCalcParams}
+                fabricId={form.values.fabricId}
+                onFabricChange={(id, count) => {
+                  form.setField("fabricId", id);
+                  if (count) setCalcParams((prev) => ({ ...prev, fabricCount: count }));
+                }}
+                fabricOptions={fabricOptions}
+              />
+            </div>
+            <div className="mt-4">
+              <SupplyTable
+                threads={supplyRows.filter((r) => r.type === "THREAD")}
+                beads={supplyRows.filter((r) => r.type === "BEAD")}
+                specialty={supplyRows.filter((r) => r.type === "SPECIALTY")}
+                adapter={adapterRef.current!}
+                calcParams={calcParams}
+                existingSupplyIds={new Set(supplyRows.map((r) => r.supplyId))}
+              />
+            </div>
           </div>
-          <div className="mt-4">
-            <SupplyTable
-              threads={supplyRows.filter((r) => r.type === "THREAD")}
-              beads={supplyRows.filter((r) => r.type === "BEAD")}
-              specialty={supplyRows.filter((r) => r.type === "SPECIALTY")}
-              adapter={adapterRef.current!}
-              calcParams={calcParams}
-              existingSupplyIds={new Set(supplyRows.map((r) => r.supplyId))}
-            />
-          </div>
-        </div>
-      </Activity>
+        </>
+      )}
 
       {/* === STICKY SAVE BAR === */}
       <StickySaveBar
