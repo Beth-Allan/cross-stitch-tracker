@@ -109,7 +109,8 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
     if (!row) {
       return { success: false, error: "Supply not found" };
     }
-    (row as unknown as Record<string, unknown>)[field] = value;
+    const updated: SupplyRow = { ...row, [field]: value };
+    this.rows.set(junctionId, updated);
     this.onRowsChange(this.getRows());
     return { success: true };
   }
