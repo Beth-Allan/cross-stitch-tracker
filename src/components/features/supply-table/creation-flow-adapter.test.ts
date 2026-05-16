@@ -356,6 +356,93 @@ describe("CreationFlowAdapter", () => {
     });
   });
 
+  // ─── Skein recalculation on stitchCount edit ──────────────────────────
+
+  describe("updateQuantity recalculation", () => {
+    it("recalculates need via calculateSkeins when stitchCount changes on a non-overridden thread row", async () => {
+      const threadResult = makeSearchResult({ id: "t1", type: "THREAD" });
+      searchFn.mockResolvedValueOnce([threadResult]);
+      await adapter.searchSupplies("THREAD", "310");
+      const addResult = await adapter.addThread("t1", 500, 2);
+      const rowId = (addResult as { success: true; id: string }).id;
+
+      // Set calc params so recalculation can happen
+      adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
+      onRowsChange.mockClear();
+
+      await adapter.updateQuantity("THREAD", rowId, "stitchCount", 1000);
+
+      const rows = adapter.getRows();
+      const updated = rows.find((r) => r.id === rowId);
+      expect(updated?.stitchCount).toBe(1000);
+      // calculateSkeins({ stitchCount: 1000, strandCount: 2, fabricCount: 14, overCount: 1, wastePercent: 20 })
+      // = ceil(1000 * 2 * 1.2 / (14 * 255)) = ceil(2400 / 3570) = ceil(0.672) = 1
+      expect(updated?.need).toBe(1);
+    });
+
+    it("does NOT recalculate need when stitchCount changes on an overridden thread row", async () => {
+      const threadResult = makeSearchResult({ id: "t1", type: "THREAD" });
+      searchFn.mockResolvedValueOnce([threadResult]);
+      await adapter.searchSupplies("THREAD", "310");
+      const addResult = await adapter.addThread("t1", 500, 2);
+      const rowId = (addResult as { success: true; id: string }).id;
+
+      // Manually override the need
+      await adapter.updateQuantity("THREAD", rowId, "need", 10);
+      // Rows now have isNeedOverridden... wait, addThread sets isNeedOverridden: false
+      // We need to set it to overridden. The "need" field update should set isNeedOverridden.
+      // Actually, CreationFlowAdapter currently does raw spread, so isNeedOverridden stays false.
+      // We need to load a row with isNeedOverridden: true.
+      adapter.loadRows([{
+        id: rowId,
+        supplyId: "t1",
+        type: "THREAD",
+        code: "310",
+        name: "Black",
+        brandName: "DMC",
+        hexColor: "#000000",
+        stitchCount: 500,
+        need: 10,
+        have: 0,
+        isNeedOverridden: true,
+      }]);
+
+      adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
+      onRowsChange.mockClear();
+
+      await adapter.updateQuantity("THREAD", rowId, "stitchCount", 1000);
+
+      const rows = adapter.getRows();
+      const updated = rows.find((r) => r.id === rowId);
+      expect(updated?.stitchCount).toBe(1000);
+      // Need should remain 10 since isNeedOverridden is true
+      expect(updated?.need).toBe(10);
+    });
+
+    it("does NOT recalculate need when field is 'need' or 'have' (unchanged behavior)", async () => {
+      const threadResult = makeSearchResult({ id: "t1", type: "THREAD" });
+      searchFn.mockResolvedValueOnce([threadResult]);
+      await adapter.searchSupplies("THREAD", "310");
+      const addResult = await adapter.addThread("t1", 500, 2);
+      const rowId = (addResult as { success: true; id: string }).id;
+
+      adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
+      onRowsChange.mockClear();
+
+      // Update "need" field - should just set the value directly
+      await adapter.updateQuantity("THREAD", rowId, "need", 99);
+      const rows1 = adapter.getRows();
+      expect(rows1.find((r) => r.id === rowId)?.need).toBe(99);
+
+      // Update "have" field - should just set the value directly
+      await adapter.updateQuantity("THREAD", rowId, "have", 5);
+      const rows2 = adapter.getRows();
+      expect(rows2.find((r) => r.id === rowId)?.have).toBe(5);
+      // need should still be 99
+      expect(rows2.find((r) => r.id === rowId)?.need).toBe(99);
+    });
+  });
+
   // ─── Supply cache fallback ─────────────────────────────────────────────
 
   describe("supply cache fallback", () => {

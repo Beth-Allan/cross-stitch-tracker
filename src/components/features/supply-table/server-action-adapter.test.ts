@@ -247,6 +247,65 @@ describe("ServerActionAdapter", () => {
     });
   });
 
+  describe("updateQuantity recalculation", () => {
+    it("sends both stitchCount AND recalculated quantityRequired when updating stitchCount on a non-overridden thread row", async () => {
+      mockUpdateQuantity.mockResolvedValue({ success: true });
+
+      // Set up rows so the adapter knows about isNeedOverridden
+      adapter.setRows([{
+        id: "jt-1",
+        supplyId: "supply-1",
+        type: "THREAD",
+        code: "310",
+        name: "Black",
+        brandName: "DMC",
+        hexColor: "#000000",
+        stitchCount: 500,
+        need: 2,
+        have: 0,
+        isNeedOverridden: false,
+      }]);
+
+      adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
+
+      await adapter.updateQuantity("THREAD", "jt-1", "stitchCount", 1000);
+
+      // calculateSkeins({ stitchCount: 1000, strandCount: 2, fabricCount: 14, overCount: 1, wastePercent: 20 })
+      // = ceil(1000 * 2 * 1.2 / (14 * 255)) = ceil(2400 / 3570) = ceil(0.672) = 1
+      expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
+        stitchCount: 1000,
+        quantityRequired: 1,
+      });
+    });
+
+    it("does NOT recalculate when updating stitchCount on an overridden thread row", async () => {
+      mockUpdateQuantity.mockResolvedValue({ success: true });
+
+      adapter.setRows([{
+        id: "jt-1",
+        supplyId: "supply-1",
+        type: "THREAD",
+        code: "310",
+        name: "Black",
+        brandName: "DMC",
+        hexColor: "#000000",
+        stitchCount: 500,
+        need: 10,
+        have: 0,
+        isNeedOverridden: true,
+      }]);
+
+      adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
+
+      await adapter.updateQuantity("THREAD", "jt-1", "stitchCount", 1000);
+
+      // Should send just stitchCount, no quantityRequired
+      expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
+        stitchCount: 1000,
+      });
+    });
+  });
+
   describe("remove", () => {
     it("calls removeProjectThread for THREAD type", async () => {
       mockRemoveThread.mockResolvedValue({ success: true });
