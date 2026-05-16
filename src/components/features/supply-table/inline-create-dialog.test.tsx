@@ -4,19 +4,11 @@ import { InlineCreateDialog } from "./inline-create-dialog";
 
 // Mock the Dialog components to render inline for testing
 vi.mock("@/components/ui/dialog", () => ({
-  Dialog: ({
-    children,
-    open,
-  }: {
-    children: React.ReactNode;
-    open: boolean;
-  }) => (open ? <div data-testid="dialog">{children}</div> : null),
-  DialogContent: ({
-    children,
-  }: {
-    children: React.ReactNode;
-    showCloseButton?: boolean;
-  }) => <div data-testid="dialog-content">{children}</div>,
+  Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
+    open ? <div data-testid="dialog">{children}</div> : null,
+  DialogContent: ({ children }: { children: React.ReactNode; showCloseButton?: boolean }) => (
+    <div data-testid="dialog-content">{children}</div>
+  ),
   DialogHeader: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="dialog-header">{children}</div>
   ),
@@ -65,9 +57,7 @@ describe("InlineCreateDialog", () => {
 
   it("has 'Create & Add' submit button", () => {
     render(<InlineCreateDialog {...defaultProps} />);
-    expect(
-      screen.getByRole("button", { name: "Create & Add" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Create & Add" })).toBeInTheDocument();
   });
 
   it("has Cancel button that calls onClose", () => {
@@ -133,9 +123,7 @@ describe("InlineCreateDialog", () => {
   });
 
   it("resets form fields when dialog opens", () => {
-    const { rerender } = render(
-      <InlineCreateDialog {...defaultProps} open={false} />,
-    );
+    const { rerender } = render(<InlineCreateDialog {...defaultProps} open={false} />);
 
     // Open the dialog
     rerender(<InlineCreateDialog {...defaultProps} open={true} />);

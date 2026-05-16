@@ -30,7 +30,7 @@ export function SummaryBar({
     <div
       role="banner"
       aria-label="Project summary"
-      className="sticky top-14 z-[90] border-b border-border bg-card"
+      className="border-border bg-card sticky top-14 z-[90] border-b"
     >
       <div className="mx-auto flex max-w-[720px] items-center gap-3 px-4 py-3">
         <button

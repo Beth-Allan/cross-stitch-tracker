@@ -288,7 +288,12 @@ describe("use-draft-persistence", () => {
           isNeedOverridden: false,
         },
       ];
-      const calcParams = { fabricCount: 16, strandCount: 2, overCount: 1 as const, wastePercent: 20 };
+      const calcParams = {
+        fabricCount: 16,
+        strandCount: 2,
+        overCount: 1 as const,
+        wastePercent: 20,
+      };
 
       saveDraftV2(form, supplies, calcParams);
 
@@ -333,12 +338,7 @@ describe("use-draft-persistence", () => {
       const draft = { version: 2, form, supplies, calcParams };
       localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
 
-      const result = loadDraftV2(
-        createDefaultValues(),
-        ["designer-1"],
-        ["storage-1"],
-        ["app-1"],
-      );
+      const result = loadDraftV2(createDefaultValues(), ["designer-1"], ["storage-1"], ["app-1"]);
 
       expect(result).not.toBeNull();
       expect(result!.form.name).toBe("My Test Chart");
@@ -352,12 +352,7 @@ describe("use-draft-persistence", () => {
       const v1Draft = createDraftValues();
       localStorage.setItem(DRAFT_KEY, JSON.stringify(v1Draft));
 
-      const result = loadDraftV2(
-        createDefaultValues(),
-        ["designer-1"],
-        ["storage-1"],
-        ["app-1"],
-      );
+      const result = loadDraftV2(createDefaultValues(), ["designer-1"], ["storage-1"], ["app-1"]);
 
       expect(result).not.toBeNull();
       expect(result!.form.name).toBe("My Test Chart");
@@ -373,7 +368,12 @@ describe("use-draft-persistence", () => {
     it("nulls stale fabricId not in validFabricIds list", async () => {
       const { loadDraftV2 } = await import("./use-draft-persistence");
       const form = createDraftValues({ fabricId: "deleted-fabric" });
-      const draft = { version: 2, form, supplies: [], calcParams: { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 } };
+      const draft = {
+        version: 2,
+        form,
+        supplies: [],
+        calcParams: { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 },
+      };
       localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
 
       const result = loadDraftV2(
@@ -401,7 +401,12 @@ describe("use-draft-persistence", () => {
   describe("clearDraft with v2", () => {
     it("removes storage item regardless of format", async () => {
       const { clearDraft } = await import("./use-draft-persistence");
-      const draft = { version: 2, form: createDraftValues(), supplies: [], calcParams: { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 } };
+      const draft = {
+        version: 2,
+        form: createDraftValues(),
+        supplies: [],
+        calcParams: { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 },
+      };
       localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
 
       clearDraft();

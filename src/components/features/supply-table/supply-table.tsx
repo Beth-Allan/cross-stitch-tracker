@@ -50,16 +50,26 @@ export function SupplyTable({
 
   // Keep adapter's calcParams in sync
   useEffect(() => {
-    if ("setCalcParams" in adapter && typeof (adapter as Record<string, unknown>).setCalcParams === "function") {
-      (adapter as Record<string, unknown> & { setCalcParams: (p: typeof mergedCalcParams) => void }).setCalcParams(mergedCalcParams);
+    if (
+      "setCalcParams" in adapter &&
+      typeof (adapter as Record<string, unknown>).setCalcParams === "function"
+    ) {
+      (
+        adapter as Record<string, unknown> & { setCalcParams: (p: typeof mergedCalcParams) => void }
+      ).setCalcParams(mergedCalcParams);
     }
   }, [adapter, mergedCalcParams]);
 
   // Keep adapter's rows in sync (for ServerActionAdapter's isNeedOverridden lookup)
   const allRows = useMemo(() => [...threads, ...beads, ...specialty], [threads, beads, specialty]);
   useEffect(() => {
-    if ("setRows" in adapter && typeof (adapter as Record<string, unknown>).setRows === "function") {
-      (adapter as Record<string, unknown> & { setRows: (r: typeof allRows) => void }).setRows(allRows);
+    if (
+      "setRows" in adapter &&
+      typeof (adapter as Record<string, unknown>).setRows === "function"
+    ) {
+      (adapter as Record<string, unknown> & { setRows: (r: typeof allRows) => void }).setRows(
+        allRows,
+      );
     }
   }, [adapter, allRows]);
 

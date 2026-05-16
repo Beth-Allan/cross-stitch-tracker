@@ -23,18 +23,16 @@ export function StickySaveBar({
 }: StickySaveBarProps) {
   const isEdit = mode === "edit";
   const canSave = !!chartName.trim();
-  const hint = canSave
-    ? "Ready to save at any point"
-    : "Enter a chart name to enable saving";
+  const hint = canSave ? "Ready to save at any point" : "Enter a chart name to enable saving";
 
   return (
     <div
       role="toolbar"
       aria-label="Form actions"
-      className="fixed bottom-0 left-0 right-0 z-100 border-t border-border bg-card"
+      className="border-border bg-card fixed right-0 bottom-0 left-0 z-100 border-t"
     >
-      <div className="max-w-[720px] mx-auto flex items-center py-3 px-4">
-        <p className="mr-auto text-xs text-muted-foreground">{hint}</p>
+      <div className="mx-auto flex max-w-[720px] items-center px-4 py-3">
+        <p className="text-muted-foreground mr-auto text-xs">{hint}</p>
         <div className="flex items-center gap-3">
           {!isEdit && onSaveDraft && (
             <Button
@@ -46,11 +44,7 @@ export function StickySaveBar({
               {saveDraftLabel}
             </Button>
           )}
-          <Button
-            type="button"
-            disabled={!canSave || isSubmitting}
-            onClick={onSubmit}
-          >
+          <Button type="button" disabled={!canSave || isSubmitting} onClick={onSubmit}>
             {isEdit
               ? isSubmitting
                 ? "Saving..."

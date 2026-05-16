@@ -105,9 +105,7 @@ function makeBead(overrides?: Partial<ProjectBeadWithBead>): ProjectBeadWithBead
   };
 }
 
-function makeSpecialty(
-  overrides?: Partial<ProjectSpecialtyWithItem>,
-): ProjectSpecialtyWithItem {
+function makeSpecialty(overrides?: Partial<ProjectSpecialtyWithItem>): ProjectSpecialtyWithItem {
   return {
     ...createMockProjectSpecialty({
       id: overrides?.id ?? "ps-1",
@@ -287,11 +285,27 @@ describe("SuppliesTab", () => {
       const threads = [
         makeThread({
           id: "pt-z",
-          thread: { ...createMockThread({ id: "t-z", colorCode: "Zzz", colorName: "Z Thread", hexColor: "#000" }), brand: mockBrand },
+          thread: {
+            ...createMockThread({
+              id: "t-z",
+              colorCode: "Zzz",
+              colorName: "Z Thread",
+              hexColor: "#000",
+            }),
+            brand: mockBrand,
+          },
         }),
         makeThread({
           id: "pt-a",
-          thread: { ...createMockThread({ id: "t-a", colorCode: "111", colorName: "A Thread", hexColor: "#FFF" }), brand: mockBrand },
+          thread: {
+            ...createMockThread({
+              id: "t-a",
+              colorCode: "111",
+              colorName: "A Thread",
+              hexColor: "#FFF",
+            }),
+            brand: mockBrand,
+          },
         }),
       ];
       render(
@@ -321,11 +335,27 @@ describe("SuppliesTab", () => {
       const threads = [
         makeThread({
           id: "pt-z",
-          thread: { ...createMockThread({ id: "t-z", colorCode: "Zzz", colorName: "Z Thread", hexColor: "#000" }), brand: mockBrand },
+          thread: {
+            ...createMockThread({
+              id: "t-z",
+              colorCode: "Zzz",
+              colorName: "Z Thread",
+              hexColor: "#000",
+            }),
+            brand: mockBrand,
+          },
         }),
         makeThread({
           id: "pt-a",
-          thread: { ...createMockThread({ id: "t-a", colorCode: "111", colorName: "A Thread", hexColor: "#FFF" }), brand: mockBrand },
+          thread: {
+            ...createMockThread({
+              id: "t-a",
+              colorCode: "111",
+              colorName: "A Thread",
+              hexColor: "#FFF",
+            }),
+            brand: mockBrand,
+          },
         }),
       ];
       render(

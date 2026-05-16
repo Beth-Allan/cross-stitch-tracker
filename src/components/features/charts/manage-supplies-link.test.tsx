@@ -5,19 +5,14 @@ import { ManageSuppliesLink } from "./manage-supplies-link";
 describe("ManageSuppliesLink", () => {
   it('renders "Supplies are managed on the project page" text', () => {
     render(<ManageSuppliesLink chartId="test-chart-id" />);
-    expect(
-      screen.getByText("Supplies are managed on the project page"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Supplies are managed on the project page")).toBeInTheDocument();
   });
 
   it("renders 'Go to Supplies' link pointing to /charts/{chartId}?tab=supplies", () => {
     render(<ManageSuppliesLink chartId="test-chart-id" />);
     const link = screen.getByRole("link", { name: /go to supplies/i });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute(
-      "href",
-      "/charts/test-chart-id?tab=supplies",
-    );
+    expect(link).toHaveAttribute("href", "/charts/test-chart-id?tab=supplies");
   });
 
   it('renders ArrowRight icon with aria-hidden="true"', () => {

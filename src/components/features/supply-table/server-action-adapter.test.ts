@@ -252,19 +252,21 @@ describe("ServerActionAdapter", () => {
       mockUpdateQuantity.mockResolvedValue({ success: true });
 
       // Set up rows so the adapter knows about isNeedOverridden
-      adapter.setRows([{
-        id: "jt-1",
-        supplyId: "supply-1",
-        type: "THREAD",
-        code: "310",
-        name: "Black",
-        brandName: "DMC",
-        hexColor: "#000000",
-        stitchCount: 500,
-        need: 2,
-        have: 0,
-        isNeedOverridden: false,
-      }]);
+      adapter.setRows([
+        {
+          id: "jt-1",
+          supplyId: "supply-1",
+          type: "THREAD",
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 500,
+          need: 2,
+          have: 0,
+          isNeedOverridden: false,
+        },
+      ]);
 
       adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
 
@@ -281,19 +283,21 @@ describe("ServerActionAdapter", () => {
     it("does NOT recalculate when updating stitchCount on an overridden thread row", async () => {
       mockUpdateQuantity.mockResolvedValue({ success: true });
 
-      adapter.setRows([{
-        id: "jt-1",
-        supplyId: "supply-1",
-        type: "THREAD",
-        code: "310",
-        name: "Black",
-        brandName: "DMC",
-        hexColor: "#000000",
-        stitchCount: 500,
-        need: 10,
-        have: 0,
-        isNeedOverridden: true,
-      }]);
+      adapter.setRows([
+        {
+          id: "jt-1",
+          supplyId: "supply-1",
+          type: "THREAD",
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 500,
+          need: 10,
+          have: 0,
+          isNeedOverridden: true,
+        },
+      ]);
 
       adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
 

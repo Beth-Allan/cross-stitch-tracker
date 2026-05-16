@@ -106,10 +106,12 @@ describe("createChartWithSupplies", () => {
       designer: null,
       genres: [],
     };
-    mockPrisma.$transaction.mockImplementationOnce(async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
-      mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
-      return fn(mockPrisma);
-    });
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+        mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
+        return fn(mockPrisma);
+      },
+    );
 
     const { createChartWithSupplies } = await import("./chart-actions");
     const result = await createChartWithSupplies(validChartInput, {
@@ -131,17 +133,17 @@ describe("createChartWithSupplies", () => {
       designer: null,
       genres: [],
     };
-    mockPrisma.$transaction.mockImplementationOnce(async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
-      mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
-      mockPrisma.projectThread.createMany.mockResolvedValueOnce({ count: 1 });
-      return fn(mockPrisma);
-    });
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+        mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
+        mockPrisma.projectThread.createMany.mockResolvedValueOnce({ count: 1 });
+        return fn(mockPrisma);
+      },
+    );
 
     const { createChartWithSupplies } = await import("./chart-actions");
     const result = await createChartWithSupplies(validChartInput, {
-      threads: [
-        { supplyId: "thread-1", stitchCount: 500, need: 2, isNeedOverridden: false },
-      ],
+      threads: [{ supplyId: "thread-1", stitchCount: 500, need: 2, isNeedOverridden: false }],
       beads: [],
       specialty: [],
     });
@@ -169,13 +171,15 @@ describe("createChartWithSupplies", () => {
       designer: null,
       genres: [],
     };
-    mockPrisma.$transaction.mockImplementationOnce(async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
-      mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
-      mockPrisma.projectThread.createMany.mockResolvedValueOnce({ count: 1 });
-      mockPrisma.projectBead.createMany.mockResolvedValueOnce({ count: 1 });
-      mockPrisma.projectSpecialty.createMany.mockResolvedValueOnce({ count: 1 });
-      return fn(mockPrisma);
-    });
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+        mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
+        mockPrisma.projectThread.createMany.mockResolvedValueOnce({ count: 1 });
+        mockPrisma.projectBead.createMany.mockResolvedValueOnce({ count: 1 });
+        mockPrisma.projectSpecialty.createMany.mockResolvedValueOnce({ count: 1 });
+        return fn(mockPrisma);
+      },
+    );
 
     const { createChartWithSupplies } = await import("./chart-actions");
     const result = await createChartWithSupplies(validChartInput, {
@@ -197,10 +201,12 @@ describe("createChartWithSupplies", () => {
       designer: null,
       genres: [],
     };
-    mockPrisma.$transaction.mockImplementationOnce(async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
-      mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
-      return fn(mockPrisma);
-    });
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+        mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
+        return fn(mockPrisma);
+      },
+    );
 
     const { createChartWithSupplies } = await import("./chart-actions");
     const result = await createChartWithSupplies(validChartInput, {});
@@ -214,10 +220,7 @@ describe("createChartWithSupplies", () => {
   it("returns error on ZodError (invalid form data)", async () => {
     const { createChartWithSupplies } = await import("./chart-actions");
     // Pass invalid chart data (missing name)
-    const result = await createChartWithSupplies(
-      { chart: { name: "" }, project: {} },
-      {},
-    );
+    const result = await createChartWithSupplies({ chart: { name: "" }, project: {} }, {});
 
     expect(result.success).toBe(false);
     if (!result.success) {

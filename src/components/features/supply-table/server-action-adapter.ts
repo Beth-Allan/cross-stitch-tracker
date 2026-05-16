@@ -120,12 +120,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
         mappedData = { stitchCount: value };
         // Recalculate need if this is a non-overridden thread row with calcParams available
         const row = this.rows.find((r) => r.id === junctionId);
-        if (
-          row &&
-          row.type === "THREAD" &&
-          !row.isNeedOverridden &&
-          this.calcParams
-        ) {
+        if (row && row.type === "THREAD" && !row.isNeedOverridden && this.calcParams) {
           const recalculated = calculateSkeins({
             stitchCount: value,
             strandCount: this.calcParams.strandCount,

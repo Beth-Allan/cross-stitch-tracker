@@ -70,9 +70,7 @@ describe("SummaryBar", () => {
     const onDetailsClick = vi.fn();
     render(<SummaryBar {...defaultProps} onDetailsClick={onDetailsClick} />);
 
-    await user.click(
-      screen.getByRole("button", { name: /return to form details/i }),
-    );
+    await user.click(screen.getByRole("button", { name: /return to form details/i }));
     expect(onDetailsClick).toHaveBeenCalledOnce();
   });
 

@@ -1,18 +1,11 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { renderHook, act } from "@/__tests__/test-utils";
 import { useSupplyTable } from "./use-supply-table";
-import type {
-  SupplyTableAdapter,
-  SupplySearchResult,
-  CalcParams,
-  CreateSupplyData,
-} from "./types";
+import type { SupplyTableAdapter, SupplySearchResult, CalcParams, CreateSupplyData } from "./types";
 import { DEFAULT_CALC_PARAMS } from "./types";
 import { calculateSkeins } from "@/lib/utils/skein-calculator";
 
-function makeSearchResult(
-  overrides: Partial<SupplySearchResult> = {},
-): SupplySearchResult {
+function makeSearchResult(overrides: Partial<SupplySearchResult> = {}): SupplySearchResult {
   return {
     id: "sr-1",
     type: "THREAD",

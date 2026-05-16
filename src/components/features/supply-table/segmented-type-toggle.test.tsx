@@ -35,9 +35,7 @@ describe("SegmentedTypeToggle", () => {
 
     const threadRadio = radios.find((r) => r.textContent?.includes("Thread"))!;
     const beadRadio = radios.find((r) => r.textContent?.includes("Beads"))!;
-    const specialtyRadio = radios.find(
-      (r) => r.textContent?.includes("Specialty"),
-    )!;
+    const specialtyRadio = radios.find((r) => r.textContent?.includes("Specialty"))!;
 
     expect(threadRadio).toHaveAttribute("aria-checked", "false");
     expect(beadRadio).toHaveAttribute("aria-checked", "true");

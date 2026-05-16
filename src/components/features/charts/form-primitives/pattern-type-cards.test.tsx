@@ -86,7 +86,9 @@ describe("PatternTypeCards", () => {
   });
 
   it("Kit and SAL can co-exist with either Paper or Digital", () => {
-    render(<PatternTypeCards {...defaultProps} isPaperChart={true} isFormalKit={true} isSAL={true} />);
+    render(
+      <PatternTypeCards {...defaultProps} isPaperChart={true} isFormalKit={true} isSAL={true} />,
+    );
 
     const paperRadio = screen.getByRole("radio", { name: /paper/i });
     const kitCheckbox = screen.getByRole("checkbox", { name: /kit/i });

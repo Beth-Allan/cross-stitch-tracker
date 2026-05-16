@@ -7,11 +7,7 @@ import { DEFAULT_CALC_PARAMS } from "./types";
 
 // Mock child components to isolate SupplyTable's structure and logic
 vi.mock("./supply-table-add-row", () => ({
-  SupplyTableAddRow: ({
-    onRowAdded,
-  }: {
-    onRowAdded: () => void;
-  }) => (
+  SupplyTableAddRow: ({ onRowAdded }: { onRowAdded: () => void }) => (
     <tr data-testid="supply-table-add-row">
       <td colSpan={7}>
         <button data-testid="trigger-row-added" onClick={onRowAdded}>
@@ -44,10 +40,7 @@ vi.mock("./supply-table-data-row", () => ({
         >
           Update
         </button>
-        <button
-          data-testid={`delete-${row.id}`}
-          onClick={() => onDelete(row.type, row.id)}
-        >
+        <button data-testid={`delete-${row.id}`} onClick={() => onDelete(row.type, row.id)}>
           Delete
         </button>
       </td>
@@ -56,13 +49,7 @@ vi.mock("./supply-table-data-row", () => ({
 }));
 
 vi.mock("./supply-table-section-divider", () => ({
-  SupplyTableSectionDivider: ({
-    label,
-    count,
-  }: {
-    label: string;
-    count: number;
-  }) =>
+  SupplyTableSectionDivider: ({ label, count }: { label: string; count: number }) =>
     count > 0 ? (
       <tr data-testid={`section-divider-${label.toLowerCase()}`}>
         <td colSpan={7}>
@@ -94,13 +81,7 @@ vi.mock("./supply-table-footer", () => ({
 }));
 
 vi.mock("@/components/ui/empty-state", () => ({
-  EmptyState: ({
-    title,
-    description,
-  }: {
-    title: string;
-    description: string;
-  }) => (
+  EmptyState: ({ title, description }: { title: string; description: string }) => (
     <div data-testid="empty-state">
       <p>{title}</p>
       <p>{description}</p>
@@ -195,17 +176,13 @@ describe("SupplyTable", () => {
   });
 
   it("renders table with thead containing 7 column headers", () => {
-    render(
-      <SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} />,
-    );
+    render(<SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} />);
     const headers = screen.getAllByRole("columnheader");
     expect(headers).toHaveLength(7);
   });
 
   it("column headers include Colour, Stitches, Need, Have, Status", () => {
-    render(
-      <SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} />,
-    );
+    render(<SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} />);
     expect(screen.getByText("Colour")).toBeInTheDocument();
     expect(screen.getByText("Stitches")).toBeInTheDocument();
     expect(screen.getByText("Need")).toBeInTheDocument();
@@ -214,14 +191,7 @@ describe("SupplyTable", () => {
   });
 
   it("renders add row as first tbody element", () => {
-    render(
-      <SupplyTable
-        threads={[makeThread()]}
-        beads={[]}
-        specialty={[]}
-        adapter={adapter}
-      />,
-    );
+    render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
     const addRow = screen.getByTestId("supply-table-add-row");
     expect(addRow).toBeInTheDocument();
     // Add row should appear before data rows
@@ -233,9 +203,7 @@ describe("SupplyTable", () => {
 
   it("renders Thread section divider with correct count when threads provided", () => {
     const threads = [makeThread(), makeThread({ id: "t2", code: "321" })];
-    render(
-      <SupplyTable threads={threads} beads={[]} specialty={[]} adapter={adapter} />,
-    );
+    render(<SupplyTable threads={threads} beads={[]} specialty={[]} adapter={adapter} />);
     const divider = screen.getByTestId("section-divider-thread");
     expect(divider).toBeInTheDocument();
     expect(divider).toHaveTextContent("Thread (2)");
@@ -243,9 +211,7 @@ describe("SupplyTable", () => {
 
   it("renders Bead section divider with correct count when beads provided", () => {
     const beads = [makeBead()];
-    render(
-      <SupplyTable threads={[]} beads={beads} specialty={[]} adapter={adapter} />,
-    );
+    render(<SupplyTable threads={[]} beads={beads} specialty={[]} adapter={adapter} />);
     const divider = screen.getByTestId("section-divider-beads");
     expect(divider).toBeInTheDocument();
     expect(divider).toHaveTextContent("Beads (1)");
@@ -253,18 +219,14 @@ describe("SupplyTable", () => {
 
   it("renders Specialty section divider with correct count when specialty provided", () => {
     const specialty = [makeSpecialty()];
-    render(
-      <SupplyTable threads={[]} beads={[]} specialty={specialty} adapter={adapter} />,
-    );
+    render(<SupplyTable threads={[]} beads={[]} specialty={specialty} adapter={adapter} />);
     const divider = screen.getByTestId("section-divider-specialty");
     expect(divider).toBeInTheDocument();
     expect(divider).toHaveTextContent("Specialty (1)");
   });
 
   it("hides section divider when section has 0 items", () => {
-    render(
-      <SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} />,
-    );
+    render(<SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} />);
     expect(screen.queryByTestId("section-divider-thread")).not.toBeInTheDocument();
     expect(screen.queryByTestId("section-divider-beads")).not.toBeInTheDocument();
     expect(screen.queryByTestId("section-divider-specialty")).not.toBeInTheDocument();
@@ -274,28 +236,16 @@ describe("SupplyTable", () => {
     const threads = [makeThread()];
     const beads = [makeBead()];
     const specialty = [makeSpecialty()];
-    render(
-      <SupplyTable
-        threads={threads}
-        beads={beads}
-        specialty={specialty}
-        adapter={adapter}
-      />,
-    );
+    render(<SupplyTable threads={threads} beads={beads} specialty={specialty} adapter={adapter} />);
     expect(screen.getByTestId("data-row-t1")).toBeInTheDocument();
     expect(screen.getByTestId("data-row-b1")).toBeInTheDocument();
     expect(screen.getByTestId("data-row-s1")).toBeInTheDocument();
   });
 
   it("renders footer with running totals", () => {
-    const threads = [
-      makeThread({ need: 3 }),
-      makeThread({ id: "t2", need: 5 }),
-    ];
+    const threads = [makeThread({ need: 3 }), makeThread({ id: "t2", need: 5 })];
     const beads = [makeBead({ need: 2 })];
-    render(
-      <SupplyTable threads={threads} beads={beads} specialty={[]} adapter={adapter} />,
-    );
+    render(<SupplyTable threads={threads} beads={beads} specialty={[]} adapter={adapter} />);
     const footer = screen.getByTestId("supply-table-footer");
     expect(footer).toBeInTheDocument();
     // threadCount=2, beadCount=1, specialtyCount=0
@@ -308,9 +258,7 @@ describe("SupplyTable", () => {
   });
 
   it("renders empty state when no supplies of any type exist", () => {
-    render(
-      <SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} />,
-    );
+    render(<SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} />);
     const emptyState = screen.getByTestId("empty-state");
     expect(emptyState).toBeInTheDocument();
     expect(emptyState).toHaveTextContent("No supplies added yet");
@@ -321,13 +269,7 @@ describe("SupplyTable", () => {
 
   it("renders loading skeleton when isLoading prop is true", () => {
     render(
-      <SupplyTable
-        threads={[]}
-        beads={[]}
-        specialty={[]}
-        adapter={adapter}
-        isLoading={true}
-      />,
+      <SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} isLoading={true} />,
     );
     const skeletons = document.querySelectorAll(".animate-skeleton-pulse");
     expect(skeletons.length).toBeGreaterThanOrEqual(1);
@@ -342,26 +284,14 @@ describe("SupplyTable", () => {
       error: "DB error",
     });
 
-    render(
-      <SupplyTable
-        threads={[makeThread()]}
-        beads={[]}
-        specialty={[]}
-        adapter={adapter}
-      />,
-    );
+    render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
 
     await act(async () => {
       fireEvent.click(screen.getByTestId("update-qty-t1"));
     });
 
     await waitFor(() => {
-      expect(adapter.updateQuantity).toHaveBeenCalledWith(
-        "THREAD",
-        "t1",
-        "quantityRequired",
-        5,
-      );
+      expect(adapter.updateQuantity).toHaveBeenCalledWith("THREAD", "t1", "quantityRequired", 5);
     });
 
     // When adapter returns an error string, it's used in the toast
@@ -376,23 +306,14 @@ describe("SupplyTable", () => {
       success: false,
     });
 
-    render(
-      <SupplyTable
-        threads={[makeThread()]}
-        beads={[]}
-        specialty={[]}
-        adapter={adapter}
-      />,
-    );
+    render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
 
     await act(async () => {
       fireEvent.click(screen.getByTestId("update-qty-t1"));
     });
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith(
-        "Couldn't update value. Try again.",
-      );
+      expect(toast.error).toHaveBeenCalledWith("Couldn't update value. Try again.");
     });
   });
 
@@ -403,14 +324,7 @@ describe("SupplyTable", () => {
       error: "Not found",
     });
 
-    render(
-      <SupplyTable
-        threads={[makeThread()]}
-        beads={[]}
-        specialty={[]}
-        adapter={adapter}
-      />,
-    );
+    render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
 
     await act(async () => {
       fireEvent.click(screen.getByTestId("delete-t1"));
@@ -432,23 +346,14 @@ describe("SupplyTable", () => {
       success: false,
     });
 
-    render(
-      <SupplyTable
-        threads={[makeThread()]}
-        beads={[]}
-        specialty={[]}
-        adapter={adapter}
-      />,
-    );
+    render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
 
     await act(async () => {
       fireEvent.click(screen.getByTestId("delete-t1"));
     });
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith(
-        "Couldn't remove supply. Try again.",
-      );
+      expect(toast.error).toHaveBeenCalledWith("Couldn't remove supply. Try again.");
     });
   });
 
@@ -456,18 +361,14 @@ describe("SupplyTable", () => {
     // This test verifies that the SupplyTable tracks newly-added row IDs
     // Since we're mocking sub-components, we test the existingSupplyIds derivation
     const threads = [makeThread()];
-    render(
-      <SupplyTable threads={threads} beads={[]} specialty={[]} adapter={adapter} />,
-    );
+    render(<SupplyTable threads={threads} beads={[]} specialty={[]} adapter={adapter} />);
     // Data rows rendered by default should NOT have isNew
     const row = screen.getByTestId("data-row-t1");
     expect(row.getAttribute("data-is-new")).toBe("false");
   });
 
   it("table has semantic HTML: table, thead, tbody, th[scope=col], td", () => {
-    render(
-      <SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />,
-    );
+    render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
     const table = document.querySelector("table");
     expect(table).toBeTruthy();
     const thead = document.querySelector("thead");
@@ -482,32 +383,21 @@ describe("SupplyTable", () => {
   });
 
   it("column headers have uppercase tracking-[0.04em] styling", () => {
-    render(
-      <SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} />,
-    );
+    render(<SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} />);
     const header = screen.getByText("Colour");
     expect(header.className).toContain("uppercase");
     expect(header.className).toContain("tracking-[0.04em]");
   });
 
   it("table wrapper has table-layout: fixed", () => {
-    render(
-      <SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} />,
-    );
+    render(<SupplyTable threads={[]} beads={[]} specialty={[]} adapter={adapter} />);
     const table = document.querySelector("table");
     expect(table).toBeTruthy();
     expect(table!.style.tableLayout).toBe("fixed");
   });
 
   it("does not show empty state when supplies exist", () => {
-    render(
-      <SupplyTable
-        threads={[makeThread()]}
-        beads={[]}
-        specialty={[]}
-        adapter={adapter}
-      />,
-    );
+    render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
     expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
   });
 
@@ -517,49 +407,29 @@ describe("SupplyTable", () => {
       new Error("Network error"),
     );
 
-    render(
-      <SupplyTable
-        threads={[makeThread()]}
-        beads={[]}
-        specialty={[]}
-        adapter={adapter}
-      />,
-    );
+    render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
 
     await act(async () => {
       fireEvent.click(screen.getByTestId("update-qty-t1"));
     });
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith(
-        "Couldn't update value. Try again.",
-      );
+      expect(toast.error).toHaveBeenCalledWith("Couldn't update value. Try again.");
     });
   });
 
   it("handles adapter.remove throwing an exception", async () => {
     const { toast } = await import("sonner");
-    (adapter.remove as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-      new Error("Network error"),
-    );
+    (adapter.remove as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("Network error"));
 
-    render(
-      <SupplyTable
-        threads={[makeThread()]}
-        beads={[]}
-        specialty={[]}
-        adapter={adapter}
-      />,
-    );
+    render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
 
     await act(async () => {
       fireEvent.click(screen.getByTestId("delete-t1"));
     });
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith(
-        "Couldn't remove supply. Try again.",
-      );
+      expect(toast.error).toHaveBeenCalledWith("Couldn't remove supply. Try again.");
     });
   });
 
@@ -597,14 +467,7 @@ describe("SupplyTable", () => {
         setRows: vi.fn(),
       };
 
-      render(
-        <SupplyTable
-          threads={threads}
-          beads={[]}
-          specialty={[]}
-          adapter={adapterWithRows}
-        />,
-      );
+      render(<SupplyTable threads={threads} beads={[]} specialty={[]} adapter={adapterWithRows} />);
 
       expect(adapterWithRows.setRows).toHaveBeenCalled();
       // Should include all rows (threads + beads + specialty)
@@ -656,9 +519,7 @@ describe("SupplyTable", () => {
       // but NOT for t3 (isNeedOverridden: true)
       await waitFor(() => {
         const calls = (adapterWithCalc.updateQuantity as ReturnType<typeof vi.fn>).mock.calls;
-        const stitchCountCalls = calls.filter(
-          (c: unknown[]) => c[2] === "stitchCount",
-        );
+        const stitchCountCalls = calls.filter((c: unknown[]) => c[2] === "stitchCount");
         expect(stitchCountCalls).toHaveLength(2);
         expect(stitchCountCalls.map((c: unknown[]) => c[1])).toContain("t1");
         expect(stitchCountCalls.map((c: unknown[]) => c[1])).toContain("t2");

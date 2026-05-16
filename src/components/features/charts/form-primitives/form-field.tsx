@@ -26,7 +26,7 @@ export function FormField({ label, hint, error, required, htmlFor, children }: F
         {required && (
           <>
             <span
-              className="bg-primary mr-1.5 inline-block size-1.5 rounded-full align-middle relative -top-px"
+              className="bg-primary relative -top-px mr-1.5 inline-block size-1.5 rounded-full align-middle"
               aria-hidden="true"
             />
             <span className="sr-only"> (required)</span>

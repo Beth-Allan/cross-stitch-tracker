@@ -59,27 +59,21 @@ export function InlineCreateDialog({
   }
 
   const typeLabel =
-    supplyType === "THREAD"
-      ? "thread"
-      : supplyType === "BEAD"
-        ? "bead"
-        : "specialty item";
+    supplyType === "THREAD" ? "thread" : supplyType === "BEAD" ? "bead" : "specialty item";
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
           <DialogTitle>Create Supply</DialogTitle>
-          <DialogDescription>
-            Create a new {typeLabel} and add it to the table.
-          </DialogDescription>
+          <DialogDescription>Create a new {typeLabel} and add it to the table.</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-3">
           <div>
             <label
               htmlFor="inline-create-name"
-              className="text-sm font-medium text-foreground mb-1 block"
+              className="text-foreground mb-1 block text-sm font-medium"
             >
               Name
             </label>
@@ -99,15 +93,13 @@ export function InlineCreateDialog({
                 }
               }}
             />
-            {error && (
-              <p className="text-destructive text-xs mt-1">{error}</p>
-            )}
+            {error && <p className="text-destructive mt-1 text-xs">{error}</p>}
           </div>
 
           <div>
             <label
               htmlFor="inline-create-code"
-              className="text-sm font-medium text-foreground mb-1 block"
+              className="text-foreground mb-1 block text-sm font-medium"
             >
               Code
             </label>

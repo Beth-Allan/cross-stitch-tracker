@@ -83,14 +83,7 @@ describe("StickySaveBar", () => {
     });
 
     it('when mode="edit" and isSubmitting, shows "Saving..."', () => {
-      render(
-        <StickySaveBar
-          {...defaultProps}
-          chartName="Test"
-          mode="edit"
-          isSubmitting={true}
-        />,
-      );
+      render(<StickySaveBar {...defaultProps} chartName="Test" mode="edit" isSubmitting={true} />);
       expect(screen.getByRole("button", { name: /saving/i })).toBeInTheDocument();
     });
 

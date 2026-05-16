@@ -847,9 +847,7 @@ describe("ChartMergedForm", () => {
 
   describe("createFn field mapping", () => {
     it("createFn for THREAD passes colorName, colorCode, hexColor, colorFamily, and brandId to createThread", async () => {
-      const { createThread: mockCreateThreadFn } = await import(
-        "@/lib/actions/supply-actions"
-      );
+      const { createThread: mockCreateThreadFn } = await import("@/lib/actions/supply-actions");
       const mockCreateThread = vi.mocked(mockCreateThreadFn);
       mockCreateThread.mockResolvedValue({
         success: true as const,
@@ -887,9 +885,7 @@ describe("ChartMergedForm", () => {
     });
 
     it("createFn for BEAD passes colorName, productCode, hexColor, colorFamily, and brandId to createBead", async () => {
-      const { createBead: mockCreateBeadFn } = await import(
-        "@/lib/actions/supply-actions"
-      );
+      const { createBead: mockCreateBeadFn } = await import("@/lib/actions/supply-actions");
       const mockCreateBead = vi.mocked(mockCreateBeadFn);
       mockCreateBead.mockResolvedValue({
         success: true as const,
@@ -925,9 +921,8 @@ describe("ChartMergedForm", () => {
     });
 
     it("createFn for SPECIALTY passes colorName, productCode, hexColor, and brandId to createSpecialtyItem", async () => {
-      const { createSpecialtyItem: mockCreateSpecialtyFn } = await import(
-        "@/lib/actions/supply-actions"
-      );
+      const { createSpecialtyItem: mockCreateSpecialtyFn } =
+        await import("@/lib/actions/supply-actions");
       const mockCreateSpecialty = vi.mocked(mockCreateSpecialtyFn);
       mockCreateSpecialty.mockResolvedValue({
         success: true as const,
@@ -1042,25 +1037,19 @@ describe("ChartMergedForm", () => {
     it('renders heading "Edit {chart.name}" instead of "Add New Chart"', async () => {
       render(<ChartMergedForm {...editFormProps} />);
       await waitFor(() => {
-        expect(
-          screen.getByRole("heading", { name: "Edit My Test Chart" }),
-        ).toBeInTheDocument();
+        expect(screen.getByRole("heading", { name: "Edit My Test Chart" })).toBeInTheDocument();
       });
       expect(screen.queryByText("Add New Chart")).not.toBeInTheDocument();
     });
 
     it('renders subtitle "Update your chart and project details"', () => {
       render(<ChartMergedForm {...editFormProps} />);
-      expect(
-        screen.getByText("Update your chart and project details"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Update your chart and project details")).toBeInTheDocument();
     });
 
     it("renders ManageSuppliesLink instead of milestone marker", () => {
       render(<ChartMergedForm {...editFormProps} />);
-      expect(
-        screen.getByText("Supplies are managed on the project page"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Supplies are managed on the project page")).toBeInTheDocument();
       expect(
         screen.queryByText("Project details filled in. Ready for supplies?"),
       ).not.toBeInTheDocument();
@@ -1068,9 +1057,7 @@ describe("ChartMergedForm", () => {
 
     it('StickySaveBar shows "Save Changes" (not "Create")', () => {
       render(<ChartMergedForm {...editFormProps} />);
-      expect(
-        screen.getByRole("button", { name: /save changes/i }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /save changes/i })).toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "Create" })).not.toBeInTheDocument();
     });
 
@@ -1120,9 +1107,7 @@ describe("ChartMergedForm", () => {
 
     it('default mode (no mode prop) still renders "Add New Chart" heading', () => {
       render(<ChartMergedForm {...defaultFormProps} />);
-      expect(
-        screen.getByRole("heading", { name: "Add New Chart" }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Add New Chart" })).toBeInTheDocument();
     });
   });
 

@@ -31,10 +31,7 @@ interface ListRowKebabMenuProps {
  * Contains "Edit Project" navigation and "Delete Project" with confirmation dialog.
  * 44px touch target on trigger per UI-SPEC.
  */
-export function ListRowKebabMenu({
-  chartId,
-  chartName,
-}: ListRowKebabMenuProps) {
+export function ListRowKebabMenu({ chartId, chartName }: ListRowKebabMenuProps) {
   const router = useRouter();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -67,16 +64,11 @@ export function ListRowKebabMenu({
           <MoreHorizontal className="text-muted-foreground size-5" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" sideOffset={8} className="w-48">
-          <DropdownMenuItem
-            onClick={() => router.push(`/charts/${chartId}/edit`)}
-          >
+          <DropdownMenuItem onClick={() => router.push(`/charts/${chartId}/edit`)}>
             <Pencil className="size-4" />
             Edit Project
           </DropdownMenuItem>
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={() => setDialogOpen(true)}
-          >
+          <DropdownMenuItem variant="destructive" onClick={() => setDialogOpen(true)}>
             <Trash2 className="size-4" />
             Delete Project
           </DropdownMenuItem>
@@ -88,23 +80,14 @@ export function ListRowKebabMenu({
           <DialogHeader>
             <DialogTitle>Delete {chartName}?</DialogTitle>
             <DialogDescription>
-              This will permanently delete this project and all its supplies.
-              This cannot be undone.
+              This will permanently delete this project and all its supplies. This cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDialogOpen(false)}
-              disabled={isPending}
-            >
+            <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={isPending}>
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isPending}
-            >
+            <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
               {isPending ? "Deleting..." : "Delete Project"}
             </Button>
           </DialogFooter>

@@ -37,7 +37,12 @@ describe("CreationFlowAdapter", () => {
   describe("addThread", () => {
     it("stores row in buffer with client-generated UUID and calls onRowsChange", async () => {
       // Pre-populate cache via searchSupplies
-      const threadResult = makeSearchResult({ id: "t1", type: "THREAD", code: "310", name: "Black" });
+      const threadResult = makeSearchResult({
+        id: "t1",
+        type: "THREAD",
+        code: "310",
+        name: "Black",
+      });
       searchFn.mockResolvedValueOnce([threadResult]);
       await adapter.searchSupplies("THREAD", "310");
 
@@ -202,7 +207,11 @@ describe("CreationFlowAdapter", () => {
       });
       createFn.mockResolvedValueOnce(created);
 
-      await adapter.createSupply("THREAD", { name: "Custom Thread", code: "CT1", brandId: "brand-1" });
+      await adapter.createSupply("THREAD", {
+        name: "Custom Thread",
+        code: "CT1",
+        brandId: "brand-1",
+      });
       const addResult = await adapter.addThread("new-1", 100, 1);
 
       expect(addResult.success).toBe(true);
@@ -230,7 +239,12 @@ describe("CreationFlowAdapter", () => {
       await adapter.addBead("b1", 100, 1);
 
       // Add a specialty
-      const specialtyResult = makeSearchResult({ id: "s1", type: "SPECIALTY", code: "K001", name: "Gold" });
+      const specialtyResult = makeSearchResult({
+        id: "s1",
+        type: "SPECIALTY",
+        code: "K001",
+        name: "Gold",
+      });
       searchFn.mockResolvedValueOnce([specialtyResult]);
       await adapter.searchSupplies("SPECIALTY", "Gold");
       await adapter.addSpecialty("s1", 1);
@@ -393,19 +407,21 @@ describe("CreationFlowAdapter", () => {
       // We need to set it to overridden. The "need" field update should set isNeedOverridden.
       // Actually, CreationFlowAdapter currently does raw spread, so isNeedOverridden stays false.
       // We need to load a row with isNeedOverridden: true.
-      adapter.loadRows([{
-        id: rowId,
-        supplyId: "t1",
-        type: "THREAD",
-        code: "310",
-        name: "Black",
-        brandName: "DMC",
-        hexColor: "#000000",
-        stitchCount: 500,
-        need: 10,
-        have: 0,
-        isNeedOverridden: true,
-      }]);
+      adapter.loadRows([
+        {
+          id: rowId,
+          supplyId: "t1",
+          type: "THREAD",
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 500,
+          need: 10,
+          have: 0,
+          isNeedOverridden: true,
+        },
+      ]);
 
       adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
       onRowsChange.mockClear();

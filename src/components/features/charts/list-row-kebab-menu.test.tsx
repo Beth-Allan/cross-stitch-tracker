@@ -141,8 +141,7 @@ describe("ListRowKebabMenu", () => {
       .getAllByRole("button")
       .find(
         (btn) =>
-          btn.textContent === "Delete Project" &&
-          btn.closest("[data-slot='dialog-content']"),
+          btn.textContent === "Delete Project" && btn.closest("[data-slot='dialog-content']"),
       );
     expect(dialogDeleteButton).toBeTruthy();
     await user.click(dialogDeleteButton!);
@@ -174,8 +173,7 @@ describe("ListRowKebabMenu", () => {
       .getAllByRole("button")
       .find(
         (btn) =>
-          btn.textContent === "Delete Project" &&
-          btn.closest("[data-slot='dialog-content']"),
+          btn.textContent === "Delete Project" && btn.closest("[data-slot='dialog-content']"),
       );
     await user.click(dialogDeleteButton!);
 
