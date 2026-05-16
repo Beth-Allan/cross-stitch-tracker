@@ -562,4 +562,108 @@ describe("SupplyTable", () => {
       );
     });
   });
+
+  describe("calcParams wiring", () => {
+    it("calls adapter.setCalcParams when adapter has that method", () => {
+      const adapterWithCalc = {
+        ...createMockAdapter(),
+        setCalcParams: vi.fn(),
+        setRows: vi.fn(),
+      };
+
+      render(
+        <SupplyTable
+          threads={[makeThread()]}
+          beads={[]}
+          specialty={[]}
+          adapter={adapterWithCalc}
+          calcParams={{ fabricCount: 18, strandCount: 2, overCount: 1, wastePercent: 20 }}
+        />,
+      );
+
+      expect(adapterWithCalc.setCalcParams).toHaveBeenCalledWith({
+        fabricCount: 18,
+        strandCount: 2,
+        overCount: 1,
+        wastePercent: 20,
+      });
+    });
+
+    it("calls adapter.setRows when adapter has that method", () => {
+      const threads = [makeThread()];
+      const adapterWithRows = {
+        ...createMockAdapter(),
+        setCalcParams: vi.fn(),
+        setRows: vi.fn(),
+      };
+
+      render(
+        <SupplyTable
+          threads={threads}
+          beads={[]}
+          specialty={[]}
+          adapter={adapterWithRows}
+        />,
+      );
+
+      expect(adapterWithRows.setRows).toHaveBeenCalled();
+      // Should include all rows (threads + beads + specialty)
+      const callArgs = adapterWithRows.setRows.mock.calls[0][0];
+      expect(callArgs).toHaveLength(1);
+      expect(callArgs[0].id).toBe("t1");
+    });
+
+    it("recalculates all non-overridden thread rows when calcParams change", async () => {
+      const adapterWithCalc = {
+        ...createMockAdapter(),
+        setCalcParams: vi.fn(),
+        setRows: vi.fn(),
+      };
+
+      const threads = [
+        makeThread({ id: "t1", stitchCount: 1000, isNeedOverridden: false }),
+        makeThread({ id: "t2", code: "321", stitchCount: 500, isNeedOverridden: false }),
+        makeThread({ id: "t3", code: "666", stitchCount: 800, isNeedOverridden: true }),
+      ];
+
+      const { rerender } = render(
+        <SupplyTable
+          threads={threads}
+          beads={[]}
+          specialty={[]}
+          adapter={adapterWithCalc}
+          calcParams={{ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 }}
+        />,
+      );
+
+      // Clear mocks from initial render
+      (adapterWithCalc.updateQuantity as ReturnType<typeof vi.fn>).mockClear();
+
+      // Rerender with different calcParams to trigger recalculation
+      await act(async () => {
+        rerender(
+          <SupplyTable
+            threads={threads}
+            beads={[]}
+            specialty={[]}
+            adapter={adapterWithCalc}
+            calcParams={{ fabricCount: 18, strandCount: 2, overCount: 1, wastePercent: 20 }}
+          />,
+        );
+      });
+
+      // Should call updateQuantity for t1 and t2 (non-overridden with stitchCount > 0)
+      // but NOT for t3 (isNeedOverridden: true)
+      await waitFor(() => {
+        const calls = (adapterWithCalc.updateQuantity as ReturnType<typeof vi.fn>).mock.calls;
+        const stitchCountCalls = calls.filter(
+          (c: unknown[]) => c[2] === "stitchCount",
+        );
+        expect(stitchCountCalls).toHaveLength(2);
+        expect(stitchCountCalls.map((c: unknown[]) => c[1])).toContain("t1");
+        expect(stitchCountCalls.map((c: unknown[]) => c[1])).toContain("t2");
+        expect(stitchCountCalls.map((c: unknown[]) => c[1])).not.toContain("t3");
+      });
+    });
+  });
 });
