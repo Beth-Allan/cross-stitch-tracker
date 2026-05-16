@@ -52,6 +52,74 @@ import {
   createSpecialtyItem,
 } from "@/lib/actions/supply-actions";
 
+/**
+ * Build the createFn callback that maps CreateSupplyData fields to the
+ * server action Zod schemas (threadSchema, beadSchema, specialtyItemSchema).
+ *
+ * Extracted as a named export so it can be tested in isolation.
+ */
+export function buildCreateFn() {
+  return async (
+    type: SupplyType,
+    data: CreateSupplyData,
+  ): Promise<SupplySearchResult> => {
+    if (type === "THREAD") {
+      const result = await createThread({
+        colorName: data.name,
+        colorCode: data.code ?? "",
+        brandId: data.brandId,
+        hexColor: data.hexColor ?? "#808080",
+        colorFamily: "NEUTRAL" as const,
+      });
+      if (!result.success) throw new Error(result.error);
+      return {
+        id: result.thread.id,
+        type: "THREAD",
+        code: result.thread.colorCode,
+        name: result.thread.colorName,
+        brandName: "",
+        brandId: data.brandId,
+        hexColor: result.thread.hexColor ?? "#000000",
+      };
+    }
+    if (type === "BEAD") {
+      const result = await createBead({
+        colorName: data.name,
+        productCode: data.code ?? "",
+        brandId: data.brandId,
+        hexColor: data.hexColor ?? "#808080",
+        colorFamily: "NEUTRAL" as const,
+      });
+      if (!result.success) throw new Error(result.error);
+      return {
+        id: result.bead.id,
+        type: "BEAD",
+        code: result.bead.productCode,
+        name: result.bead.colorName,
+        brandName: "",
+        brandId: data.brandId,
+        hexColor: result.bead.hexColor ?? "#000000",
+      };
+    }
+    const result = await createSpecialtyItem({
+      colorName: data.name,
+      productCode: data.code ?? "",
+      brandId: data.brandId,
+      hexColor: data.hexColor ?? "#808080",
+    });
+    if (!result.success) throw new Error(result.error);
+    return {
+      id: result.specialtyItem.id,
+      type: "SPECIALTY",
+      code: result.specialtyItem.productCode,
+      name: result.specialtyItem.colorName,
+      brandName: "",
+      brandId: data.brandId,
+      hexColor: result.specialtyItem.hexColor ?? "#000000",
+    };
+  };
+}
+
 interface ChartMergedFormProps {
   designers: Designer[];
   genres: Genre[];
@@ -128,62 +196,7 @@ export function ChartMergedForm({
         hexColor: s.hexColor ?? "",
       }));
     };
-    const createFn = async (
-      type: SupplyType,
-      data: CreateSupplyData,
-    ): Promise<SupplySearchResult> => {
-      if (type === "THREAD") {
-        const result = await createThread({
-          name: data.name,
-          colorCode: data.code,
-          brandId: data.brandId,
-          hexColor: data.hexColor,
-        });
-        if (!result.success) throw new Error(result.error);
-        return {
-          id: result.thread.id,
-          type: "THREAD",
-          code: result.thread.colorCode,
-          name: result.thread.colorName,
-          brandName: "",
-          brandId: data.brandId,
-          hexColor: result.thread.hexColor ?? "#000000",
-        };
-      }
-      if (type === "BEAD") {
-        const result = await createBead({
-          name: data.name,
-          productCode: data.code,
-          brandId: data.brandId,
-        });
-        if (!result.success) throw new Error(result.error);
-        return {
-          id: result.bead.id,
-          type: "BEAD",
-          code: result.bead.productCode,
-          name: result.bead.colorName,
-          brandName: "",
-          brandId: data.brandId,
-          hexColor: "#000000",
-        };
-      }
-      const result = await createSpecialtyItem({
-        name: data.name,
-        productCode: data.code,
-        brandId: data.brandId,
-      });
-      if (!result.success) throw new Error(result.error);
-      return {
-        id: result.specialtyItem.id,
-        type: "SPECIALTY",
-        code: result.specialtyItem.productCode,
-        name: result.specialtyItem.colorName,
-        brandName: "",
-        brandId: data.brandId,
-        hexColor: "#000000",
-      };
-    };
-    adapterRef.current = new CreationFlowAdapter(setSupplyRows, searchFn, createFn);
+    adapterRef.current = new CreationFlowAdapter(setSupplyRows, searchFn, buildCreateFn());
   }
 
   const onSuccess = useCallback(
