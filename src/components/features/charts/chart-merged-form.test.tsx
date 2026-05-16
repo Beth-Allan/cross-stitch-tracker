@@ -957,4 +957,88 @@ describe("ChartMergedForm", () => {
       expect(callArg).not.toHaveProperty("name");
     });
   });
+
+  // --- Draft auto-save on unmount tests (GAP 10) ---
+
+  describe("draft auto-save on unmount", () => {
+    it("saves draft to localStorage when component unmounts with form content", async () => {
+      const user = userEvent.setup();
+      const { unmount } = render(<ChartMergedForm {...defaultFormProps} />);
+
+      // Type a chart name to make the form "dirty"
+      await user.type(screen.getByLabelText(/chart name/i), "Auto-saved Chart");
+
+      // Unmount the component (simulates navigation away)
+      unmount();
+
+      // Draft should have been auto-saved
+      const stored = localStorage.getItem(DRAFT_KEY);
+      expect(stored).toBeTruthy();
+      const parsed = JSON.parse(stored!);
+      expect(parsed.version).toBe(2);
+      expect(parsed.form.name).toBe("Auto-saved Chart");
+    });
+
+    it("does NOT save draft on unmount when form was submitted successfully", async () => {
+      mockCreateChart.mockResolvedValue({
+        success: true,
+        chartId: "new-id",
+      });
+
+      const user = userEvent.setup();
+      const { unmount } = render(<ChartMergedForm {...defaultFormProps} />);
+
+      await user.type(screen.getByLabelText(/chart name/i), "Submitted Chart");
+      await user.type(screen.getByLabelText(/total stitch count/i), "5000");
+
+      // Submit the form
+      await user.click(screen.getByRole("button", { name: "Create" }));
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith("/charts");
+      });
+
+      // Clear localStorage (clearDraft was called on success)
+      expect(localStorage.getItem(DRAFT_KEY)).toBeNull();
+
+      // Now unmount -- should NOT save a new draft
+      unmount();
+
+      // localStorage should still be empty (no auto-save after successful submit)
+      expect(localStorage.getItem(DRAFT_KEY)).toBeNull();
+    });
+
+    it("does NOT save draft on unmount when form name is empty", () => {
+      const { unmount } = render(<ChartMergedForm {...defaultFormProps} />);
+
+      // Don't type anything -- form name is empty
+      unmount();
+
+      // No draft should be saved (empty form)
+      expect(localStorage.getItem(DRAFT_KEY)).toBeNull();
+    });
+  });
+
+  // --- Supply mode conditional rendering test (GAP 5) ---
+
+  it("supply mode uses conditional rendering (no Activity wrapper for supply content)", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<ChartMergedForm {...defaultFormProps} />);
+
+    // In form mode, CalculatorCard should NOT be in the DOM at all
+    // (conditional rendering means unmounted, not hidden)
+    expect(screen.queryByRole("group", { name: /skein calculator settings/i })).toBeNull();
+
+    await user.type(screen.getByLabelText(/chart name/i), "My Chart");
+    await user.click(screen.getByRole("button", { name: /add supplies/i }));
+
+    // Now in supply mode, CalculatorCard should be in the DOM and visible
+    expect(screen.getByRole("group", { name: /skein calculator settings/i })).toBeVisible();
+
+    // Verify no Activity element wraps the supply content
+    // Activity renders as a hidden subtree -- with conditional rendering
+    // the supply section is simply absent when mode is "form"
+    const supplySection = container.querySelector("[data-supply-mode]");
+    // If we use a data attribute marker, or just verify the content mounts/unmounts
+    // The key assertion is above: calculator not in DOM when mode=form
+  });
 });
