@@ -1,5 +1,53 @@
 # Retrospective
 
+## Milestone: v1.3 — Form & Supply Overhaul
+
+**Shipped:** 2026-05-16
+**Phases:** 5 | **Plans:** 19
+**Timeline:** 13 days (2026-05-03 → 2026-05-16)
+**Tests:** 1,535 | **PR:** #32
+
+### What Was Built
+
+- Unified Supply Table: keyboard-first entry with grouped Thread/Beads/Specialty sections, SVG donut indicators, portal autocomplete, inline editing, persistent add row (20 source files, 162 tests)
+- Supply Table on Project Detail: ServerActionAdapter for persistence, slide-in animation, sort toggle — replaced old 457-line component
+- Merged Form: single-page chart+project creation (720px), pattern type card grid, draft persistence, sticky save bar, milestone markers
+- Supply Takeover: React Activity toggles form to full-page supply entry, CreationFlowAdapter buffers locally, createChartWithSupplies atomic save, fabric assignment + skein calculator card
+- Edit Mode & Cleanup: full-page edit at /charts/[id]/edit, list-row kebab menus, 21 deprecated files removed (3,700+ lines)
+
+### What Worked
+
+- **Adapter pattern for reuse** — SupplyTableAdapter interface enabled one table component in two contexts (creation flow with local state, project detail with server actions). Clean separation of persistence concern from UI.
+- **Sketch findings as design spec** — v1.3 was designed upfront via /gsd-sketch experiments. Validated design decisions (no tabs, persistent add row, keyboard-first) eliminated rework during execution.
+- **React Activity for state preservation** — CSS visibility toggle between form and supply-takeover kept React state alive without unmounting. Zero re-renders on mode switch.
+- **Two-phase save pattern** — Creating chart first, then batch-adding supplies in one $transaction kept the creation flow simple while guaranteeing atomicity.
+- **Aggressive dead code cleanup** — Phase 14 explicitly deleted 21 deprecated files. No "we'll clean it later" debt carried forward.
+
+### What Was Inefficient
+
+- **SUMMARY.md files never generated** — All 5 phases lack proper SUMMARY.md files, making automated accomplishment extraction fail at milestone close. Executor didn't create them.
+- **REQUIREMENTS traceability drift (4th time)** — All 22 requirements still showed "Pending" despite being fully implemented. Same structural issue as v1.0-v1.2.
+- **Gap closure in Phase 13** — Plans 13-04 and 13-05 were reactive fixes from UAT (field mismatches, skein recalculation wiring). Could have been caught in initial planning with better adapter interface testing.
+- **Verification marked human_needed** — Phases 11 and 13 verification left in "human_needed" status without explicit resolution. Blocked audit completeness.
+
+### Patterns Established
+
+- **SupplyTableAdapter interface** — Contract between table UI and data persistence (add, update, delete, getAll). Enables drop-in replacement of backing store.
+- **CreationFlowAdapter (local state buffer)** — Buffers supply mutations in React state during creation, flushed to DB on form submit via batch server action.
+- **React Activity for page-level toggles** — CSS visibility swap preserves component state without unmounting. Alternative to conditional rendering for complex forms.
+- **PortalAutocomplete** — Base UI Combobox with Portal escaping table stacking context. Reusable wherever autocomplete needs to overflow containers.
+- **Draft persistence with schema evolution** — localStorage save/load with stale ID detection and versioned schema. Graceful degradation when schema changes.
+
+### Key Lessons
+
+1. **Enforce SUMMARY.md generation in executor** — 4 milestones without reliable summaries. This must be structural: executor writes one-liner + key decisions after each plan completes.
+2. **Traceability is still broken** — Same issue every milestone. Either automate requirement checkbox updates or accept that REQUIREMENTS.md is write-once/archive-once and stop pretending it's live.
+3. **Test adapter interfaces before wiring** — Phase 13 gap closure (plans 04-05) existed because adapter contracts weren't fully tested against real data shapes before integration.
+4. **Verification needs explicit acceptance** — "human_needed" status should trigger a blocking step before milestone close, not be silently deferred.
+5. **Sketch-driven development works** — Fastest milestone per plan count despite higher complexity. Pre-validated design decisions eliminated pivot risk.
+
+---
+
 ## Milestone: v1.2 — Track & Measure
 
 **Shipped:** 2026-04-20
@@ -144,13 +192,13 @@
 
 ## Cross-Milestone Trends
 
-| Metric | v1.0 | v1.1 | v1.2 |
-|--------|------|------|------|
-| Phases | 4 | 3 | 2 |
-| Plans | 23 | 20 | 20 |
-| Tests | 395 | 867 | 1,172 |
-| Days | 22 | 5 | 4 |
-| Plans/day | ~1 | ~4 | ~5 |
-| Commits | 225+ | 225 | 153 |
-| PRs | 6 | 3 | 2 |
-| LOC | 48k | ~65k | 82k |
+| Metric | v1.0 | v1.1 | v1.2 | v1.3 |
+|--------|------|------|------|------|
+| Phases | 4 | 3 | 2 | 5 |
+| Plans | 23 | 20 | 20 | 19 |
+| Tests | 395 | 867 | 1,172 | 1,535 |
+| Days | 22 | 5 | 4 | 13 |
+| Plans/day | ~1 | ~4 | ~5 | ~1.5 |
+| Commits | 225+ | 225 | 153 | 190 |
+| PRs | 6 | 3 | 2 | 1 |
+| LOC | 48k | ~65k | 82k | ~90k |
