@@ -3,10 +3,13 @@
 import type {
   SupplyTableAdapter,
   SupplyType,
+  SupplyRow,
   SupplySearchResult,
   CreateSupplyData,
+  CalcParams,
   Result,
 } from "./types";
+import { calculateSkeins } from "@/lib/utils/skein-calculator";
 import {
   addThreadToProject,
   addBeadToProject,
@@ -33,10 +36,29 @@ import {
  * Returns junction record IDs on add success for new-row animation wiring (D-07, D-10).
  */
 export class ServerActionAdapter implements SupplyTableAdapter {
+  private calcParams: CalcParams | null = null;
+  private rows: SupplyRow[] = [];
+
   constructor(
     private projectId: string,
     private refreshFn: () => void,
   ) {}
+
+  /**
+   * Set calculation parameters for skein recalculation.
+   * Called by SupplyTable when mergedCalcParams changes.
+   */
+  setCalcParams(params: CalcParams): void {
+    this.calcParams = params;
+  }
+
+  /**
+   * Keep adapter informed of current row state for isNeedOverridden lookup.
+   * Called by SupplyTable when rows change.
+   */
+  setRows(rows: SupplyRow[]): void {
+    this.rows = rows;
+  }
 
   async addThread(threadId: string, stitchCount: number, need: number): Promise<Result> {
     const result = await addThreadToProject({
@@ -94,9 +116,27 @@ export class ServerActionAdapter implements SupplyTableAdapter {
 
     let mappedData: Record<string, unknown>;
     switch (field) {
-      case "stitchCount":
+      case "stitchCount": {
         mappedData = { stitchCount: value };
+        // Recalculate need if this is a non-overridden thread row with calcParams available
+        const row = this.rows.find((r) => r.id === junctionId);
+        if (
+          row &&
+          row.type === "THREAD" &&
+          !row.isNeedOverridden &&
+          this.calcParams
+        ) {
+          const recalculated = calculateSkeins({
+            stitchCount: value,
+            strandCount: this.calcParams.strandCount,
+            fabricCount: this.calcParams.fabricCount,
+            overCount: this.calcParams.overCount,
+            wastePercent: this.calcParams.wastePercent,
+          });
+          mappedData.quantityRequired = recalculated;
+        }
         break;
+      }
       case "need":
         mappedData = { quantityRequired: value, isNeedOverridden: true };
         break;

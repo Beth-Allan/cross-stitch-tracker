@@ -4,8 +4,10 @@ import type {
   SupplyRow,
   SupplySearchResult,
   CreateSupplyData,
+  CalcParams,
   Result,
 } from "./types";
+import { calculateSkeins } from "@/lib/utils/skein-calculator";
 
 /**
  * Adapter for the chart creation flow that buffers supply rows in memory.
@@ -20,12 +22,21 @@ import type {
 export class CreationFlowAdapter implements SupplyTableAdapter {
   private rows: Map<string, SupplyRow> = new Map();
   private supplyCache: Map<string, SupplySearchResult> = new Map();
+  private calcParams: CalcParams | null = null;
 
   constructor(
     private onRowsChange: (rows: SupplyRow[]) => void,
     private searchFn: (type: SupplyType, query: string) => Promise<SupplySearchResult[]>,
     private createFn: (type: SupplyType, data: CreateSupplyData) => Promise<SupplySearchResult>,
   ) {}
+
+  /**
+   * Set calculation parameters for skein recalculation.
+   * Called by SupplyTable when mergedCalcParams changes.
+   */
+  setCalcParams(params: CalcParams): void {
+    this.calcParams = params;
+  }
 
   async addThread(threadId: string, stitchCount: number, need: number): Promise<Result> {
     const duplicate = this.findDuplicate(threadId, "THREAD");
@@ -109,7 +120,26 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
     if (!row) {
       return { success: false, error: "Supply not found" };
     }
-    const updated: SupplyRow = { ...row, [field]: value };
+
+    let updated: SupplyRow;
+    if (
+      field === "stitchCount" &&
+      row.type === "THREAD" &&
+      !row.isNeedOverridden &&
+      this.calcParams
+    ) {
+      const recalculated = calculateSkeins({
+        stitchCount: value,
+        strandCount: this.calcParams.strandCount,
+        fabricCount: this.calcParams.fabricCount,
+        overCount: this.calcParams.overCount,
+        wastePercent: this.calcParams.wastePercent,
+      });
+      updated = { ...row, stitchCount: value, need: recalculated };
+    } else {
+      updated = { ...row, [field]: value };
+    }
+
     this.rows.set(junctionId, updated);
     this.onRowsChange(this.getRows());
     return { success: true };
