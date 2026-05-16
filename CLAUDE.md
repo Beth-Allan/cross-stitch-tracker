@@ -3,7 +3,7 @@
 ## Current Status
 
 **Milestone:** v1.3 Form & Supply Overhaul
-**Last Updated:** 2026-05-15
+**Last Updated:** 2026-05-16
 **Roadmap:** 5 milestones / 16 phases — v1.0 + v1.1 + v1.2 shipped, v1.3 in progress
 
 ### Done
@@ -21,18 +21,22 @@
 
 ### In Progress
 
-- **v1.3 Form & Supply Overhaul** — Phases 11-12 complete, Phase 13 gap closure in progress, Phase 14 remaining
+- **v1.3 Form & Supply Overhaul** — All 5 phases (10-14) complete. Milestone ready to ship.
 
 ### Done This Session
 
-- **Code review fixes applied** (5 commits): Fixed all 6 critical+warning findings from Phase 13 code review — fabric ownership guard (CR-01), localStorage supply validation (WR-01), duplicate fabricCount update (WR-02), type-unsafe cast (WR-03), non-null assertion (WR-04), code duplication extraction (WR-05). 60 tests pass.
-- **UAT gap closure plans created** (2 plans): 13-04-PLAN (createFn field mismatches, Activity-to-conditional for fabric dropdown, draft auto-save on unmount) and 13-05-PLAN (skein recalculation wiring through adapters). Both Wave 1 (parallel).
+- **Phase 14 executed**: `/gsd-execute-phase 14` — 3 plans across 3 waves, all complete
+  - Plan 01: Removed 9 deprecated files (2,412 lines)
+  - Plan 02: Built edit mode + kebab menu, rewired edit route (+ gallery-grid fix, stitch count auto-calc fix)
+  - Plan 03: Removed 12 more deprecated files (1,312 lines) + chart-list.tsx from code review
+  - Total: 23 deprecated files removed (3,700+ lines), 1,522 tests passing
+- **Code review**: 0 critical, 3 warnings (dead code found and removed, hardcoded colors noted)
+- **Phase verified**: 3/3 success criteria pass automated + human approval
 
 ### Next Up — RESUME HERE
 
-1. `/gsd-execute-phase 13 --gaps-only` to execute gap closure plans 04 and 05
-2. Re-run UAT to verify all 4 gaps are closed
-3. `/gsd-discuss-phase 14` for the final v1.3 phase
+1. `/gsd-complete-milestone` — archive v1.3 and prepare for v1.4
+2. Or: `/gsd-ship` — create PR for Phase 14 changes
 
 ### Backlog
 
