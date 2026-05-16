@@ -141,8 +141,8 @@ Plans:
 - [x] 13-03-PLAN.md -- Activity mode toggle wiring, supply table embedding, visual checkpoint
 
 **Wave 3 — Gap Closure** *(parallel, from UAT)*
-- [ ] 13-04-PLAN.md -- Fix createFn field mismatches, Activity-to-conditional for fabric dropdown, draft auto-save on unmount
-- [ ] 13-05-PLAN.md -- Wire skein recalculation through adapters and SupplyTable on stitchCount/calcParams change
+- [x] 13-04-PLAN.md -- Fix createFn field mismatches, Activity-to-conditional for fabric dropdown, draft auto-save on unmount
+- [x] 13-05-PLAN.md -- Wire skein recalculation through adapters and SupplyTable on stitchCount/calcParams change
 **UI hint**: yes
 
 ### Phase 14: Edit Mode & Cleanup
@@ -182,5 +182,5 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 10. Unified Supply Table | v1.3 | 6/6 | Complete    | 2026-05-04 |
 | 11. Supply Table on Project Detail | v1.3 | 2/2 | Complete    | 2026-05-11 |
 | 12. Merged Form | v1.3 | 3/3 | Complete    | 2026-05-11 |
-| 13. Supply Takeover | v1.3 | 3/5 | In progress | - |
+| 13. Supply Takeover | v1.3 | 5/5 | Complete   | 2026-05-16 |
 | 14. Edit Mode & Cleanup | v1.3 | 0/? | Not started | - |
