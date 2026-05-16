@@ -1,6 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen } from "@/__tests__/test-utils";
-import userEvent from "@testing-library/user-event";
 import { ChartList } from "./chart-list";
 import {
   createMockChartWithRelations,
@@ -8,41 +7,31 @@ import {
   createMockGenre,
 } from "@/__tests__/mocks";
 
-const mockDeleteChart = vi.fn();
 vi.mock("@/lib/actions/chart-actions", () => ({
-  createChart: vi.fn(),
-  updateChart: vi.fn(),
-  deleteChart: (...args: unknown[]) => mockDeleteChart(...args),
+  deleteChart: vi.fn(),
 }));
 
-vi.mock("@/lib/actions/designer-actions", () => ({
-  createDesigner: vi.fn(),
-}));
-
-vi.mock("@/lib/actions/genre-actions", () => ({
-  createGenre: vi.fn(),
-}));
-
-vi.mock("@/lib/actions/storage-location-actions", () => ({
-  createStorageLocation: vi.fn(),
-}));
-
-vi.mock("@/lib/actions/stitching-app-actions", () => ({
-  createStitchingApp: vi.fn(),
-}));
-
-vi.mock("@/lib/actions/upload-actions", () => ({
-  getPresignedUploadUrl: vi.fn(),
-}));
-
-const mockRouterRefresh = vi.fn();
-const mockRouterPush = vi.fn();
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ refresh: mockRouterRefresh, push: mockRouterPush }),
+  useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
 }));
 
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
+}));
+
+// Mock ListRowKebabMenu to avoid testing its internals here (tested in list-row-kebab-menu.test.tsx)
+vi.mock("./list-row-kebab-menu", () => ({
+  ListRowKebabMenu: ({
+    chartId,
+    chartName,
+  }: {
+    chartId: string;
+    chartName: string;
+  }) => (
+    <button aria-label="Project actions" data-testid={`kebab-${chartId}`}>
+      {chartName}
+    </button>
+  ),
 }));
 
 const mockDesigners = [
@@ -103,73 +92,39 @@ describe("ChartList", () => {
     expect(screen.getByText(/every great stash starts with one chart/i)).toBeInTheDocument();
   });
 
-  it("each chart row has edit and delete buttons with proper aria-labels", () => {
+  it("renders ListRowKebabMenu per row (not inline Pencil/Trash buttons)", () => {
     render(<ChartList charts={mockCharts} designers={mockDesigners} genres={mockGenres} />);
 
-    // Desktop + mobile both render action buttons
-    const editDragon = screen.getAllByLabelText("Edit Dragon Dreams");
-    expect(editDragon.length).toBeGreaterThanOrEqual(1);
-
-    const deleteDragon = screen.getAllByLabelText("Delete Dragon Dreams");
-    expect(deleteDragon.length).toBeGreaterThanOrEqual(1);
-
-    const editFox = screen.getAllByLabelText("Edit Woodland Fox");
-    expect(editFox.length).toBeGreaterThanOrEqual(1);
-
-    const deleteFox = screen.getAllByLabelText("Delete Woodland Fox");
-    expect(deleteFox.length).toBeGreaterThanOrEqual(1);
+    // Desktop + mobile both render kebab triggers (mocked as buttons with "Project actions" label)
+    const kebabTriggers = screen.getAllByLabelText("Project actions");
+    // At least 2 per chart (desktop table row + mobile card) x 2 charts = 4
+    expect(kebabTriggers.length).toBeGreaterThanOrEqual(2);
   });
 
-  it("clicking edit button opens the ChartEditModal (verify 'Edit Chart' title appears)", async () => {
-    const user = userEvent.setup();
+  it("does NOT render ChartEditModal (no 'Edit Chart' dialog title)", () => {
     render(<ChartList charts={mockCharts} designers={mockDesigners} genres={mockGenres} />);
 
-    const editButtons = screen.getAllByLabelText("Edit Dragon Dreams");
-    await user.click(editButtons[0]);
-
-    expect(await screen.findByText("Edit Chart")).toBeInTheDocument();
+    expect(screen.queryByText("Edit Chart")).not.toBeInTheDocument();
   });
 
-  it("clicking delete button opens delete confirmation dialog (verify 'Delete Chart' title appears)", async () => {
-    const user = userEvent.setup();
+  it("does NOT have editingChart state (no inline edit/delete buttons)", () => {
     render(<ChartList charts={mockCharts} designers={mockDesigners} genres={mockGenres} />);
 
-    const deleteButtons = screen.getAllByLabelText("Delete Dragon Dreams");
-    await user.click(deleteButtons[0]);
-
-    // Dialog title is a heading; the button also says "Delete Chart" so use role to disambiguate
-    expect(await screen.findByRole("heading", { name: "Delete Chart" })).toBeInTheDocument();
-    expect(screen.getByText(/permanently delete Dragon Dreams/)).toBeInTheDocument();
+    // Old pattern had aria-labels like "Edit Dragon Dreams" and "Delete Dragon Dreams"
+    // for inline buttons. Now those don't exist (kebab mock uses "Project actions").
+    expect(screen.queryByLabelText("Edit Dragon Dreams")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Delete Dragon Dreams")).not.toBeInTheDocument();
   });
 
-  it("confirming delete calls deleteChart server action", async () => {
-    const user = userEvent.setup();
-    mockDeleteChart.mockResolvedValue({ success: true });
-    render(<ChartList charts={mockCharts} designers={mockDesigners} genres={mockGenres} />);
-
-    // Open delete dialog
-    const deleteButtons = screen.getAllByLabelText("Delete Woodland Fox");
-    await user.click(deleteButtons[0]);
-
-    // Click the Delete Chart confirm button
-    const confirmButton = await screen.findByRole("button", { name: /^delete chart$/i });
-    await user.click(confirmButton);
-
-    expect(mockDeleteChart).toHaveBeenCalledWith("c2");
-  });
-
-  it("mobile card layout renders chart names and action buttons", () => {
+  it("mobile card layout renders chart names and kebab triggers", () => {
     render(<ChartList charts={mockCharts} designers={mockDesigners} genres={mockGenres} />);
 
     // Chart names appear at least twice (desktop table + mobile card)
     const dragonNames = screen.getAllByText("Dragon Dreams");
     expect(dragonNames.length).toBeGreaterThanOrEqual(2);
 
-    // Edit/delete buttons appear at least twice each (desktop + mobile)
-    const editDragon = screen.getAllByLabelText("Edit Dragon Dreams");
-    expect(editDragon.length).toBeGreaterThanOrEqual(2);
-
-    const deleteDragon = screen.getAllByLabelText("Delete Dragon Dreams");
-    expect(deleteDragon.length).toBeGreaterThanOrEqual(2);
+    // Kebab triggers appear for each chart (desktop + mobile)
+    const kebabTriggers = screen.getAllByLabelText("Project actions");
+    expect(kebabTriggers.length).toBeGreaterThanOrEqual(2);
   });
 });
