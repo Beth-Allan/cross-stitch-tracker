@@ -52,7 +52,7 @@ export function FilterBar({
             type="button"
             onClick={() => onSearchChange("")}
             aria-label="Clear search"
-            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2.5 -translate-y-1/2 transition-colors"
+            className="text-muted-foreground hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-2.5 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-sm transition-colors outline-none focus-visible:ring-2"
           >
             <X className="h-3.5 w-3.5" strokeWidth={2} />
           </button>

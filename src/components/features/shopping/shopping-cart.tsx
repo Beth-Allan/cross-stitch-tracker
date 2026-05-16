@@ -266,7 +266,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
                 aria-pressed={viewMode === "by-project"}
                 onClick={() => setViewMode("by-project")}
                 className={cn(
-                  "rounded-md px-3.5 py-1.5 text-sm font-medium transition-all",
+                  "focus-visible:ring-ring rounded-md px-3.5 py-1.5 text-sm font-medium transition-all outline-none focus-visible:ring-2",
                   viewMode === "by-project"
                     ? "bg-card text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground",
@@ -279,7 +279,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
                 aria-pressed={viewMode === "by-supply"}
                 onClick={() => setViewMode("by-supply")}
                 className={cn(
-                  "rounded-md px-3.5 py-1.5 text-sm font-medium transition-all",
+                  "focus-visible:ring-ring rounded-md px-3.5 py-1.5 text-sm font-medium transition-all outline-none focus-visible:ring-2",
                   viewMode === "by-supply"
                     ? "bg-card text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground",

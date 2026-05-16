@@ -39,7 +39,7 @@ const QUICK_ADD_GROUPS: QuickAddGroup[] = [
       {
         label: "Log Stitches",
         icon: Scissors,
-        iconColor: "text-emerald-600 dark:text-emerald-400",
+        iconColor: "text-progress-foreground",
         action: "logStitches",
       },
     ],
@@ -177,10 +177,10 @@ export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
-        className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+        className={`focus-visible:ring-ring inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
           open
-            ? "border-emerald-600 bg-emerald-600 text-white dark:border-emerald-500 dark:bg-emerald-500"
-            : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-300 dark:hover:bg-emerald-950/50"
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-selected-border bg-selected text-selected-foreground hover:bg-selected/80"
         }`}
       >
         <Plus
@@ -233,7 +233,7 @@ export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
                             role="menuitem"
                             tabIndex={focusedIndex === flatIndex ? 0 : -1}
                             onClick={() => handleItemClick(item)}
-                            className="hover:bg-muted focus:bg-muted flex w-full items-center gap-3 rounded-lg px-3 py-1.5 text-sm transition-colors focus:outline-none"
+                            className="hover:bg-muted focus-visible:bg-muted focus-visible:ring-ring flex w-full items-center gap-3 rounded-lg px-3 py-1.5 text-sm transition-colors outline-none focus-visible:ring-2"
                           >
                             <Icon className={`h-4 w-4 ${item.iconColor}`} strokeWidth={1.5} />
                             {item.label}

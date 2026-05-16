@@ -66,7 +66,7 @@ export function QuantityControl({
     <div
       className={cn(
         "inline-flex items-center gap-1",
-        isFulfilled && "rounded-lg bg-emerald-100 px-2 dark:bg-emerald-900/30",
+        isFulfilled && "bg-selected rounded-lg px-2",
         hasError && "rounded-lg ring-2 ring-red-300 dark:ring-red-700",
         shaking && "animate-shake",
       )}
@@ -77,8 +77,9 @@ export function QuantityControl({
         disabled={acquired <= 0 || isPending}
         aria-label="Decrement quantity"
         className={cn(
-          "flex h-7 min-h-[44px] w-7 min-w-[44px] items-center justify-center rounded transition-colors",
+          "flex h-7 min-h-[44px] w-7 min-w-[44px] items-center justify-center rounded transition-colors outline-none",
           "text-muted-foreground hover:text-foreground",
+          "focus-visible:ring-ring focus-visible:ring-2",
           "disabled:cursor-not-allowed disabled:opacity-50",
         )}
       >
@@ -100,7 +101,7 @@ export function QuantityControl({
           }}
           className={cn(
             "border-border bg-card text-foreground w-10 rounded border px-1 py-0.5 text-center font-mono text-sm tabular-nums outline-none",
-            "focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30",
+            "focus:border-ring focus:ring-ring/30 focus:ring-1",
             "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
           )}
           aria-label={`Acquired quantity out of ${required}`}
@@ -113,7 +114,7 @@ export function QuantityControl({
           className={cn(
             "min-w-[3ch] rounded border border-transparent px-1.5 py-0.5 text-center font-mono text-sm tabular-nums transition-all",
             isFulfilled
-              ? "text-emerald-700 hover:border-emerald-300 dark:text-emerald-300 dark:hover:border-emerald-700"
+              ? "text-selected-foreground hover:border-selected-border"
               : "text-foreground hover:border-border hover:bg-muted",
           )}
           aria-label={`${acquired} of ${required} acquired, click to edit`}
@@ -128,8 +129,9 @@ export function QuantityControl({
         disabled={acquired >= required || isPending}
         aria-label="Increment quantity"
         className={cn(
-          "flex h-7 min-h-[44px] w-7 min-w-[44px] items-center justify-center rounded transition-colors",
-          "text-muted-foreground hover:text-emerald-600",
+          "flex h-7 min-h-[44px] w-7 min-w-[44px] items-center justify-center rounded transition-colors outline-none",
+          "text-muted-foreground hover:text-progress-foreground",
+          "focus-visible:ring-ring focus-visible:ring-2",
           "disabled:cursor-not-allowed disabled:opacity-50",
         )}
       >
@@ -137,9 +139,7 @@ export function QuantityControl({
       </button>
 
       {isPending && <Loader2 className="text-muted-foreground h-3.5 w-3.5 animate-spin" />}
-      {!isPending && isFulfilled && (
-        <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-      )}
+      {!isPending && isFulfilled && <Check className="text-progress-foreground h-3.5 w-3.5" />}
     </div>
   );
 }

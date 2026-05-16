@@ -72,7 +72,7 @@ function EmptyFilterState({ onClearFilters }: { onClearFilters?: () => void }) {
         <button
           type="button"
           onClick={onClearFilters}
-          className="mt-4 text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+          className="text-progress-foreground hover:text-selected-foreground mt-4 text-sm font-medium transition-colors"
         >
           Clear all filters
         </button>
@@ -188,11 +188,11 @@ function ListProgressCell({ card }: { card: GalleryCardData }) {
       <div className="flex items-center gap-2">
         <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
           <div
-            className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400"
+            className="bg-progress h-full rounded-full"
             style={{ width: `${card.progressPercent}%` }}
           />
         </div>
-        <span className="font-mono text-xs text-emerald-600 tabular-nums dark:text-emerald-400">
+        <span className="text-progress-foreground font-mono text-xs tabular-nums">
           {card.progressPercent}%
         </span>
       </div>
@@ -259,7 +259,7 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
           <div className="min-w-0">
             <Link
               href={`/charts/${card.chartId}`}
-              className="font-heading text-foreground decoration-border block truncate text-sm font-semibold underline underline-offset-2 transition-colors hover:text-emerald-700 hover:decoration-emerald-500 dark:hover:text-emerald-400"
+              className="font-heading text-foreground decoration-border hover:text-selected-foreground hover:decoration-progress block truncate text-sm font-semibold underline underline-offset-2 transition-colors"
             >
               {card.name}
             </Link>
@@ -409,7 +409,7 @@ function TableView({
                   <div className="min-w-0">
                     <Link
                       href={`/charts/${card.chartId}`}
-                      className="font-heading text-foreground decoration-border block truncate text-sm font-semibold underline underline-offset-2 transition-colors hover:text-emerald-700 hover:decoration-emerald-500 dark:hover:text-emerald-400"
+                      className="font-heading text-foreground decoration-border hover:text-selected-foreground hover:decoration-progress block truncate text-sm font-semibold underline underline-offset-2 transition-colors"
                     >
                       {card.name}
                     </Link>
@@ -445,11 +445,11 @@ function TableView({
                   <div className="flex max-w-[100px] items-center gap-2">
                     <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
                       <div
-                        className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400"
+                        className="bg-progress h-full rounded-full"
                         style={{ width: `${card.progressPercent}%` }}
                       />
                     </div>
-                    <span className="font-mono text-xs text-emerald-600 tabular-nums dark:text-emerald-400">
+                    <span className="text-progress-foreground font-mono text-xs tabular-nums">
                       {card.progressPercent}%
                     </span>
                   </div>

@@ -138,7 +138,7 @@ export function ShoppingListTab({ threads, beads, specialty, fabrics }: Shopping
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <Check className="mb-3 h-8 w-8 text-emerald-500" />
+        <Check className="text-progress mb-3 h-8 w-8" />
         <p className="text-muted-foreground text-sm">
           All supplies acquired for selected projects!
         </p>
@@ -176,7 +176,7 @@ export function ShoppingListTab({ threads, beads, specialty, fabrics }: Shopping
         <p className="text-muted-foreground text-sm">
           {items.length} item{items.length !== 1 ? "s" : ""} to buy
           {checkedCount > 0 && (
-            <span className="text-emerald-600">
+            <span className="text-progress-foreground">
               {" \u00B7 "}
               {checkedCount} checked off
             </span>
@@ -216,16 +216,14 @@ export function ShoppingListTab({ threads, beads, specialty, fabrics }: Shopping
                     className={cn(
                       "flex w-full items-center gap-2.5 rounded-lg border p-3 text-left transition-colors",
                       isChecked
-                        ? "border-emerald-300 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-950/30"
+                        ? "border-selected-border bg-selected"
                         : "border-border bg-card hover:bg-muted/50",
                     )}
                   >
                     <span
                       className={cn(
                         "shrink-0",
-                        isChecked
-                          ? "text-emerald-500 dark:text-emerald-400"
-                          : "text-stone-300 dark:text-stone-600",
+                        isChecked ? "text-progress" : "text-muted-foreground/40",
                       )}
                     >
                       {isChecked ? (

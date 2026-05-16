@@ -71,7 +71,7 @@ export function ViewToggleBar({
               <Tooltip key={mode}>
                 <TooltipTrigger
                   className={cn(
-                    "inline-flex items-center justify-center rounded-md px-2.5 py-2 transition-colors",
+                    "focus-visible:ring-ring inline-flex items-center justify-center rounded-md px-2.5 py-2 transition-colors outline-none focus-visible:ring-2",
                     view === mode
                       ? "bg-card text-foreground shadow-sm"
                       : "text-muted-foreground/60 hover:text-muted-foreground",

@@ -61,11 +61,11 @@ function WIPFooter({ card }: { card: GalleryCardData }) {
           aria-label="Stitching progress"
         >
           <div
-            className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400"
+            className="bg-progress h-full rounded-full"
             style={{ width: `${card.progressPercent}%` }}
           />
         </div>
-        <span className="font-mono text-xs font-medium text-emerald-600 tabular-nums dark:text-emerald-400">
+        <span className="text-progress-foreground font-mono text-xs font-medium tabular-nums">
           {card.progressPercent}%
         </span>
       </div>
@@ -162,7 +162,7 @@ export function GalleryCard({ card }: GalleryCardProps) {
 
   return (
     <div
-      className={`group bg-card hover:shadow-foreground/8 flex flex-col overflow-hidden rounded-xl transition-[box-shadow,transform] duration-200 hover:-translate-y-1 hover:shadow-lg ${
+      className={`group bg-card hover:shadow-foreground/8 flex flex-col overflow-hidden rounded-xl transition-[box-shadow,transform] duration-200 hover:-translate-y-1 hover:shadow-lg motion-reduce:transform-none ${
         celebrationClasses ?? "border-border border"
       }`}
     >
@@ -173,7 +173,7 @@ export function GalleryCard({ card }: GalleryCardProps) {
             src={card.coverImageUrl!}
             alt={card.name}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
             onError={() => setImgFailed(true)}
             unoptimized
           />
@@ -210,7 +210,7 @@ export function GalleryCard({ card }: GalleryCardProps) {
         {/* Project name link */}
         <Link
           href={`/charts/${card.chartId}`}
-          className="font-heading text-foreground decoration-border line-clamp-2 text-sm leading-snug font-semibold underline underline-offset-2 transition-colors hover:text-emerald-700 hover:decoration-emerald-500 dark:hover:text-emerald-400 dark:hover:decoration-emerald-400"
+          className="font-heading text-foreground decoration-border hover:text-selected-foreground hover:decoration-progress line-clamp-2 text-sm leading-snug font-semibold underline underline-offset-2 transition-colors"
         >
           {card.name}
         </Link>

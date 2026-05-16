@@ -206,9 +206,7 @@ function AggregatedSupplyRow({
     <div
       className={cn(
         "flex items-center gap-3 rounded-lg border p-3",
-        isFulfilled
-          ? "border-emerald-200 bg-emerald-50/30 dark:border-emerald-800 dark:bg-emerald-950/20"
-          : "border-border bg-card",
+        isFulfilled ? "border-selected-border bg-selected" : "border-border bg-card",
       )}
     >
       {supply.hexColor && <ColorSwatch hexColor={supply.hexColor} size="sm" />}
@@ -261,16 +259,14 @@ function FabricSection({ fabrics }: { fabrics: ShoppingFabricNeed[] }) {
             key={fabric.projectId}
             className={cn(
               "flex items-center gap-3 rounded-lg border p-4",
-              fabric.hasFabric
-                ? "border-emerald-200 bg-emerald-50/30 dark:border-emerald-800 dark:bg-emerald-950/20"
-                : "border-border bg-card",
+              fabric.hasFabric ? "border-selected-border bg-selected" : "border-border bg-card",
             )}
           >
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <span className="text-foreground text-sm font-semibold">{fabric.projectName}</span>
                 {fabric.hasFabric && (
-                  <span className="inline-flex items-center gap-1 text-xs text-emerald-600">
+                  <span className="text-progress-foreground inline-flex items-center gap-1 text-xs">
                     <Check className="h-3 w-3" />
                     Has fabric
                   </span>

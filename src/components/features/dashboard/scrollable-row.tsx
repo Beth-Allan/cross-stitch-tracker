@@ -52,7 +52,7 @@ export function ScrollableRow({ children, className }: ScrollableRowProps) {
         aria-label="Scroll left"
         tabIndex={canScrollLeft ? 0 : -1}
         aria-hidden={!canScrollLeft}
-        className={`border-border bg-card hover:bg-muted absolute top-1/2 -left-3 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border shadow-md transition-colors ${
+        className={`border-border bg-card hover:bg-muted focus-visible:ring-ring absolute top-1/2 -left-3 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border shadow-md transition-colors outline-none focus-visible:ring-2 ${
           canScrollLeft ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
@@ -78,7 +78,7 @@ export function ScrollableRow({ children, className }: ScrollableRowProps) {
         aria-label="Scroll right"
         tabIndex={canScrollRight ? 0 : -1}
         aria-hidden={!canScrollRight}
-        className={`border-border bg-card hover:bg-muted absolute top-1/2 -right-3 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border shadow-md transition-colors ${
+        className={`border-border bg-card hover:bg-muted focus-visible:ring-ring absolute top-1/2 -right-3 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border shadow-md transition-colors outline-none focus-visible:ring-2 ${
           canScrollRight ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       >

@@ -68,12 +68,12 @@ describe("MultiSelectDropdown", () => {
     expect(screen.queryByText("Alpha")).not.toBeInTheDocument();
   });
 
-  it("applies active styling (emerald border) when items selected", () => {
+  it("applies active styling (selected border) when items selected", () => {
     const { container } = render(
       <MultiSelectDropdown label="Status" options={options} selected={["A"]} onToggle={vi.fn()} />,
     );
     const trigger = screen.getByRole("button", { name: /status/i });
-    expect(trigger.className).toContain("border-emerald-300");
+    expect(trigger.className).toContain("border-selected-border");
   });
 
   it("shows checked checkbox for selected options", () => {

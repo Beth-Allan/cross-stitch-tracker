@@ -135,7 +135,7 @@ export function SortDropdown({ sort, dir, onSortChange }: SortDropdownProps) {
         aria-haspopup="listbox"
         aria-controls={isOpen ? listboxId : undefined}
         aria-label={`Sort by ${SORT_LABELS[sort]}, ${directionLabel}`}
-        className="border-border text-muted-foreground hover:border-foreground/25 flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm whitespace-nowrap transition-colors"
+        className="border-border text-muted-foreground hover:border-foreground/25 focus-visible:ring-ring flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm whitespace-nowrap transition-colors outline-none focus-visible:ring-2"
       >
         {dir === "asc" ? (
           <ArrowUp className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -179,7 +179,7 @@ export function SortDropdown({ sort, dir, onSortChange }: SortDropdownProps) {
                 )}
               >
                 <span className="flex items-center gap-2">
-                  {isActive && <Check className="h-3.5 w-3.5 text-emerald-500" />}
+                  {isActive && <Check className="text-progress h-3.5 w-3.5" />}
                   {!isActive && <span className="w-3.5" />}
                   <span>{SORT_LABELS[field]}</span>
                 </span>
