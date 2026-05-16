@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Form & Supply Overhaul
-status: milestone_complete
-stopped_at: Phase 14 context gathered
-last_updated: "2026-05-16T20:03:56.581Z"
-last_activity: 2026-05-16 -- Phase 14 execution started
+status: shipped
+stopped_at: v1.3 shipped — PR #32
+last_updated: "2026-05-16"
+last_activity: 2026-05-16 -- v1.3 shipped — PR #32
 progress:
   total_phases: 5
   completed_phases: 5
