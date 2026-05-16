@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useTransition, useMemo } from "react";
+import { useState, useCallback, useTransition, useMemo, useEffect, useRef } from "react";
 import { CircleDot, Gem, Sparkles, Package } from "lucide-react";
 import { toast } from "sonner";
 import { SupplyTableAddRow } from "./supply-table-add-row";
@@ -44,6 +44,43 @@ export function SupplyTable({
   const [, startTransition] = useTransition();
 
   const mergedCalcParams = useMemo(() => ({ ...DEFAULT_CALC_PARAMS, ...calcParams }), [calcParams]);
+
+  // Track previous calcParams to detect actual changes (skip initial mount)
+  const prevCalcParamsRef = useRef<string | null>(null);
+
+  // Keep adapter's calcParams in sync
+  useEffect(() => {
+    if ("setCalcParams" in adapter && typeof (adapter as Record<string, unknown>).setCalcParams === "function") {
+      (adapter as Record<string, unknown> & { setCalcParams: (p: typeof mergedCalcParams) => void }).setCalcParams(mergedCalcParams);
+    }
+  }, [adapter, mergedCalcParams]);
+
+  // Keep adapter's rows in sync (for ServerActionAdapter's isNeedOverridden lookup)
+  const allRows = useMemo(() => [...threads, ...beads, ...specialty], [threads, beads, specialty]);
+  useEffect(() => {
+    if ("setRows" in adapter && typeof (adapter as Record<string, unknown>).setRows === "function") {
+      (adapter as Record<string, unknown> & { setRows: (r: typeof allRows) => void }).setRows(allRows);
+    }
+  }, [adapter, allRows]);
+
+  // Bulk recalculation when calcParams change (not on initial mount)
+  useEffect(() => {
+    const key = JSON.stringify(mergedCalcParams);
+    if (prevCalcParamsRef.current === null) {
+      // Initial mount — just record, don't recalculate
+      prevCalcParamsRef.current = key;
+      return;
+    }
+    if (prevCalcParamsRef.current === key) return;
+    prevCalcParamsRef.current = key;
+
+    // Recalculate all non-overridden thread rows with stitchCount > 0
+    for (const row of threads) {
+      if (!row.isNeedOverridden && row.stitchCount > 0) {
+        adapter.updateQuantity("THREAD", row.id, "stitchCount", row.stitchCount);
+      }
+    }
+  }, [mergedCalcParams, threads, adapter]);
 
   // Derive existing supply IDs from all sections for add-row disabled items
   const existingIds = useMemo(() => {
