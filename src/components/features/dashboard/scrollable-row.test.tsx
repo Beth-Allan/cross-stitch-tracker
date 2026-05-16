@@ -23,4 +23,26 @@ describe("ScrollableRow", () => {
     expect(screen.getByLabelText("Scroll left")).toBeInTheDocument();
     expect(screen.getByLabelText("Scroll right")).toBeInTheDocument();
   });
+
+  it("scroll buttons have 44px minimum touch target (h-11 w-11)", () => {
+    render(
+      <ScrollableRow>
+        <div>Card 1</div>
+      </ScrollableRow>,
+    );
+    const leftBtn = screen.getByLabelText("Scroll left");
+    expect(leftBtn.className).toContain("h-11");
+    expect(leftBtn.className).toContain("w-11");
+  });
+
+  it("scroll buttons have focus-visible ring styles", () => {
+    render(
+      <ScrollableRow>
+        <div>Card 1</div>
+      </ScrollableRow>,
+    );
+    const leftBtn = screen.getByLabelText("Scroll left");
+    expect(leftBtn.className).toContain("focus-visible:ring-ring");
+    expect(leftBtn.className).toContain("focus-visible:ring-2");
+  });
 });

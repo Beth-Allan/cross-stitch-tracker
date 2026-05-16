@@ -256,5 +256,12 @@ describe("GalleryCard", () => {
       expect(cardEl.className).toContain("border");
       expect(cardEl.className).toContain("border-border");
     });
+
+    it("applies motion-reduce:transform-none to card wrapper", () => {
+      const card = createMockGalleryCard();
+      const { container } = render(<GalleryCard card={card} />);
+      const cardEl = container.firstChild as HTMLElement;
+      expect(cardEl.className).toContain("motion-reduce:transform-none");
+    });
   });
 });

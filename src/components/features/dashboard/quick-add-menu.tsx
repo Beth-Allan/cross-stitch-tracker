@@ -146,6 +146,11 @@ export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
         e.preventDefault();
         closeMenu();
         break;
+      case "Enter":
+      case " ":
+        e.preventDefault();
+        if (focusedIndex >= 0) handleItemClick(ALL_ITEMS[focusedIndex]);
+        break;
       case "ArrowDown":
         e.preventDefault();
         setFocusedIndex((i) => (i + 1) % ALL_ITEMS.length);
@@ -214,9 +219,14 @@ export function QuickAddMenu({ onLogStitches }: QuickAddMenuProps) {
                 return (
                   <div
                     key={group.label}
+                    role="group"
+                    aria-labelledby={`quick-add-group-${group.label.toLowerCase().replace(/\s+/g, "-")}`}
                     className={groupIndex > 0 ? "border-border mt-1.5 border-t pt-1.5" : ""}
                   >
-                    <span className="text-muted-foreground px-3 pb-1 text-[11px] font-semibold tracking-wider uppercase">
+                    <span
+                      id={`quick-add-group-${group.label.toLowerCase().replace(/\s+/g, "-")}`}
+                      className="text-muted-foreground px-3 pb-1 text-[11px] font-semibold tracking-wider uppercase"
+                    >
                       {group.label}
                     </span>
                     <div className="mt-1 px-1">
