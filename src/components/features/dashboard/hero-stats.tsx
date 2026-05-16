@@ -47,10 +47,7 @@ export function HeroStats({ stats }: HeroStatsProps) {
         const subtitle = formatStatSubtitle(key, stats);
 
         return (
-          <div
-            key={key}
-            className="rounded-xl border border-emerald-100 bg-emerald-50/60 p-4 dark:border-emerald-900/30 dark:bg-emerald-950/20"
-          >
+          <div key={key} className="border-success-border bg-success-muted rounded-xl border p-4">
             <p className="text-muted-foreground mb-2 text-[11px] font-bold tracking-wider uppercase">
               {label}
             </p>

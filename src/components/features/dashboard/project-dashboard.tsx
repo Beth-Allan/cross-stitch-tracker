@@ -20,7 +20,7 @@ export function ProjectDashboard({ data, imageUrls }: ProjectDashboardProps) {
   return (
     <div className="mx-auto max-w-[1200px] space-y-8">
       <div>
-        <h1 className="font-heading text-2xl font-bold">Project Dashboard</h1>
+        <h1 className="font-heading text-2xl font-semibold">Project Dashboard</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Track your progress across every project in your collection
         </p>

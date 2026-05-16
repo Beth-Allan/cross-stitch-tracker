@@ -32,7 +32,7 @@ export function MainDashboard({ data, startNextCards, imageUrls }: MainDashboard
       {/* Page header + Quick Add */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-heading text-2xl font-bold">Your Library</h1>
+          <h1 className="font-heading text-2xl font-semibold">Your Library</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Welcome back to your cross stitch collection
           </p>

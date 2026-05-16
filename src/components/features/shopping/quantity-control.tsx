@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, Minus, Plus } from "lucide-react";
+import { Check, Loader2, Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface QuantityControlProps {
@@ -136,7 +136,10 @@ export function QuantityControl({
         <Plus className="h-4 w-4" />
       </button>
 
-      {isFulfilled && <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />}
+      {isPending && <Loader2 className="text-muted-foreground h-3.5 w-3.5 animate-spin" />}
+      {!isPending && isFulfilled && (
+        <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+      )}
     </div>
   );
 }

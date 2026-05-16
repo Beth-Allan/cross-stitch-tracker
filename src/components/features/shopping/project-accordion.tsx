@@ -29,7 +29,7 @@ interface ProjectAccordionProps {
     junctionId: string,
     quantity: number,
   ) => void;
-  isPending: boolean;
+  pendingIds: Set<string>;
   failedIds: Set<string>;
 }
 
@@ -44,7 +44,7 @@ export function ProjectAccordion({
   onToggle,
   onSelectAll,
   onUpdateAcquired,
-  isPending,
+  pendingIds,
   failedIds,
 }: ProjectAccordionProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
@@ -180,7 +180,7 @@ export function ProjectAccordion({
                       allSelectedProjectIds={allSelectedProjectIds}
                       allSupplies={threads}
                       onUpdateAcquired={onUpdateAcquired}
-                      isPending={isPending}
+                      pendingIds={pendingIds}
                       failedIds={failedIds}
                     />
                   )}
@@ -193,7 +193,7 @@ export function ProjectAccordion({
                       allSelectedProjectIds={allSelectedProjectIds}
                       allSupplies={beads}
                       onUpdateAcquired={onUpdateAcquired}
-                      isPending={isPending}
+                      pendingIds={pendingIds}
                       failedIds={failedIds}
                     />
                   )}
@@ -206,7 +206,7 @@ export function ProjectAccordion({
                       allSelectedProjectIds={allSelectedProjectIds}
                       allSupplies={specialty}
                       onUpdateAcquired={onUpdateAcquired}
-                      isPending={isPending}
+                      pendingIds={pendingIds}
                       failedIds={failedIds}
                     />
                   )}
@@ -269,7 +269,7 @@ function SupplyGroup({
   allSelectedProjectIds,
   allSupplies,
   onUpdateAcquired,
-  isPending,
+  pendingIds,
   failedIds,
 }: {
   label: string;
@@ -283,7 +283,7 @@ function SupplyGroup({
     junctionId: string,
     quantity: number,
   ) => void;
-  isPending: boolean;
+  pendingIds: Set<string>;
   failedIds: Set<string>;
 }) {
   return (
@@ -320,7 +320,7 @@ function SupplyGroup({
               <QuantityControl
                 acquired={supply.quantityAcquired}
                 required={supply.quantityRequired}
-                isPending={isPending}
+                isPending={pendingIds.has(supply.junctionId)}
                 hasError={failedIds.has(supply.junctionId)}
                 onChange={(newValue) => onUpdateAcquired(type, supply.junctionId, newValue)}
               />

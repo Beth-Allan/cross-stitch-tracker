@@ -42,7 +42,7 @@ const defaultProps = {
   onToggle: vi.fn(),
   onSelectAll: vi.fn(),
   onUpdateAcquired: vi.fn(),
-  isPending: false,
+  pendingIds: new Set<string>(),
   failedIds: new Set<string>(),
 };
 

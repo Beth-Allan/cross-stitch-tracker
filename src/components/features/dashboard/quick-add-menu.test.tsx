@@ -32,13 +32,14 @@ describe("QuickAddMenu", () => {
     expect(screen.getByText("New Genre")).toBeInTheDocument();
   });
 
-  it("'Log Stitches' item has a border-b separator", () => {
+  it("renders group labels for menu sections", () => {
     render(<QuickAddMenu onLogStitches={vi.fn()} />);
 
     fireEvent.click(screen.getByText("Quick Add"));
 
-    const logStitchesButton = screen.getByText("Log Stitches").closest("button");
-    expect(logStitchesButton?.className).toContain("border-b");
+    expect(screen.getByText("Quick Actions")).toBeInTheDocument();
+    expect(screen.getByText("Create")).toBeInTheDocument();
+    expect(screen.getByText("Reference")).toBeInTheDocument();
   });
 
   it("calls onLogStitches callback when 'Log Stitches' is clicked", () => {
