@@ -100,12 +100,8 @@ describe("CalculatorCard", () => {
 
   it("renders Over segmented control with buttons for 1 and 2", () => {
     render(<CalculatorCard {...defaultProps} />);
-    expect(
-      screen.getByRole("button", { name: /stitch over 1 thread/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /stitch over 2 thread/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /stitch over 1 thread/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /stitch over 2 thread/i })).toBeInTheDocument();
   });
 
   it("Over button 1 shows active state (aria-pressed=true) when overCount is 1", () => {
@@ -118,10 +114,7 @@ describe("CalculatorCard", () => {
 
   it("Over button 2 shows active state when overCount is 2", () => {
     render(
-      <CalculatorCard
-        {...defaultProps}
-        calcParams={{ ...defaultCalcParams, overCount: 2 }}
-      />,
+      <CalculatorCard {...defaultProps} calcParams={{ ...defaultCalcParams, overCount: 2 }} />,
     );
     const over2 = screen.getByRole("button", { name: /stitch over 2 thread/i });
     expect(over2).toHaveAttribute("aria-pressed", "true");
@@ -132,16 +125,9 @@ describe("CalculatorCard", () => {
   it("clicking Over button calls onCalcParamsChange with updated overCount", async () => {
     const user = userEvent.setup();
     const onCalcParamsChange = vi.fn();
-    render(
-      <CalculatorCard
-        {...defaultProps}
-        onCalcParamsChange={onCalcParamsChange}
-      />,
-    );
+    render(<CalculatorCard {...defaultProps} onCalcParamsChange={onCalcParamsChange} />);
 
-    await user.click(
-      screen.getByRole("button", { name: /stitch over 2 thread/i }),
-    );
+    await user.click(screen.getByRole("button", { name: /stitch over 2 thread/i }));
     expect(onCalcParamsChange).toHaveBeenCalledWith({
       ...defaultCalcParams,
       overCount: 2,
@@ -163,31 +149,30 @@ describe("CalculatorCard", () => {
   it("selecting fabric calls onFabricChange with fabric ID", async () => {
     const user = userEvent.setup();
     const onFabricChange = vi.fn();
-    render(
-      <CalculatorCard {...defaultProps} onFabricChange={onFabricChange} />,
-    );
+    render(<CalculatorCard {...defaultProps} onFabricChange={onFabricChange} />);
 
     const select = screen.getByTestId("fabric-select");
     await user.selectOptions(select, "fab-1");
     expect(onFabricChange).toHaveBeenCalledWith("fab-1", 28);
   });
 
-  it("selecting fabric with count auto-fills fabricCount in onCalcParamsChange callback", async () => {
+  it("selecting fabric delegates fabricCount update to parent via onFabricChange, not onCalcParamsChange", async () => {
     const user = userEvent.setup();
     const onCalcParamsChange = vi.fn();
+    const onFabricChange = vi.fn();
     render(
       <CalculatorCard
         {...defaultProps}
         onCalcParamsChange={onCalcParamsChange}
+        onFabricChange={onFabricChange}
       />,
     );
 
     const select = screen.getByTestId("fabric-select");
     await user.selectOptions(select, "fab-1");
-    expect(onCalcParamsChange).toHaveBeenCalledWith({
-      ...defaultCalcParams,
-      fabricCount: 28,
-    });
+    // Parent handles fabricCount via onFabricChange — child should NOT double-update
+    expect(onFabricChange).toHaveBeenCalledWith("fab-1", 28);
+    expect(onCalcParamsChange).not.toHaveBeenCalled();
   });
 
   it('has role="group" and aria-label="Skein calculator settings"', () => {

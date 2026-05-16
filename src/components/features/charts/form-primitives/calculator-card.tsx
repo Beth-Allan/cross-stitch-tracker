@@ -29,13 +29,10 @@ export function CalculatorCard({
   const handleFabricSelect = useCallback(
     (value: string | null) => {
       const fabric = fabricOptions.find((f) => f.value === value);
+      // Parent's onFabricChange handles both fabricId and fabricCount update
       onFabricChange(value, fabric?.count);
-      // Auto-fill fabricCount when fabric is selected (D-10)
-      if (fabric?.count) {
-        onCalcParamsChange({ ...calcParams, fabricCount: fabric.count });
-      }
     },
-    [fabricOptions, onFabricChange, onCalcParamsChange, calcParams],
+    [fabricOptions, onFabricChange],
   );
 
   const handleOverChange = useCallback(
@@ -70,11 +67,9 @@ export function CalculatorCard({
     <div
       role="group"
       aria-label="Skein calculator settings"
-      className="rounded-lg border border-border bg-card p-4"
+      className="border-border bg-card rounded-lg border p-4"
     >
-      <h3 className="text-foreground mb-3 text-sm font-semibold">
-        Skein Calculator
-      </h3>
+      <h3 className="text-foreground mb-3 text-sm font-semibold">Skein Calculator</h3>
 
       {/* Fabric row */}
       <div className="mb-3">
@@ -93,7 +88,7 @@ export function CalculatorCard({
       <div className="flex flex-wrap gap-x-6 gap-y-3">
         {/* Strands */}
         <div className="flex items-center gap-2">
-          <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+          <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
             STRANDS
           </span>
           <EditableNumber
@@ -108,7 +103,7 @@ export function CalculatorCard({
 
         {/* Over */}
         <div className="flex items-center gap-2">
-          <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+          <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
             OVER
           </span>
           <div className="flex gap-1">
@@ -143,7 +138,7 @@ export function CalculatorCard({
 
         {/* Fabric Count */}
         <div className="flex items-center gap-2">
-          <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+          <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
             COUNT
           </span>
           <EditableNumber
@@ -158,7 +153,7 @@ export function CalculatorCard({
 
         {/* Waste */}
         <div className="flex items-center gap-2">
-          <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+          <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
             WASTE
           </span>
           <EditableNumber
