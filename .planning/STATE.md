@@ -18,16 +18,16 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-03)
+See: .planning/PROJECT.md (updated 2026-05-16)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 14 — edit-mode-cleanup
+**Current focus:** Planning next milestone (v1.4)
 
 ## Current Position
 
-Phase: 14
-Plan: Not started
-Status: Milestone complete
+Phase: —
+Plan: —
+Status: Between milestones (v1.3 archived, v1.4 not started)
 Last activity: 2026-05-16
 
 Progress: [░░░░░░░░░░] 0%
