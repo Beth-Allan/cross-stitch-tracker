@@ -151,9 +151,18 @@ Plans:
 **Requirements**: EDIT-01, EDIT-02, CLEAN-01
 **Success Criteria** (what must be TRUE):
   1. User edits an existing chart/project via a full-page merged form (same layout as creation) -- not a modal
-  2. User can navigate to the edit form from the project detail page and from the gallery card kebab menu
+  2. User can navigate to the edit form from the project detail page and from the list-row kebab menu
   3. Old chart form, old supply tab, old supply row components, and the edit modal are fully removed from the codebase
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1**
+- [ ] 14-01-PLAN.md -- Remove 9 deprecated files with zero live importers
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 14-02-PLAN.md -- Edit mode for merged form, list-row kebab menu, edit route rewire
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 14-03-PLAN.md -- Remove 12 post-rewire deprecated files, ROADMAP update
 **UI hint**: yes
 
 ## Execution Order
@@ -183,4 +192,4 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 11. Supply Table on Project Detail | v1.3 | 2/2 | Complete    | 2026-05-11 |
 | 12. Merged Form | v1.3 | 3/3 | Complete    | 2026-05-11 |
 | 13. Supply Takeover | v1.3 | 5/5 | Complete   | 2026-05-16 |
-| 14. Edit Mode & Cleanup | v1.3 | 0/? | Not started | - |
+| 14. Edit Mode & Cleanup | v1.3 | 0/3 | Not started | - |
