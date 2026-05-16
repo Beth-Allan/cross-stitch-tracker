@@ -21,18 +21,17 @@
 
 ### In Progress
 
-- **v1.3 Form & Supply Overhaul** — All 5 phases (10-14) complete. Milestone ready to ship.
+- **v1.3 Form & Supply Overhaul** — SHIPPED 2026-05-16, archived, tagged v1.3
 
 ### Done This Session
 
-- **Impeccable audit** (full app): Score 16/20, 0 P0/P1, 4 P2/3 P3 issues
-- **Harden pass** (`0af6d1c`): focus-visible rings on all custom interactive elements, 44px touch targets on scroll arrows, motion-reduce on card hover transforms
-- **Polish pass** (`0af6d1c`): 5 new semantic tokens (progress, selected families), 44 hardcoded emerald instances converted across gallery/shopping/dashboard
+- **Milestone close** — archived v1.3 (roadmap, requirements, 5 phase directories), wrote retrospective, merged to main, tagged v1.3, cleaned up 7 old feature branches
+- 23 deferred artifacts acknowledged (stale debug sessions + quick tasks from v1.0-v1.2 era)
 
 ### Next Up — RESUME HERE
 
-1. `/gsd-complete-milestone` — archive v1.3 and prepare for v1.4
-2. Or: `/gsd-ship` — create PR for v1.3 changes
+1. `git push origin main --tags` — push archive + tag to remote
+2. `/gsd-new-milestone` — start v1.4 Motivation & Planning (questioning → research → requirements → roadmap)
 
 ### Backlog
 
