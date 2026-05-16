@@ -838,4 +838,123 @@ describe("ChartMergedForm", () => {
 
     warningSpy.mockRestore();
   });
+
+  // --- createFn field name tests (GAP 7) ---
+
+  describe("createFn field mapping", () => {
+    it("createFn for THREAD passes colorName, colorCode, hexColor, colorFamily, and brandId to createThread", async () => {
+      const { createThread: mockCreateThreadFn } = await import(
+        "@/lib/actions/supply-actions"
+      );
+      const mockCreateThread = vi.mocked(mockCreateThreadFn);
+      mockCreateThread.mockResolvedValue({
+        success: true as const,
+        thread: {
+          id: "new-t-1",
+          colorCode: "999",
+          colorName: "Dark Purple",
+          hexColor: "#800080",
+          brandId: "brand-1",
+        },
+      });
+
+      const { buildCreateFn } = await import("./chart-merged-form");
+
+      const createFn = buildCreateFn();
+      await createFn("THREAD", {
+        name: "Dark Purple",
+        code: "999",
+        brandId: "brand-1",
+        hexColor: "#800080",
+      });
+
+      expect(mockCreateThread).toHaveBeenCalledWith(
+        expect.objectContaining({
+          colorName: "Dark Purple",
+          colorCode: "999",
+          brandId: "brand-1",
+          hexColor: "#800080",
+          colorFamily: "NEUTRAL",
+        }),
+      );
+      // Must NOT have a 'name' field (wrong field name)
+      const callArg = mockCreateThread.mock.calls[0][0] as Record<string, unknown>;
+      expect(callArg).not.toHaveProperty("name");
+    });
+
+    it("createFn for BEAD passes colorName, productCode, hexColor, colorFamily, and brandId to createBead", async () => {
+      const { createBead: mockCreateBeadFn } = await import(
+        "@/lib/actions/supply-actions"
+      );
+      const mockCreateBead = vi.mocked(mockCreateBeadFn);
+      mockCreateBead.mockResolvedValue({
+        success: true as const,
+        bead: {
+          id: "new-b-1",
+          productCode: "00001",
+          colorName: "Red Glass",
+          hexColor: "#808080",
+          brandId: "brand-2",
+        },
+      });
+
+      const { buildCreateFn } = await import("./chart-merged-form");
+
+      const createFn = buildCreateFn();
+      await createFn("BEAD", {
+        name: "Red Glass",
+        code: "00001",
+        brandId: "brand-2",
+      });
+
+      expect(mockCreateBead).toHaveBeenCalledWith(
+        expect.objectContaining({
+          colorName: "Red Glass",
+          productCode: "00001",
+          brandId: "brand-2",
+          hexColor: "#808080",
+          colorFamily: "NEUTRAL",
+        }),
+      );
+      const callArg = mockCreateBead.mock.calls[0][0] as Record<string, unknown>;
+      expect(callArg).not.toHaveProperty("name");
+    });
+
+    it("createFn for SPECIALTY passes colorName, productCode, hexColor, and brandId to createSpecialtyItem", async () => {
+      const { createSpecialtyItem: mockCreateSpecialtyFn } = await import(
+        "@/lib/actions/supply-actions"
+      );
+      const mockCreateSpecialty = vi.mocked(mockCreateSpecialtyFn);
+      mockCreateSpecialty.mockResolvedValue({
+        success: true as const,
+        specialtyItem: {
+          id: "new-s-1",
+          productCode: "KR-001",
+          colorName: "Gold Braid",
+          hexColor: "#808080",
+          brandId: "brand-3",
+        },
+      });
+
+      const { buildCreateFn } = await import("./chart-merged-form");
+
+      const createFn = buildCreateFn();
+      await createFn("SPECIALTY", {
+        name: "Gold Braid",
+        code: "KR-001",
+        brandId: "brand-3",
+      });
+
+      expect(mockCreateSpecialty).toHaveBeenCalledWith(
+        expect.objectContaining({
+          colorName: "Gold Braid",
+          productCode: "KR-001",
+          brandId: "brand-3",
+          hexColor: "#808080",
+        }),
+      );
+      const callArg = mockCreateSpecialty.mock.calls[0][0] as Record<string, unknown>;
+      expect(callArg).not.toHaveProperty("name");
+    });
+  });
 });
