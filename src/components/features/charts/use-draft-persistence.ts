@@ -4,6 +4,28 @@ import { DEFAULT_CALC_PARAMS } from "@/components/features/supply-table/types";
 
 export const DRAFT_KEY = "chart-draft";
 
+const SUPPLY_TYPES = new Set(["THREAD", "BEAD", "SPECIALTY"]);
+
+/** Lightweight runtime guard — rejects malformed supply rows from localStorage. */
+function isValidSupplyRow(s: unknown): s is SupplyRow {
+  if (typeof s !== "object" || s === null) return false;
+  const r = s as Record<string, unknown>;
+  return (
+    typeof r.id === "string" &&
+    typeof r.supplyId === "string" &&
+    typeof r.type === "string" &&
+    SUPPLY_TYPES.has(r.type) &&
+    typeof r.code === "string" &&
+    typeof r.name === "string" &&
+    typeof r.brandName === "string" &&
+    typeof r.hexColor === "string" &&
+    typeof r.stitchCount === "number" &&
+    typeof r.need === "number" &&
+    typeof r.have === "number" &&
+    typeof r.isNeedOverridden === "boolean"
+  );
+}
+
 /**
  * V2 draft format that includes supply rows and calc params
  * alongside the form values. Backward-compatible with V1 drafts.
@@ -151,9 +173,11 @@ export function loadDraftV2(
       merged.fabricId = null;
     }
 
+    const validSupplies = (draft.supplies ?? []).filter(isValidSupplyRow);
+
     return {
       form: merged,
-      supplies: draft.supplies ?? [],
+      supplies: validSupplies,
       calcParams: draft.calcParams ?? DEFAULT_CALC_PARAMS,
     };
   } catch {
