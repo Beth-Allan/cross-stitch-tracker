@@ -131,7 +131,7 @@ Plans:
   2. User can return to form details via a "Details" link in the summary bar with all form state preserved (no data loss)
   3. User can optionally assign fabric as the first step in supply takeover, which auto-populates the skein calculator's fabric count default
   4. User can configure skein calculation parameters (Strands Over, Fabric Count, Waste %) via a styled card with segmented controls in the supply area
-**Plans**: 3 plans
+**Plans**: 5 plans
 Plans:
 **Wave 1** *(parallel)*
 - [x] 13-01-PLAN.md -- CreationFlowAdapter, createChartWithSupplies server action, batchSupplySchema, draft persistence V2
@@ -139,6 +139,10 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [x] 13-03-PLAN.md -- Activity mode toggle wiring, supply table embedding, visual checkpoint
+
+**Wave 3 — Gap Closure** *(parallel, from UAT)*
+- [ ] 13-04-PLAN.md -- Fix createFn field mismatches, Activity-to-conditional for fabric dropdown, draft auto-save on unmount
+- [ ] 13-05-PLAN.md -- Wire skein recalculation through adapters and SupplyTable on stitchCount/calcParams change
 **UI hint**: yes
 
 ### Phase 14: Edit Mode & Cleanup
@@ -178,5 +182,5 @@ Note: Phase 12 (Merged Form) has no dependency on Phases 10-11 and could theoret
 | 10. Unified Supply Table | v1.3 | 6/6 | Complete    | 2026-05-04 |
 | 11. Supply Table on Project Detail | v1.3 | 2/2 | Complete    | 2026-05-11 |
 | 12. Merged Form | v1.3 | 3/3 | Complete    | 2026-05-11 |
-| 13. Supply Takeover | v1.3 | 3/3 | Complete    | 2026-05-16 |
+| 13. Supply Takeover | v1.3 | 3/5 | In progress | - |
 | 14. Edit Mode & Cleanup | v1.3 | 0/? | Not started | - |
