@@ -112,8 +112,11 @@ Plans:
   4. All entity references (projects, designers) in stats are clickable links to their detail pages
 **Plans:** 3 plans
 Plans:
+**Wave 1**
 - [ ] 19-01-PLAN.md — Types, chart configs, and breakdown queries (size, designer, genre)
 - [ ] 19-02-PLAN.md — MetricsBar and LifetimeCounters components
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 19-03-PLAN.md — Chart components, RankedList, StatsOverview layout, page wiring
 
 ### Phase 20: Activity Visualization & Calendar
