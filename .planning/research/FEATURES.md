@@ -1,209 +1,175 @@
 # Feature Landscape
 
-**Domain:** Form & supply table overhaul for a cross-stitch project management app
-**Researched:** 2026-05-03
-**Confidence:** HIGH (validated sketch findings + UX pattern research + existing codebase analysis)
-
-## Comparable Patterns Studied
-
-| Reference App / Pattern | Type | Key Insight |
-|------------------------|------|-------------|
-| QuickBooks invoice line items | Accounting SaaS | Persistent add row, autocomplete on item name fills description/rate, Tab to move between cells, sticky item type between adds |
-| Google Sheets cell entry | Spreadsheet | Type-ahead autocomplete from column values, Enter commits and moves down, Tab moves right, Escape cancels, all fields always visible |
-| Jira backlog grid | Project management | Inline editing on click, keyboard navigation between rows, grouped sections (epics), different row layouts per context |
-| AG Grid / TanStack Table | Data grid libraries | Grouped row display with collapsible sections, different column renderers per row type, keyboard cell navigation with arrow keys |
-| Airtable record detail | Database UI | Collapsible field groups, tab navigation for sections, inline editing with save-on-blur, linked record search with autocomplete |
-| Harvest time entry | Time tracking | Persistent add row with live running total, auto-save, Tab navigation between entry fields |
-| StashCache (cross-stitch) | Craft supply tracking | Input materials list, auto-checks stash for what's missing, kitted status from supply completeness |
-| Cross Stitch Journal | Craft project tracker | Stage-based project tracking (Wishlist through Finished), supply tracking, goal setting |
-| X-Stitch Plus | Craft stash manager | Thread/fabric/chart inventory, shopping list generation, per-project material lists |
-| Thread-bare skein calculator | Cross-stitch tool | Stitches-per-skein formula incorporating fabric count, strand count, over count |
-
----
+**Domain:** Statistics & data visualization for craft/hobby tracking apps
+**Researched:** 2026-05-17
+**Confidence:** HIGH (cross-referenced DesignOS spec, competitor apps, fitness tracker patterns)
 
 ## Table Stakes
 
-Features users expect in a form + supply table overhaul. Missing any = the product feels incomplete or regressed.
+Features users expect in a statistics dashboard for a hobby tracker. Missing = product feels incomplete or pointless.
 
-| Feature | Why Expected | Complexity | Depends On | Notes |
-|---------|-------------|------------|------------|-------|
-| **Single-page form for chart+project creation** | The current form already works as a scrolling page. Merging the chart/project distinction (which was always artificial -- users think "I'm adding a project") is table stakes for a form overhaul. Notion, Airtable, every project tracker uses one form per entity. | Med | Existing `useChartForm` hook, Chart+Project Prisma models | Replaces current `chart-add-form.tsx` and `chart-edit-modal.tsx`. Must support both create and edit modes. ~50 fields organized into 4 groups with `<hr>` dividers per sketch 003. |
-| **Required field indicators** | Users need to know what's mandatory before they start filling in a long form. Green dot indicator (sketch 003 winner) is cleaner than "optional" tags on 40+ fields. Standard UX pattern -- Airtable uses asterisks, Notion uses red dots. | Low | None | Only Chart Name and Status are required. The green dot pattern is validated in sketch 003. |
-| **Sticky save bar** | Long forms need persistent save access. Users should never scroll to find the submit button. GitLab Pajamas, SAP Fiori, and Primer all document this pattern. The sketch validated a fixed bottom bar with save-readiness hint. | Low | Form validation state | Fixed bottom bar: save-readiness hint on left ("Chart name entered -- ready to save"), Save Draft + Create buttons on right. Must account for mobile viewport (no overlap with iOS safe area). |
-| **Keyboard navigation within supply table** | Tab between cells, Enter to commit row, Escape to cancel -- this is what every spreadsheet and accounting app does. QuickBooks, Google Sheets, Harvest all use this flow. Users transcribing from a pattern will enter 30+ thread codes in one sitting; mouse-only entry is a dealbreaker. | Med-High | Supply table component, focus management | Flow: type code -> autocomplete -> Enter to select -> stitches field auto-focuses -> Enter to add (fast path) or Tab to override need -> Enter to add -> search refocuses. Escape resets add row at any point. |
-| **Autocomplete for supply search** | Pre-seeded DMC catalog (495 threads) demands search-and-select, not manual entry. This is the existing app's core advantage over Notion. Every comparable app with a catalog (QuickBooks items, Airtable linked records) uses autocomplete. The W3C ARIA combobox pattern defines the keyboard contract. | Med | DMC thread catalog, Bead/Specialty catalogs, ARIA combobox role | Must implement `role="combobox"` with `aria-activedescendant`, `aria-expanded`, `aria-autocomplete="list"`. Portal rendering (`position: fixed`) to escape table stacking context -- validated in sketch 002. |
-| **Already-added items shown as disabled in autocomplete** | Preventing duplicates is table stakes for any search-to-add pattern. QuickBooks grays out already-invoiced items. The existing `SearchToAdd` component does this. | Low | Existing pattern in `search-to-add.tsx` | Show "Added" badge on items already in the table. Filter or gray out -- not remove -- so users can see them and understand why a code doesn't appear. |
-| **Inline editable cells in data rows** | Once supplies are added, users need to adjust stitch counts, need quantities, and have quantities without opening a modal. Click-to-edit is standard in Airtable, AG Grid, Material React Table. The existing `EditableNumber` component proves the pattern works. | Med | Existing `EditableNumber` component pattern | Click cell to enter edit mode, Enter/blur to save, Escape to cancel. Auto-select content on focus so typing replaces. Save via server action with optimistic update. |
-| **SVG donut status indicators** | Proportional have/need visualization is superior to binary checkmarks. The sketch validated 16x16 SVG donuts using `stroke-dasharray`/`stroke-dashoffset`. Three states: empty ring (0 have), partial amber ring, full green ring. Hover tooltip shows "X of Y". | Low | `quantityRequired` and `quantityAcquired` fields on junction tables | Pure SVG, no library needed. The formula is: `dashoffset = circumference * (1 - have/need)`. Already designed in sketch 002. Replaces current simple icons. |
-| **Delete supply with confirmation** | Users will make mistakes during bulk entry. Row-level delete with hover-reveal button (danger red) is standard. The existing supplies tab already has this pattern. | Low | Existing `removeProjectThread/Bead/Specialty` server actions | Hover-reveal on row, danger-red on hover. No modal confirmation for individual rows -- too slow for bulk editing. Consider undo toast instead. |
-| **Supply count footer** | Running totals ("N colours added / Total: N skeins needed") anchor the user's progress during bulk entry. QuickBooks shows invoice totals, Harvest shows time totals. Every table-entry UI needs a summary row. | Low | Computed from table data | Footer outside `<tbody>`. Recalculates on every add/edit/delete. Shows count per section + grand total. |
-
----
+| Feature | Why Expected | Complexity | Data Source | Notes |
+|---------|--------------|------------|-------------|-------|
+| Lifetime hero counters (total stitches, sessions, days) | Every stats dashboard opens with headline numbers. StitchPal, Strava, Cross Stitch Journal all do this. Users want instant "wow I've done a lot." | Low | `StitchSession` aggregate | JetBrains Mono, large numbers. Already designed in DesignOS HeroStats. |
+| Rolling time-window stats (today/week/month/year) | Gives immediacy. "What have I done recently?" is the #1 question. Strava, Cross Stitch Journal, Pattern Keeper all show this. | Low | `StitchSession` filtered by date range | Already designed. Requires efficient date-range queries. |
+| Monthly bar chart (stitch totals per month) | Visual progress over time is universal. Every fitness tracker and Cross Stitch Journal uses monthly aggregation as primary chart. | Medium | `StitchSession` grouped by month | Already designed with click-to-drill-down popover. Pure CSS bars vs charting library is a key decision. |
+| Stitching calendar (daily activity view) | GitHub contribution pattern. Cross Stitch Journal uses it for streaks. Visual consistency tracking is deeply motivating. | Medium | `StitchSession` grouped by date | Already designed as full monthly grid with project color-coding. |
+| Session history table (sortable, filterable) | Users need to verify/edit logged data. StitchPal and Cross Stitch Journal both show session lists. | Low | `StitchSession` with joins | Already designed. Needs pagination for power users with 100s of sessions. |
+| Personal bests / records | Strava's core hook. Cross Stitch Journal tracks "longest streak." StitchPal implies records via calculated averages. Stats nerds need a trophy case. | Medium | Computed from `StitchSession` scan | Already designed: 3-card grid with trophy/flame/star icons. Categories: best day (this year + all time), longest streak. |
+| Current/longest streak | Cross Stitch Journal added this as a headline feature. Strava uses weekly streaks. Streaks drive habit formation without heavy gamification. | Low | `StitchSession` consecutive date analysis | Subset of personal bests. Low complexity but high motivational value. |
+| Project-level session stats (per-project mini dashboard) | StitchPal's core feature. Users want to see "how fast am I going on THIS project?" Total, count, average per session, first/last date. | Low | `StitchSession` filtered by projectId | Already built as ProjectSessionsTab in v1.2. |
+| Collection overview (status breakdown, size breakdown) | Ravelry shows project counts by status. User has 500+ charts across 7 statuses -- needs aggregate view. | Low | `Project` + `Chart` counts | Already designed in StatCards. Queries are simple counts/groups. |
+| Stitch rate / speed calculation | Cross-stitch specific. 100-250 stitches/hour is the range. StitchPal and Stitchmate both calculate this. Users measure improvement over time. | Low | `StitchSession` where timeSpentMinutes is not null | Only possible when user logs time. Display as average stitches/hour. |
 
 ## Differentiators
 
-Features that elevate this beyond a basic form + table. Not universally expected, but validated through sketches and high value for this specific user's workflow.
+Features that set the product apart. Not expected by every user, but valued by "stats nerds" who want their data to feel rewarding and comprehensive.
 
-| Feature | Value Proposition | Complexity | Depends On | Notes |
-|---------|-------------------|------------|------------|-------|
-| **Supply takeover mode** | No comparable craft app transitions from form to supply table within the same page. The sketch-validated pattern: form collapses into a sticky summary bar, supply table fills the page. This keeps the user in flow rather than forcing navigation to a separate page. Closest analog: QuickBooks switching from customer details to line items on the same invoice. | Med-High | Form state management, form collapse animation, summary bar component | Milestone marker triggers transition. Summary bar shows "Project Name / Designer / Status / Stitches" with "Back to Details" link. Supply table mounts below. Sticky save bar persists through transition. Form state preserved in memory during takeover. |
-| **Segmented type toggle (sticky between adds)** | Instead of separate "Add Thread" / "Add Bead" / "Add Specialty" buttons (forcing a choice per item), one persistent add row with a 3-way segmented toggle. Toggle stays on last-used type between adds. This matches how stitchers transcribe: all threads first, then switch to beads. No comparable craft app has this. QuickBooks has item type selection but resets per line. | Med | Supply table add row, segmented control component | Three options with emoji icons. Active state is primary-colored. Stays sticky across adds. Field adaptation: Thread shows stitches + auto-calc need; Bead shows bead count + manual need (pkg); Specialty shows just need (item). |
-| **Auto-calculated skein need from stitches** | Entering stitch count and getting auto-filled skein need is the "wow" moment. Thread-bare and other calculators require navigating to a separate tool. Having it inline in the add row, with visual indication (primary color text + sparkle badge), makes the table smarter than a spreadsheet. | Med | Existing `calculateSkeins()` utility, fabric assignment for defaults | Live calculation as user types stitch count. Formula: `stitches * strands / (effectiveCount * 255) * wasteFactor`. Primary color text indicates auto-calc. If user manually edits, `isNeedOverridden` flag set, auto-calc badge disappears. Need defaults to 1 when no stitches entered. |
-| **Fabric assignment feeding skein calculator** | Linking fabric (with its `count` field) to a project in supply takeover mode auto-populates the skein calculator's fabricCount and infers overCount (count <= 25 -> over 1, count >= 28 -> over 2). This eliminates a manual configuration step that most users would forget or get wrong. No comparable app connects fabric to calculation defaults. | Med | Existing Fabric model with `count` field, `calculateSkeins()`, skein calculator settings panel | Fabric selector in supply takeover area. On selection, fabricCount + overCount auto-set. User can still override via calculator settings panel. Backlog item 999.14 already captured this need. |
-| **Grouped sections with different column schemas** | Thread/Bead/Specialty items in one table surface with section dividers, but columns adapt per type (Thread has Stitches column, Bead has Bead Count, Specialty has neither). No standard data grid library handles this natively -- it requires custom rendering per section. The unified view prevents the "which tab am I on?" confusion of tabbed supply types. | High | Custom table rendering, section divider components | Section dividers as `<tr>` elements with icon + label + count badge. Colspan for divider rows. Column adaptation means Stitches/arrow columns show `--` or are blank for non-thread types. The add row dynamically shows/hides fields based on selected type. |
-| **Persistent add row at table top** | Most table UIs use a modal or slide-out panel for adding rows. A persistent first row (visually distinguished with green tint + bottom border) means zero clicks to start adding. Google Sheets is the closest analog -- the next empty row is always ready. For bulk transcription of 30+ supply codes, this saves significant time vs. click-to-open patterns. | Med | Table layout, add row state management, focus orchestration | Visually distinct: faint green background (`rgba(5,150,105,0.03)`), 2px primary bottom border. All input fields always visible. After successful add, fields clear and search refocuses. New item prepends to its correct section with slide-in animation. |
-| **Pattern type cards with expandable sub-fields** | Instead of a dropdown for Chart Only / Kit / Digital Only / Subscription, selectable cards in a 2x2 grid. Selecting "Kit" expands to show "Colours in kit" input. This makes pattern type feel like a meaningful choice rather than a buried dropdown. Closest analog: Stripe's payment method selection cards. | Low-Med | Form state, CSS max-height transition | Cards with radio-style check circle. Selected state: primary border + subtle green background. Expand animation via `max-height` + `opacity` transition (validated in sketch 003 CSS). |
-| **Keyboard hints bar** | A subtle bar below the supply table showing available keyboard shortcuts ("Arrow Up/Down navigate, Enter select/add, Tab next field, Esc clear"). Power users discover shortcuts; this accelerates that discovery. Figma and VS Code show contextual keyboard hints. | Low | None | Static presentational component. Could auto-hide after N uses (localStorage counter). Helps bridge the gap between mouse-first and keyboard-first users. |
-| **New-row slide-in animation** | Newly added supply rows animate in with a subtle slide-down + fade (`translateY(-6px)` to `0`, 200ms). This provides visual confirmation that the add succeeded and shows where the item landed in the grouped sections. Adds polish that distinguishes from spreadsheet-level UX. | Low | CSS `@keyframes` animation | Applied via `.data-row` class. 200ms ease timing. Prepend to section means animation is visible at the section boundary, not the table top. |
-| **Reusable supply table on project detail** | The same supply table component used in the form's takeover mode can be reused on the existing project detail Supplies tab. Currently that tab uses a different `project-supplies-tab.tsx` with its own `EditableNumber` and `SearchToAdd` integration. Unifying means one component to maintain, consistent UX across contexts. | Med | Supply table component abstraction | Must work in two contexts: (1) supply takeover during creation (no saved project yet, optimistic state), (2) project detail tab (existing project, server actions for persistence). Abstract via props: `projectId` (optional for create mode), `onSupplyChange` callback. |
-
----
+| Feature | Value Proposition | Complexity | Data Source | Notes |
+|---------|-------------------|------------|-------------|-------|
+| Year in Review (annual summary) | Strava's most-shared feature ("Year in Sport"). Spotify Wrapped proved annual recaps create emotional attachment. No cross-stitch app does this well. | High | All models, full-year scan | Already fully designed: hero stats, monthly pace, project timeline, top projects, favourite supplies, highlights, year selector. High complexity = many data queries. |
+| "New record!" celebration toast on session log | Strava shows achievement banners immediately on activity upload. Creates dopamine hit at the moment of logging. No stitching app celebrates records in real-time. | Medium | Compare new session against stored bests | Requires post-save comparison logic. Toast with confetti or glow effect. Categories: best day, best session, new project milestone. |
+| Project timeline visualization (Gantt-like) | Shows when you worked on each project across a year. Unique to this domain -- most stitchers don't track this anywhere. Makes rotation patterns visible. | Medium | `StitchSession` grouped by project + date range | Already designed in Year in Review. Horizontal bars across 12-month grid. |
+| Stitching pace trends (month-over-month velocity) | Shows if you're stitching more or less than before. Strava uses "fitness" and "fatigue" curves. Stitchers care about seasonal patterns (summer slumps, winter marathons). | Medium | `StitchSession` daily averages per month | Already designed as bar chart with "trending up/down" indicator. |
+| Favourite supplies analysis (most-used threads/beads) | No other stitching app surfaces this. Ravelry tracks yarn usage. Shows your DMC colour palette across projects -- fun discovery. | Medium | `ProjectThread` + `ProjectBead` join counts | Already designed in Year in Review. Color swatches + project counts. |
+| Day-of-week pattern analysis | Fitness trackers show when you exercise most. "You stitch most on Saturdays" is genuinely interesting self-knowledge. | Low | `StitchSession` grouped by dayOfWeek | Not in DesignOS yet -- would be a small stat card. Simple GROUP BY. |
+| Designer/genre breakdown stats | "Your favourite designer is [X]" and "60% of your collection is samplers" -- collection personality profiling. | Low | `Chart` joins to `Designer` + `Genre` | Partially in StatCards design. Simple join + count. |
+| Estimated completion dates | StitchPal's differentiator. "At your current pace, you'll finish on [date]." Deeply motivating for BAP stitchers. | Medium | `StitchSession` rate calculation + `Chart.stitchCount` - `Project.stitchesCompleted` | Already in backlog (999.7). Depends on consistent session logging. Inaccurate without sufficient data. |
+| Heatmap calendar (GitHub contribution style) | Denser than the existing stitching calendar -- shows intensity via color shading across months. Instantly communicates consistency at a year-level glance. | Medium | `StitchSession` count/sum per day | Alternative/complement to the designed calendar. Color intensity = stitch volume. |
+| Top-3 annual records (Strava "Annual Best Efforts") | Strava recently added year-scoped records alongside all-time records. Shows "best version of you this year" without comparing to all-time peaks that may feel unbeatable. | Low | `StitchSession` filtered by year, top N | Extension of personal bests. Already partially supported by "Best Day This Year" in sample data. |
 
 ## Anti-Features
 
-Features to explicitly NOT build in this milestone.
+Features to explicitly NOT build for this milestone.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| **Full data grid library (AG Grid, TanStack Table)** | The supply table has 3 supply types with different column schemas per section, a persistent add row, and inline autocomplete -- none of which standard grid libraries handle well. AG Grid is 300kb+ gzipped. TanStack Table is headless but its grouping model assumes uniform column schemas. Building custom with `<table>` + focused components is simpler and lighter for this specific use case. | Custom `<table>` with fixed layout, semantic HTML, and focused client components for editable cells and autocomplete. Match the sketch CSS patterns exactly. |
-| **Drag-and-drop row reordering** | Supply order doesn't matter semantically -- items auto-sort into sections by type. Adding dnd-kit for visual reordering adds complexity without value. The insertion-order within sections is sufficient. | Items sort by creation date within their section. No manual ordering needed. |
-| **Multi-column sort/filter on supply table** | The supply table is for transcription and management, not analysis. During entry of 30 threads, sorting/filtering breaks the mental model of "I'm going through the pattern's thread list." | Static sort (newest first within sections). The table is small enough (typically <100 rows) that visual scanning suffices. If scaling becomes an issue, address in backlog item 999.11. |
-| **Auto-save / draft persistence to server** | The form overhaul is a create/edit flow, not a document editor. Auto-save adds complexity (debouncing, conflict resolution, partial state in DB). The sticky save bar with explicit Save Draft + Create buttons is clearer. | Explicit save only. Consider `beforeunload` warning for unsaved changes (already exists in current form via `isDirty` check). localStorage draft could be a future enhancement but is not table stakes. |
-| **Supply quantity stepper in add flow** | The add row is for transcription: code + stitches + need. "Have" quantities are a separate shopping workflow (backlog wisdom from sketch findings: "The add flow is for transcription from pattern. Have quantities are a separate shopping workflow."). Adding a have-quantity field in the add row confuses two workflows. | Have quantities are only editable on existing data rows via inline editing, or via the Shopping Cart. The add row focuses on "what does the pattern call for?" |
-| **Inline supply creation in add row** | The existing `SearchToAdd` has an "Add New" flow for creating supplies not in the catalog. Building inline creation inside the compact add row would overcrowd it. | Existing `InlineSupplyCreate` component handles this via a slide-out or modal triggered from "No results found -- Create new?" in the autocomplete dropdown. |
-| **Undo/redo stack** | Full undo/redo for table operations (add, edit, delete) requires a state management layer (command pattern, history stack). Significant complexity for an edge case. | Undo toast for deletes (3-second window to reverse). For edits, Escape cancels in-progress changes. For adds, delete the row. |
-| **Batch operations (select multiple, bulk delete)** | The table is for per-item transcription. Bulk operations are a different workflow (more relevant for the Shopping Cart). | Single-row delete via hover-reveal button. If user needs to clear all supplies, that's a rare enough operation to do one at a time. |
-| **Responsive table layout (card view on mobile)** | The supply table's column density (7 columns) doesn't work on phone screens. But this user stitches on iPad and manages on Mac -- the iPhone use case for bulk supply entry is negligible. | Desktop-optimized fixed-width table. On mobile, the form works fine (720px max-width is responsive). Supply takeover mode is a desktop workflow. The project detail supplies tab (existing) already handles mobile. |
-
----
+| Social leaderboards / comparisons | Single-user app. Social comparison adds complexity and can be demotivating ("I only stitch 50/hour compared to Reddit averages"). The app is personal, not competitive. | Focus on personal records and self-improvement trends. |
+| Achievement badge/trophy system with unlock mechanics | Heavy gamification (Habitica model) risks making stitching feel like a chore. Extrinsic motivation undermines intrinsic satisfaction. The "stats nerd" wants data, not game mechanics. | Personal bests with celebration moments (toasts) instead of persistent badge collection. |
+| AI-generated insights / smart recommendations | "You should stitch more on Wednesdays" feels patronizing. The data should speak for itself without the app being prescriptive about user behavior. | Present patterns (day-of-week chart) and let user draw their own conclusions. |
+| Real-time stitching timer (built into stats page) | Timer belongs to session logging UX, not stats consumption. StitchPal's timer is a separate mode. Mixing input and output confuses the stats dashboard role. | Keep timer in Log Session modal (already exists with optional timeSpentMinutes). |
+| Projected "finish date" with countdown widget | Projections based on sparse data are wildly inaccurate and anxiety-inducing. A BAP with 3 sessions logged showing "estimated finish: 2034" is demoralizing. | Show estimated completion only when sufficient data exists (10+ sessions). Present as informational, not as a deadline/countdown. |
+| Share card / social export generation | Adds image generation complexity (canvas, og:image). Deferred to post-stats milestone per PROJECT.md "Out of Scope." | Keep stats private and personal for now. Add sharing later if demanded. |
+| Comparison across projects ("Project A vs Project B") | Comparing a mini (500 stitches) to a BAP (80k stitches) is meaningless. Per-project stats exist on their detail pages. | Each project has its own session tab with mini stats. No cross-project comparison needed. |
+| Historical supply price tracking | Prices change, brands differ by country, sales happen. Tracking supply costs accurately is a data entry nightmare for 500+ charts worth of supplies. | If supply costs are ever added, keep it simple: optional per-project total, not per-item price history. |
+| Rotation schedule integration in stats | Stats should observe behavior, not prescribe it. Rotation management is a separate feature domain (deferred in PROJECT.md). | Stats can show project distribution patterns without telling users what to stitch next. |
 
 ## Feature Dependencies
 
 ```
-Existing ChartAddForm + useChartForm ──────────> Merged single-page form (refactor, not rewrite)
-                                                  - BasicInfoSection, StitchCountSection, etc. are reusable
-                                                  - useChartForm hook needs mode awareness (create vs edit)
+StitchSession data exists (v1.2 shipped)
+  --> Hero counters (no additional dependencies)
+  --> Monthly bar chart (no additional dependencies)
+  --> Stitching calendar (no additional dependencies)
+  --> Session history (no additional dependencies)
+  --> Personal bests (requires: streak algorithm, max-finding queries)
+  --> Stitch rate (requires: sessions with timeSpentMinutes logged)
 
-Merged form state ─────────────────────────────> Supply takeover mode
-                                                  - Form collapse requires preserving form state
-                                                  - Summary bar reads from form values
-                                                  - "Back to Details" restores form with values intact
+Personal bests computed
+  --> "New record!" toast (requires: compare new session against current bests)
 
-Supply takeover mode ──────────────────────────> Unified supply table (lives inside takeover area)
-                                                  - Table needs project context (or pending-project context for create)
-                                                  - Fabric assignment panel sits above table
+Project + Chart data exists (v1.0 shipped)
+  --> Collection overview stats (no additional dependencies)
+  --> Designer/genre breakdown (no additional dependencies)
 
-Existing SearchToAdd + InlineSupplyCreate ─────> Autocomplete in add row (port to table context)
-                                                  - SearchToAdd logic reusable, UI must adapt to table cell
-                                                  - Portal dropdown pattern already validated
-                                                  - Already-added filtering exists
+ProjectThread + ProjectBead linked (v1.0 shipped)
+  --> Favourite supplies analysis (no additional dependencies)
 
-Existing calculateSkeins() utility ────────────> Auto-calc need in add row + data rows
-                                                  - Formula unchanged
-                                                  - Needs calculator settings (strand, fabric, over, waste)
-
-Existing Fabric model + selector ──────────────> Fabric assignment feeding calculator defaults
-                                                  - Fabric.count -> fabricCount
-                                                  - count inference -> overCount
-                                                  - Existing fabric selector can be reused
-
-Existing EditableNumber component ─────────────> Inline editable cells in data rows
-                                                  - Pattern proven in project-supplies-tab.tsx
-                                                  - May need enhancement for Enter-to-save (currently blur-only)
-
-Existing supply server actions ────────────────> All supply mutations (add/remove/update)
-                                                  - addThreadToProject, removeProjectThread, etc. exist
-                                                  - updateProjectSupplyQuantity exists
-                                                  - May need batch-add action for create mode
-
-Existing project-supplies-tab.tsx ─────────────> Reusable supply table on project detail
-                                                  - Currently a different component with similar logic
-                                                  - Goal: single component used in both contexts
-
-Schema: isNeedOverridden on ProjectThread ─────> Auto-calc vs manual override distinction
-                                                  - Already in schema
-                                                  - May need equivalent on ProjectBead/ProjectSpecialty (currently not present, but beads/specialty default to manual)
+All of the above
+  --> Year in Review (requires: all queries scoped to year, year selector UI)
 ```
 
-**Critical path:**
-1. Merged form (refactor existing sections) -> foundation for everything else
-2. Supply table component (new) -> core of the overhaul, most complex piece
-3. Supply takeover mode -> connects form to table
-4. Fabric assignment + calculator integration -> feeds auto-calc
-5. Reuse on project detail -> extracts table component for dual-context use
+## Feature Categories
 
-**Parallel work possible:**
-- SVG donut indicators (pure presentational, no dependencies)
-- Pattern type cards (form-only, no supply table dependency)
-- Keyboard hints bar (pure presentational)
+### Category 1: Activity Stats (session-derived)
+Source: `StitchSession` table exclusively.
+- Hero counters
+- Monthly bar chart
+- Stitching calendar / heatmap
+- Session history
+- Personal bests + streaks
+- Stitch rate
+- Day-of-week patterns
+- Stitching pace trends
+- "New record!" toast
 
----
+### Category 2: Collection Stats (project/chart-derived)
+Source: `Project` + `Chart` + `Designer` + `Genre`.
+- Status breakdown (pie/donut or card grid)
+- Size category distribution
+- Designer favourites
+- Genre distribution
+- Projects started/finished per year
+
+### Category 3: Supply Insights (junction-table-derived)
+Source: `ProjectThread` + `ProjectBead` + `ProjectSpecialty` + joins to supply tables.
+- Most-used threads/beads
+- Color palette distribution
+- Supply-per-project counts
+- Most colors in a project
+
+### Category 4: Synthesis / Cross-Domain
+Source: Multiple tables combined.
+- Year in Review (all categories)
+- Project timeline (sessions x projects x time)
+- Estimated completion (sessions x project.stitchCount)
+- Celebration toasts (sessions x personal bests)
 
 ## MVP Recommendation
 
-### Must Build (v1.3 core)
+**Phase 1 priority -- build the stats computation engine + Overview tab:**
+1. Hero counters (today/week/month/year) -- instant gratification, low complexity
+2. Personal bests (best day this year, best day all time, longest streak) -- motivational hook
+3. Monthly bar chart with drill-down -- visual storytelling
+4. Collection overview stat cards -- leverages existing data
 
-1. **Merged single-page form** -- Refactor existing `ChartAddForm` sections into the sketch 003 layout: 4 field groups with `<hr>` dividers, green required dots, pattern type cards. This is the foundation -- the form must work standalone before supply takeover is wired.
+**Phase 2 priority -- Calendar + deeper insights:**
+5. Stitching calendar (full monthly grid with project color-coding)
+6. Session history (sortable table with pagination)
+7. "New record!" celebration toast (wired into session logging flow)
+8. Stitch rate calculation (average stitches/hour)
 
-2. **Unified supply table with grouped sections** -- The centerpiece of the milestone. Persistent add row with segmented type toggle, section dividers with counts, keyboard-first entry flow, autocomplete from portal dropdown, auto-calc need for threads. This is the highest-complexity feature.
+**Phase 3 priority -- Year in Review:**
+9. Year in Review with all 8 sections (per DesignOS design)
+10. Project timeline visualization
+11. Favourite supplies analysis
+12. Pace trends with trend indicators
 
-3. **Supply takeover mode** -- The form-to-table transition. Milestone marker, form collapse to summary bar, supply table fills the page. Without this, the form and table are disconnected experiences.
+**Defer to later milestone:**
+- Day-of-week patterns (low priority, easy to add later)
+- Estimated completion dates (needs robust data; add when users have more sessions)
+- Heatmap calendar (alternative view -- existing calendar design is sufficient)
+- Supply cost tracking (requires schema changes)
 
-4. **Inline editable cells on data rows** -- Click-to-edit stitch counts, need quantities, have quantities. Without inline editing, the table is view-only after add, which defeats the "spreadsheet feel."
+## What Makes a "Stats Nerd" Delighted
 
-5. **SVG donut status indicators** -- Proportional have/need visualization replacing current icons. Low effort, high visual impact. The CSS/SVG is already designed.
+Based on research across Strava, GitHub, fitness trackers, and cross-stitch apps:
 
-6. **Reusable supply table on project detail** -- Abstract the table component so it works in both create-form and project-detail contexts. Replaces current `project-supplies-tab.tsx` with the new unified component.
+1. **Immediate feedback** -- "New record!" toast the moment you log a session that beats a personal best. Strava does this with activity upload; it's the single most motivating feature.
 
-### Stretch Goals
+2. **Big numbers in monospace font** -- The hero counter row. Making lifetime totals feel impressive. "You've stitched 247,832 stitches" in JetBrains Mono 30px hits different than body text.
 
-7. **Fabric assignment feeding calculator defaults** -- Auto-populates fabricCount and overCount from linked fabric. Medium complexity because fabric selector integration already exists, but wiring to calculator settings requires careful state plumbing.
+3. **Visual consistency patterns** -- The calendar/heatmap. Seeing a row of colored days makes consistency feel tangible. GitHub proved this drives behavior even without gamification.
 
-8. **Skein calculator styled card** -- Replaces current flat settings bar with the sketch-validated card with segmented controls. Visual upgrade, medium effort.
+4. **Annual narrative** -- Year in Review creates a story: "This was your year." Emotional, shareable (even if just mentally), and creates anticipation for next year. Spotify, Strava, GitHub all do this.
 
-### Defer
+5. **Records that accumulate** -- Personal bests grow over time. Unlike badges (which you unlock and forget), records invite beating. "My best day is 1,247 -- can I beat it?" creates intrinsic challenge.
 
-- **Sticky save bar save-readiness hint** -- The hint ("Chart name entered -- ready to save") is nice polish but not blocking. Can ship with just the buttons initially and add the hint text in a polish pass.
-- **Form edit mode parity** -- The current edit flow uses a modal (`chart-edit-modal.tsx`). Converting edit to the same single-page form is valuable but can follow the create flow.
-- **Keyboard hints auto-dismissal** -- The localStorage counter for auto-hiding is a future refinement.
+6. **Clickable deep-links** -- Every stat that mentions a project/thread/designer should link to that entity. Stats are a discovery surface, not a dead end.
 
----
-
-## Complexity Assessment
-
-| Feature | Complexity | Why |
-|---------|------------|-----|
-| Merged form | Med | Refactor of existing sections, not greenfield. Pattern type cards are new. |
-| Supply table | High | Custom table with 3 supply types, different column schemas, persistent add row, keyboard orchestration, portal autocomplete, inline editing, optimistic adds. This is the hardest single component in the app. |
-| Supply takeover | Med-High | State preservation during form collapse, summary bar rendering from form values, scroll position management, "back" transition restoring form. |
-| Keyboard flow | Med-High | Focus management across autocomplete -> input -> input -> commit cycle. Tab/Enter/Escape handling. Edge cases: autocomplete open + Tab should select + advance (not just close). |
-| Autocomplete portal | Med | Already validated in sketch, but implementing in a table cell context with proper z-index, scroll handling, and ARIA compliance is nontrivial. |
-| Grouped sections | Med | Section divider rows, auto-sorting new items into correct section, different column rendering per section type. |
-| Segmented toggle | Low-Med | Standard component, but "sticky between adds" means persisting selected type in component state across add cycles. |
-| SVG donuts | Low | Pure math + SVG. Formula validated in sketch. |
-| Fabric -> calculator | Med | Wiring fabric selector to calculator settings state, inferring overCount from count, handling "no fabric assigned" default. |
-| Reusable table | Med | Abstraction layer: `projectId` optional (create vs edit), callback props for mutations, optimistic state for create mode vs server state for edit mode. |
-
----
+7. **Trend indicators** -- "Trending up" vs "slowing down" on pace. Not prescriptive ("you should stitch more") but observational ("here's what's happening").
 
 ## Sources
 
-- [Pencil & Paper: Data Table UX Patterns](https://www.pencilandpaper.io/articles/ux-pattern-analysis-enterprise-data-tables) -- Inline editing, expandable rows, confirmation patterns
-- [W3C ARIA Combobox Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) -- Keyboard interaction spec for autocomplete
-- [Apple HIG: Segmented Controls](https://developer.apple.com/design/human-interface-guidelines/segmented-controls) -- When to use segmented controls, state behavior
-- [Mobbin: Segmented Control UI Design](https://mobbin.com/glossary/segmented-control) -- Segmented control best practices and variants
-- [GitLab Pajamas: Saving and Feedback](https://design.gitlab.com/usability/saving-and-feedback) -- Save draft vs explicit save patterns, sticky save bar
-- [Primer: Saving](https://primer.style/ui-patterns/saving/) -- Explicit vs auto-save form patterns
-- [NN/g: Progressive Disclosure](https://www.nngroup.com/articles/progressive-disclosure/) -- Form-to-detail transition patterns, collapsible sections
-- [Material React Table: Inline Cell Editing](https://www.material-react-table.com/docs/examples/editing-crud-inline-cell) -- Production click-to-edit table implementation
-- [CSS-Tricks: Building a Progress Ring](https://css-tricks.com/building-progress-ring-quickly/) -- SVG ring/donut progress technique
-- [React Aria: useComboBox](https://react-spectrum.adobe.com/react-aria/useComboBox.html) -- Accessible combobox implementation reference
-- [Thread-bare: Skein Estimator](https://www.thread-bare.com/tools/cross-stitch-skein-estimator) -- Skein calculation formula reference
-- [Sirious Stitches: Inventory Tracking](https://sirithre.com/inventory-tracking-cross-stitch-patterns-wips-and-materials/) -- How cross-stitchers actually track supplies (Google Sheets, Trello, Airtable)
-- [Cross Stitch Journal](https://apps.apple.com/us/app/cross-stitch-journal/id6443886471) -- Competitor: stage-based tracking with supply management
-- [X-Stitch Plus](https://apps.apple.com/us/app/xstitch-plus/id1281394467) -- Competitor: thread/fabric/chart inventory with shopping lists
-- Sketch findings: `supply-data-entry.md`, `project-creation-form.md` -- Validated design decisions from 4 sketch experiments
-
----
-*Feature research for: Cross-stitch project management -- v1.3 Form & Supply Overhaul*
-*Researched: 2026-05-03*
+- [StitchPal (App Store)](https://apps.apple.com/us/app/stitchpal/id1550536005) -- estimated completion, daily progress logging, stitch rate
+- [Cross Stitch Journal (App Store)](https://apps.apple.com/us/app/cross-stitch-journal/id6443886471) -- streaks, progress charts, project status tracking
+- [Pattern Keeper](https://patternkeeper.app/) -- stitch count tracking, percentage complete
+- [MyCozyApp](https://mycozyapp.com/) -- progress tracking, celebration on completion
+- [Strava Best Efforts](https://support.strava.com/hc/en-us/articles/19685360245005-Best-Efforts-Overview) -- personal records, annual bests, top-3 lifetime
+- [Strava Year in Sport](https://support.strava.com/hc/en-us/articles/22067973274509-Your-Year-in-Sport) -- annual recap, personalized narrative
+- [Strava Gamification Case Study (Trophy)](https://trophy.so/blog/strava-gamification-case-study) -- weekly streaks, badges, motivation design
+- [Ravelry Community Stats](https://blog.ravelry.com/2022-community-stats/) -- aggregate yarn/project tracking
+- [GitHub Calendar Heatmap patterns](https://github.com/topics/heatmap-calendar) -- consistency visualization
+- [Cross Stitch Speed Metrics](https://sirithre.com/speed-test-how-to-measure-your-average-cross-stitch-rate-and-why/) -- stitch rate benchmarks (100-250/hr typical)
+- [Stash2Go Features](https://www.stash2go.com/features.html) -- Ravelry companion app stats
+- DesignOS: `product-plan/sections/stitching-sessions-and-statistics/` -- all component designs, types, and sample data
