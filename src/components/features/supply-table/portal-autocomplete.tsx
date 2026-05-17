@@ -40,7 +40,8 @@ export function PortalAutocomplete({
   useEffect(() => {
     if (!isOpen || !anchorRef.current) return;
     function updatePosition() {
-      const rect = anchorRef.current!.getBoundingClientRect();
+      if (!anchorRef.current) return;
+      const rect = anchorRef.current.getBoundingClientRect();
       setCoords({
         top: rect.bottom + 4,
         left: rect.left,
@@ -103,11 +104,7 @@ export function PortalAutocomplete({
       className="border-border bg-card rounded-lg border shadow-lg"
     >
       {/* Results list (no input -- keyboard handled by parent) */}
-      <div
-        id="portal-autocomplete-listbox"
-        role="listbox"
-        className="max-h-60 overflow-y-auto"
-      >
+      <div id="portal-autocomplete-listbox" role="listbox" className="max-h-60 overflow-y-auto">
         {isLoading ? (
           <p className="text-muted-foreground px-3 py-4 text-center text-sm">Searching...</p>
         ) : displayItems.length > 0 ? (
