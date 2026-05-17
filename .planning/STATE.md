@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Statistics & Records
 status: "Phase 19 shipped — PR #38"
-stopped_at: Phase 20 context gathered
-last_updated: "2026-05-17T23:00:30.155Z"
+stopped_at: Phase 20 UI-SPEC approved
+last_updated: "2026-05-17T23:11:19.818Z"
 last_activity: "2026-05-17 -- Phase 19 shipped (PR #38)"
 progress:
   total_phases: 4
@@ -87,7 +87,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-17T23:00:30.149Z
-Stopped at: Phase 20 context gathered
+Last session: 2026-05-17T23:11:19.812Z
+Stopped at: Phase 20 UI-SPEC approved
 Resume action: `/gsd-plan-phase 18`
-Resume file: .planning/phases/20-activity-visualization-calendar/20-CONTEXT.md
+Resume file: .planning/phases/20-activity-visualization-calendar/20-UI-SPEC.md
