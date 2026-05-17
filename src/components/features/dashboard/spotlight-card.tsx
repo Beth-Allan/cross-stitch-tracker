@@ -56,7 +56,7 @@ export function SpotlightCard({
 
   return (
     <div className="border-border bg-card relative overflow-hidden rounded-2xl border shadow-sm">
-      <div className="grid max-h-[360px] min-h-[260px] grid-cols-1 md:grid-cols-2">
+      <div className="grid max-h-[300px] min-h-[260px] grid-cols-1 md:grid-cols-[320px_1fr]">
         {/* Image half -- hidden on mobile */}
         <div className="bg-muted relative overflow-hidden max-md:hidden">
           {imageUrl ? (
@@ -130,7 +130,7 @@ export function SpotlightCard({
           <div className="mt-1 flex flex-wrap gap-2.5">
             <LinkButton
               href={`/charts/${project.chartId}`}
-              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
+              className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold"
             >
               Check It Out
               <ArrowRight className="h-4 w-4" strokeWidth={2} />
@@ -139,7 +139,7 @@ export function SpotlightCard({
               onClick={handleShuffle}
               disabled={isPending}
               type="button"
-              className="border-border bg-card text-muted-foreground hover:bg-muted inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
+              className="border-border bg-card text-muted-foreground hover:bg-muted inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50"
               aria-label="Shuffle spotlight project"
             >
               <RefreshCw className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`} strokeWidth={2} />
