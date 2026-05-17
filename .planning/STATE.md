@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Fixes & Polish
 status: planning
-stopped_at: Phase 15 context gathered
+stopped_at: Phase 15 UI-SPEC approved
 last_updated: "2026-05-16T23:45:20.299Z"
 last_activity: 2026-05-16 -- Roadmap created for v1.4
 progress:
@@ -122,3 +122,4 @@ Items acknowledged and deferred at v1.3 milestone close on 2026-05-16:
 Last session: 2026-05-16T23:45:20.293Z
 Stopped at: Phase 15 context gathered
 Resume action: `/gsd-plan-phase 15`
+Resume file: .planning/phases/15-chart-file-management/15-UI-SPEC.md
