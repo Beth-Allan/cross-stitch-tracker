@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@/__tests__/test-utils";
 import { PortalAutocomplete } from "./portal-autocomplete";
 import type { SupplySearchResult } from "./types";
+import { MAX_DISPLAY_ITEMS } from "./use-supply-table";
 
 // Mock createPortal to render children inline (RTL handles portals fine,
 // but we want to verify createPortal is used in the source)
@@ -173,7 +174,7 @@ describe("PortalAutocomplete", () => {
     // Parent pre-sorts: addable first, then already-added, sliced to 8
     const addable = manyItems.filter((item) => !existingIds.has(item.id));
     const alreadyAdded = manyItems.filter((item) => existingIds.has(item.id));
-    const displayItems = [...addable, ...alreadyAdded].slice(0, 8);
+    const displayItems = [...addable, ...alreadyAdded].slice(0, MAX_DISPLAY_ITEMS);
 
     render(
       <PortalAutocomplete

@@ -7,7 +7,7 @@ import { SegmentedTypeToggle } from "./segmented-type-toggle";
 import { PortalAutocomplete } from "./portal-autocomplete";
 import { InlineCreateDialog } from "./inline-create-dialog";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
-import { useSupplyTable } from "./use-supply-table";
+import { useSupplyTable, MAX_DISPLAY_ITEMS } from "./use-supply-table";
 import type { SupplyTableAdapter, CalcParams } from "./types";
 
 interface SupplyTableAddRowProps {
@@ -36,6 +36,7 @@ export function SupplyTableAddRow({
     setSearchText,
     searchResults,
     isSearching,
+    isSearchError,
     selectedItem,
     selectItem,
     stitchCount,
@@ -84,7 +85,8 @@ export function SupplyTableAddRow({
       requestAnimationFrame(() => {
         searchInputRef.current?.focus();
       });
-    } catch {
+    } catch (error) {
+      console.error("Supply add commit failed:", error);
       toast.error("Couldn't add supply. Try again.");
     }
   }
@@ -121,7 +123,7 @@ export function SupplyTableAddRow({
   const displayItems = useMemo(() => {
     const addable = searchResults.filter((item) => !existingSupplyIds.has(item.id));
     const alreadyAdded = searchResults.filter((item) => existingSupplyIds.has(item.id));
-    return [...addable, ...alreadyAdded].slice(0, 8);
+    return [...addable, ...alreadyAdded].slice(0, MAX_DISPLAY_ITEMS);
   }, [searchResults, existingSupplyIds]);
 
   function handleSearchKeyDown(e: React.KeyboardEvent) {
@@ -212,6 +214,10 @@ export function SupplyTableAddRow({
                 />
               </div>
             </div>
+          )}
+
+          {isSearchError && searchText.trim().length > 0 && !selectedItem && (
+            <p className="text-destructive mt-1 text-xs">Search failed. Try again.</p>
           )}
 
           <PortalAutocomplete

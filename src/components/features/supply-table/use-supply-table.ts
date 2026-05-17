@@ -11,6 +11,7 @@ import type {
 } from "./types";
 
 const DEBOUNCE_MS = 150;
+export const MAX_DISPLAY_ITEMS = 8;
 
 /**
  * Custom hook managing the add-row state machine for the supply table.
@@ -36,6 +37,7 @@ export function useSupplyTable(
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [createSearchText, setCreateSearchText] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
+  const [isSearchError, setIsSearchError] = useState(false);
 
   // useTransition for non-blocking search state updates (D-02)
   const [, startTransition] = useTransition();
@@ -61,6 +63,7 @@ export function useSupplyTable(
     }
 
     cancelledRef.current = false;
+    setIsSearchError(false);
     startTransition(() => {
       setIsSearching(true);
     });
@@ -71,9 +74,11 @@ export function useSupplyTable(
         if (!cancelledRef.current) {
           setSearchResults(results);
         }
-      } catch {
+      } catch (error) {
         if (!cancelledRef.current) {
+          console.error("Supply search failed:", error);
           setSearchResults([]);
+          setIsSearchError(true);
         }
       } finally {
         if (!cancelledRef.current) {
@@ -222,7 +227,8 @@ export function useSupplyTable(
         const created = await adapter.createSupply(supplyType, data);
         selectItem(created);
         setShowCreateDialog(false);
-      } catch {
+      } catch (error) {
+        console.error("Supply create failed:", error);
         toast.error("Couldn't create supply. Try again.");
       }
     },
@@ -245,6 +251,7 @@ export function useSupplyTable(
     setSearchText,
     searchResults,
     isSearching,
+    isSearchError,
     // Selection
     selectedItem,
     selectItem,

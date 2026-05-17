@@ -515,6 +515,50 @@ describe("SupplyTableAddRow", () => {
     expect(searchInput).toBeInTheDocument();
   });
 
+  it("ArrowDown then Enter selects the highlighted item", async () => {
+    const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    renderAddRow();
+
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "310" } });
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    // ArrowDown to highlight first item
+    await act(async () => {
+      fireEvent.keyDown(searchInput, { key: "ArrowDown" });
+    });
+
+    // Enter to select
+    await act(async () => {
+      fireEvent.keyDown(searchInput, { key: "Enter" });
+    });
+
+    // Selected item code should appear in the DOM
+    expect(screen.getByText("310")).toBeInTheDocument();
+  });
+
+  it("shows error message when search fails", async () => {
+    vi.mocked(adapter.searchSupplies).mockRejectedValue(new Error("Network error"));
+
+    renderAddRow();
+
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "310" } });
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    expect(screen.getByText("Search failed. Try again.")).toBeInTheDocument();
+  });
+
   it("Escape on search input resets the add row", async () => {
     const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
     vi.mocked(adapter.searchSupplies).mockResolvedValue(results);

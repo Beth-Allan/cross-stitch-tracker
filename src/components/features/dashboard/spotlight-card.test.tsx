@@ -168,6 +168,13 @@ describe("SpotlightCard", () => {
     expect(checkItOut?.className).not.toContain("bg-emerald");
   });
 
+  it("does not render designer name span when designerName is null", () => {
+    render(<SpotlightCard project={createMockSpotlight({ designerName: null })} imageUrl={null} />);
+
+    expect(screen.queryByText("Long Dog Samplers")).not.toBeInTheDocument();
+    expect(screen.getByText("Maritime Mystery SAL")).toBeInTheDocument();
+  });
+
   it("returns null when project is null", () => {
     const { container } = render(<SpotlightCard project={null} imageUrl={null} />);
 
