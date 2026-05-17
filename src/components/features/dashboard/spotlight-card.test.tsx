@@ -37,6 +37,24 @@ vi.mock("@/components/ui/link-button", () => ({
   ),
 }));
 
+// Mock Button
+vi.mock("@/components/ui/button", () => ({
+  Button: ({
+    children,
+    className,
+    ...props
+  }: {
+    children: React.ReactNode;
+    className?: string;
+    variant?: string;
+    [key: string]: unknown;
+  }) => (
+    <button className={className} {...props}>
+      {children}
+    </button>
+  ),
+}));
+
 // Mock CoverPlaceholder
 vi.mock("@/components/features/gallery/cover-placeholder", () => ({
   CoverPlaceholder: ({ status }: { status: string }) => (
@@ -131,6 +149,16 @@ describe("SpotlightCard", () => {
 
     const grid = container.querySelector(".grid");
     expect(grid?.className).toContain("md:grid-cols-[320px_1fr]");
+  });
+
+  it("renders both buttons with h-auto for consistent content-based sizing", () => {
+    render(<SpotlightCard project={createMockSpotlight()} imageUrl={null} />);
+
+    const checkItOut = screen.getByText("Check It Out").closest("a");
+    const shuffle = screen.getByText("Shuffle Spotlight").closest("button");
+
+    expect(checkItOut?.className).toContain("h-auto");
+    expect(shuffle?.className).toContain("h-auto");
   });
 
   it("does not contain hardcoded emerald classes on Check It Out button", () => {

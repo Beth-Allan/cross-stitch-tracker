@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Sparkles, ArrowRight, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import type { SpotlightProject } from "@/types/dashboard";
+import { Button } from "@/components/ui/button";
 import { LinkButton } from "@/components/ui/link-button";
 import { CoverPlaceholder } from "@/components/features/gallery/cover-placeholder";
 import { StatusBadge } from "@/components/features/charts/status-badge";
@@ -132,21 +133,21 @@ export function SpotlightCard({
           <div className="mt-1 flex flex-wrap gap-2.5">
             <LinkButton
               href={`/charts/${project.chartId}`}
-              className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold"
+              className="h-auto gap-2 rounded-xl px-5 py-2.5 font-semibold"
             >
               Check It Out
               <ArrowRight className="h-4 w-4" strokeWidth={2} />
             </LinkButton>
-            <button
+            <Button
               onClick={handleShuffle}
               disabled={isPending}
-              type="button"
-              className="border-border bg-card text-muted-foreground hover:bg-muted inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50"
+              variant="outline"
+              className="h-auto gap-2 rounded-xl px-5 py-2.5 font-semibold"
               aria-label="Shuffle spotlight project"
             >
               <RefreshCw className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`} strokeWidth={2} />
               Shuffle Spotlight
-            </button>
+            </Button>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { buttonVariants } from "./button-variants";
 import type { VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
 interface LinkButtonProps
   extends React.AnchorHTMLAttributes<HTMLAnchorElement>, VariantProps<typeof buttonVariants> {
@@ -28,7 +29,7 @@ export function LinkButton({
   return (
     <Link
       href={href}
-      className={buttonVariants({ variant, size, className })}
+      className={cn(buttonVariants({ variant, size }), className)}
       target={target}
       rel={safeRel}
       {...props}
