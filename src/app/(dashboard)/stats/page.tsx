@@ -1,64 +1,37 @@
 import { requireAuth } from "@/lib/auth-guard";
-import { getHeroStats, getCollectionBreakdown } from "@/lib/queries/stats";
-import { formatTime } from "@/lib/utils/format-time";
+import {
+  getHeroStats,
+  getCollectionBreakdown,
+  getSizeBreakdown,
+  getDesignerBreakdown,
+  getGenreBreakdown,
+} from "@/lib/queries/stats";
 import { StatsPageShell } from "@/components/features/stats/stats-page-shell";
-import { CollectionStatusChart } from "@/components/features/stats/collection-status-chart";
-import type { StatsHeroData, CollectionBreakdownData } from "@/types/stats";
+import { StatsOverview } from "@/components/features/stats/stats-overview";
 
 export default async function StatsPage() {
   const user = await requireAuth();
 
-  const [heroStats, collectionBreakdown] = await Promise.all([
-    getHeroStats(user.id),
-    getCollectionBreakdown(user.id),
-  ]);
+  const [heroStats, collectionBreakdown, sizeBreakdown, designerBreakdown, genreBreakdown] =
+    await Promise.all([
+      getHeroStats(user.id),
+      getCollectionBreakdown(user.id),
+      getSizeBreakdown(user.id),
+      getDesignerBreakdown(user.id),
+      getGenreBreakdown(user.id),
+    ]);
 
   return (
     <StatsPageShell
       overviewContent={
-        <StatsOverview heroStats={heroStats} collectionBreakdown={collectionBreakdown} />
+        <StatsOverview
+          heroStats={heroStats}
+          collectionBreakdown={collectionBreakdown}
+          sizeBreakdown={sizeBreakdown}
+          designerBreakdown={designerBreakdown}
+          genreBreakdown={genreBreakdown}
+        />
       }
     />
-  );
-}
-
-function StatsOverview({
-  heroStats,
-  collectionBreakdown,
-}: {
-  heroStats: StatsHeroData;
-  collectionBreakdown: CollectionBreakdownData;
-}) {
-  return (
-    <div className="space-y-8">
-      {/* Hero counters — Phase 19 will build the full component */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <HeroCounter
-          label="Total Stitches"
-          value={heroStats.totalLifetimeStitches.toLocaleString()}
-        />
-        <HeroCounter label="Sessions" value={heroStats.totalSessions.toLocaleString()} />
-        <HeroCounter label="Time Stitching" value={formatTime(heroStats.totalTimeMinutes)} />
-        <HeroCounter label="Completed" value={heroStats.projectsCompleted.toLocaleString()} />
-      </div>
-
-      {/* Collection donut chart — validates Recharts integration */}
-      <div className="border-border bg-card rounded-lg border p-6">
-        <h3 className="text-muted-foreground mb-4 text-sm font-medium">Collection by Status</h3>
-        <CollectionStatusChart
-          data={collectionBreakdown.byStatus}
-          totalProjects={collectionBreakdown.totalProjects}
-        />
-      </div>
-    </div>
-  );
-}
-
-function HeroCounter({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border-border bg-card rounded-lg border p-4">
-      <p className="text-muted-foreground text-sm">{label}</p>
-      <p className="text-foreground text-2xl font-bold">{value}</p>
-    </div>
   );
 }
