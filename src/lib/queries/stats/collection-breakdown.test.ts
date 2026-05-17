@@ -6,7 +6,7 @@ vi.mock("@/lib/db", () => ({ prisma: mockPrisma }));
 
 // Bypass unstable_cache -- make it transparent
 vi.mock("next/cache", () => ({
-  unstable_cache: (fn: Function) => fn,
+  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
 }));
 
 describe("getCollectionBreakdown", () => {
@@ -62,9 +62,7 @@ describe("getCollectionBreakdown", () => {
   });
 
   it("includes all 7 statuses even when some have 0 count", async () => {
-    mockPrisma.project.groupBy.mockResolvedValue([
-      { status: "IN_PROGRESS", _count: { id: 2 } },
-    ]);
+    mockPrisma.project.groupBy.mockResolvedValue([{ status: "IN_PROGRESS", _count: { id: 2 } }]);
 
     const { getCollectionBreakdown } = await import("./collection-breakdown");
     const result = await getCollectionBreakdown("user-1");

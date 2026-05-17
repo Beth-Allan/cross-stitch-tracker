@@ -59,7 +59,7 @@ export function StatsPageShell({
 
 function PlaceholderTab({ label }: { label: string }) {
   return (
-    <div className="flex min-h-[40vh] items-center justify-center text-muted-foreground">
+    <div className="text-muted-foreground flex min-h-[40vh] items-center justify-center">
       {label} — coming in a future update
     </div>
   );

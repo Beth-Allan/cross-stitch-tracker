@@ -1,11 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, Label } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { collectionStatusConfig } from "@/lib/chart-configs";
 import type { StatusBreakdownItem } from "@/types/stats";
 
@@ -17,7 +13,7 @@ interface CollectionStatusChartProps {
 export function CollectionStatusChart({ data, totalProjects }: CollectionStatusChartProps) {
   if (totalProjects === 0) {
     return (
-      <div className="flex h-[200px] items-center justify-center text-muted-foreground">
+      <div className="text-muted-foreground flex h-[200px] items-center justify-center">
         No projects yet
       </div>
     );
@@ -48,12 +44,7 @@ export function CollectionStatusChart({ data, totalProjects }: CollectionStatusC
             content={({ viewBox }) => {
               if (viewBox && "cx" in viewBox && "cy" in viewBox) {
                 return (
-                  <text
-                    x={viewBox.cx}
-                    y={viewBox.cy}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                  >
+                  <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
                     <tspan
                       x={viewBox.cx}
                       y={viewBox.cy}

@@ -5,8 +5,7 @@ import type { StatsHeroData } from "@/types/stats";
 
 async function computeHeroStats(userId: string): Promise<StatsHeroData> {
   const tz = getUserTimezone(userId);
-  const { todayStart, todayEnd, weekStart, monthStart, yearStart } =
-    getLocalDayBoundaries(tz);
+  const { todayStart, todayEnd, weekStart, monthStart, yearStart } = getLocalDayBoundaries(tz);
 
   const [today, week, month, year, lifetime, completedCount] = await Promise.all([
     prisma.stitchSession.aggregate({
@@ -48,9 +47,8 @@ async function computeHeroStats(userId: string): Promise<StatsHeroData> {
 }
 
 export function getHeroStats(userId: string) {
-  return unstable_cache(
-    () => computeHeroStats(userId),
-    [`stats-hero-${userId}`],
-    { tags: ["stats"], revalidate: 300 }
-  )();
+  return unstable_cache(() => computeHeroStats(userId), [`stats-hero-${userId}`], {
+    tags: ["stats"],
+    revalidate: 300,
+  })();
 }

@@ -9,13 +9,7 @@ vi.mock("recharts", () => ({
   PieChart: ({ children }: { children: ReactNode }) => (
     <div data-testid="pie-chart">{children}</div>
   ),
-  Pie: ({
-    children,
-    data,
-  }: {
-    children: ReactNode;
-    data?: StatusBreakdownItem[];
-  }) => (
+  Pie: ({ children, data }: { children: ReactNode; data?: StatusBreakdownItem[] }) => (
     <div data-testid="pie" data-slice-count={data?.length ?? 0}>
       {children}
     </div>
@@ -36,7 +30,6 @@ vi.mock("@/components/ui/chart", () => ({
   ChartContainer: ({
     children,
     config,
-    className,
   }: {
     children: ReactNode;
     config: Record<string, unknown>;
@@ -50,9 +43,7 @@ vi.mock("@/components/ui/chart", () => ({
   ChartTooltipContent: () => <div data-testid="chart-tooltip-content" />,
 }));
 
-function createMockData(
-  overrides?: Partial<Record<ProjectStatus, number>>,
-): StatusBreakdownItem[] {
+function createMockData(overrides?: Partial<Record<ProjectStatus, number>>): StatusBreakdownItem[] {
   const defaults: Record<ProjectStatus, number> = {
     UNSTARTED: 10,
     KITTING: 5,

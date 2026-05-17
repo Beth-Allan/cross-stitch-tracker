@@ -51,9 +51,7 @@ describe("StatsPageShell", () => {
       wrapper: withNuqsTestingAdapter({ searchParams: "?tab=activity" }),
     });
 
-    expect(
-      screen.getByText("Activity — coming in a future update"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Activity — coming in a future update")).toBeInTheDocument();
   });
 
   it("shows placeholder text for Records tab when no content provided", () => {
@@ -61,9 +59,7 @@ describe("StatsPageShell", () => {
       wrapper: withNuqsTestingAdapter({ searchParams: "?tab=records" }),
     });
 
-    expect(
-      screen.getByText("Records — coming in a future update"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Records — coming in a future update")).toBeInTheDocument();
   });
 
   it("shows custom activity content when provided", () => {
