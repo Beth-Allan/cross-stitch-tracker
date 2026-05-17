@@ -40,12 +40,20 @@ export function FocalPointEditor({
   const [isPending, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Measure container size on edit mode entry
+  // Measure container size on edit mode entry and track resize
   useEffect(() => {
-    if (isEditMode && containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
+    if (!isEditMode || !containerRef.current) return;
+    const el = containerRef.current;
+
+    const updateSize = () => {
+      const rect = el.getBoundingClientRect();
       setContainerSize({ width: rect.width, height: rect.height });
-    }
+    };
+    updateSize();
+
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(el);
+    return () => observer.disconnect();
   }, [isEditMode]);
 
   const handleImageClick = useCallback(
@@ -53,14 +61,8 @@ export function FocalPointEditor({
       if (!isEditMode) return;
       const target = event.currentTarget;
       const rect = target.getBoundingClientRect();
-      const x = Math.max(
-        0,
-        Math.min(1, (event.clientX - rect.left) / rect.width),
-      );
-      const y = Math.max(
-        0,
-        Math.min(1, (event.clientY - rect.top) / rect.height),
-      );
+      const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+      const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
       setPendingPoint({ x, y });
     },
     [isEditMode],
@@ -79,11 +81,7 @@ export function FocalPointEditor({
     if (!pendingPoint) return;
     startTransition(async () => {
       try {
-        const result = await updateFocalPoint(
-          chartId,
-          pendingPoint.x,
-          pendingPoint.y,
-        );
+        const result = await updateFocalPoint(chartId, pendingPoint.x, pendingPoint.y);
         if (result.success) {
           setIsEditMode(false);
           toast.success("Focal point saved");
@@ -132,7 +130,7 @@ export function FocalPointEditor({
   if (!imageUrl) return null;
 
   return (
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+     
     <div onKeyDown={handleKeyDown}>
       {/* Edit mode trigger button — top-right of hero banner */}
       {!isEditMode && (
@@ -177,20 +175,11 @@ export function FocalPointEditor({
 
       {/* Action bar — below the image, in layout flow */}
       {isEditMode && (
-        <div className="absolute right-0 bottom-0 left-0 z-20 mt-2 flex items-center gap-2 rounded-b-lg border-t border-border bg-card/90 p-2 backdrop-blur-sm animate-in slide-in-from-bottom-1 duration-200">
-          <Button
-            size="sm"
-            onClick={handleSave}
-            disabled={isPending || !pendingPoint}
-          >
+        <div className="border-border bg-card/90 animate-in slide-in-from-bottom-1 absolute right-0 bottom-0 left-0 z-20 mt-2 flex items-center gap-2 rounded-b-lg border-t p-2 backdrop-blur-sm duration-200">
+          <Button size="sm" onClick={handleSave} disabled={isPending || !pendingPoint}>
             {isPending ? "Saving..." : "Save"}
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleCancel}
-            disabled={isPending}
-          >
+          <Button size="sm" variant="outline" onClick={handleCancel} disabled={isPending}>
             Cancel
           </Button>
           <Button
