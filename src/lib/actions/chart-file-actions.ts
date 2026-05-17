@@ -10,7 +10,10 @@ import { getR2Client, R2_BUCKET_NAME } from "@/lib/r2";
 
 const addChartFileSchema = z.object({
   chartId: z.string().min(1),
-  url: z.string().min(1),
+  url: z
+    .string()
+    .min(1)
+    .regex(/^files\//, "Invalid file path"),
   filename: z.string().trim().min(1).max(255),
   mimeType: z.string().min(1),
   fileSize: z.number().int().positive(),
@@ -105,19 +108,30 @@ export async function getChartFileDownloadUrl(fileId: string) {
     return { success: false as const, error: "File not found" };
   }
 
-  const url = await getSignedUrl(
-    getR2Client(),
-    new GetObjectCommand({
-      Bucket: R2_BUCKET_NAME,
-      Key: file.url,
-    }),
-    { expiresIn: 3600 },
-  );
+  try {
+    const url = await getSignedUrl(
+      getR2Client(),
+      new GetObjectCommand({
+        Bucket: R2_BUCKET_NAME,
+        Key: file.url,
+      }),
+      { expiresIn: 3600 },
+    );
 
-  return {
-    success: true as const,
-    url,
-    filename: file.filename,
-    mimeType: file.mimeType,
-  };
+    return {
+      success: true as const,
+      url,
+      filename: file.filename,
+      mimeType: file.mimeType,
+    };
+  } catch (error) {
+    console.error("getChartFileDownloadUrl R2 error:", error);
+    if (
+      error instanceof Error &&
+      error.message.includes("R2 environment variables not configured")
+    ) {
+      return { success: false as const, error: "File storage is not configured." };
+    }
+    return { success: false as const, error: "Failed to generate download URL" };
+  }
 }

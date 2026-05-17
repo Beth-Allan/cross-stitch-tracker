@@ -3,9 +3,7 @@ import { createMockPrisma } from "@/__tests__/mocks";
 
 // Mock auth to return authenticated session
 vi.mock("@/lib/auth", () => ({
-  auth: vi
-    .fn()
-    .mockResolvedValue({ user: { id: "user-1", name: "Test", email: "test@test.com" } }),
+  auth: vi.fn().mockResolvedValue({ user: { id: "user-1", name: "Test", email: "test@test.com" } }),
 }));
 
 const mockPrisma = createMockPrisma();
@@ -141,6 +139,24 @@ describe("chart-file-actions", () => {
         expect(result.error).toBeDefined();
       }
     });
+
+    it("rejects url that does not start with files/ prefix", async () => {
+      const { addChartFile } = await import("./chart-file-actions");
+
+      const result = await addChartFile({
+        chartId: "chart-1",
+        url: "covers/other-chart/image.png",
+        filename: "image.png",
+        mimeType: "image/png",
+        fileSize: 1000,
+        label: null,
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Invalid file path");
+      }
+    });
   });
 
   describe("deleteChartFile", () => {
@@ -232,6 +248,30 @@ describe("chart-file-actions", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error).toBe("File not found");
+      }
+    });
+
+    it("returns structured error when R2 is not configured", async () => {
+      const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+      const { getChartFileDownloadUrl } = await import("./chart-file-actions");
+
+      mockPrisma.chartFile.findUnique.mockResolvedValue({
+        id: "file-1",
+        url: "files/chart-1/abc-test.pdf",
+        filename: "test.pdf",
+        mimeType: "application/pdf",
+        chart: { id: "chart-1", project: { userId: "user-1" } },
+      });
+
+      vi.mocked(getSignedUrl).mockRejectedValueOnce(
+        new Error("R2 environment variables not configured"),
+      );
+
+      const result = await getChartFileDownloadUrl("file-1");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("File storage is not configured.");
       }
     });
   });
