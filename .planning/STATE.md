@@ -4,8 +4,8 @@ milestone: v1.4
 milestone_name: Fixes & Polish
 status: executing
 stopped_at: Phase 16 context gathered
-last_updated: "2026-05-17T03:27:55.534Z"
-last_activity: 2026-05-17 -- Phase 16 planning complete
+last_updated: "2026-05-17T03:30:09.285Z"
+last_activity: 2026-05-17 -- Phase 16 execution started
 progress:
   total_phases: 3
   completed_phases: 1
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-16)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** v1.4 Fixes & Polish -- targeted fixes and feature additions (chart files, input bug, dashboard sizing, image focal point)
+**Current focus:** Phase 16 — input-dashboard-fixes
 
 ## Current Position
 
-Phase: 15 (Chart File Management) -- complete
-Plan: 4/4 done
-Status: Ready to execute
-Last activity: 2026-05-17 -- Phase 16 planning complete
+Phase: 16 (input-dashboard-fixes) — EXECUTING
+Plan: 1 of 2
+Status: Executing Phase 16
+Last activity: 2026-05-17 -- Phase 16 execution started
 
 ```
 [======              ] 33% (1/3 phases)
