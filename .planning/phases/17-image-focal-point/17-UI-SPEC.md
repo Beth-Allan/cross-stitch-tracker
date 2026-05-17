@@ -37,13 +37,13 @@ Declared values (must be multiples of 4):
 | md | 16px | Default element spacing, button padding |
 | lg | 24px | Section padding |
 | xl | 32px | Layout gaps |
-| 2xl | 48px | Major section breaks |
+| 2xl | 48px | Major section breaks, minimum touch target |
 | 3xl | 64px | Page-level spacing |
 
 Exceptions:
 - Focal point marker: 24px diameter (12px radius) for visibility on images
-- Edit mode action bar: 8px gap between buttons, 12px padding (existing button pattern)
-- Touch target minimum: 44px for the edit mode trigger button (matching hero-kebab-menu pattern)
+- Edit mode action bar: 8px gap between buttons, 8px padding (compact bar)
+- Touch target minimum: 48px for the edit mode trigger button (exceeds accessibility minimum, aligns with spacing scale)
 
 ---
 
@@ -53,12 +53,12 @@ Exceptions:
 |------|------|--------|-------------|------|
 | Body | 16px | 400 (regular) | 1.5 | Source Sans 3 |
 | Label/Caption | 14px | 400 (regular) | 1.4 | Source Sans 3 |
-| Small label | 11px | 700 (bold) | 1.3 | Source Sans 3 |
+| Small label | 11px | 600 (semibold) | 1.3 | Source Sans 3 |
 | Heading | 24px | 600 (semibold) | 1.2 | Fraunces |
 
 Phase-specific usage:
-- Edit mode button label: 14px, weight 500 (medium — matches existing Button component)
-- Crop guide label (optional "Gallery preview"): 11px bold uppercase tracking-wider (matches Spotlight section label pattern)
+- Edit mode button labels: inherit Button component defaults (no weight override)
+- Crop guide label (optional "Gallery preview"): 11px semibold uppercase tracking-wider (matches Spotlight section label pattern)
 
 ---
 
@@ -188,7 +188,7 @@ Additional phase-specific colors:
 | Outside area | Semi-transparent black at 50% opacity (`bg-black/50`) |
 | Border | 2px dashed `white/80` |
 | Corner indicators | None (keep it clean) |
-| Label | "Gallery preview" in 11px bold uppercase white, positioned 4px inside top-left of guide |
+| Label | "Gallery preview" in 11px semibold uppercase white, positioned 4px inside top-left of guide |
 | Transition | Position follows marker with 100ms ease-out |
 
 ---
@@ -200,7 +200,7 @@ Additional phase-specific colors:
 | Position | Absolute, top-right corner of hero banner (8px inset) |
 | Icon | `Crosshair` from lucide-react (16px) |
 | Label | "Set Focal Point" (hidden on mobile, icon-only; visible on md+) |
-| Size | 44px min touch target (icon-only mobile), auto-width with text on md+ |
+| Size | 48px min touch target (icon-only mobile), auto-width with text on md+ |
 | Style | `bg-black/60 text-white hover:bg-black/70 backdrop-blur-sm rounded-lg` |
 | Visibility | Only when cover image exists AND not already in edit mode |
 | z-index | Above the hero image layers (z-10, same plane as hero-kebab-menu) |
@@ -215,7 +215,7 @@ Additional phase-specific colors:
 | Layout | `flex items-center gap-2` with buttons left-aligned, "Reset to Center" right-aligned (ml-auto) |
 | Buttons | Save (variant="default"), Cancel (variant="outline"), Reset to Center (variant="ghost") |
 | Appearance | Animated in with height expansion (0 to auto, 200ms ease) |
-| Background | `bg-card border-border border rounded-lg p-3 mt-2` |
+| Background | `bg-card border-border border rounded-lg p-2 mt-2` |
 
 ---
 
@@ -274,7 +274,7 @@ NOT applied to:
 
 | Breakpoint | Behavior |
 |------------|----------|
-| Mobile (<768px) | Trigger button is icon-only (Crosshair, 44px square). Crop guide scales to 70% of image width. Action bar stacks if needed. |
+| Mobile (<768px) | Trigger button is icon-only (Crosshair, 48px square). Crop guide scales to 70% of image width. Action bar stacks if needed. |
 | Tablet/Desktop (md+) | Trigger button shows icon + label text. Crop guide at 60% width (max 360px). Action bar stays horizontal. |
 | Hero max-height | Mobile: 160px, md: 192px, lg+: 256px (existing constraints — edit mode respects these) |
 
