@@ -6,7 +6,7 @@ vi.mock("@/lib/db", () => ({ prisma: mockPrisma }));
 
 // Bypass unstable_cache -- make it transparent
 vi.mock("next/cache", () => ({
-  unstable_cache: (fn: Function) => fn,
+  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
 }));
 
 // Mock timezone to return fixed boundaries
