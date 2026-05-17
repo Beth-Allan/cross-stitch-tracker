@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { collectionStatusConfig } from "./chart-configs";
+import {
+  collectionStatusConfig,
+  sizeCategoryConfig,
+  designerBarConfig,
+  genreDistributionConfig,
+} from "./chart-configs";
 import type { ChartConfig } from "@/components/ui/chart";
 
 const EXPECTED_STATUS_KEYS = [
@@ -33,6 +38,65 @@ describe("collectionStatusConfig", () => {
   it("satisfies ChartConfig type", () => {
     // TypeScript compile-time check via assignment
     const _config: ChartConfig = collectionStatusConfig;
+    expect(_config).toBeDefined();
+  });
+});
+
+// ─── Size Category Config ─────────────────────────────────────────────────
+
+const EXPECTED_SIZE_KEYS = ["Mini", "Small", "Medium", "Large", "BAP"] as const;
+
+describe("sizeCategoryConfig", () => {
+  it("has exactly 5 keys: Mini, Small, Medium, Large, BAP", () => {
+    const keys = Object.keys(sizeCategoryConfig);
+    expect(keys).toHaveLength(5);
+    expect(keys).toEqual([...EXPECTED_SIZE_KEYS]);
+  });
+
+  it("values have labels matching key names and colors matching var(--chart-N) pattern", () => {
+    EXPECTED_SIZE_KEYS.forEach((key, index) => {
+      const entry = sizeCategoryConfig[key];
+      expect(entry.label).toBe(key);
+      expect(entry.color).toBe(`var(--chart-${index + 1})`);
+    });
+  });
+
+  it("satisfies ChartConfig type", () => {
+    const _config: ChartConfig = sizeCategoryConfig;
+    expect(_config).toBeDefined();
+  });
+});
+
+// ─── Designer Bar Config ──────────────────────────────────────────────────
+
+describe("designerBarConfig", () => {
+  it("has exactly 1 key 'count' with label 'Charts' and color 'var(--chart-1)'", () => {
+    const keys = Object.keys(designerBarConfig);
+    expect(keys).toHaveLength(1);
+    expect(keys[0]).toBe("count");
+    expect(designerBarConfig.count.label).toBe("Charts");
+    expect(designerBarConfig.count.color).toBe("var(--chart-1)");
+  });
+
+  it("satisfies ChartConfig type", () => {
+    const _config: ChartConfig = designerBarConfig;
+    expect(_config).toBeDefined();
+  });
+});
+
+// ─── Genre Distribution Config ────────────────────────────────────────────
+
+describe("genreDistributionConfig", () => {
+  it("has exactly 1 key 'count' with label 'Charts' and color 'var(--chart-3)'", () => {
+    const keys = Object.keys(genreDistributionConfig);
+    expect(keys).toHaveLength(1);
+    expect(keys[0]).toBe("count");
+    expect(genreDistributionConfig.count.label).toBe("Charts");
+    expect(genreDistributionConfig.count.color).toBe("var(--chart-3)");
+  });
+
+  it("satisfies ChartConfig type", () => {
+    const _config: ChartConfig = genreDistributionConfig;
     expect(_config).toBeDefined();
   });
 });

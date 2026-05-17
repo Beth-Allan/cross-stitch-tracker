@@ -26,6 +26,30 @@ export interface CollectionBreakdownData {
   totalProjects: number;
 }
 
+// ─── Size Breakdown ──────────────────────────────────────────────────────
+
+export interface SizeBreakdownItem {
+  category: string;
+  count: number;
+  fill: string;
+}
+
+// ─── Designer Breakdown ──────────────────────────────────────────────────
+
+export interface DesignerBreakdownItem {
+  designerId: string;
+  name: string;
+  count: number;
+}
+
+// ─── Genre Breakdown ─────────────────────────────────────────────────────
+
+export interface GenreBreakdownItem {
+  genreId: string;
+  name: string;
+  count: number;
+}
+
 // ─── Date Boundaries ──────────────────────────────────────────────────────
 
 export interface LocalDateBoundaries {
