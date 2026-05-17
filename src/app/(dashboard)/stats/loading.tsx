@@ -1,10 +1,27 @@
 export default function StatsLoading() {
   return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="text-center">
-        <div className="bg-muted animate-skeleton-pulse mx-auto mb-4 h-12 w-12 rounded-full" />
-        <div className="bg-muted animate-skeleton-pulse mx-auto mb-2 h-6 w-32 rounded-lg" />
-        <div className="bg-muted animate-skeleton-pulse mx-auto h-4 w-64 rounded" />
+    <div className="space-y-8">
+      {/* Tab skeleton */}
+      <div className="flex gap-4 border-b border-border pb-2">
+        <div className="bg-muted animate-skeleton-pulse h-8 w-20 rounded" />
+        <div className="bg-muted animate-skeleton-pulse h-8 w-20 rounded" />
+        <div className="bg-muted animate-skeleton-pulse h-8 w-20 rounded" />
+      </div>
+
+      {/* Hero counter skeletons */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="rounded-lg border border-border bg-card p-4">
+            <div className="bg-muted animate-skeleton-pulse mb-2 h-4 w-20 rounded" />
+            <div className="bg-muted animate-skeleton-pulse h-8 w-24 rounded" />
+          </div>
+        ))}
+      </div>
+
+      {/* Chart skeleton */}
+      <div className="rounded-lg border border-border bg-card p-6">
+        <div className="bg-muted animate-skeleton-pulse mb-4 h-4 w-32 rounded" />
+        <div className="bg-muted animate-skeleton-pulse mx-auto h-[250px] w-[250px] rounded-full" />
       </div>
     </div>
   );
