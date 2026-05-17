@@ -18,9 +18,15 @@ export function CropGuideOverlay({
   containerWidth,
   containerHeight,
 }: CropGuideOverlayProps) {
-  // 60% of container width, max 360px (mobile: 70%)
-  const guideWidth = Math.min(containerWidth * 0.6, 360);
-  const guideHeight = guideWidth * (3 / 4); // 4:3 aspect ratio
+  // 60% of container width, max 360px, maintaining 4:3 aspect ratio
+  let guideWidth = Math.min(containerWidth * 0.6, 360);
+  let guideHeight = guideWidth * (3 / 4); // 4:3 aspect ratio
+
+  // If guide is taller than container, scale down to fit
+  if (guideHeight > containerHeight) {
+    guideHeight = containerHeight;
+    guideWidth = guideHeight * (4 / 3);
+  }
 
   // Center on focal point, clamp to container bounds
   let left = focalX * containerWidth - guideWidth / 2;
@@ -41,7 +47,7 @@ export function CropGuideOverlay({
       }}
     >
       {/* Label: 11px semibold uppercase tracking-wider, top-left inside guide */}
-      <span className="absolute top-1 left-1 text-[11px] font-semibold uppercase tracking-wider text-white">
+      <span className="absolute top-1 left-1 text-[11px] font-semibold tracking-wider text-white uppercase">
         Gallery preview
       </span>
     </div>
