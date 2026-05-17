@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Fixes & Polish
 status: "Phase 16 shipped — PR #34"
-stopped_at: Phase 16 context gathered
-last_updated: "2026-05-17T04:16:57.309Z"
+stopped_at: Phase 17 context gathered
+last_updated: "2026-05-17T04:42:16.365Z"
 last_activity: 2026-05-17
 progress:
   total_phases: 3
@@ -120,7 +120,7 @@ Items acknowledged and deferred at v1.3 milestone close on 2026-05-16:
 
 ## Session Continuity
 
-Last session: 2026-05-17T03:10:02.990Z
-Stopped at: Phase 16 context gathered
+Last session: 2026-05-17T04:42:16.360Z
+Stopped at: Phase 17 context gathered
 Resume action: `/gsd-plan-phase 17`
-Resume file: .planning/ROADMAP.md
+Resume file: .planning/phases/17-image-focal-point/17-CONTEXT.md
