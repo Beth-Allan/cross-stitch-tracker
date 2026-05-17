@@ -21,7 +21,7 @@ export interface ChartFormValues {
   designerId: string | null;
   coverImageUrl: string | null;
   coverThumbnailUrl: string | null;
-  digitalFileUrl: string | null;
+  uploadedFiles: Array<{ key: string; filename: string; mimeType: string; fileSize: number }>;
   stitchesWide: number;
   stitchesHigh: number;
   stitchCount: number;
@@ -83,7 +83,7 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
       designerId: null,
       coverImageUrl: null,
       coverThumbnailUrl: null,
-      digitalFileUrl: null,
+      uploadedFiles: [],
       stitchesWide: 0,
       stitchesHigh: 0,
       stitchCount: 0,
@@ -114,7 +114,7 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
     designerId: data.designerId,
     coverImageUrl: data.coverImageUrl,
     coverThumbnailUrl: data.coverThumbnailUrl,
-    digitalFileUrl: data.digitalWorkingCopyUrl,
+    uploadedFiles: [],
     stitchesWide: data.stitchesWide,
     stitchesHigh: data.stitchesHigh,
     stitchCount:
@@ -209,7 +209,7 @@ export function useChartForm({
         designerId: values.designerId,
         coverImageUrl: values.coverImageUrl,
         coverThumbnailUrl: values.coverThumbnailUrl,
-        digitalFileUrl: values.digitalFileUrl,
+        fileKeys: values.uploadedFiles,
         stitchCount: values.stitchCount,
         stitchCountApproximate: values.stitchCountApproximate,
         stitchesWide: values.stitchesWide,
