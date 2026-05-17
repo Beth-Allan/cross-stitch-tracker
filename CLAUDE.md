@@ -64,7 +64,7 @@
 - 999.13: Per-brand skein length — add `skeinLengthMeters` to ThreadBrand (default 8m for DMC), use in skein calculator instead of hardcoded constant. Fixes inaccuracy for Weeks Dye Works/Gentle Art (5yd), Kreinik (10-11m), etc.
 - 999.14: Auto-infer overCount from fabric count — when fabric is linked to a project, auto-set overCount based on fabric count (≤25 → over 1, ≥28 → over 2). User can still override via settings bar toggle.
 - 999.15: Add visual commit button (checkmark) to supply table add row — keyboard Enter works but no visible affordance for mouse-first users
-- 999.16: SearchToAdd drops keystrokes on fast typing — typing "310" registers as "30". Needs investigation: likely server action re-renders during typing, not just debounce timing
+- ~~999.16: SearchToAdd drops keystrokes on fast typing~~ — **Resolved in Phase 16** (PR #34). Root cause: PortalAutocomplete focus-steal. Fix: single-input architecture with results-only portal.
 - 999.17: InlineCreateDialog UX clarity — field labels (Name/Code) are generic across supply types; should contextualize per type (e.g., "Color Name" for beads, "Product Name" for specialty) and clarify what's optional
 
 ### Blockers

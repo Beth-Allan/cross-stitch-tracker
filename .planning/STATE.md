@@ -49,7 +49,7 @@ Last activity: 2026-05-17
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
 | 15. Chart File Management | Multiple working copies per chart | FILE-01, FILE-02, FILE-03 | Complete |
-| 16. Input & Dashboard Fixes | SearchToAdd bug + Spotlight sizing | INPUT-01, DASH-01, DASH-02 | Not started |
+| 16. Input & Dashboard Fixes | SearchToAdd bug + Spotlight sizing | INPUT-01, DASH-01, DASH-02 | Shipped (PR #34) |
 | 17. Image Focal Point | Click-to-set anchor for cover images | IMG-01, IMG-02 | Not started |
 
 ## Performance Metrics
@@ -122,5 +122,5 @@ Items acknowledged and deferred at v1.3 milestone close on 2026-05-16:
 
 Last session: 2026-05-17T03:10:02.990Z
 Stopped at: Phase 16 context gathered
-Resume action: `/gsd-plan-phase 15`
-Resume file: .planning/phases/16-input-dashboard-fixes/16-CONTEXT.md
+Resume action: `/gsd-plan-phase 17`
+Resume file: .planning/ROADMAP.md

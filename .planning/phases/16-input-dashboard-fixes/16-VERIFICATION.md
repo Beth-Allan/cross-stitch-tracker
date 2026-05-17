@@ -1,8 +1,9 @@
 ---
 phase: 16-input-dashboard-fixes
 verified: 2026-05-16T21:49:30Z
-status: human_needed
+status: verified
 score: 7/7 must-haves verified
+human_verification_completed: 2026-05-17T05:15:00Z
 overrides_applied: 0
 human_verification:
   - test: "Type '310' quickly in SearchToAdd on the project detail Supplies tab — specifically type all 3 characters as fast as you can"
@@ -20,8 +21,8 @@ human_verification:
 
 **Phase Goal:** SearchToAdd input works reliably and the Dashboard Spotlight section displays at correct proportions
 **Verified:** 2026-05-16T21:49:30Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Status:** verified
+**Re-verification:** Human UAT completed 2026-05-17 — 3/3 passed (see 16-UAT.md)
 
 ## Goal Achievement
 
@@ -95,27 +96,13 @@ Note: REQUIREMENTS.md traceability table still shows INPUT-01/DASH-01/DASH-02 as
 
 No blockers found. The one emerald reference remaining in `spotlight-card.tsx` (lines 119, 123) is on the progress bar percentage display, not on the Spotlight buttons — this is intentional and correct.
 
-### Human Verification Required
+### Human Verification — Completed
 
-The automated checks pass comprehensively. Three items require human visual/interactive confirmation before this phase is fully closed:
+All three human verification items passed in UAT (see `16-UAT.md`):
 
-### 1. Keystroke Drop Regression Test
-
-**Test:** Open the project detail page for any project with supplies. Click the search input in the add-row. Type "310" as fast as you normally would.
-**Expected:** All 3 characters appear in the input field. No dropped keystrokes. The dropdown opens below the input without the focus ever leaving the input.
-**Why human:** The bug was a timing-sensitive focus-steal via DOM events. Automated tests verify the architectural fix (no `focus()` in portal, correct ARIA wiring) but cannot replicate real keyboard event races at human typing speed.
-
-### 2. Dashboard Spotlight Visual Proportions
-
-**Test:** Visit the main dashboard. Look at the "Rediscover This One" Spotlight section.
-**Expected:** The image column is thumbnail-sized (narrow, fixed ~320px), not a 50/50 banner. The card height is visually shorter and less dominant than before. "Check It Out" and "Shuffle Spotlight" buttons are at matching visual weight (same padding, same font boldness).
-**Why human:** CSS class changes need visual confirmation — automated tests verify the class strings are present but not the rendered proportional impact on the page.
-
-### 3. Dark Mode Button Colors
-
-**Test:** Toggle to dark mode. Look at the Spotlight "Check It Out" button.
-**Expected:** Button shows a lighter emerald shade (design system dark-mode token), not the hardcoded `bg-emerald-600` that would be too dark in dark mode. The `buttonVariants` default variant provides semantic dark-mode support automatically.
-**Why human:** Tailwind CSS dark mode token resolution cannot be asserted in jsdom tests.
+1. **Keystroke Drop Regression** — PASSED. Typed "310" fast, all 3 characters appeared.
+2. **Dashboard Spotlight Visual Proportions** — PASSED. Image column thumbnail-sized, card balanced.
+3. **Dark Mode Button Colors** — PASSED. Cosmetic issue found (button size mismatch) and fixed inline during UAT.
 
 ### Gaps Summary
 

@@ -209,9 +209,8 @@ describe("PortalAutocomplete", () => {
     // t-1 is now last (disabled items sorted after addable)
     const options = screen.getAllByRole("option");
     const disabledOption = options.find((opt) => opt.getAttribute("aria-disabled") === "true");
-    if (disabledOption) {
-      fireEvent.click(disabledOption);
-    }
+    expect(disabledOption).toBeDefined();
+    fireEvent.click(disabledOption!);
     expect(defaultProps.onSelect).not.toHaveBeenCalled();
   });
 });
