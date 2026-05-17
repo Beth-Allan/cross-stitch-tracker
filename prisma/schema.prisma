@@ -54,7 +54,6 @@ model Chart {
   isFormalKit            Boolean   @default(false)
   isSAL                  Boolean   @default(false)
   kitColorCount          Int?
-  digitalWorkingCopyUrl  String?
   dateAdded              DateTime  @default(now())
   project                Project?
   files                  ChartFile[]
