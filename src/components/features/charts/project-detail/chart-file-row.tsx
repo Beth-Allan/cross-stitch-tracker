@@ -24,7 +24,14 @@ export function ChartFileRow({ file, onDelete, onDownload }: ChartFileRowProps) 
     <div
       className="group hover:bg-muted flex min-h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 sm:flex-row"
       onClick={() => onDownload(file.id)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onDownload(file.id);
+        }
+      }}
       role="link"
+      tabIndex={0}
       aria-label={`Open ${file.filename}`}
     >
       <FileTypeIcon mimeType={file.mimeType} filename={file.filename} />

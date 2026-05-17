@@ -66,7 +66,7 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 
 ### Active — Milestone 5: Fixes & Polish (v1.4)
 
-- [ ] Multiple digital working copies per chart (ChartFile table replacing single URL field)
+- [x] Multiple digital working copies per chart (ChartFile table replacing single URL field)
 - [ ] SearchToAdd keystroke dropping fix ("310" → "30" bug)
 - [ ] Dashboard Spotlight section sizing (image too large + mismatched button sizes)
 - [ ] Image focal point control (click-to-set anchor for cover images across all display contexts)

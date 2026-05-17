@@ -559,6 +559,7 @@ export function createMockPrisma() {
     },
     chartFile: {
       create: vi.fn(),
+      createMany: vi.fn(),
       findMany: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),

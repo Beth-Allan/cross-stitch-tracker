@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-05-16)
 Phase: 15 (Chart File Management) -- complete
 Plan: 4/4 done
 Status: Verified, shipping
-Last activity: 2026-05-17 -- Phase 15 planning complete
+Last activity: 2026-05-17 -- Phase 15 executed and verified
 
 ```
-[====================] 0% (0/3 phases)
+[======              ] 33% (1/3 phases)
 ```
 
 ## Milestone Structure
@@ -48,7 +48,7 @@ Last activity: 2026-05-17 -- Phase 15 planning complete
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
-| 15. Chart File Management | Multiple working copies per chart | FILE-01, FILE-02, FILE-03 | Not started |
+| 15. Chart File Management | Multiple working copies per chart | FILE-01, FILE-02, FILE-03 | Complete |
 | 16. Input & Dashboard Fixes | SearchToAdd bug + Spotlight sizing | INPUT-01, DASH-01, DASH-02 | Not started |
 | 17. Image Focal Point | Click-to-set anchor for cover images | IMG-01, IMG-02 | Not started |
 

@@ -9,9 +9,9 @@ Requirements for Fixes & Polish milestone. Each maps to roadmap phases.
 
 ### Chart Files
 
-- [ ] **FILE-01**: User can attach multiple digital working copy files to a single chart
-- [ ] **FILE-02**: User can add/remove individual working copy files without affecting others
-- [ ] **FILE-03**: User can see all attached working copies listed on the project detail page
+- [x] **FILE-01**: User can attach multiple digital working copy files to a single chart
+- [x] **FILE-02**: User can add/remove individual working copy files without affecting others
+- [x] **FILE-03**: User can see all attached working copies listed on the project detail page
 
 ### Input
 
@@ -58,9 +58,9 @@ Deferred to subsequent milestones. See PROJECT.md Deferred section.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FILE-01 | Phase 15 | Pending |
-| FILE-02 | Phase 15 | Pending |
-| FILE-03 | Phase 15 | Pending |
+| FILE-01 | Phase 15 | Complete |
+| FILE-02 | Phase 15 | Complete |
+| FILE-03 | Phase 15 | Complete |
 | INPUT-01 | Phase 16 | Pending |
 | DASH-01 | Phase 16 | Pending |
 | DASH-02 | Phase 16 | Pending |
