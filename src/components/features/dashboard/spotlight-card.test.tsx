@@ -182,4 +182,30 @@ describe("SpotlightCard", () => {
 
     expect(container.innerHTML).toBe("");
   });
+
+  describe("Focal point", () => {
+    it("applies objectPosition style to cover image when focal point is set", () => {
+      render(
+        <SpotlightCard
+          project={createMockSpotlight({ focalPointX: 0.25, focalPointY: 0.75 })}
+          imageUrl="https://example.com/cover.jpg"
+        />,
+      );
+
+      const img = screen.getByRole("img", { name: "Maritime Mystery SAL" });
+      expect(img).toHaveStyle({ objectPosition: "25% 75%" });
+    });
+
+    it("does not apply objectPosition when focal point is null", () => {
+      render(
+        <SpotlightCard
+          project={createMockSpotlight({ focalPointX: null, focalPointY: null })}
+          imageUrl="https://example.com/cover.jpg"
+        />,
+      );
+
+      const img = screen.getByRole("img", { name: "Maritime Mystery SAL" });
+      expect(img.style.objectPosition).toBeFalsy();
+    });
+  });
 });

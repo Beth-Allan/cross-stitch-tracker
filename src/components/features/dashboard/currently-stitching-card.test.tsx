@@ -89,4 +89,22 @@ describe("CurrentlyStitchingCard", () => {
 
     expect(screen.getByText("0%")).toBeInTheDocument();
   });
+
+  describe("Focal point", () => {
+    it("applies objectPosition style to cover image when focal point is set", () => {
+      const project = createMockProject({ focalPointX: 0.1, focalPointY: 0.9 });
+      render(<CurrentlyStitchingCard project={project} imageUrl="https://example.com/thumb.jpg" />);
+
+      const img = screen.getByRole("img", { name: "Enchanted Forest Sampler" });
+      expect(img).toHaveStyle({ objectPosition: "10% 90%" });
+    });
+
+    it("does not apply objectPosition when focal point is null", () => {
+      const project = createMockProject({ focalPointX: null, focalPointY: null });
+      render(<CurrentlyStitchingCard project={project} imageUrl="https://example.com/thumb.jpg" />);
+
+      const img = screen.getByRole("img", { name: "Enchanted Forest Sampler" });
+      expect(img.style.objectPosition).toBeFalsy();
+    });
+  });
 });

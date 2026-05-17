@@ -70,4 +70,42 @@ describe("ProjectAccordion", () => {
 
     expect(screen.queryByRole("img", { name: "Test Project" })).not.toBeInTheDocument();
   });
+
+  describe("Focal point", () => {
+    it("applies objectPosition style to thumbnail when focal point is set", () => {
+      const project = makeProject({
+        coverThumbnailUrl: "thumb-key",
+        focalPointX: 0.6,
+        focalPointY: 0.2,
+      });
+      render(
+        <ProjectAccordion
+          {...defaultProps}
+          projects={[project]}
+          imageUrls={{ "thumb-key": "https://r2.example.com/thumb.jpg" }}
+        />,
+      );
+
+      const img = screen.getByRole("img", { name: "Test Project" });
+      expect(img).toHaveStyle({ objectPosition: "60% 20%" });
+    });
+
+    it("does not apply objectPosition when focal point is null", () => {
+      const project = makeProject({
+        coverThumbnailUrl: "thumb-key",
+        focalPointX: null,
+        focalPointY: null,
+      });
+      render(
+        <ProjectAccordion
+          {...defaultProps}
+          projects={[project]}
+          imageUrls={{ "thumb-key": "https://r2.example.com/thumb.jpg" }}
+        />,
+      );
+
+      const img = screen.getByRole("img", { name: "Test Project" });
+      expect(img.style.objectPosition).toBeFalsy();
+    });
+  });
 });

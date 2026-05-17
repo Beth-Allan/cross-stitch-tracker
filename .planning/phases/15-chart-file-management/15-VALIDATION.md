@@ -1,10 +1,11 @@
 ---
 phase: 15
 slug: chart-file-management
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-16
+nyquist_verified: 2026-05-17
 ---
 
 # Phase 15 — Validation Strategy
@@ -38,13 +39,16 @@ created: 2026-05-16
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 15-01-01 | 01 | 1 | FILE-01 | T-15-01 | requireAuth() on addChartFile | unit | `npx vitest run src/lib/actions/chart-file-actions.test.ts -t "creates"` | ❌ W0 | ⬜ pending |
-| 15-01-02 | 01 | 1 | FILE-01 | — | N/A | unit | `npx vitest run src/components/features/charts/form-primitives/chart-file-upload.test.tsx` | ❌ W0 | ⬜ pending |
-| 15-02-01 | 02 | 1 | FILE-02 | T-15-02 | Ownership check before delete | unit | `npx vitest run src/lib/actions/chart-file-actions.test.ts -t "delete"` | ❌ W0 | ⬜ pending |
-| 15-02-02 | 02 | 1 | FILE-02 | T-15-03 | Reject unauthorized user | unit | `npx vitest run src/lib/actions/chart-file-actions.test.ts -t "unauthorized"` | ❌ W0 | ⬜ pending |
-| 15-02-03 | 02 | 1 | FILE-02 | — | N/A | unit | `npx vitest run src/components/features/charts/project-detail/delete-file-dialog.test.tsx` | ❌ W0 | ⬜ pending |
-| 15-03-01 | 03 | 2 | FILE-03 | — | N/A | unit | `npx vitest run src/components/features/charts/project-detail/chart-file-list.test.tsx` | ❌ W0 | ⬜ pending |
-| 15-03-02 | 03 | 2 | FILE-03 | — | N/A | unit | `npx vitest run src/components/features/charts/project-detail/overview-tab.test.tsx -t "file"` | ✅ | ⬜ pending |
+| 15-01-01 | 01 | 1 | FILE-01 | T-15-01 | requireAuth() on addChartFile | unit | `npx vitest run src/lib/actions/chart-file-actions.test.ts -t "creates"` | ✅ | ✅ green |
+| 15-01-01-auth | 01 | 1 | FILE-01 | T-15-01 | addChartFile rejects unauthenticated caller | unit | `npx vitest run src/lib/actions/chart-file-actions-auth.test.ts` | ✅ | ✅ green |
+| 15-01-02 | 01 | 1 | FILE-01 | — | N/A | unit | `npx vitest run src/components/features/charts/form-primitives/chart-file-upload.test.tsx` | ✅ | ✅ green |
+| 15-02-01 | 02 | 1 | FILE-02 | T-15-02 | Ownership check before delete | unit | `npx vitest run src/lib/actions/chart-file-actions.test.ts -t "delete"` | ✅ | ✅ green |
+| 15-02-02 | 02 | 1 | FILE-02 | T-15-03 | Reject unauthorized user | unit | `npx vitest run src/lib/actions/chart-file-actions-auth.test.ts` | ✅ | ✅ green |
+| 15-02-03 | 02 | 1 | FILE-02 | — | N/A | unit | `npx vitest run src/components/features/charts/project-detail/delete-file-dialog.test.tsx` | ✅ | ✅ green |
+| 15-02-04 | 02 | 1 | FILE-02 | — | R2 failure is non-blocking for deleteChartFile | unit | `npx vitest run src/lib/actions/chart-file-actions-r2-failure.test.ts` | ✅ | ✅ green |
+| 15-03-01 | 03 | 2 | FILE-03 | — | N/A | unit | `npx vitest run src/components/features/charts/project-detail/chart-file-list.test.tsx` | ✅ | ✅ green |
+| 15-03-01-sort | 03 | 2 | FILE-03 | — | Files render newest-first (D-03) | unit | `npx vitest run src/components/features/charts/project-detail/chart-file-list-sort.test.tsx` | ✅ | ✅ green |
+| 15-03-02 | 03 | 2 | FILE-03 | — | N/A | unit | `npx vitest run src/components/features/charts/project-detail/overview-tab.test.tsx -t "file"` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -52,12 +56,29 @@ created: 2026-05-16
 
 ## Wave 0 Requirements
 
-- [ ] `src/lib/actions/chart-file-actions.test.ts` — stubs for FILE-01, FILE-02
-- [ ] `src/components/features/charts/form-primitives/chart-file-upload.test.tsx` — covers FILE-01
-- [ ] `src/components/features/charts/project-detail/chart-file-list.test.tsx` — covers FILE-03
-- [ ] `src/components/features/charts/project-detail/delete-file-dialog.test.tsx` — covers FILE-02
+- [x] `src/lib/actions/chart-file-actions.test.ts` — covers FILE-01, FILE-02 (9 tests)
+- [x] `src/lib/actions/chart-file-actions-auth.test.ts` — covers T-15-01/03/04 unauthenticated rejection (3 tests) [Nyquist gap]
+- [x] `src/lib/actions/chart-file-actions-r2-failure.test.ts` — covers D-07 non-blocking R2 failure (1 test) [Nyquist gap]
+- [x] `src/lib/utils/format-file-size.test.ts` — covers formatFileSize utility (6 tests)
+- [x] `src/components/features/charts/form-primitives/chart-file-upload.test.tsx` — covers FILE-01 (6 tests)
+- [x] `src/components/features/charts/project-detail/chart-file-list.test.tsx` — covers FILE-03 (3 tests)
+- [x] `src/components/features/charts/project-detail/chart-file-list-sort.test.tsx` — covers D-03 sort order (1 test) [Nyquist gap]
+- [x] `src/components/features/charts/project-detail/delete-file-dialog.test.tsx` — covers FILE-02 (4 tests)
+- [x] `src/components/features/charts/project-detail/overview-tab.test.tsx` — covers FILE-03 kitting integration (30 tests)
 
 *Existing infrastructure covers test framework setup.*
+
+---
+
+## Nyquist Gap Resolution
+
+Three behavioral gaps were identified and filled during adversarial review:
+
+| Gap | Behavior | Test File | Status |
+|-----|----------|-----------|--------|
+| Auth rejection | addChartFile/deleteChartFile/getChartFileDownloadUrl throw "Unauthorized" when session is null | `chart-file-actions-auth.test.ts` | FILLED |
+| D-03 sort order | ChartFileList renders files newest-first regardless of prop array order | `chart-file-list-sort.test.tsx` | FILLED |
+| D-07 non-blocking R2 | deleteChartFile returns success and removes DB record even when R2 DeleteObjectCommand throws | `chart-file-actions-r2-failure.test.ts` | FILLED |
 
 ---
 
@@ -70,13 +91,35 @@ created: 2026-05-16
 
 ---
 
+## Test Totals
+
+| File | Tests | Status |
+|------|-------|--------|
+| `chart-file-actions.test.ts` | 10 | green |
+| `chart-file-actions-auth.test.ts` | 3 | green |
+| `chart-file-actions-r2-failure.test.ts` | 1 | green |
+| `format-file-size.test.ts` | 6 | green |
+| `chart-file-upload.test.tsx` | 6 | green |
+| `chart-file-list.test.tsx` | 3 | green |
+| `chart-file-list-sort.test.tsx` | 1 | green |
+| `delete-file-dialog.test.tsx` | 4 | green |
+| `overview-tab.test.tsx` | 30 | green |
+| **Total** | **64** | **all green** |
+
+Run all phase 15 tests:
+```
+npx vitest run src/lib/actions/chart-file-actions.test.ts src/lib/actions/chart-file-actions-auth.test.ts src/lib/actions/chart-file-actions-r2-failure.test.ts src/lib/utils/format-file-size.test.ts src/components/features/charts/form-primitives/chart-file-upload.test.tsx src/components/features/charts/project-detail/chart-file-list.test.tsx src/components/features/charts/project-detail/chart-file-list-sort.test.tsx src/components/features/charts/project-detail/delete-file-dialog.test.tsx src/components/features/charts/project-detail/overview-tab.test.tsx --reporter=verbose
+```
+
+---
+
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 30s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 30s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** verified 2026-05-17 — all 65 tests green, 3 adversarial gaps filled
