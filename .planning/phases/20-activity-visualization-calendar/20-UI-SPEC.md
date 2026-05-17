@@ -34,30 +34,43 @@ Declared values (multiples of 4):
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px | Icon gaps, inline padding, calendar cell internal gaps |
-| sm | 8px | Compact element spacing, chart bar gaps, table cell padding |
+| sm | 8px | Compact element spacing, chart bar gaps, table cell padding, calendar day cell internal padding |
 | md | 16px | Default element spacing, card padding on mobile |
 | lg | 24px | Section padding, card padding on desktop |
 | xl | 32px | Space between major activity sections (`space-y-8`) |
 | 2xl | 48px | Not used this phase |
 | 3xl | 64px | Not used this phase |
 
-Exceptions: Calendar day cells use 6px internal padding (from DesignOS reference). Session table rows use 12px vertical padding for comfortable scan density.
+Exceptions: Session table rows use 12px vertical padding for comfortable scan density. Calendar day cells use 8px internal padding (DesignOS shows 6px but the spec uses 8px to maintain 4px-grid alignment).
 
 ---
 
 ## Typography
 
+4 font sizes, 2 weights:
+
 | Role | Size | Weight | Line Height | Token |
 |------|------|--------|-------------|-------|
-| Body | 14px | 400 (regular) | 1.5 | `text-sm` |
-| Label | 10px | 600 (semibold) | 1.2 | `text-[10px] font-semibold uppercase tracking-wider` |
-| Heading | 14px | 600 (semibold) | 1.2 | `font-heading text-sm font-semibold` |
+| Body / Table data | 14px | 400 (regular) | 1.5 | `text-sm` |
+| Table header / Calendar day number | 12px | 600 (semibold) / 400 (regular) | 1.2 / 1 | `text-xs font-semibold uppercase tracking-wider` / `text-xs tabular-nums` |
+| Label / Calendar session pill / Calendar stitch count | 10px | 600 (semibold) | 1.2 | `text-[10px] font-semibold` |
 | Display (counters) | 30px | 600 (semibold) | 1.2 | `font-mono text-3xl font-semibold tabular-nums` |
-| Table data | 14px | 400 (regular) | 1.5 | `text-sm` with `tabular-nums` for numeric columns |
-| Table header | 12px | 600 (semibold) | 1.2 | `text-xs font-semibold uppercase tracking-wider` |
-| Calendar day number | 12px | 400 (regular) | 1 | `text-xs tabular-nums` |
-| Calendar session pill | 10px | 500 (medium) | 1.2 | `text-[10px] font-medium` |
-| Calendar stitch count | 9px | 400 (regular) | 1.2 | `text-[9px] tabular-nums` |
+
+### Size scale (4 sizes)
+
+| Size | Used for |
+|------|----------|
+| 10px | Labels (uppercase), calendar session pill project name, calendar stitch count |
+| 12px | Table headers, calendar day numbers |
+| 14px | Body text, table data, heading labels |
+| 30px | Display counters (pace card values) |
+
+### Weight scale (2 weights)
+
+| Weight | Used for |
+|--------|----------|
+| 400 (regular) | Body text, table data, calendar day numbers |
+| 600 (semibold) | Labels, headings, display counters, table headers, calendar pills |
 
 ---
 
@@ -221,6 +234,17 @@ Day-of-week chart: always full width (7 bars are narrow enough). Monthly chart: 
 | Stitch rate | Only displayed when time data is available. Shows "stitches/hr" with trend direction |
 | Cards are static | No click interactions -- informational display only |
 
+### Accessibility: Icon-Only Button Labels
+
+All icon-only navigation buttons must include an explicit `aria-label`:
+
+| Button | Icon | aria-label |
+|--------|------|------------|
+| Monthly chart previous year | `ChevronLeft` | `"Previous year"` |
+| Monthly chart next year | `ChevronRight` | `"Next year"` |
+| Calendar previous month | `ChevronLeft` | `"Previous month"` |
+| Calendar next month | `ChevronRight` | `"Next month"` |
+
 ---
 
 ## Copywriting Contract
@@ -275,7 +299,7 @@ Layout: 2-column grid on mobile, 5-across flex row on desktop (same responsive p
 ```
 +------------------+
 | 15               |  <- day number (12px, muted) or today circle
-| [Project A  198] |  <- session pill (colored bg, 10px project name, 9px count)
+| [Project A  198] |  <- session pill (colored bg, 10px project name + stitch count)
 | [Project B  356] |  <- second pill if multiple sessions
 +------------------+
 ```
