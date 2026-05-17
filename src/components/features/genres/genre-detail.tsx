@@ -258,6 +258,7 @@ function ChartRow({ chart }: { chart: GenreChart }) {
             src={chart.coverThumbnailUrl}
             alt={chart.name}
             className="h-full w-full object-cover"
+            style={getObjectPositionStyle(chart.focalPointX, chart.focalPointY)}
           />
         </div>
       ) : (

@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { CheckSquare, ChevronRight, Square } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
 import { QuantityControl } from "./quantity-control";
@@ -130,6 +131,7 @@ export function ProjectAccordion({
                     width={40}
                     height={40}
                     className="shrink-0 rounded object-cover"
+                    style={getObjectPositionStyle(project.focalPointX, project.focalPointY)}
                     loading="lazy"
                     unoptimized
                   />
