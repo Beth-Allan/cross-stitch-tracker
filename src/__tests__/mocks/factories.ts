@@ -133,6 +133,8 @@ export function createMockChart(overrides?: Partial<Chart>): Chart {
     designerId: null,
     coverImageUrl: null,
     coverThumbnailUrl: null,
+    focalPointX: null,
+    focalPointY: null,
     stitchCount: 5000,
     stitchCountApproximate: false,
     stitchesWide: 100,

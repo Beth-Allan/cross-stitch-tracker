@@ -45,6 +45,8 @@ model Chart {
   designerId             String?
   coverImageUrl          String?
   coverThumbnailUrl      String?
+  focalPointX            Float?
+  focalPointY            Float?
   stitchCount            Int       @default(0)
   stitchCountApproximate Boolean   @default(false)
   stitchesWide           Int       @default(0)
