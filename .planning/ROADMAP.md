@@ -110,8 +110,11 @@ Plans:
   2. User can see today/this week/this month/this year stitch counts that update after logging a session
   3. User can see collection broken down by status, size category, designer, and genre as interactive charts
   4. All entity references (projects, designers) in stats are clickable links to their detail pages
-**Plans**: TBD
-**UI hint**: yes
+**Plans:** 3 plans
+Plans:
+- [ ] 19-01-PLAN.md — Types, chart configs, and breakdown queries (size, designer, genre)
+- [ ] 19-02-PLAN.md — MetricsBar and LifetimeCounters components
+- [ ] 19-03-PLAN.md — Chart components, RankedList, StatsOverview layout, page wiring
 
 ### Phase 20: Activity Visualization & Calendar
 **Goal**: Users can explore their stitching activity over time through charts, a navigable calendar, session history, and pace metrics
@@ -162,6 +165,6 @@ Plans:
 | 16. Input & Dashboard Fixes | v1.4 | 2/2 | Complete | 2026-05-17 |
 | 17. Image Focal Point | v1.4 | 3/3 | Complete | 2026-05-17 |
 | 18. Stats Engine & Charting Foundation | v1.5 | 3/3 | Complete    | 2026-05-17 |
-| 19. Hero Stats & Collection Overview | v1.5 | 0/? | Not started | - |
+| 19. Hero Stats & Collection Overview | v1.5 | 0/3 | Planned | - |
 | 20. Activity Visualization & Calendar | v1.5 | 0/? | Not started | - |
 | 21. Records, Insights & Celebrations | v1.5 | 0/? | Not started | - |
