@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-05-17)
 
 Phase: 20
 Plan: Not started
-Status: Ready to discuss/plan
-Last activity: 2026-05-17 -- Phase 19 executed (3/3 plans, 1747 tests)
+Status: Phase 19 shipped — PR #38
+Last activity: 2026-05-17 -- Phase 19 shipped (PR #38)
 
 Progress: [█████░░░░░] 50%
 
