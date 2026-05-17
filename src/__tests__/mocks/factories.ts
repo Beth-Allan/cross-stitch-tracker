@@ -557,6 +557,13 @@ export function createMockPrisma() {
       groupBy: vi.fn(),
       count: vi.fn(),
     },
+    chartFile: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
     $transaction: vi.fn(),
   };
 }
