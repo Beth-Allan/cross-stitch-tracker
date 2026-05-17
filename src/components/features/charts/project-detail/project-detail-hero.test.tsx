@@ -8,6 +8,10 @@ vi.mock("@/lib/actions/chart-actions", () => ({
   deleteChart: vi.fn(),
 }));
 
+vi.mock("@/lib/actions/focal-point-actions", () => ({
+  updateFocalPoint: vi.fn(),
+}));
+
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
