@@ -190,15 +190,59 @@
 4. **Gap closure budget works** — 2 plans per phase for "fix what we missed" is the right default. Phase 5 used 3 (the extra was a genuine gap), Phase 7 used 2.
 5. **Multi-agent review is worth the cost** — 3 rounds on Phase 5 was expensive but caught critical auth bypass. 1 round on Phases 6-7 was sufficient for lower-risk changes.
 
+## Milestone: v1.4 — Fixes & Polish
+
+**Shipped:** 2026-05-17
+**Phases:** 3 | **Plans:** 9
+**Timeline:** 2 days (2026-05-16 → 2026-05-17)
+**Tests:** 1,641 | **PRs:** #34, #35
+
+### What Was Built
+
+- Chart File Management: ChartFile model with multi-file R2 upload, per-file add/remove lifecycle, presigned URL downloads, migration from legacy single-URL field
+- SearchToAdd keystroke fix: single-input architecture with results-only portal (eliminated focus-steal from dual-input design)
+- Dashboard Spotlight sizing: 320px fixed column, 300px max-height image, matched button styling
+- Image Focal Point: click-to-set anchor with crosshair marker, 4:3 crop guide overlay, keyboard accessibility, CSS object-position propagation across 8+ display contexts
+
+### What Worked
+
+- **Focused scope** — 3 independent phases with clear success criteria. No inter-phase dependencies meant each could ship independently.
+- **Milestone audit before close** — Caught Nyquist gaps early, filled 9 test gaps across all phases before completing.
+- **Security verification** — Threat model reviews for Phases 15 and 17 caught no critical issues, confirming patterns established in earlier milestones are holding.
+- **Rapid execution** — 9 plans in 2 days (~4.5/day). Small, well-scoped fixes execute fast when requirements are clear.
+
+### What Was Inefficient
+
+- **SUMMARY.md files still not generated** — 5th milestone in a row. Executor still doesn't create them. Auto-extracted accomplishments from CLI were garbled (included rule references).
+- **REQUIREMENTS.md traceability drift (5th time)** — 5/8 requirements unchecked despite being fully implemented. Structural issue never fixed.
+- **Phase 17 UAT blocked by R2 dev config** — Human UAT couldn't proceed because dev server had no R2 configured. Could have been flagged as a prerequisite.
+- **Artifact accumulation** — 24 open items at milestone close, all inherited from prior milestones. Needed explicit cleanup session.
+
+### Patterns Established
+
+- **ResizeObserver for container-relative positioning** — Used in focal point editor for accurate click-to-coordinate conversion that handles layout shifts.
+- **Normalized 0-1 coordinate storage** — Resolution-independent focal point that converts to CSS percentage at render time.
+- **Results-only portal pattern** — Portal shows dropdown results but input stays in document flow. Eliminates focus-steal issues.
+- **Artifact cleanup at milestone close** — Explicitly resolve or delete inherited items instead of re-deferring indefinitely.
+
+### Key Lessons
+
+1. **Enforce SUMMARY.md generation or stop expecting it** — 5 milestones, same gap. Either make it structural in the executor or accept its absence and write accomplishments manually at close.
+2. **REQUIREMENTS traceability is write-once** — Same issue every milestone. Accept that REQUIREMENTS.md is an input document, not a live tracker. Verification reports are the true status source.
+3. **Dev environment prerequisites matter** — R2 dev config blocked UAT. Document required services per phase so human testing isn't surprised.
+4. **Clean as you go** — The 24 inherited items were manageable to clean in one session. Don't carry artifact debt across more than one milestone.
+
+---
+
 ## Cross-Milestone Trends
 
-| Metric | v1.0 | v1.1 | v1.2 | v1.3 |
-|--------|------|------|------|------|
-| Phases | 4 | 3 | 2 | 5 |
-| Plans | 23 | 20 | 20 | 19 |
-| Tests | 395 | 867 | 1,172 | 1,535 |
-| Days | 22 | 5 | 4 | 13 |
-| Plans/day | ~1 | ~4 | ~5 | ~1.5 |
-| Commits | 225+ | 225 | 153 | 190 |
-| PRs | 6 | 3 | 2 | 1 |
-| LOC | 48k | ~65k | 82k | ~90k |
+| Metric | v1.0 | v1.1 | v1.2 | v1.3 | v1.4 |
+|--------|------|------|------|------|------|
+| Phases | 4 | 3 | 2 | 5 | 3 |
+| Plans | 23 | 20 | 20 | 19 | 9 |
+| Tests | 395 | 867 | 1,172 | 1,535 | 1,641 |
+| Days | 22 | 5 | 4 | 13 | 2 |
+| Plans/day | ~1 | ~4 | ~5 | ~1.5 | ~4.5 |
+| Commits | 225+ | 225 | 153 | 190 | 153 |
+| PRs | 6 | 3 | 2 | 1 | 2 |
+| LOC | 48k | ~65k | 82k | ~90k | ~95k |

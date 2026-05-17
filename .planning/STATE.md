@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Fixes & Polish
-status: "Phase 17 shipped — PR #35"
-stopped_at: Phase 17 UI-SPEC approved
-last_updated: "2026-05-17T17:45:49.771Z"
+status: "SHIPPED — milestone complete"
+stopped_at: Milestone archived
+last_updated: "2026-05-17T17:50:00.000Z"
 last_activity: 2026-05-17
 progress:
   total_phases: 3
@@ -18,20 +18,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-16)
+See: .planning/PROJECT.md (updated 2026-05-17)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 17 — image-focal-point
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 17 (image-focal-point) — EXECUTING
-Plan: 1 of 3
-Status: Phase 17 shipped — PR #35
+Milestone: v1.4 Fixes & Polish — SHIPPED
+Status: Milestone archived, git tagged
 Last activity: 2026-05-17
 
 ```
-[======              ] 33% (1/3 phases)
+[====================] 100% (3/3 phases)
 ```
 
 ## Milestone Structure
@@ -107,7 +106,7 @@ Remaining from v1.3:
 
 ## Session Continuity
 
-Last session: 2026-05-17T04:50:36.254Z
-Stopped at: Phase 17 UI-SPEC approved
-Resume action: `/gsd-plan-phase 17`
-Resume file: .planning/phases/17-image-focal-point/17-UI-SPEC.md
+Last session: 2026-05-17
+Stopped at: v1.4 milestone complete
+Resume action: `/gsd-new-milestone`
+Resume file: .planning/PROJECT.md
