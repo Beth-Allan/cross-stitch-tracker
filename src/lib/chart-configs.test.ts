@@ -4,6 +4,8 @@ import {
   sizeCategoryConfig,
   designerBarConfig,
   genreDistributionConfig,
+  monthlyBarConfig,
+  dayOfWeekConfig,
 } from "./chart-configs";
 import type { ChartConfig } from "@/components/ui/chart";
 
@@ -97,6 +99,40 @@ describe("genreDistributionConfig", () => {
 
   it("satisfies ChartConfig type", () => {
     const _config: ChartConfig = genreDistributionConfig;
+    expect(_config).toBeDefined();
+  });
+});
+
+// ─── Monthly Bar Config ─────────────────────────────────────────────────
+
+describe("monthlyBarConfig", () => {
+  it("has exactly 1 key 'totalStitches' with label 'Stitches' and color 'var(--chart-1)'", () => {
+    const keys = Object.keys(monthlyBarConfig);
+    expect(keys).toHaveLength(1);
+    expect(keys[0]).toBe("totalStitches");
+    expect(monthlyBarConfig.totalStitches.label).toBe("Stitches");
+    expect(monthlyBarConfig.totalStitches.color).toBe("var(--chart-1)");
+  });
+
+  it("satisfies ChartConfig type", () => {
+    const _config: ChartConfig = monthlyBarConfig;
+    expect(_config).toBeDefined();
+  });
+});
+
+// ─── Day of Week Config ──────────────────────────────────────────────────
+
+describe("dayOfWeekConfig", () => {
+  it("has exactly 1 key 'avgStitches' with label 'Avg Stitches' and color 'var(--chart-1)'", () => {
+    const keys = Object.keys(dayOfWeekConfig);
+    expect(keys).toHaveLength(1);
+    expect(keys[0]).toBe("avgStitches");
+    expect(dayOfWeekConfig.avgStitches.label).toBe("Avg Stitches");
+    expect(dayOfWeekConfig.avgStitches.color).toBe("var(--chart-1)");
+  });
+
+  it("satisfies ChartConfig type", () => {
+    const _config: ChartConfig = dayOfWeekConfig;
     expect(_config).toBeDefined();
   });
 });
