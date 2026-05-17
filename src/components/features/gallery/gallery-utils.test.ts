@@ -161,6 +161,8 @@ describe("transformToGalleryCard", () => {
     designerId: "d1",
     coverImageUrl: "covers/img.jpg",
     coverThumbnailUrl: "covers/thumb.jpg",
+    focalPointX: null,
+    focalPointY: null,
     stitchCount: 10000,
     stitchCountApproximate: false,
     stitchesWide: 100,
@@ -301,6 +303,28 @@ describe("transformToGalleryCard", () => {
     };
     const card = transformToGalleryCard(chartZero, imageUrls);
     expect(card.progressPercent).toBe(0);
+  });
+
+  it("passes through focalPointX and focalPointY when present on chart", () => {
+    const chartWithFocal: GalleryChartData = {
+      ...baseChart,
+      focalPointX: 0.3,
+      focalPointY: 0.7,
+    };
+    const card = transformToGalleryCard(chartWithFocal, imageUrls);
+    expect(card.focalPointX).toBe(0.3);
+    expect(card.focalPointY).toBe(0.7);
+  });
+
+  it("returns null for focalPointX/Y when chart has no focal point", () => {
+    const chartNoFocal: GalleryChartData = {
+      ...baseChart,
+      focalPointX: null,
+      focalPointY: null,
+    };
+    const card = transformToGalleryCard(chartNoFocal, imageUrls);
+    expect(card.focalPointX).toBeNull();
+    expect(card.focalPointY).toBeNull();
   });
 });
 

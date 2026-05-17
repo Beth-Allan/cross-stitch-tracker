@@ -107,6 +107,8 @@ export function transformToGalleryCard(
     coverThumbnailUrl: chart.coverThumbnailUrl
       ? (imageUrls[chart.coverThumbnailUrl] ?? null)
       : null,
+    focalPointX: chart.focalPointX ?? null,
+    focalPointY: chart.focalPointY ?? null,
     status,
     statusGroup,
     genres: chart.genres.map((g) => g.name),
