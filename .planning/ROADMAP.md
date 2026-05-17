@@ -65,7 +65,7 @@ Full details: `milestones/v1.3-ROADMAP.md`
 
 ### v1.4 Fixes & Polish
 
-- [ ] **Phase 15: Chart File Management** - Multiple digital working copies per chart with add/remove lifecycle
+- [x] **Phase 15: Chart File Management** - Multiple digital working copies per chart with add/remove lifecycle -- completed 2026-05-17
 - [ ] **Phase 16: Input & Dashboard Fixes** - SearchToAdd keystroke bug fix and Spotlight section sizing corrections
 - [ ] **Phase 17: Image Focal Point** - Click-to-set anchor point for cover images across all display contexts
 
@@ -80,12 +80,12 @@ Full details: `milestones/v1.3-ROADMAP.md`
   2. User can add a new working copy file without affecting existing files
   3. User can remove a specific working copy file without affecting others
   4. User can see all attached working copies listed on the project detail page with filenames and download links
-**Plans**: 4 plans
+**Plans**: 4/4 complete
 Plans:
-- [ ] 15-01-PLAN.md — Schema, server actions, validation constants
-- [ ] 15-02-PLAN.md — Multi-file upload component and creation form integration
-- [ ] 15-03-PLAN.md — Project detail file list UI with add/remove lifecycle
-- [ ] 15-04-PLAN.md — Data migration and codebase cleanup
+- [x] 15-01-PLAN.md — Schema, server actions, validation constants
+- [x] 15-02-PLAN.md — Multi-file upload component and creation form integration
+- [x] 15-03-PLAN.md — Project detail file list UI with add/remove lifecycle
+- [x] 15-04-PLAN.md — Data migration and codebase cleanup
 **UI hint**: yes
 
 ### Phase 16: Input & Dashboard Fixes
@@ -96,12 +96,12 @@ Plans:
   1. User can type "310" (or any multi-digit code) quickly in SearchToAdd without keystrokes being dropped
   2. Spotlight "Rediscover This One" image displays at a constrained, proportional size (not dominating the section)
   3. "Check it Out" and "Shuffle Spotlight" buttons render at matching, visually balanced sizes
-**Plans**: 4 plans
+**Plans**: 4/4 complete
 Plans:
-- [ ] 15-01-PLAN.md — Schema, server actions, validation constants
-- [ ] 15-02-PLAN.md — Multi-file upload component and creation form integration
-- [ ] 15-03-PLAN.md — Project detail file list UI with add/remove lifecycle
-- [ ] 15-04-PLAN.md — Data migration and codebase cleanup
+- [x] 15-01-PLAN.md — Schema, server actions, validation constants
+- [x] 15-02-PLAN.md — Multi-file upload component and creation form integration
+- [x] 15-03-PLAN.md — Project detail file list UI with add/remove lifecycle
+- [x] 15-04-PLAN.md — Data migration and codebase cleanup
 **UI hint**: yes
 
 ### Phase 17: Image Focal Point
@@ -113,12 +113,12 @@ Plans:
   2. The focal point is stored and persisted across page loads
   3. Gallery cards display cover images cropped to the saved focal point
   4. Dashboard cards, hero banners, and project detail all respect the same focal point
-**Plans**: 4 plans
+**Plans**: 4/4 complete
 Plans:
-- [ ] 15-01-PLAN.md — Schema, server actions, validation constants
-- [ ] 15-02-PLAN.md — Multi-file upload component and creation form integration
-- [ ] 15-03-PLAN.md — Project detail file list UI with add/remove lifecycle
-- [ ] 15-04-PLAN.md — Data migration and codebase cleanup
+- [x] 15-01-PLAN.md — Schema, server actions, validation constants
+- [x] 15-02-PLAN.md — Multi-file upload component and creation form integration
+- [x] 15-03-PLAN.md — Project detail file list UI with add/remove lifecycle
+- [x] 15-04-PLAN.md — Data migration and codebase cleanup
 **UI hint**: yes
 
 ## Execution Order
