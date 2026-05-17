@@ -45,8 +45,8 @@ export function DeleteFileDialog({
             Remove Working Copy
           </DialogTitle>
           <DialogDescription>
-            This will permanently delete &ldquo;{filename}&rdquo; from this chart.
-            This action cannot be undone.
+            This will permanently delete &ldquo;{filename}&rdquo; from this chart. This action
+            cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -58,12 +58,7 @@ export function DeleteFileDialog({
           >
             Cancel
           </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={handleConfirm}
-            disabled={isPending}
-          >
+          <Button type="button" variant="destructive" onClick={handleConfirm} disabled={isPending}>
             {isPending ? "Deleting..." : "Delete File"}
           </Button>
         </DialogFooter>

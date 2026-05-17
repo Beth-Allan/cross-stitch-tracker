@@ -19,5 +19,5 @@ export function FileTypeIcon({ mimeType, filename }: { mimeType: string; filenam
   if (PATTERN_EXTENSIONS.includes(ext)) {
     return <FileCode className="size-4 text-purple-500" aria-hidden="true" />;
   }
-  return <File className="size-4 text-muted-foreground" aria-hidden="true" />;
+  return <File className="text-muted-foreground size-4" aria-hidden="true" />;
 }

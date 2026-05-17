@@ -61,9 +61,7 @@ export function ChartFileList({ chartId, files }: ChartFileListProps) {
               ext as (typeof ALLOWED_CHART_FILE_EXTENSIONS)[number],
             )
           ) {
-            toast.error(
-              `Unsupported file type. Accepted: PDF, images, .pat, .xsd, .css, .saga`,
-            );
+            toast.error(`Unsupported file type. Accepted: PDF, images, .pat, .xsd, .css, .saga`);
             continue;
           }
         }
@@ -169,12 +167,7 @@ export function ChartFileList({ chartId, files }: ChartFileListProps) {
         icon={Files}
         title="Working Copies"
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleAddFilesClick}
-            disabled={isUploading}
-          >
+          <Button variant="outline" size="sm" onClick={handleAddFilesClick} disabled={isUploading}>
             {isUploading ? "Uploading..." : "Add Files"}
           </Button>
         }

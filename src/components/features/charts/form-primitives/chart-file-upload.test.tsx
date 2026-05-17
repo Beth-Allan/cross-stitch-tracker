@@ -22,28 +22,28 @@ describe("ChartFileUpload", () => {
   });
 
   it("renders 'Upload Working Copies' button when no files uploaded", () => {
-    render(
-      <ChartFileUpload
-        uploadedFiles={[]}
-        onFilesChange={vi.fn()}
-      />,
-    );
+    render(<ChartFileUpload uploadedFiles={[]} onFilesChange={vi.fn()} />);
 
     expect(screen.getByText("Upload Working Copies")).toBeInTheDocument();
   });
 
   it("renders file rows for each completed upload", () => {
     const files = [
-      { key: "files/unsaved/abc-test.pdf", filename: "test.pdf", mimeType: "application/pdf", fileSize: 1024 },
-      { key: "files/unsaved/def-photo.png", filename: "photo.png", mimeType: "image/png", fileSize: 2048 },
+      {
+        key: "files/unsaved/abc-test.pdf",
+        filename: "test.pdf",
+        mimeType: "application/pdf",
+        fileSize: 1024,
+      },
+      {
+        key: "files/unsaved/def-photo.png",
+        filename: "photo.png",
+        mimeType: "image/png",
+        fileSize: 2048,
+      },
     ];
 
-    render(
-      <ChartFileUpload
-        uploadedFiles={files}
-        onFilesChange={vi.fn()}
-      />,
-    );
+    render(<ChartFileUpload uploadedFiles={files} onFilesChange={vi.fn()} />);
 
     expect(screen.getByText("test.pdf")).toBeInTheDocument();
     expect(screen.getByText("photo.png")).toBeInTheDocument();
@@ -59,12 +59,7 @@ describe("ChartFileUpload", () => {
       key: "files/unsaved/xyz-newfile.pdf",
     });
 
-    render(
-      <ChartFileUpload
-        uploadedFiles={[]}
-        onFilesChange={onFilesChange}
-      />,
-    );
+    render(<ChartFileUpload uploadedFiles={[]} onFilesChange={onFilesChange} />);
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(["content"], "newfile.pdf", { type: "application/pdf" });
@@ -74,7 +69,12 @@ describe("ChartFileUpload", () => {
 
     await waitFor(() => {
       expect(onFilesChange).toHaveBeenCalledWith([
-        { key: "files/unsaved/xyz-newfile.pdf", filename: "newfile.pdf", mimeType: "application/pdf", fileSize: 5000 },
+        {
+          key: "files/unsaved/xyz-newfile.pdf",
+          filename: "newfile.pdf",
+          mimeType: "application/pdf",
+          fileSize: 5000,
+        },
       ]);
     });
   });
@@ -82,12 +82,7 @@ describe("ChartFileUpload", () => {
   it("shows error message for invalid file type", async () => {
     const onFilesChange = vi.fn();
 
-    render(
-      <ChartFileUpload
-        uploadedFiles={[]}
-        onFilesChange={onFilesChange}
-      />,
-    );
+    render(<ChartFileUpload uploadedFiles={[]} onFilesChange={onFilesChange} />);
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(["content"], "malware.exe", { type: "application/x-msdownload" });
@@ -107,12 +102,7 @@ describe("ChartFileUpload", () => {
   it("shows error message for file exceeding 10MB", async () => {
     const onFilesChange = vi.fn();
 
-    render(
-      <ChartFileUpload
-        uploadedFiles={[]}
-        onFilesChange={onFilesChange}
-      />,
-    );
+    render(<ChartFileUpload uploadedFiles={[]} onFilesChange={onFilesChange} />);
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(["content"], "huge.pdf", { type: "application/pdf" });
@@ -130,22 +120,32 @@ describe("ChartFileUpload", () => {
   it("allows removing an uploaded file from the list", () => {
     const onFilesChange = vi.fn();
     const files = [
-      { key: "files/unsaved/abc-test.pdf", filename: "test.pdf", mimeType: "application/pdf", fileSize: 1024 },
-      { key: "files/unsaved/def-photo.png", filename: "photo.png", mimeType: "image/png", fileSize: 2048 },
+      {
+        key: "files/unsaved/abc-test.pdf",
+        filename: "test.pdf",
+        mimeType: "application/pdf",
+        fileSize: 1024,
+      },
+      {
+        key: "files/unsaved/def-photo.png",
+        filename: "photo.png",
+        mimeType: "image/png",
+        fileSize: 2048,
+      },
     ];
 
-    render(
-      <ChartFileUpload
-        uploadedFiles={files}
-        onFilesChange={onFilesChange}
-      />,
-    );
+    render(<ChartFileUpload uploadedFiles={files} onFilesChange={onFilesChange} />);
 
     const removeButtons = screen.getAllByLabelText(/Remove/);
     fireEvent.click(removeButtons[0]);
 
     expect(onFilesChange).toHaveBeenCalledWith([
-      { key: "files/unsaved/def-photo.png", filename: "photo.png", mimeType: "image/png", fileSize: 2048 },
+      {
+        key: "files/unsaved/def-photo.png",
+        filename: "photo.png",
+        mimeType: "image/png",
+        fileSize: 2048,
+      },
     ]);
   });
 });

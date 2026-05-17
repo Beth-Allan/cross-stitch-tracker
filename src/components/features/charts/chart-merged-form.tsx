@@ -285,7 +285,12 @@ export function ChartMergedForm({
       designerId: null,
       coverImageUrl: null,
       coverThumbnailUrl: null,
-      uploadedFiles: [] as Array<{ key: string; filename: string; mimeType: string; fileSize: number }>,
+      uploadedFiles: [] as Array<{
+        key: string;
+        filename: string;
+        mimeType: string;
+        fileSize: number;
+      }>,
       stitchesWide: 0,
       stitchesHigh: 0,
       stitchCount: 0,

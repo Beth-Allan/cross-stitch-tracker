@@ -51,9 +51,7 @@ describe("ChartFileList", () => {
     render(<ChartFileList chartId="chart-1" files={[]} />);
 
     expect(screen.getByText("No working copies yet")).toBeInTheDocument();
-    expect(
-      screen.getByText(/Upload your digital pattern files/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Upload your digital pattern files/)).toBeInTheDocument();
   });
 
   it("shows 'Add Files' button in section header", () => {

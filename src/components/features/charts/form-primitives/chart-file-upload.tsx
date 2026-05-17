@@ -55,11 +55,7 @@ function generateFileId(): string {
   return `upload-${fileIdCounter}-${Date.now()}`;
 }
 
-export function ChartFileUpload({
-  chartId,
-  uploadedFiles,
-  onFilesChange,
-}: ChartFileUploadProps) {
+export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: ChartFileUploadProps) {
   const [inProgress, setInProgress] = useState<InProgressFile[]>([]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -87,7 +83,9 @@ export function ChartFileUpload({
         if ("success" in result && !result.success) {
           setInProgress((prev) =>
             prev.map((f) =>
-              f.id === localId ? { ...f, state: "error" as const, error: "Upload failed. Please try again." } : f,
+              f.id === localId
+                ? { ...f, state: "error" as const, error: "Upload failed. Please try again." }
+                : f,
             ),
           );
           return null;
@@ -96,7 +94,9 @@ export function ChartFileUpload({
         if (!("url" in result)) {
           setInProgress((prev) =>
             prev.map((f) =>
-              f.id === localId ? { ...f, state: "error" as const, error: "Upload failed. Please try again." } : f,
+              f.id === localId
+                ? { ...f, state: "error" as const, error: "Upload failed. Please try again." }
+                : f,
             ),
           );
           return null;
@@ -121,7 +121,9 @@ export function ChartFileUpload({
       } catch {
         setInProgress((prev) =>
           prev.map((f) =>
-            f.id === localId ? { ...f, state: "error" as const, error: "Upload failed. Please try again." } : f,
+            f.id === localId
+              ? { ...f, state: "error" as const, error: "Upload failed. Please try again." }
+              : f,
           ),
         );
         return null;
@@ -233,7 +235,10 @@ export function ChartFileUpload({
 
       {/* In-progress uploads */}
       {inProgress.map((file) => (
-        <div key={file.id} className="border-border flex items-center gap-2 rounded-lg border px-3 py-2">
+        <div
+          key={file.id}
+          className="border-border flex items-center gap-2 rounded-lg border px-3 py-2"
+        >
           {file.state === "uploading" && (
             <Loader2 className="text-muted-foreground size-4 shrink-0 animate-spin" />
           )}
@@ -246,7 +251,10 @@ export function ChartFileUpload({
 
       {/* Completed files */}
       {uploadedFiles.map((file) => (
-        <div key={file.key} className="border-border flex items-center gap-2 rounded-lg border px-3 py-2">
+        <div
+          key={file.key}
+          className="border-border flex items-center gap-2 rounded-lg border px-3 py-2"
+        >
           <span className="text-foreground flex-1 truncate text-sm">{file.filename}</span>
           <span className="text-muted-foreground text-xs">{formatFileSize(file.fileSize)}</span>
           <button

@@ -13,9 +13,7 @@ describe("DeleteFileDialog", () => {
   it("renders filename in description", () => {
     render(<DeleteFileDialog {...defaultProps} />);
 
-    expect(
-      screen.getByText(/pattern-chart\.pdf/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/pattern-chart\.pdf/)).toBeInTheDocument();
   });
 
   it("calls onConfirm when 'Delete File' clicked", async () => {
