@@ -1,5 +1,5 @@
 ---
-status: investigating
+status: converted_to_backlog
 trigger: "37x42 unassigned fabric not showing as match for project needing 16.7x8 fabric"
 created: 2026-04-17T00:00:00Z
 updated: 2026-04-17T00:00:00Z

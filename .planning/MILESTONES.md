@@ -1,5 +1,23 @@
 # Milestones
 
+## v1.4 Fixes & Polish (Shipped: 2026-05-17)
+
+**Delivered:** Multiple working copy files per chart, SearchToAdd keystroke fix, Dashboard Spotlight sizing, and click-to-set focal point control for cover images across all display contexts.
+
+**Stats:** 3 phases, 9 plans | 153 commits | 1,641 tests | 2 days (2026-05-16 → 2026-05-17)
+
+**Key accomplishments:**
+
+1. **Chart File Management** — New ChartFile model with multi-file upload to R2, per-file add/remove lifecycle, presigned URL downloads, and migration from legacy single-URL field
+2. **SearchToAdd Keystroke Fix** — Single-input architecture with results-only portal replacing focus-stealing dual-input; zero dropped keystrokes on fast typing
+3. **Dashboard Spotlight Sizing** — 320px fixed column, 300px max-height image, matched button styling with consistent buttonVariants
+4. **Focal Point Control** — Click-to-set anchor for cover images with crosshair marker, 4:3 crop guide overlay, keyboard accessibility (Enter/Space), and CSS object-position propagation across all 8+ display contexts
+5. **Security & Validation** — Threat mitigations verified for Phases 15 and 17; Nyquist compliance across all phases (9 test gaps filled)
+
+**PR:** #34 (Phase 16), #35 (Phases 15 + 17)
+
+---
+
 ## v1.3 Form & Supply Overhaul (Shipped: 2026-05-16)
 
 **Delivered:** Keyboard-driven unified supply table, single-page chart+project creation form, supply takeover mode with skein calculator, full edit mode, and removal of all deprecated components.

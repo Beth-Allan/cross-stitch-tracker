@@ -10,10 +10,10 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 ## Current State
 
-**Last shipped:** v1.3 Form & Supply Overhaul (2026-05-16)
-**Next milestone:** v1.4 Fixes & Polish (starting)
+**Last shipped:** v1.4 Fixes & Polish (2026-05-17)
+**Next milestone:** Planning (run `/gsd-new-milestone`)
 
-The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project selection, and image optimization. 1,535 tests, ~90k LOC TypeScript.
+The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project selection, image optimization, multi-file working copies per chart, and click-to-set focal point control for cover images. 1,641 tests, ~95k LOC TypeScript.
 
 ## Requirements
 
@@ -63,13 +63,14 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - ✓ Supply takeover mode with fabric assignment, skein calculator card, two-phase atomic save — v1.3
 - ✓ Full-page edit mode using merged form layout, accessible from project detail and gallery kebab menu — v1.3
 - ✓ Deprecated component cleanup (21 files, 3,700+ lines removed) — v1.3
+- ✓ Multiple digital working copies per chart (ChartFile model, multi-file upload, per-file lifecycle) — v1.4
+- ✓ SearchToAdd keystroke fix (single-input architecture, results-only portal) — v1.4
+- ✓ Dashboard Spotlight sizing (320px column, matched buttons) — v1.4
+- ✓ Click-to-set focal point for cover images across all display contexts — v1.4
 
-### Active — Milestone 5: Fixes & Polish (v1.4)
+### Active
 
-- [x] Multiple digital working copies per chart (ChartFile table replacing single URL field)
-- [ ] SearchToAdd keystroke dropping fix ("310" → "30" bug)
-- [ ] Dashboard Spotlight section sizing (image too large + mismatched button sizes)
-- [ ] Image focal point control (click-to-set anchor for cover images across all display contexts)
+(No active milestone — run `/gsd-new-milestone` to plan next)
 
 ### Deferred (no phase assigned)
 
@@ -101,16 +102,18 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 
 ## Context
 
-**Current state (v1.3 shipped):**
-- 1,535 tests, ~90k LOC TypeScript, deployed to Vercel
+**Current state (v1.4 shipped):**
+- 1,641 tests, ~95k LOC TypeScript, deployed to Vercel
 - Tech stack: Next.js 16, Prisma 7, Tailwind v4, Auth.js v5 beta, shadcn/ui v4 (Base UI)
 - Database: PostgreSQL on Neon (prod), Cloudflare R2 (file storage)
-- 25+ backlog items captured (see CLAUDE.md backlog section)
+- 20+ backlog items captured (see CLAUDE.md backlog section)
 - Unified supply table shared across creation form and project detail (adapter pattern)
 - Single-page chart creation/edit form with supply takeover mode
 - Gallery with 3 view modes, project detail with tabbed layout (Overview + Supplies + Sessions)
 - Pattern Dive, Main Dashboard, Project Dashboard, Shopping Cart — all shipped in v1.2
 - Image optimization (Sharp WebP conversion) on all uploads
+- Multi-file working copies per chart (ChartFile model with R2 storage)
+- Click-to-set focal point for cover images (all 8+ display contexts)
 - DMC catalog complete at 495 threads
 
 **Design system:** Emerald/amber/stone palette. Fraunces headings, Source Sans 3 body, JetBrains Mono hero stats. 7 status colors. Full semantic design tokens (bg-card, text-muted-foreground, etc.). 44px+ touch targets on interactive elements.
@@ -173,6 +176,11 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 | PortalAutocomplete from Base UI Combobox | Escapes table stacking context; extracted from existing SearchToAdd | ✓ Good |
 | Zero new npm dependencies for v1.3 | Everything built with installed stack; no bundle growth | ✓ Good |
 | Draft persistence in localStorage | saveDraft/loadDraft/clearDraft with stale ID detection and schema evolution | ✓ Good |
+| ChartFile model replacing single URL | Multiple working copies need independent lifecycle; migration script for data | ✓ Good |
+| Single-input portal autocomplete | Dual-input caused focus-steal keystroke drops; results-only portal eliminates issue | ✓ Good |
+| Normalized 0-1 focal point coordinates | Resolution-independent; CSS object-position conversion via utility function | ✓ Good |
+| ResizeObserver for focal point container | getBoundingClientRect on click only; observer handles layout shifts | ✓ Good |
+| Zero new npm dependencies for v1.4 | Focal point, file management — all pure CSS + existing stack | ✓ Good |
 
 ## Evolution
 
@@ -191,4 +199,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-16 after v1.4 milestone started*
+*Last updated: 2026-05-17 after v1.4 milestone shipped*

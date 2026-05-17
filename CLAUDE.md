@@ -25,16 +25,15 @@
 
 ### Done This Session
 
-- **Phase 17 code review fixes** — 4/4 findings fixed (1 critical, 3 warnings)
-  - CR-01: Cross-field Zod refinement preventing mismatched null focal point coordinates
-  - WR-01: ResizeObserver keeps editor measurements current during resize
-  - WR-02: Keyboard placement (Enter/Space → center) resolves WCAG 2.1.1 violation
-  - WR-03: Crop guide overlay scales down for wide/short containers
+- **v1.4 Milestone Audit (re-audit)** — status upgraded to PASSED after Nyquist completion: 8/8 requirements, 3/3 phases, 10/10 integration, 5/5 E2E flows, Nyquist compliant
+- **Nyquist Validation** — 9 test gaps filled across phases 15-17:
+  - Phase 15: auth rejection, file sort order, R2 failure handling (3 new test files)
+  - Phase 16: ArrowUp wiring, adapter stability, aria-activedescendant (2 new test files)
+  - Phase 17: focal point style assertions for spotlight/stitching/shopping (3 test files updated)
 
 ### Next Up — RESUME HERE
 
-1. Browser test 5 UAT items: `/gsd-verify-work 17`
-2. Ship: `/gsd-ship`
+1. Complete milestone: `/gsd-complete-milestone 1.4`
 
 ### Backlog
 
@@ -71,6 +70,7 @@
 - 999.18: BucketProject focal point gap — progress bucket cards use object-cover but don't apply focal point styling. Add focalPointX/Y to BucketProject type, query, and bucket-project-row.tsx
 - **999.19: Fix pre-existing TypeScript errors in test files (HIGH PRIORITY)** — dashboard-tabs.test.tsx (wrapper prop), chart-actions.test.ts (createMany mock), shopping-cart-actions.test.ts (error narrowing). 18 errors across 3 files.
 - 999.20: Focal point action bar blocks bottom of image — action bar overlaps hero image in edit mode, preventing focal point placement in bottom ~25%. Rework to position outside image or use floating controls.
+- 999.21: Fabric matching excludes valid candidates — Pattern Dive Fabric Requirements tab shows zero matches for projects without assigned fabric (null fabricCount short-circuits matching logic)
 
 ### Blockers
 

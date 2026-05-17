@@ -1,5 +1,5 @@
 ---
-status: partial
+status: passed
 phase: 17-image-focal-point
 source: [17-VERIFICATION.md]
 started: 2026-05-17T15:55:00Z
