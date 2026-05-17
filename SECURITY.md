@@ -2,6 +2,56 @@
 
 ---
 
+## Phase 15 — Chart File Management
+
+**Audit Date:** 2026-05-17
+**ASVS Level:** 1
+**Auditor:** gsd-secure-phase
+**Result:** SECURED — 0 open, 13 closed
+
+### Threat Verification
+
+| Threat ID | Category               | Disposition | Status | Evidence                                                                                                                                                                                                                                                                |
+| --------- | ---------------------- | ----------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T-15-01   | Spoofing               | mitigate    | CLOSED | `chart-file-actions.ts:24` — `requireAuth()` called as first statement; `chart-file-actions.ts:41` — `chart.project?.userId !== user.id` before any DB write                                                                                                            |
+| T-15-02   | Tampering              | mitigate    | CLOSED | `chart-file-actions.ts:11-21` — Zod schema validates all fields including `url` regex `^files/`; `upload-actions.ts:79-87` — server-side MIME allowlist (`ALLOWED_FILE_TYPES`) enforced for `category="files"` before presigned URL generation                          |
+| T-15-03   | Elevation of Privilege | mitigate    | CLOSED | `chart-file-actions.ts:67-73` — file fetched with `chart.project.userId`; `chart-file-actions.ts:72` — `file.chart.project?.userId !== user.id` checked before R2 delete and DB delete                                                                                  |
+| T-15-04   | Information Disclosure | mitigate    | CLOSED | `chart-file-actions.ts:102-108` — ownership check in `getChartFileDownloadUrl` before presigned URL issued; `chart-file-actions.ts:118` — `expiresIn: 3600` (1-hour expiry)                                                                                             |
+| T-15-05   | Denial of Service      | accept      | CLOSED | Accepted risk — 10MB enforced server-side via `uploadRequestSchema` in `upload.ts:47-50` (`.max(MAX_FILE_SIZE)`); no per-chart count limit documented as acceptable for single-user app                                                                                 |
+| T-15-06   | Tampering              | mitigate    | CLOSED | `chart-file-upload.tsx:37-49` — `validateFile()` checks extension against `ALLOWED_CHART_FILE_EXTENSIONS` AND MIME against `ALLOWED_CHART_FILE_TYPES`; server-side: `upload-actions.ts:79-87` — `ALLOWED_FILE_TYPES` check (identical 6 members) for `category="files"` |
+| T-15-07   | Denial of Service      | accept      | CLOSED | Accepted risk — same 10MB enforcement as T-15-05; no per-chart count limit; single-user app                                                                                                                                                                             |
+| T-15-08   | Spoofing               | mitigate    | CLOSED | `chart-actions.ts:126` — `createChart` calls `requireAuth()`; `chart-actions.ts:157` — `createChartWithSupplies` calls `requireAuth()`; `chart-actions.ts:74-83` — `chartFile.createMany` inside authenticated transaction                                              |
+| T-15-09   | Information Disclosure | mitigate    | CLOSED | `chart-file-actions.ts:102-108` — ownership check before presigned GET URL; `chart-file-list.tsx:128-148` — `getChartFileDownloadUrl` is the sole download path                                                                                                         |
+| T-15-10   | Elevation of Privilege | mitigate    | CLOSED | `chart-file-actions.ts:67-73` — `deleteChartFile` checks `file.chart.project?.userId !== user.id`; `chart-file-list.tsx:151-159` — delete exclusively calls `deleteChartFile`                                                                                           |
+| T-15-11   | Repudiation            | accept      | CLOSED | Accepted risk — no audit log for deletions; single-user app, repudiation risk negligible                                                                                                                                                                                |
+| T-15-12   | Information Disclosure | accept      | CLOSED | Accepted risk — migration copies URL strings only; ownership enforced identically post-migration via `addChartFile`/`getChartFileDownloadUrl`/`deleteChartFile`                                                                                                         |
+| T-15-13   | Tampering              | mitigate    | CLOSED | `migrate-working-copies.sql` — migration precedes column drop (execution order documented in 15-04-SUMMARY.md); `NOT EXISTS` idempotency guard; verification count query included in script                                                                             |
+
+### Open Threats
+
+None — all threats closed.
+
+### Accepted Risks Log
+
+| Threat ID | Risk                             | Rationale                                                                                           |
+| --------- | -------------------------------- | --------------------------------------------------------------------------------------------------- |
+| T-15-05   | No per-chart file count limit    | Single-user app. 10MB per-file ceiling enforced at `uploadRequestSchema` level (`upload.ts:47-50`). |
+| T-15-07   | No per-chart file count limit    | Same justification as T-15-05.                                                                      |
+| T-15-11   | No audit log for file deletions  | Single-user app. Repudiation risk is negligible.                                                    |
+| T-15-12   | Migration copies raw URL strings | Access controls unchanged post-migration. No new exposure surface introduced.                       |
+
+### Unregistered Flags
+
+No SUMMARY.md files for Phase 15 contained a `## Threat Flags` section. No unregistered attack surface to log.
+
+### Notes
+
+**ALLOWED_FILE_TYPES vs ALLOWED_CHART_FILE_TYPES (T-15-02, T-15-06):** The server-side MIME check in `upload-actions.ts` uses `ALLOWED_FILE_TYPES` (not `ALLOWED_CHART_FILE_TYPES`) for `category="files"`. Both constants contain the identical six members as of this audit. This is not a gap, but if the two constants diverge in a future phase, the server-side enforcement would silently fail to match the client-side allowlist. Recommendation: consolidate to a single exported constant.
+
+**Migration deploy order (T-15-13):** `migrate-working-copies.sql` and `prisma db push --accept-data-loss` were deferred from the worktree (no DATABASE_URL in that environment). The required execution order is documented in `15-04-SUMMARY.md`. This is a deploy-time operational dependency, not a code gap.
+
+---
+
 ## Phase 8 — Session Logging & Pattern Dive
 
 **Audit Date:** 2026-04-16
