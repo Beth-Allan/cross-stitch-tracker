@@ -110,14 +110,14 @@ Plans:
   2. User can see today/this week/this month/this year stitch counts that update after logging a session
   3. User can see collection broken down by status, size category, designer, and genre as interactive charts
   4. All entity references (projects, designers) in stats are clickable links to their detail pages
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
 **Wave 1**
 - [x] 19-01-PLAN.md — Types, chart configs, and breakdown queries (size, designer, genre)
 - [x] 19-02-PLAN.md — MetricsBar and LifetimeCounters components
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 19-03-PLAN.md — Chart components, RankedList, StatsOverview layout, page wiring
+- [x] 19-03-PLAN.md — Chart components, RankedList, StatsOverview layout, page wiring
 
 ### Phase 20: Activity Visualization & Calendar
 **Goal**: Users can explore their stitching activity over time through charts, a navigable calendar, session history, and pace metrics
