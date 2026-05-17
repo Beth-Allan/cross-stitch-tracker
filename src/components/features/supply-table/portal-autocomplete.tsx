@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Plus } from "lucide-react";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
@@ -8,7 +8,7 @@ import type { SupplySearchResult } from "./types";
 
 interface PortalAutocompleteProps {
   isOpen: boolean;
-  items: SupplySearchResult[];
+  displayItems: SupplySearchResult[];
   existingIds: Set<string>;
   searchText: string;
   highlightIndex: number;
@@ -19,11 +19,9 @@ interface PortalAutocompleteProps {
   isLoading?: boolean;
 }
 
-const MAX_ITEMS = 8;
-
 export function PortalAutocomplete({
   isOpen,
-  items,
+  displayItems,
   existingIds,
   searchText,
   highlightIndex,
@@ -74,13 +72,6 @@ export function PortalAutocomplete({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, anchorRef, onClose]);
-
-  // Sort: addable first, then already-added. Slice to max 8.
-  const displayItems = useMemo(() => {
-    const addable = items.filter((item) => !existingIds.has(item.id));
-    const alreadyAdded = items.filter((item) => existingIds.has(item.id));
-    return [...addable, ...alreadyAdded].slice(0, MAX_ITEMS);
-  }, [items, existingIds]);
 
   function isDisabled(item: SupplySearchResult): boolean {
     return existingIds.has(item.id);

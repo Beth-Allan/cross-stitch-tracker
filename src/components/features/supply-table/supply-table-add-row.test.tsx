@@ -20,16 +20,16 @@ vi.mock("./portal-autocomplete", () => ({
     isOpen,
     onSelect,
     onCreateRequest,
-    items,
+    displayItems,
   }: {
     isOpen: boolean;
     onSelect: (item: SupplySearchResult) => void;
     onCreateRequest: (text: string) => void;
-    items: SupplySearchResult[];
+    displayItems: SupplySearchResult[];
   }) =>
     isOpen ? (
       <div data-testid="portal-autocomplete">
-        {items.map((item) => (
+        {displayItems.map((item) => (
           <button
             key={item.id}
             data-testid={`autocomplete-item-${item.id}`}

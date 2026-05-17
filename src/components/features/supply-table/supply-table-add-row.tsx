@@ -216,7 +216,7 @@ export function SupplyTableAddRow({
 
           <PortalAutocomplete
             isOpen={isAutocompleteOpen}
-            items={searchResults}
+            displayItems={displayItems}
             existingIds={existingSupplyIds}
             searchText={searchText}
             highlightIndex={highlightIndex}

@@ -56,7 +56,7 @@ describe("PortalAutocomplete", () => {
   let anchorRef: React.RefObject<HTMLInputElement | null>;
   const defaultProps = {
     isOpen: true,
-    items: makeItems(),
+    displayItems: makeItems(),
     existingIds: new Set<string>(),
     searchText: "",
     highlightIndex: -1,
@@ -126,7 +126,7 @@ describe("PortalAutocomplete", () => {
     render(
       <PortalAutocomplete
         {...defaultProps}
-        items={[]}
+        displayItems={[]}
         searchText="NewThread"
         anchorRef={anchorRef}
       />,
@@ -139,7 +139,7 @@ describe("PortalAutocomplete", () => {
     render(
       <PortalAutocomplete
         {...defaultProps}
-        items={[]}
+        displayItems={[]}
         searchText="NewThread"
         anchorRef={anchorRef}
       />,
@@ -160,7 +160,7 @@ describe("PortalAutocomplete", () => {
     expect(screen.getAllByText("DMC").length).toBeGreaterThan(0);
   });
 
-  it("max 8 items displayed with addable first, then already-added", () => {
+  it("max 8 items displayed with addable first, then already-added (pre-sorted by parent)", () => {
     const manyItems = Array.from({ length: 12 }, (_, i) =>
       makeItem({
         id: `t-${i}`,
@@ -170,11 +170,15 @@ describe("PortalAutocomplete", () => {
       }),
     );
     const existingIds = new Set(["t-0", "t-1"]);
+    // Parent pre-sorts: addable first, then already-added, sliced to 8
+    const addable = manyItems.filter((item) => !existingIds.has(item.id));
+    const alreadyAdded = manyItems.filter((item) => existingIds.has(item.id));
+    const displayItems = [...addable, ...alreadyAdded].slice(0, 8);
 
     render(
       <PortalAutocomplete
         {...defaultProps}
-        items={manyItems}
+        displayItems={displayItems}
         existingIds={existingIds}
         anchorRef={anchorRef}
       />,
@@ -203,9 +207,7 @@ describe("PortalAutocomplete", () => {
     );
     // t-1 is now last (disabled items sorted after addable)
     const options = screen.getAllByRole("option");
-    const disabledOption = options.find(
-      (opt) => opt.getAttribute("aria-disabled") === "true",
-    );
+    const disabledOption = options.find((opt) => opt.getAttribute("aria-disabled") === "true");
     if (disabledOption) {
       fireEvent.click(disabledOption);
     }
