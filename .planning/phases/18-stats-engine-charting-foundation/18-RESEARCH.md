@@ -498,17 +498,19 @@ const statusCounts = await prisma.project.groupBy({
 | A3 | TZDate from @date-fns/tz returns Date-compatible objects that Prisma accepts in WHERE clauses | Code Examples | MEDIUM -- if TZDate doesn't serialize to Date for Prisma, need to call `.toDate()` or similar. Test in first query function. |
 | A4 | `revalidateTag` accepts a single string tag (not requiring a second strategy argument) in Next.js 16.2.4 | Architecture Patterns | LOW -- Context7 docs show optional second parameter. Single-arg call should work. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **TZDate serialization with Prisma**
+1. **TZDate serialization with Prisma** (RESOLVED)
    - What we know: TZDate extends Date and is API-compatible. Prisma expects Date objects in WHERE clauses.
    - What's unclear: Whether Prisma's `@prisma/adapter-neon` correctly serializes TZDate to timestamptz
    - Recommendation: Write a unit test that creates a TZDate and passes it to a Prisma aggregate WHERE clause. If it fails, wrap with `new Date(tzDate.getTime())`.
+   - Resolution: Plan 01 Task 2 includes timezone tests that will validate TZDate serialization. If Prisma rejects TZDate, the executor wraps with `new Date(tzDate.getTime())`.
 
-2. **Chart component for Phase 18 proof-of-concept**
+2. **Chart component for Phase 18 proof-of-concept** (RESOLVED)
    - What we know: Need at least one chart to validate Recharts + design token integration (D-07)
    - What's unclear: Which chart best validates the full stack
    - Recommendation: A **collection status donut** (PieChart with innerRadius) -- it uses the `--status-*` CSS variables already in globals.css, tests ChartConfig color mapping, and the data (project counts by status) is trivial to query via Prisma groupBy. Simple enough for Phase 18, not throwaway.
+   - Resolution: Plan 03 Task 1 implements the collection status donut chart (per D-09, D-10, D-11).
 
 ## Environment Availability
 
