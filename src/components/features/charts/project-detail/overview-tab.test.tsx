@@ -1,7 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@/__tests__/test-utils";
 import { OverviewTab } from "./overview-tab";
 import type { ProjectDetailProps } from "./types";
+
+// Mock the ChartFileList since it's a complex client component with server action dependencies
+vi.mock("./chart-file-list", () => ({
+  ChartFileList: ({ files }: { chartId: string; files: unknown[] }) => (
+    <div data-testid="chart-file-list">Files: {files.length}</div>
+  ),
+}));
 
 type ChartProp = ProjectDetailProps["chart"];
 type SuppliesProp = ProjectDetailProps["supplies"];
@@ -20,7 +27,7 @@ function makeChart(
     stitchesHigh: 150,
     coverImageUrl: null,
     coverThumbnailUrl: null,
-    digitalWorkingCopyUrl: null,
+    files: [],
     notes: null,
     dateAdded: new Date("2025-01-01T12:00:00Z"),
     designer: { id: "d-1", name: "Test Designer" },
@@ -263,14 +270,70 @@ describe("OverviewTab", () => {
       expect(fabricMatches.length).toBeGreaterThanOrEqual(1);
     });
 
-    it("shows digital copy status", () => {
+    it("shows 'N files attached' when files array has items", () => {
       const chart = makeChart({
-        chart: { digitalWorkingCopyUrl: "https://example.com/file.pdf" },
+        chart: {
+          files: [
+            {
+              id: "f-1",
+              url: "files/chart-1/abc.pdf",
+              filename: "pattern.pdf",
+              mimeType: "application/pdf",
+              fileSize: 1024,
+              label: null,
+              notes: null,
+              createdAt: new Date("2026-01-15"),
+            },
+            {
+              id: "f-2",
+              url: "files/chart-1/def.png",
+              filename: "photo.png",
+              mimeType: "image/png",
+              fileSize: 2048,
+              label: null,
+              notes: null,
+              createdAt: new Date("2026-01-14"),
+            },
+          ],
+        },
         project: { status: "UNSTARTED", stitchesCompleted: 0 },
       });
       render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
 
-      expect(screen.getByText(/Digital Copy/i)).toBeInTheDocument();
+      expect(screen.getByText("2 files attached")).toBeInTheDocument();
+    });
+
+    it("shows 'Not uploaded' when files array is empty", () => {
+      const chart = makeChart({
+        chart: { files: [] },
+        project: { status: "UNSTARTED", stitchesCompleted: 0 },
+      });
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
+
+      expect(screen.getByText("Not uploaded")).toBeInTheDocument();
+    });
+
+    it("shows singular 'file attached' for single file", () => {
+      const chart = makeChart({
+        chart: {
+          files: [
+            {
+              id: "f-1",
+              url: "files/chart-1/abc.pdf",
+              filename: "pattern.pdf",
+              mimeType: "application/pdf",
+              fileSize: 1024,
+              label: null,
+              notes: null,
+              createdAt: new Date("2026-01-15"),
+            },
+          ],
+        },
+        project: { status: "UNSTARTED", stitchesCompleted: 0 },
+      });
+      render(<OverviewTab chart={chart} supplies={makeSupplies()} sessionCount={0} />);
+
+      expect(screen.getByText("1 file attached")).toBeInTheDocument();
     });
   });
 

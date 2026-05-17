@@ -404,6 +404,19 @@ export async function getChart(chartId: string) {
       },
       designer: true,
       genres: true,
+      files: {
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          url: true,
+          filename: true,
+          mimeType: true,
+          fileSize: true,
+          label: true,
+          notes: true,
+          createdAt: true,
+        },
+      },
     },
   });
   // Only return charts owned by the current user
