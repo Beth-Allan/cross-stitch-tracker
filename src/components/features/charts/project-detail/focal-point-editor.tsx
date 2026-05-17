@@ -119,11 +119,11 @@ export function FocalPointEditor({ chartId, initialFocalPoint, imageUrl }: Focal
       {!isEditMode && (
         <button
           onClick={handleEnterEditMode}
-          className="absolute top-2 right-2 z-10 flex min-h-12 min-w-12 items-center gap-1.5 rounded-lg bg-black/60 px-2 py-1.5 text-white backdrop-blur-sm hover:bg-black/70 md:px-3"
+          className="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white/80 backdrop-blur-sm transition-colors hover:bg-black/70 hover:text-white"
           aria-label="Set focal point for cover image"
+          title="Set Focal Point"
         >
-          <Crosshair className="h-4 w-4" />
-          <span className="hidden text-sm md:inline">Set Focal Point</span>
+          <Crosshair className="h-3.5 w-3.5" />
         </button>
       )}
 
