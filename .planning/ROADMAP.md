@@ -79,7 +79,7 @@ Full details: `milestones/v1.4-ROADMAP.md`
 
 **Milestone Goal:** A dedicated statistics dashboard that surfaces lifetime counters, activity charts, collection insights, and personal bests — making every stitch feel measured and rewarding.
 
-- [ ] **Phase 18: Stats Engine & Charting Foundation** - Server-side query layer, caching, timezone handling, and Recharts installation
+- [x] **Phase 18: Stats Engine & Charting Foundation** - Server-side query layer, caching, timezone handling, and Recharts installation (completed 2026-05-17)
 - [ ] **Phase 19: Hero Stats & Collection Overview** - Lifetime counters, rolling time-window stats, and collection breakdown charts
 - [ ] **Phase 20: Activity Visualization & Calendar** - Monthly bar chart, stitching calendar, session history, day-of-week patterns, and pace trends
 - [ ] **Phase 21: Records, Insights & Celebrations** - Personal bests board, "New record!" toast, designer/genre/supply insights, and completion estimates
@@ -95,11 +95,11 @@ Full details: `milestones/v1.4-ROADMAP.md`
   2. Cache invalidates automatically when a session is logged, edited, or deleted
   3. Date boundaries align with the user's timezone (a session at 11pm Pacific on Monday counts as Monday, not Tuesday)
   4. A Recharts chart component renders in a test page with design system colors (emerald/amber/stone tokens)
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 18-01-PLAN.md — Install deps, types, timezone utility, chart configs
 - [x] 18-02-PLAN.md — Query layer (hero stats, collection breakdown) + cache invalidation
-- [ ] 18-03-PLAN.md — Stats page shell + collection status donut chart
+- [x] 18-03-PLAN.md — Stats page shell + collection status donut chart
 
 ### Phase 19: Hero Stats & Collection Overview
 **Goal**: Users can view a stats page with lifetime counters, time-window stats, and interactive collection breakdown charts
@@ -161,7 +161,7 @@ Plans:
 | 15. Chart File Management | v1.4 | 4/4 | Complete | 2026-05-17 |
 | 16. Input & Dashboard Fixes | v1.4 | 2/2 | Complete | 2026-05-17 |
 | 17. Image Focal Point | v1.4 | 3/3 | Complete | 2026-05-17 |
-| 18. Stats Engine & Charting Foundation | v1.5 | 2/3 | In Progress|  |
+| 18. Stats Engine & Charting Foundation | v1.5 | 3/3 | Complete   | 2026-05-17 |
 | 19. Hero Stats & Collection Overview | v1.5 | 0/? | Not started | - |
 | 20. Activity Visualization & Calendar | v1.5 | 0/? | Not started | - |
 | 21. Records, Insights & Celebrations | v1.5 | 0/? | Not started | - |
