@@ -73,7 +73,7 @@ export function SpotlightCard({
 
         {/* Content half */}
         <div className="flex flex-col justify-center gap-3 p-7 md:p-8">
-          {/* Section label */}
+          {/* Section label — amber is an intentional decorative accent (no semantic token equivalent) */}
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-amber-500 dark:text-amber-400" strokeWidth={2} />
             <span className="text-[11px] font-bold tracking-wider text-amber-600 uppercase dark:text-amber-400">
@@ -116,11 +116,11 @@ export function SpotlightCard({
             <div className="flex items-center gap-2.5">
               <div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
                 <div
-                  className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400"
+                  className="bg-primary h-full rounded-full"
                   style={{ width: `${project.progressPercent}%` }}
                 />
               </div>
-              <span className="font-mono text-sm font-medium text-emerald-600 tabular-nums dark:text-emerald-400">
+              <span className="text-primary font-mono text-sm font-medium tabular-nums">
                 {project.progressPercent}%
               </span>
             </div>
