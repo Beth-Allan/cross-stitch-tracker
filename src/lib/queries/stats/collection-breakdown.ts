@@ -15,23 +15,28 @@ const ALL_STATUSES: ProjectStatus[] = [
 ];
 
 async function computeCollectionBreakdown(userId: string): Promise<CollectionBreakdownData> {
-  const statusCounts = await prisma.project.groupBy({
-    by: ["status"],
-    where: { userId },
-    _count: { id: true },
-  });
+  try {
+    const statusCounts = await prisma.project.groupBy({
+      by: ["status"],
+      where: { userId },
+      _count: { id: true },
+    });
 
-  const countMap = new Map(statusCounts.map((s) => [s.status, s._count.id]));
+    const countMap = new Map(statusCounts.map((s) => [s.status, s._count.id]));
 
-  const byStatus: StatusBreakdownItem[] = ALL_STATUSES.map((status) => ({
-    status,
-    count: countMap.get(status) ?? 0,
-    fill: collectionStatusConfig[status]?.color ?? "var(--chart-1)",
-  }));
+    const byStatus: StatusBreakdownItem[] = ALL_STATUSES.map((status) => ({
+      status,
+      count: countMap.get(status) ?? 0,
+      fill: collectionStatusConfig[status]?.color ?? "var(--chart-1)",
+    }));
 
-  const totalProjects = byStatus.reduce((sum, item) => sum + item.count, 0);
+    const totalProjects = byStatus.reduce((sum, item) => sum + item.count, 0);
 
-  return { byStatus, totalProjects };
+    return { byStatus, totalProjects };
+  } catch (error) {
+    console.error("[stats] computeCollectionBreakdown failed:", { userId, error });
+    throw error;
+  }
 }
 
 export function getCollectionBreakdown(userId: string) {
