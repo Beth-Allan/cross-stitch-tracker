@@ -161,7 +161,7 @@ Plans:
 | 15. Chart File Management | v1.4 | 4/4 | Complete | 2026-05-17 |
 | 16. Input & Dashboard Fixes | v1.4 | 2/2 | Complete | 2026-05-17 |
 | 17. Image Focal Point | v1.4 | 3/3 | Complete | 2026-05-17 |
-| 18. Stats Engine & Charting Foundation | v1.5 | 3/3 | Complete   | 2026-05-17 |
+| 18. Stats Engine & Charting Foundation | v1.5 | 3/3 | Complete    | 2026-05-17 |
 | 19. Hero Stats & Collection Overview | v1.5 | 0/? | Not started | - |
 | 20. Activity Visualization & Calendar | v1.5 | 0/? | Not started | - |
 | 21. Records, Insights & Celebrations | v1.5 | 0/? | Not started | - |

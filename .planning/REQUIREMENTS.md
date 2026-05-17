@@ -7,10 +7,10 @@
 
 ### Stats Engine & Infrastructure
 
-- [ ] **STAT-01**: Stats page loads within 2s with all data pre-fetched via parallel queries
-- [ ] **STAT-02**: Stats data refreshes automatically when sessions are logged/edited/deleted, charts are added/modified, supplies are linked, or project status changes (cache invalidation)
-- [ ] **STAT-03**: All date-based stats respect the user's timezone (not UTC boundaries)
-- [ ] **STAT-04**: Charting library (Recharts via shadcn chart component) installed and integrated with design system tokens
+- [x] **STAT-01**: Stats page loads within 2s with all data pre-fetched via parallel queries
+- [x] **STAT-02**: Stats data refreshes automatically when sessions are logged/edited/deleted, charts are added/modified, supplies are linked, or project status changes (cache invalidation)
+- [x] **STAT-03**: All date-based stats respect the user's timezone (not UTC boundaries)
+- [x] **STAT-04**: Charting library (Recharts via shadcn chart component) installed and integrated with design system tokens
 
 ### Hero & Collection Stats
 
@@ -87,10 +87,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| STAT-01 | Phase 18 | Pending |
-| STAT-02 | Phase 18 | Pending |
-| STAT-03 | Phase 18 | Pending |
-| STAT-04 | Phase 18 | Pending |
+| STAT-01 | Phase 18 | Complete |
+| STAT-02 | Phase 18 | Complete |
+| STAT-03 | Phase 18 | Complete |
+| STAT-04 | Phase 18 | Complete |
 | HERO-01 | Phase 19 | Pending |
 | HERO-02 | Phase 19 | Pending |
 | HERO-03 | Phase 19 | Pending |
