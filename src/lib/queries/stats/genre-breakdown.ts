@@ -37,7 +37,7 @@ async function computeGenreBreakdown(
 export function getGenreBreakdown(userId: string, limit = 10) {
   return unstable_cache(
     () => computeGenreBreakdown(userId, limit),
-    [`stats-genre-${userId}`],
+    [`stats-genre-${userId}-${limit}`],
     { tags: ["stats"], revalidate: 3600 },
   )();
 }

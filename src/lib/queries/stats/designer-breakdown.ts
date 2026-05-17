@@ -37,7 +37,7 @@ async function computeDesignerBreakdown(
 export function getDesignerBreakdown(userId: string, limit = 10) {
   return unstable_cache(
     () => computeDesignerBreakdown(userId, limit),
-    [`stats-designer-${userId}`],
+    [`stats-designer-${userId}-${limit}`],
     { tags: ["stats"], revalidate: 3600 },
   )();
 }
