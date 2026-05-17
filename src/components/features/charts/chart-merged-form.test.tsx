@@ -126,11 +126,11 @@ describe("ChartMergedForm", () => {
     expect(screen.getByRole("radiogroup", { name: /chart format/i })).toBeInTheDocument();
   });
 
-  it("renders FileUpload for digital working copy", () => {
+  it("renders ChartFileUpload for digital working copies", () => {
     render(<ChartMergedForm {...defaultFormProps} />);
 
-    // FileUpload renders a button "Upload Working Copy"
-    expect(screen.getByRole("button", { name: /upload working copy/i })).toBeInTheDocument();
+    // ChartFileUpload renders a button "Upload Working Copies"
+    expect(screen.getByRole("button", { name: /upload working copies/i })).toBeInTheDocument();
   });
 
   it("renders milestone marker text", () => {

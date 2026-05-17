@@ -1,5 +1,6 @@
 import type {
   Chart,
+  ChartFile,
   Project,
   ProjectStatus,
   Designer,
@@ -16,10 +17,16 @@ export type ProjectWithRelations = Project & {
   fabric: (Fabric & { brand: FabricBrand }) | null;
 };
 
+export type ChartFileData = Pick<
+  ChartFile,
+  "id" | "url" | "filename" | "mimeType" | "fileSize" | "label" | "notes" | "createdAt"
+>;
+
 export type ChartWithProject = Chart & {
   project: ProjectWithRelations | null;
   designer: Designer | null;
   genres: Genre[];
+  files: ChartFileData[];
 };
 
 // ─── Gallery Query Types ────────────────────────────────────────────────────

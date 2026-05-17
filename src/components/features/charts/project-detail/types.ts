@@ -61,7 +61,6 @@ export interface ProjectDetailProps {
     stitchesHigh: number | null;
     coverImageUrl: string | null;
     coverThumbnailUrl: string | null;
-    digitalWorkingCopyUrl?: string | null;
     files: Array<{
       id: string;
       url: string;
