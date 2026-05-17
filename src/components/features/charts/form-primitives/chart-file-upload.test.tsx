@@ -54,6 +54,7 @@ describe("ChartFileUpload", () => {
   it("calls onFilesChange with updated file list when upload completes", async () => {
     const onFilesChange = vi.fn();
     mockGetPresignedUploadUrl.mockResolvedValue({
+      success: true as const,
       url: "https://r2.example.com/presigned",
       key: "files/unsaved/xyz-newfile.pdf",
     });

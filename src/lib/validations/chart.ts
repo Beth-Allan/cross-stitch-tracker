@@ -9,7 +9,16 @@ export const chartFormSchema = z.object({
       designerId: z.string().nullable().default(null),
       coverImageUrl: z.string().min(1).nullable().default(null),
       coverThumbnailUrl: z.string().min(1).nullable().default(null),
-      digitalFileUrl: z.string().min(1).nullable().default(null),
+      fileKeys: z
+        .array(
+          z.object({
+            key: z.string().min(1),
+            filename: z.string().trim().min(1).max(255),
+            mimeType: z.string().min(1),
+            fileSize: z.number().int().positive(),
+          }),
+        )
+        .default([]),
       stitchCount: z.number().int().min(0).default(0),
       stitchCountApproximate: z.boolean().default(false),
       stitchesWide: z.number().int().min(0).default(0),
