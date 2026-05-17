@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useTransition } from "react";
 import { toast } from "sonner";
 import { calculateSkeins } from "@/lib/utils/skein-calculator";
 import type {
@@ -35,6 +35,10 @@ export function useSupplyTable(
   const [isAutoCalc, setIsAutoCalc] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [createSearchText, setCreateSearchText] = useState("");
+  const [highlightIndex, setHighlightIndex] = useState(-1);
+
+  // useTransition for non-blocking search state updates (D-02)
+  const [, startTransition] = useTransition();
 
   // Refs for debounce cleanup
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -57,7 +61,9 @@ export function useSupplyTable(
     }
 
     cancelledRef.current = false;
-    setIsSearching(true);
+    startTransition(() => {
+      setIsSearching(true);
+    });
 
     debounceRef.current = setTimeout(async () => {
       try {
@@ -83,6 +89,34 @@ export function useSupplyTable(
       }
     };
   }, [searchText, supplyType, adapter]);
+
+  // --- Reset highlightIndex when search results change ---
+  useEffect(() => {
+    setHighlightIndex(-1);
+  }, [searchResults]);
+
+  // --- Keyboard navigation for highlight (D-01: single input architecture) ---
+  const moveHighlight = useCallback(
+    (direction: 1 | -1, displayItems: SupplySearchResult[], existingIds: Set<string>) => {
+      setHighlightIndex((prev) => {
+        if (direction === 1 && prev < 0) {
+          // Find first addable item
+          for (let i = 0; i < displayItems.length; i++) {
+            if (!existingIds.has(displayItems[i].id)) return i;
+          }
+          return prev;
+        }
+        if (direction === -1 && prev < 0) return prev;
+        let idx = prev + direction;
+        while (idx >= 0 && idx < displayItems.length) {
+          if (!existingIds.has(displayItems[idx].id)) return idx;
+          idx += direction;
+        }
+        return prev;
+      });
+    },
+    [],
+  );
 
   // --- Search text setter (public API) ---
   const setSearchText = useCallback((text: string) => {
@@ -233,5 +267,9 @@ export function useSupplyTable(
     getFocusTarget,
     // Existing IDs passthrough for autocomplete
     existingSupplyIds,
+    // Highlight navigation (D-01: keyboard from table row input)
+    highlightIndex,
+    setHighlightIndex,
+    moveHighlight,
   };
 }
