@@ -30,7 +30,7 @@ export function LifetimeCounters(props: LifetimeCountersProps) {
 
           return (
             <div key={card.key} className="bg-card ring-foreground/10 rounded-xl p-4 ring-1">
-              <p className="text-muted-foreground text-xs uppercase tracking-wider">{card.label}</p>
+              <p className="text-muted-foreground text-xs tracking-wider uppercase">{card.label}</p>
               <p className="text-foreground mt-1 font-mono text-lg font-semibold tabular-nums">
                 {formatted}
               </p>

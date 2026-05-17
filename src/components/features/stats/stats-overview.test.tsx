@@ -1,6 +1,12 @@
 import { render, screen } from "@/__tests__/test-utils";
 import { describe, it, expect, vi } from "vitest";
-import type { StatsHeroData, CollectionBreakdownData, SizeBreakdownItem, DesignerBreakdownItem, GenreBreakdownItem } from "@/types/stats";
+import type {
+  StatsHeroData,
+  CollectionBreakdownData,
+  SizeBreakdownItem,
+  DesignerBreakdownItem,
+  GenreBreakdownItem,
+} from "@/types/stats";
 
 // Mock all child components
 vi.mock("./metrics-bar", () => ({
@@ -29,10 +35,7 @@ vi.mock("./lifetime-counters", () => ({
 
 vi.mock("./collection-status-chart", () => ({
   CollectionStatusChart: (props: Record<string, unknown>) => (
-    <div
-      data-testid="collection-status-chart"
-      data-total={props.totalProjects}
-    />
+    <div data-testid="collection-status-chart" data-total={props.totalProjects} />
   ),
 }));
 

@@ -42,9 +42,7 @@ describe("RankedList", () => {
   });
 
   it("renders count values with font-mono tabular-nums", () => {
-    const { container } = render(
-      <RankedList items={mockDesignerItems} label="Top Designers" />,
-    );
+    const { container } = render(<RankedList items={mockDesignerItems} label="Top Designers" />);
 
     // Find count elements - they contain the numeric values
     const countElements = container.querySelectorAll(".font-mono.tabular-nums");

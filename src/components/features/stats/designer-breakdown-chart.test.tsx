@@ -5,40 +5,20 @@ import type { DesignerBreakdownItem } from "@/types/stats";
 
 // Mock recharts to avoid SSR/canvas issues in tests
 vi.mock("recharts", () => ({
-  BarChart: ({
-    children,
-    layout,
-  }: {
-    children: ReactNode;
-    layout?: string;
-  }) => (
+  BarChart: ({ children, layout }: { children: ReactNode; layout?: string }) => (
     <div data-testid="bar-chart" data-layout={layout}>
       {children}
     </div>
   ),
-  Bar: ({
-    children,
-    dataKey,
-    fill,
-  }: {
-    children?: ReactNode;
-    dataKey: string;
-    fill?: string;
-  }) => (
+  Bar: ({ children, dataKey, fill }: { children?: ReactNode; dataKey: string; fill?: string }) => (
     <div data-testid="bar" data-key={dataKey} data-fill={fill}>
       {children}
     </div>
   ),
-  XAxis: ({ type }: { type?: string }) => (
-    <div data-testid="x-axis" data-type={type} />
+  XAxis: ({ type }: { type?: string }) => <div data-testid="x-axis" data-type={type} />,
+  YAxis: ({ type, dataKey }: { type?: string; dataKey?: string }) => (
+    <div data-testid="y-axis" data-type={type} data-key={dataKey} />
   ),
-  YAxis: ({
-    type,
-    dataKey,
-  }: {
-    type?: string;
-    dataKey?: string;
-  }) => <div data-testid="y-axis" data-type={type} data-key={dataKey} />,
   ResponsiveContainer: ({ children }: { children: ReactNode }) => (
     <div data-testid="responsive-container">{children}</div>
   ),

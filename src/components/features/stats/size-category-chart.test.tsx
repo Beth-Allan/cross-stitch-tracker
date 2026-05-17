@@ -13,9 +13,7 @@ vi.mock("recharts", () => ({
       {children}
     </div>
   ),
-  XAxis: ({ dataKey }: { dataKey?: string }) => (
-    <div data-testid="x-axis" data-key={dataKey} />
-  ),
+  XAxis: ({ dataKey }: { dataKey?: string }) => <div data-testid="x-axis" data-key={dataKey} />,
   YAxis: () => <div data-testid="y-axis" />,
   Cell: ({ fill }: { fill: string }) => <div data-testid="cell" data-fill={fill} />,
   ResponsiveContainer: ({ children }: { children: ReactNode }) => (

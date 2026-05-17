@@ -26,7 +26,7 @@ export function MetricsBar(props: MetricsBarProps) {
             <div className="flex w-full flex-col items-center gap-1 px-4 py-3 sm:px-6 sm:py-4">
               <div className="flex items-center gap-1.5">
                 <Icon className="text-success h-4 w-4" />
-                <span className="text-success-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                <span className="text-success-muted-foreground text-xs font-semibold tracking-wider uppercase">
                   {cell.label}
                 </span>
               </div>

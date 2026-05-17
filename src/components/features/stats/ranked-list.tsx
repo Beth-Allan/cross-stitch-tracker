@@ -33,9 +33,7 @@ export function RankedList({ items, label }: RankedListProps) {
               <span className="text-foreground text-sm">{item.name}</span>
             )}
           </div>
-          <span className="text-muted-foreground font-mono text-xs tabular-nums">
-            {item.count}
-          </span>
+          <span className="text-muted-foreground font-mono text-xs tabular-nums">{item.count}</span>
         </div>
       ))}
     </div>

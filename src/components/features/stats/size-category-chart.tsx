@@ -1,11 +1,7 @@
 "use client";
 
 import { BarChart, Bar, XAxis, YAxis, Cell } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { sizeCategoryConfig } from "@/lib/chart-configs";
 import type { SizeBreakdownItem } from "@/types/stats";
 

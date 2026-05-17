@@ -46,9 +46,7 @@ describe("getGenreBreakdown", () => {
     await getGenreBreakdown("user-1");
 
     // Verify findMany was called with take: 10 (default limit)
-    expect(mockPrisma.genre.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ take: 10 }),
-    );
+    expect(mockPrisma.genre.findMany).toHaveBeenCalledWith(expect.objectContaining({ take: 10 }));
   });
 
   it("each item has genreId, name, and count fields", async () => {
