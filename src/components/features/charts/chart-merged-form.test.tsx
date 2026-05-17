@@ -856,7 +856,10 @@ describe("ChartMergedForm", () => {
           colorCode: "999",
           colorName: "Dark Purple",
           hexColor: "#800080",
+          colorFamily: "PURPLE",
           brandId: "brand-1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       });
 
@@ -894,7 +897,10 @@ describe("ChartMergedForm", () => {
           productCode: "00001",
           colorName: "Red Glass",
           hexColor: "#808080",
+          colorFamily: "RED",
           brandId: "brand-2",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       });
 
@@ -930,8 +936,11 @@ describe("ChartMergedForm", () => {
           id: "new-s-1",
           productCode: "KR-001",
           colorName: "Gold Braid",
+          description: "Metallic braid",
           hexColor: "#808080",
           brandId: "brand-3",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       });
 

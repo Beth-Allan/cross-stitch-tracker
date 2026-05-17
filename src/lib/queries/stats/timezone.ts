@@ -17,18 +17,18 @@ export function getUserTimezone(_userId: string): string {
  *
  * Example: midnight MDT (UTC-6) returns a Date at 06:00 UTC.
  */
-export function getLocalDayBoundaries(timezone: string): LocalDateBoundaries {
-  const now = TZDate.tz(timezone);
-  if (isNaN(now.getTime())) {
+export function getLocalDayBoundaries(timezone: string, now?: TZDate): LocalDateBoundaries {
+  const current = now ?? TZDate.tz(timezone);
+  if (isNaN(current.getTime())) {
     throw new Error(
       `Invalid timezone "${timezone}" in STATS_TIMEZONE. Use a valid IANA timezone like "America/Edmonton".`,
     );
   }
   return {
-    todayStart: startOfDay(now),
-    todayEnd: endOfDay(now),
-    weekStart: startOfWeek(now),
-    monthStart: startOfMonth(now),
-    yearStart: startOfYear(now),
+    todayStart: startOfDay(current),
+    todayEnd: endOfDay(current),
+    weekStart: startOfWeek(current),
+    monthStart: startOfMonth(current),
+    yearStart: startOfYear(current),
   };
 }

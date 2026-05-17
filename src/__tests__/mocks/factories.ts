@@ -502,6 +502,7 @@ export function createMockPrisma() {
     },
     projectThread: {
       create: vi.fn(),
+      createMany: vi.fn(),
       findMany: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),
@@ -510,6 +511,7 @@ export function createMockPrisma() {
     },
     projectBead: {
       create: vi.fn(),
+      createMany: vi.fn(),
       findMany: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),
@@ -518,6 +520,7 @@ export function createMockPrisma() {
     },
     projectSpecialty: {
       create: vi.fn(),
+      createMany: vi.fn(),
       findMany: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),

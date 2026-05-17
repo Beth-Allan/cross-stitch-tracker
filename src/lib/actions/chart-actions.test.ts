@@ -8,10 +8,6 @@ vi.mock("@/lib/auth", () => ({
 
 // Mock prisma to prevent actual DB calls
 const mockPrisma = createMockPrisma();
-// Add createMany to junction table mocks (not in shared factory yet)
-mockPrisma.projectThread.createMany = vi.fn();
-mockPrisma.projectBead.createMany = vi.fn();
-mockPrisma.projectSpecialty.createMany = vi.fn();
 vi.mock("@/lib/db", () => ({
   prisma: mockPrisma,
 }));
