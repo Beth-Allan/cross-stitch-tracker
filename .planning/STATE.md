@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Fixes & Polish
-status: "Phase 16 shipped — PR #34"
-stopped_at: Phase 17 context gathered
-last_updated: "2026-05-17T04:42:16.365Z"
-last_activity: 2026-05-17
+status: executing
+stopped_at: Phase 17 UI-SPEC approved
+last_updated: "2026-05-17T05:26:06.646Z"
+last_activity: 2026-05-17 -- Phase 17 planning complete
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 6
+  total_plans: 9
   completed_plans: 6
-  percent: 100
+  percent: 67
 ---
 
 # Project State
@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-05-16)
 
 Phase: 16 (input-dashboard-fixes) — EXECUTING
 Plan: 1 of 2
-Status: Phase 16 shipped — PR #34
-Last activity: 2026-05-17
+Status: Ready to execute
+Last activity: 2026-05-17 -- Phase 17 planning complete
 
 ```
 [======              ] 33% (1/3 phases)
@@ -120,7 +120,7 @@ Items acknowledged and deferred at v1.3 milestone close on 2026-05-16:
 
 ## Session Continuity
 
-Last session: 2026-05-17T04:42:16.360Z
-Stopped at: Phase 17 context gathered
+Last session: 2026-05-17T04:50:36.254Z
+Stopped at: Phase 17 UI-SPEC approved
 Resume action: `/gsd-plan-phase 17`
-Resume file: .planning/phases/17-image-focal-point/17-CONTEXT.md
+Resume file: .planning/phases/17-image-focal-point/17-UI-SPEC.md

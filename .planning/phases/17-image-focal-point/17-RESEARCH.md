@@ -388,17 +388,15 @@ export function getObjectPositionStyle(
 | A1 | Crop guide clamping math (Pattern 3) works correctly at image boundaries | Architecture Patterns | Low -- standard min/max clamping, easily verified visually |
 | A2 | `onClick` on a div wrapping the hero image captures both mouse and touch events correctly across all browsers | Pitfalls | Medium -- may need explicit touch event handling on some mobile browsers |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Object-contain coordinate mapping accuracy**
+1. **Object-contain coordinate mapping accuracy** ✓
    - What we know: Hero uses `width={1200} height={800}` with `object-contain` and `w-full`. For images with different aspect ratios, there will be letterboxing.
-   - What's unclear: Whether clicking in the letterbox area produces out-of-bounds coordinates or just edge values.
-   - Recommendation: Clamp all coordinates to 0-1 range and accept that edge positions may be slightly inaccurate. In practice, users will click on the visible image content, not the letterbox.
+   - Resolution: Clamp all coordinates to 0-1 range. In practice, users click on visible image content, not the letterbox. The `getBoundingClientRect()` + `offsetX/offsetY` approach produces coordinates relative to the element, and dividing by element dimensions gives normalized 0-1 regardless of letterboxing. Edge clicks produce clamped edge values which is acceptable behavior.
 
-2. **Which queries need focalPointX/Y added explicitly?**
+2. **Which queries need focalPointX/Y added explicitly?** ✓
    - What we know: `getChart()` uses full `include` (all Chart fields come through automatically). `getChartsForGallery()` uses `include` at chart level without field restriction (all chart fields). Dashboard actions use `chart: { select: { ... } }` which requires explicit field listing.
-   - What's unclear: Whether any other page queries (genre-detail, designer-detail, shopping) use restrictive selects.
-   - Recommendation: Grep for all Prisma queries that select chart fields and audit each one during planning.
+   - Resolution: Audit confirms these files need explicit `focalPointX: true, focalPointY: true` in their `chart: { select: {} }` blocks: `dashboard-actions.ts` (getRandomSpotlightProject, getCurrentlyStitchingProjects, getStartNextProjects, getBuriedTreasures), `genre-actions.ts` (getGenreWithCharts), `designer-actions.ts` (getDesignerWithCharts), `shopping-cart-actions.ts` (getShoppingCartData). Files using full includes (getChart, getChartsForGallery) need no changes.
 
 ## Validation Architecture
 
