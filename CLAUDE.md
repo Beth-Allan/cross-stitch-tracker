@@ -4,7 +4,7 @@
 
 **Milestone:** v1.4 Fixes & Polish
 **Last Updated:** 2026-05-17
-**Roadmap:** 5 milestones / 17 phases — v1.0 + v1.1 + v1.2 + v1.3 shipped, v1.4 in progress
+**Roadmap:** 5 milestones / 17 phases — v1.0 through v1.4 shipped
 
 ### Done
 
@@ -19,25 +19,20 @@
   - Archived to: `.planning/milestones/v1.2-*`
   - Full details: `.planning/MILESTONES.md` and `.planning/RETROSPECTIVE.md`
 
-### In Progress
-
-- **v1.4 Fixes & Polish** — Phase 15+16 shipped, Phase 17 executed (human UAT pending)
-
 ### Done This Session
 
-- **v1.4 Milestone Audit (re-audit)** — status upgraded to PASSED after Nyquist completion: 8/8 requirements, 3/3 phases, 10/10 integration, 5/5 E2E flows, Nyquist compliant
-- **Nyquist Validation** — 9 test gaps filled across phases 15-17:
-  - Phase 15: auth rejection, file sort order, R2 failure handling (3 new test files)
-  - Phase 16: ArrowUp wiring, adapter stability, aria-activedescendant (2 new test files)
-  - Phase 17: focal point style assertions for spotlight/stitching/shopping (3 test files updated)
+- **v1.4 Milestone Complete** — archived, tagged `v1.4`, retrospective written
+  - Cleaned 24 inherited artifacts (4 debug sessions closed, 14 quick tasks deleted, 1 stale todo removed)
+  - fabric-matching bug converted to backlog 999.21
+  - Phase directories archived to `milestones/v1.4-phases/`
 
 ### Next Up — RESUME HERE
 
-1. Complete milestone: `/gsd-complete-milestone 1.4`
+1. Start next milestone: `/gsd-new-milestone`
 
 ### Backlog
 
-- **999.0: Multiple digital working copies per chart (HIGH PRIORITY)** — ChartFile table to replace single digitalWorkingCopyUrl field
+- ~~999.0: Multiple digital working copies per chart~~ — **Shipped in Phase 15** (v1.4)
 - 999.0.4: Duplicate chart detection — warn before creating a chart that may already exist
 - 999.0.10: Quick-add missing supplies from project detail page — inline creation without navigating away
 - 999.0.12: Collapsible projects in shopping list — collapsed as default state
