@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import type { BuriedTreasure } from "@/types/dashboard";
+import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import { CoverPlaceholder } from "@/components/features/gallery/cover-placeholder";
 import { SectionHeading } from "./section-heading";
 
@@ -57,6 +58,7 @@ export function BuriedTreasuresSection({ treasures, imageUrls }: BuriedTreasures
                     alt={t.chartName}
                     loading="lazy"
                     className="h-full w-full object-cover"
+                    style={getObjectPositionStyle(t.focalPointX, t.focalPointY)}
                   />
                 ) : (
                   <CoverPlaceholder status="UNSTARTED" />

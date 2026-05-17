@@ -264,4 +264,30 @@ describe("GalleryCard", () => {
       expect(cardEl.className).toContain("motion-reduce:transform-none");
     });
   });
+
+  describe("Focal point", () => {
+    it("applies objectPosition style when focal point is provided", () => {
+      const card = createMockGalleryCard({
+        coverImageUrl: "https://example.com/image.jpg",
+        name: "Focal Test",
+        focalPointX: 0.3,
+        focalPointY: 0.7,
+      });
+      render(<GalleryCard card={card} />);
+      const img = screen.getByRole("img", { name: "Focal Test" });
+      expect(img).toHaveStyle({ objectPosition: "30% 70%" });
+    });
+
+    it("does not apply objectPosition when focal point is null", () => {
+      const card = createMockGalleryCard({
+        coverImageUrl: "https://example.com/image.jpg",
+        name: "No Focal Test",
+        focalPointX: null,
+        focalPointY: null,
+      });
+      render(<GalleryCard card={card} />);
+      const img = screen.getByRole("img", { name: "No Focal Test" });
+      expect(img.style.objectPosition).toBeFalsy();
+    });
+  });
 });

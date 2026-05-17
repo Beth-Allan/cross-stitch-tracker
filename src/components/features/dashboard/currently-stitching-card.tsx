@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Clock, Calendar } from "lucide-react";
 import type { CurrentlyStitchingProject } from "@/types/dashboard";
+import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import { CoverPlaceholder } from "@/components/features/gallery/cover-placeholder";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 
@@ -48,6 +49,7 @@ export function CurrentlyStitchingCard({ project, imageUrl }: CurrentlyStitching
             alt={project.projectName}
             loading="lazy"
             className="h-full w-full object-cover"
+            style={getObjectPositionStyle(project.focalPointX, project.focalPointY)}
           />
         ) : (
           <CoverPlaceholder status={project.status} />
