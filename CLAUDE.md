@@ -21,18 +21,20 @@
 
 ### In Progress
 
-- **v1.4 Fixes & Polish** — Phase 15 shipped, Phase 16 planned
+- **v1.4 Fixes & Polish** — Phase 15+16 shipped, Phase 17 executed (human UAT pending)
 
 ### Done This Session
 
-- **Phase 16 planned** — 2 plans in Wave 1 (parallel): keystroke bug fix + dashboard styling
-- **Phase 16 code review fixes applied** — 5/5 findings fixed (1 critical, 4 warnings)
-- **Phase 16 UAT passed** — 3/3 tests passed; 1 cosmetic issue (button size mismatch) found and fixed inline
-  - Fix: LinkButton now uses `cn()`/twMerge; Shuffle button uses `Button` component with `variant="outline"`
+- **Phase 17 code review fixes** — 4/4 findings fixed (1 critical, 3 warnings)
+  - CR-01: Cross-field Zod refinement preventing mismatched null focal point coordinates
+  - WR-01: ResizeObserver keeps editor measurements current during resize
+  - WR-02: Keyboard placement (Enter/Space → center) resolves WCAG 2.1.1 violation
+  - WR-03: Crop guide overlay scales down for wide/short containers
 
 ### Next Up — RESUME HERE
 
-1. Ship: `/gsd-ship`
+1. Browser test 5 UAT items: `/gsd-verify-work 17`
+2. Ship: `/gsd-ship`
 
 ### Backlog
 
