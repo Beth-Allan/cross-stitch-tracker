@@ -129,9 +129,9 @@ Plans:
   3. User can browse all sessions in a sortable, paginated table
   4. User can see day-of-week patterns, rolling averages (7/30/90-day), and month-over-month pace trends
   5. User can see their stitch rate (stitches/hour) with trend direction when time data is available
-**Plans:** 4 plans
+**Plans:** 1/4 plans executed
 Plans:
-- [ ] 20-01-PLAN.md — Types, chart configs, queries, server actions, search-params cache
+- [x] 20-01-PLAN.md — Types, chart configs, queries, server actions, search-params cache
 - [ ] 20-02-PLAN.md — PaceCards, MonthlyStitchChart, MonthlyDrillDown, DayOfWeekChart
 - [ ] 20-03-PLAN.md — StitchingCalendar, SessionHistoryTable, shadcn table\/pagination
 - [ ] 20-04-PLAN.md — ActivityOverview layout, page.tsx wiring, human verification
@@ -177,5 +177,5 @@ Plans:
 | 17. Image Focal Point | v1.4 | 3/3 | Complete | 2026-05-17 |
 | 18. Stats Engine & Charting Foundation | v1.5 | 3/3 | Complete    | 2026-05-17 |
 | 19. Hero Stats & Collection Overview | v1.5 | 0/3 | Planned | - |
-| 20. Activity Visualization & Calendar | v1.5 | 0/4 | Planned | - |
+| 20. Activity Visualization & Calendar | v1.5 | 1/4 | In Progress|  |
 | 21. Records, Insights & Celebrations | v1.5 | 0/? | Not started | - |
