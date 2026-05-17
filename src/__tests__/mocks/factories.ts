@@ -452,6 +452,7 @@ export function createMockPrisma() {
       update: vi.fn(),
       updateMany: vi.fn(),
       count: vi.fn(),
+      groupBy: vi.fn(),
     },
     designer: {
       create: vi.fn(),
