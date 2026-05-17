@@ -94,7 +94,7 @@ export async function createSession(formData: unknown) {
 
     revalidatePath(`/charts/${project.chartId}`);
     revalidatePath("/sessions");
-    revalidateTag("stats");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, session: returnSession };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -171,7 +171,7 @@ export async function updateSession(sessionId: string, formData: unknown) {
 
     revalidatePath(`/charts/${chartId}`);
     revalidatePath("/sessions");
-    revalidateTag("stats");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, session: returnSession };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -213,7 +213,7 @@ export async function deleteSession(sessionId: string) {
 
     revalidatePath(`/charts/${chartId}`);
     revalidatePath("/sessions");
-    revalidateTag("stats");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     console.error("deleteSession error:", error);
