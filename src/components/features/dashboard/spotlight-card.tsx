@@ -88,7 +88,9 @@ export function SpotlightCard({
 
           {/* Designer + status */}
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-muted-foreground text-sm">{project.designerName}</span>
+            {project.designerName && (
+              <span className="text-muted-foreground text-sm">{project.designerName}</span>
+            )}
             <StatusBadge status={project.status} />
           </div>
 
