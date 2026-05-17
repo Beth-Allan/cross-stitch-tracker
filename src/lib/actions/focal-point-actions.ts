@@ -6,11 +6,7 @@ import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { updateFocalPointSchema } from "@/lib/validations/focal-point";
 
-export async function updateFocalPoint(
-  chartId: string,
-  x: number | null,
-  y: number | null,
-) {
+export async function updateFocalPoint(chartId: string, x: number | null, y: number | null) {
   const user = await requireAuth();
 
   try {
@@ -32,6 +28,9 @@ export async function updateFocalPoint(
     revalidatePath("/charts");
     revalidatePath(`/charts/${validated.chartId}`);
     revalidatePath("/");
+    revalidatePath("/designers");
+    revalidatePath("/genres");
+    revalidatePath("/shopping");
 
     return { success: true as const };
   } catch (error) {

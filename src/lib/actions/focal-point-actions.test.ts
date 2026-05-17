@@ -128,6 +128,20 @@ describe("updateFocalPoint", () => {
     expect(result.error).toBe("Chart not found");
   });
 
+  it("rejects x=null when y is provided (cross-field refinement)", async () => {
+    const { updateFocalPoint } = await import("./focal-point-actions");
+    const result = await updateFocalPoint("chart-1", null, 0.5);
+    expect(result.success).toBe(false);
+    expect(result.error).toBeDefined();
+  });
+
+  it("rejects y=null when x is provided (cross-field refinement)", async () => {
+    const { updateFocalPoint } = await import("./focal-point-actions");
+    const result = await updateFocalPoint("chart-1", 0.5, null);
+    expect(result.success).toBe(false);
+    expect(result.error).toBeDefined();
+  });
+
   it("revalidates paths on success", async () => {
     const { revalidatePath } = await import("next/cache");
     mockPrisma.chart.findUnique.mockResolvedValueOnce({
@@ -142,5 +156,8 @@ describe("updateFocalPoint", () => {
     expect(revalidatePath).toHaveBeenCalledWith("/charts");
     expect(revalidatePath).toHaveBeenCalledWith("/charts/chart-1");
     expect(revalidatePath).toHaveBeenCalledWith("/");
+    expect(revalidatePath).toHaveBeenCalledWith("/designers");
+    expect(revalidatePath).toHaveBeenCalledWith("/genres");
+    expect(revalidatePath).toHaveBeenCalledWith("/shopping");
   });
 });

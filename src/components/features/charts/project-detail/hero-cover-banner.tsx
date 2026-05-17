@@ -55,8 +55,9 @@ export function HeroCoverBanner({
       {/* Focal point editor overlay — trigger button + edit mode UI */}
       <FocalPointEditor
         chartId={chartId}
-        initialFocalPointX={focalPointX}
-        initialFocalPointY={focalPointY}
+        initialFocalPoint={
+          focalPointX != null && focalPointY != null ? { x: focalPointX, y: focalPointY } : null
+        }
         imageUrl={imageUrl}
       />
     </div>

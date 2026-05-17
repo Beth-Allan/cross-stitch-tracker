@@ -1,8 +1,6 @@
-"use client";
-
 interface CropGuideOverlayProps {
-  focalX: number; // 0-1 normalized
-  focalY: number; // 0-1 normalized
+  focalPointX: number; // 0-1 normalized
+  focalPointY: number; // 0-1 normalized
   containerWidth: number; // px
   containerHeight: number; // px
 }
@@ -13,8 +11,8 @@ interface CropGuideOverlayProps {
  * Uses box-shadow trick for dimming outside the crop area.
  */
 export function CropGuideOverlay({
-  focalX,
-  focalY,
+  focalPointX,
+  focalPointY,
   containerWidth,
   containerHeight,
 }: CropGuideOverlayProps) {
@@ -29,8 +27,8 @@ export function CropGuideOverlay({
   }
 
   // Center on focal point, clamp to container bounds
-  let left = focalX * containerWidth - guideWidth / 2;
-  let top = focalY * containerHeight - guideHeight / 2;
+  let left = focalPointX * containerWidth - guideWidth / 2;
+  let top = focalPointY * containerHeight - guideHeight / 2;
   left = Math.max(0, Math.min(containerWidth - guideWidth, left));
   top = Math.max(0, Math.min(containerHeight - guideHeight, top));
 

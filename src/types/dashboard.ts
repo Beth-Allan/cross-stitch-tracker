@@ -1,15 +1,14 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
+import type { OptionalFocalPoint } from "@/types/focal-point";
 
 // ─── Currently Stitching ───────────────────────────────────────────────────
 
-export interface CurrentlyStitchingProject {
+export interface CurrentlyStitchingProject extends OptionalFocalPoint {
   projectId: string;
   chartId: string;
   projectName: string;
   designerName: string | null;
   coverThumbnailUrl: string | null;
-  focalPointX: number | null;
-  focalPointY: number | null;
   status: ProjectStatus;
   stitchesCompleted: number;
   totalStitches: number;
@@ -21,15 +20,13 @@ export interface CurrentlyStitchingProject {
 
 // ─── Start Next ────────────────────────────────────────────────────────────
 
-export interface StartNextProject {
+export interface StartNextProject extends OptionalFocalPoint {
   projectId: string;
   chartId: string;
   projectName: string;
   designerName: string | null;
   coverThumbnailUrl: string | null;
   coverImageUrl: string | null;
-  focalPointX: number | null;
-  focalPointY: number | null;
   status: ProjectStatus;
   totalStitches: number;
   genres: string[];
@@ -37,14 +34,12 @@ export interface StartNextProject {
 
 // ─── Buried Treasures ──────────────────────────────────────────────────────
 
-export interface BuriedTreasure {
+export interface BuriedTreasure extends OptionalFocalPoint {
   chartId: string;
   projectId: string | null;
   chartName: string;
   designerName: string | null;
   coverThumbnailUrl: string | null;
-  focalPointX: number | null;
-  focalPointY: number | null;
   dateAdded: Date;
   daysInLibrary: number;
   genres: string[];
@@ -52,15 +47,13 @@ export interface BuriedTreasure {
 
 // ─── Spotlight ─────────────────────────────────────────────────────────────
 
-export interface SpotlightProject {
+export interface SpotlightProject extends OptionalFocalPoint {
   projectId: string;
   chartId: string;
   projectName: string;
   designerName: string | null;
   coverThumbnailUrl: string | null;
   coverImageUrl: string | null;
-  focalPointX: number | null;
-  focalPointY: number | null;
   status: ProjectStatus;
   genres: string[];
   totalStitches: number;
@@ -158,14 +151,12 @@ export interface ProjectDashboardData {
 
 // ─── Shopping Cart Types ───────────────────────────────────────────────────
 
-export interface ShoppingCartProject {
+export interface ShoppingCartProject extends OptionalFocalPoint {
   projectId: string;
   chartId: string;
   projectName: string;
   designerName: string | null;
   coverThumbnailUrl: string | null;
-  focalPointX: number | null;
-  focalPointY: number | null;
   status: ProjectStatus;
   threadCount: number;
   beadCount: number;

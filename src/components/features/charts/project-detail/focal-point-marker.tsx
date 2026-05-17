@@ -1,5 +1,3 @@
-"use client";
-
 interface FocalPointMarkerProps {
   x: number; // 0-1 normalized
   y: number; // 0-1 normalized
@@ -24,12 +22,12 @@ export function FocalPointMarker({ x, y }: FocalPointMarkerProps) {
       {/* Crosshair lines extending 8px beyond the 12px radius circle (N/S/E/W) */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         {/* Vertical line */}
-        <div className="absolute left-1/2 -top-5 h-10 w-0.5 -translate-x-1/2 bg-white" />
+        <div className="absolute -top-5 left-1/2 h-10 w-0.5 -translate-x-1/2 bg-white" />
         {/* Horizontal line */}
         <div className="absolute top-1/2 -left-5 h-0.5 w-10 -translate-y-1/2 bg-white" />
       </div>
       {/* Center circle: 24px diameter, emerald fill at 80%, white border, shadow, scale animation */}
-      <div className="h-6 w-6 rounded-full border-2 border-white bg-primary/80 shadow-[0_1px_3px_rgba(0,0,0,0.3)] animate-in zoom-in-0 duration-150" />
+      <div className="bg-primary/80 animate-in zoom-in-0 h-6 w-6 rounded-full border-2 border-white shadow-[0_1px_3px_rgba(0,0,0,0.3)] duration-150" />
     </div>
   );
 }

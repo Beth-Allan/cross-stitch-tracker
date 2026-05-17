@@ -10,8 +10,7 @@ import { CropGuideOverlay } from "./crop-guide-overlay";
 
 interface FocalPointEditorProps {
   chartId: string;
-  initialFocalPointX: number | null;
-  initialFocalPointY: number | null;
+  initialFocalPoint: { x: number; y: number } | null;
   imageUrl: string | null;
 }
 
@@ -21,21 +20,12 @@ interface FocalPointEditorProps {
  * and save/cancel/reset controls. Renders as overlay elements on top of the
  * hero image — does NOT render the image itself.
  */
-export function FocalPointEditor({
-  chartId,
-  initialFocalPointX,
-  initialFocalPointY,
-  imageUrl,
-}: FocalPointEditorProps) {
+export function FocalPointEditor({ chartId, initialFocalPoint, imageUrl }: FocalPointEditorProps) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [pendingPoint, setPendingPoint] = useState<{
     x: number;
     y: number;
-  } | null>(
-    initialFocalPointX != null && initialFocalPointY != null
-      ? { x: initialFocalPointX, y: initialFocalPointY }
-      : null,
-  );
+  } | null>(initialFocalPoint);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const [isPending, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -70,11 +60,7 @@ export function FocalPointEditor({
 
   function handleEnterEditMode() {
     setIsEditMode(true);
-    setPendingPoint(
-      initialFocalPointX != null && initialFocalPointY != null
-        ? { x: initialFocalPointX, y: initialFocalPointY }
-        : null,
-    );
+    setPendingPoint(initialFocalPoint);
   }
 
   function handleSave() {
@@ -86,20 +72,17 @@ export function FocalPointEditor({
           setIsEditMode(false);
           toast.success("Focal point saved");
         } else {
-          toast.error("Couldn't save focal point. Try again.");
+          toast.error(result.error ?? "Couldn't save focal point. Try again.");
         }
-      } catch {
+      } catch (error) {
+        console.error("Focal point save failed:", error);
         toast.error("Couldn't save focal point. Try again.");
       }
     });
   }
 
   function handleCancel() {
-    setPendingPoint(
-      initialFocalPointX != null && initialFocalPointY != null
-        ? { x: initialFocalPointX, y: initialFocalPointY }
-        : null,
-    );
+    setPendingPoint(initialFocalPoint);
     setIsEditMode(false);
   }
 
@@ -110,12 +93,13 @@ export function FocalPointEditor({
         if (result.success) {
           setPendingPoint(null);
           setIsEditMode(false);
-          toast.success("Focal point saved");
+          toast.success("Focal point reset");
         } else {
-          toast.error("Couldn't save focal point. Try again.");
+          toast.error(result.error ?? "Couldn't reset focal point. Try again.");
         }
-      } catch {
-        toast.error("Couldn't save focal point. Try again.");
+      } catch (error) {
+        console.error("Focal point reset failed:", error);
+        toast.error("Couldn't reset focal point. Try again.");
       }
     });
   }
@@ -163,8 +147,8 @@ export function FocalPointEditor({
           {pendingPoint && containerSize.width > 0 && (
             <>
               <CropGuideOverlay
-                focalX={pendingPoint.x}
-                focalY={pendingPoint.y}
+                focalPointX={pendingPoint.x}
+                focalPointY={pendingPoint.y}
                 containerWidth={containerSize.width}
                 containerHeight={containerSize.height}
               />

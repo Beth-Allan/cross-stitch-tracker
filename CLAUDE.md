@@ -68,6 +68,8 @@
 - 999.15: Add visual commit button (checkmark) to supply table add row — keyboard Enter works but no visible affordance for mouse-first users
 - ~~999.16: SearchToAdd drops keystrokes on fast typing~~ — **Resolved in Phase 16** (PR #34). Root cause: PortalAutocomplete focus-steal. Fix: single-input architecture with results-only portal.
 - 999.17: InlineCreateDialog UX clarity — field labels (Name/Code) are generic across supply types; should contextualize per type (e.g., "Color Name" for beads, "Product Name" for specialty) and clarify what's optional
+- 999.18: BucketProject focal point gap — progress bucket cards use object-cover but don't apply focal point styling. Add focalPointX/Y to BucketProject type, query, and bucket-project-row.tsx
+- **999.19: Fix pre-existing TypeScript errors in test files (HIGH PRIORITY)** — dashboard-tabs.test.tsx (wrapper prop), chart-actions.test.ts (createMany mock), shopping-cart-actions.test.ts (error narrowing). 18 errors across 3 files.
 
 ### Blockers
 

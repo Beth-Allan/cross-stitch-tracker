@@ -18,8 +18,7 @@ vi.mock("sonner", () => ({
 
 const defaultProps = {
   chartId: "chart-123",
-  initialFocalPointX: null,
-  initialFocalPointY: null,
+  initialFocalPoint: null,
   imageUrl: "https://example.com/image.jpg",
 };
 
@@ -31,16 +30,12 @@ describe("FocalPointEditor", () => {
 
   it("renders trigger button when imageUrl is provided", () => {
     render(<FocalPointEditor {...defaultProps} />);
-    expect(
-      screen.getByRole("button", { name: /set focal point/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /set focal point/i })).toBeInTheDocument();
   });
 
   it("does NOT render trigger button when imageUrl is null", () => {
     render(<FocalPointEditor {...defaultProps} imageUrl={null} />);
-    expect(
-      screen.queryByRole("button", { name: /set focal point/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /set focal point/i })).not.toBeInTheDocument();
   });
 
   it("enters edit mode when trigger button is clicked", () => {
@@ -51,14 +46,10 @@ describe("FocalPointEditor", () => {
     // Action bar buttons should appear
     expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /reset to center/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /reset to center/i })).toBeInTheDocument();
 
     // Trigger button should be hidden in edit mode
-    expect(
-      screen.queryByRole("button", { name: /set focal point/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /set focal point/i })).not.toBeInTheDocument();
   });
 
   it("exits edit mode when Cancel is clicked", () => {
@@ -72,12 +63,8 @@ describe("FocalPointEditor", () => {
     fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
 
     // Action bar should disappear, trigger should reappear
-    expect(
-      screen.queryByRole("button", { name: /save/i }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /set focal point/i }),
-    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /save/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /set focal point/i })).toBeInTheDocument();
   });
 
   it("shows marker after clicking on image area", () => {
@@ -149,9 +136,7 @@ describe("FocalPointEditor", () => {
     fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
 
     // Reset
-    fireEvent.click(
-      screen.getByRole("button", { name: /reset to center/i }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: /reset to center/i }));
 
     await waitFor(() => {
       expect(mockUpdateFocalPoint).toHaveBeenCalledWith("chart-123", null, null);
@@ -170,6 +155,90 @@ describe("FocalPointEditor", () => {
     expect(mockUpdateFocalPoint).not.toHaveBeenCalled();
   });
 
+  it("shows error toast and stays in edit mode when save returns failure", async () => {
+    mockUpdateFocalPoint.mockResolvedValueOnce({ success: false, error: "Chart not found" });
+    render(<FocalPointEditor {...defaultProps} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
+
+    const clickArea = screen.getByRole("button", { name: /click to place focal point/i });
+    vi.spyOn(clickArea, "getBoundingClientRect").mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 400,
+      height: 300,
+      right: 400,
+      bottom: 300,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    fireEvent.click(clickArea, { clientX: 200, clientY: 150 });
+
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith("Chart not found");
+    });
+    expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument();
+  });
+
+  it("shows error toast and stays in edit mode when save throws", async () => {
+    mockUpdateFocalPoint.mockRejectedValueOnce(new Error("Network error"));
+    render(<FocalPointEditor {...defaultProps} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
+
+    const clickArea = screen.getByRole("button", { name: /click to place focal point/i });
+    vi.spyOn(clickArea, "getBoundingClientRect").mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 400,
+      height: 300,
+      right: 400,
+      bottom: 300,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    fireEvent.click(clickArea, { clientX: 200, clientY: 150 });
+
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith("Couldn't save focal point. Try again.");
+    });
+    expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument();
+  });
+
+  it("shows error toast when reset fails", async () => {
+    mockUpdateFocalPoint.mockResolvedValueOnce({ success: false, error: "Failed to update" });
+    render(<FocalPointEditor {...defaultProps} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
+    fireEvent.click(screen.getByRole("button", { name: /reset to center/i }));
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith("Failed to update");
+    });
+    expect(screen.getByRole("button", { name: /reset to center/i })).toBeInTheDocument();
+  });
+
+  it("has Save button disabled when no focal point has been placed", () => {
+    render(<FocalPointEditor {...defaultProps} />);
+    fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
+
+    const saveButton = screen.getByRole("button", { name: /save/i });
+    expect(saveButton).toBeDisabled();
+  });
+
+  it("restores existing focal point when entering edit mode", () => {
+    render(<FocalPointEditor {...defaultProps} initialFocalPoint={{ x: 0.3, y: 0.7 }} />);
+    fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
+
+    expect(screen.getByText(/focal point set at 30%, 70%/i)).toBeInTheDocument();
+  });
+
   it("exits edit mode on Escape key", () => {
     render(<FocalPointEditor {...defaultProps} />);
 
@@ -183,11 +252,7 @@ describe("FocalPointEditor", () => {
     });
 
     // Should exit edit mode
-    expect(
-      screen.queryByRole("button", { name: /save/i }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /set focal point/i }),
-    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /save/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /set focal point/i })).toBeInTheDocument();
   });
 });

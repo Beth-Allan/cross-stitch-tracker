@@ -1,5 +1,6 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
 import type { SizeCategory } from "@/lib/utils/size-category";
+import type { OptionalFocalPoint } from "@/types/focal-point";
 
 // Re-export for convenience
 export type { ProjectStatus } from "@/generated/prisma/client";
@@ -36,15 +37,13 @@ export type SortDir = (typeof SORT_DIRS)[number];
 
 // ─── Gallery Card Data ──────────────────────────────────────────────────────
 
-export interface GalleryCardData {
+export interface GalleryCardData extends OptionalFocalPoint {
   chartId: string;
   projectId: string | null;
   name: string;
   designerName: string;
   coverImageUrl: string | null;
   coverThumbnailUrl: string | null;
-  focalPointX: number | null;
-  focalPointY: number | null;
   status: ProjectStatus;
   statusGroup: StatusGroup;
   genres: string[];
