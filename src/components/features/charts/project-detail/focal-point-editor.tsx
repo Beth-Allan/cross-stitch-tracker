@@ -130,7 +130,6 @@ export function FocalPointEditor({
   if (!imageUrl) return null;
 
   return (
-     
     <div onKeyDown={handleKeyDown}>
       {/* Edit mode trigger button — top-right of hero banner */}
       {!isEditMode && (
@@ -155,7 +154,9 @@ export function FocalPointEditor({
           onClick={handleImageClick}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
-              // Let click handler deal with mouse events only
+              e.preventDefault();
+              // Place at center as keyboard default
+              setPendingPoint({ x: 0.5, y: 0.5 });
             }
           }}
         >
