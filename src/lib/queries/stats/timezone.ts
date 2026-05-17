@@ -1,11 +1,5 @@
 import { TZDate } from "@date-fns/tz";
-import {
-  startOfDay,
-  endOfDay,
-  startOfWeek,
-  startOfMonth,
-  startOfYear,
-} from "date-fns";
+import { startOfDay, endOfDay, startOfWeek, startOfMonth, startOfYear } from "date-fns";
 import type { LocalDateBoundaries } from "@/types/stats";
 
 /**
@@ -14,7 +8,7 @@ import type { LocalDateBoundaries } from "@/types/stats";
  * Future: look up per-user timezone preference from DB.
  */
 export function getUserTimezone(_userId: string): string {
-  return process.env.STATS_TIMEZONE ?? "America/Denver";
+  return process.env.STATS_TIMEZONE ?? "America/Edmonton";
 }
 
 /**
@@ -25,6 +19,11 @@ export function getUserTimezone(_userId: string): string {
  */
 export function getLocalDayBoundaries(timezone: string): LocalDateBoundaries {
   const now = TZDate.tz(timezone);
+  if (isNaN(now.getTime())) {
+    throw new Error(
+      `Invalid timezone "${timezone}" in STATS_TIMEZONE. Use a valid IANA timezone like "America/Edmonton".`,
+    );
+  }
   return {
     todayStart: startOfDay(now),
     todayEnd: endOfDay(now),

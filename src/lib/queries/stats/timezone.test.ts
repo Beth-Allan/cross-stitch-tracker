@@ -29,11 +29,11 @@ describe("timezone utilities", () => {
       expect(getUserTimezone("user-1")).toBe("America/Denver");
     });
 
-    it("returns America/Denver as default when STATS_TIMEZONE is not set", async () => {
+    it("returns America/Edmonton as default when STATS_TIMEZONE is not set", async () => {
       delete process.env.STATS_TIMEZONE;
       vi.resetModules();
       const { getUserTimezone } = await import("./timezone");
-      expect(getUserTimezone("user-1")).toBe("America/Denver");
+      expect(getUserTimezone("user-1")).toBe("America/Edmonton");
     });
 
     it("returns a custom timezone when STATS_TIMEZONE is set differently", async () => {
@@ -109,9 +109,7 @@ describe("timezone utilities", () => {
 
       // The session at 05:30 UTC (23:30 MDT on May 16) falls within boundaries
       const sessionTime = new Date("2026-05-17T05:30:00.000Z");
-      expect(sessionTime.getTime() >= boundaries.todayStart.getTime()).toBe(
-        true,
-      );
+      expect(sessionTime.getTime() >= boundaries.todayStart.getTime()).toBe(true);
       expect(sessionTime.getTime() <= boundaries.todayEnd.getTime()).toBe(true);
     });
 
@@ -126,6 +124,16 @@ describe("timezone utilities", () => {
       expect(boundaries.weekStart.getTime()).not.toBeNaN();
       expect(boundaries.monthStart.getTime()).not.toBeNaN();
       expect(boundaries.yearStart.getTime()).not.toBeNaN();
+    });
+
+    it("throws an error for an invalid timezone string", async () => {
+      vi.setSystemTime(FIXED_UTC_TIME);
+      vi.resetModules();
+      const { getLocalDayBoundaries } = await import("./timezone");
+
+      expect(() => getLocalDayBoundaries("Invalid/Timezone")).toThrow(
+        'Invalid timezone "Invalid/Timezone"',
+      );
     });
   });
 });

@@ -1,3 +1,4 @@
+import type { ProjectStatus } from "@/generated/prisma/client";
 import { type ChartConfig } from "@/components/ui/chart";
 
 export const collectionStatusConfig = {
@@ -8,4 +9,4 @@ export const collectionStatusConfig = {
   ON_HOLD: { label: "On Hold", color: "var(--status-on-hold)" },
   FINISHED: { label: "Finished", color: "var(--status-finished)" },
   FFO: { label: "FFO", color: "var(--status-ffo)" },
-} satisfies ChartConfig;
+} satisfies Record<ProjectStatus, ChartConfig[string]>;
