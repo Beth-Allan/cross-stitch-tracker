@@ -72,6 +72,20 @@ describe("getSizeBreakdown", () => {
     expect(result.find((r) => r.category === "Medium")!.count).toBe(1);
   });
 
+  it("excludes charts with no size data (all zeros) from bucket counts", async () => {
+    mockPrisma.chart.findMany.mockResolvedValue([
+      { stitchCount: 0, stitchesWide: 0, stitchesHigh: 0 },
+      { stitchCount: 500, stitchesWide: 0, stitchesHigh: 0 },
+    ]);
+
+    const { getSizeBreakdown } = await import("./size-breakdown");
+    const result = await getSizeBreakdown("user-1");
+
+    const totalCount = result.reduce((sum, item) => sum + item.count, 0);
+    expect(totalCount).toBe(1);
+    expect(result.find((r) => r.category === "Mini")!.count).toBe(1);
+  });
+
   it("each item has fill property from sizeCategoryConfig", async () => {
     mockPrisma.chart.findMany.mockResolvedValue([
       { stitchCount: 500, stitchesWide: 0, stitchesHigh: 0 },

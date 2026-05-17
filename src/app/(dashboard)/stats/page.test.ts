@@ -131,6 +131,19 @@ describe("StatsPage server component", () => {
     expect(mockGetGenreBreakdown).toHaveBeenCalledWith("user-123");
   });
 
+  it("propagates auth error and does not call queries when requireAuth rejects", async () => {
+    mockRequireAuth.mockRejectedValue(new Error("Unauthorized"));
+
+    const { default: StatsPage } = await import("./page");
+    await expect(StatsPage()).rejects.toThrow("Unauthorized");
+
+    expect(mockGetHeroStats).not.toHaveBeenCalled();
+    expect(mockGetCollectionBreakdown).not.toHaveBeenCalled();
+    expect(mockGetSizeBreakdown).not.toHaveBeenCalled();
+    expect(mockGetDesignerBreakdown).not.toHaveBeenCalled();
+    expect(mockGetGenreBreakdown).not.toHaveBeenCalled();
+  });
+
   it("calls all 5 query functions in parallel via Promise.all", async () => {
     const { default: StatsPage } = await import("./page");
     await StatsPage();

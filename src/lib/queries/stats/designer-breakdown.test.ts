@@ -45,29 +45,40 @@ describe("getDesignerBreakdown", () => {
   });
 
   it("respects limit parameter (default 10)", async () => {
-    mockPrisma.chart.groupBy.mockResolvedValue([
-      { designerId: "d1", _count: { id: 10 } },
-    ]);
-    mockPrisma.designer.findMany.mockResolvedValue([
-      { id: "d1", name: "Designer One" },
-    ]);
+    mockPrisma.chart.groupBy.mockResolvedValue([{ designerId: "d1", _count: { id: 10 } }]);
+    mockPrisma.designer.findMany.mockResolvedValue([{ id: "d1", name: "Designer One" }]);
 
     const { getDesignerBreakdown } = await import("./designer-breakdown");
     await getDesignerBreakdown("user-1");
 
     // Verify groupBy was called with take: 10 (default limit)
-    expect(mockPrisma.chart.groupBy).toHaveBeenCalledWith(
-      expect.objectContaining({ take: 10 }),
-    );
+    expect(mockPrisma.chart.groupBy).toHaveBeenCalledWith(expect.objectContaining({ take: 10 }));
+  });
+
+  it("returns 'Unknown' and warns when designer ID cannot be resolved", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    mockPrisma.chart.groupBy.mockResolvedValue([
+      { designerId: "d1", _count: { id: 5 } },
+      { designerId: "d-orphan", _count: { id: 3 } },
+    ]);
+    mockPrisma.designer.findMany.mockResolvedValue([{ id: "d1", name: "Known Designer" }]);
+
+    const { getDesignerBreakdown } = await import("./designer-breakdown");
+    const result = await getDesignerBreakdown("user-1");
+
+    expect(result).toHaveLength(2);
+    expect(result[1]).toEqual({ designerId: "d-orphan", name: "Unknown", count: 3 });
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("1 designer ID(s) not found"), [
+      "d-orphan",
+    ]);
+
+    warnSpy.mockRestore();
   });
 
   it("each item has designerId, name, and count fields", async () => {
-    mockPrisma.chart.groupBy.mockResolvedValue([
-      { designerId: "d1", _count: { id: 7 } },
-    ]);
-    mockPrisma.designer.findMany.mockResolvedValue([
-      { id: "d1", name: "Test Designer" },
-    ]);
+    mockPrisma.chart.groupBy.mockResolvedValue([{ designerId: "d1", _count: { id: 7 } }]);
+    mockPrisma.designer.findMany.mockResolvedValue([{ id: "d1", name: "Test Designer" }]);
 
     const { getDesignerBreakdown } = await import("./designer-breakdown");
     const result = await getDesignerBreakdown("user-1");
