@@ -10,3 +10,19 @@ export const collectionStatusConfig = {
   FINISHED: { label: "Finished", color: "var(--status-finished)" },
   FFO: { label: "FFO", color: "var(--status-ffo)" },
 } satisfies Record<ProjectStatus, ChartConfig[string]>;
+
+export const sizeCategoryConfig = {
+  Mini: { label: "Mini", color: "var(--chart-1)" },
+  Small: { label: "Small", color: "var(--chart-2)" },
+  Medium: { label: "Medium", color: "var(--chart-3)" },
+  Large: { label: "Large", color: "var(--chart-4)" },
+  BAP: { label: "BAP", color: "var(--chart-5)" },
+} satisfies ChartConfig;
+
+export const designerBarConfig = {
+  count: { label: "Charts", color: "var(--chart-1)" },
+} satisfies ChartConfig;
+
+export const genreDistributionConfig = {
+  count: { label: "Charts", color: "var(--chart-3)" },
+} satisfies ChartConfig;
