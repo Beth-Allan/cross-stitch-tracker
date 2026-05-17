@@ -457,22 +457,25 @@ async function computeGenreBreakdown(userId: string, limit: number) {
 
 **All other claims verified via codebase inspection or documentation.**
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **MetricsBar: Server or Client Component?**
    - What we know: UI-SPEC labels it as "client component" but the design is pure HTML/CSS display (no hooks, no event handlers, no Recharts)
    - What's unclear: Whether any interactivity is planned (tooltip, hover state with JS)
    - Recommendation: Start as Server Component. The metrics bar is a flex row with text and icons -- no client-side behavior needed. If interactive behavior is needed, add "use client" later.
+   - **RESOLVED:** Plan 02 implements MetricsBar as a Server Component (no "use client"). Pure display with icons and text -- no client-side behavior required.
 
 2. **Genre items: links or plain text?**
    - What we know: UI-SPEC says "genre names are plain text (not links)" because "no detail page exists"
    - What's actually true: Genre detail pages DO exist at `/genres/[id]` [VERIFIED: src/app/(dashboard)/genres/[id]/page.tsx]
    - Recommendation: Make genre items `<Link>` elements pointing to `/genres/{genreId}`, matching the designer pattern. This fulfills INS-06 more completely and the infrastructure exists.
+   - **RESOLVED:** Plan 03 implements genre items as `<Link>` elements to `/genres/{genreId}`. Genre detail pages confirmed to exist. Fulfills INS-06.
 
 3. **Charts with no stitch data in size breakdown**
    - What we know: `getEffectiveStitchCount()` returns `{ count: 0, approximate: false }` for charts with zero stitchCount and zero dimensions
    - What's unclear: Whether these should be counted in the size chart at all, or excluded
    - Recommendation: Include them in "Mini" bucket (consistent with gallery behavior). The UI-SPEC doesn't call out an "Unknown" category.
+   - **RESOLVED:** Plan 01 query uses `getEffectiveStitchCount()` and includes zero-data charts in "Mini" bucket, consistent with gallery filter behavior.
 
 ## Project Constraints (from CLAUDE.md)
 
