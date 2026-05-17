@@ -60,7 +60,13 @@ export function ProjectDetailHero({ chart, imageUrls, onStatusChange }: ProjectD
   return (
     <div className={cn("space-y-4 rounded-lg", getCelebrationClasses(status))}>
       {/* Cover image banner */}
-      <HeroCoverBanner imageUrl={coverImageUrl} chartName={chart.name} />
+      <HeroCoverBanner
+        imageUrl={coverImageUrl}
+        chartName={chart.name}
+        chartId={chart.id}
+        focalPointX={chart.focalPointX}
+        focalPointY={chart.focalPointY}
+      />
 
       {/* Navigation bar: Back to Gallery + Edit + Kebab */}
       <div className="flex items-center justify-between">

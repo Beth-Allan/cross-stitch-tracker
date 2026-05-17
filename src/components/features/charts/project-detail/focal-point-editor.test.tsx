@@ -2,14 +2,16 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@/__tests__/test-utils";
 import { FocalPointEditor } from "./focal-point-editor";
 
-// Mock server action
-const mockUpdateFocalPoint = vi.fn();
+// vi.hoisted runs before vi.mock hoisting — safe to reference in mock factories
+const { mockUpdateFocalPoint, mockToast } = vi.hoisted(() => ({
+  mockUpdateFocalPoint: vi.fn(),
+  mockToast: { success: vi.fn(), error: vi.fn() },
+}));
+
 vi.mock("@/lib/actions/focal-point-actions", () => ({
   updateFocalPoint: (...args: unknown[]) => mockUpdateFocalPoint(...args),
 }));
 
-// Mock sonner toast
-const mockToast = { success: vi.fn(), error: vi.fn() };
 vi.mock("sonner", () => ({
   toast: mockToast,
 }));
