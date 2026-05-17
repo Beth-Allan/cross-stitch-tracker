@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Milestone:** v1.3 Form & Supply Overhaul
-**Last Updated:** 2026-05-16
-**Roadmap:** 5 milestones / 16 phases — v1.0 + v1.1 + v1.2 shipped, v1.3 in progress
+**Milestone:** v1.4 Fixes & Polish
+**Last Updated:** 2026-05-17
+**Roadmap:** 5 milestones / 17 phases — v1.0 + v1.1 + v1.2 + v1.3 shipped, v1.4 in progress
 
 ### Done
 
@@ -21,17 +21,18 @@
 
 ### In Progress
 
-- **v1.3 Form & Supply Overhaul** — SHIPPED 2026-05-16, archived, tagged v1.3
+- **v1.4 Fixes & Polish** — Phase 15 shipped, Phase 16 planned
 
 ### Done This Session
 
-- **Phase 15 executed** — 4/4 plans complete across 3 waves, 1564 tests passing, CR-01 fix applied
-- **Phase 15 verified** — all automated checks pass, human testing required (3 items)
+- **Phase 16 planned** — 2 plans in Wave 1 (parallel): keystroke bug fix + dashboard styling
+- **Phase 16 code review fixes applied** — 5/5 findings fixed (1 critical, 4 warnings)
+- **Phase 16 UAT passed** — 3/3 tests passed; 1 cosmetic issue (button size mismatch) found and fixed inline
+  - Fix: LinkButton now uses `cn()`/twMerge; Shuffle button uses `Button` component with `variant="outline"`
 
 ### Next Up — RESUME HERE
 
-1. Human-test phase 15 (upload files, delete file, download behavior)
-2. After approval: mark phase complete → `/gsd-discuss-phase 16`
+1. Ship: `/gsd-ship`
 
 ### Backlog
 
@@ -63,7 +64,7 @@
 - 999.13: Per-brand skein length — add `skeinLengthMeters` to ThreadBrand (default 8m for DMC), use in skein calculator instead of hardcoded constant. Fixes inaccuracy for Weeks Dye Works/Gentle Art (5yd), Kreinik (10-11m), etc.
 - 999.14: Auto-infer overCount from fabric count — when fabric is linked to a project, auto-set overCount based on fabric count (≤25 → over 1, ≥28 → over 2). User can still override via settings bar toggle.
 - 999.15: Add visual commit button (checkmark) to supply table add row — keyboard Enter works but no visible affordance for mouse-first users
-- 999.16: SearchToAdd drops keystrokes on fast typing — typing "310" registers as "30". Needs investigation: likely server action re-renders during typing, not just debounce timing
+- ~~999.16: SearchToAdd drops keystrokes on fast typing~~ — **Resolved in Phase 16** (PR #34). Root cause: PortalAutocomplete focus-steal. Fix: single-input architecture with results-only portal.
 - 999.17: InlineCreateDialog UX clarity — field labels (Name/Code) are generic across supply types; should contextualize per type (e.g., "Color Name" for beads, "Product Name" for specialty) and clarify what's optional
 
 ### Blockers

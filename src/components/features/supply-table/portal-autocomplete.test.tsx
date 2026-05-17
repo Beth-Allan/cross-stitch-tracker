@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@/__tests__/test-utils";
 import { PortalAutocomplete } from "./portal-autocomplete";
 import type { SupplySearchResult } from "./types";
+import { MAX_DISPLAY_ITEMS } from "./use-supply-table";
 
 // Mock createPortal to render children inline (RTL handles portals fine,
 // but we want to verify createPortal is used in the source)
@@ -56,10 +57,10 @@ describe("PortalAutocomplete", () => {
   let anchorRef: React.RefObject<HTMLInputElement | null>;
   const defaultProps = {
     isOpen: true,
-    items: makeItems(),
+    displayItems: makeItems(),
     existingIds: new Set<string>(),
     searchText: "",
-    onSearchChange: vi.fn(),
+    highlightIndex: -1,
     onSelect: vi.fn(),
     onCreateRequest: vi.fn(),
     onClose: vi.fn(),
@@ -70,16 +71,13 @@ describe("PortalAutocomplete", () => {
     anchorRef = createAnchorRef();
   });
 
-  it("renders search input with placeholder", () => {
+  it("renders NO input element when isOpen is true (results-only dropdown)", () => {
     render(<PortalAutocomplete {...defaultProps} anchorRef={anchorRef} />);
-    expect(screen.getByPlaceholderText("Search by code or name...")).toBeInTheDocument();
-  });
-
-  it("calls onSearchChange when typing in search input", () => {
-    render(<PortalAutocomplete {...defaultProps} anchorRef={anchorRef} />);
-    const input = screen.getByPlaceholderText("Search by code or name...");
-    fireEvent.change(input, { target: { value: "310" } });
-    expect(defaultProps.onSearchChange).toHaveBeenCalledWith("310");
+    // Should NOT have any input inside the portal
+    const inputs = screen.queryAllByRole("combobox");
+    expect(inputs.length).toBe(0);
+    // Also check there's no text input with the search placeholder
+    expect(screen.queryByPlaceholderText("Search by code or name...")).not.toBeInTheDocument();
   });
 
   it("renders dropdown when items are provided and isOpen is true", () => {
@@ -99,63 +97,18 @@ describe("PortalAutocomplete", () => {
     expect(options.length).toBe(4);
   });
 
-  it("ArrowDown moves highlight to next non-disabled item", () => {
-    render(<PortalAutocomplete {...defaultProps} anchorRef={anchorRef} />);
-    const input = screen.getByPlaceholderText("Search by code or name...");
-
-    fireEvent.keyDown(input, { key: "ArrowDown" });
+  it("accepts highlightIndex prop and highlights the correct option", () => {
+    render(<PortalAutocomplete {...defaultProps} highlightIndex={1} anchorRef={anchorRef} />);
     const options = screen.getAllByRole("option");
-    expect(options[0]).toHaveAttribute("data-highlighted", "true");
-
-    fireEvent.keyDown(input, { key: "ArrowDown" });
     expect(options[1]).toHaveAttribute("data-highlighted", "true");
+    expect(options[0]).not.toHaveAttribute("data-highlighted");
   });
 
-  it("ArrowUp moves highlight to previous non-disabled item", () => {
+  it("does NOT have onSearchChange prop (prop removed)", () => {
+    // This is a type-level test -- we ensure the component does not accept onSearchChange
+    // The fact that defaultProps above does not include onSearchChange and renders is the proof
     render(<PortalAutocomplete {...defaultProps} anchorRef={anchorRef} />);
-    const input = screen.getByPlaceholderText("Search by code or name...");
-
-    // Move down twice, then up once
-    fireEvent.keyDown(input, { key: "ArrowDown" });
-    fireEvent.keyDown(input, { key: "ArrowDown" });
-    fireEvent.keyDown(input, { key: "ArrowUp" });
-
-    const options = screen.getAllByRole("option");
-    expect(options[0]).toHaveAttribute("data-highlighted", "true");
-  });
-
-  it("Enter on highlighted item calls onSelect with that item", () => {
-    render(<PortalAutocomplete {...defaultProps} anchorRef={anchorRef} />);
-    const input = screen.getByPlaceholderText("Search by code or name...");
-
-    fireEvent.keyDown(input, { key: "ArrowDown" });
-    fireEvent.keyDown(input, { key: "Enter" });
-
-    expect(defaultProps.onSelect).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "t-1", code: "310" }),
-    );
-  });
-
-  it("Enter on disabled (already-added) item does nothing", () => {
-    const existingIds = new Set(["t-1", "t-2", "t-3", "t-4"]);
-    render(
-      <PortalAutocomplete {...defaultProps} existingIds={existingIds} anchorRef={anchorRef} />,
-    );
-    const input = screen.getByPlaceholderText("Search by code or name...");
-
-    // All items are disabled, ArrowDown should not find an addable item
-    fireEvent.keyDown(input, { key: "ArrowDown" });
-    fireEvent.keyDown(input, { key: "Enter" });
-
-    expect(defaultProps.onSelect).not.toHaveBeenCalled();
-  });
-
-  it("Escape closes dropdown and calls onClose", () => {
-    render(<PortalAutocomplete {...defaultProps} anchorRef={anchorRef} />);
-    const input = screen.getByPlaceholderText("Search by code or name...");
-
-    fireEvent.keyDown(input, { key: "Escape" });
-    expect(defaultProps.onClose).toHaveBeenCalled();
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
   });
 
   it("already-added items render with 'Added' label and disabled appearance", () => {
@@ -174,7 +127,7 @@ describe("PortalAutocomplete", () => {
     render(
       <PortalAutocomplete
         {...defaultProps}
-        items={[]}
+        displayItems={[]}
         searchText="NewThread"
         anchorRef={anchorRef}
       />,
@@ -187,7 +140,7 @@ describe("PortalAutocomplete", () => {
     render(
       <PortalAutocomplete
         {...defaultProps}
-        items={[]}
+        displayItems={[]}
         searchText="NewThread"
         anchorRef={anchorRef}
       />,
@@ -208,7 +161,7 @@ describe("PortalAutocomplete", () => {
     expect(screen.getAllByText("DMC").length).toBeGreaterThan(0);
   });
 
-  it("max 8 items displayed with addable first, then already-added", () => {
+  it("max 8 items displayed with addable first, then already-added (pre-sorted by parent)", () => {
     const manyItems = Array.from({ length: 12 }, (_, i) =>
       makeItem({
         id: `t-${i}`,
@@ -218,11 +171,15 @@ describe("PortalAutocomplete", () => {
       }),
     );
     const existingIds = new Set(["t-0", "t-1"]);
+    // Parent pre-sorts: addable first, then already-added, sliced to 8
+    const addable = manyItems.filter((item) => !existingIds.has(item.id));
+    const alreadyAdded = manyItems.filter((item) => existingIds.has(item.id));
+    const displayItems = [...addable, ...alreadyAdded].slice(0, MAX_DISPLAY_ITEMS);
 
     render(
       <PortalAutocomplete
         {...defaultProps}
-        items={manyItems}
+        displayItems={displayItems}
         existingIds={existingIds}
         anchorRef={anchorRef}
       />,
@@ -235,45 +192,25 @@ describe("PortalAutocomplete", () => {
     expect(options[0]).not.toHaveAttribute("aria-disabled", "true");
   });
 
-  it("ArrowDown skips disabled items", () => {
-    // Item 0 is addable, item 1 is disabled, item 2 is addable
-    const items = [
-      makeItem({ id: "t-1", code: "310", name: "Black" }),
-      makeItem({ id: "t-2", code: "321", name: "Red" }),
-      makeItem({ id: "t-3", code: "333", name: "Blue" }),
-    ];
-    // Note: items are sorted addable-first, so after sorting:
-    // t-1 (addable), t-3 (addable), t-2 (disabled)
-    const existingIds = new Set(["t-2"]);
-
-    render(
-      <PortalAutocomplete
-        {...defaultProps}
-        items={items}
-        existingIds={existingIds}
-        anchorRef={anchorRef}
-      />,
-    );
-    const input = screen.getByPlaceholderText("Search by code or name...");
-
-    // ArrowDown to first addable
-    fireEvent.keyDown(input, { key: "ArrowDown" });
-    // ArrowDown to second addable (skips disabled)
-    fireEvent.keyDown(input, { key: "ArrowDown" });
-
+  it("clicking an addable item calls onSelect with that item", () => {
+    render(<PortalAutocomplete {...defaultProps} anchorRef={anchorRef} />);
     const options = screen.getAllByRole("option");
-    // Second addable item should be highlighted
-    expect(options[1]).toHaveAttribute("data-highlighted", "true");
+    fireEvent.click(options[0]);
+    expect(defaultProps.onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "t-1", code: "310" }),
+    );
   });
 
-  it("uses aria-activedescendant to indicate highlighted item", () => {
-    render(<PortalAutocomplete {...defaultProps} anchorRef={anchorRef} />);
-    const input = screen.getByPlaceholderText("Search by code or name...");
-
-    // Initially no aria-activedescendant or empty
-    expect(input.getAttribute("aria-activedescendant")).toBeFalsy();
-
-    fireEvent.keyDown(input, { key: "ArrowDown" });
-    expect(input.getAttribute("aria-activedescendant")).toBeTruthy();
+  it("clicking a disabled item does not call onSelect", () => {
+    const existingIds = new Set(["t-1"]);
+    render(
+      <PortalAutocomplete {...defaultProps} existingIds={existingIds} anchorRef={anchorRef} />,
+    );
+    // t-1 is now last (disabled items sorted after addable)
+    const options = screen.getAllByRole("option");
+    const disabledOption = options.find((opt) => opt.getAttribute("aria-disabled") === "true");
+    expect(disabledOption).toBeDefined();
+    fireEvent.click(disabledOption!);
+    expect(defaultProps.onSelect).not.toHaveBeenCalled();
   });
 });

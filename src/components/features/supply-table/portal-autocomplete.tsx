@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Plus } from "lucide-react";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
@@ -8,10 +8,10 @@ import type { SupplySearchResult } from "./types";
 
 interface PortalAutocompleteProps {
   isOpen: boolean;
-  items: SupplySearchResult[];
+  displayItems: SupplySearchResult[];
   existingIds: Set<string>;
   searchText: string;
-  onSearchChange: (text: string) => void;
+  highlightIndex: number;
   onSelect: (item: SupplySearchResult) => void;
   onCreateRequest: (searchText: string) => void;
   onClose: () => void;
@@ -19,14 +19,12 @@ interface PortalAutocompleteProps {
   isLoading?: boolean;
 }
 
-const MAX_ITEMS = 8;
-
 export function PortalAutocomplete({
   isOpen,
-  items,
+  displayItems,
   existingIds,
   searchText,
-  onSearchChange,
+  highlightIndex,
   onSelect,
   onCreateRequest,
   onClose,
@@ -34,15 +32,14 @@ export function PortalAutocomplete({
   isLoading,
 }: PortalAutocompleteProps) {
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
-  const [highlightIndex, setHighlightIndex] = useState(-1);
-  const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Calculate position from anchor element, recalculate on scroll/resize
   useEffect(() => {
     if (!isOpen || !anchorRef.current) return;
     function updatePosition() {
-      const rect = anchorRef.current!.getBoundingClientRect();
+      if (!anchorRef.current) return;
+      const rect = anchorRef.current.getBoundingClientRect();
       setCoords({
         top: rect.bottom + 4,
         left: rect.left,
@@ -76,78 +73,14 @@ export function PortalAutocomplete({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, anchorRef, onClose]);
 
-  // Reset highlight when items change
-  useEffect(() => {
-    setHighlightIndex(-1);
-  }, [items]);
-
-  // Focus input when dropdown opens
-  useEffect(() => {
-    if (isOpen) {
-      inputRef.current?.focus();
-    }
-  }, [isOpen]);
-
-  // Sort: addable first, then already-added. Slice to max 8.
-  const displayItems = useMemo(() => {
-    const addable = items.filter((item) => !existingIds.has(item.id));
-    const alreadyAdded = items.filter((item) => existingIds.has(item.id));
-    return [...addable, ...alreadyAdded].slice(0, MAX_ITEMS);
-  }, [items, existingIds]);
-
   function isDisabled(item: SupplySearchResult): boolean {
     return existingIds.has(item.id);
-  }
-
-  function findNextAddableIndex(fromIndex: number, direction: 1 | -1): number {
-    let idx = fromIndex + direction;
-    while (idx >= 0 && idx < displayItems.length) {
-      if (!isDisabled(displayItems[idx])) return idx;
-      idx += direction;
-    }
-    return fromIndex; // Stay put if no addable item found
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setHighlightIndex((prev) => {
-        if (prev < 0) {
-          // Find first addable item
-          for (let i = 0; i < displayItems.length; i++) {
-            if (!isDisabled(displayItems[i])) return i;
-          }
-          return prev; // No addable items
-        }
-        return findNextAddableIndex(prev, 1);
-      });
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlightIndex((prev) => {
-        if (prev < 0) return prev;
-        return findNextAddableIndex(prev, -1);
-      });
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (highlightIndex >= 0 && displayItems[highlightIndex]) {
-        if (!isDisabled(displayItems[highlightIndex])) {
-          onSelect(displayItems[highlightIndex]);
-        }
-      }
-    } else if (e.key === "Escape") {
-      onClose();
-    }
   }
 
   if (!isOpen) return null;
 
   const hasSearchText = searchText.trim().length > 0;
   const showCreateOption = displayItems.length === 0 && hasSearchText && !isLoading;
-
-  const highlightedId =
-    highlightIndex >= 0 && displayItems[highlightIndex]
-      ? `portal-autocomplete-item-${displayItems[highlightIndex].id}`
-      : undefined;
 
   const dropdown = (
     <div
@@ -161,30 +94,8 @@ export function PortalAutocomplete({
       }}
       className="border-border bg-card rounded-lg border shadow-lg"
     >
-      {/* Search input */}
-      <div className="p-2">
-        <input
-          ref={inputRef}
-          type="text"
-          value={searchText}
-          onChange={(e) => onSearchChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Search by code or name..."
-          className="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-ring/40 w-full rounded border px-3 py-1.5 text-sm transition-colors focus:ring-2 focus:outline-none"
-          role="combobox"
-          aria-expanded={true}
-          aria-controls="portal-autocomplete-listbox"
-          aria-activedescendant={highlightedId || undefined}
-          aria-autocomplete="list"
-        />
-      </div>
-
-      {/* Results list */}
-      <div
-        id="portal-autocomplete-listbox"
-        role="listbox"
-        className="border-border max-h-60 overflow-y-auto border-t"
-      >
+      {/* Results list (no input -- keyboard handled by parent) */}
+      <div id="portal-autocomplete-listbox" role="listbox" className="max-h-60 overflow-y-auto">
         {isLoading ? (
           <p className="text-muted-foreground px-3 py-4 text-center text-sm">Searching...</p>
         ) : displayItems.length > 0 ? (

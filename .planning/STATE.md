@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Fixes & Polish
-status: executing
-stopped_at: Phase 15 complete
-last_updated: "2026-05-17T02:45:00.000Z"
-last_activity: 2026-05-17 -- Phase 15 executed and verified
+status: "Phase 16 shipped — PR #34"
+stopped_at: Phase 16 context gathered
+last_updated: "2026-05-17T04:16:57.309Z"
+last_activity: 2026-05-17
 progress:
   total_phases: 3
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 33
+  completed_phases: 2
+  total_plans: 6
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-16)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** v1.4 Fixes & Polish -- targeted fixes and feature additions (chart files, input bug, dashboard sizing, image focal point)
+**Current focus:** Phase 16 — input-dashboard-fixes
 
 ## Current Position
 
-Phase: 15 (Chart File Management) -- complete
-Plan: 4/4 done
-Status: Verified, shipping
-Last activity: 2026-05-17 -- Phase 15 executed and verified
+Phase: 16 (input-dashboard-fixes) — EXECUTING
+Plan: 1 of 2
+Status: Phase 16 shipped — PR #34
+Last activity: 2026-05-17
 
 ```
 [======              ] 33% (1/3 phases)
@@ -49,7 +49,7 @@ Last activity: 2026-05-17 -- Phase 15 executed and verified
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
 | 15. Chart File Management | Multiple working copies per chart | FILE-01, FILE-02, FILE-03 | Complete |
-| 16. Input & Dashboard Fixes | SearchToAdd bug + Spotlight sizing | INPUT-01, DASH-01, DASH-02 | Not started |
+| 16. Input & Dashboard Fixes | SearchToAdd bug + Spotlight sizing | INPUT-01, DASH-01, DASH-02 | Shipped (PR #34) |
 | 17. Image Focal Point | Click-to-set anchor for cover images | IMG-01, IMG-02 | Not started |
 
 ## Performance Metrics
@@ -120,7 +120,7 @@ Items acknowledged and deferred at v1.3 milestone close on 2026-05-16:
 
 ## Session Continuity
 
-Last session: 2026-05-16T23:45:20.293Z
-Stopped at: Phase 15 context gathered
-Resume action: `/gsd-plan-phase 15`
-Resume file: .planning/phases/15-chart-file-management/15-UI-SPEC.md
+Last session: 2026-05-17T03:10:02.990Z
+Stopped at: Phase 16 context gathered
+Resume action: `/gsd-plan-phase 17`
+Resume file: .planning/ROADMAP.md

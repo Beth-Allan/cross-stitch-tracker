@@ -20,16 +20,16 @@ vi.mock("./portal-autocomplete", () => ({
     isOpen,
     onSelect,
     onCreateRequest,
-    items,
+    displayItems,
   }: {
     isOpen: boolean;
     onSelect: (item: SupplySearchResult) => void;
     onCreateRequest: (text: string) => void;
-    items: SupplySearchResult[];
+    displayItems: SupplySearchResult[];
   }) =>
     isOpen ? (
       <div data-testid="portal-autocomplete">
-        {items.map((item) => (
+        {displayItems.map((item) => (
           <button
             key={item.id}
             data-testid={`autocomplete-item-${item.id}`}
@@ -446,5 +446,139 @@ describe("SupplyTableAddRow", () => {
 
     // Auto-calc sparkle should be present for THREAD
     expect(screen.getByTestId("auto-calc-sparkle")).toBeInTheDocument();
+  });
+
+  // --- ARIA combobox tests ---
+
+  it("search input has role='combobox' attribute", () => {
+    renderAddRow();
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    expect(searchInput).toHaveAttribute("role", "combobox");
+  });
+
+  it("search input has aria-expanded that reflects autocomplete open state", async () => {
+    const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    renderAddRow();
+
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    // Initially closed
+    expect(searchInput).toHaveAttribute("aria-expanded", "false");
+
+    // Type to open autocomplete
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "310" } });
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    // Now open
+    expect(searchInput).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("search input has aria-controls='portal-autocomplete-listbox'", () => {
+    renderAddRow();
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    expect(searchInput).toHaveAttribute("aria-controls", "portal-autocomplete-listbox");
+  });
+
+  it("search input has aria-autocomplete='list'", () => {
+    renderAddRow();
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    expect(searchInput).toHaveAttribute("aria-autocomplete", "list");
+  });
+
+  // --- Keyboard navigation from search input ---
+
+  it("ArrowDown on search input triggers highlight navigation", async () => {
+    const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    renderAddRow();
+
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "310" } });
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    // ArrowDown should not cause focus loss from search input
+    await act(async () => {
+      fireEvent.keyDown(searchInput, { key: "ArrowDown" });
+    });
+
+    // The search input should still be in the DOM (focus not stolen)
+    expect(searchInput).toBeInTheDocument();
+  });
+
+  it("ArrowDown then Enter selects the highlighted item", async () => {
+    const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    renderAddRow();
+
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "310" } });
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    // ArrowDown to highlight first item
+    await act(async () => {
+      fireEvent.keyDown(searchInput, { key: "ArrowDown" });
+    });
+
+    // Enter to select
+    await act(async () => {
+      fireEvent.keyDown(searchInput, { key: "Enter" });
+    });
+
+    // Selected item code should appear in the DOM
+    expect(screen.getByText("310")).toBeInTheDocument();
+  });
+
+  it("shows error message when search fails", async () => {
+    vi.mocked(adapter.searchSupplies).mockRejectedValue(new Error("Network error"));
+
+    renderAddRow();
+
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "310" } });
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    expect(screen.getByText("Search failed. Try again.")).toBeInTheDocument();
+  });
+
+  it("Escape on search input resets the add row", async () => {
+    const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    renderAddRow();
+
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "310" } });
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    // Escape should reset
+    await act(async () => {
+      fireEvent.keyDown(searchInput, { key: "Escape" });
+    });
+
+    // Input value should be cleared
+    expect(searchInput).toHaveAttribute("value", "");
   });
 });

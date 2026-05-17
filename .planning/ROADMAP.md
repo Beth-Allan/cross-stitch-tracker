@@ -66,7 +66,7 @@ Full details: `milestones/v1.3-ROADMAP.md`
 ### v1.4 Fixes & Polish
 
 - [x] **Phase 15: Chart File Management** - Multiple digital working copies per chart with add/remove lifecycle -- completed 2026-05-17
-- [ ] **Phase 16: Input & Dashboard Fixes** - SearchToAdd keystroke bug fix and Spotlight section sizing corrections
+- [x] **Phase 16: Input & Dashboard Fixes** - SearchToAdd keystroke bug fix and Spotlight section sizing corrections (completed 2026-05-17)
 - [ ] **Phase 17: Image Focal Point** - Click-to-set anchor point for cover images across all display contexts
 
 ## Phase Details
@@ -96,7 +96,10 @@ Plans:
   1. User can type "310" (or any multi-digit code) quickly in SearchToAdd without keystrokes being dropped
   2. Spotlight "Rediscover This One" image displays at a constrained, proportional size (not dominating the section)
   3. "Check it Out" and "Shuffle Spotlight" buttons render at matching, visually balanced sizes
-**Plans**: 0 (not yet planned)
+**Plans**: 2 plans
+Plans:
+- [x] 16-01-PLAN.md — SearchToAdd keystroke bug fix + dead code deletion
+- [x] 16-02-PLAN.md — Spotlight grid sizing + button styling
 **UI hint**: yes
 
 ### Phase 17: Image Focal Point
@@ -139,5 +142,5 @@ Plans:
 | 13. Supply Takeover | v1.3 | 5/5 | Complete | 2026-05-16 |
 | 14. Edit Mode & Cleanup | v1.3 | 3/3 | Complete | 2026-05-16 |
 | 15. Chart File Management | v1.4 | 4/4 | Complete | 2026-05-17 |
-| 16. Input & Dashboard Fixes | v1.4 | 0/? | Not started | - |
+| 16. Input & Dashboard Fixes | v1.4 | 2/2 | Complete   | 2026-05-17 |
 | 17. Image Focal Point | v1.4 | 0/? | Not started | - |

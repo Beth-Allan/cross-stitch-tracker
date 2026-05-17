@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { SupplyTable } from "@/components/features/supply-table";
 import type { SupplyRow, CalcParams } from "@/components/features/supply-table";
@@ -15,7 +15,6 @@ import type {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface SuppliesTabProps {
-  chartId: string;
   project: NonNullable<ProjectDetailProps["chart"]["project"]>;
   supplies: NonNullable<ProjectDetailProps["supplies"]>;
 }
@@ -85,10 +84,13 @@ export function SuppliesTab({ project, supplies }: SuppliesTabProps) {
   const router = useRouter();
   const [sortOption, setSortOption] = useState<SupplySortOption>("added");
 
-  // Instantiate ServerActionAdapter with project.id and router.refresh
+  // Stabilize router.refresh reference to prevent adapter recreation (D-03)
+  const stableRefresh = useCallback(() => router.refresh(), [router]);
+
+  // Instantiate ServerActionAdapter with project.id and stable refresh
   const adapter = useMemo(
-    () => new ServerActionAdapter(project.id, () => router.refresh()),
-    [project.id, router],
+    () => new ServerActionAdapter(project.id, stableRefresh),
+    [project.id, stableRefresh],
   );
 
   // CalcParams derived from project fields (D-01: read-only, no settings bar)

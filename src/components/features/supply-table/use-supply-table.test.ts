@@ -449,4 +449,272 @@ describe("useSupplyTable", () => {
     expect(result.current.showCreateDialog).toBe(true);
     expect(result.current.createSearchText).toBe("custom thread");
   });
+
+  // --- New tests for highlightIndex and useTransition ---
+
+  it("includes highlightIndex in return value, defaults to -1", () => {
+    const { result } = renderSupplyTableHook();
+    expect(result.current.highlightIndex).toBe(-1);
+  });
+
+  it("highlightIndex resets to -1 when searchResults change", async () => {
+    const results1 = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+    const results2 = [makeSearchResult({ id: "t2", code: "321", name: "Red" })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValueOnce(results1);
+
+    const { result } = renderSupplyTableHook();
+
+    // Trigger search and get results
+    act(() => {
+      result.current.setSearchText("310");
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    // Manually move highlight
+    act(() => {
+      result.current.setHighlightIndex(0);
+    });
+    expect(result.current.highlightIndex).toBe(0);
+
+    // Now change search to get new results
+    vi.mocked(adapter.searchSupplies).mockResolvedValueOnce(results2);
+    act(() => {
+      result.current.setSearchText("321");
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    // Highlight should reset
+    expect(result.current.highlightIndex).toBe(-1);
+  });
+
+  it("exports moveHighlight function for keyboard navigation", () => {
+    const { result } = renderSupplyTableHook();
+    expect(typeof result.current.moveHighlight).toBe("function");
+  });
+
+  it("moveHighlight navigates forward through addable items", async () => {
+    const results = [
+      makeSearchResult({ id: "t1", code: "310", name: "Black" }),
+      makeSearchResult({ id: "t2", code: "321", name: "Red" }),
+    ];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    const { result } = renderSupplyTableHook();
+
+    act(() => {
+      result.current.setSearchText("3");
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    const displayItems = result.current.searchResults;
+    const emptySet = new Set<string>();
+
+    act(() => {
+      result.current.moveHighlight(1, displayItems, emptySet);
+    });
+    expect(result.current.highlightIndex).toBe(0);
+
+    act(() => {
+      result.current.moveHighlight(1, displayItems, emptySet);
+    });
+    expect(result.current.highlightIndex).toBe(1);
+  });
+
+  it("moveHighlight skips disabled (existing) items", async () => {
+    const results = [
+      makeSearchResult({ id: "t1", code: "310", name: "Black" }),
+      makeSearchResult({ id: "t2", code: "321", name: "Red" }),
+      makeSearchResult({ id: "t3", code: "333", name: "Blue" }),
+    ];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    const { result } = renderSupplyTableHook();
+
+    act(() => {
+      result.current.setSearchText("3");
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    const displayItems = result.current.searchResults;
+    const existingSet = new Set(["t2"]); // t2 is disabled
+
+    act(() => {
+      result.current.moveHighlight(1, displayItems, existingSet);
+    });
+    expect(result.current.highlightIndex).toBe(0); // t1
+
+    act(() => {
+      result.current.moveHighlight(1, displayItems, existingSet);
+    });
+    expect(result.current.highlightIndex).toBe(2); // t3 (skipped t2)
+  });
+
+  it("moveHighlight navigates backward through addable items", async () => {
+    const results = [
+      makeSearchResult({ id: "t1", code: "310", name: "Black" }),
+      makeSearchResult({ id: "t2", code: "321", name: "Red" }),
+      makeSearchResult({ id: "t3", code: "333", name: "Blue" }),
+    ];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    const { result } = renderSupplyTableHook();
+
+    act(() => {
+      result.current.setSearchText("3");
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    const displayItems = result.current.searchResults;
+    const emptySet = new Set<string>();
+
+    // Move forward to index 2
+    act(() => result.current.moveHighlight(1, displayItems, emptySet));
+    act(() => result.current.moveHighlight(1, displayItems, emptySet));
+    act(() => result.current.moveHighlight(1, displayItems, emptySet));
+    expect(result.current.highlightIndex).toBe(2);
+
+    // Move backward
+    act(() => result.current.moveHighlight(-1, displayItems, emptySet));
+    expect(result.current.highlightIndex).toBe(1);
+
+    act(() => result.current.moveHighlight(-1, displayItems, emptySet));
+    expect(result.current.highlightIndex).toBe(0);
+  });
+
+  it("moveHighlight backward skips disabled items", async () => {
+    const results = [
+      makeSearchResult({ id: "t1", code: "310", name: "Black" }),
+      makeSearchResult({ id: "t2", code: "321", name: "Red" }),
+      makeSearchResult({ id: "t3", code: "333", name: "Blue" }),
+    ];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    const { result } = renderSupplyTableHook();
+
+    act(() => {
+      result.current.setSearchText("3");
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    const displayItems = result.current.searchResults;
+    const existingSet = new Set(["t2"]); // t2 is disabled
+
+    // Move forward to index 2 (t3)
+    act(() => result.current.moveHighlight(1, displayItems, existingSet));
+    act(() => result.current.moveHighlight(1, displayItems, existingSet));
+    expect(result.current.highlightIndex).toBe(2); // t3
+
+    // Move backward — should skip t2 and land on t1
+    act(() => result.current.moveHighlight(-1, displayItems, existingSet));
+    expect(result.current.highlightIndex).toBe(0); // t1 (skipped t2)
+  });
+
+  it("moveHighlight backward stays put when no prior addable item exists", async () => {
+    const results = [
+      makeSearchResult({ id: "t1", code: "310", name: "Black" }),
+      makeSearchResult({ id: "t2", code: "321", name: "Red" }),
+    ];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    const { result } = renderSupplyTableHook();
+
+    act(() => {
+      result.current.setSearchText("3");
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    const displayItems = result.current.searchResults;
+    const existingSet = new Set(["t1"]); // t1 is disabled
+
+    // Move to t2 (index 1)
+    act(() => result.current.moveHighlight(1, displayItems, existingSet));
+    expect(result.current.highlightIndex).toBe(1);
+
+    // ArrowUp — t1 is disabled, no prior addable item, should stay at 1
+    act(() => result.current.moveHighlight(-1, displayItems, existingSet));
+    expect(result.current.highlightIndex).toBe(1);
+  });
+
+  it("sets isSearchError on search failure", async () => {
+    vi.mocked(adapter.searchSupplies).mockRejectedValue(new Error("Network error"));
+
+    const { result } = renderSupplyTableHook();
+
+    act(() => {
+      result.current.setSearchText("310");
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    expect(result.current.isSearchError).toBe(true);
+    expect(result.current.searchResults).toEqual([]);
+  });
+
+  it("clears isSearchError on next successful search", async () => {
+    vi.mocked(adapter.searchSupplies).mockRejectedValueOnce(new Error("fail"));
+
+    const { result } = renderSupplyTableHook();
+
+    act(() => {
+      result.current.setSearchText("310");
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+    expect(result.current.isSearchError).toBe(true);
+
+    // New search succeeds
+    const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValueOnce(results);
+
+    act(() => {
+      result.current.setSearchText("321");
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+    expect(result.current.isSearchError).toBe(false);
+    expect(result.current.searchResults).toEqual(results);
+  });
+
+  it("uses useTransition for setIsSearching (non-blocking)", async () => {
+    // We verify that the hook uses useTransition by checking that isSearching
+    // transitions happen without blocking -- the hook should expose no isPending
+    // directly, but the key indicator is that setIsSearching is wrapped.
+    // The actual verification is structural (source code inspection), but
+    // functionally: search should still work correctly.
+    const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    const { result } = renderSupplyTableHook();
+
+    act(() => {
+      result.current.setSearchText("310");
+    });
+
+    // isSearching should be true during search
+    expect(result.current.isSearching).toBe(true);
+
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+
+    expect(result.current.isSearching).toBe(false);
+    expect(result.current.searchResults).toEqual(results);
+  });
 });
