@@ -8,6 +8,7 @@ export const ALLOWED_FILE_TYPES = [
   "image/webp",
   "application/pdf",
   "application/octet-stream", // .saga, .oxs, .xsd (cross-stitch software formats)
+  "text/css", // .css CrossStitch pattern files report as text/css in browsers
 ] as const;
 
 export const ALLOWED_CHART_FILE_TYPES = [
