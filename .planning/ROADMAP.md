@@ -80,7 +80,7 @@ Full details: `milestones/v1.4-ROADMAP.md`
 **Milestone Goal:** A dedicated statistics dashboard that surfaces lifetime counters, activity charts, collection insights, and personal bests — making every stitch feel measured and rewarding.
 
 - [x] **Phase 18: Stats Engine & Charting Foundation** - Server-side query layer, caching, timezone handling, and Recharts installation (completed 2026-05-17)
-- [ ] **Phase 19: Hero Stats & Collection Overview** - Lifetime counters, rolling time-window stats, and collection breakdown charts
+- [x] **Phase 19: Hero Stats & Collection Overview** - Lifetime counters, rolling time-window stats, and collection breakdown charts (completed 2026-05-17)
 - [ ] **Phase 20: Activity Visualization & Calendar** - Monthly bar chart, stitching calendar, session history, day-of-week patterns, and pace trends
 - [ ] **Phase 21: Records, Insights & Celebrations** - Personal bests board, "New record!" toast, designer/genre/supply insights, and completion estimates
 
