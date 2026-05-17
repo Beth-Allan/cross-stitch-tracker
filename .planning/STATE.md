@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: Fixes & Polish
-status: "SHIPPED — milestone complete"
-stopped_at: Milestone archived
-last_updated: "2026-05-17T17:50:00.000Z"
+milestone: v1.5
+milestone_name: Statistics & Records
+status: "Phase 18 shipped — PR #37"
+stopped_at: Phase 18 context gathered
+last_updated: "2026-05-17T20:10:49.191Z"
 last_activity: 2026-05-17
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
+  total_phases: 4
+  completed_phases: 1
+  total_plans: 3
+  completed_plans: 3
   percent: 100
 ---
 
@@ -21,17 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-17)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Planning next milestone
+**Current focus:** Phase 18 — stats-engine-charting-foundation
 
 ## Current Position
 
-Milestone: v1.4 Fixes & Polish — SHIPPED
-Status: Milestone archived, git tagged
+Phase: 19
+Plan: Not started
+Status: Phase 18 shipped — PR #37
 Last activity: 2026-05-17
 
-```
-[====================] 100% (3/3 phases)
-```
+Progress: [░░░░░░░░░░] 0%
 
 ## Milestone Structure
 
@@ -41,15 +40,17 @@ Last activity: 2026-05-17
 | v1.1 | Browse & Organize | 5-7 | Shipped 2026-04-16 |
 | v1.2 | Track & Measure | 8-9.1 | Shipped 2026-04-20 |
 | v1.3 | Form & Supply Overhaul | 10-14 | Shipped 2026-05-16 |
-| v1.4 | Fixes & Polish | 15-17 | In progress |
+| v1.4 | Fixes & Polish | 15-17 | Shipped 2026-05-17 |
+| v1.5 | Statistics & Records | 18-21 | In progress |
 
-## v1.4 Phase Summary
+## v1.5 Phase Summary
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
-| 15. Chart File Management | Multiple working copies per chart | FILE-01, FILE-02, FILE-03 | Complete |
-| 16. Input & Dashboard Fixes | SearchToAdd bug + Spotlight sizing | INPUT-01, DASH-01, DASH-02 | Shipped (PR #34) |
-| 17. Image Focal Point | Click-to-set anchor for cover images | IMG-01, IMG-02 | Not started |
+| 18. Stats Engine & Charting Foundation | Query layer + caching + Recharts | STAT-01..04 | Ready to plan |
+| 19. Hero Stats & Collection Overview | Lifetime counters + breakdowns | HERO-01..06, INS-06 | Not started |
+| 20. Activity Visualization & Calendar | Time charts + calendar + pace | VIZ-01..07, INS-04 | Not started |
+| 21. Records, Insights & Celebrations | Records + toast + insights | REC-01..05, INS-01..03, INS-05 | Not started |
 
 ## Performance Metrics
 
@@ -57,23 +58,18 @@ Last activity: 2026-05-17
 **Velocity (v1.1):** 20 plans / 5 days (~4/day)
 **Velocity (v1.2):** 20 plans / 4 days (~5/day)
 **Velocity (v1.3):** 19 plans / 13 days (~1.5/day)
+**Velocity (v1.4):** 9 plans / 2 days (~4.5/day)
 
 ## Accumulated Context
 
-### Key Architecture (from v1.3)
+### Key Architecture (from research)
 
-- CSS visibility toggle (or React Activity) for form/supply-takeover -- preserves form state without unmounting
-- SupplyTableAdapter interface: server-action adapter (project detail) vs. local-state adapter (creation flow)
-- Two-phase save on create: createChart first, then batchAddSuppliesToProject in one $transaction
-- PortalAutocomplete extracted from existing SearchToAdd -- Base UI Combobox.Portal
-- Zero new npm dependencies -- everything built with installed stack
-
-### v1.4 Context
-
-- **Chart Files:** New ChartFile table replaces single `digitalWorkingCopyUrl` field on Chart. Schema migration needed.
-- **SearchToAdd bug:** "310" registers as "30" -- likely re-render during server action triggers input value loss. Investigation needed.
-- **Dashboard sizing:** Spotlight image too large, buttons mismatched -- CSS constraint fix.
-- **Focal point:** New schema fields (focalPointX/Y on Chart), click-to-set UI, CSS object-position propagation.
+- `src/lib/queries/stats/` for query layer (pure functions, no "use server")
+- `unstable_cache` with `revalidateTag("stats")` on session mutations (5-min TTL + on-demand)
+- Recharts always Client Components with dynamic import (SSR incompatible)
+- `Promise.all` for parallel data fetching (existing dashboard pattern)
+- No schema migrations needed — all data sources already exist
+- Two new deps: Recharts 3.8.x (via shadcn chart), date-fns 4.1.0
 
 ### Decisions
 
@@ -86,27 +82,12 @@ None.
 ### Blockers/Concerns
 
 - `.env.local` bcrypt hashes must escape `$` as `\$`
-
-## Deferred Items
-
-Cleaned up at v1.4 milestone close on 2026-05-17:
-
-- 4 debug sessions closed (hydration-mismatch, searchable-select, supplies-findmany, thread-picker — all fixed or dev-only)
-- 14 quick tasks deleted (abandoned artifacts from Mar-Apr with no state files)
-- 1 stale todo deleted (Phase 7 scope rewrite — shipped in v1.1)
-- fabric-matching-excludes-valid converted to backlog 999.21
-
-Remaining from v1.3:
-
-| Category | Item | Status |
-|----------|------|--------|
-| uat_gap | Phase 13 (13-UAT.md) | diagnosed |
-| verification_gap | Phase 11 (11-VERIFICATION.md) | human_needed |
-| verification_gap | Phase 13 (13-VERIFICATION.md) | human_needed |
+- Confirm `StitchSession.date` field type for timezone handling
+- Pin exact Recharts version after shadcn install (remove caret)
 
 ## Session Continuity
 
-Last session: 2026-05-17
-Stopped at: v1.4 milestone complete
-Resume action: `/gsd-new-milestone`
-Resume file: .planning/PROJECT.md
+Last session: 2026-05-17T18:49:32.491Z
+Stopped at: Phase 18 context gathered
+Resume action: `/gsd-plan-phase 18`
+Resume file: .planning/phases/18-stats-engine-charting-foundation/18-CONTEXT.md

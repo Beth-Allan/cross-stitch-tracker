@@ -13,8 +13,10 @@ vi.mock("@/lib/db", () => ({
 }));
 
 const mockRevalidatePath = vi.fn();
+const mockRevalidateTag = vi.fn();
 vi.mock("next/cache", () => ({
   revalidatePath: mockRevalidatePath,
+  revalidateTag: mockRevalidateTag,
 }));
 
 const mockProcessAndStoreImage = vi.fn();
@@ -333,6 +335,7 @@ describe("session-actions", () => {
 
       expect(mockRevalidatePath).toHaveBeenCalledWith("/charts/chart-1");
       expect(mockRevalidatePath).toHaveBeenCalledWith("/sessions");
+      expect(mockRevalidateTag).toHaveBeenCalledWith("stats", { expire: 0 });
     });
 
     it("optimizes session photo when photoKey is provided", async () => {
@@ -550,6 +553,7 @@ describe("session-actions", () => {
 
       expect(mockRevalidatePath).toHaveBeenCalledWith("/charts/chart-1");
       expect(mockRevalidatePath).toHaveBeenCalledWith("/sessions");
+      expect(mockRevalidateTag).toHaveBeenCalledWith("stats", { expire: 0 });
     });
 
     it("optimizes new photo on update when photoKey is present", async () => {
@@ -772,6 +776,7 @@ describe("session-actions", () => {
 
       expect(mockRevalidatePath).toHaveBeenCalledWith("/charts/chart-1");
       expect(mockRevalidatePath).toHaveBeenCalledWith("/sessions");
+      expect(mockRevalidateTag).toHaveBeenCalledWith("stats", { expire: 0 });
     });
   });
 

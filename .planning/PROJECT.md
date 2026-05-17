@@ -11,7 +11,7 @@ A stitcher can manage their entire chart collection and supplies faster and more
 ## Current State
 
 **Last shipped:** v1.4 Fixes & Polish (2026-05-17)
-**Next milestone:** Planning (run `/gsd-new-milestone`)
+**Next milestone:** v1.5 Statistics & Records (in progress)
 
 The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project selection, image optimization, multi-file working copies per chart, and click-to-set focal point control for cover images. 1,641 tests, ~95k LOC TypeScript.
 
@@ -70,7 +70,21 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 
 ### Active
 
-(No active milestone — run `/gsd-new-milestone` to plan next)
+## Current Milestone: v1.5 Statistics & Records
+
+**Goal:** A dedicated statistics dashboard that surfaces lifetime counters, activity charts, collection insights, and personal bests — making every stitch feel measured and rewarding.
+
+**Target features:**
+- Stats computation engine (server-side query/aggregation layer)
+- Dedicated Stats Dashboard page with lifetime hero counters
+- Collection overview (status/size/designer/genre breakdowns)
+- Activity charts (monthly bar chart, heatmap calendar, day-of-week, rolling averages)
+- Velocity & trends (month-over-month, seasonal patterns, completion rate)
+- Designer, genre, and thread/supply insights
+- Personal Bests record board (records per category with linked entities)
+- "New record!" celebration toast on session logging
+- Charting library integration for complex visualizations
+- All entity references are clickable links (projects, threads, designers)
 
 ### Deferred (no phase assigned)
 
@@ -199,4 +213,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-17 after v1.4 milestone shipped*
+*Last updated: 2026-05-17 — v1.5 Statistics & Records milestone started*

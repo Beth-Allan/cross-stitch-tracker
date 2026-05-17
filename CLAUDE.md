@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Milestone:** v1.4 Fixes & Polish
+**Milestone:** v1.5 Statistics & Records
 **Last Updated:** 2026-05-17
-**Roadmap:** 5 milestones / 17 phases — v1.0 through v1.4 shipped
+**Roadmap:** 6 milestones / 21 phases — v1.0 through v1.4 shipped, v1.5 Phase 18 planned
 
 ### Done
 
@@ -21,14 +21,18 @@
 
 ### Done This Session
 
-- **v1.4 Milestone Complete** — archived, tagged `v1.4`, retrospective written
-  - Cleaned 24 inherited artifacts (4 debug sessions closed, 14 quick tasks deleted, 1 stale todo removed)
-  - fabric-matching bug converted to backlog 999.21
-  - Phase directories archived to `milestones/v1.4-phases/`
+- **Phase 18 executed** — 3 plans, 3 waves, all complete (1682 tests passing)
+  - Plan 01: Installed recharts 2.15.3 + date-fns 4.1.0 + @date-fns/tz 1.4.1, types, timezone utility, chart configs
+  - Plan 02: Query layer (getHeroStats, getCollectionBreakdown) with unstable_cache + revalidateTag
+  - Plan 03: Stats page shell (3-tab layout with nuqs) + collection status donut chart (Recharts PieChart)
+  - Fixed: revalidateTag Next.js 16 signature (2-arg form with `{ expire: 0 }`)
+  - Code review: 2 advisory warnings (WR-01 lt/lte boundary, WR-02 unguarded cast), 0 critical
+  - Verification: 10/10 automated must-haves pass, 2 human verification items pending
 
 ### Next Up — RESUME HERE
 
-1. Start next milestone: `/gsd-new-milestone`
+1. **Human verify Phase 18** — visit `/stats`, confirm donut chart renders with correct colors + log a session to test cache invalidation
+2. `/gsd-discuss-phase 19` — discuss Hero Stats & Collection Overview phase (`/clear` first)
 
 ### Backlog
 

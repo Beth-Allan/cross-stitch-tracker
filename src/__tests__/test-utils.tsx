@@ -9,8 +9,12 @@ function AllProviders({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function customRender(ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) {
-  return render(ui, { wrapper: AllProviders, ...options });
+function customRender(
+  ui: ReactElement,
+  options?: Omit<RenderOptions, "wrapper"> & { wrapper?: RenderOptions["wrapper"] },
+) {
+  const { wrapper, ...rest } = options ?? {};
+  return render(ui, { wrapper: wrapper ?? AllProviders, ...rest });
 }
 
 // Re-export everything from RTL, override render with our wrapper
