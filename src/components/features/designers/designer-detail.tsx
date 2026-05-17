@@ -21,6 +21,7 @@ import { DesignerFormModal } from "./designer-form-modal";
 import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
 import { deleteDesigner } from "@/lib/actions/designer-actions";
 import { getEffectiveStitchCount } from "@/lib/utils/size-category";
+import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import type { DesignerDetail as DesignerDetailType, DesignerChart } from "@/types/designer";
 
 /* ---- Types ---- */
@@ -304,6 +305,7 @@ function ChartRow({ chart }: { chart: DesignerChart }) {
             src={chart.coverThumbnailUrl}
             alt={chart.name}
             className="h-full w-full object-cover"
+            style={getObjectPositionStyle(chart.focalPointX, chart.focalPointY)}
           />
         </div>
       ) : (

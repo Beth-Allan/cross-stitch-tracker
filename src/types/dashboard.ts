@@ -1,8 +1,9 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
+import type { OptionalFocalPoint } from "@/types/focal-point";
 
 // ─── Currently Stitching ───────────────────────────────────────────────────
 
-export interface CurrentlyStitchingProject {
+export interface CurrentlyStitchingProject extends OptionalFocalPoint {
   projectId: string;
   chartId: string;
   projectName: string;
@@ -19,7 +20,7 @@ export interface CurrentlyStitchingProject {
 
 // ─── Start Next ────────────────────────────────────────────────────────────
 
-export interface StartNextProject {
+export interface StartNextProject extends OptionalFocalPoint {
   projectId: string;
   chartId: string;
   projectName: string;
@@ -33,7 +34,7 @@ export interface StartNextProject {
 
 // ─── Buried Treasures ──────────────────────────────────────────────────────
 
-export interface BuriedTreasure {
+export interface BuriedTreasure extends OptionalFocalPoint {
   chartId: string;
   projectId: string | null;
   chartName: string;
@@ -46,7 +47,7 @@ export interface BuriedTreasure {
 
 // ─── Spotlight ─────────────────────────────────────────────────────────────
 
-export interface SpotlightProject {
+export interface SpotlightProject extends OptionalFocalPoint {
   projectId: string;
   chartId: string;
   projectName: string;
@@ -150,7 +151,7 @@ export interface ProjectDashboardData {
 
 // ─── Shopping Cart Types ───────────────────────────────────────────────────
 
-export interface ShoppingCartProject {
+export interface ShoppingCartProject extends OptionalFocalPoint {
   projectId: string;
   chartId: string;
   projectName: string;

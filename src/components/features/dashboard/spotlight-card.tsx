@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Sparkles, ArrowRight, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import type { SpotlightProject } from "@/types/dashboard";
+import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import { Button } from "@/components/ui/button";
 import { LinkButton } from "@/components/ui/link-button";
 import { CoverPlaceholder } from "@/components/features/gallery/cover-placeholder";
@@ -66,6 +67,7 @@ export function SpotlightCard({
               alt={project.projectName}
               loading="lazy"
               className="h-full w-full object-cover"
+              style={getObjectPositionStyle(project.focalPointX, project.focalPointY)}
             />
           ) : (
             <CoverPlaceholder status={project.status} />

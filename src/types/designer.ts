@@ -1,4 +1,5 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
+import type { OptionalFocalPoint } from "@/types/focal-point";
 
 export type DesignerWithStats = {
   id: string;
@@ -8,7 +9,7 @@ export type DesignerWithStats = {
   chartCount: number;
 };
 
-export type DesignerChart = {
+export type DesignerChart = OptionalFocalPoint & {
   id: string;
   name: string;
   coverThumbnailUrl: string | null;

@@ -24,6 +24,8 @@ function makeProject(overrides?: Partial<ShoppingCartProject>): ShoppingCartProj
     projectName: "Test Project",
     designerName: "Test Designer",
     coverThumbnailUrl: null,
+    focalPointX: null,
+    focalPointY: null,
     status: "IN_PROGRESS",
     threadCount: 5,
     beadCount: 0,

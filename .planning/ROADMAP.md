@@ -67,7 +67,7 @@ Full details: `milestones/v1.3-ROADMAP.md`
 
 - [x] **Phase 15: Chart File Management** - Multiple digital working copies per chart with add/remove lifecycle -- completed 2026-05-17
 - [x] **Phase 16: Input & Dashboard Fixes** - SearchToAdd keystroke bug fix and Spotlight section sizing corrections (completed 2026-05-17)
-- [ ] **Phase 17: Image Focal Point** - Click-to-set anchor point for cover images across all display contexts
+- [x] **Phase 17: Image Focal Point** - Click-to-set anchor point for cover images across all display contexts (completed 2026-05-17)
 
 ## Phase Details
 
@@ -111,7 +111,11 @@ Plans:
   2. The focal point is stored and persisted across page loads
   3. Gallery cards display cover images cropped to the saved focal point
   4. Dashboard cards, hero banners, and project detail all respect the same focal point
-**Plans**: 0 (not yet planned)
+**Plans**: 3 plans
+Plans:
+- [x] 17-01-PLAN.md — Schema, server action, utility, and display context types
+- [x] 17-02-PLAN.md — Focal point propagation to all object-cover display contexts
+- [x] 17-03-PLAN.md — Focal point editor UI with click-to-set, crop preview, and persistence
 **UI hint**: yes
 
 ## Execution Order
@@ -143,4 +147,4 @@ Plans:
 | 14. Edit Mode & Cleanup | v1.3 | 3/3 | Complete | 2026-05-16 |
 | 15. Chart File Management | v1.4 | 4/4 | Complete | 2026-05-17 |
 | 16. Input & Dashboard Fixes | v1.4 | 2/2 | Complete   | 2026-05-17 |
-| 17. Image Focal Point | v1.4 | 0/? | Not started | - |
+| 17. Image Focal Point | v1.4 | 3/3 | Complete   | 2026-05-17 |

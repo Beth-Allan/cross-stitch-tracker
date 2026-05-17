@@ -2,10 +2,14 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { FocalPointEditor } from "./focal-point-editor";
 
 interface HeroCoverBannerProps {
   imageUrl: string | null;
   chartName: string;
+  chartId: string;
+  focalPointX: number | null;
+  focalPointY: number | null;
 }
 
 /**
@@ -14,7 +18,13 @@ interface HeroCoverBannerProps {
  * over a blurred background fill for visual weight.
  * Returns null when no image (per D-02: compact metadata-forward layout).
  */
-export function HeroCoverBanner({ imageUrl, chartName }: HeroCoverBannerProps) {
+export function HeroCoverBanner({
+  imageUrl,
+  chartName,
+  chartId,
+  focalPointX,
+  focalPointY,
+}: HeroCoverBannerProps) {
   const [imgError, setImgError] = useState(false);
 
   // D-02: Skip banner entirely when no cover image
@@ -41,6 +51,14 @@ export function HeroCoverBanner({ imageUrl, chartName }: HeroCoverBannerProps) {
         className="relative mx-auto max-h-64 w-full object-contain max-[767px]:max-h-40 md:max-h-48"
         onError={() => setImgError(true)}
         unoptimized
+      />
+      {/* Focal point editor overlay — trigger button + edit mode UI */}
+      <FocalPointEditor
+        chartId={chartId}
+        initialFocalPoint={
+          focalPointX != null && focalPointY != null ? { x: focalPointX, y: focalPointY } : null
+        }
+        imageUrl={imageUrl}
       />
     </div>
   );

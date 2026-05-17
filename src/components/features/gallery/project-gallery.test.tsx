@@ -63,6 +63,8 @@ function createMockGalleryChartData(overrides?: Partial<GalleryChartData>): Gall
     designerId: "d1",
     coverImageUrl: null,
     coverThumbnailUrl: null,
+    focalPointX: null,
+    focalPointY: null,
     stitchCount: 10000,
     stitchCountApproximate: false,
     stitchesWide: 100,

@@ -79,6 +79,8 @@ function createMockSpotlight(overrides?: Partial<SpotlightProject>): SpotlightPr
     designerName: "Long Dog Samplers",
     coverThumbnailUrl: null,
     coverImageUrl: null,
+    focalPointX: null,
+    focalPointY: null,
     status: "IN_PROGRESS",
     genres: ["Animals", "Sampler"],
     totalStitches: 34000,

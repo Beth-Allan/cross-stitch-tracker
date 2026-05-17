@@ -41,6 +41,8 @@ function createMockProject(
     projectName: "Enchanted Forest Sampler",
     designerName: "Heaven and Earth Designs",
     coverThumbnailUrl: null,
+    focalPointX: null,
+    focalPointY: null,
     status: "IN_PROGRESS",
     stitchesCompleted: 15000,
     totalStitches: 45200,

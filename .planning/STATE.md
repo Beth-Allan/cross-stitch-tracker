@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Fixes & Polish
-status: "Phase 16 shipped — PR #34"
-stopped_at: Phase 16 context gathered
-last_updated: "2026-05-17T04:16:57.309Z"
+status: "Phase 17 shipped — PR #35"
+stopped_at: Phase 17 UI-SPEC approved
+last_updated: "2026-05-17T16:14:58.753Z"
 last_activity: 2026-05-17
 progress:
   total_phases: 3
-  completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
+  completed_phases: 3
+  total_plans: 9
+  completed_plans: 9
   percent: 100
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-16)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 16 — input-dashboard-fixes
+**Current focus:** Phase 17 — image-focal-point
 
 ## Current Position
 
-Phase: 16 (input-dashboard-fixes) — EXECUTING
-Plan: 1 of 2
-Status: Phase 16 shipped — PR #34
+Phase: 17 (image-focal-point) — EXECUTING
+Plan: 1 of 3
+Status: Phase 17 shipped — PR #35
 Last activity: 2026-05-17
 
 ```
@@ -120,7 +120,7 @@ Items acknowledged and deferred at v1.3 milestone close on 2026-05-16:
 
 ## Session Continuity
 
-Last session: 2026-05-17T03:10:02.990Z
-Stopped at: Phase 16 context gathered
+Last session: 2026-05-17T04:50:36.254Z
+Stopped at: Phase 17 UI-SPEC approved
 Resume action: `/gsd-plan-phase 17`
-Resume file: .planning/ROADMAP.md
+Resume file: .planning/phases/17-image-focal-point/17-UI-SPEC.md

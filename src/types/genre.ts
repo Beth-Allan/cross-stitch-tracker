@@ -1,4 +1,5 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
+import type { OptionalFocalPoint } from "@/types/focal-point";
 
 export type GenreWithStats = {
   id: string;
@@ -6,7 +7,7 @@ export type GenreWithStats = {
   chartCount: number;
 };
 
-export type GenreChart = {
+export type GenreChart = OptionalFocalPoint & {
   id: string;
   name: string;
   coverThumbnailUrl: string | null;

@@ -8,6 +8,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { CoverPlaceholder } from "./cover-placeholder";
 import { KittingDots } from "./kitting-dots";
+import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import { getCelebrationClasses } from "./gallery-utils";
 import { SIZE_TOOLTIP_TEXT } from "./gallery-format";
 import { formatNumber, formatDate } from "./gallery-format";
@@ -174,6 +175,7 @@ export function GalleryCard({ card }: GalleryCardProps) {
             alt={card.name}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
+            style={getObjectPositionStyle(card.focalPointX, card.focalPointY)}
             onError={() => setImgFailed(true)}
             unoptimized
           />

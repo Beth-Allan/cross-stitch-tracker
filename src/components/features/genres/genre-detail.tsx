@@ -19,6 +19,7 @@ import { SizeBadge } from "@/components/features/charts/size-badge";
 import { GenreFormModal } from "./genre-form-modal";
 import { DeleteConfirmationDialog } from "@/components/features/designers/delete-confirmation-dialog";
 import { deleteGenre } from "@/lib/actions/genre-actions";
+import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import { getEffectiveStitchCount } from "@/lib/utils/size-category";
 import type { GenreDetail as GenreDetailType, GenreChart } from "@/types/genre";
 
@@ -257,6 +258,7 @@ function ChartRow({ chart }: { chart: GenreChart }) {
             src={chart.coverThumbnailUrl}
             alt={chart.name}
             className="h-full w-full object-cover"
+            style={getObjectPositionStyle(chart.focalPointX, chart.focalPointY)}
           />
         </div>
       ) : (
