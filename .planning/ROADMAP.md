@@ -96,7 +96,10 @@ Plans:
   1. User can type "310" (or any multi-digit code) quickly in SearchToAdd without keystrokes being dropped
   2. Spotlight "Rediscover This One" image displays at a constrained, proportional size (not dominating the section)
   3. "Check it Out" and "Shuffle Spotlight" buttons render at matching, visually balanced sizes
-**Plans**: 0 (not yet planned)
+**Plans**: 2 plans
+Plans:
+- [ ] 16-01-PLAN.md — SearchToAdd keystroke bug fix + dead code deletion
+- [ ] 16-02-PLAN.md — Spotlight grid sizing + button styling
 **UI hint**: yes
 
 ### Phase 17: Image Focal Point
@@ -139,5 +142,5 @@ Plans:
 | 13. Supply Takeover | v1.3 | 5/5 | Complete | 2026-05-16 |
 | 14. Edit Mode & Cleanup | v1.3 | 3/3 | Complete | 2026-05-16 |
 | 15. Chart File Management | v1.4 | 4/4 | Complete | 2026-05-17 |
-| 16. Input & Dashboard Fixes | v1.4 | 0/? | Not started | - |
+| 16. Input & Dashboard Fixes | v1.4 | 0/2 | Not started | - |
 | 17. Image Focal Point | v1.4 | 0/? | Not started | - |
