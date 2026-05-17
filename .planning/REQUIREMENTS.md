@@ -87,40 +87,40 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| STAT-01 | — | Pending |
-| STAT-02 | — | Pending |
-| STAT-03 | — | Pending |
-| STAT-04 | — | Pending |
-| HERO-01 | — | Pending |
-| HERO-02 | — | Pending |
-| HERO-03 | — | Pending |
-| HERO-04 | — | Pending |
-| HERO-05 | — | Pending |
-| HERO-06 | — | Pending |
-| VIZ-01 | — | Pending |
-| VIZ-02 | — | Pending |
-| VIZ-03 | — | Pending |
-| VIZ-04 | — | Pending |
-| VIZ-05 | — | Pending |
-| VIZ-06 | — | Pending |
-| VIZ-07 | — | Pending |
-| REC-01 | — | Pending |
-| REC-02 | — | Pending |
-| REC-03 | — | Pending |
-| REC-04 | — | Pending |
-| REC-05 | — | Pending |
-| INS-01 | — | Pending |
-| INS-02 | — | Pending |
-| INS-03 | — | Pending |
-| INS-04 | — | Pending |
-| INS-05 | — | Pending |
-| INS-06 | — | Pending |
+| STAT-01 | Phase 18 | Pending |
+| STAT-02 | Phase 18 | Pending |
+| STAT-03 | Phase 18 | Pending |
+| STAT-04 | Phase 18 | Pending |
+| HERO-01 | Phase 19 | Pending |
+| HERO-02 | Phase 19 | Pending |
+| HERO-03 | Phase 19 | Pending |
+| HERO-04 | Phase 19 | Pending |
+| HERO-05 | Phase 19 | Pending |
+| HERO-06 | Phase 19 | Pending |
+| VIZ-01 | Phase 20 | Pending |
+| VIZ-02 | Phase 20 | Pending |
+| VIZ-03 | Phase 20 | Pending |
+| VIZ-04 | Phase 20 | Pending |
+| VIZ-05 | Phase 20 | Pending |
+| VIZ-06 | Phase 20 | Pending |
+| VIZ-07 | Phase 20 | Pending |
+| REC-01 | Phase 21 | Pending |
+| REC-02 | Phase 21 | Pending |
+| REC-03 | Phase 21 | Pending |
+| REC-04 | Phase 21 | Pending |
+| REC-05 | Phase 21 | Pending |
+| INS-01 | Phase 21 | Pending |
+| INS-02 | Phase 21 | Pending |
+| INS-03 | Phase 21 | Pending |
+| INS-04 | Phase 20 | Pending |
+| INS-05 | Phase 21 | Pending |
+| INS-06 | Phase 19 | Pending |
 
 **Coverage:**
 - v1.5 requirements: 28 total
-- Mapped to phases: 0
-- Unmapped: 28 ⚠️ (awaiting roadmap)
+- Mapped to phases: 28
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-17*
-*Last updated: 2026-05-17 after initial definition*
+*Last updated: 2026-05-17 after roadmap creation*
