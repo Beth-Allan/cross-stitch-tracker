@@ -8,6 +8,8 @@ export interface CurrentlyStitchingProject {
   projectName: string;
   designerName: string | null;
   coverThumbnailUrl: string | null;
+  focalPointX: number | null;
+  focalPointY: number | null;
   status: ProjectStatus;
   stitchesCompleted: number;
   totalStitches: number;
@@ -26,6 +28,8 @@ export interface StartNextProject {
   designerName: string | null;
   coverThumbnailUrl: string | null;
   coverImageUrl: string | null;
+  focalPointX: number | null;
+  focalPointY: number | null;
   status: ProjectStatus;
   totalStitches: number;
   genres: string[];
@@ -39,6 +43,8 @@ export interface BuriedTreasure {
   chartName: string;
   designerName: string | null;
   coverThumbnailUrl: string | null;
+  focalPointX: number | null;
+  focalPointY: number | null;
   dateAdded: Date;
   daysInLibrary: number;
   genres: string[];
@@ -53,6 +59,8 @@ export interface SpotlightProject {
   designerName: string | null;
   coverThumbnailUrl: string | null;
   coverImageUrl: string | null;
+  focalPointX: number | null;
+  focalPointY: number | null;
   status: ProjectStatus;
   genres: string[];
   totalStitches: number;
@@ -156,6 +164,8 @@ export interface ShoppingCartProject {
   projectName: string;
   designerName: string | null;
   coverThumbnailUrl: string | null;
+  focalPointX: number | null;
+  focalPointY: number | null;
   status: ProjectStatus;
   threadCount: number;
   beadCount: number;

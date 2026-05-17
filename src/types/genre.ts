@@ -10,6 +10,8 @@ export type GenreChart = {
   id: string;
   name: string;
   coverThumbnailUrl: string | null;
+  focalPointX: number | null;
+  focalPointY: number | null;
   stitchCount: number;
   stitchesWide: number;
   stitchesHigh: number;

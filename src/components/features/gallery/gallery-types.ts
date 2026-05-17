@@ -43,6 +43,8 @@ export interface GalleryCardData {
   designerName: string;
   coverImageUrl: string | null;
   coverThumbnailUrl: string | null;
+  focalPointX: number | null;
+  focalPointY: number | null;
   status: ProjectStatus;
   statusGroup: StatusGroup;
   genres: string[];
