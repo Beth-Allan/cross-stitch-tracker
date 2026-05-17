@@ -73,7 +73,7 @@ export function ProjectDetailPage({
         }
         suppliesContent={
           project && supplies ? (
-            <SuppliesTab chartId={chart.id} project={project} supplies={supplies} />
+            <SuppliesTab project={project} supplies={supplies} />
           ) : (
             <div className="text-muted-foreground py-12 text-center">
               <p className="font-heading text-lg font-semibold">No project linked</p>

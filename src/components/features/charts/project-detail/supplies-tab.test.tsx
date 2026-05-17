@@ -151,7 +151,6 @@ describe("SuppliesTab", () => {
     it("renders the unified supply table when supplies are provided", () => {
       render(
         <SuppliesTab
-          chartId="chart-1"
           project={defaultProject}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
         />,
@@ -166,7 +165,6 @@ describe("SuppliesTab", () => {
     it("renders empty state when no supplies exist", () => {
       render(
         <SuppliesTab
-          chartId="chart-1"
           project={defaultProject}
           supplies={{ threads: [], beads: [], specialty: [] }}
         />,
@@ -183,7 +181,6 @@ describe("SuppliesTab", () => {
       };
       render(
         <SuppliesTab
-          chartId="chart-1"
           project={projectWithFabric}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
         />,
@@ -195,7 +192,6 @@ describe("SuppliesTab", () => {
     it("uses default fabricCount=14 when project.fabric is null", () => {
       render(
         <SuppliesTab
-          chartId="chart-1"
           project={{ ...defaultProject, fabric: null }}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
         />,
@@ -213,7 +209,6 @@ describe("SuppliesTab", () => {
       };
       render(
         <SuppliesTab
-          chartId="chart-1"
           project={customProject}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
         />,
@@ -227,7 +222,6 @@ describe("SuppliesTab", () => {
     it("transforms ProjectThreadWithThread to SupplyRow (colorCode -> code)", () => {
       render(
         <SuppliesTab
-          chartId="chart-1"
           project={defaultProject}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
         />,
@@ -241,7 +235,6 @@ describe("SuppliesTab", () => {
     it("transforms ProjectBeadWithBead to SupplyRow (productCode -> code)", () => {
       render(
         <SuppliesTab
-          chartId="chart-1"
           project={defaultProject}
           supplies={{ threads: [], beads: [makeBead()], specialty: [] }}
         />,
@@ -255,7 +248,6 @@ describe("SuppliesTab", () => {
     it("transforms ProjectSpecialtyWithItem to SupplyRow (productCode -> code, description appended)", () => {
       render(
         <SuppliesTab
-          chartId="chart-1"
           project={defaultProject}
           supplies={{ threads: [], beads: [], specialty: [makeSpecialty()] }}
         />,
@@ -269,7 +261,6 @@ describe("SuppliesTab", () => {
     it('default sort is "added" (Added button has aria-pressed=true)', () => {
       render(
         <SuppliesTab
-          chartId="chart-1"
           project={defaultProject}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
         />,
@@ -309,11 +300,7 @@ describe("SuppliesTab", () => {
         }),
       ];
       render(
-        <SuppliesTab
-          chartId="chart-1"
-          project={defaultProject}
-          supplies={{ threads, beads: [], specialty: [] }}
-        />,
+        <SuppliesTab project={defaultProject} supplies={{ threads, beads: [], specialty: [] }} />,
       );
 
       // In "added" order, "Zzz" appears before "111"
@@ -359,11 +346,7 @@ describe("SuppliesTab", () => {
         }),
       ];
       render(
-        <SuppliesTab
-          chartId="chart-1"
-          project={defaultProject}
-          supplies={{ threads, beads: [], specialty: [] }}
-        />,
+        <SuppliesTab project={defaultProject} supplies={{ threads, beads: [], specialty: [] }} />,
       );
 
       // Sort A-Z
@@ -380,7 +363,6 @@ describe("SuppliesTab", () => {
     it("sort toggle buttons have aria-pressed attributes", () => {
       render(
         <SuppliesTab
-          chartId="chart-1"
           project={defaultProject}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
         />,
@@ -398,7 +380,6 @@ describe("SuppliesTab", () => {
       // or adapter creation fails, rendering would throw
       render(
         <SuppliesTab
-          chartId="chart-1"
           project={defaultProject}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
         />,
@@ -412,7 +393,6 @@ describe("SuppliesTab", () => {
     it("does NOT render CalculatorSettingsBar (per D-02/D-03)", () => {
       render(
         <SuppliesTab
-          chartId="chart-1"
           project={defaultProject}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
         />,

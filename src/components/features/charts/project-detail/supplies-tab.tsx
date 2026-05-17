@@ -15,7 +15,6 @@ import type {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface SuppliesTabProps {
-  chartId: string;
   project: NonNullable<ProjectDetailProps["chart"]["project"]>;
   supplies: NonNullable<ProjectDetailProps["supplies"]>;
 }
