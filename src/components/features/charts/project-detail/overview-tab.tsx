@@ -16,6 +16,7 @@ import { getEffectiveStitchCount } from "@/lib/utils/size-category";
 import { formatNumber, formatDate } from "@/components/features/gallery/gallery-format";
 import { SECTION_ORDER, type OverviewSection } from "./types";
 import type { ProjectDetailProps } from "./types";
+import { ChartFileList } from "./chart-file-list";
 
 /** Format a date-only value (YYYY-MM-DD stored as midnight UTC) without timezone shift. */
 function formatDateOnly(date: Date | null | undefined): string {
@@ -109,8 +110,12 @@ export function OverviewTab({ chart, supplies, sessionCount }: OverviewTabProps)
           />
           <KittingItem
             label="Digital Copy"
-            ready={!!chart.digitalWorkingCopyUrl}
-            detail={chart.digitalWorkingCopyUrl ? "Ready" : "Not uploaded"}
+            ready={chart.files.length > 0}
+            detail={
+              chart.files.length > 0
+                ? `${chart.files.length} file${chart.files.length !== 1 ? "s" : ""} attached`
+                : "Not uploaded"
+            }
           />
           <KittingItem
             label="Supplies"
@@ -217,8 +222,11 @@ export function OverviewTab({ chart, supplies, sessionCount }: OverviewTabProps)
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      {sectionOrder.map((section) => sectionRenderers[section]())}
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {sectionOrder.map((section) => sectionRenderers[section]())}
+      </div>
+      <ChartFileList chartId={chart.id} files={chart.files} />
     </div>
   );
 }

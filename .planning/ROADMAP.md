@@ -2,7 +2,7 @@
 
 ## Overview
 
-Cross-stitch project management app replacing Notion. v1.3 shipped 2026-05-16 with keyboard-driven supply table, merged creation form, supply takeover mode, edit mode, and full deprecated component cleanup. Iterating based on real usage.
+Cross-stitch project management app replacing Notion. v1.3 shipped 2026-05-16 with keyboard-driven supply table, merged creation form, supply takeover mode, edit mode, and full deprecated component cleanup. v1.4 addresses targeted fixes and polish: chart file management, input bug, dashboard sizing, and image focal point control.
 
 Design components from `product-plan/sections/` are imported and adapted as each phase's UI is built. See `.claude/rules/ui-design-reference.md` for the mapping.
 
@@ -12,7 +12,7 @@ Design components from `product-plan/sections/` are imported and adapted as each
 - ✅ **v1.1 Browse & Organize** -- Phases 5-7 (shipped 2026-04-16)
 - ✅ **v1.2 Track & Measure** -- Phases 8-9.1 (shipped 2026-04-20)
 - ✅ **v1.3 Form & Supply Overhaul** -- Phases 10-14 (shipped 2026-05-16)
-- 📋 **v1.4 Motivation & Planning** -- Phases TBD (planned)
+- 📋 **v1.4 Fixes & Polish** -- Phases 15-17 (in progress)
 
 ## Phases
 
@@ -63,10 +63,53 @@ Full details: `milestones/v1.3-ROADMAP.md`
 
 </details>
 
-### 📋 v1.4 Motivation & Planning (Planned)
+### v1.4 Fixes & Polish
 
-- [ ] **Phase 15: Advanced Stats** - Year in Review, monthly charts, stitching calendar
-- [ ] **Phase 16: Goals & Scheduling** - Goal setting, rotation management, achievements
+- [x] **Phase 15: Chart File Management** - Multiple digital working copies per chart with add/remove lifecycle -- completed 2026-05-17
+- [ ] **Phase 16: Input & Dashboard Fixes** - SearchToAdd keystroke bug fix and Spotlight section sizing corrections
+- [ ] **Phase 17: Image Focal Point** - Click-to-set anchor point for cover images across all display contexts
+
+## Phase Details
+
+### Phase 15: Chart File Management
+**Goal**: Users can manage multiple digital working copy files per chart instead of a single URL
+**Depends on**: Nothing (independent feature)
+**Requirements**: FILE-01, FILE-02, FILE-03
+**Success Criteria** (what must be TRUE):
+  1. User can attach multiple working copy files to a chart (not limited to one)
+  2. User can add a new working copy file without affecting existing files
+  3. User can remove a specific working copy file without affecting others
+  4. User can see all attached working copies listed on the project detail page with filenames and download links
+**Plans**: 4/4 complete
+Plans:
+- [x] 15-01-PLAN.md — Schema, server actions, validation constants
+- [x] 15-02-PLAN.md — Multi-file upload component and creation form integration
+- [x] 15-03-PLAN.md — Project detail file list UI with add/remove lifecycle
+- [x] 15-04-PLAN.md — Data migration and codebase cleanup
+**UI hint**: yes
+
+### Phase 16: Input & Dashboard Fixes
+**Goal**: SearchToAdd input works reliably and the Dashboard Spotlight section displays at correct proportions
+**Depends on**: Nothing (independent fixes)
+**Requirements**: INPUT-01, DASH-01, DASH-02
+**Success Criteria** (what must be TRUE):
+  1. User can type "310" (or any multi-digit code) quickly in SearchToAdd without keystrokes being dropped
+  2. Spotlight "Rediscover This One" image displays at a constrained, proportional size (not dominating the section)
+  3. "Check it Out" and "Shuffle Spotlight" buttons render at matching, visually balanced sizes
+**Plans**: 0 (not yet planned)
+**UI hint**: yes
+
+### Phase 17: Image Focal Point
+**Goal**: Users can control which area of a cover image stays visible when the image is cropped in different display contexts
+**Depends on**: Nothing (independent feature)
+**Requirements**: IMG-01, IMG-02
+**Success Criteria** (what must be TRUE):
+  1. User can click/tap on a cover image to set its focal point (anchor position)
+  2. The focal point is stored and persisted across page loads
+  3. Gallery cards display cover images cropped to the saved focal point
+  4. Dashboard cards, hero banners, and project detail all respect the same focal point
+**Plans**: 0 (not yet planned)
+**UI hint**: yes
 
 ## Execution Order
 
@@ -74,7 +117,7 @@ Full details: `milestones/v1.3-ROADMAP.md`
 - v1.1: 5 -> 6 -> 7
 - v1.2: 8 -> 9 -> 9.1
 - v1.3: 10 -> 11 -> 12 -> 13 -> 14
-- v1.4: TBD
+- v1.4: 15 -> 16 -> 17
 
 ## Progress
 
@@ -95,3 +138,6 @@ Full details: `milestones/v1.3-ROADMAP.md`
 | 12. Merged Form | v1.3 | 3/3 | Complete | 2026-05-11 |
 | 13. Supply Takeover | v1.3 | 5/5 | Complete | 2026-05-16 |
 | 14. Edit Mode & Cleanup | v1.3 | 3/3 | Complete | 2026-05-16 |
+| 15. Chart File Management | v1.4 | 4/4 | Complete | 2026-05-17 |
+| 16. Input & Dashboard Fixes | v1.4 | 0/? | Not started | - |
+| 17. Image Focal Point | v1.4 | 0/? | Not started | - |

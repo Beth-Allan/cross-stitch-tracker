@@ -8,6 +8,28 @@ export const ALLOWED_FILE_TYPES = [
   "image/webp",
   "application/pdf",
   "application/octet-stream", // .saga, .oxs, .xsd (cross-stitch software formats)
+  "text/css", // .css CrossStitch pattern files report as text/css in browsers
+] as const;
+
+export const ALLOWED_CHART_FILE_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "application/pdf",
+  "application/octet-stream", // .pat, .xsd, .saga (binary pattern formats)
+  "text/css", // .css CrossStitch files report as text/css in browsers
+] as const;
+
+export const ALLOWED_CHART_FILE_EXTENSIONS = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".webp",
+  ".pdf",
+  ".pat",
+  ".xsd",
+  ".css",
+  ".saga",
 ] as const;
 
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB

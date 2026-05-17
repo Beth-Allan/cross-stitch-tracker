@@ -283,24 +283,6 @@ describe("upload-actions failure modes", () => {
       expect(result.success).toBe(true);
     });
 
-    it("does NOT trigger processAndStoreImage for digitalWorkingCopyUrl", async () => {
-      const { confirmUpload } = await import("./upload-actions");
-      mockPrisma.chart.findUnique.mockResolvedValueOnce({
-        id: "c1",
-        project: { userId: "user-1" },
-      });
-      mockPrisma.chart.update.mockResolvedValue({});
-
-      const result = await confirmUpload({
-        chartId: "c1",
-        field: "digitalWorkingCopyUrl",
-        key: "files/c1/working-copy.pdf",
-      });
-
-      expect(result.success).toBe(true);
-      expect(mockSend).not.toHaveBeenCalled();
-    });
-
     it("does NOT trigger processAndStoreImage for coverThumbnailUrl", async () => {
       const { confirmUpload } = await import("./upload-actions");
       mockPrisma.chart.findUnique.mockResolvedValueOnce({

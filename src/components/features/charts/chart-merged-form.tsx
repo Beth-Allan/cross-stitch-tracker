@@ -22,7 +22,7 @@ import { saveDraftV2, loadDraftV2, clearDraft } from "./use-draft-persistence";
 import { FormField } from "./form-primitives/form-field";
 import { SearchableSelect } from "./form-primitives/searchable-select";
 import { CoverImageUpload } from "./form-primitives/cover-image-upload";
-import { FileUpload } from "./form-primitives/file-upload";
+import { ChartFileUpload } from "./form-primitives/chart-file-upload";
 import { GenrePicker } from "./form-primitives/genre-picker";
 import { StitchCountFields } from "./form-primitives/stitch-count-fields";
 import { StyledCheckbox } from "./form-primitives/styled-checkbox";
@@ -285,7 +285,12 @@ export function ChartMergedForm({
       designerId: null,
       coverImageUrl: null,
       coverThumbnailUrl: null,
-      digitalFileUrl: null,
+      uploadedFiles: [] as Array<{
+        key: string;
+        filename: string;
+        mimeType: string;
+        fileSize: number;
+      }>,
       stitchesWide: 0,
       stitchesHigh: 0,
       stitchCount: 0,
@@ -596,10 +601,10 @@ export function ChartMergedForm({
               </FormField>
             </div>
 
-            <FormField label="Digital Working Copy" htmlFor="digital-file">
-              <FileUpload
-                onUploadComplete={(key) => form.setField("digitalFileUrl", key)}
-                onRemove={() => form.setField("digitalFileUrl", null)}
+            <FormField label="Digital Working Copies" htmlFor="digital-files">
+              <ChartFileUpload
+                uploadedFiles={form.values.uploadedFiles}
+                onFilesChange={(files) => form.setField("uploadedFiles", files)}
               />
             </FormField>
 

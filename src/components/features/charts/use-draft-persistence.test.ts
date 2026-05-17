@@ -12,7 +12,7 @@ function createDefaultValues(): ChartFormValues {
     designerId: null,
     coverImageUrl: null,
     coverThumbnailUrl: null,
-    digitalFileUrl: null,
+    uploadedFiles: [],
     stitchesWide: 0,
     stitchesHigh: 0,
     stitchCount: 0,

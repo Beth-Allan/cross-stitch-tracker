@@ -11,7 +11,7 @@ A stitcher can manage their entire chart collection and supplies faster and more
 ## Current State
 
 **Last shipped:** v1.3 Form & Supply Overhaul (2026-05-16)
-**Next milestone:** v1.4 Motivation & Planning (not yet started)
+**Next milestone:** v1.4 Fixes & Polish (starting)
 
 The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project selection, and image optimization. 1,535 tests, ~90k LOC TypeScript.
 
@@ -64,7 +64,14 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - ✓ Full-page edit mode using merged form layout, accessible from project detail and gallery kebab menu — v1.3
 - ✓ Deprecated component cleanup (21 files, 3,700+ lines removed) — v1.3
 
-### Active — Milestone 5: Motivation & Planning (v1.4)
+### Active — Milestone 5: Fixes & Polish (v1.4)
+
+- [x] Multiple digital working copies per chart (ChartFile table replacing single URL field)
+- [ ] SearchToAdd keystroke dropping fix ("310" → "30" bug)
+- [ ] Dashboard Spotlight section sizing (image too large + mismatched button sizes)
+- [ ] Image focal point control (click-to-set anchor for cover images across all display contexts)
+
+### Deferred (no phase assigned)
 
 - [ ] Comprehensive statistics engine (daily/weekly/monthly/yearly metrics)
 - [ ] Monthly stitch bar charts and stitching calendar view
@@ -74,9 +81,6 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - [ ] Scheduling plans (project start dates, recurring stitching days, seasonal focus)
 - [ ] Multi-style rotation management (Focus+Rotate, Milestone, Daily, Round Robin, Random, Seasonal)
 - [ ] Achievement trophy case with auto-tracked milestones, streaks, and records
-
-### Deferred (no phase assigned)
-
 - [ ] Reusable advanced filter bar with configurable dimensions and dismissible chips
 - [ ] Series/collection management with completion tracking
 - [ ] Auto-calculated kitted status and kitting progress indicators (8 conditions)
@@ -187,4 +191,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-16 after v1.3 milestone archived*
+*Last updated: 2026-05-16 after v1.4 milestone started*

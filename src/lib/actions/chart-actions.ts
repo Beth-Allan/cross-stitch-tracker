@@ -39,7 +39,6 @@ async function createChartAndProject(
       designerId: chart.designerId,
       coverImageUrl: chart.coverImageUrl,
       coverThumbnailUrl: chart.coverThumbnailUrl,
-      digitalWorkingCopyUrl: chart.digitalFileUrl,
       stitchCount: effectiveStitchCount,
       stitchCountApproximate: effectiveApproximate,
       stitchesWide: chart.stitchesWide,
@@ -70,6 +69,19 @@ async function createChartAndProject(
     },
     include: { project: true, designer: true, genres: true },
   });
+
+  // Create ChartFile records for uploaded files
+  if (chart.fileKeys && chart.fileKeys.length > 0) {
+    await tx.chartFile.createMany({
+      data: chart.fileKeys.map((f) => ({
+        chartId: result.id,
+        url: f.key,
+        filename: f.filename,
+        mimeType: f.mimeType,
+        fileSize: f.fileSize,
+      })),
+    });
+  }
 
   // Link fabric to the new project if provided
   if (project.fabricId && result.project) {
@@ -245,7 +257,6 @@ export async function updateChart(chartId: string, formData: unknown) {
           designerId: chart.designerId,
           coverImageUrl: chart.coverImageUrl,
           coverThumbnailUrl: chart.coverThumbnailUrl,
-          digitalWorkingCopyUrl: chart.digitalFileUrl,
           stitchCount: effectiveStitchCount,
           stitchCountApproximate: effectiveApproximate,
           stitchesWide: chart.stitchesWide,
@@ -404,6 +415,19 @@ export async function getChart(chartId: string) {
       },
       designer: true,
       genres: true,
+      files: {
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          url: true,
+          filename: true,
+          mimeType: true,
+          fileSize: true,
+          label: true,
+          notes: true,
+          createdAt: true,
+        },
+      },
     },
   });
   // Only return charts owned by the current user
