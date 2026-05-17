@@ -80,7 +80,12 @@ Full details: `milestones/v1.3-ROADMAP.md`
   2. User can add a new working copy file without affecting existing files
   3. User can remove a specific working copy file without affecting others
   4. User can see all attached working copies listed on the project detail page with filenames and download links
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 15-01-PLAN.md — Schema, server actions, validation constants
+- [ ] 15-02-PLAN.md — Multi-file upload component and creation form integration
+- [ ] 15-03-PLAN.md — Project detail file list UI with add/remove lifecycle
+- [ ] 15-04-PLAN.md — Data migration and codebase cleanup
 **UI hint**: yes
 
 ### Phase 16: Input & Dashboard Fixes
@@ -91,7 +96,12 @@ Full details: `milestones/v1.3-ROADMAP.md`
   1. User can type "310" (or any multi-digit code) quickly in SearchToAdd without keystrokes being dropped
   2. Spotlight "Rediscover This One" image displays at a constrained, proportional size (not dominating the section)
   3. "Check it Out" and "Shuffle Spotlight" buttons render at matching, visually balanced sizes
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 15-01-PLAN.md — Schema, server actions, validation constants
+- [ ] 15-02-PLAN.md — Multi-file upload component and creation form integration
+- [ ] 15-03-PLAN.md — Project detail file list UI with add/remove lifecycle
+- [ ] 15-04-PLAN.md — Data migration and codebase cleanup
 **UI hint**: yes
 
 ### Phase 17: Image Focal Point
@@ -103,7 +113,12 @@ Full details: `milestones/v1.3-ROADMAP.md`
   2. The focal point is stored and persisted across page loads
   3. Gallery cards display cover images cropped to the saved focal point
   4. Dashboard cards, hero banners, and project detail all respect the same focal point
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 15-01-PLAN.md — Schema, server actions, validation constants
+- [ ] 15-02-PLAN.md — Multi-file upload component and creation form integration
+- [ ] 15-03-PLAN.md — Project detail file list UI with add/remove lifecycle
+- [ ] 15-04-PLAN.md — Data migration and codebase cleanup
 **UI hint**: yes
 
 ## Execution Order
@@ -133,6 +148,6 @@ Full details: `milestones/v1.3-ROADMAP.md`
 | 12. Merged Form | v1.3 | 3/3 | Complete | 2026-05-11 |
 | 13. Supply Takeover | v1.3 | 5/5 | Complete | 2026-05-16 |
 | 14. Edit Mode & Cleanup | v1.3 | 3/3 | Complete | 2026-05-16 |
-| 15. Chart File Management | v1.4 | 0/? | Not started | - |
+| 15. Chart File Management | v1.4 | 0/4 | Not started | - |
 | 16. Input & Dashboard Fixes | v1.4 | 0/? | Not started | - |
 | 17. Image Focal Point | v1.4 | 0/? | Not started | - |
