@@ -141,7 +141,6 @@ export function createMockChart(overrides?: Partial<Chart>): Chart {
     isFormalKit: false,
     isSAL: false,
     kitColorCount: null,
-    digitalWorkingCopyUrl: null,
     dateAdded: new Date(),
     notes: null,
     createdAt: new Date(),
@@ -175,6 +174,7 @@ export function createMockChartWithRelations(
       project === null ? null : createMockProjectWithRelations({ chartId: chart.id, ...project }),
     designer: designer === undefined || designer === null ? null : createMockDesigner(designer),
     genres: genres ?? [],
+    files: [],
   };
 }
 

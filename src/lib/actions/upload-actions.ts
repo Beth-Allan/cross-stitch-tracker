@@ -19,7 +19,7 @@ import {
   THUMBNAIL_QUALITY,
 } from "@/lib/validations/upload";
 
-const VALID_CHART_FIELDS = ["coverImageUrl", "coverThumbnailUrl", "digitalWorkingCopyUrl"] as const;
+const VALID_CHART_FIELDS = ["coverImageUrl", "coverThumbnailUrl"] as const;
 
 async function fetchImageBuffer(
   key: string,

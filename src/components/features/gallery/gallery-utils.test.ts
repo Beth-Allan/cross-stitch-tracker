@@ -169,7 +169,6 @@ describe("transformToGalleryCard", () => {
     isFormalKit: false,
     isSAL: false,
     kitColorCount: null,
-    digitalWorkingCopyUrl: null,
     dateAdded: new Date("2026-01-15"),
     notes: null,
     createdAt: new Date(),
