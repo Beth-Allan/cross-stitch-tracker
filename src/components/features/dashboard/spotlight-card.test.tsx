@@ -91,23 +91,53 @@ describe("SpotlightCard", () => {
     expect(screen.getByText("Shuffle Spotlight")).toBeInTheDocument();
   });
 
-  it("renders both buttons with matching padding", () => {
+  it("renders both buttons with matching padding and font-semibold", () => {
     render(<SpotlightCard project={createMockSpotlight()} imageUrl={null} />);
 
     const checkItOut = screen.getByText("Check It Out").closest("a");
     const shuffle = screen.getByText("Shuffle Spotlight").closest("button");
 
     expect(checkItOut?.className).toContain("px-5");
+    expect(checkItOut?.className).toContain("py-2.5");
+    expect(checkItOut?.className).toContain("font-semibold");
     expect(shuffle?.className).toContain("px-5");
+    expect(shuffle?.className).toContain("py-2.5");
+    expect(shuffle?.className).toContain("font-semibold");
   });
 
-  it("constrains image container height", () => {
+  it("renders both buttons with rounded-xl", () => {
+    render(<SpotlightCard project={createMockSpotlight()} imageUrl={null} />);
+
+    const checkItOut = screen.getByText("Check It Out").closest("a");
+    const shuffle = screen.getByText("Shuffle Spotlight").closest("button");
+
+    expect(checkItOut?.className).toContain("rounded-xl");
+    expect(shuffle?.className).toContain("rounded-xl");
+  });
+
+  it("constrains grid max-height to 300px", () => {
     const { container } = render(
       <SpotlightCard project={createMockSpotlight()} imageUrl="https://example.com/thumb.jpg" />,
     );
 
     const grid = container.querySelector(".grid");
-    expect(grid?.className).toContain("max-h-");
+    expect(grid?.className).toContain("max-h-[300px]");
+  });
+
+  it("uses fixed 320px image column on md breakpoint", () => {
+    const { container } = render(
+      <SpotlightCard project={createMockSpotlight()} imageUrl="https://example.com/thumb.jpg" />,
+    );
+
+    const grid = container.querySelector(".grid");
+    expect(grid?.className).toContain("md:grid-cols-[320px_1fr]");
+  });
+
+  it("does not contain hardcoded emerald classes on Check It Out button", () => {
+    render(<SpotlightCard project={createMockSpotlight()} imageUrl={null} />);
+
+    const checkItOut = screen.getByText("Check It Out").closest("a");
+    expect(checkItOut?.className).not.toContain("bg-emerald");
   });
 
   it("returns null when project is null", () => {
