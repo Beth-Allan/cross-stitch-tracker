@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { ArrowRight, Sparkles as SparklesIcon, X } from "lucide-react";
 import { SegmentedTypeToggle } from "./segmented-type-toggle";
@@ -51,6 +51,8 @@ export function SupplyTableAddRow({
     setCreateSearchText,
     handleCreateSupply,
     getFocusTarget,
+    highlightIndex,
+    moveHighlight,
   } = useSupplyTable(adapter, calcParams, existingSupplyIds);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -115,8 +117,26 @@ export function SupplyTableAddRow({
     }
   }
 
+  // Compute displayItems for keyboard navigation (same sorting as portal)
+  const displayItems = useMemo(() => {
+    const addable = searchResults.filter((item) => !existingSupplyIds.has(item.id));
+    const alreadyAdded = searchResults.filter((item) => existingSupplyIds.has(item.id));
+    return [...addable, ...alreadyAdded].slice(0, 8);
+  }, [searchResults, existingSupplyIds]);
+
   function handleSearchKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Escape") {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      moveHighlight(1, displayItems, existingSupplyIds);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      moveHighlight(-1, displayItems, existingSupplyIds);
+    } else if (e.key === "Enter" && highlightIndex >= 0 && displayItems[highlightIndex]) {
+      e.preventDefault();
+      if (!existingSupplyIds.has(displayItems[highlightIndex].id)) {
+        selectItem(displayItems[highlightIndex]);
+      }
+    } else if (e.key === "Escape") {
       e.preventDefault();
       handleEscape();
     }
@@ -180,6 +200,15 @@ export function SupplyTableAddRow({
                   placeholder="Search by code or name..."
                   className={inputClassName}
                   autoComplete="off"
+                  role="combobox"
+                  aria-expanded={isAutocompleteOpen}
+                  aria-controls="portal-autocomplete-listbox"
+                  aria-activedescendant={
+                    highlightIndex >= 0 && displayItems[highlightIndex]
+                      ? `portal-autocomplete-item-${displayItems[highlightIndex].id}`
+                      : undefined
+                  }
+                  aria-autocomplete="list"
                 />
               </div>
             </div>
@@ -190,7 +219,7 @@ export function SupplyTableAddRow({
             items={searchResults}
             existingIds={existingSupplyIds}
             searchText={searchText}
-            onSearchChange={setSearchText}
+            highlightIndex={highlightIndex}
             onSelect={selectItem}
             onCreateRequest={handleCreateRequest}
             onClose={() => setSearchText("")}
