@@ -4,7 +4,7 @@
 
 **Milestone:** v1.5 Statistics & Records
 **Last Updated:** 2026-05-17
-**Roadmap:** 6 milestones / 21 phases — v1.0 through v1.4 shipped, v1.5 Phase 18 planned
+**Roadmap:** 6 milestones / 21 phases — v1.0 through v1.4 shipped, v1.5 Phase 19 planned
 
 ### Done
 
@@ -21,18 +21,18 @@
 
 ### Done This Session
 
-- **Phase 18 executed** — 3 plans, 3 waves, all complete (1682 tests passing)
-  - Plan 01: Installed recharts 2.15.3 + date-fns 4.1.0 + @date-fns/tz 1.4.1, types, timezone utility, chart configs
-  - Plan 02: Query layer (getHeroStats, getCollectionBreakdown) with unstable_cache + revalidateTag
-  - Plan 03: Stats page shell (3-tab layout with nuqs) + collection status donut chart (Recharts PieChart)
-  - Fixed: revalidateTag Next.js 16 signature (2-arg form with `{ expire: 0 }`)
-  - Code review: 2 advisory warnings (WR-01 lt/lte boundary, WR-02 unguarded cast), 0 critical
-  - Verification: 10/10 automated must-haves pass, 2 human verification items pending
+- **Phase 19 executed** — 3 plans, 2 waves, 1747 tests passing, human verified
+  - Plan 01 (W1): Types, chart configs, 3 breakdown queries (size/designer/genre) with TDD — 20 tests
+  - Plan 02 (W1): MetricsBar (green accent strip) + LifetimeCounters (4 stat cards) — 13 tests
+  - Plan 03 (W2): SizeCategoryChart, DesignerBreakdownChart, GenreDistributionChart, RankedList, StatsOverview layout + page.tsx wiring — 30 tests
+  - Code review: Fixed WR-01/WR-02 (cache key missing `limit` param in designer/genre queries)
+  - Verification: 7/7 must-haves pass, all 7 requirements satisfied (HERO-01–06, INS-06)
 
 ### Next Up — RESUME HERE
 
-1. **Human verify Phase 18** — visit `/stats`, confirm donut chart renders with correct colors + log a session to test cache invalidation
-2. `/gsd-discuss-phase 19` — discuss Hero Stats & Collection Overview phase (`/clear` first)
+1. `/gsd-discuss-phase 20` — discuss Activity Visualization & Calendar phase
+2. `/gsd-plan-phase 20` — plan after discuss
+3. `/gsd-execute-phase 20` — execute
 
 ### Backlog
 
