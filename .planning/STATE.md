@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Fixes & Polish
-status: executing
+status: "Phase 17 shipped — PR #35"
 stopped_at: Phase 17 UI-SPEC approved
-last_updated: "2026-05-17T15:07:31.032Z"
-last_activity: 2026-05-17 -- Phase 17 execution started
+last_updated: "2026-05-17T16:14:58.753Z"
+last_activity: 2026-05-17
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 9
-  completed_plans: 6
-  percent: 67
+  completed_plans: 9
+  percent: 100
 ---
 
 # Project State
@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-05-16)
 
 Phase: 17 (image-focal-point) — EXECUTING
 Plan: 1 of 3
-Status: Executing Phase 17
-Last activity: 2026-05-17 -- Phase 17 execution started
+Status: Phase 17 shipped — PR #35
+Last activity: 2026-05-17
 
 ```
 [======              ] 33% (1/3 phases)
