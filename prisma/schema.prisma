@@ -57,9 +57,25 @@ model Chart {
   digitalWorkingCopyUrl  String?
   dateAdded              DateTime  @default(now())
   project                Project?
+  files                  ChartFile[]
   notes                  String?
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
+}
+
+model ChartFile {
+  id        String   @id @default(cuid())
+  chart     Chart    @relation(fields: [chartId], references: [id], onDelete: Cascade)
+  chartId   String
+  url       String
+  filename  String
+  mimeType  String
+  fileSize  Int
+  label     String?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([chartId])
 }
 
 model Project {
