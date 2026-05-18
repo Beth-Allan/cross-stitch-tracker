@@ -10,3 +10,6 @@ export { getSessionHistory } from "./session-history";
 export { getPaceMetrics } from "./pace-metrics";
 export { getDayOfWeekPattern } from "./day-of-week";
 export { getDailyBreakdown } from "./daily-breakdown";
+export { getPersonalBests } from "./personal-bests";
+export { getFastestCompletions } from "./fastest-completions";
+export { getAvailableYears } from "./available-years";
