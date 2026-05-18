@@ -5,6 +5,7 @@ import { ThreadInsightList } from "./thread-insight-list";
 import { DesignerInsightList } from "./designer-insight-list";
 import { GenreInsightList } from "./genre-insight-list";
 import { CompletionEstimatesSection } from "./completion-estimates-section";
+import { DataUnavailable } from "./data-unavailable";
 import type {
   PersonalBestRecord,
   FastestCompletion,
@@ -15,13 +16,13 @@ import type {
 } from "@/types/stats";
 
 interface RecordsOverviewProps {
-  personalBests: PersonalBestRecord[];
-  fastestCompletions: FastestCompletion[];
-  threadInsights: ThreadInsight[];
-  designerInsights: DesignerInsight[];
-  genreInsights: GenreInsight[];
-  completionEstimates: CompletionEstimate[];
-  availableYears: number[];
+  personalBests: PersonalBestRecord[] | null;
+  fastestCompletions: FastestCompletion[] | null;
+  threadInsights: ThreadInsight[] | null;
+  designerInsights: DesignerInsight[] | null;
+  genreInsights: GenreInsight[] | null;
+  completionEstimates: CompletionEstimate[] | null;
+  availableYears: number[] | null;
   hasNoSessions: boolean;
 }
 
@@ -49,22 +50,42 @@ export function RecordsOverview({
   return (
     <div className="space-y-8">
       <div className="mb-4 flex justify-end">
-        <YearScopeToggle availableYears={availableYears} />
+        <YearScopeToggle availableYears={availableYears ?? []} />
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
-          <RecordsTable personalBests={personalBests} fastestCompletions={fastestCompletions} />
-        </CardContent>
-      </Card>
+      {personalBests !== null && fastestCompletions !== null ? (
+        <Card>
+          <CardContent className="pt-6">
+            <RecordsTable personalBests={personalBests} fastestCompletions={fastestCompletions} />
+          </CardContent>
+        </Card>
+      ) : (
+        <DataUnavailable label="Personal records" />
+      )}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <ThreadInsightList items={threadInsights} />
-        <DesignerInsightList items={designerInsights} />
-        <GenreInsightList items={genreInsights} />
+        {threadInsights !== null ? (
+          <ThreadInsightList items={threadInsights} />
+        ) : (
+          <DataUnavailable label="Thread insights" />
+        )}
+        {designerInsights !== null ? (
+          <DesignerInsightList items={designerInsights} />
+        ) : (
+          <DataUnavailable label="Designer insights" />
+        )}
+        {genreInsights !== null ? (
+          <GenreInsightList items={genreInsights} />
+        ) : (
+          <DataUnavailable label="Genre insights" />
+        )}
       </div>
 
-      <CompletionEstimatesSection items={completionEstimates} />
+      {completionEstimates !== null ? (
+        <CompletionEstimatesSection items={completionEstimates} />
+      ) : (
+        <DataUnavailable label="Completion estimates" />
+      )}
     </div>
   );
 }
