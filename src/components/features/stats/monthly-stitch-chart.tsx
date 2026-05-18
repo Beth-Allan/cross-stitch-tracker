@@ -118,7 +118,7 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
             <Bar
               dataKey="totalStitches"
               radius={4}
-              onClick={(data: MonthlyTotal, index: number) => handleBarClick(data, index)}
+              onClick={(_data, index) => handleBarClick(chartData[index], index)}
             >
               {chartData.map((entry, index) => (
                 <Cell
