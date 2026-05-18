@@ -13,11 +13,6 @@ function buildDateFilter(scope: string, tz: string): { gte: Date; lt: Date } | n
   return { gte: yearStart, lt: nextYearStart };
 }
 
-interface SessionRow {
-  stitchCount: number;
-  date?: Date;
-}
-
 async function computeGenreInsights(
   userId: string,
   scope: string,
@@ -39,7 +34,8 @@ async function computeGenreInsights(
           },
         },
         sessions: {
-          select: { stitchCount: true, date: true },
+          where: dateFilter ? { date: dateFilter } : undefined,
+          select: { stitchCount: true },
         },
       },
     });
@@ -52,16 +48,8 @@ async function computeGenreInsights(
       const genres = project.chart.genres;
       if (genres.length === 0) continue;
 
-      let sessions: SessionRow[] = project.sessions;
-      if (dateFilter) {
-        sessions = sessions.filter((s: SessionRow) => {
-          if (!s.date) return false;
-          return s.date >= dateFilter.gte && s.date < dateFilter.lt;
-        });
-      }
-
-      const projectStitches = sessions.reduce(
-        (sum: number, s: SessionRow) => sum + s.stitchCount,
+      const projectStitches = project.sessions.reduce(
+        (sum: number, s: { stitchCount: number }) => sum + s.stitchCount,
         0,
       );
 

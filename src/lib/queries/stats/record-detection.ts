@@ -71,19 +71,22 @@ export async function detectBrokenRecords(
   }
 
   // --- Best Session Detection ---
-  // Find the highest single-session stitchCount excluding the current session's value
-  // by looking at all sessions that are NOT from today
+  // Find the highest single-session stitchCount across ALL sessions.
+  // Skip exactly one instance matching the current session's stitchCount
+  // (the just-inserted row) so we don't self-compare.
   let previousBestSession = 0;
+  let skippedSelf = false;
   for (const s of allSessions) {
-    const localDate = format(TZDate.tz(tz, s.date), "yyyy-MM-dd");
-    if (localDate === todayStr) continue; // Exclude today to avoid self-comparison
+    if (!skippedSelf && s.stitchCount === session.stitchCount) {
+      const localDate = format(TZDate.tz(tz, s.date), "yyyy-MM-dd");
+      if (localDate === todayStr) {
+        skippedSelf = true;
+        continue;
+      }
+    }
     if (s.stitchCount > previousBestSession) previousBestSession = s.stitchCount;
   }
 
-  // Also check earlier sessions from today (not the current one)
-  // We can't distinguish "our" session from others today without an ID,
-  // so we compare against all historical sessions excluding today.
-  // This means if user logs two sessions today, only the first record-breaking one triggers.
   if (session.stitchCount > previousBestSession) {
     records.push({
       type: "bestSession",
