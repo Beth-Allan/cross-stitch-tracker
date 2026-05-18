@@ -41,9 +41,8 @@ async function computeDayOfWeekPattern(userId: string): Promise<DayOfWeekData[]>
 }
 
 export function getDayOfWeekPattern(userId: string) {
-  return unstable_cache(
-    () => computeDayOfWeekPattern(userId),
-    [`stats-dayofweek-${userId}`],
-    { tags: ["stats"], revalidate: 300 },
-  )();
+  return unstable_cache(() => computeDayOfWeekPattern(userId), [`stats-dayofweek-${userId}`], {
+    tags: ["stats"],
+    revalidate: 300,
+  })();
 }

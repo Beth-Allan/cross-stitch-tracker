@@ -42,7 +42,7 @@ export function PaceCards({ paceMetrics }: PaceCardsProps) {
         <div className="flex w-full flex-col items-center gap-1 px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-1.5">
             <Activity className="text-success h-4 w-4" />
-            <span className="text-success-muted-foreground text-xs font-semibold uppercase tracking-wider">
+            <span className="text-success-muted-foreground text-xs font-semibold tracking-wider uppercase">
               7-DAY AVG
             </span>
           </div>
@@ -59,7 +59,7 @@ export function PaceCards({ paceMetrics }: PaceCardsProps) {
         <div className="flex w-full flex-col items-center gap-1 px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-1.5">
             <BarChart3 className="text-success h-4 w-4" />
-            <span className="text-success-muted-foreground text-xs font-semibold uppercase tracking-wider">
+            <span className="text-success-muted-foreground text-xs font-semibold tracking-wider uppercase">
               30-DAY AVG
             </span>
           </div>
@@ -76,7 +76,7 @@ export function PaceCards({ paceMetrics }: PaceCardsProps) {
         <div className="flex w-full flex-col items-center gap-1 px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-1.5">
             <TrendingUp className="text-success h-4 w-4" />
-            <span className="text-success-muted-foreground text-xs font-semibold uppercase tracking-wider">
+            <span className="text-success-muted-foreground text-xs font-semibold tracking-wider uppercase">
               90-DAY AVG
             </span>
           </div>
@@ -94,7 +94,7 @@ export function PaceCards({ paceMetrics }: PaceCardsProps) {
           <div className="flex items-center gap-1.5">
             {momPercentage > 0 && <TrendingUp className="text-success h-4 w-4" />}
             {momPercentage < 0 && <TrendingDown className="text-warning h-4 w-4" />}
-            <span className="text-success-muted-foreground text-xs font-semibold uppercase tracking-wider">
+            <span className="text-success-muted-foreground text-xs font-semibold tracking-wider uppercase">
               VS LAST MONTH
             </span>
           </div>
@@ -117,7 +117,7 @@ export function PaceCards({ paceMetrics }: PaceCardsProps) {
             {stitchRateTrend !== null && stitchRateTrend < 0 && (
               <TrendingDown className="text-warning h-4 w-4" />
             )}
-            <span className="text-success-muted-foreground text-xs font-semibold uppercase tracking-wider">
+            <span className="text-success-muted-foreground text-xs font-semibold tracking-wider uppercase">
               STITCH RATE
             </span>
           </div>
