@@ -509,6 +509,7 @@ export function createMockPrisma() {
       update: vi.fn(),
       delete: vi.fn(),
       upsert: vi.fn(),
+      groupBy: vi.fn(),
     },
     projectBead: {
       create: vi.fn(),
@@ -562,6 +563,7 @@ export function createMockPrisma() {
     },
     stitchSession: {
       create: vi.fn(),
+      findFirst: vi.fn(),
       findMany: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),
