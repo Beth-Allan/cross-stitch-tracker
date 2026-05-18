@@ -196,7 +196,7 @@ Phase 22 first (foundation). Phases 23, 24, 25, 26 depend only on Phase 22 and c
 | 19. Hero Stats & Collection Overview | v1.5 | 3/3 | Complete | 2026-05-17 |
 | 20. Activity Visualization & Calendar | v1.5 | 4/4 | Complete | 2026-05-18 |
 | 21. Records, Insights & Celebrations | v1.5 | 4/4 | Complete | 2026-05-18 |
-| 22. Critical Fixes & Test Infrastructure | v1.6 | 3/3 | Complete   | 2026-05-18 |
+| 22. Critical Fixes & Test Infrastructure | v1.6 | 3/3 | Complete    | 2026-05-18 |
 | 23. Test Coverage & Reliability | v1.6 | 0/? | Not started | - |
 | 24. Code Quality | v1.6 | 0/? | Not started | - |
 | 25. Shopping Cart Scaling | v1.6 | 0/? | Not started | - |

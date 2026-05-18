@@ -9,16 +9,16 @@ Requirements for v1.6 Cleanup & Hardening. Each maps to roadmap phases.
 
 ### Critical Fixes
 
-- [ ] **CRIT-01**: Supply actions reject operations when project belongs to a different user
+- [x] **CRIT-01**: Supply actions reject operations when project belongs to a different user
 - [ ] **CRIT-02**: Shopping cart scales to 75+ projects with search/filter, status grouping, and supply-type search
-- [ ] **CRIT-03**: TypeScript errors in dashboard-tabs.test, chart-actions.test, and shopping-cart-actions.test are resolved
-- [ ] **CRIT-04**: Stats page degrades gracefully when individual queries fail instead of crashing entirely
+- [x] **CRIT-03**: TypeScript errors in dashboard-tabs.test, chart-actions.test, and shopping-cart-actions.test are resolved
+- [x] **CRIT-04**: Stats page degrades gracefully when individual queries fail instead of crashing entirely
 
 ### Test Coverage
 
 - [ ] **TEST-01**: Skein calculator has edge case tests for fabricCount=0 and resolveDefaultBrandId
-- [ ] **TEST-02**: Test infrastructure uses createMockPrisma() defaults and fixes vacuous assertions for $transaction
-- [ ] **TEST-03**: Stats actions have tests for requireAuth rejection and Zod boundary violations
+- [x] **TEST-02**: Test infrastructure uses createMockPrisma() defaults and fixes vacuous assertions for $transaction
+- [x] **TEST-03**: Stats actions have tests for requireAuth rejection and Zod boundary violations
 - [ ] **TEST-04**: StitchingCalendar has tests for Jan-to-Dec and Dec-to-Jan year-rollover navigation
 - [ ] **TEST-05**: Record detection handles two sessions on same day with identical stitch counts
 - [ ] **TEST-06**: Completion estimates exclude projects where stitchesCompleted >= totalStitches
@@ -113,13 +113,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CRIT-01 | Phase 22 | Pending |
+| CRIT-01 | Phase 22 | Complete |
 | CRIT-02 | Phase 25 | Pending |
-| CRIT-03 | Phase 22 | Pending |
-| CRIT-04 | Phase 22 | Pending |
+| CRIT-03 | Phase 22 | Complete |
+| CRIT-04 | Phase 22 | Complete |
 | TEST-01 | Phase 23 | Pending |
-| TEST-02 | Phase 22 | Pending |
-| TEST-03 | Phase 22 | Pending |
+| TEST-02 | Phase 22 | Complete |
+| TEST-03 | Phase 22 | Complete |
 | TEST-04 | Phase 23 | Pending |
 | TEST-05 | Phase 23 | Pending |
 | TEST-06 | Phase 23 | Pending |
