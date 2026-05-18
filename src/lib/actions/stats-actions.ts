@@ -30,7 +30,10 @@ export async function fetchCalendarMonth(
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message };
     }
-    console.error("fetchCalendarMonth error:", error);
+    console.error(
+      "fetchCalendarMonth error:",
+      error instanceof Error ? error.message : String(error),
+    );
     return { success: false, error: "Failed to load calendar data" };
   }
 }
@@ -49,7 +52,10 @@ export async function fetchDailyBreakdown(
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message };
     }
-    console.error("fetchDailyBreakdown error:", error);
+    console.error(
+      "fetchDailyBreakdown error:",
+      error instanceof Error ? error.message : String(error),
+    );
     return { success: false, error: "Failed to load breakdown data" };
   }
 }
@@ -65,7 +71,10 @@ export async function fetchMonthlyTotals(year: number): Promise<StatsResult<Mont
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message };
     }
-    console.error("fetchMonthlyTotals error:", error);
+    console.error(
+      "fetchMonthlyTotals error:",
+      error instanceof Error ? error.message : String(error),
+    );
     return { success: false, error: "Failed to load monthly data" };
   }
 }

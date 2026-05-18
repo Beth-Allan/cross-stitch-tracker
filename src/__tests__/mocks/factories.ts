@@ -597,9 +597,11 @@ export function createMockPrisma() {
  * Override $transaction for one call with a custom tx-client scope.
  * Replaces the 7-line mockImplementationOnce boilerplate.
  */
+export type MockPrisma = ReturnType<typeof createMockPrisma>;
+
 export function mockTransaction(
-  mockPrisma: ReturnType<typeof createMockPrisma>,
-  overrides: Record<string, Record<string, ReturnType<typeof vi.fn>>>,
+  mockPrisma: MockPrisma,
+  overrides: Partial<{ [K in keyof MockPrisma]: Partial<MockPrisma[K]> }>,
 ) {
   mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) =>
     cb(overrides),

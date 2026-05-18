@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { RenderOptions } from "@testing-library/react";
+import type { RenderOptions } from "@/__tests__/test-utils";
 import { render, screen } from "@/__tests__/test-utils";
 import { withNuqsTestingAdapter } from "nuqs/adapters/testing";
 import { DashboardTabs, DASHBOARD_TABS } from "./dashboard-tabs";

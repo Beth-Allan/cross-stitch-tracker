@@ -281,4 +281,52 @@ describe("StatsPage server component", () => {
       }),
     );
   });
+
+  it("does not throw when individual stat queries reject (Promise.allSettled)", async () => {
+    mockGetHeroStats.mockRejectedValue(new Error("DB timeout"));
+    mockGetCollectionBreakdown.mockRejectedValue(new Error("connection lost"));
+    mockGetPaceMetrics.mockRejectedValue(new Error("query error"));
+
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { default: StatsPage } = await import("./page");
+    await expect(StatsPage({ searchParams: Promise.resolve({}) })).resolves.not.toThrow();
+    spy.mockRestore();
+  });
+
+  it("does not throw when all stat queries reject", async () => {
+    const queryMocks = [
+      mockGetHeroStats,
+      mockGetCollectionBreakdown,
+      mockGetSizeBreakdown,
+      mockGetDesignerBreakdown,
+      mockGetGenreBreakdown,
+      mockGetMonthlyTotals,
+      mockGetCalendarDays,
+      mockGetSessionHistory,
+      mockGetPaceMetrics,
+      mockGetDayOfWeekPattern,
+      mockGetPersonalBests,
+      mockGetFastestCompletions,
+      mockGetThreadInsights,
+      mockGetDesignerInsights,
+      mockGetGenreInsights,
+      mockGetCompletionEstimates,
+      mockGetAvailableYears,
+    ];
+    queryMocks.forEach((mock) => mock.mockRejectedValue(new Error("total failure")));
+
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { default: StatsPage } = await import("./page");
+    await expect(StatsPage({ searchParams: Promise.resolve({}) })).resolves.not.toThrow();
+    spy.mockRestore();
+  });
+
+  it("does not throw when project list query fails", async () => {
+    mockFindMany.mockRejectedValue(new Error("project query failed"));
+
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { default: StatsPage } = await import("./page");
+    await expect(StatsPage({ searchParams: Promise.resolve({}) })).resolves.not.toThrow();
+    spy.mockRestore();
+  });
 });

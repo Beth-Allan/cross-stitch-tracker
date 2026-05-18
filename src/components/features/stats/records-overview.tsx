@@ -49,9 +49,13 @@ export function RecordsOverview({
 
   return (
     <div className="space-y-8">
-      <div className="mb-4 flex justify-end">
-        <YearScopeToggle availableYears={availableYears ?? []} />
-      </div>
+      {availableYears !== null ? (
+        <div className="mb-4 flex justify-end">
+          <YearScopeToggle availableYears={availableYears} />
+        </div>
+      ) : (
+        <DataUnavailable label="Year filter" />
+      )}
 
       {personalBests !== null && fastestCompletions !== null ? (
         <Card>

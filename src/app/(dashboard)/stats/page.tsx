@@ -82,38 +82,44 @@ export default async function StatsPage({
     getAvailableYears(user.id),
   ]);
 
-  const heroStats = settled<StatsHeroData>(results[0]);
-  const collectionBreakdown = settled<CollectionBreakdownData>(results[1]);
-  const sizeBreakdown = settled<SizeBreakdownItem[]>(results[2]);
-  const designerBreakdown = settled<DesignerBreakdownItem[]>(results[3]);
-  const genreBreakdown = settled<GenreBreakdownItem[]>(results[4]);
-  const monthlyTotals = settled<MonthlyTotal[]>(results[5]);
-  const calendarData = settled<CalendarDayData[]>(results[6]);
-  const sessionHistory = settled<SessionHistoryData>(results[7]);
-  const paceMetrics = settled<PaceMetricsData>(results[8]);
-  const dayOfWeekData = settled<DayOfWeekData[]>(results[9]);
-  const personalBests = settled<PersonalBestRecord[]>(results[10]);
-  const fastestCompletions = settled<FastestCompletion[]>(results[11]);
-  const threadInsights = settled<ThreadInsight[]>(results[12]);
-  const designerInsights = settled<DesignerInsight[]>(results[13]);
-  const genreInsights = settled<GenreInsight[]>(results[14]);
-  const completionEstimates = settled<CompletionEstimate[]>(results[15]);
-  const availableYears = settled<AvailableYearsData>(results[16]);
+  const heroStats = settled<StatsHeroData>(results[0], "heroStats");
+  const collectionBreakdown = settled<CollectionBreakdownData>(results[1], "collectionBreakdown");
+  const sizeBreakdown = settled<SizeBreakdownItem[]>(results[2], "sizeBreakdown");
+  const designerBreakdown = settled<DesignerBreakdownItem[]>(results[3], "designerBreakdown");
+  const genreBreakdown = settled<GenreBreakdownItem[]>(results[4], "genreBreakdown");
+  const monthlyTotals = settled<MonthlyTotal[]>(results[5], "monthlyTotals");
+  const calendarData = settled<CalendarDayData[]>(results[6], "calendarData");
+  const sessionHistory = settled<SessionHistoryData>(results[7], "sessionHistory");
+  const paceMetrics = settled<PaceMetricsData>(results[8], "paceMetrics");
+  const dayOfWeekData = settled<DayOfWeekData[]>(results[9], "dayOfWeekData");
+  const personalBests = settled<PersonalBestRecord[]>(results[10], "personalBests");
+  const fastestCompletions = settled<FastestCompletion[]>(results[11], "fastestCompletions");
+  const threadInsights = settled<ThreadInsight[]>(results[12], "threadInsights");
+  const designerInsights = settled<DesignerInsight[]>(results[13], "designerInsights");
+  const genreInsights = settled<GenreInsight[]>(results[14], "genreInsights");
+  const completionEstimates = settled<CompletionEstimate[]>(results[15], "completionEstimates");
+  const availableYears = settled<AvailableYearsData>(results[16], "availableYears");
 
-  // Fetch project list for session table filter dropdown
-  const projects = await prisma.project.findMany({
-    where: { userId: user.id },
-    select: {
-      id: true,
-      chart: { select: { name: true } },
-    },
-    orderBy: { chart: { name: "asc" } },
-  });
-
-  const projectList = projects.map((p) => ({
-    id: p.id,
-    name: p.chart.name,
-  }));
+  let projectList: { id: string; name: string }[] = [];
+  try {
+    const projects = await prisma.project.findMany({
+      where: { userId: user.id },
+      select: {
+        id: true,
+        chart: { select: { name: true } },
+      },
+      orderBy: { chart: { name: "asc" } },
+    });
+    projectList = projects.map((p) => ({
+      id: p.id,
+      name: p.chart.name,
+    }));
+  } catch (error) {
+    console.error(
+      "[stats] projectList query failed:",
+      error instanceof Error ? error.message : String(error),
+    );
+  }
 
   const hasNoSessions = heroStats === null || heroStats.totalSessions === 0;
 

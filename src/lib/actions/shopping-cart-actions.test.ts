@@ -460,7 +460,9 @@ describe("shopping-cart-actions", () => {
       const result = await updateSupplyAcquired("thread", "junction-1", -1);
 
       expect(result.success).toBe(false);
-      expect((result as { success: false; error: string }).error).toBeDefined();
+      if (!result.success) {
+        expect(result.error).toBeDefined();
+      }
     });
 
     it("rejects non-integer quantity (Zod validation error)", async () => {
@@ -468,7 +470,9 @@ describe("shopping-cart-actions", () => {
       const result = await updateSupplyAcquired("thread", "junction-1", 1.5);
 
       expect(result.success).toBe(false);
-      expect((result as { success: false; error: string }).error).toBeDefined();
+      if (!result.success) {
+        expect(result.error).toBeDefined();
+      }
     });
 
     it("updates quantityAcquired for thread type and revalidates /shopping path", async () => {
