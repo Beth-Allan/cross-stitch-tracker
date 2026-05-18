@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Statistics & Records
-status: "Phase 21 shipped — PR #40"
-stopped_at: Phase 21 UI-SPEC approved
-last_updated: "2026-05-18T04:40:25.264Z"
-last_activity: 2026-05-17
+status: "Milestone v1.5 shipped and archived"
+stopped_at: Milestone complete
+last_updated: "2026-05-18"
+last_activity: 2026-05-18
 progress:
   total_phases: 4
   completed_phases: 4
@@ -18,19 +18,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-17)
+See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 21 — records-insights-celebrations
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 21
-Plan: Not started
-Status: Phase 21 shipped — PR #40
-Last activity: 2026-05-17
+Phase: 21 (final)
+Plan: All complete
+Status: Milestone v1.5 shipped and archived
+Last activity: 2026-05-18
 
-Progress: [█████░░░░░] 50%
+Progress: [██████████] 100%
 
 ## Milestone Structure
 
@@ -41,16 +41,7 @@ Progress: [█████░░░░░] 50%
 | v1.2 | Track & Measure | 8-9.1 | Shipped 2026-04-20 |
 | v1.3 | Form & Supply Overhaul | 10-14 | Shipped 2026-05-16 |
 | v1.4 | Fixes & Polish | 15-17 | Shipped 2026-05-17 |
-| v1.5 | Statistics & Records | 18-21 | In progress |
-
-## v1.5 Phase Summary
-
-| Phase | Goal | Requirements | Status |
-|-------|------|--------------|--------|
-| 18. Stats Engine & Charting Foundation | Query layer + caching + Recharts | STAT-01..04 | Complete (2026-05-17) |
-| 19. Hero Stats & Collection Overview | Lifetime counters + breakdowns | HERO-01..06, INS-06 | Complete (2026-05-17) |
-| 20. Activity Visualization & Calendar | Time charts + calendar + pace | VIZ-01..07, INS-04 | Not started |
-| 21. Records, Insights & Celebrations | Records + toast + insights | REC-01..05, INS-01..03, INS-05 | Not started |
+| v1.5 | Statistics & Records | 18-21 | Shipped 2026-05-18 |
 
 ## Performance Metrics
 
@@ -59,17 +50,17 @@ Progress: [█████░░░░░] 50%
 **Velocity (v1.2):** 20 plans / 4 days (~5/day)
 **Velocity (v1.3):** 19 plans / 13 days (~1.5/day)
 **Velocity (v1.4):** 9 plans / 2 days (~4.5/day)
+**Velocity (v1.5):** 14 plans / 2 days (~7/day)
 
 ## Accumulated Context
 
-### Key Architecture (from research)
+### Key Architecture
 
 - `src/lib/queries/stats/` for query layer (pure functions, no "use server")
 - `unstable_cache` with `revalidateTag("stats")` on session mutations (5-min TTL + on-demand)
-- Recharts always Client Components with dynamic import (SSR incompatible)
-- `Promise.all` for parallel data fetching (existing dashboard pattern)
-- No schema migrations needed — all data sources already exist
-- Two new deps: Recharts 3.8.x (via shadcn chart), date-fns 4.1.0
+- Recharts always Client Components (SSR incompatible)
+- `Promise.all` for parallel data fetching (17 queries on stats page)
+- Two deps added: Recharts 3.8.0 (via shadcn chart), date-fns 4.1.0
 
 ### Decisions
 
@@ -82,12 +73,34 @@ None.
 ### Blockers/Concerns
 
 - `.env.local` bcrypt hashes must escape `$` as `\$`
-- Confirm `StitchSession.date` field type for timezone handling
-- Pin exact Recharts version after shadcn install (remove caret)
+
+## Deferred Items
+
+Items acknowledged and deferred at milestone close on 2026-05-18:
+
+| Category | Item | Status |
+|----------|------|--------|
+| debug | fabric-matching-excludes-valid | converted_to_backlog |
+| verification | Phase 19 (19-VERIFICATION.md) | human_needed |
+| verification | Phase 20 (20-VERIFICATION.md) | human_needed |
+| verification | Phase 21 (21-VERIFICATION.md) | human_needed |
+| quick_task | 260328-igi-fix-critical-and-high-auth-security-issu | missing |
+| quick_task | 260328-im6-fix-shell-navigation-issues-and-dry-clea | missing |
+| quick_task | 260328-iv3-add-csp-header-and-commit-github-actions | missing |
+| quick_task | 260329-oj1-centralize-test-mocks-and-create-test-fa | missing |
+| quick_task | 260329-ora-add-failure-mode-tests-for-existing-code | missing |
+| quick_task | 260329-p5l-fix-the-issues-identified-in-pr-2-pr-2-r | missing |
+| quick_task | 260407-ozt-migrate-docs-conventions-to-claude-rules | missing |
+| quick_task | 260411-iwm-fix-thread-sort-to-use-numeric-ordering | missing |
+| quick_task | 260411-j3i-form-submit-idempotency-disable-submit-b | missing |
+| quick_task | 260411-j8v-show-already-added-indicator-for-project | missing |
+| quick_task | 260411-jhw-chart-list-edit-delete-actions-matching | missing |
+| quick_task | 260411-js1-chart-images-not-displaying-generate-pre | missing |
+| quick_task | 260411-kip-wire-generatethumbnail-into-cover-upload | missing |
+| quick_task | 260414-s7s-fix-gallery-view-mode-persistence-back-l | missing |
 
 ## Session Continuity
 
-Last session: 2026-05-18T02:41:47.500Z
-Stopped at: Phase 21 UI-SPEC approved
-Resume action: `/gsd-plan-phase 18`
-Resume file: .planning/phases/21-records-insights-celebrations/21-UI-SPEC.md
+Last session: 2026-05-18
+Stopped at: Milestone v1.5 complete
+Resume action: `/gsd-new-milestone`

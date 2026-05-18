@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A personal cross-stitch project management app that replaced a complex Notion system. Tracks 500+ charts through acquisition, kitting, stitching, completion, and finishing — with supply inventory, auto-generated shopping lists, and pre-seeded DMC catalog. Single-user, deployed as a PWA on Vercel.
+A personal cross-stitch project management app that replaced a complex Notion system. Tracks 500+ charts through acquisition, kitting, stitching, completion, and finishing — with supply inventory, auto-generated shopping lists, pre-seeded DMC catalog, and a comprehensive statistics dashboard with activity charts, personal records, and celebration moments. Single-user, deployed as a PWA on Vercel.
 
 ## Core Value
 
@@ -10,10 +10,10 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 ## Current State
 
-**Last shipped:** v1.4 Fixes & Polish (2026-05-17)
-**Next milestone:** v1.5 Statistics & Records (in progress)
+**Last shipped:** v1.5 Statistics & Records (2026-05-18)
+**Next milestone:** Planning (run `/gsd-new-milestone`)
 
-The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project selection, image optimization, multi-file working copies per chart, and click-to-set focal point control for cover images. 1,641 tests, ~95k LOC TypeScript.
+The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project selection, image optimization, multi-file working copies per chart, click-to-set focal point control for cover images, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights, and celebration confetti on record-breaking sessions. 1,967 tests, ~125k LOC TypeScript.
 
 ## Requirements
 
@@ -56,10 +56,10 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - ✓ Main Dashboard (Currently Stitching, Start Next, Buried Treasures, Spotlight, Collection Stats, Quick Add) — v1.2
 - ✓ Project Dashboard (hero stats, 5 progress buckets with sorting, Finished tab with 4 sort dimensions) — v1.2
 - ✓ Shopping Cart upgrade (project selection, tabbed supply aggregation, quantity stepper, IDOR protection) — v1.2
-- ✓ Image optimization on upload — covers and session photos converted to 1200px WebP q80 via Sharp, raw originals deleted from R2 — Phase 9.1
+- ✓ Image optimization on upload — covers and session photos converted to 1200px WebP q80 via Sharp — v1.2
 - ✓ Unified supply table with grouped sections, SVG donuts, keyboard-first persistent add row, portal autocomplete, inline editing — v1.3
 - ✓ Supply table reusable on project detail Supplies tab with server-action persistence — v1.3
-- ✓ Single-page merged form for chart+project creation with pattern type cards, draft persistence, sticky save bar �� v1.3
+- ✓ Single-page merged form for chart+project creation with pattern type cards, draft persistence, sticky save bar — v1.3
 - ✓ Supply takeover mode with fabric assignment, skein calculator card, two-phase atomic save — v1.3
 - ✓ Full-page edit mode using merged form layout, accessible from project detail and gallery kebab menu — v1.3
 - ✓ Deprecated component cleanup (21 files, 3,700+ lines removed) — v1.3
@@ -67,31 +67,27 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - ✓ SearchToAdd keystroke fix (single-input architecture, results-only portal) — v1.4
 - ✓ Dashboard Spotlight sizing (320px column, matched buttons) — v1.4
 - ✓ Click-to-set focal point for cover images across all display contexts — v1.4
+- ✓ Stats computation engine with timezone-aware queries, caching, and auto-invalidation — v1.5
+- ✓ Stats page with 3-tab layout (Overview, Activity, Records) and 17 parallel queries — v1.5
+- ✓ Lifetime hero counters (stitches, sessions, time, completions) with rolling time-window metrics — v1.5
+- ✓ Collection breakdown charts (status, size, designer, genre) with interactive ranked lists — v1.5
+- ✓ Monthly stitch bar chart with click-to-drill-down detail — v1.5
+- ✓ Stitching calendar (month-view grid, project color-coding, month navigation) — v1.5
+- ✓ Session history table (sortable, paginated, filterable by project) — v1.5
+- ✓ Day-of-week patterns, rolling averages (7/30/90-day), month-over-month pace trends — v1.5
+- ✓ Personal bests board with year-scoped records and fastest completions by size category — v1.5
+- ✓ "New record!" celebration toast with canvas-confetti on record-breaking sessions — v1.5
+- ✓ Designer/genre/thread insights with color swatches and completion rates — v1.5
+- ✓ Completion estimates for active projects with progress bars — v1.5
 
 ### Active
 
-## Current Milestone: v1.5 Statistics & Records
-
-**Goal:** A dedicated statistics dashboard that surfaces lifetime counters, activity charts, collection insights, and personal bests — making every stitch feel measured and rewarding.
-
-**Target features:**
-- Stats computation engine (server-side query/aggregation layer)
-- Dedicated Stats Dashboard page with lifetime hero counters
-- Collection overview (status/size/designer/genre breakdowns)
-- Activity charts (monthly bar chart, heatmap calendar, day-of-week, rolling averages)
-- Velocity & trends (month-over-month, seasonal patterns, completion rate)
-- Designer, genre, and thread/supply insights
-- Personal Bests record board (records per category with linked entities)
-- "New record!" celebration toast on session logging
-- Charting library integration for complex visualizations
-- All entity references are clickable links (projects, threads, designers)
+(No active requirements — run `/gsd-new-milestone` to define next milestone)
 
 ### Deferred (no phase assigned)
 
-- [ ] Comprehensive statistics engine (daily/weekly/monthly/yearly metrics)
-- [ ] Monthly stitch bar charts and stitching calendar view
-- [ ] Year in Review tab with 8 stat sections and year selector
-- [ ] Personal bests (most stitches in a day, longest streak, records)
+- [ ] Comprehensive year in review tab with 8 stat sections and year selector
+- [ ] Contextual stats sprinkled into existing pages (Pattern Dive, project detail, dashboard)
 - [ ] Goal tracking (project-specific and global, milestone targets, frequency goals)
 - [ ] Scheduling plans (project start dates, recurring stitching days, seasonal focus)
 - [ ] Multi-style rotation management (Focus+Rotate, Milestone, Daily, Round Robin, Random, Seasonal)
@@ -113,22 +109,22 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - Barcode scanning for supplies — DMC doesn't standardize barcodes
 - Rotation schedule generator (auto-planning) — manual management in MVP
 - Direct social media posting — deferred post-MVP
+- Social leaderboards / comparisons — single-user app
+- AI-generated insights / recommendations — data should speak for itself
+- Real-time stitching timer on stats page — timer belongs to session logging UX
+- Cross-project comparison view — comparing a mini to a BAP is meaningless
+- Historical supply price tracking — data entry nightmare for 500+ charts
 
 ## Context
 
-**Current state (v1.4 shipped):**
-- 1,641 tests, ~95k LOC TypeScript, deployed to Vercel
+**Current state (v1.5 shipped):**
+- 1,967 tests, ~125k LOC TypeScript, deployed to Vercel
 - Tech stack: Next.js 16, Prisma 7, Tailwind v4, Auth.js v5 beta, shadcn/ui v4 (Base UI)
 - Database: PostgreSQL on Neon (prod), Cloudflare R2 (file storage)
-- 20+ backlog items captured (see CLAUDE.md backlog section)
-- Unified supply table shared across creation form and project detail (adapter pattern)
-- Single-page chart creation/edit form with supply takeover mode
-- Gallery with 3 view modes, project detail with tabbed layout (Overview + Supplies + Sessions)
-- Pattern Dive, Main Dashboard, Project Dashboard, Shopping Cart — all shipped in v1.2
-- Image optimization (Sharp WebP conversion) on all uploads
-- Multi-file working copies per chart (ChartFile model with R2 storage)
-- Click-to-set focal point for cover images (all 8+ display contexts)
-- DMC catalog complete at 495 threads
+- 40+ backlog items captured (see CLAUDE.md backlog section)
+- Stats dashboard: 3-tab layout with 17 parallel cached queries, Recharts charts, unstable_cache with tag-based invalidation
+- Two runtime deps added in v1.5: Recharts 3.8.0 (via shadcn chart), date-fns 4.1.0 + @date-fns/tz 1.4.1
+- All prior features intact: gallery, project detail, supply table, merged form, dashboards, shopping cart, session logging, focal point, file management
 
 **Design system:** Emerald/amber/stone palette. Fraunces headings, Source Sans 3 body, JetBrains Mono hero stats. 7 status colors. Full semantic design tokens (bg-card, text-muted-foreground, etc.). 44px+ touch targets on interactive elements.
 
@@ -195,6 +191,14 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 | Normalized 0-1 focal point coordinates | Resolution-independent; CSS object-position conversion via utility function | ✓ Good |
 | ResizeObserver for focal point container | getBoundingClientRect on click only; observer handles layout shifts | ✓ Good |
 | Zero new npm dependencies for v1.4 | Focal point, file management — all pure CSS + existing stack | ✓ Good |
+| Recharts via shadcn chart component | Consistent with design system; shadcn wraps Recharts with CSS variable theming | ✓ Good |
+| unstable_cache with tag-based invalidation | 5-min TTL for current data, 1-hour for historical; revalidateTag("stats") on session mutations | ✓ Good |
+| TZDate for timezone boundaries | date-fns/tz ensures session at 11pm Pacific counts as correct local date | ✓ Good |
+| 17 parallel queries via Promise.all | Extends existing dashboard pattern; avoids Neon cold start waterfall | ✓ Good |
+| nuqs for stats URL state | Tab selection, year scope, session table sort/page/filter — all URL-persisted | ✓ Good |
+| Server Components for stats layout | StatsOverview, ActivityOverview, RecordsOverview are all Server Components; only charts and interactive controls are Client | ✓ Good |
+| canvas-confetti for celebrations | Lightweight (6KB), main-thread fallback avoids CSP worker-src issues | ✓ Good |
+| Record detection in createSession | detectBrokenRecords runs after session insert, returns broken records for client-side celebration | ✓ Good |
 
 ## Evolution
 
@@ -213,4 +217,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-17 — v1.5 Statistics & Records milestone started*
+*Last updated: 2026-05-18 after v1.5 milestone*

@@ -1,5 +1,55 @@
 # Retrospective
 
+## Milestone: v1.5 — Statistics & Records
+
+**Shipped:** 2026-05-18
+**Phases:** 4 | **Plans:** 14
+**Timeline:** 2 days (2026-05-17 → 2026-05-18)
+**Tests:** 1,967 | **PRs:** #39, #40
+
+### What Was Built
+
+- Stats Engine: 12+ query modules in `src/lib/queries/stats/`, unstable_cache with tag-based invalidation (300s/3600s TTL), TZDate timezone boundaries, Recharts via shadcn chart integration
+- Hero Stats & Collection Overview: MetricsBar (today/week/month/year), LifetimeCounters (4 hero metrics), 4 collection breakdown charts (status donut, size category, designer bar, genre distribution) with RankedList links
+- Activity Visualization: MonthlyStitchChart with click-to-drill-down, StitchingCalendar (month grid + project pills + nav), SessionHistoryTable (sort/filter/paginate via nuqs), PaceCards (rolling averages + MoM + stitch rate), DayOfWeekChart
+- Records & Insights: RecordsTable (personal bests + fastest completions), YearScopeToggle (nuqs), ThreadInsightList (hex swatches), DesignerInsightList (completion rates), GenreInsightList (stitch counts), CompletionEstimatesSection (progress bars), record detection in createSession, canvas-confetti celebration toast
+
+### What Worked
+
+- **Highest velocity yet** — ~7 plans/day, up from ~4.5 in v1.4. Established query patterns from earlier phases (Promise.all, unstable_cache, TDD) made each new module fast to build.
+- **Wave-based parallelism** — Plans within the same wave (e.g., 21-03 and 21-04 in Wave 3) executed in parallel worktrees. Data layer and UI plans ran concurrently when dependencies allowed.
+- **UI-SPEC design contracts** — Both Phase 20 and 21 had UI-SPECs with checker validation. Design decisions were locked before implementation, eliminating mid-execution pivots.
+- **TDD query layer** — All 12+ query modules written test-first. Caught timezone boundary bugs, empty-data edge cases, and groupBy null handling before components were built.
+- **Code review finding real bugs** — CR-01 in Phase 21 caught a false celebration bug (confetti firing on multi-session days when total exceeded record but individual session didn't). Fixed before merge.
+- **Milestone audit before close** — v1.5-MILESTONE-AUDIT.md caught 5 integration warnings (cache staleness, duplicate constants) and cataloged all tech debt. Clean input for milestone completion.
+
+### What Was Inefficient
+
+- **SUMMARY.md quality (6th time)** — CLI accomplishment extraction still garbled. Same root cause: SUMMARY frontmatter format doesn't match what the extractor expects. Had to manually rewrite MILESTONES.md entry.
+- **REQUIREMENTS checkbox drift (6th time)** — 14 of 28 checkboxes stale in REQUIREMENTS.md. Verification reports are the true source of truth; REQUIREMENTS.md is an input doc.
+- **CSP worker-src confetti issue** — canvas-confetti's web worker mode hit CSP `worker-src blob:` violation. Required 3 fix iterations before settling on main-thread fallback. Should have tested CSP compatibility during research.
+- **Year column dead code in RecordsTable** — Placeholder year columns shipped with `--` in both branches of a ternary. Caught during code review but was a waste of implementation time.
+- **18 inherited artifact items** — 14 stale quick tasks from v1.0/v1.1 era still lingering. Should have been cleaned in v1.4.
+
+### Patterns Established
+
+- **Stats query module pattern** — Each module exports a cached query function (`getX`) with `unstable_cache`, `revalidateTag("stats")`, and TZDate-aware date filtering. Consistent across all 12+ modules.
+- **Scope-aware queries** — `buildDateFilter` helper generates Prisma date range from `scope` param ("all" | year number). Reusable across any date-scoped query.
+- **Server Component composition for stats** — StatsOverview, ActivityOverview, RecordsOverview are Server Components that compose Client chart components. Data fetching stays server-side.
+- **nuqs for complex URL state** — Stats page uses nuqs for tab, year scope, session table sort/page/filter. All state URL-persisted and shareable.
+- **Record detection in server action** — `detectBrokenRecords` runs after session insert, returns broken records for client-side celebration. Non-blocking (try-catch-log-rethrow).
+- **canvas-confetti main-thread fallback** — Avoids CSP worker-src issues. Static import, z-index 9999, 150ms delay for modal dismiss timing.
+
+### Key Lessons
+
+1. **Accept REQUIREMENTS.md as write-once** — 6 milestones, same drift. VERIFICATION.md is the truth source. Stop expecting live checkbox tracking and treat REQUIREMENTS.md as the input spec for each milestone.
+2. **Test CSP compatibility during research** — canvas-confetti's worker mode failed CSP. Should have tested in the research phase, not discovered during human verification.
+3. **Clean stale artifacts between milestones** — 14 quick tasks from March/April were still open at v1.5 close. Build artifact cleanup into the milestone-start flow (or use `/gsd-cleanup`).
+4. **Wave-based parallelism scales** — 4 phases in 2 days with consistent quality. The pattern of data-layer-first (Wave 1) then UI (Wave 2-3) works well for stats features.
+5. **Code review catches real bugs** — Phase 21 CR-01 (false celebration) and WR-02 (missing date filter) were genuine logic errors, not style nits. Multi-agent review continues to pay off.
+
+---
+
 ## Milestone: v1.3 — Form & Supply Overhaul
 
 **Shipped:** 2026-05-16
@@ -236,13 +286,13 @@
 
 ## Cross-Milestone Trends
 
-| Metric | v1.0 | v1.1 | v1.2 | v1.3 | v1.4 |
-|--------|------|------|------|------|------|
-| Phases | 4 | 3 | 2 | 5 | 3 |
-| Plans | 23 | 20 | 20 | 19 | 9 |
-| Tests | 395 | 867 | 1,172 | 1,535 | 1,641 |
-| Days | 22 | 5 | 4 | 13 | 2 |
-| Plans/day | ~1 | ~4 | ~5 | ~1.5 | ~4.5 |
-| Commits | 225+ | 225 | 153 | 190 | 153 |
-| PRs | 6 | 3 | 2 | 1 | 2 |
-| LOC | 48k | ~65k | 82k | ~90k | ~95k |
+| Metric | v1.0 | v1.1 | v1.2 | v1.3 | v1.4 | v1.5 |
+|--------|------|------|------|------|------|------|
+| Phases | 4 | 3 | 2 | 5 | 3 | 4 |
+| Plans | 23 | 20 | 20 | 19 | 9 | 14 |
+| Tests | 395 | 867 | 1,172 | 1,535 | 1,641 | 1,967 |
+| Days | 22 | 5 | 4 | 13 | 2 | 2 |
+| Plans/day | ~1 | ~4 | ~5 | ~1.5 | ~4.5 | ~7 |
+| Commits | 225+ | 225 | 153 | 190 | 153 | ~170 |
+| PRs | 6 | 3 | 2 | 1 | 2 | 2 |
+| LOC | 48k | ~65k | 82k | ~90k | ~95k | ~125k |

@@ -1,5 +1,23 @@
 # Milestones
 
+## v1.5 Statistics & Records (Shipped: 2026-05-18)
+
+**Delivered:** A comprehensive statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records board, celebration confetti, and supply/designer/genre insights — making every stitch feel measured and rewarding.
+
+**Stats:** 4 phases, 14 plans | ~170 commits | 1,967 tests | 2 days (2026-05-17 → 2026-05-18)
+
+**Key accomplishments:**
+
+1. **Stats Engine & Charting Foundation** — Server-side query layer with unstable_cache, timezone-aware date boundaries via TZDate, Recharts integration with design system tokens, 3-tab stats page shell
+2. **Hero Stats & Collection Overview** — Lifetime counters (stitches, sessions, time, completions), rolling time-window metrics, interactive collection breakdown charts (status, size, designer, genre) with ranked lists
+3. **Activity Visualization & Calendar** — Monthly stitch bar chart with click-to-drill-down, navigable stitching calendar with project color-coding, sortable/paginated session history table, day-of-week patterns, rolling averages (7/30/90-day), month-over-month pace trends
+4. **Records, Insights & Celebrations** — Personal bests board with year-scoped records, fastest completions by size category, "New record!" celebration toast with canvas-confetti, designer/genre/thread insights with color swatches, completion estimates for active projects
+
+**Known deferred items at close:** 18 (see STATE.md Deferred Items)
+**PRs:** #39 (Phase 20), #40 (Phase 21)
+
+---
+
 ## v1.4 Fixes & Polish (Shipped: 2026-05-17)
 
 **Delivered:** Multiple working copy files per chart, SearchToAdd keystroke fix, Dashboard Spotlight sizing, and click-to-set focal point control for cover images across all display contexts.
