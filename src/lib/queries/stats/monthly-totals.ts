@@ -4,21 +4,33 @@ import { prisma } from "@/lib/db";
 import { getUserTimezone } from "./timezone";
 import type { MonthlyTotal } from "@/types/stats";
 
-const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
+const MONTH_LABELS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+] as const;
 
 async function computeMonthlyTotals(userId: string, year: number): Promise<MonthlyTotal[]> {
   try {
     const tz = getUserTimezone(userId);
 
-    // Year boundaries in user's timezone
     const yearStart = new TZDate(year, 0, 1, 0, 0, 0, tz);
-    const yearEnd = new TZDate(year, 11, 31, 23, 59, 59, tz);
+    const nextYearStart = new TZDate(year + 1, 0, 1, 0, 0, 0, tz);
 
     const results = await prisma.stitchSession.groupBy({
       by: ["date"],
       where: {
         project: { userId },
-        date: { gte: yearStart, lte: yearEnd },
+        date: { gte: yearStart, lt: nextYearStart },
       },
       _sum: { stitchCount: true },
     });

@@ -13,14 +13,13 @@ async function computeDailyBreakdown(
   try {
     const tz = getUserTimezone(userId);
 
-    // Month boundaries (month is 1-based input, TZDate uses 0-based)
     const monthStart = new TZDate(year, month - 1, 1, 0, 0, 0, tz);
-    const monthEnd = new TZDate(year, month, 0, 23, 59, 59, tz);
+    const nextMonthStart = new TZDate(year, month, 1, 0, 0, 0, tz);
 
     const sessions = await prisma.stitchSession.findMany({
       where: {
         project: { userId },
-        date: { gte: monthStart, lte: monthEnd },
+        date: { gte: monthStart, lt: nextMonthStart },
       },
       include: {
         project: {

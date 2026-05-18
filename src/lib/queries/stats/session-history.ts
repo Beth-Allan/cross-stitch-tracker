@@ -7,12 +7,13 @@ const PAGE_SIZE = 25;
 
 async function computeSessionHistory(
   userId: string,
-  page: number,
+  rawPage: number,
   sortField: string,
   sortDir: string,
   projectId: string | null,
 ): Promise<SessionHistoryData> {
   try {
+    const page = Math.max(1, rawPage);
     const where: Prisma.StitchSessionWhereInput = {
       project: { userId },
       ...(projectId && projectId !== "all" ? { projectId } : {}),
@@ -65,7 +66,7 @@ async function computeSessionHistory(
   } catch (error) {
     console.error("[stats] computeSessionHistory failed:", {
       userId,
-      page,
+      page: rawPage,
       sortField,
       sortDir,
       projectId,

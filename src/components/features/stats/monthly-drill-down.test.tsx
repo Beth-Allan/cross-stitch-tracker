@@ -33,13 +33,13 @@ describe("MonthlyDrillDown", () => {
       <MonthlyDrillDown
         entries={mockEntries}
         isExpanded={true}
+        isLoading={false}
         monthLabel="January"
         year={2026}
         totalStitches={678}
       />,
     );
 
-    // "Autumn Leaves" appears in 2 entries
     const autumnEntries = screen.getAllByText("Autumn Leaves");
     expect(autumnEntries).toHaveLength(2);
     expect(screen.getByText("Winter Garden")).toBeInTheDocument();
@@ -53,6 +53,7 @@ describe("MonthlyDrillDown", () => {
       <MonthlyDrillDown
         entries={mockEntries}
         isExpanded={true}
+        isLoading={false}
         monthLabel="January"
         year={2026}
         totalStitches={678}
@@ -71,6 +72,7 @@ describe("MonthlyDrillDown", () => {
       <MonthlyDrillDown
         entries={mockEntries}
         isExpanded={true}
+        isLoading={false}
         monthLabel="January"
         year={2026}
         totalStitches={678}
@@ -86,6 +88,7 @@ describe("MonthlyDrillDown", () => {
       <MonthlyDrillDown
         entries={mockEntries}
         isExpanded={true}
+        isLoading={false}
         monthLabel="January"
         year={2026}
         totalStitches={678}
@@ -96,19 +99,51 @@ describe("MonthlyDrillDown", () => {
     expect(scrollContainer).toBeInTheDocument();
   });
 
-  it("returns null when not expanded (no entries visible)", () => {
-    const { container } = render(
+  it("shows Loading... when isLoading is true", () => {
+    render(
       <MonthlyDrillDown
         entries={[]}
         isExpanded={true}
+        isLoading={true}
         monthLabel="January"
         year={2026}
         totalStitches={0}
       />,
     );
 
-    // Empty entries + expanded = null output
-    expect(container.querySelector("[data-testid]")).not.toBeInTheDocument();
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
     expect(screen.queryByText("January 2026")).not.toBeInTheDocument();
+  });
+
+  it("shows empty state when expanded with no entries and not loading", () => {
+    render(
+      <MonthlyDrillDown
+        entries={[]}
+        isExpanded={true}
+        isLoading={false}
+        monthLabel="January"
+        year={2026}
+        totalStitches={0}
+      />,
+    );
+
+    expect(screen.getByText("No sessions this month")).toBeInTheDocument();
+    expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
+  });
+
+  it("does not render interactive elements when collapsed", () => {
+    render(
+      <MonthlyDrillDown
+        entries={mockEntries}
+        isExpanded={false}
+        isLoading={false}
+        monthLabel="January"
+        year={2026}
+        totalStitches={678}
+      />,
+    );
+
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    expect(screen.queryByText("Autumn Leaves")).not.toBeInTheDocument();
   });
 });

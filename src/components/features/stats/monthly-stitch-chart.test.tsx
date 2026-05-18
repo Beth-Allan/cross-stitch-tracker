@@ -68,6 +68,7 @@ vi.mock("./monthly-drill-down", () => ({
     monthLabel,
   }: {
     isExpanded: boolean;
+    isLoading: boolean;
     monthLabel: string;
     entries: unknown[];
     year: number;

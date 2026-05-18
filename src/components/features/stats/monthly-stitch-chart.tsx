@@ -177,6 +177,7 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
       <MonthlyDrillDown
         entries={drillDownData}
         isExpanded={activeMonth !== null}
+        isLoading={isPending && activeMonth !== null}
         monthLabel={activeMonthLabel}
         year={year}
         totalStitches={activeTotalStitches}

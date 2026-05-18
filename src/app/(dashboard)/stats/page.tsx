@@ -75,12 +75,7 @@ export default async function StatsPage({
     name: p.chart.name,
   }));
 
-  // Determine if user has any sessions (for empty state)
-  const hasNoSessions =
-    sessionHistory.total === 0 &&
-    paceMetrics.avg7Day === 0 &&
-    paceMetrics.avg30Day === 0 &&
-    paceMetrics.avg90Day === 0;
+  const hasNoSessions = heroStats.totalSessions === 0;
 
   return (
     <StatsPageShell
