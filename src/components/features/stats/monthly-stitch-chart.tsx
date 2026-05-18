@@ -135,7 +135,7 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
                 <Cell
                   key={entry.month}
                   fill={
-                    index === activeMonth
+                    activeMonth === null || index === activeMonth
                       ? "var(--chart-1)"
                       : "color-mix(in oklch, var(--chart-1) 60%, transparent)"
                   }
