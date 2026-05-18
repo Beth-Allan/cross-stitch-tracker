@@ -645,6 +645,164 @@ describe("session-actions", () => {
 
       warnSpy.mockRestore();
     });
+
+    it("returns overTotal warning when session pushes progress past 100%", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+        stitchesCompleted: 900,
+        chart: { stitchCount: 1000 },
+      });
+
+      const mockSession = createMockStitchSession({ id: "new-session", stitchCount: 200 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 1100 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 1100 }),
+          },
+        });
+      });
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.warning).toBe("overTotal");
+      }
+    });
+
+    it("does not return warning when progress stays under 100%", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+        stitchesCompleted: 500,
+        chart: { stitchCount: 1000 },
+      });
+
+      const mockSession = createMockStitchSession({ id: "new-session", stitchCount: 200 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 700 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 700 }),
+          },
+        });
+      });
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.warning).toBeUndefined();
+      }
+    });
+
+    it("does not return warning when chart has no stitchCount", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+        stitchesCompleted: 900,
+        chart: { stitchCount: null },
+      });
+
+      const mockSession = createMockStitchSession({ id: "new-session", stitchCount: 200 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 1100 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 1100 }),
+          },
+        });
+      });
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.warning).toBeUndefined();
+      }
+    });
+
+    it("saves session even when overTotal warning is returned", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+        stitchesCompleted: 900,
+        chart: { stitchCount: 1000 },
+      });
+
+      const mockSession = createMockStitchSession({ id: "new-session", stitchCount: 200 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 1100 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 1100 }),
+          },
+        });
+      });
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
+      if (result.success) {
+        expect(result.warning).toBe("overTotal");
+        expect(result.session).toBeDefined();
+      }
+    });
   });
 
   // ─── updateSession ─────────────────────────────────────────────────────
