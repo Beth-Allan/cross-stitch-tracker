@@ -81,7 +81,7 @@ Full details: `milestones/v1.4-ROADMAP.md`
 
 - [x] **Phase 18: Stats Engine & Charting Foundation** - Server-side query layer, caching, timezone handling, and Recharts installation (completed 2026-05-17)
 - [x] **Phase 19: Hero Stats & Collection Overview** - Lifetime counters, rolling time-window stats, and collection breakdown charts (completed 2026-05-17)
-- [ ] **Phase 20: Activity Visualization & Calendar** - Monthly bar chart, stitching calendar, session history, day-of-week patterns, and pace trends
+- [x] **Phase 20: Activity Visualization & Calendar** - Monthly bar chart, stitching calendar, session history, day-of-week patterns, and pace trends (completed 2026-05-18)
 - [ ] **Phase 21: Records, Insights & Celebrations** - Personal bests board, "New record!" toast, designer/genre/supply insights, and completion estimates
 
 ## Phase Details
@@ -129,12 +129,12 @@ Plans:
   3. User can browse all sessions in a sortable, paginated table
   4. User can see day-of-week patterns, rolling averages (7/30/90-day), and month-over-month pace trends
   5. User can see their stitch rate (stitches/hour) with trend direction when time data is available
-**Plans:** 2/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 - [x] 20-01-PLAN.md — Types, chart configs, queries, server actions, search-params cache
-- [ ] 20-02-PLAN.md — PaceCards, MonthlyStitchChart, MonthlyDrillDown, DayOfWeekChart
+- [x] 20-02-PLAN.md — PaceCards, MonthlyStitchChart, MonthlyDrillDown, DayOfWeekChart
 - [x] 20-03-PLAN.md — StitchingCalendar, SessionHistoryTable, shadcn table\/pagination
-- [ ] 20-04-PLAN.md — ActivityOverview layout, page.tsx wiring, human verification
+- [x] 20-04-PLAN.md — ActivityOverview layout, page.tsx wiring, human verification
 
 ### Phase 21: Records, Insights & Celebrations
 **Goal**: Users can view personal bests, receive celebration toasts when breaking records, and explore supply/designer/genre insights with completion estimates
@@ -177,5 +177,5 @@ Plans:
 | 17. Image Focal Point | v1.4 | 3/3 | Complete | 2026-05-17 |
 | 18. Stats Engine & Charting Foundation | v1.5 | 3/3 | Complete    | 2026-05-17 |
 | 19. Hero Stats & Collection Overview | v1.5 | 0/3 | Planned | - |
-| 20. Activity Visualization & Calendar | v1.5 | 2/4 | In Progress|  |
+| 20. Activity Visualization & Calendar | v1.5 | 4/4 | Complete   | 2026-05-18 |
 | 21. Records, Insights & Celebrations | v1.5 | 0/? | Not started | - |
