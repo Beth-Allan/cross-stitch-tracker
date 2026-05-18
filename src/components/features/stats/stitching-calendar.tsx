@@ -47,24 +47,14 @@ interface StitchingCalendarProps {
   initialYear: number;
 }
 
-export function StitchingCalendar({
-  data,
-  initialMonth,
-  initialYear,
-}: StitchingCalendarProps) {
+export function StitchingCalendar({ data, initialMonth, initialYear }: StitchingCalendarProps) {
   const [month, setMonth] = useState(initialMonth);
   const [year, setYear] = useState(initialYear);
   const [calendarData, setCalendarData] = useState<CalendarDayData[]>(data);
   const [isPending, startTransition] = useTransition();
 
-  const projectColorMap = useMemo(
-    () => getProjectColorMap(calendarData),
-    [calendarData],
-  );
-  const projectNameMap = useMemo(
-    () => getProjectNameMap(calendarData),
-    [calendarData],
-  );
+  const projectColorMap = useMemo(() => getProjectColorMap(calendarData), [calendarData]);
+  const projectNameMap = useMemo(() => getProjectNameMap(calendarData), [calendarData]);
 
   const dayLookup = useMemo(() => {
     const map = new Map<string, CalendarDayData>();
@@ -112,9 +102,9 @@ export function StitchingCalendar({
   const isEmpty = calendarData.length === 0;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card">
+    <div className="border-border bg-card overflow-hidden rounded-xl border">
       {/* Month navigation header */}
-      <div className="flex items-center justify-between border-b border-border px-5 py-3">
+      <div className="border-border flex items-center justify-between border-b px-5 py-3">
         <Button
           variant="ghost"
           size="icon"
@@ -137,11 +127,11 @@ export function StitchingCalendar({
       </div>
 
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 border-b border-border">
+      <div className="border-border grid grid-cols-7 border-b">
         {WEEKDAYS.map((day) => (
           <div
             key={day}
-            className="py-2 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
+            className="text-muted-foreground py-2 text-center text-[10px] font-semibold tracking-wider uppercase"
           >
             {day}
           </div>
@@ -149,16 +139,14 @@ export function StitchingCalendar({
       </div>
 
       {/* Calendar grid */}
-      <div
-        className={`grid grid-cols-7 ${isPending ? "opacity-50" : ""}`}
-      >
+      <div className={`grid grid-cols-7 ${isPending ? "opacity-50" : ""}`}>
         {calendarCells.map((dayNum, i) => {
           if (dayNum === null) {
             return (
               <div
                 key={`pad-${i}`}
                 data-testid="padding-cell"
-                className="min-h-[48px] border-b border-r border-border bg-muted sm:min-h-[80px]"
+                className="border-border bg-muted min-h-[48px] border-r border-b sm:min-h-[80px]"
               />
             );
           }
@@ -170,7 +158,7 @@ export function StitchingCalendar({
           return (
             <div
               key={dateStr}
-              className={`min-h-[48px] border-b border-r border-border p-1 sm:min-h-[80px] sm:p-2 ${
+              className={`border-border min-h-[48px] border-r border-b p-1 sm:min-h-[80px] sm:p-2 ${
                 isTodayDate ? "bg-success-muted" : ""
               }`}
             >
@@ -179,14 +167,12 @@ export function StitchingCalendar({
                 {isTodayDate ? (
                   <span
                     data-testid="today-indicator"
-                    className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-success text-[10px] font-medium text-white"
+                    className="bg-success inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium text-white"
                   >
                     {dayNum}
                   </span>
                 ) : (
-                  <span className="text-xs tabular-nums text-muted-foreground">
-                    {dayNum}
-                  </span>
+                  <span className="text-muted-foreground text-xs tabular-nums">{dayNum}</span>
                 )}
               </div>
 
@@ -197,10 +183,10 @@ export function StitchingCalendar({
                   <Link
                     key={si}
                     href={`/projects/${session.projectId}`}
-                    className="mb-0.5 hidden rounded border px-1 py-0.5 text-[10px] font-semibold leading-tight truncate sm:block"
+                    className="mb-0.5 hidden truncate rounded border px-1 py-0.5 text-[10px] leading-tight font-semibold sm:block"
                     style={{
-                      backgroundColor: `hsl(var(--chart-${colorIndex + 1}) / 0.15)`,
-                      borderColor: `hsl(var(--chart-${colorIndex + 1}) / 0.4)`,
+                      backgroundColor: `color-mix(in oklch, var(--chart-${colorIndex + 1}) 15%, transparent)`,
+                      borderColor: `color-mix(in oklch, var(--chart-${colorIndex + 1}) 40%, transparent)`,
                       color: `var(--chart-${colorIndex + 1})`,
                     }}
                   >
@@ -213,8 +199,7 @@ export function StitchingCalendar({
               {dayData?.sessions && dayData.sessions.length > 0 && (
                 <div className="flex gap-0.5 sm:hidden">
                   {dayData.sessions.map((session, si) => {
-                    const colorIndex =
-                      projectColorMap.get(session.projectId) ?? 0;
+                    const colorIndex = projectColorMap.get(session.projectId) ?? 0;
                     return (
                       <div
                         key={si}
@@ -234,16 +219,14 @@ export function StitchingCalendar({
 
       {/* Empty state */}
       {isEmpty && (
-        <div className="py-8 text-center text-sm text-muted-foreground">
-          No sessions this month
-        </div>
+        <div className="text-muted-foreground py-8 text-center text-sm">No sessions this month</div>
       )}
 
       {/* Calendar legend */}
       {!isEmpty && (
         <div
           data-testid="calendar-legend"
-          className="hidden flex-wrap gap-3 border-t border-border px-5 py-3 sm:flex"
+          className="border-border hidden flex-wrap gap-3 border-t px-5 py-3 sm:flex"
         >
           {[...projectColorMap.entries()].map(([projectId, colorIndex]) => (
             <div key={projectId} className="flex items-center gap-1.5">
@@ -253,7 +236,7 @@ export function StitchingCalendar({
                   backgroundColor: `var(--chart-${colorIndex + 1})`,
                 }}
               />
-              <span className="text-xs text-muted-foreground">
+              <span className="text-muted-foreground text-xs">
                 {projectNameMap.get(projectId) ?? projectId}
               </span>
             </div>

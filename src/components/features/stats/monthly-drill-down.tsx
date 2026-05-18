@@ -20,7 +20,17 @@ export function MonthlyDrillDown({
   totalStitches,
 }: MonthlyDrillDownProps) {
   if (entries.length === 0 && isExpanded) {
-    return null;
+    return (
+      <div className="grid transition-all duration-300" style={{ gridTemplateRows: "1fr" }}>
+        <div className="overflow-hidden">
+          <div className="bg-card border-border mt-2 rounded-lg border p-4">
+            <div className="flex h-20 items-center justify-center">
+              <span className="text-muted-foreground text-sm">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -29,7 +39,7 @@ export function MonthlyDrillDown({
       style={{ gridTemplateRows: isExpanded ? "1fr" : "0fr" }}
     >
       <div className="overflow-hidden">
-        <div className="bg-card mt-2 rounded-lg border border-border p-4">
+        <div className="bg-card border-border mt-2 rounded-lg border p-4">
           <div className="flex items-baseline justify-between">
             <h4 className="font-heading text-sm font-semibold">
               {monthLabel} {year}
@@ -50,7 +60,7 @@ export function MonthlyDrillDown({
                   </span>
                   <Link
                     href={`/projects/${entry.projectId}`}
-                    className="text-foreground text-sm underline decoration-muted-foreground/50 hover:decoration-foreground"
+                    className="text-foreground decoration-muted-foreground/50 hover:decoration-foreground text-sm underline"
                   >
                     {entry.projectName}
                   </Link>

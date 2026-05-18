@@ -2,11 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { BarChart, Bar, XAxis, YAxis, Cell } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { monthlyBarConfig } from "@/lib/chart-configs";
@@ -82,7 +78,7 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
   }
 
   const activeTotalStitches =
-    activeMonth !== null ? chartData[activeMonth]?.totalStitches ?? 0 : 0;
+    activeMonth !== null ? (chartData[activeMonth]?.totalStitches ?? 0) : 0;
   const activeMonthLabel = activeMonth !== null ? MONTH_LABELS[activeMonth] : "";
 
   return (
@@ -97,9 +93,7 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <h3 className="font-heading text-sm font-semibold">
-          Monthly Stitches &mdash; {year}
-        </h3>
+        <h3 className="font-heading text-sm font-semibold">Monthly Stitches &mdash; {year}</h3>
         <Button
           variant="ghost"
           size="icon"
@@ -132,7 +126,7 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
                   fill={
                     index === activeMonth
                       ? "var(--chart-1)"
-                      : "hsl(var(--chart-1) / 0.6)"
+                      : "color-mix(in oklch, var(--chart-1) 60%, transparent)"
                   }
                   cursor={entry.totalStitches > 0 ? "pointer" : "default"}
                 />

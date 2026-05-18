@@ -18,12 +18,17 @@ async function computeSessionHistory(
       ...(projectId && projectId !== "all" ? { projectId } : {}),
     };
 
+    const validDirs = ["asc", "desc"] as const;
+    const direction = validDirs.includes(sortDir as (typeof validDirs)[number])
+      ? (sortDir as "asc" | "desc")
+      : "desc";
+
     const orderBy = {
       [sortField === "stitches"
         ? "stitchCount"
         : sortField === "time"
           ? "timeSpentMinutes"
-          : "date"]: sortDir as "asc" | "desc",
+          : "date"]: direction,
     };
 
     const [sessions, total] = await Promise.all([
