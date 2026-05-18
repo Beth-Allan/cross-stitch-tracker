@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@/__tests__/test-utils";
 import type { BrokenRecord } from "@/types/stats";
 
@@ -21,9 +21,14 @@ vi.mock("sonner", () => ({
 describe("fireCelebration", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
-  it("fires confetti with expected particle config", async () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("fires confetti after 150ms delay with expected config", async () => {
     const { fireCelebration } = await import("./record-celebration");
 
     const records: BrokenRecord[] = [
@@ -38,9 +43,8 @@ describe("fireCelebration", () => {
 
     fireCelebration(records);
 
-    await vi.waitFor(() => {
-      expect(mockConfetti).toHaveBeenCalledTimes(1);
-    });
+    expect(mockConfetti).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(150);
 
     expect(mockConfetti).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -48,6 +52,7 @@ describe("fireCelebration", () => {
         spread: 80,
         startVelocity: 45,
         origin: { x: 0.5, y: 0.2 },
+        zIndex: 9999,
         colors: expect.arrayContaining(["#34d399", "#fbbf24"]),
       }),
     );

@@ -1,5 +1,6 @@
 "use client";
 
+import confetti from "canvas-confetti";
 import { Trophy, X } from "lucide-react";
 import { toast } from "sonner";
 import type { BrokenRecord } from "@/types/stats";
@@ -50,9 +51,8 @@ export function fireCelebration(brokenRecords: BrokenRecord[]): void {
     { duration: 6000 },
   );
 
-  import("canvas-confetti")
-    .then((mod) => {
-      const confetti = mod.default ?? mod;
+  setTimeout(() => {
+    try {
       confetti({
         particleCount: 150,
         spread: 80,
@@ -60,7 +60,10 @@ export function fireCelebration(brokenRecords: BrokenRecord[]): void {
         origin: { x: 0.5, y: 0.2 },
         colors: ["#34d399", "#fbbf24", "#f59e0b", "#6ee7b7"],
         ticks: 120,
+        zIndex: 9999,
       });
-    })
-    .catch(() => {});
+    } catch {
+      // confetti is non-critical
+    }
+  }, 150);
 }
