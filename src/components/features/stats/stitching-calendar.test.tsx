@@ -127,7 +127,7 @@ describe("StitchingCalendar", () => {
   it("clicking next month button calls fetchCalendarMonth with correct month/year", async () => {
     const { fetchCalendarMonth } = await import("@/lib/actions/stats-actions");
     const mockFetch = vi.mocked(fetchCalendarMonth);
-    mockFetch.mockResolvedValue([]);
+    mockFetch.mockResolvedValue({ success: true, data: [] });
 
     render(<StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />);
 

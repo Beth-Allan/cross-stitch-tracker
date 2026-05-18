@@ -21,7 +21,7 @@ describe("stats-actions", () => {
   });
 
   describe("fetchCalendarMonth", () => {
-    it("calls requireAuth and delegates to getCalendarDays", async () => {
+    it("returns success with data from getCalendarDays", async () => {
       const mockData = [{ date: "2026-05-10", sessions: [] }];
       mockGetCalendarDays.mockResolvedValue(mockData);
 
@@ -30,13 +30,32 @@ describe("stats-actions", () => {
 
       expect(mockRequireAuth).toHaveBeenCalled();
       expect(mockGetCalendarDays).toHaveBeenCalledWith("user-1", 5, 2026);
-      expect(result).toEqual(mockData);
+      expect(result).toEqual({ success: true, data: mockData });
+    });
+
+    it("returns error on invalid month", async () => {
+      const { fetchCalendarMonth } = await import("./stats-actions");
+      const result = await fetchCalendarMonth(13, 2026);
+
+      expect(result.success).toBe(false);
+      expect(mockGetCalendarDays).not.toHaveBeenCalled();
+    });
+
+    it("returns error when requireAuth rejects", async () => {
+      mockRequireAuth.mockRejectedValue(new Error("Unauthorized"));
+
+      const { fetchCalendarMonth } = await import("./stats-actions");
+      const result = await fetchCalendarMonth(5, 2026);
+
+      expect(result).toEqual({ success: false, error: "Failed to load calendar data" });
     });
   });
 
   describe("fetchDailyBreakdown", () => {
-    it("calls requireAuth and delegates to getDailyBreakdown", async () => {
-      const mockData = [{ date: "2026-05-10", projectId: "p1", projectName: "A", stitchCount: 100 }];
+    it("returns success with data from getDailyBreakdown", async () => {
+      const mockData = [
+        { date: "2026-05-10", projectId: "p1", chartId: "c1", projectName: "A", stitchCount: 100 },
+      ];
       mockGetDailyBreakdown.mockResolvedValue(mockData);
 
       const { fetchDailyBreakdown } = await import("./stats-actions");
@@ -44,12 +63,20 @@ describe("stats-actions", () => {
 
       expect(mockRequireAuth).toHaveBeenCalled();
       expect(mockGetDailyBreakdown).toHaveBeenCalledWith("user-1", 5, 2026);
-      expect(result).toEqual(mockData);
+      expect(result).toEqual({ success: true, data: mockData });
+    });
+
+    it("returns error on invalid year", async () => {
+      const { fetchDailyBreakdown } = await import("./stats-actions");
+      const result = await fetchDailyBreakdown(5, 2019);
+
+      expect(result.success).toBe(false);
+      expect(mockGetDailyBreakdown).not.toHaveBeenCalled();
     });
   });
 
   describe("fetchMonthlyTotals", () => {
-    it("calls requireAuth and delegates to getMonthlyTotals", async () => {
+    it("returns success with data from getMonthlyTotals", async () => {
       const mockData = [{ month: "Jan", totalStitches: 5000, year: 2026 }];
       mockGetMonthlyTotals.mockResolvedValue(mockData);
 
@@ -58,7 +85,15 @@ describe("stats-actions", () => {
 
       expect(mockRequireAuth).toHaveBeenCalled();
       expect(mockGetMonthlyTotals).toHaveBeenCalledWith("user-1", 2026);
-      expect(result).toEqual(mockData);
+      expect(result).toEqual({ success: true, data: mockData });
+    });
+
+    it("returns error on invalid year", async () => {
+      const { fetchMonthlyTotals } = await import("./stats-actions");
+      const result = await fetchMonthlyTotals(2101);
+
+      expect(result.success).toBe(false);
+      expect(mockGetMonthlyTotals).not.toHaveBeenCalled();
     });
   });
 });

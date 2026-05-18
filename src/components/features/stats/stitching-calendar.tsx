@@ -4,6 +4,7 @@ import { useState, useEffect, useTransition, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 import { getDaysInMonth, getDay, startOfMonth, format, isToday } from "date-fns";
 import { fetchCalendarMonth } from "@/lib/actions/stats-actions";
 import type { CalendarDayData } from "@/types/stats";
@@ -96,11 +97,19 @@ export function StitchingCalendar({ data, initialMonth, initialYear }: Stitching
       newMonth = 1;
       newYear++;
     }
-    setMonth(newMonth);
-    setYear(newYear);
     startTransition(async () => {
-      const result = await fetchCalendarMonth(newMonth, newYear);
-      setCalendarData(result);
+      try {
+        const result = await fetchCalendarMonth(newMonth, newYear);
+        if (!result.success) {
+          toast.error(result.error);
+          return;
+        }
+        setMonth(newMonth);
+        setYear(newYear);
+        setCalendarData(result.data);
+      } catch {
+        toast.error("Something went wrong loading calendar.");
+      }
     });
   }
 

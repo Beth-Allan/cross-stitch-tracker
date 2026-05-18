@@ -119,7 +119,7 @@ describe("MonthlyStitchChart", () => {
       totalStitches: 1000,
       year: 2025,
     }));
-    mockFetchMonthlyTotals.mockResolvedValue(newYearData);
+    mockFetchMonthlyTotals.mockResolvedValue({ success: true, data: newYearData });
 
     render(<MonthlyStitchChart data={mockMonthlyData} initialYear={2026} />);
 
@@ -137,7 +137,7 @@ describe("MonthlyStitchChart", () => {
       totalStitches: 2000,
       year: 2027,
     }));
-    mockFetchMonthlyTotals.mockResolvedValue(newYearData);
+    mockFetchMonthlyTotals.mockResolvedValue({ success: true, data: newYearData });
 
     render(<MonthlyStitchChart data={mockMonthlyData} initialYear={2026} />);
 
@@ -150,9 +150,18 @@ describe("MonthlyStitchChart", () => {
   });
 
   it("clicking a non-zero bar calls fetchDailyBreakdown and shows drill-down", async () => {
-    mockFetchDailyBreakdown.mockResolvedValue([
-      { date: "2026-01-15", projectId: "p1", chartId: "c1", projectName: "Test", stitchCount: 100 },
-    ]);
+    mockFetchDailyBreakdown.mockResolvedValue({
+      success: true,
+      data: [
+        {
+          date: "2026-01-15",
+          projectId: "p1",
+          chartId: "c1",
+          projectName: "Test",
+          stitchCount: 100,
+        },
+      ],
+    });
 
     render(<MonthlyStitchChart data={mockMonthlyData} initialYear={2026} />);
 
@@ -170,9 +179,18 @@ describe("MonthlyStitchChart", () => {
   });
 
   it("clicking same bar again collapses drill-down", async () => {
-    mockFetchDailyBreakdown.mockResolvedValue([
-      { date: "2026-01-15", projectId: "p1", chartId: "c1", projectName: "Test", stitchCount: 100 },
-    ]);
+    mockFetchDailyBreakdown.mockResolvedValue({
+      success: true,
+      data: [
+        {
+          date: "2026-01-15",
+          projectId: "p1",
+          chartId: "c1",
+          projectName: "Test",
+          stitchCount: 100,
+        },
+      ],
+    });
 
     render(<MonthlyStitchChart data={mockMonthlyData} initialYear={2026} />);
 

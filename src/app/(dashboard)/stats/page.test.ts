@@ -110,12 +110,13 @@ const mockGenreBreakdown: GenreBreakdownItem[] = [
   { genreId: "g2", name: "Sampler", count: 3 },
 ];
 
-const mockMonthlyTotals: MonthlyTotal[] = [
-  { month: "Jan", totalStitches: 3000, year: 2026 },
-];
+const mockMonthlyTotals: MonthlyTotal[] = [{ month: "Jan", totalStitches: 3000, year: 2026 }];
 
 const mockCalendarData: CalendarDayData[] = [
-  { date: "2026-05-15", sessions: [{ projectId: "p1", projectName: "Test", stitchCount: 200 }] },
+  {
+    date: "2026-05-15",
+    sessions: [{ projectId: "p1", chartId: "c1", projectName: "Test", stitchCount: 200 }],
+  },
 ];
 
 const mockSessionHistory: SessionHistoryData = {
@@ -136,9 +137,7 @@ const mockPaceMetrics: PaceMetricsData = {
   stitchRatePrior: 110,
 };
 
-const mockDayOfWeekData: DayOfWeekData[] = [
-  { dayOfWeek: "Mon", avgStitches: 200 },
-];
+const mockDayOfWeekData: DayOfWeekData[] = [{ dayOfWeek: "Mon", avgStitches: 200 }];
 
 describe("StatsPage server component", () => {
   beforeEach(() => {
@@ -155,9 +154,7 @@ describe("StatsPage server component", () => {
     mockGetPaceMetrics.mockResolvedValue(mockPaceMetrics);
     mockGetDayOfWeekPattern.mockResolvedValue(mockDayOfWeekData);
     mockParse.mockResolvedValue({ page: 1, sort: "date", dir: "desc", project: "all" });
-    mockFindMany.mockResolvedValue([
-      { id: "p1", chart: { name: "Test Project" } },
-    ]);
+    mockFindMany.mockResolvedValue([{ id: "p1", chart: { name: "Test Project" } }]);
   });
 
   it("calls requireAuth() before any data fetching", async () => {
@@ -192,7 +189,11 @@ describe("StatsPage server component", () => {
     expect(mockGetDesignerBreakdown).toHaveBeenCalledWith("user-123");
     expect(mockGetGenreBreakdown).toHaveBeenCalledWith("user-123");
     expect(mockGetMonthlyTotals).toHaveBeenCalledWith("user-123", expect.any(Number));
-    expect(mockGetCalendarDays).toHaveBeenCalledWith("user-123", expect.any(Number), expect.any(Number));
+    expect(mockGetCalendarDays).toHaveBeenCalledWith(
+      "user-123",
+      expect.any(Number),
+      expect.any(Number),
+    );
     expect(mockGetSessionHistory).toHaveBeenCalledWith("user-123", 1, "date", "desc", null);
     expect(mockGetPaceMetrics).toHaveBeenCalledWith("user-123");
     expect(mockGetDayOfWeekPattern).toHaveBeenCalledWith("user-123");

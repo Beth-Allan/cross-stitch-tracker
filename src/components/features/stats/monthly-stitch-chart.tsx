@@ -5,6 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, Cell } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 import { monthlyBarConfig } from "@/lib/chart-configs";
 import { fetchDailyBreakdown, fetchMonthlyTotals } from "@/lib/actions/stats-actions";
 import { MonthlyDrillDown } from "./monthly-drill-down";
@@ -49,22 +50,38 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
   function handlePrevYear() {
     const newYear = year - 1;
     startTransition(async () => {
-      const newData = await fetchMonthlyTotals(newYear);
-      setYear(newYear);
-      setChartData(newData);
-      setActiveMonth(null);
-      setDrillDownData([]);
+      try {
+        const result = await fetchMonthlyTotals(newYear);
+        if (!result.success) {
+          toast.error(result.error);
+          return;
+        }
+        setYear(newYear);
+        setChartData(result.data);
+        setActiveMonth(null);
+        setDrillDownData([]);
+      } catch {
+        toast.error("Something went wrong loading chart data.");
+      }
     });
   }
 
   function handleNextYear() {
     const newYear = year + 1;
     startTransition(async () => {
-      const newData = await fetchMonthlyTotals(newYear);
-      setYear(newYear);
-      setChartData(newData);
-      setActiveMonth(null);
-      setDrillDownData([]);
+      try {
+        const result = await fetchMonthlyTotals(newYear);
+        if (!result.success) {
+          toast.error(result.error);
+          return;
+        }
+        setYear(newYear);
+        setChartData(result.data);
+        setActiveMonth(null);
+        setDrillDownData([]);
+      } catch {
+        toast.error("Something went wrong loading chart data.");
+      }
     });
   }
 
@@ -79,8 +96,18 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
 
     setActiveMonth(index);
     startTransition(async () => {
-      const breakdown = await fetchDailyBreakdown(index + 1, year);
-      setDrillDownData(breakdown);
+      try {
+        const result = await fetchDailyBreakdown(index + 1, year);
+        if (!result.success) {
+          toast.error(result.error);
+          setActiveMonth(null);
+          return;
+        }
+        setDrillDownData(result.data);
+      } catch {
+        toast.error("Something went wrong loading breakdown.");
+        setActiveMonth(null);
+      }
     });
   }
 

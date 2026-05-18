@@ -28,7 +28,7 @@ describe("Activity Visualization Types", () => {
     it("has date (string) and sessions (CalendarSession[]) fields", () => {
       const item: CalendarDayData = {
         date: "2026-05-17",
-        sessions: [{ projectId: "p1", projectName: "Test", stitchCount: 100 }],
+        sessions: [{ projectId: "p1", chartId: "c1", projectName: "Test", stitchCount: 100 }],
       };
       expect(item.date).toBe("2026-05-17");
       expect(item.sessions).toHaveLength(1);
@@ -39,6 +39,7 @@ describe("Activity Visualization Types", () => {
     it("has projectId (string), projectName (string), stitchCount (number) fields", () => {
       const item: CalendarSession = {
         projectId: "p1",
+        chartId: "c1",
         projectName: "My Project",
         stitchCount: 200,
       };
@@ -71,6 +72,7 @@ describe("Activity Visualization Types", () => {
         id: "s1",
         date: new Date("2026-05-17"),
         projectId: "p1",
+        chartId: "c1",
         projectName: "Test",
         stitchCount: 150,
         timeSpentMinutes: null,
@@ -123,6 +125,7 @@ describe("Activity Visualization Types", () => {
       const item: DailyBreakdownEntry = {
         date: "2026-05-17",
         projectId: "p1",
+        chartId: "c1",
         projectName: "My Project",
         stitchCount: 300,
       };
