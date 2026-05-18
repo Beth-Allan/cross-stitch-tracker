@@ -22,8 +22,9 @@ A stitcher can manage their entire chart collection and supplies faster and more
 ## Current State
 
 **Last shipped:** v1.5 Statistics & Records (2026-05-18)
+**Phase 22 complete:** Critical Fixes & Test Infrastructure (2026-05-18)
 
-The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project selection, image optimization, multi-file working copies per chart, click-to-set focal point control for cover images, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights, and celebration confetti on record-breaking sessions. 1,967 tests, ~125k LOC TypeScript.
+The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project selection, image optimization, multi-file working copies per chart, click-to-set focal point control for cover images, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights, and celebration confetti on record-breaking sessions. 1,995 tests, ~125k LOC TypeScript. Stats page resilient to individual query failures via Promise.allSettled.
 
 ## Requirements
 
