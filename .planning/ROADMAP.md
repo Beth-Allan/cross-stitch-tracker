@@ -128,7 +128,11 @@ Plans:
   5. File deletion and photo upload errors in session-actions are surfaced to the user instead of silently swallowed
   6. Stats data refreshes when chart status changes or supply mutations occur (no stale cache)
   7. Session logging rejects stitch counts that would push a project over 100% progress
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 23-01-PLAN.md -- Edge case tests: calendar year-rollover, record detection duplicates, completion estimate exclusions
+- [ ] 23-02-PLAN.md -- Session reliability: file error visibility, deleteSession photo cleanup, over-100% progress guardrail
+- [ ] 23-03-PLAN.md -- Cache staleness: revalidateTag on chart status + supply mutations, resolveDefaultBrandId tests
 
 ### Phase 24: Code Quality
 **Goal**: Stats types use precise TypeScript representations, shared utilities are deduplicated, and code comments follow project conventions
@@ -197,7 +201,7 @@ Phase 22 first (foundation). Phases 23, 24, 25, 26 depend only on Phase 22 and c
 | 20. Activity Visualization & Calendar | v1.5 | 4/4 | Complete | 2026-05-18 |
 | 21. Records, Insights & Celebrations | v1.5 | 4/4 | Complete | 2026-05-18 |
 | 22. Critical Fixes & Test Infrastructure | v1.6 | 3/3 | Complete    | 2026-05-18 |
-| 23. Test Coverage & Reliability | v1.6 | 0/? | Not started | - |
+| 23. Test Coverage & Reliability | v1.6 | 0/3 | Not started | - |
 | 24. Code Quality | v1.6 | 0/? | Not started | - |
 | 25. Shopping Cart Scaling | v1.6 | 0/? | Not started | - |
 | 26. UX Polish | v1.6 | 0/? | Not started | - |
