@@ -26,6 +26,11 @@ vi.mock("@/lib/actions/upload-actions", () => ({
   deleteFile: (...args: unknown[]) => mockDeleteFile(...args),
 }));
 
+const mockDetectBrokenRecords = vi.fn().mockResolvedValue([]);
+vi.mock("@/lib/queries/stats/record-detection", () => ({
+  detectBrokenRecords: (...args: unknown[]) => mockDetectBrokenRecords(...args),
+}));
+
 describe("session-actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -460,6 +465,137 @@ describe("session-actions", () => {
       });
 
       expect(mockProcessAndStoreImage).not.toHaveBeenCalled();
+    });
+
+    it("returns brokenRecords from detectBrokenRecords on success", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+      });
+
+      const mockSession = createMockStitchSession({ id: "new-session", stitchCount: 500 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 500 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 500 }),
+          },
+        });
+      });
+
+      const brokenRecords = [
+        {
+          type: "bestSession",
+          label: "Best Session",
+          oldValue: 300,
+          newValue: 500,
+          unit: "stitches",
+        },
+      ];
+      mockDetectBrokenRecords.mockResolvedValueOnce(brokenRecords);
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 500,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.brokenRecords).toEqual(brokenRecords);
+      }
+      expect(mockDetectBrokenRecords).toHaveBeenCalledWith("user-1", {
+        date: new Date("2026-04-10"),
+        stitchCount: 500,
+        projectId: "proj-1",
+      });
+    });
+
+    it("returns empty brokenRecords when no records broken", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+      });
+
+      const mockSession = createMockStitchSession({ id: "new-session", stitchCount: 50 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 50 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 50 }),
+          },
+        });
+      });
+
+      mockDetectBrokenRecords.mockResolvedValueOnce([]);
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 50,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.brokenRecords).toEqual([]);
+      }
+    });
+
+    it("succeeds when detectBrokenRecords throws (non-blocking)", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+      });
+
+      const mockSession = createMockStitchSession({ id: "new-session", stitchCount: 100 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 100 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 100 }),
+          },
+        });
+      });
+
+      mockDetectBrokenRecords.mockRejectedValueOnce(new Error("Prisma connection timeout"));
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 100,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.brokenRecords).toEqual([]);
+      }
     });
   });
 

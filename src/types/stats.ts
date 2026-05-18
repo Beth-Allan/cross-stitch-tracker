@@ -1,4 +1,5 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
+import type { SizeCategory } from "@/lib/utils/size-category";
 
 // ─── Hero Stats ───────────────────────────────────────────────────────────
 
@@ -130,4 +131,93 @@ export interface DailyBreakdownEntry {
   chartId: string;
   projectName: string;
   stitchCount: number;
+}
+
+// ─── Personal Bests ────────────────────────────────────────────────────────
+
+export type RecordType = "bestDay" | "bestSession" | "longestStreak" | "currentStreak";
+
+export interface PersonalBestRecord {
+  type: RecordType;
+  label: string;
+  value: number;
+  unit: string;
+  date: string | null;
+  projectId: string | null;
+  chartId: string | null;
+  projectName: string | null;
+}
+
+// ─── Fastest Completions ───────────────────────────────────────────────────
+
+export type { SizeCategory } from "@/lib/utils/size-category";
+
+export interface FastestCompletion {
+  sizeCategory: SizeCategory;
+  daysToComplete: number;
+  projectId: string;
+  chartId: string;
+  projectName: string;
+  startDate: string;
+  finishDate: string;
+}
+
+// ─── Thread Insights ───────────────────────────────────────────────────────
+
+export interface ThreadInsight {
+  threadId: string;
+  brandName: string;
+  colorCode: string;
+  colorName: string;
+  hexColor: string;
+  projectCount: number;
+}
+
+// ─── Designer Insights ─────────────────────────────────────────────────────
+
+export interface DesignerInsight {
+  designerId: string;
+  name: string;
+  totalProjects: number;
+  completedProjects: number;
+  completionRate: number;
+}
+
+// ─── Genre Insights ────────────────────────────────────────────────────────
+
+export interface GenreInsight {
+  genreId: string;
+  name: string;
+  totalStitches: number;
+}
+
+// ─── Completion Estimates ──────────────────────────────────────────────────
+
+export interface CompletionEstimate {
+  projectId: string;
+  chartId: string;
+  projectName: string;
+  stitchesCompleted: number;
+  totalStitches: number;
+  percentComplete: number;
+  estimatedDate: string;
+  avgPerDay: number;
+}
+
+// ─── Broken Records (celebration system) ───────────────────────────────────
+
+export type BrokenRecordType = "bestDay" | "bestSession" | "longestStreak";
+
+export interface BrokenRecord {
+  type: BrokenRecordType;
+  label: string;
+  oldValue: number;
+  newValue: number;
+  unit: string;
+}
+
+// ─── Available Years ───────────────────────────────────────────────────────
+
+export interface AvailableYearsData {
+  years: number[];
 }

@@ -7,6 +7,8 @@ import {
   getProjectSessionStats,
   getActiveProjectsForPicker,
 } from "@/lib/actions/session-actions";
+import { requireAuth } from "@/lib/auth-guard";
+import { getProjectCompletionEstimate } from "@/lib/queries/stats/completion-estimates";
 import { ProjectDetailPage } from "@/components/features/charts/project-detail/project-detail-page";
 import type {
   StitchSessionRow,
@@ -16,30 +18,38 @@ import type {
 
 export default async function ChartDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const chart = await getChart(id);
+  const [user, chart] = await Promise.all([requireAuth(), getChart(id)]);
   if (!chart) notFound();
 
-  // Fetch all data in parallel (supplies, images, sessions, stats, active projects)
-  const [projectSupplies, imageUrls, sessionsResult, statsResult, projectsResult] =
-    await Promise.all([
-      chart.project ? getProjectSupplies(chart.project.id) : null,
-      getPresignedImageUrls([chart.coverImageUrl, chart.coverThumbnailUrl]),
-      chart.project
-        ? getSessionsForProject(chart.project.id)
-        : { success: true as const, sessions: [] as StitchSessionRow[] },
-      chart.project
-        ? getProjectSessionStats(chart.project.id)
-        : {
-            success: true as const,
-            stats: {
-              totalStitches: 0,
-              sessionsLogged: 0,
-              avgPerSession: 0,
-              activeSince: null,
-            } as ProjectSessionStats,
-          },
-      getActiveProjectsForPicker(),
-    ]);
+  const [
+    projectSupplies,
+    imageUrls,
+    sessionsResult,
+    statsResult,
+    projectsResult,
+    completionEstimate,
+  ] = await Promise.all([
+    chart.project ? getProjectSupplies(chart.project.id) : null,
+    getPresignedImageUrls([chart.coverImageUrl, chart.coverThumbnailUrl]),
+    chart.project
+      ? getSessionsForProject(chart.project.id)
+      : { success: true as const, sessions: [] as StitchSessionRow[] },
+    chart.project
+      ? getProjectSessionStats(chart.project.id)
+      : {
+          success: true as const,
+          stats: {
+            totalStitches: 0,
+            sessionsLogged: 0,
+            avgPerSession: 0,
+            activeSince: null,
+          } as ProjectSessionStats,
+        },
+    getActiveProjectsForPicker(),
+    chart.project
+      ? getProjectCompletionEstimate(user.id, chart.project.id).catch(() => null)
+      : null,
+  ]);
 
   const sessions =
     sessionsResult.success && "sessions" in sessionsResult ? sessionsResult.sessions : [];
@@ -65,6 +75,7 @@ export default async function ChartDetailPage({ params }: { params: Promise<{ id
       sessions={sessions}
       sessionStats={sessionStats}
       activeProjects={activeProjects}
+      completionEstimate={completionEstimate}
     />
   );
 }

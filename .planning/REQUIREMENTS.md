@@ -33,19 +33,19 @@
 
 ### Personal Records
 
-- [ ] **REC-01**: User can see personal bests board: most stitches in a day, most in a session, longest streak, current streak
-- [ ] **REC-02**: Personal bests link to the associated project/session (clickable entity references)
-- [ ] **REC-03**: User sees "New record!" celebration toast immediately when logging a session that beats a personal best
-- [ ] **REC-04**: User can see year-scoped records alongside all-time records
-- [ ] **REC-05**: User can see fastest project completions by size category (linked to projects)
+- [x] **REC-01**: User can see personal bests board: most stitches in a day, most in a session, longest streak, current streak
+- [x] **REC-02**: Personal bests link to the associated project/session (clickable entity references)
+- [x] **REC-03**: User sees "New record!" celebration toast immediately when logging a session that beats a personal best
+- [x] **REC-04**: User can see year-scoped records alongside all-time records
+- [x] **REC-05**: User can see fastest project completions by size category (linked to projects)
 
 ### Insights & Analysis
 
-- [ ] **INS-01**: User can see their most-used thread colors (appears in most projects, with color swatches)
-- [ ] **INS-02**: User can see designer breakdown (favourite designer, completion rate per designer)
-- [ ] **INS-03**: User can see genre distribution stats
+- [x] **INS-01**: User can see their most-used thread colors (appears in most projects, with color swatches)
+- [x] **INS-02**: User can see designer breakdown (favourite designer, completion rate per designer)
+- [x] **INS-03**: User can see genre distribution stats
 - [ ] **INS-04**: User can see stitch rate (stitches/hour) when time data is logged, with trend over time
-- [ ] **INS-05**: User can see estimated completion dates for active projects (when sufficient session data exists)
+- [x] **INS-05**: User can see estimated completion dates for active projects (when sufficient session data exists)
 - [ ] **INS-06**: All stat entities (projects, threads, designers) are clickable links to their detail pages
 
 ## Future Requirements (v1.6+)
@@ -104,16 +104,16 @@
 | VIZ-05 | Phase 20 | Pending |
 | VIZ-06 | Phase 20 | Pending |
 | VIZ-07 | Phase 20 | Pending |
-| REC-01 | Phase 21 | Pending |
-| REC-02 | Phase 21 | Pending |
-| REC-03 | Phase 21 | Pending |
-| REC-04 | Phase 21 | Pending |
-| REC-05 | Phase 21 | Pending |
-| INS-01 | Phase 21 | Pending |
-| INS-02 | Phase 21 | Pending |
-| INS-03 | Phase 21 | Pending |
+| REC-01 | Phase 21 | Complete |
+| REC-02 | Phase 21 | Complete |
+| REC-03 | Phase 21 | Complete |
+| REC-04 | Phase 21 | Complete |
+| REC-05 | Phase 21 | Complete |
+| INS-01 | Phase 21 | Complete |
+| INS-02 | Phase 21 | Complete |
+| INS-03 | Phase 21 | Complete |
 | INS-04 | Phase 20 | Pending |
-| INS-05 | Phase 21 | Pending |
+| INS-05 | Phase 21 | Complete |
 | INS-06 | Phase 19 | Pending |
 
 **Coverage:**

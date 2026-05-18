@@ -29,6 +29,13 @@ const mockGetCalendarDays = vi.fn();
 const mockGetSessionHistory = vi.fn();
 const mockGetPaceMetrics = vi.fn();
 const mockGetDayOfWeekPattern = vi.fn();
+const mockGetPersonalBests = vi.fn();
+const mockGetFastestCompletions = vi.fn();
+const mockGetThreadInsights = vi.fn();
+const mockGetDesignerInsights = vi.fn();
+const mockGetGenreInsights = vi.fn();
+const mockGetCompletionEstimates = vi.fn();
+const mockGetAvailableYears = vi.fn();
 vi.mock("@/lib/queries/stats", () => ({
   getHeroStats: (...args: unknown[]) => mockGetHeroStats(...args),
   getCollectionBreakdown: (...args: unknown[]) => mockGetCollectionBreakdown(...args),
@@ -40,6 +47,13 @@ vi.mock("@/lib/queries/stats", () => ({
   getSessionHistory: (...args: unknown[]) => mockGetSessionHistory(...args),
   getPaceMetrics: (...args: unknown[]) => mockGetPaceMetrics(...args),
   getDayOfWeekPattern: (...args: unknown[]) => mockGetDayOfWeekPattern(...args),
+  getPersonalBests: (...args: unknown[]) => mockGetPersonalBests(...args),
+  getFastestCompletions: (...args: unknown[]) => mockGetFastestCompletions(...args),
+  getThreadInsights: (...args: unknown[]) => mockGetThreadInsights(...args),
+  getDesignerInsights: (...args: unknown[]) => mockGetDesignerInsights(...args),
+  getGenreInsights: (...args: unknown[]) => mockGetGenreInsights(...args),
+  getCompletionEstimates: (...args: unknown[]) => mockGetCompletionEstimates(...args),
+  getAvailableYears: (...args: unknown[]) => mockGetAvailableYears(...args),
 }));
 
 // Mock search params cache
@@ -71,6 +85,10 @@ vi.mock("@/components/features/stats/stats-overview", () => ({
 
 vi.mock("@/components/features/stats/activity-overview", () => ({
   ActivityOverview: () => null,
+}));
+
+vi.mock("@/components/features/stats/records-overview", () => ({
+  RecordsOverview: () => null,
 }));
 
 const mockHeroStats: StatsHeroData = {
@@ -153,7 +171,20 @@ describe("StatsPage server component", () => {
     mockGetSessionHistory.mockResolvedValue(mockSessionHistory);
     mockGetPaceMetrics.mockResolvedValue(mockPaceMetrics);
     mockGetDayOfWeekPattern.mockResolvedValue(mockDayOfWeekData);
-    mockParse.mockResolvedValue({ page: 1, sort: "date", dir: "desc", project: "all" });
+    mockGetPersonalBests.mockResolvedValue([]);
+    mockGetFastestCompletions.mockResolvedValue([]);
+    mockGetThreadInsights.mockResolvedValue([]);
+    mockGetDesignerInsights.mockResolvedValue([]);
+    mockGetGenreInsights.mockResolvedValue([]);
+    mockGetCompletionEstimates.mockResolvedValue([]);
+    mockGetAvailableYears.mockResolvedValue([]);
+    mockParse.mockResolvedValue({
+      page: 1,
+      sort: "date",
+      dir: "desc",
+      project: "all",
+      scope: "all-time",
+    });
     mockFindMany.mockResolvedValue([{ id: "p1", chart: { name: "Test Project" } }]);
   });
 
