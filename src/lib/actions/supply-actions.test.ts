@@ -681,6 +681,32 @@ describe("supply-actions", () => {
       });
     });
 
+    it("rejects when project belongs to different user", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { addThreadToProject } = await import("./supply-actions");
+
+      const result = await addThreadToProject({
+        projectId: "p1",
+        threadId: "t1",
+      });
+
+      expect(result).toEqual({ success: false, error: "Project not found" });
+      expect(mockPrisma.projectThread.create).not.toHaveBeenCalled();
+    });
+
+    it("rejects when project does not exist", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce(null);
+      const { addThreadToProject } = await import("./supply-actions");
+
+      const result = await addThreadToProject({
+        projectId: "nonexistent",
+        threadId: "t1",
+      });
+
+      expect(result).toEqual({ success: false, error: "Project not found" });
+      expect(mockPrisma.projectThread.create).not.toHaveBeenCalled();
+    });
+
     it("returns error for duplicate project+thread (P2002)", async () => {
       mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const p2002Error = Object.assign(new Error("Unique constraint"), {
@@ -719,6 +745,19 @@ describe("supply-actions", () => {
       expect(result.success).toBe(true);
     });
 
+    it("rejects when project belongs to different user", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { addBeadToProject } = await import("./supply-actions");
+
+      const result = await addBeadToProject({
+        projectId: "p1",
+        beadId: "b1",
+      });
+
+      expect(result).toEqual({ success: false, error: "Project not found" });
+      expect(mockPrisma.projectBead.create).not.toHaveBeenCalled();
+    });
+
     it("returns error for duplicate (P2002)", async () => {
       mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       const p2002Error = Object.assign(new Error("Unique constraint"), {
@@ -755,6 +794,19 @@ describe("supply-actions", () => {
       });
 
       expect(result.success).toBe(true);
+    });
+
+    it("rejects when project belongs to different user", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { addSpecialtyToProject } = await import("./supply-actions");
+
+      const result = await addSpecialtyToProject({
+        projectId: "p1",
+        specialtyItemId: "s1",
+      });
+
+      expect(result).toEqual({ success: false, error: "Project not found" });
+      expect(mockPrisma.projectSpecialty.create).not.toHaveBeenCalled();
     });
 
     it("returns error for duplicate (P2002)", async () => {
@@ -838,6 +890,48 @@ describe("supply-actions", () => {
         data: { quantityAcquired: 1 },
       });
     });
+
+    it("rejects thread update when record belongs to different user", async () => {
+      mockPrisma.projectThread.findUnique.mockResolvedValueOnce({
+        project: { userId: "other-user" },
+      });
+      const { updateProjectSupplyQuantity } = await import("./supply-actions");
+
+      const result = await updateProjectSupplyQuantity("pt1", "thread", {
+        quantityRequired: 5,
+      });
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+      expect(mockPrisma.projectThread.update).not.toHaveBeenCalled();
+    });
+
+    it("rejects bead update when record belongs to different user", async () => {
+      mockPrisma.projectBead.findUnique.mockResolvedValueOnce({
+        project: { userId: "other-user" },
+      });
+      const { updateProjectSupplyQuantity } = await import("./supply-actions");
+
+      const result = await updateProjectSupplyQuantity("pb1", "bead", {
+        quantityRequired: 5,
+      });
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+      expect(mockPrisma.projectBead.update).not.toHaveBeenCalled();
+    });
+
+    it("rejects specialty update when record belongs to different user", async () => {
+      mockPrisma.projectSpecialty.findUnique.mockResolvedValueOnce({
+        project: { userId: "other-user" },
+      });
+      const { updateProjectSupplyQuantity } = await import("./supply-actions");
+
+      const result = await updateProjectSupplyQuantity("ps1", "specialty", {
+        quantityRequired: 5,
+      });
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+      expect(mockPrisma.projectSpecialty.update).not.toHaveBeenCalled();
+    });
   });
 
   describe("removeProjectThread", () => {
@@ -853,6 +947,28 @@ describe("supply-actions", () => {
         where: { id: "pt1" },
       });
     });
+
+    it("rejects when record belongs to different user", async () => {
+      mockPrisma.projectThread.findUnique.mockResolvedValueOnce({
+        project: { userId: "other-user" },
+      });
+      const { removeProjectThread } = await import("./supply-actions");
+
+      const result = await removeProjectThread("pt1");
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+      expect(mockPrisma.projectThread.delete).not.toHaveBeenCalled();
+    });
+
+    it("rejects when record does not exist", async () => {
+      mockPrisma.projectThread.findUnique.mockResolvedValueOnce(null);
+      const { removeProjectThread } = await import("./supply-actions");
+
+      const result = await removeProjectThread("nonexistent");
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+      expect(mockPrisma.projectThread.delete).not.toHaveBeenCalled();
+    });
   });
 
   describe("removeProjectBead", () => {
@@ -867,6 +983,28 @@ describe("supply-actions", () => {
       expect(mockPrisma.projectBead.delete).toHaveBeenCalledWith({
         where: { id: "pb1" },
       });
+    });
+
+    it("rejects when record belongs to different user", async () => {
+      mockPrisma.projectBead.findUnique.mockResolvedValueOnce({
+        project: { userId: "other-user" },
+      });
+      const { removeProjectBead } = await import("./supply-actions");
+
+      const result = await removeProjectBead("pb1");
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+      expect(mockPrisma.projectBead.delete).not.toHaveBeenCalled();
+    });
+
+    it("rejects when record does not exist", async () => {
+      mockPrisma.projectBead.findUnique.mockResolvedValueOnce(null);
+      const { removeProjectBead } = await import("./supply-actions");
+
+      const result = await removeProjectBead("nonexistent");
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+      expect(mockPrisma.projectBead.delete).not.toHaveBeenCalled();
     });
   });
 
@@ -884,6 +1022,28 @@ describe("supply-actions", () => {
       expect(mockPrisma.projectSpecialty.delete).toHaveBeenCalledWith({
         where: { id: "ps1" },
       });
+    });
+
+    it("rejects when record belongs to different user", async () => {
+      mockPrisma.projectSpecialty.findUnique.mockResolvedValueOnce({
+        project: { userId: "other-user" },
+      });
+      const { removeProjectSpecialty } = await import("./supply-actions");
+
+      const result = await removeProjectSpecialty("ps1");
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+      expect(mockPrisma.projectSpecialty.delete).not.toHaveBeenCalled();
+    });
+
+    it("rejects when record does not exist", async () => {
+      mockPrisma.projectSpecialty.findUnique.mockResolvedValueOnce(null);
+      const { removeProjectSpecialty } = await import("./supply-actions");
+
+      const result = await removeProjectSpecialty("nonexistent");
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+      expect(mockPrisma.projectSpecialty.delete).not.toHaveBeenCalled();
     });
   });
 
