@@ -15,6 +15,7 @@ import type {
   ProjectSessionStats,
   ActiveProjectForPicker,
 } from "@/types/session";
+import type { CompletionEstimate } from "@/types/stats";
 
 interface ProjectDetailPageProps {
   chart: ChartWithProject;
@@ -23,6 +24,7 @@ interface ProjectDetailPageProps {
   sessions: StitchSessionRow[];
   sessionStats: ProjectSessionStats;
   activeProjects: ActiveProjectForPicker[];
+  completionEstimate?: CompletionEstimate | null;
 }
 
 export function ProjectDetailPage({
@@ -32,6 +34,7 @@ export function ProjectDetailPage({
   sessions,
   sessionStats,
   activeProjects,
+  completionEstimate,
 }: ProjectDetailPageProps) {
   const router = useRouter();
   // Track status locally so overview tab reorders sections on status change
@@ -89,6 +92,7 @@ export function ProjectDetailPage({
               imageUrls={imageUrls}
               activeProjects={activeProjects}
               projectId={project.id}
+              completionEstimate={completionEstimate}
             />
           ) : (
             <div className="text-muted-foreground py-12 text-center">

@@ -168,3 +168,87 @@ describe("getCompletionEstimates", () => {
     expect(result).toEqual([]);
   });
 });
+
+describe("getProjectCompletionEstimate", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetModules();
+  });
+
+  it("returns single estimate for a project with sufficient data", async () => {
+    const dayMs = 24 * 60 * 60 * 1000;
+    const now = new Date();
+    const firstSessionDate = new Date(now.getTime() - 30 * dayMs);
+
+    mockPrisma.project.findUnique.mockResolvedValue({
+      id: "p1",
+      chartId: "c1",
+      status: "IN_PROGRESS",
+      stitchesCompleted: 3000,
+      chart: { id: "c1", name: "Big Project", stitchCount: 10000 },
+      sessions: [
+        { date: firstSessionDate, stitchCount: 1000 },
+        { date: new Date(now.getTime() - 20 * dayMs), stitchCount: 1000 },
+        { date: new Date(now.getTime() - 10 * dayMs), stitchCount: 1000 },
+      ],
+    });
+
+    const { getProjectCompletionEstimate } = await import("./completion-estimates");
+    const result = await getProjectCompletionEstimate("user-1", "p1");
+
+    expect(result).not.toBeNull();
+    expect(result!.projectId).toBe("p1");
+    expect(result!.chartId).toBe("c1");
+    expect(result!.projectName).toBe("Big Project");
+    expect(result!.percentComplete).toBe(30);
+    expect(result!.estimatedDate).toMatch(/^~[A-Z][a-z]{2} \d{4}$/);
+  });
+
+  it("returns null when project has no target stitches", async () => {
+    mockPrisma.project.findUnique.mockResolvedValue({
+      id: "p1",
+      chartId: "c1",
+      status: "IN_PROGRESS",
+      stitchesCompleted: 500,
+      chart: { id: "c1", name: "No Count", stitchCount: 0 },
+      sessions: [
+        { date: new Date("2026-01-01"), stitchCount: 100 },
+        { date: new Date("2026-01-02"), stitchCount: 200 },
+        { date: new Date("2026-01-03"), stitchCount: 200 },
+      ],
+    });
+
+    const { getProjectCompletionEstimate } = await import("./completion-estimates");
+    const result = await getProjectCompletionEstimate("user-1", "p1");
+
+    expect(result).toBeNull();
+  });
+
+  it("returns null when project has fewer than 3 sessions", async () => {
+    mockPrisma.project.findUnique.mockResolvedValue({
+      id: "p1",
+      chartId: "c1",
+      status: "IN_PROGRESS",
+      stitchesCompleted: 500,
+      chart: { id: "c1", name: "Too Few", stitchCount: 5000 },
+      sessions: [
+        { date: new Date("2026-01-01"), stitchCount: 250 },
+        { date: new Date("2026-01-02"), stitchCount: 250 },
+      ],
+    });
+
+    const { getProjectCompletionEstimate } = await import("./completion-estimates");
+    const result = await getProjectCompletionEstimate("user-1", "p1");
+
+    expect(result).toBeNull();
+  });
+
+  it("returns null when project not found", async () => {
+    mockPrisma.project.findUnique.mockResolvedValue(null);
+
+    const { getProjectCompletionEstimate } = await import("./completion-estimates");
+    const result = await getProjectCompletionEstimate("user-1", "p-nonexistent");
+
+    expect(result).toBeNull();
+  });
+});

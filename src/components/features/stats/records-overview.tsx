@@ -1,6 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { YearScopeToggle } from "./year-scope-toggle";
 import { RecordsTable } from "./records-table";
+import { ThreadInsightList } from "./thread-insight-list";
+import { DesignerInsightList } from "./designer-insight-list";
+import { GenreInsightList } from "./genre-insight-list";
+import { CompletionEstimatesSection } from "./completion-estimates-section";
 import type {
   PersonalBestRecord,
   FastestCompletion,
@@ -58,9 +62,13 @@ export function RecordsOverview({
         </CardContent>
       </Card>
 
-      {/* Insights -- Plan 03 */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <ThreadInsightList items={threadInsights} />
+        <DesignerInsightList items={designerInsights} />
+        <GenreInsightList items={genreInsights} />
+      </div>
 
-      {/* Completion Estimates -- Plan 03 */}
+      <CompletionEstimatesSection items={completionEstimates} />
     </div>
   );
 }
