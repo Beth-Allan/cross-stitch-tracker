@@ -72,6 +72,7 @@ export interface MonthlyTotal {
 
 export interface CalendarSession {
   projectId: string;
+  chartId: string;
   projectName: string;
   stitchCount: number;
 }
@@ -87,6 +88,7 @@ export interface SessionHistoryItem {
   id: string;
   date: Date;
   projectId: string;
+  chartId: string;
   projectName: string;
   stitchCount: number;
   timeSpentMinutes: number | null;
@@ -125,6 +127,7 @@ export interface DayOfWeekData {
 export interface DailyBreakdownEntry {
   date: string; // "YYYY-MM-DD"
   projectId: string;
+  chartId: string;
   projectName: string;
   stitchCount: number;
 }

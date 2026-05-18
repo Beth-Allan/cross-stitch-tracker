@@ -30,20 +30,20 @@ function createMockData(): CalendarDayData[] {
     {
       date: "2026-05-05",
       sessions: [
-        { projectId: "p1", projectName: "Dragon Sampler", stitchCount: 198 },
+        { projectId: "p1", chartId: "c1", projectName: "Dragon Sampler", stitchCount: 198 },
       ],
     },
     {
       date: "2026-05-10",
       sessions: [
-        { projectId: "p2", projectName: "Winter Village", stitchCount: 356 },
-        { projectId: "p1", projectName: "Dragon Sampler", stitchCount: 120 },
+        { projectId: "p2", chartId: "c2", projectName: "Winter Village", stitchCount: 356 },
+        { projectId: "p1", chartId: "c1", projectName: "Dragon Sampler", stitchCount: 120 },
       ],
     },
     {
       date: "2026-05-17",
       sessions: [
-        { projectId: "p1", projectName: "Dragon Sampler", stitchCount: 245 },
+        { projectId: "p1", chartId: "c1", projectName: "Dragon Sampler", stitchCount: 245 },
       ],
     },
   ];
@@ -55,9 +55,7 @@ describe("StitchingCalendar", () => {
   });
 
   it("renders 7 column headers (Mon through Sun)", () => {
-    render(
-      <StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />,
-    );
+    render(<StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />);
 
     expect(screen.getByText("Mon")).toBeInTheDocument();
     expect(screen.getByText("Tue")).toBeInTheDocument();
@@ -69,9 +67,7 @@ describe("StitchingCalendar", () => {
   });
 
   it("renders correct number of day cells for May 2026 (31 days + padding)", () => {
-    render(
-      <StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />,
-    );
+    render(<StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />);
 
     // May 2026 starts on Friday (index 4 in Mon-start grid) => 4 padding cells + 31 day cells
     // Total cells should be 35 (5 rows × 7)
@@ -90,64 +86,50 @@ describe("StitchingCalendar", () => {
       {
         date: todayStr,
         sessions: [
-          { projectId: "p1", projectName: "Test Project", stitchCount: 100 },
+          { projectId: "p1", chartId: "c1", projectName: "Test Project", stitchCount: 100 },
         ],
       },
     ];
 
-    render(
-      <StitchingCalendar data={data} initialMonth={month} initialYear={year} />,
-    );
+    render(<StitchingCalendar data={data} initialMonth={month} initialYear={year} />);
 
     const todayIndicator = screen.getByTestId("today-indicator");
     expect(todayIndicator).toBeInTheDocument();
     expect(todayIndicator.className).toContain("bg-success");
   });
 
-  it("renders session pills with project names as links to /projects/{projectId}", () => {
+  it("renders session pills with project names as links to /charts/{chartId}", () => {
     const data = createMockData();
 
-    render(
-      <StitchingCalendar data={data} initialMonth={5} initialYear={2026} />,
-    );
+    render(<StitchingCalendar data={data} initialMonth={5} initialYear={2026} />);
 
-    // Check for links to projects
+    // Check for links to charts (using chartId, not projectId)
     const dragonLinks = screen.getAllByRole("link", {
       name: /Dragon Sampler/,
     });
     expect(dragonLinks.length).toBeGreaterThan(0);
-    expect(dragonLinks[0]).toHaveAttribute("href", "/projects/p1");
+    expect(dragonLinks[0]).toHaveAttribute("href", "/charts/c1");
 
     const winterLinks = screen.getAllByRole("link", {
       name: /Winter Village/,
     });
     expect(winterLinks.length).toBeGreaterThan(0);
-    expect(winterLinks[0]).toHaveAttribute("href", "/projects/p2");
+    expect(winterLinks[0]).toHaveAttribute("href", "/charts/c2");
   });
 
   it('month navigation prev/next buttons have aria-label "Previous month" / "Next month"', () => {
-    render(
-      <StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />,
-    );
+    render(<StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />);
 
-    expect(
-      screen.getByRole("button", { name: "Previous month" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Next month" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Previous month" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Next month" })).toBeInTheDocument();
   });
 
   it("clicking next month button calls fetchCalendarMonth with correct month/year", async () => {
-    const { fetchCalendarMonth } = await import(
-      "@/lib/actions/stats-actions"
-    );
+    const { fetchCalendarMonth } = await import("@/lib/actions/stats-actions");
     const mockFetch = vi.mocked(fetchCalendarMonth);
     mockFetch.mockResolvedValue([]);
 
-    render(
-      <StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />,
-    );
+    render(<StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />);
 
     const nextBtn = screen.getByRole("button", { name: "Next month" });
     fireEvent.click(nextBtn);
@@ -158,9 +140,7 @@ describe("StitchingCalendar", () => {
   });
 
   it('empty month shows "No sessions this month" text', () => {
-    render(
-      <StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />,
-    );
+    render(<StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />);
 
     expect(screen.getByText("No sessions this month")).toBeInTheDocument();
   });
@@ -168,9 +148,7 @@ describe("StitchingCalendar", () => {
   it("calendar legend renders project color swatches below the grid", () => {
     const data = createMockData();
 
-    render(
-      <StitchingCalendar data={data} initialMonth={5} initialYear={2026} />,
-    );
+    render(<StitchingCalendar data={data} initialMonth={5} initialYear={2026} />);
 
     // Legend should show project names
     const legendContainer = screen.getByTestId("calendar-legend");
@@ -185,9 +163,7 @@ describe("StitchingCalendar", () => {
   });
 
   it("padding cells for days before month start use bg-muted styling", () => {
-    render(
-      <StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />,
-    );
+    render(<StitchingCalendar data={[]} initialMonth={5} initialYear={2026} />);
 
     // May 2026 starts on Friday, so Mon-Thu should be padding cells (4 cells)
     const paddingCells = screen.getAllByTestId("padding-cell");

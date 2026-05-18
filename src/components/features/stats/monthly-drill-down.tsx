@@ -59,7 +59,7 @@ export function MonthlyDrillDown({
                     {format(parseISO(entry.date), "EEE, MMM d")}
                   </span>
                   <Link
-                    href={`/projects/${entry.projectId}`}
+                    href={`/charts/${entry.chartId}`}
                     className="text-foreground decoration-muted-foreground/50 hover:decoration-foreground text-sm underline"
                   >
                     {entry.projectName}

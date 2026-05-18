@@ -25,7 +25,7 @@ async function computeCalendarDays(
       },
       include: {
         project: {
-          select: { id: true, chart: { select: { name: true } } },
+          select: { id: true, chartId: true, chart: { select: { name: true } } },
         },
       },
       orderBy: { date: "asc" },
@@ -46,6 +46,7 @@ async function computeCalendarDays(
 
       grouped.get(dateKey)!.sessions.push({
         projectId: session.project.id,
+        chartId: session.project.chartId,
         projectName: session.project.chart.name,
         stitchCount: session.stitchCount,
       });

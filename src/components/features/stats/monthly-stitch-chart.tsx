@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { BarChart, Bar, XAxis, YAxis, Cell } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,13 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
   const [activeMonth, setActiveMonth] = useState<number | null>(null);
   const [drillDownData, setDrillDownData] = useState<DailyBreakdownEntry[]>([]);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setChartData(data);
+    setYear(initialYear);
+    setActiveMonth(null);
+    setDrillDownData([]);
+  }, [data, initialYear]);
 
   const isEmpty = chartData.every((item) => item.totalStitches === 0);
 
@@ -118,7 +125,11 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
             <Bar
               dataKey="totalStitches"
               radius={4}
-              onClick={(_data, index) => handleBarClick(chartData[index], index)}
+              onClick={(barData) => {
+                const entry = barData.payload as MonthlyTotal;
+                const monthIndex = chartData.findIndex((d) => d.month === entry.month);
+                if (monthIndex >= 0) handleBarClick(entry, monthIndex);
+              }}
             >
               {chartData.map((entry, index) => (
                 <Cell

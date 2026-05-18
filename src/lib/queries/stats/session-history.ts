@@ -39,7 +39,7 @@ async function computeSessionHistory(
         take: PAGE_SIZE,
         include: {
           project: {
-            select: { id: true, chart: { select: { name: true } } },
+            select: { id: true, chartId: true, chart: { select: { name: true } } },
           },
         },
       }),
@@ -51,6 +51,7 @@ async function computeSessionHistory(
         id: s.id,
         date: s.date,
         projectId: s.project.id,
+        chartId: s.project.chartId,
         projectName: s.project.chart.name,
         stitchCount: s.stitchCount,
         timeSpentMinutes: s.timeSpentMinutes,

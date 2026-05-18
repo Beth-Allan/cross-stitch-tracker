@@ -24,7 +24,7 @@ async function computeDailyBreakdown(
       },
       include: {
         project: {
-          select: { id: true, chart: { select: { name: true } } },
+          select: { id: true, chartId: true, chart: { select: { name: true } } },
         },
       },
       orderBy: { date: "asc" },
@@ -35,6 +35,7 @@ async function computeDailyBreakdown(
       return {
         date: format(tzDate, "yyyy-MM-dd"),
         projectId: session.project.id,
+        chartId: session.project.chartId,
         projectName: session.project.chart.name,
         stitchCount: session.stitchCount,
       };

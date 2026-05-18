@@ -7,18 +7,21 @@ const mockEntries: DailyBreakdownEntry[] = [
   {
     date: "2026-01-15",
     projectId: "proj-1",
+    chartId: "chart-1",
     projectName: "Autumn Leaves",
     stitchCount: 198,
   },
   {
     date: "2026-01-16",
     projectId: "proj-2",
+    chartId: "chart-2",
     projectName: "Winter Garden",
     stitchCount: 356,
   },
   {
     date: "2026-01-17",
     projectId: "proj-1",
+    chartId: "chart-1",
     projectName: "Autumn Leaves",
     stitchCount: 124,
   },
@@ -45,7 +48,7 @@ describe("MonthlyDrillDown", () => {
     expect(screen.getByText("124")).toBeInTheDocument();
   });
 
-  it("project names are rendered as Links to /projects/{projectId}", () => {
+  it("project names are rendered as Links to /charts/{chartId}", () => {
     render(
       <MonthlyDrillDown
         entries={mockEntries}
@@ -57,10 +60,10 @@ describe("MonthlyDrillDown", () => {
     );
 
     const autumnLinks = screen.getAllByRole("link", { name: "Autumn Leaves" });
-    expect(autumnLinks[0]).toHaveAttribute("href", "/projects/proj-1");
+    expect(autumnLinks[0]).toHaveAttribute("href", "/charts/chart-1");
 
     const winterLink = screen.getByRole("link", { name: "Winter Garden" });
-    expect(winterLink).toHaveAttribute("href", "/projects/proj-2");
+    expect(winterLink).toHaveAttribute("href", "/charts/chart-2");
   });
 
   it("shows month + year heading with total stitch count", () => {

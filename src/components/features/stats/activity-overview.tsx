@@ -80,12 +80,9 @@ export function ActivityOverview({
         </CardContent>
       </Card>
 
-      {/* 5. Session History -- Card wrapper with heading */}
+      {/* 5. Session History -- Card wrapper, table handles its own heading */}
       <Card>
-        <CardHeader>
-          <h3 className="font-heading text-sm font-semibold">Session History</h3>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <SessionHistoryTable data={sessionHistory} projects={projects} />
         </CardContent>
       </Card>

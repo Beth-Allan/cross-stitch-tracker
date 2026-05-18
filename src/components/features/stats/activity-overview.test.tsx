@@ -77,7 +77,7 @@ const mockDayOfWeekData: DayOfWeekData[] = [
 const mockCalendarData: CalendarDayData[] = [
   {
     date: "2026-05-15",
-    sessions: [{ projectId: "p1", projectName: "My Project", stitchCount: 200 }],
+    sessions: [{ projectId: "p1", chartId: "c1", projectName: "My Project", stitchCount: 200 }],
   },
 ];
 
@@ -87,6 +87,7 @@ const mockSessionHistory: SessionHistoryData = {
       id: "s1",
       date: new Date("2026-05-15"),
       projectId: "p1",
+      chartId: "c1",
       projectName: "My Project",
       stitchCount: 200,
       timeSpentMinutes: 60,
@@ -216,9 +217,10 @@ describe("ActivityOverview", () => {
     expect(screen.getByText("Stitching Patterns by Day")).toBeInTheDocument();
   });
 
-  it("Session table Card has heading 'Session History'", () => {
+  it("Session table Card wraps SessionHistoryTable in CardContent", () => {
     render(<ActivityOverview {...defaultProps} />);
 
-    expect(screen.getByText("Session History")).toBeInTheDocument();
+    const table = screen.getByTestId("session-history-table");
+    expect(table.closest("[data-slot='card-content']")).toBeInTheDocument();
   });
 });

@@ -63,11 +63,36 @@ function ChartContainer({
         data-slot="chart"
         data-chart={chartId}
         className={cn(
-          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          // Recharts theming overrides
+          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground",
+          "[&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50",
+          "[&_.recharts-curve.recharts-tooltip-cursor]:stroke-border",
+          "[&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border",
+          "[&_.recharts-radial-bar-background-sector]:fill-muted",
+          "[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted",
+          "[&_.recharts-reference-line_[stroke='#ccc']]:stroke-border",
+          "[&_.recharts-dot[stroke='#fff']]:stroke-transparent",
+          "[&_.recharts-sector[stroke='#fff']]:stroke-transparent",
+          // Suppress green focus outlines from global * { outline-color: var(--ring) }
+          // The global rule sets outline-color on all elements; these suppress the outline
+          // on Recharts SVG elements that may receive focus via accessibilityLayer (tabIndex=0)
+          // or ZIndex portals (tabIndex=-1). Cover all recharts classes plus SVG internals.
+          "[&_.recharts-layer]:outline-hidden",
+          "[&_.recharts-surface]:outline-hidden",
+          "[&_.recharts-sector]:outline-hidden",
+          "[&_.recharts-wrapper]:outline-hidden",
+          "[&_.recharts-rectangle]:outline-hidden",
+          "[&_svg]:outline-hidden",
+          "[&_svg_*]:outline-hidden",
+          // Layout
+          "flex aspect-video justify-center text-xs",
           className,
         )}
         {...props}
       >
+        {/* ChartStyle injects CSS custom properties for chart colors from config.
+            Content is derived from the ChartConfig type (developer-defined labels/colors),
+            not from user input, so dangerouslySetInnerHTML is safe here. */}
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer initialDimension={initialDimension}>
           {children}
@@ -86,6 +111,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
   return (
     <style
+      // Safe: values come from ChartConfig (developer-defined colors/themes), not user input
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
           .map(
@@ -219,7 +245,7 @@ function ChartTooltipContent({
                     )}
                     <div
                       className={cn(
-                        "flex flex-1 justify-between leading-none",
+                        "flex flex-1 justify-between gap-2 leading-none",
                         nestLabel ? "items-end" : "items-center",
                       )}
                     >

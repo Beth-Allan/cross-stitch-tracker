@@ -15,9 +15,13 @@ vi.mock("recharts", () => ({
   }: {
     children: ReactNode;
     dataKey: string;
-    onClick?: (data: unknown, index: number) => void;
+    onClick?: (data: { payload?: Record<string, unknown> }) => void;
   }) => (
-    <div data-testid="bar" data-key={dataKey} onClick={() => onClick?.({}, 0)}>
+    <div
+      data-testid="bar"
+      data-key={dataKey}
+      onClick={() => onClick?.({ payload: { month: "Jan", totalStitches: 5000, year: 2026 } })}
+    >
       {children}
     </div>
   ),
@@ -147,7 +151,7 @@ describe("MonthlyStitchChart", () => {
 
   it("clicking a non-zero bar calls fetchDailyBreakdown and shows drill-down", async () => {
     mockFetchDailyBreakdown.mockResolvedValue([
-      { date: "2026-01-15", projectId: "p1", projectName: "Test", stitchCount: 100 },
+      { date: "2026-01-15", projectId: "p1", chartId: "c1", projectName: "Test", stitchCount: 100 },
     ]);
 
     render(<MonthlyStitchChart data={mockMonthlyData} initialYear={2026} />);
@@ -167,7 +171,7 @@ describe("MonthlyStitchChart", () => {
 
   it("clicking same bar again collapses drill-down", async () => {
     mockFetchDailyBreakdown.mockResolvedValue([
-      { date: "2026-01-15", projectId: "p1", projectName: "Test", stitchCount: 100 },
+      { date: "2026-01-15", projectId: "p1", chartId: "c1", projectName: "Test", stitchCount: 100 },
     ]);
 
     render(<MonthlyStitchChart data={mockMonthlyData} initialYear={2026} />);

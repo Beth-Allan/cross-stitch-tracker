@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useMemo } from "react";
+import { useState, useEffect, useTransition, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -52,6 +52,12 @@ export function StitchingCalendar({ data, initialMonth, initialYear }: Stitching
   const [year, setYear] = useState(initialYear);
   const [calendarData, setCalendarData] = useState<CalendarDayData[]>(data);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setMonth(initialMonth);
+    setYear(initialYear);
+    setCalendarData(data);
+  }, [data, initialMonth, initialYear]);
 
   const projectColorMap = useMemo(() => getProjectColorMap(calendarData), [calendarData]);
   const projectNameMap = useMemo(() => getProjectNameMap(calendarData), [calendarData]);
@@ -182,7 +188,7 @@ export function StitchingCalendar({ data, initialMonth, initialYear }: Stitching
                 return (
                   <Link
                     key={si}
-                    href={`/projects/${session.projectId}`}
+                    href={`/charts/${session.chartId}`}
                     className="mb-0.5 hidden truncate rounded border px-1 py-0.5 text-[10px] leading-tight font-semibold sm:block"
                     style={{
                       backgroundColor: `color-mix(in oklch, var(--chart-${colorIndex + 1}) 15%, transparent)`,

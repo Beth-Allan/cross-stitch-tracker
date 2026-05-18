@@ -28,6 +28,7 @@ function createMockData(overrides?: Partial<SessionHistoryData>): SessionHistory
         id: "s1",
         date: new Date("2026-05-15T10:00:00Z"),
         projectId: "p1",
+        chartId: "c1",
         projectName: "Dragon Sampler",
         stitchCount: 198,
         timeSpentMinutes: 45,
@@ -37,6 +38,7 @@ function createMockData(overrides?: Partial<SessionHistoryData>): SessionHistory
         id: "s2",
         date: new Date("2026-05-14T10:00:00Z"),
         projectId: "p2",
+        chartId: "c2",
         projectName: "Winter Village",
         stitchCount: 356,
         timeSpentMinutes: null,
@@ -46,6 +48,7 @@ function createMockData(overrides?: Partial<SessionHistoryData>): SessionHistory
         id: "s3",
         date: new Date("2026-05-13T10:00:00Z"),
         projectId: "p1",
+        chartId: "c1",
         projectName: "Dragon Sampler",
         stitchCount: 120,
         timeSpentMinutes: 90,
@@ -67,9 +70,7 @@ const mockProjects = [
 
 function renderWithNuqs(ui: React.ReactElement) {
   return render(ui, {
-    wrapper: ({ children }) => (
-      <NuqsTestingAdapter>{children}</NuqsTestingAdapter>
-    ),
+    wrapper: ({ children }) => <NuqsTestingAdapter>{children}</NuqsTestingAdapter>,
   });
 }
 
@@ -79,9 +80,7 @@ describe("SessionHistoryTable", () => {
   });
 
   it("renders table rows with Date, Project, Stitches, Time, Photo columns", () => {
-    renderWithNuqs(
-      <SessionHistoryTable data={createMockData()} projects={mockProjects} />,
-    );
+    renderWithNuqs(<SessionHistoryTable data={createMockData()} projects={mockProjects} />);
 
     // Check column headers exist (use getAllByText for "Project" which appears in filter label too)
     expect(screen.getByText("Date")).toBeInTheDocument();
@@ -91,37 +90,31 @@ describe("SessionHistoryTable", () => {
   });
 
   it("date column shows formatted dates (MMM d, yyyy)", () => {
-    renderWithNuqs(
-      <SessionHistoryTable data={createMockData()} projects={mockProjects} />,
-    );
+    renderWithNuqs(<SessionHistoryTable data={createMockData()} projects={mockProjects} />);
 
     expect(screen.getByText("May 15, 2026")).toBeInTheDocument();
     expect(screen.getByText("May 14, 2026")).toBeInTheDocument();
     expect(screen.getByText("May 13, 2026")).toBeInTheDocument();
   });
 
-  it("project names are rendered as clickable Links to /projects/{projectId}", () => {
-    renderWithNuqs(
-      <SessionHistoryTable data={createMockData()} projects={mockProjects} />,
-    );
+  it("project names are rendered as clickable Links to /charts/{chartId}", () => {
+    renderWithNuqs(<SessionHistoryTable data={createMockData()} projects={mockProjects} />);
 
     const dragonLinks = screen.getAllByRole("link", {
       name: /Dragon Sampler/,
     });
     expect(dragonLinks.length).toBeGreaterThan(0);
-    expect(dragonLinks[0]).toHaveAttribute("href", "/projects/p1");
+    expect(dragonLinks[0]).toHaveAttribute("href", "/charts/c1");
 
     const winterLinks = screen.getAllByRole("link", {
       name: /Winter Village/,
     });
     expect(winterLinks.length).toBeGreaterThan(0);
-    expect(winterLinks[0]).toHaveAttribute("href", "/projects/p2");
+    expect(winterLinks[0]).toHaveAttribute("href", "/charts/c2");
   });
 
   it('time column shows formatted time when timeSpentMinutes is not null, "--" when null', () => {
-    renderWithNuqs(
-      <SessionHistoryTable data={createMockData()} projects={mockProjects} />,
-    );
+    renderWithNuqs(<SessionHistoryTable data={createMockData()} projects={mockProjects} />);
 
     // 45 minutes = "45m"
     expect(screen.getByText("45m")).toBeInTheDocument();
@@ -132,9 +125,7 @@ describe("SessionHistoryTable", () => {
   });
 
   it("photo column shows Camera icon when hasPhoto is true", () => {
-    renderWithNuqs(
-      <SessionHistoryTable data={createMockData()} projects={mockProjects} />,
-    );
+    renderWithNuqs(<SessionHistoryTable data={createMockData()} projects={mockProjects} />);
 
     // Two sessions have photos
     const cameraIcons = screen.getAllByTestId("photo-indicator");
@@ -142,9 +133,7 @@ describe("SessionHistoryTable", () => {
   });
 
   it("sort headers show ArrowUpDown icon for sortable columns (Date, Stitches, Time)", () => {
-    renderWithNuqs(
-      <SessionHistoryTable data={createMockData()} projects={mockProjects} />,
-    );
+    renderWithNuqs(<SessionHistoryTable data={createMockData()} projects={mockProjects} />);
 
     // Date is the default sort, so it should have the arrow indicator
     const dateHeader = screen.getByRole("button", { name: /Date/ });
@@ -176,9 +165,7 @@ describe("SessionHistoryTable", () => {
       />,
     );
 
-    expect(
-      screen.getByRole("button", { name: "Previous" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Previous" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
   });
 
@@ -196,15 +183,11 @@ describe("SessionHistoryTable", () => {
       />,
     );
 
-    expect(
-      screen.getByText("No sessions match your filters"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("No sessions match your filters")).toBeInTheDocument();
   });
 
   it('project filter dropdown renders with "All Projects" default', () => {
-    renderWithNuqs(
-      <SessionHistoryTable data={createMockData()} projects={mockProjects} />,
-    );
+    renderWithNuqs(<SessionHistoryTable data={createMockData()} projects={mockProjects} />);
 
     // "Project" label should appear (in filter area and table header)
     const projectTexts = screen.getAllByText("Project");

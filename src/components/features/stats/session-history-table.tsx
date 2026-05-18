@@ -43,10 +43,7 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
     "dir",
     parseAsStringLiteral([...SORT_DIRS]).withDefault("desc"),
   );
-  const [project, setProject] = useQueryState(
-    "project",
-    parseAsString.withDefault("all"),
-  );
+  const [project, setProject] = useQueryState("project", parseAsString.withDefault("all"));
 
   function handleSort(field: SortField) {
     if (sort === field) {
@@ -69,7 +66,7 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
       <div className="flex items-center justify-between">
         <h3 className="font-heading text-sm font-semibold">Session History</h3>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Project</span>
+          <span className="text-muted-foreground text-xs">Project</span>
           <Select value={project} onValueChange={handleProjectFilter}>
             <SelectTrigger size="sm">
               <SelectValue />
@@ -87,42 +84,27 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border border-border bg-card">
+      <div className="border-border bg-card rounded-xl border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>
-                <button
-                  onClick={() => handleSort("date")}
-                  className="flex items-center gap-1"
-                >
+                <button onClick={() => handleSort("date")} className="flex items-center gap-1">
                   Date
-                  {sort === "date" && (
-                    <ArrowUpDown className="h-3 w-3 text-success" />
-                  )}
+                  {sort === "date" && <ArrowUpDown className="text-success h-3 w-3" />}
                 </button>
               </TableHead>
               <TableHead>Project</TableHead>
               <TableHead>
-                <button
-                  onClick={() => handleSort("stitches")}
-                  className="flex items-center gap-1"
-                >
+                <button onClick={() => handleSort("stitches")} className="flex items-center gap-1">
                   Stitches
-                  {sort === "stitches" && (
-                    <ArrowUpDown className="h-3 w-3 text-success" />
-                  )}
+                  {sort === "stitches" && <ArrowUpDown className="text-success h-3 w-3" />}
                 </button>
               </TableHead>
               <TableHead>
-                <button
-                  onClick={() => handleSort("time")}
-                  className="flex items-center gap-1"
-                >
+                <button onClick={() => handleSort("time")} className="flex items-center gap-1">
                   Time
-                  {sort === "time" && (
-                    <ArrowUpDown className="h-3 w-3 text-success" />
-                  )}
+                  {sort === "time" && <ArrowUpDown className="text-success h-3 w-3" />}
                 </button>
               </TableHead>
               <TableHead className="w-10" />
@@ -132,7 +114,7 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
             {data.sessions.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="py-8 text-center">
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-muted-foreground text-sm">
                     No sessions match your filters
                   </span>
                 </TableCell>
@@ -140,13 +122,13 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
             ) : (
               data.sessions.map((item) => (
                 <TableRow key={item.id} className="hover:bg-accent">
-                  <TableCell className="tabular-nums whitespace-nowrap text-muted-foreground">
+                  <TableCell className="text-muted-foreground whitespace-nowrap tabular-nums">
                     {format(new Date(item.date), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell>
                     <Link
-                      href={`/projects/${item.projectId}`}
-                      className="inline-block max-w-[200px] truncate underline decoration-muted-foreground/50 hover:decoration-foreground"
+                      href={`/charts/${item.chartId}`}
+                      className="decoration-muted-foreground/50 hover:decoration-foreground inline-block max-w-[200px] truncate underline"
                     >
                       {item.projectName}
                     </Link>
@@ -159,10 +141,7 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
                   </TableCell>
                   <TableCell className="text-center">
                     {item.hasPhoto && (
-                      <Camera
-                        data-testid="photo-indicator"
-                        className="h-3.5 w-3.5 text-success"
-                      />
+                      <Camera data-testid="photo-indicator" className="text-success h-3.5 w-3.5" />
                     )}
                   </TableCell>
                 </TableRow>
@@ -175,7 +154,7 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
       {/* Pagination */}
       {data.totalPages > 0 && (
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">
+          <span className="text-muted-foreground text-sm">
             Page {data.page} of {data.totalPages}
           </span>
           <div className="flex gap-2">
