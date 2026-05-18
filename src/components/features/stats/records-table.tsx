@@ -11,11 +11,7 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
-import type {
-  PersonalBestRecord,
-  FastestCompletion,
-  SizeCategory,
-} from "@/types/stats";
+import type { PersonalBestRecord, FastestCompletion, SizeCategory } from "@/types/stats";
 
 const SIZE_CATEGORIES: SizeCategory[] = ["Mini", "Small", "Medium", "Large", "BAP"];
 
@@ -29,7 +25,6 @@ const RECORD_ICONS = {
 interface RecordsTableProps {
   personalBests: PersonalBestRecord[];
   fastestCompletions: FastestCompletion[];
-  availableYears: number[];
 }
 
 function formatRecordValue(value: number, unit: string): string {
@@ -47,9 +42,7 @@ function RecordValueCell({
   isAllTime: boolean;
 }) {
   if (!record || (record.value === 0 && !record.date)) {
-    return (
-      <span className="text-muted-foreground font-mono">--</span>
-    );
+    return <span className="text-muted-foreground font-mono">--</span>;
   }
 
   const valueSize = isAllTime
@@ -58,9 +51,7 @@ function RecordValueCell({
 
   return (
     <div className="flex flex-col gap-0.5">
-      <span className={valueSize}>
-        {formatRecordValue(record.value, record.unit)}
-      </span>
+      <span className={valueSize}>{formatRecordValue(record.value, record.unit)}</span>
       <span className="text-muted-foreground text-xs">{record.unit}</span>
       {record.date && (
         <span className="text-muted-foreground text-xs">
@@ -87,9 +78,7 @@ function CompletionValueCell({
   isAllTime: boolean;
 }) {
   if (!completion) {
-    return (
-      <span className="text-muted-foreground font-mono">--</span>
-    );
+    return <span className="text-muted-foreground font-mono">--</span>;
   }
 
   const valueSize = isAllTime
@@ -110,30 +99,16 @@ function CompletionValueCell({
   );
 }
 
-export function RecordsTable({
-  personalBests,
-  fastestCompletions,
-  availableYears,
-}: RecordsTableProps) {
-  const allTimeColClass = "bg-success-muted";
-
+export function RecordsTable({ personalBests, fastestCompletions }: RecordsTableProps) {
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead className="min-w-[160px]">Record</TableHead>
-          <TableHead className={`${allTimeColClass} min-w-[160px] font-semibold`}>
-            All-time
-          </TableHead>
-          {availableYears.map((year) => (
-            <TableHead key={year} className="min-w-[140px]">
-              {year}
-            </TableHead>
-          ))}
+          <TableHead className="bg-success-muted min-w-[160px] font-semibold">Value</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {/* Personal Best rows */}
         {personalBests.map((record) => {
           const iconConfig = RECORD_ICONS[record.type];
           const IconComponent = iconConfig.icon;
@@ -152,38 +127,23 @@ export function RecordsTable({
                   </span>
                 </div>
               </TableCell>
-              <TableCell className={allTimeColClass}>
+              <TableCell className="bg-success-muted">
                 <RecordValueCell record={record} isAllTime={true} />
               </TableCell>
-              {availableYears.map((year) => (
-                <TableCell key={year}>
-                  {isCurrentStreak ? (
-                    <span className="text-muted-foreground font-mono">--</span>
-                  ) : (
-                    <span className="text-muted-foreground font-mono">--</span>
-                  )}
-                </TableCell>
-              ))}
             </TableRow>
           );
         })}
 
-        {/* Grouped Divider */}
         <TableRow className="hover:bg-transparent">
-          <TableCell
-            colSpan={2 + availableYears.length}
-            className="bg-muted px-3 py-2"
-          >
-            <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+          <TableCell colSpan={2} className="bg-muted px-3 py-2">
+            <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
               Fastest Completions
             </span>
           </TableCell>
         </TableRow>
 
-        {/* Fastest Completion rows */}
         {SIZE_CATEGORIES.map((category) => {
-          const completion =
-            fastestCompletions.find((c) => c.sizeCategory === category) ?? null;
+          const completion = fastestCompletions.find((c) => c.sizeCategory === category) ?? null;
 
           return (
             <TableRow key={category}>
@@ -193,14 +153,9 @@ export function RecordsTable({
                   <span className="font-medium">Fastest {category}</span>
                 </div>
               </TableCell>
-              <TableCell className={allTimeColClass}>
+              <TableCell className="bg-success-muted">
                 <CompletionValueCell completion={completion} isAllTime={true} />
               </TableCell>
-              {availableYears.map((year) => (
-                <TableCell key={year}>
-                  <span className="text-muted-foreground font-mono">--</span>
-                </TableCell>
-              ))}
             </TableRow>
           );
         })}

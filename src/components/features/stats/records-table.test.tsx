@@ -76,13 +76,10 @@ const mockFastestCompletions: FastestCompletion[] = [
   },
 ];
 
-const defaultYears = [2026, 2025];
-
 describe("RecordsTable", () => {
   const defaultProps = {
     personalBests: mockPersonalBests,
     fastestCompletions: mockFastestCompletions,
-    availableYears: defaultYears,
   };
 
   it("renders 4 personal best rows (Best Day, Best Session, Longest Streak, Current Streak)", () => {
@@ -110,11 +107,11 @@ describe("RecordsTable", () => {
     expect(screen.getByText("Fastest BAP")).toBeInTheDocument();
   });
 
-  it("All-time column has bg-success-muted background class", () => {
+  it("Value column has bg-success-muted background class", () => {
     render(<RecordsTable {...defaultProps} />);
 
-    const allTimeHeader = screen.getByText("All-time").closest("th");
-    expect(allTimeHeader?.className).toContain("bg-success-muted");
+    const valueHeader = screen.getByText("Value").closest("th");
+    expect(valueHeader?.className).toContain("bg-success-muted");
   });
 
   it("record values display with toLocaleString() for stitches", () => {
@@ -168,7 +165,7 @@ describe("RecordsTable", () => {
     expect(snowflakeLink).toHaveAttribute("href", "/charts/chart-3");
   });
 
-  it("Current Streak shows -- in year columns", () => {
+  it("empty fastest completion categories show --", () => {
     render(<RecordsTable {...defaultProps} />);
 
     const dashes = screen.getAllByText("--");

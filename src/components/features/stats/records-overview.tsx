@@ -54,11 +54,7 @@ export function RecordsOverview({
 
       <Card>
         <CardContent className="pt-6">
-          <RecordsTable
-            personalBests={personalBests}
-            fastestCompletions={fastestCompletions}
-            availableYears={availableYears}
-          />
+          <RecordsTable personalBests={personalBests} fastestCompletions={fastestCompletions} />
         </CardContent>
       </Card>
 
