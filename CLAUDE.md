@@ -28,11 +28,29 @@
   - Code review: Fixed WR-01/WR-02 (cache key missing `limit` param in designer/genre queries)
   - Verification: 7/7 must-haves pass, all 7 requirements satisfied (HERO-01–06, INS-06)
 
+- **Phase 20 planned** — 4 plans, 3 waves, covering VIZ-01..07 + INS-04
+  - Plan 01 (W1): Types, chart configs, 6 query modules, server actions, search-params
+  - Plan 02 (W2): PaceCards, MonthlyStitchChart + DrillDown, DayOfWeekChart
+  - Plan 03 (W2): StitchingCalendar, SessionHistoryTable, shadcn table/pagination
+  - Plan 04 (W3): ActivityOverview layout, page.tsx wiring, human verification
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-discuss-phase 20` — discuss Activity Visualization & Calendar phase
-2. `/gsd-plan-phase 20` — plan after discuss
-3. `/gsd-execute-phase 20` — execute
+1. Fix Phase 20 human-verification bugs (5 issues below), then `/gsd-verify-work 20`
+
+**Phase 20 bugs found during human verification:**
+- **BUG-1: Monthly chart drill-down broken** — Clicking April/May bars shows green selection border around both months but no drill-down panel expands. Likely the `onClick` handler or the index-based `chartData[index]` lookup after the Recharts type fix isn't mapping correctly to the right month.
+- **BUG-2: Calendar project links 404** — Session pills link to `/projects/{projectId}` but the actual route is `/charts/{projectId}` (this app uses `/charts/[id]` not `/projects/[id]`).
+- **BUG-3: Session history project links 404** — Same issue as BUG-2, links use wrong route prefix.
+- **BUG-4: SessionHistoryTable appears twice** — The Activity tab renders the session table section duplicated. Check `activity-overview.tsx` composition for double-render.
+- **BUG-5: Chart bars don't reload on back-nav** — Monthly chart and day-of-week chart don't re-render data when navigating away and pressing Back. Client-side state stale after SPA navigation.
+
+**Files to fix:**
+- `src/components/features/stats/monthly-stitch-chart.tsx` — BUG-1 (onClick handler)
+- `src/components/features/stats/stitching-calendar.tsx` — BUG-2 (Link href)
+- `src/components/features/stats/session-history-table.tsx` — BUG-3 (Link href)
+- `src/components/features/stats/activity-overview.tsx` — BUG-4 (duplicate section)
+- `src/components/features/stats/monthly-stitch-chart.tsx` + `day-of-week-chart.tsx` — BUG-5 (stale state on back-nav)
 
 ### Backlog
 
