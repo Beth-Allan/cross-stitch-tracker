@@ -1,6 +1,8 @@
 "use client";
 
 import confetti from "canvas-confetti";
+
+const fireConfetti = confetti.create(undefined, { useWorker: false, resize: true });
 import { Trophy, X } from "lucide-react";
 import { toast } from "sonner";
 import type { BrokenRecord } from "@/types/stats";
@@ -53,7 +55,7 @@ export function fireCelebration(brokenRecords: BrokenRecord[]): void {
 
   setTimeout(() => {
     try {
-      confetti({
+      fireConfetti({
         particleCount: 150,
         spread: 80,
         startVelocity: 45,

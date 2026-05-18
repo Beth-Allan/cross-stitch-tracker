@@ -3,9 +3,10 @@ import { render, screen } from "@/__tests__/test-utils";
 import type { BrokenRecord } from "@/types/stats";
 
 // Mock canvas-confetti
-const mockConfetti = vi.fn();
+const mockFireConfetti = vi.fn();
+const mockCreate = vi.fn(() => mockFireConfetti);
 vi.mock("canvas-confetti", () => ({
-  default: mockConfetti,
+  default: { create: mockCreate },
 }));
 
 // Mock sonner toast
@@ -43,10 +44,10 @@ describe("fireCelebration", () => {
 
     fireCelebration(records);
 
-    expect(mockConfetti).not.toHaveBeenCalled();
+    expect(mockFireConfetti).not.toHaveBeenCalled();
     vi.advanceTimersByTime(150);
 
-    expect(mockConfetti).toHaveBeenCalledWith(
+    expect(mockFireConfetti).toHaveBeenCalledWith(
       expect.objectContaining({
         particleCount: 150,
         spread: 80,
