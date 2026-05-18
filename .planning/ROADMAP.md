@@ -146,7 +146,7 @@ Plans:
   3. User can see year-scoped records alongside all-time records, and fastest completions by size category
   4. User can see most-used thread colors (with swatches), designer completion rates, and genre distribution
   5. User can see estimated completion dates for active projects when sufficient session data exists
-**Plans:** 2/4 plans executed
+**Plans:** 3/4 plans executed
 Plans:
 **Wave 1**
 - [x] 21-01-PLAN.md — Types, search-params, canvas-confetti install, 7 TDD query modules (personal bests, fastest completions, insights, estimates, available years)
@@ -156,7 +156,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 for layout wiring; Plan 04 only needs Wave 1)*
 - [ ] 21-03-PLAN.md — ThreadInsightList, DesignerInsightList, GenreInsightList, CompletionEstimatesSection, RecordsOverview final assembly
-- [ ] 21-04-PLAN.md — Record detection, celebration confetti/toast, createSession integration, human verification
+- [x] 21-04-PLAN.md — Record detection, celebration confetti/toast, createSession integration, human verification
 
 ## Progress
 
@@ -183,4 +183,4 @@ Plans:
 | 18. Stats Engine & Charting Foundation | v1.5 | 3/3 | Complete    | 2026-05-17 |
 | 19. Hero Stats & Collection Overview | v1.5 | 3/3 | Complete | 2026-05-17 |
 | 20. Activity Visualization & Calendar | v1.5 | 4/4 | Complete   | 2026-05-18 |
-| 21. Records, Insights & Celebrations | v1.5 | 2/4 | In Progress|  |
+| 21. Records, Insights & Celebrations | v1.5 | 3/4 | In Progress|  |
