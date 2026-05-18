@@ -8,10 +8,20 @@ A personal cross-stitch project management app that replaced a complex Notion sy
 
 A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
 
+## Current Milestone: v1.6 Cleanup & Hardening
+
+**Goal:** Address all accumulated backlog items — bug fixes, test gaps, code quality issues, UX polish, cache correctness, and silent failure handling — to harden the app before building new features.
+
+**Target features:**
+- Fix HIGH PRIORITY items (supply action tests, shopping cart scaling, TypeScript errors, stats resilience)
+- Fill test coverage gaps (skein calculator, calendar rollover, record detection, completion estimates)
+- Fix silent failures and cache staleness (session-actions, stats revalidation on chart/supply mutations)
+- Code quality improvements (type narrowing, constant deduplication, discriminated unions, comment cleanup)
+- UX polish (ARIA violations, focal point overlap, fabric matching, supply UI affordances, shopping pill styling)
+
 ## Current State
 
 **Last shipped:** v1.5 Statistics & Records (2026-05-18)
-**Next milestone:** Planning (run `/gsd-new-milestone`)
 
 The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project selection, image optimization, multi-file working copies per chart, click-to-set focal point control for cover images, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights, and celebration confetti on record-breaking sessions. 1,967 tests, ~125k LOC TypeScript.
 
@@ -82,7 +92,7 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 
 ### Active
 
-(No active requirements — run `/gsd-new-milestone` to define next milestone)
+(Defining requirements for v1.6 Cleanup & Hardening)
 
 ### Deferred (no phase assigned)
 
@@ -217,4 +227,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-18 after v1.5 milestone*
+*Last updated: 2026-05-18 after v1.6 milestone start*

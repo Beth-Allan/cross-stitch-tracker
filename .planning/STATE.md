@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.5
-milestone_name: Statistics & Records
-status: "Milestone v1.5 shipped and archived"
-stopped_at: Milestone complete
-last_updated: "2026-05-18"
+milestone: v1.6
+milestone_name: Cleanup & Hardening
+status: planning
+last_updated: "2026-05-18T20:42:04.218Z"
 last_activity: 2026-05-18
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 14
-  completed_plans: 14
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,12 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 
 ## Current Position
 
-Phase: 21 (final)
-Plan: All complete
-Status: Milestone v1.5 shipped and archived
-Last activity: 2026-05-18
-
-Progress: [██████████] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-18 — Milestone v1.6 started
 
 ## Milestone Structure
 
