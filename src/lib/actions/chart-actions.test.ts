@@ -103,7 +103,7 @@ describe("createChartWithSupplies", () => {
       genres: [],
     };
     mockPrisma.$transaction.mockImplementationOnce(
-      async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+      async (fn: (tx: unknown) => Promise<unknown>) => {
         mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
         return fn(mockPrisma);
       },
@@ -130,7 +130,7 @@ describe("createChartWithSupplies", () => {
       genres: [],
     };
     mockPrisma.$transaction.mockImplementationOnce(
-      async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+      async (fn: (tx: unknown) => Promise<unknown>) => {
         mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
         mockPrisma.projectThread.createMany.mockResolvedValueOnce({ count: 1 });
         return fn(mockPrisma);
@@ -168,7 +168,7 @@ describe("createChartWithSupplies", () => {
       genres: [],
     };
     mockPrisma.$transaction.mockImplementationOnce(
-      async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+      async (fn: (tx: unknown) => Promise<unknown>) => {
         mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
         mockPrisma.projectThread.createMany.mockResolvedValueOnce({ count: 1 });
         mockPrisma.projectBead.createMany.mockResolvedValueOnce({ count: 1 });
@@ -198,7 +198,7 @@ describe("createChartWithSupplies", () => {
       genres: [],
     };
     mockPrisma.$transaction.mockImplementationOnce(
-      async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+      async (fn: (tx: unknown) => Promise<unknown>) => {
         mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
         return fn(mockPrisma);
       },

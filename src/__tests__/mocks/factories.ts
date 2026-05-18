@@ -436,7 +436,7 @@ export function createMockStitchSession(
  * Returns an object matching the prisma client shape used in server actions.
  */
 export function createMockPrisma() {
-  return {
+  const mockPrisma = {
     chart: {
       create: vi.fn(),
       findMany: vi.fn(),
@@ -582,6 +582,28 @@ export function createMockPrisma() {
     },
     $transaction: vi.fn(),
   };
+
+  // D-05: Default $transaction handles both callback and array forms
+  mockPrisma.$transaction.mockImplementation((fn: unknown) =>
+    typeof fn === "function"
+      ? (fn as (tx: typeof mockPrisma) => unknown)(mockPrisma)
+      : Promise.all(fn as Promise<unknown>[]),
+  );
+
+  return mockPrisma;
+}
+
+/**
+ * Override $transaction for one call with a custom tx-client scope.
+ * Replaces the 7-line mockImplementationOnce boilerplate.
+ */
+export function mockTransaction(
+  mockPrisma: ReturnType<typeof createMockPrisma>,
+  overrides: Record<string, Record<string, ReturnType<typeof vi.fn>>>,
+) {
+  mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) =>
+    cb(overrides),
+  );
 }
 
 /**
