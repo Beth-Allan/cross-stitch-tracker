@@ -110,7 +110,11 @@ Full details: `milestones/v1.5-ROADMAP.md`
   3. Stats page renders partial data when individual queries fail instead of showing an error page
   4. createMockPrisma() provides sensible defaults for $transaction and vacuous assertions are eliminated
   5. Stats actions return appropriate errors for unauthenticated requests and invalid Zod inputs
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 22-01-PLAN.md -- Test infrastructure: $transaction defaults + mockTransaction helper + fix 3 test files
+- [ ] 22-02-PLAN.md -- Security + auth: supply ownership rejection tests + stats-actions auth restructuring
+- [ ] 22-03-PLAN.md -- Stats resilience: Promise.allSettled + settled() utility + nullable component props
 
 ### Phase 23: Test Coverage & Reliability
 **Goal**: Test coverage gaps are filled for edge cases across the app, and silent failures in session handling and cache staleness in stats are resolved
@@ -192,7 +196,7 @@ Phase 22 first (foundation). Phases 23, 24, 25, 26 depend only on Phase 22 and c
 | 19. Hero Stats & Collection Overview | v1.5 | 3/3 | Complete | 2026-05-17 |
 | 20. Activity Visualization & Calendar | v1.5 | 4/4 | Complete | 2026-05-18 |
 | 21. Records, Insights & Celebrations | v1.5 | 4/4 | Complete | 2026-05-18 |
-| 22. Critical Fixes & Test Infrastructure | v1.6 | 0/? | Not started | - |
+| 22. Critical Fixes & Test Infrastructure | v1.6 | 0/3 | Not started | - |
 | 23. Test Coverage & Reliability | v1.6 | 0/? | Not started | - |
 | 24. Code Quality | v1.6 | 0/? | Not started | - |
 | 25. Shopping Cart Scaling | v1.6 | 0/? | Not started | - |
