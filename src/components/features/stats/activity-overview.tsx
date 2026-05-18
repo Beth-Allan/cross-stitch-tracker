@@ -4,6 +4,7 @@ import { MonthlyStitchChart } from "./monthly-stitch-chart";
 import { DayOfWeekChart } from "./day-of-week-chart";
 import { StitchingCalendar } from "./stitching-calendar";
 import { SessionHistoryTable } from "./session-history-table";
+import { DataUnavailable } from "./data-unavailable";
 import type {
   MonthlyTotal,
   CalendarDayData,
@@ -13,11 +14,11 @@ import type {
 } from "@/types/stats";
 
 interface ActivityOverviewProps {
-  paceMetrics: PaceMetricsData;
-  monthlyTotals: MonthlyTotal[];
-  dayOfWeekData: DayOfWeekData[];
-  calendarData: CalendarDayData[];
-  sessionHistory: SessionHistoryData;
+  paceMetrics: PaceMetricsData | null;
+  monthlyTotals: MonthlyTotal[] | null;
+  dayOfWeekData: DayOfWeekData[] | null;
+  calendarData: CalendarDayData[] | null;
+  sessionHistory: SessionHistoryData | null;
   projects: { id: string; name: string }[];
   currentYear: number;
   currentMonth: number;
@@ -49,43 +50,58 @@ export function ActivityOverview({
 
   return (
     <div className="space-y-8">
-      {/* 1. PaceCards -- full width, no Card wrapper (self-contained like MetricsBar) */}
-      <PaceCards paceMetrics={paceMetrics} />
+      {paceMetrics !== null ? (
+        <PaceCards paceMetrics={paceMetrics} />
+      ) : (
+        <DataUnavailable label="Pace metrics" />
+      )}
 
-      {/* 2. Monthly Stitches -- Card wrapper, chart handles its own heading */}
-      <Card>
-        <CardContent className="pt-6">
-          <MonthlyStitchChart data={monthlyTotals} initialYear={currentYear} />
-        </CardContent>
-      </Card>
+      {monthlyTotals !== null ? (
+        <Card>
+          <CardContent className="pt-6">
+            <MonthlyStitchChart data={monthlyTotals} initialYear={currentYear} />
+          </CardContent>
+        </Card>
+      ) : (
+        <DataUnavailable label="Monthly stitches" />
+      )}
 
-      {/* 3. Day of Week -- Card wrapper with heading */}
-      <Card>
-        <CardHeader>
-          <h3 className="font-heading text-sm font-semibold">Stitching Patterns by Day</h3>
-        </CardHeader>
-        <CardContent>
-          <DayOfWeekChart data={dayOfWeekData} />
-        </CardContent>
-      </Card>
+      {dayOfWeekData !== null ? (
+        <Card>
+          <CardHeader>
+            <h3 className="font-heading text-sm font-semibold">Stitching Patterns by Day</h3>
+          </CardHeader>
+          <CardContent>
+            <DayOfWeekChart data={dayOfWeekData} />
+          </CardContent>
+        </Card>
+      ) : (
+        <DataUnavailable label="Day of week patterns" />
+      )}
 
-      {/* 4. Calendar -- Card wrapper, calendar handles its own heading */}
-      <Card>
-        <CardContent className="pt-6">
-          <StitchingCalendar
-            data={calendarData}
-            initialMonth={currentMonth}
-            initialYear={currentYear}
-          />
-        </CardContent>
-      </Card>
+      {calendarData !== null ? (
+        <Card>
+          <CardContent className="pt-6">
+            <StitchingCalendar
+              data={calendarData}
+              initialMonth={currentMonth}
+              initialYear={currentYear}
+            />
+          </CardContent>
+        </Card>
+      ) : (
+        <DataUnavailable label="Stitching calendar" />
+      )}
 
-      {/* 5. Session History -- Card wrapper, table handles its own heading */}
-      <Card>
-        <CardContent className="pt-6">
-          <SessionHistoryTable data={sessionHistory} projects={projects} />
-        </CardContent>
-      </Card>
+      {sessionHistory !== null ? (
+        <Card>
+          <CardContent className="pt-6">
+            <SessionHistoryTable data={sessionHistory} projects={projects} />
+          </CardContent>
+        </Card>
+      ) : (
+        <DataUnavailable label="Session history" />
+      )}
     </div>
   );
 }

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Cleanup & Hardening
-status: planning
+status: "Phase 22 shipped — PR #41"
 stopped_at: Phase 22 context gathered
-last_updated: "2026-05-18T21:06:30.208Z"
-last_activity: 2026-05-18 -- Roadmap created for v1.6
+last_updated: "2026-05-18T22:09:56.372Z"
+last_activity: "2026-05-18 -- Phase 22 shipped — PR #41"
 progress:
   total_phases: 5
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  completed_phases: 1
+  total_plans: 3
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 22 -- Critical Fixes & Test Infrastructure
+**Current focus:** Phase 22 — critical-fixes-test-infrastructure
 
 ## Current Position
 
-Phase: 22 of 26 (Critical Fixes & Test Infrastructure)
-Plan: --
-Status: Ready to plan
-Last activity: 2026-05-18 -- Roadmap created for v1.6
+Phase: 23
+Plan: Not started
+Status: Phase 22 shipped — PR #41
+Last activity: 2026-05-18 -- Phase 22 shipped — PR #41
 
 Progress: [░░░░░░░░░░] 0%
 

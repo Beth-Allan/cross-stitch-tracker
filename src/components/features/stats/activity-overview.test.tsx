@@ -52,6 +52,12 @@ vi.mock("./session-history-table", () => ({
   ),
 }));
 
+vi.mock("./data-unavailable", () => ({
+  DataUnavailable: (props: Record<string, unknown>) => (
+    <div data-testid="data-unavailable" data-label={props.label} />
+  ),
+}));
+
 import { ActivityOverview } from "./activity-overview";
 
 const mockPaceMetrics: PaceMetricsData = {
@@ -222,5 +228,49 @@ describe("ActivityOverview", () => {
 
     const table = screen.getByTestId("session-history-table");
     expect(table.closest("[data-slot='card-content']")).toBeInTheDocument();
+  });
+
+  it("shows DataUnavailable for paceMetrics when null", () => {
+    render(<ActivityOverview {...defaultProps} paceMetrics={null} />);
+
+    const unavailable = screen.getAllByTestId("data-unavailable");
+    expect(unavailable.some((el) => el.getAttribute("data-label") === "Pace metrics")).toBe(true);
+    expect(screen.queryByTestId("pace-cards")).not.toBeInTheDocument();
+  });
+
+  it("shows DataUnavailable for monthlyTotals when null", () => {
+    render(<ActivityOverview {...defaultProps} monthlyTotals={null} />);
+
+    const unavailable = screen.getAllByTestId("data-unavailable");
+    expect(unavailable.some((el) => el.getAttribute("data-label") === "Monthly stitches")).toBe(
+      true,
+    );
+    expect(screen.queryByTestId("monthly-stitch-chart")).not.toBeInTheDocument();
+  });
+
+  it("shows DataUnavailable for each null prop independently", () => {
+    render(
+      <ActivityOverview
+        {...defaultProps}
+        paceMetrics={null}
+        monthlyTotals={null}
+        dayOfWeekData={null}
+        calendarData={null}
+        sessionHistory={null}
+      />,
+    );
+
+    const unavailable = screen.getAllByTestId("data-unavailable");
+    expect(unavailable).toHaveLength(5);
+  });
+
+  it("renders normal content alongside null props", () => {
+    render(<ActivityOverview {...defaultProps} paceMetrics={null} calendarData={null} />);
+
+    expect(screen.getByTestId("monthly-stitch-chart")).toBeInTheDocument();
+    expect(screen.getByTestId("day-of-week-chart")).toBeInTheDocument();
+    expect(screen.getByTestId("session-history-table")).toBeInTheDocument();
+    const unavailable = screen.getAllByTestId("data-unavailable");
+    expect(unavailable).toHaveLength(2);
   });
 });

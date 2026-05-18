@@ -57,6 +57,12 @@ vi.mock("./ranked-list", () => ({
   ),
 }));
 
+vi.mock("./data-unavailable", () => ({
+  DataUnavailable: (props: Record<string, unknown>) => (
+    <div data-testid="data-unavailable" data-label={props.label} />
+  ),
+}));
+
 import { StatsOverview } from "./stats-overview";
 
 const mockHeroStats: StatsHeroData = {
@@ -220,5 +226,73 @@ describe("StatsOverview", () => {
 
     const grid = container.querySelector(".md\\:grid-cols-2");
     expect(grid).toBeInTheDocument();
+  });
+
+  it("shows DataUnavailable for heroStats when null", () => {
+    render(
+      <StatsOverview
+        heroStats={null}
+        collectionBreakdown={mockCollectionBreakdown}
+        sizeBreakdown={mockSizeBreakdown}
+        designerBreakdown={mockDesignerBreakdown}
+        genreBreakdown={mockGenreBreakdown}
+      />,
+    );
+
+    const unavailable = screen.getAllByTestId("data-unavailable");
+    expect(unavailable.some((el) => el.getAttribute("data-label") === "Stats summary")).toBe(true);
+    expect(screen.queryByTestId("metrics-bar")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("lifetime-counters")).not.toBeInTheDocument();
+  });
+
+  it("shows DataUnavailable for collectionBreakdown when null", () => {
+    render(
+      <StatsOverview
+        heroStats={mockHeroStats}
+        collectionBreakdown={null}
+        sizeBreakdown={mockSizeBreakdown}
+        designerBreakdown={mockDesignerBreakdown}
+        genreBreakdown={mockGenreBreakdown}
+      />,
+    );
+
+    const unavailable = screen.getAllByTestId("data-unavailable");
+    expect(unavailable.some((el) => el.getAttribute("data-label") === "Collection status")).toBe(
+      true,
+    );
+    expect(screen.queryByTestId("collection-status-chart")).not.toBeInTheDocument();
+  });
+
+  it("shows DataUnavailable for each null prop independently", () => {
+    render(
+      <StatsOverview
+        heroStats={null}
+        collectionBreakdown={null}
+        sizeBreakdown={null}
+        designerBreakdown={null}
+        genreBreakdown={null}
+      />,
+    );
+
+    const unavailable = screen.getAllByTestId("data-unavailable");
+    expect(unavailable).toHaveLength(5);
+  });
+
+  it("renders normal content alongside null props", () => {
+    render(
+      <StatsOverview
+        heroStats={mockHeroStats}
+        collectionBreakdown={null}
+        sizeBreakdown={mockSizeBreakdown}
+        designerBreakdown={null}
+        genreBreakdown={mockGenreBreakdown}
+      />,
+    );
+
+    expect(screen.getByTestId("metrics-bar")).toBeInTheDocument();
+    expect(screen.getByTestId("size-category-chart")).toBeInTheDocument();
+    expect(screen.getByTestId("genre-distribution-chart")).toBeInTheDocument();
+    const unavailable = screen.getAllByTestId("data-unavailable");
+    expect(unavailable).toHaveLength(2);
   });
 });

@@ -6,6 +6,7 @@ import { SizeCategoryChart } from "./size-category-chart";
 import { DesignerBreakdownChart } from "./designer-breakdown-chart";
 import { GenreDistributionChart } from "./genre-distribution-chart";
 import { RankedList } from "./ranked-list";
+import { DataUnavailable } from "./data-unavailable";
 import type {
   StatsHeroData,
   CollectionBreakdownData,
@@ -15,11 +16,11 @@ import type {
 } from "@/types/stats";
 
 interface StatsOverviewProps {
-  heroStats: StatsHeroData;
-  collectionBreakdown: CollectionBreakdownData;
-  sizeBreakdown: SizeBreakdownItem[];
-  designerBreakdown: DesignerBreakdownItem[];
-  genreBreakdown: GenreBreakdownItem[];
+  heroStats: StatsHeroData | null;
+  collectionBreakdown: CollectionBreakdownData | null;
+  sizeBreakdown: SizeBreakdownItem[] | null;
+  designerBreakdown: DesignerBreakdownItem[] | null;
+  genreBreakdown: GenreBreakdownItem[] | null;
 }
 
 export function StatsOverview({
@@ -31,84 +32,98 @@ export function StatsOverview({
 }: StatsOverviewProps) {
   return (
     <div className="space-y-8">
-      {/* 1. MetricsBar -- full width */}
-      <MetricsBar
-        stitchesToday={heroStats.stitchesToday}
-        stitchesThisWeek={heroStats.stitchesThisWeek}
-        stitchesThisMonth={heroStats.stitchesThisMonth}
-        stitchesThisYear={heroStats.stitchesThisYear}
-      />
+      {heroStats !== null ? (
+        <>
+          <MetricsBar
+            stitchesToday={heroStats.stitchesToday}
+            stitchesThisWeek={heroStats.stitchesThisWeek}
+            stitchesThisMonth={heroStats.stitchesThisMonth}
+            stitchesThisYear={heroStats.stitchesThisYear}
+          />
+          <LifetimeCounters
+            totalLifetimeStitches={heroStats.totalLifetimeStitches}
+            totalSessions={heroStats.totalSessions}
+            totalTimeMinutes={heroStats.totalTimeMinutes}
+            projectsCompleted={heroStats.projectsCompleted}
+          />
+        </>
+      ) : (
+        <DataUnavailable label="Stats summary" />
+      )}
 
-      {/* 2. LifetimeCounters -- full width */}
-      <LifetimeCounters
-        totalLifetimeStitches={heroStats.totalLifetimeStitches}
-        totalSessions={heroStats.totalSessions}
-        totalTimeMinutes={heroStats.totalTimeMinutes}
-        projectsCompleted={heroStats.projectsCompleted}
-      />
-
-      {/* 3. Collection charts 2x2 grid */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {/* Row 1 Left: Status donut */}
-        <Card>
-          <CardHeader>
-            <h3 className="font-heading text-sm font-semibold">Collection by Status</h3>
-          </CardHeader>
-          <CardContent>
-            <CollectionStatusChart
-              data={collectionBreakdown.byStatus}
-              totalProjects={collectionBreakdown.totalProjects}
-            />
-          </CardContent>
-        </Card>
+        {collectionBreakdown !== null ? (
+          <Card>
+            <CardHeader>
+              <h3 className="font-heading text-sm font-semibold">Collection by Status</h3>
+            </CardHeader>
+            <CardContent>
+              <CollectionStatusChart
+                data={collectionBreakdown.byStatus}
+                totalProjects={collectionBreakdown.totalProjects}
+              />
+            </CardContent>
+          </Card>
+        ) : (
+          <DataUnavailable label="Collection status" />
+        )}
 
-        {/* Row 1 Right: Size bars */}
-        <Card>
-          <CardHeader>
-            <h3 className="font-heading text-sm font-semibold">Collection by Size</h3>
-          </CardHeader>
-          <CardContent>
-            <SizeCategoryChart data={sizeBreakdown} />
-          </CardContent>
-        </Card>
+        {sizeBreakdown !== null ? (
+          <Card>
+            <CardHeader>
+              <h3 className="font-heading text-sm font-semibold">Collection by Size</h3>
+            </CardHeader>
+            <CardContent>
+              <SizeCategoryChart data={sizeBreakdown} />
+            </CardContent>
+          </Card>
+        ) : (
+          <DataUnavailable label="Size breakdown" />
+        )}
 
-        {/* Row 2 Left: Designer bars + ranked list */}
-        <Card>
-          <CardHeader>
-            <h3 className="font-heading text-sm font-semibold">Top Designers</h3>
-          </CardHeader>
-          <CardContent>
-            <DesignerBreakdownChart data={designerBreakdown} />
-            <RankedList
-              items={designerBreakdown.map((d) => ({
-                id: d.designerId,
-                name: d.name,
-                count: d.count,
-                href: `/designers/${d.designerId}`,
-              }))}
-              label="Top Designers by Chart Count"
-            />
-          </CardContent>
-        </Card>
+        {designerBreakdown !== null ? (
+          <Card>
+            <CardHeader>
+              <h3 className="font-heading text-sm font-semibold">Top Designers</h3>
+            </CardHeader>
+            <CardContent>
+              <DesignerBreakdownChart data={designerBreakdown} />
+              <RankedList
+                items={designerBreakdown.map((d) => ({
+                  id: d.designerId,
+                  name: d.name,
+                  count: d.count,
+                  href: `/designers/${d.designerId}`,
+                }))}
+                label="Top Designers by Chart Count"
+              />
+            </CardContent>
+          </Card>
+        ) : (
+          <DataUnavailable label="Designer breakdown" />
+        )}
 
-        {/* Row 2 Right: Genre bars + ranked list */}
-        <Card>
-          <CardHeader>
-            <h3 className="font-heading text-sm font-semibold">Genre Distribution</h3>
-          </CardHeader>
-          <CardContent>
-            <GenreDistributionChart data={genreBreakdown} />
-            <RankedList
-              items={genreBreakdown.map((g) => ({
-                id: g.genreId,
-                name: g.name,
-                count: g.count,
-                href: `/genres/${g.genreId}`,
-              }))}
-              label="Genre Distribution by Chart Count"
-            />
-          </CardContent>
-        </Card>
+        {genreBreakdown !== null ? (
+          <Card>
+            <CardHeader>
+              <h3 className="font-heading text-sm font-semibold">Genre Distribution</h3>
+            </CardHeader>
+            <CardContent>
+              <GenreDistributionChart data={genreBreakdown} />
+              <RankedList
+                items={genreBreakdown.map((g) => ({
+                  id: g.genreId,
+                  name: g.name,
+                  count: g.count,
+                  href: `/genres/${g.genreId}`,
+                }))}
+                label="Genre Distribution by Chart Count"
+              />
+            </CardContent>
+          </Card>
+        ) : (
+          <DataUnavailable label="Genre distribution" />
+        )}
       </div>
     </div>
   );
