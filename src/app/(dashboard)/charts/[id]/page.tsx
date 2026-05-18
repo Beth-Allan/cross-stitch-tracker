@@ -7,6 +7,8 @@ import {
   getProjectSessionStats,
   getActiveProjectsForPicker,
 } from "@/lib/actions/session-actions";
+import { requireAuth } from "@/lib/auth-guard";
+import { getProjectCompletionEstimate } from "@/lib/queries/stats/completion-estimates";
 import { ProjectDetailPage } from "@/components/features/charts/project-detail/project-detail-page";
 import type {
   StitchSessionRow,
@@ -16,11 +18,11 @@ import type {
 
 export default async function ChartDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const chart = await getChart(id);
+  const [user, chart] = await Promise.all([requireAuth(), getChart(id)]);
   if (!chart) notFound();
 
-  // Fetch all data in parallel (supplies, images, sessions, stats, active projects)
-  const [projectSupplies, imageUrls, sessionsResult, statsResult, projectsResult] =
+  // Fetch all data in parallel (supplies, images, sessions, stats, active projects, estimate)
+  const [projectSupplies, imageUrls, sessionsResult, statsResult, projectsResult, completionEstimate] =
     await Promise.all([
       chart.project ? getProjectSupplies(chart.project.id) : null,
       getPresignedImageUrls([chart.coverImageUrl, chart.coverThumbnailUrl]),
@@ -39,6 +41,9 @@ export default async function ChartDetailPage({ params }: { params: Promise<{ id
             } as ProjectSessionStats,
           },
       getActiveProjectsForPicker(),
+      chart.project
+        ? getProjectCompletionEstimate(user.id, chart.project.id)
+        : null,
     ]);
 
   const sessions =
@@ -65,6 +70,7 @@ export default async function ChartDetailPage({ params }: { params: Promise<{ id
       sessions={sessions}
       sessionStats={sessionStats}
       activeProjects={activeProjects}
+      completionEstimate={completionEstimate}
     />
   );
 }

@@ -13,12 +13,16 @@ import type {
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+import { ProjectCompletionEstimate } from "@/components/features/stats/project-completion-estimate";
+import type { CompletionEstimate } from "@/types/stats";
+
 interface ProjectSessionsTabProps {
   sessions: StitchSessionRow[];
   stats: ProjectSessionStats;
   imageUrls: Record<string, string>;
   activeProjects: ActiveProjectForPicker[];
   projectId: string;
+  completionEstimate?: CompletionEstimate | null;
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -63,6 +67,7 @@ export function ProjectSessionsTab({
   imageUrls,
   activeProjects,
   projectId,
+  completionEstimate,
 }: ProjectSessionsTabProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editSession, setEditSession] = useState<{
@@ -150,6 +155,12 @@ export function ProjectSessionsTab({
           <MiniStatCard key={stat.label} {...stat} />
         ))}
       </div>
+
+      {completionEstimate && (
+        <div className="mb-6">
+          <ProjectCompletionEstimate estimate={completionEstimate} />
+        </div>
+      )}
 
       {/* Session count + Log Session button */}
       <div className="mb-3 flex items-center justify-between">

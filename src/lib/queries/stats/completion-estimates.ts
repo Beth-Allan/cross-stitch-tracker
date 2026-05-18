@@ -106,3 +106,66 @@ export function getCompletionEstimates(userId: string, scope: string) {
     { tags: ["stats"], revalidate },
   )();
 }
+
+export async function getProjectCompletionEstimate(
+  userId: string,
+  projectId: string,
+): Promise<CompletionEstimate | null> {
+  try {
+    const tz = getUserTimezone(userId);
+
+    const project = await prisma.project.findUnique({
+      where: { id: projectId, userId },
+      include: {
+        chart: {
+          select: { id: true, name: true, stitchCount: true },
+        },
+        sessions: {
+          select: { date: true, stitchCount: true },
+          orderBy: { date: "asc" },
+        },
+      },
+    });
+
+    if (!project) return null;
+
+    const totalStitches = project.chart.stitchCount;
+    if (totalStitches <= 0) return null;
+    if (project.sessions.length < MIN_SESSIONS) return null;
+
+    const now = TZDate.tz(tz);
+    const firstSession = project.sessions[0];
+    const daysSinceFirst = differenceInCalendarDays(now, firstSession.date);
+    if (daysSinceFirst <= 0) return null;
+
+    const totalSessionStitches = project.sessions.reduce(
+      (sum, s) => sum + s.stitchCount,
+      0,
+    );
+    const avgPerDay = totalSessionStitches / daysSinceFirst;
+    if (avgPerDay <= 0) return null;
+
+    const remaining = totalStitches - project.stitchesCompleted;
+    if (remaining <= 0) return null;
+
+    const daysRemaining = Math.ceil(remaining / avgPerDay);
+    const estimatedDate = addDays(now, daysRemaining);
+    const percentComplete = Math.round(
+      (project.stitchesCompleted / totalStitches) * 100,
+    );
+
+    return {
+      projectId: project.id,
+      chartId: project.chart.id,
+      projectName: project.chart.name,
+      stitchesCompleted: project.stitchesCompleted,
+      totalStitches,
+      percentComplete,
+      estimatedDate: `~${format(estimatedDate, "MMM yyyy")}`,
+      avgPerDay: Math.round(avgPerDay * 10) / 10,
+    };
+  } catch (error) {
+    console.error("[stats] getProjectCompletionEstimate failed:", { userId, projectId, error });
+    throw error;
+  }
+}
