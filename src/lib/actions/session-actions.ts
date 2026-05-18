@@ -55,7 +55,14 @@ export async function createSession(formData: unknown) {
     // Verify project ownership
     const project = await prisma.project.findUnique({
       where: { id: validated.projectId },
-      select: { id: true, userId: true, chartId: true, startingStitches: true },
+      select: {
+        id: true,
+        userId: true,
+        chartId: true,
+        startingStitches: true,
+        stitchesCompleted: true,
+        chart: { select: { stitchCount: true } },
+      },
     });
     if (!project || project.userId !== user.id) {
       return { success: false as const, error: "Project not found" };
@@ -107,10 +114,18 @@ export async function createSession(formData: unknown) {
       console.warn("[stats] Record detection failed (non-blocking):", err);
     }
 
+    let warning: "overTotal" | undefined;
+    if (
+      project.chart?.stitchCount &&
+      project.stitchesCompleted + validated.stitchCount > project.chart.stitchCount
+    ) {
+      warning = "overTotal";
+    }
+
     revalidatePath(`/charts/${project.chartId}`);
     revalidatePath("/sessions");
     revalidateTag("stats", { expire: 0 });
-    return { success: true as const, session: returnSession, brokenRecords };
+    return { success: true as const, session: returnSession, brokenRecords, warning };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };
