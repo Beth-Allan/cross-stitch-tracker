@@ -33,9 +33,8 @@ async function computeAvailableYears(userId: string): Promise<AvailableYearsData
 }
 
 export function getAvailableYears(userId: string) {
-  return unstable_cache(
-    () => computeAvailableYears(userId),
-    [`stats-available-years-${userId}`],
-    { tags: ["stats"], revalidate: 300 },
-  )();
+  return unstable_cache(() => computeAvailableYears(userId), [`stats-available-years-${userId}`], {
+    tags: ["stats"],
+    revalidate: 300,
+  })();
 }

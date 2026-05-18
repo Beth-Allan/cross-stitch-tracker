@@ -27,9 +27,7 @@ async function computeThreadInsights(
       where: {
         project: {
           userId,
-          ...(dateFilter
-            ? { sessions: { some: { date: dateFilter } } }
-            : {}),
+          ...(dateFilter ? { sessions: { some: { date: dateFilter } } } : {}),
         },
       },
       _count: { projectId: true },

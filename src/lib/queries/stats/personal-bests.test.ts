@@ -176,7 +176,7 @@ describe("getPersonalBests", () => {
     expect(currentStreak.value).toBe(0);
   });
 
-  it('year-scoped returns null/0 for current streak', async () => {
+  it("year-scoped returns null/0 for current streak", async () => {
     mockPrisma.stitchSession.findMany.mockResolvedValue([]);
     mockPrisma.stitchSession.findFirst.mockResolvedValue(null);
 

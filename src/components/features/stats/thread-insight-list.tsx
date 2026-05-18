@@ -39,7 +39,7 @@ export function ThreadInsightList({ items }: ThreadInsightListProps) {
                     {item.brandName} {item.colorCode} -- {item.colorName}
                   </span>
                 </div>
-                <span className="text-muted-foreground whitespace-nowrap font-mono text-xs tabular-nums">
+                <span className="text-muted-foreground font-mono text-xs whitespace-nowrap tabular-nums">
                   {item.projectCount} {item.projectCount === 1 ? "project" : "projects"}
                 </span>
               </div>

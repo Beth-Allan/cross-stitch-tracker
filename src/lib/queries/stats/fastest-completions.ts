@@ -3,10 +3,7 @@ import { TZDate } from "@date-fns/tz";
 import { differenceInCalendarDays, format } from "date-fns";
 import { prisma } from "@/lib/db";
 import { getUserTimezone } from "./timezone";
-import {
-  calculateSizeCategory,
-  getEffectiveStitchCount,
-} from "@/lib/utils/size-category";
+import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
 import type { FastestCompletion, SizeCategory } from "@/types/stats";
 
 function buildDateFilter(scope: string, tz: string): { gte: Date; lt: Date } | null {

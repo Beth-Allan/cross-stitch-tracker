@@ -35,7 +35,13 @@ describe("getFastestCompletions", () => {
         status: "FINISHED",
         startDate: new Date("2026-01-01"),
         finishDate: new Date("2026-01-11"),
-        chart: { id: "c1", name: "Small Project", stitchCount: 3000, stitchesWide: 0, stitchesHigh: 0 },
+        chart: {
+          id: "c1",
+          name: "Small Project",
+          stitchCount: 3000,
+          stitchesWide: 0,
+          stitchesHigh: 0,
+        },
         sessions: [],
       },
       {
@@ -44,7 +50,13 @@ describe("getFastestCompletions", () => {
         status: "FFO",
         startDate: new Date("2026-01-01"),
         finishDate: new Date("2026-02-01"),
-        chart: { id: "c2", name: "Medium Project", stitchCount: 10000, stitchesWide: 0, stitchesHigh: 0 },
+        chart: {
+          id: "c2",
+          name: "Medium Project",
+          stitchCount: 10000,
+          stitchesWide: 0,
+          stitchesHigh: 0,
+        },
         sessions: [],
       },
       {
@@ -53,7 +65,13 @@ describe("getFastestCompletions", () => {
         status: "FINISHED",
         startDate: new Date("2026-01-01"),
         finishDate: new Date("2026-01-20"),
-        chart: { id: "c3", name: "Faster Medium", stitchCount: 8000, stitchesWide: 0, stitchesHigh: 0 },
+        chart: {
+          id: "c3",
+          name: "Faster Medium",
+          stitchCount: 8000,
+          stitchesWide: 0,
+          stitchesHigh: 0,
+        },
         sessions: [],
       },
     ]);
@@ -83,10 +101,7 @@ describe("getFastestCompletions", () => {
         startDate: null,
         finishDate: new Date("2026-01-21"),
         chart: { id: "c1", name: "No Start", stitchCount: 3000, stitchesWide: 0, stitchesHigh: 0 },
-        sessions: [
-          { date: new Date("2026-01-11") },
-          { date: new Date("2026-01-15") },
-        ],
+        sessions: [{ date: new Date("2026-01-11") }, { date: new Date("2026-01-15") }],
       },
     ]);
 
@@ -105,7 +120,13 @@ describe("getFastestCompletions", () => {
         status: "FINISHED",
         startDate: null,
         finishDate: new Date("2026-01-21"),
-        chart: { id: "c1", name: "No Start Or Sessions", stitchCount: 3000, stitchesWide: 0, stitchesHigh: 0 },
+        chart: {
+          id: "c1",
+          name: "No Start Or Sessions",
+          stitchCount: 3000,
+          stitchesWide: 0,
+          stitchesHigh: 0,
+        },
         sessions: [],
       },
     ]);

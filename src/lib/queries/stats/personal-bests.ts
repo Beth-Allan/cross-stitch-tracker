@@ -24,10 +24,7 @@ interface SessionRow {
   };
 }
 
-async function computePersonalBests(
-  userId: string,
-  scope: string,
-): Promise<PersonalBestRecord[]> {
+async function computePersonalBests(userId: string, scope: string): Promise<PersonalBestRecord[]> {
   try {
     const tz = getUserTimezone(userId);
     const dateFilter = buildDateFilter(scope, tz);
@@ -122,7 +119,9 @@ async function computePersonalBests(
     }
 
     // --- Streaks ---
-    const uniqueDates = [...new Set(sessions.map((s) => format(new TZDate(s.date, tz), "yyyy-MM-dd")))].sort();
+    const uniqueDates = [
+      ...new Set(sessions.map((s) => format(new TZDate(s.date, tz), "yyyy-MM-dd"))),
+    ].sort();
 
     let longestStreak = 1;
     let currentRun = 1;

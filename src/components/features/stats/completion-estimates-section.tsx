@@ -17,9 +17,7 @@ export function CompletionEstimatesSection({ items }: CompletionEstimatesSection
         </h3>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground mb-4 text-xs">
-          Based on your average stitching pace
-        </p>
+        <p className="text-muted-foreground mb-4 text-xs">Based on your average stitching pace</p>
         {items.length === 0 ? (
           <>
             <p className="text-muted-foreground py-4 text-sm">No estimates available</p>
@@ -31,10 +29,7 @@ export function CompletionEstimatesSection({ items }: CompletionEstimatesSection
         ) : (
           <div>
             {items.map((item) => (
-              <div
-                key={item.projectId}
-                className="border-border border-b py-3 last:border-0"
-              >
+              <div key={item.projectId} className="border-border border-b py-3 last:border-0">
                 <div className="mb-1 flex items-center justify-between">
                   <Link
                     href={`/charts/${item.chartId}`}
@@ -63,8 +58,8 @@ export function CompletionEstimatesSection({ items }: CompletionEstimatesSection
                   </span>
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  {item.stitchesCompleted.toLocaleString()} of{" "}
-                  {item.totalStitches.toLocaleString()} stitches
+                  {item.stitchesCompleted.toLocaleString()} of {item.totalStitches.toLocaleString()}{" "}
+                  stitches
                 </p>
               </div>
             ))}

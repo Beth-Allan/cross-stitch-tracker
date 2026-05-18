@@ -34,7 +34,7 @@ export function GenreInsightList({ items }: GenreInsightListProps) {
                     {item.name}
                   </Link>
                 </div>
-                <span className="text-muted-foreground whitespace-nowrap font-mono text-xs tabular-nums">
+                <span className="text-muted-foreground font-mono text-xs whitespace-nowrap tabular-nums">
                   {item.totalStitches.toLocaleString()} stitches
                 </span>
               </div>

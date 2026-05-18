@@ -28,9 +28,7 @@ async function computeDesignerInsights(
       where: {
         userId,
         chart: { designerId: { not: null } },
-        ...(dateFilter
-          ? { sessions: { some: { date: dateFilter } } }
-          : {}),
+        ...(dateFilter ? { sessions: { some: { date: dateFilter } } } : {}),
       },
       select: {
         id: true,
@@ -46,10 +44,7 @@ async function computeDesignerInsights(
 
     if (projects.length === 0) return [];
 
-    const designerMap = new Map<
-      string,
-      { name: string; total: number; completed: number }
-    >();
+    const designerMap = new Map<string, { name: string; total: number; completed: number }>();
 
     for (const project of projects) {
       const designerId = project.chart.designerId;

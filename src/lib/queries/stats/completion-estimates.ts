@@ -29,9 +29,7 @@ async function computeCompletionEstimates(
         userId,
         status: { in: ["IN_PROGRESS", "ON_HOLD"] },
         chart: { stitchCount: { gt: 0 } },
-        ...(dateFilter
-          ? { sessions: { some: { date: dateFilter } } }
-          : {}),
+        ...(dateFilter ? { sessions: { some: { date: dateFilter } } } : {}),
       },
       include: {
         chart: {
@@ -57,10 +55,7 @@ async function computeCompletionEstimates(
       const daysSinceFirst = differenceInCalendarDays(now, firstSession.date);
       if (daysSinceFirst <= 0) continue;
 
-      const totalSessionStitches = project.sessions.reduce(
-        (sum, s) => sum + s.stitchCount,
-        0,
-      );
+      const totalSessionStitches = project.sessions.reduce((sum, s) => sum + s.stitchCount, 0);
       const avgPerDay = totalSessionStitches / daysSinceFirst;
       if (avgPerDay <= 0) continue;
 
@@ -69,9 +64,7 @@ async function computeCompletionEstimates(
 
       const daysRemaining = Math.ceil(remaining / avgPerDay);
       const estimatedDate = addDays(now, daysRemaining);
-      const percentComplete = Math.round(
-        (project.stitchesCompleted / totalStitches) * 100,
-      );
+      const percentComplete = Math.round((project.stitchesCompleted / totalStitches) * 100);
 
       estimates.push({
         projectId: project.id,
@@ -138,10 +131,7 @@ export async function getProjectCompletionEstimate(
     const daysSinceFirst = differenceInCalendarDays(now, firstSession.date);
     if (daysSinceFirst <= 0) return null;
 
-    const totalSessionStitches = project.sessions.reduce(
-      (sum, s) => sum + s.stitchCount,
-      0,
-    );
+    const totalSessionStitches = project.sessions.reduce((sum, s) => sum + s.stitchCount, 0);
     const avgPerDay = totalSessionStitches / daysSinceFirst;
     if (avgPerDay <= 0) return null;
 
@@ -150,9 +140,7 @@ export async function getProjectCompletionEstimate(
 
     const daysRemaining = Math.ceil(remaining / avgPerDay);
     const estimatedDate = addDays(now, daysRemaining);
-    const percentComplete = Math.round(
-      (project.stitchesCompleted / totalStitches) * 100,
-    );
+    const percentComplete = Math.round((project.stitchesCompleted / totalStitches) * 100);
 
     return {
       projectId: project.id,

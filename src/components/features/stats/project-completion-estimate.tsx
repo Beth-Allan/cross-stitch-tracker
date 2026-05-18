@@ -34,8 +34,8 @@ export function ProjectCompletionEstimate({ estimate }: ProjectCompletionEstimat
           </span>
         </div>
         <p className="text-muted-foreground mt-1 text-xs">
-          {estimate.stitchesCompleted.toLocaleString()} of{" "}
-          {estimate.totalStitches.toLocaleString()} stitches
+          {estimate.stitchesCompleted.toLocaleString()} of {estimate.totalStitches.toLocaleString()}{" "}
+          stitches
         </p>
       </div>
     </div>

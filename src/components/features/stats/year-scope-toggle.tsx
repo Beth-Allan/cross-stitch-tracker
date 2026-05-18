@@ -7,10 +7,7 @@ interface YearScopeToggleProps {
 }
 
 export function YearScopeToggle({ availableYears }: YearScopeToggleProps) {
-  const [scope, setScope] = useQueryState(
-    "scope",
-    parseAsString.withDefault("all"),
-  );
+  const [scope, setScope] = useQueryState("scope", parseAsString.withDefault("all"));
 
   const options: { value: string; label: string }[] = [
     { value: "all", label: "All-time" },
@@ -21,11 +18,7 @@ export function YearScopeToggle({ availableYears }: YearScopeToggleProps) {
   ];
 
   return (
-    <div
-      role="group"
-      aria-label="Time scope"
-      className="bg-muted inline-flex gap-1 rounded-xl p-1"
-    >
+    <div role="group" aria-label="Time scope" className="bg-muted inline-flex gap-1 rounded-xl p-1">
       {options.map(({ value, label }) => (
         <button
           key={value}
