@@ -249,7 +249,7 @@ Notes:
 - Missing hex: `bg-muted border-border` (neutral gray placeholder)
 - Brand/code: `text-sm text-foreground` (e.g., "DMC 310 -- Black")
 - Count: `text-xs text-muted-foreground font-mono tabular-nums` right-aligned (e.g., "12 projects")
-- Row spacing: `py-1.5` for comfortable density
+- Row spacing: `py-2` (8px) for comfortable density
 
 ### Designer Completion Rates (INS-02)
 
@@ -260,7 +260,7 @@ Notes:
 - Designer name: clickable Link to `/designers/{id}` with standard entity link styling
 - Rate: `text-sm font-semibold text-foreground` for percentage, `text-xs text-muted-foreground` for fraction
 - Example: "82%" then "(14/17)" on same line, right-aligned
-- Row spacing: `py-1.5`
+- Row spacing: `py-2` (8px)
 
 ### Most Stitched Genres (INS-03)
 
@@ -270,7 +270,7 @@ Notes:
 - Rank: matches RankedList pattern
 - Genre name: clickable Link to `/genres/{id}` with standard entity link styling
 - Stitch count: `text-xs text-muted-foreground font-mono tabular-nums` right-aligned, formatted with `toLocaleString()`
-- Row spacing: `py-1.5`
+- Row spacing: `py-2` (8px)
 
 ---
 
