@@ -15,6 +15,7 @@ vi.mock("@/lib/db", () => ({
 // Mock next/cache to prevent server-only errors in test
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
 }));
 
 describe("chart-actions auth guard", () => {
@@ -222,5 +223,29 @@ describe("createChartWithSupplies", () => {
     if (!result.success) {
       expect(result.error).toBeTruthy();
     }
+  });
+});
+
+// ─── updateChartStatus cache invalidation ───────────────────────────────────
+
+describe("updateChartStatus cache invalidation", () => {
+  beforeEach(async () => {
+    vi.resetAllMocks();
+    const auth = await import("@/lib/auth");
+    (auth.auth as ReturnType<typeof vi.fn>).mockResolvedValue({
+      user: { id: "user-1", email: "test@test.com" },
+    });
+  });
+
+  it("calls revalidateTag('stats') after successful status update", async () => {
+    mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+    mockPrisma.project.update.mockResolvedValueOnce({ id: "p1", status: "IN_PROGRESS" });
+    const { updateChartStatus } = await import("./chart-actions");
+    const { revalidateTag } = await import("next/cache");
+
+    const result = await updateChartStatus("chart-1", "IN_PROGRESS");
+
+    expect(result.success).toBe(true);
+    expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
   });
 });
