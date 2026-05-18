@@ -1,7 +1,10 @@
 import { describe, it, expect } from "vitest";
+import type { RenderOptions } from "@testing-library/react";
 import { render, screen } from "@/__tests__/test-utils";
 import { withNuqsTestingAdapter } from "nuqs/adapters/testing";
 import { DashboardTabs, DASHBOARD_TABS } from "./dashboard-tabs";
+
+type Wrapper = RenderOptions["wrapper"];
 
 describe("DashboardTabs", () => {
   const defaultProps = {
@@ -11,7 +14,7 @@ describe("DashboardTabs", () => {
 
   it("renders 'Your Library' and 'Progress' tab triggers", () => {
     render(<DashboardTabs {...defaultProps} />, {
-      wrapper: withNuqsTestingAdapter(),
+      wrapper: withNuqsTestingAdapter() as Wrapper,
     });
 
     expect(screen.getByRole("tab", { name: /Your Library/i })).toBeInTheDocument();
@@ -24,7 +27,7 @@ describe("DashboardTabs", () => {
 
   it("shows library content by default (library tab is default)", () => {
     render(<DashboardTabs {...defaultProps} />, {
-      wrapper: withNuqsTestingAdapter(),
+      wrapper: withNuqsTestingAdapter() as Wrapper,
     });
 
     expect(screen.getByTestId("library-content")).toBeInTheDocument();
@@ -32,7 +35,7 @@ describe("DashboardTabs", () => {
 
   it("shows the 'Your Library' tab as active by default", () => {
     render(<DashboardTabs {...defaultProps} />, {
-      wrapper: withNuqsTestingAdapter(),
+      wrapper: withNuqsTestingAdapter() as Wrapper,
     });
 
     const libraryTab = screen.getByRole("tab", { name: /Your Library/i });
@@ -41,7 +44,7 @@ describe("DashboardTabs", () => {
 
   it("shows progress content when progress tab is active via URL", () => {
     render(<DashboardTabs {...defaultProps} />, {
-      wrapper: withNuqsTestingAdapter({ searchParams: "?tab=progress" }),
+      wrapper: withNuqsTestingAdapter({ searchParams: "?tab=progress" }) as Wrapper,
     });
 
     expect(screen.getByTestId("progress-content")).toBeInTheDocument();
@@ -49,7 +52,7 @@ describe("DashboardTabs", () => {
 
   it("tab triggers have min-h-11 for 44px touch targets", () => {
     render(<DashboardTabs {...defaultProps} />, {
-      wrapper: withNuqsTestingAdapter(),
+      wrapper: withNuqsTestingAdapter() as Wrapper,
     });
 
     const tabs = screen.getAllByRole("tab");
@@ -60,7 +63,7 @@ describe("DashboardTabs", () => {
 
   it("renders exactly 2 tabs", () => {
     render(<DashboardTabs {...defaultProps} />, {
-      wrapper: withNuqsTestingAdapter(),
+      wrapper: withNuqsTestingAdapter() as Wrapper,
     });
 
     const tabs = screen.getAllByRole("tab");
