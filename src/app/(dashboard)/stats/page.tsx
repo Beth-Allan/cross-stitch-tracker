@@ -11,10 +11,18 @@ import {
   getSessionHistory,
   getPaceMetrics,
   getDayOfWeekPattern,
+  getPersonalBests,
+  getFastestCompletions,
+  getThreadInsights,
+  getDesignerInsights,
+  getGenreInsights,
+  getCompletionEstimates,
+  getAvailableYears,
 } from "@/lib/queries/stats";
 import { StatsPageShell } from "@/components/features/stats/stats-page-shell";
 import { StatsOverview } from "@/components/features/stats/stats-overview";
 import { ActivityOverview } from "@/components/features/stats/activity-overview";
+import { RecordsOverview } from "@/components/features/stats/records-overview";
 import { statsSearchParamsCache } from "./search-params";
 
 export default async function StatsPage({
@@ -26,7 +34,7 @@ export default async function StatsPage({
 
   // Parse URL search params for session table state
   const parsedParams = await statsSearchParamsCache.parse(searchParams);
-  const { page, sort, dir, project } = parsedParams;
+  const { page, sort, dir, project, scope } = parsedParams;
 
   // Current date values for calendar/chart initial state
   const now = new Date();
@@ -45,19 +53,31 @@ export default async function StatsPage({
     sessionHistory,
     paceMetrics,
     dayOfWeekData,
+    personalBests,
+    fastestCompletions,
+    threadInsights,
+    designerInsights,
+    genreInsights,
+    completionEstimates,
+    availableYears,
   ] = await Promise.all([
-    // Existing overview queries
     getHeroStats(user.id),
     getCollectionBreakdown(user.id),
     getSizeBreakdown(user.id),
     getDesignerBreakdown(user.id),
     getGenreBreakdown(user.id),
-    // New activity queries
     getMonthlyTotals(user.id, currentYear),
     getCalendarDays(user.id, currentMonth, currentYear),
     getSessionHistory(user.id, page, sort, dir, project === "all" ? null : project),
     getPaceMetrics(user.id),
     getDayOfWeekPattern(user.id),
+    getPersonalBests(user.id, scope),
+    getFastestCompletions(user.id, scope),
+    getThreadInsights(user.id, scope),
+    getDesignerInsights(user.id, scope),
+    getGenreInsights(user.id, scope),
+    getCompletionEstimates(user.id, scope),
+    getAvailableYears(user.id),
   ]);
 
   // Fetch project list for session table filter dropdown
@@ -98,6 +118,18 @@ export default async function StatsPage({
           projects={projectList}
           currentYear={currentYear}
           currentMonth={currentMonth}
+          hasNoSessions={hasNoSessions}
+        />
+      }
+      recordsContent={
+        <RecordsOverview
+          personalBests={personalBests}
+          fastestCompletions={fastestCompletions}
+          threadInsights={threadInsights}
+          designerInsights={designerInsights}
+          genreInsights={genreInsights}
+          completionEstimates={completionEstimates}
+          availableYears={availableYears.years}
           hasNoSessions={hasNoSessions}
         />
       }
