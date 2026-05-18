@@ -23,6 +23,7 @@ vi.mock("@/lib/db", () => ({
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
 }));
 
 describe("supply-actions", () => {
@@ -1416,6 +1417,106 @@ describe("supply-actions", () => {
       if (result.success) {
         expect(result.record).toBeDefined();
       }
+    });
+  });
+
+  // ─── resolveDefaultBrandId (via public API) ─────────────────────────────────
+
+  describe("resolveDefaultBrandId (via public API)", () => {
+    it("createThread with brandId='default' upserts Custom (Thread) brand", async () => {
+      mockPrisma.supplyBrand.upsert.mockResolvedValueOnce({
+        id: "brand-custom",
+        name: "Custom (Thread)",
+        supplyType: "THREAD",
+      });
+      mockPrisma.thread.create.mockResolvedValueOnce(
+        createMockThread({ brandId: "brand-custom" }),
+      );
+      const { createThread } = await import("./supply-actions");
+
+      await createThread({
+        brandId: "default",
+        colorCode: "123",
+        colorName: "Test Thread",
+        hexColor: "#FF0000",
+        colorFamily: "RED",
+      });
+
+      expect(mockPrisma.supplyBrand.upsert).toHaveBeenCalledWith({
+        where: { name: "Custom (Thread)" },
+        create: { name: "Custom (Thread)", supplyType: "THREAD" },
+        update: {},
+      });
+      expect(mockPrisma.thread.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({ brandId: "brand-custom" }),
+      });
+    });
+
+    it("createThread with specific brandId skips upsert", async () => {
+      mockPrisma.thread.create.mockResolvedValueOnce(
+        createMockThread({ brandId: "brand-specific" }),
+      );
+      const { createThread } = await import("./supply-actions");
+
+      await createThread({
+        brandId: "brand-specific",
+        colorCode: "456",
+        colorName: "Specific Thread",
+        hexColor: "#00FF00",
+        colorFamily: "GREEN",
+      });
+
+      expect(mockPrisma.supplyBrand.upsert).not.toHaveBeenCalled();
+      expect(mockPrisma.thread.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({ brandId: "brand-specific" }),
+      });
+    });
+
+    it("createBead with brandId='default' upserts Custom (Bead) brand", async () => {
+      mockPrisma.supplyBrand.upsert.mockResolvedValueOnce({
+        id: "brand-bead",
+        name: "Custom (Bead)",
+        supplyType: "BEAD",
+      });
+      mockPrisma.bead.create.mockResolvedValueOnce(
+        createMockBead({ brandId: "brand-bead" }),
+      );
+      const { createBead } = await import("./supply-actions");
+
+      await createBead({
+        brandId: "default",
+        productCode: "789",
+        colorName: "Test Bead",
+        hexColor: "#0000FF",
+        colorFamily: "BLUE",
+      });
+
+      expect(mockPrisma.supplyBrand.upsert).toHaveBeenCalledWith({
+        where: { name: "Custom (Bead)" },
+        create: { name: "Custom (Bead)", supplyType: "BEAD" },
+        update: {},
+      });
+    });
+  });
+
+  // ─── Cache Invalidation ─────────────────────────────────────────────────────
+
+  describe("cache invalidation", () => {
+    it("createThread calls revalidateTag('stats') after successful creation", async () => {
+      mockPrisma.thread.create.mockResolvedValueOnce(createMockThread());
+      const { createThread } = await import("./supply-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await createThread({
+        brandId: "brand-1",
+        colorCode: "310",
+        colorName: "Black",
+        hexColor: "#000000",
+        colorFamily: "BLACK",
+      });
+
+      expect(result.success).toBe(true);
+      expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
     });
   });
 });
