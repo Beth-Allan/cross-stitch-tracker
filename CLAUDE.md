@@ -21,27 +21,20 @@
 
 ### Done This Session
 
-- **Phase 19 executed** — 3 plans, 2 waves, 1747 tests passing, human verified
-  - Plan 01 (W1): Types, chart configs, 3 breakdown queries (size/designer/genre) with TDD — 20 tests
-  - Plan 02 (W1): MetricsBar (green accent strip) + LifetimeCounters (4 stat cards) — 13 tests
-  - Plan 03 (W2): SizeCategoryChart, DesignerBreakdownChart, GenreDistributionChart, RankedList, StatsOverview layout + page.tsx wiring — 30 tests
-  - Code review: Fixed WR-01/WR-02 (cache key missing `limit` param in designer/genre queries)
-  - Verification: 7/7 must-haves pass, all 7 requirements satisfied (HERO-01–06, INS-06)
-
-- **Phase 20 bug fixes** — All 5 human-verification bugs resolved + 2 bonus fixes
-  - BUG-1: Monthly drill-down — used `barData.payload` from Recharts instead of unreliable index param
-  - BUG-2/3: Links used `projectId` but `/charts/[id]` expects `chartId` — added `chartId` to types, queries, and all link hrefs
-  - BUG-4: Duplicate "Session History" heading — removed CardHeader from ActivityOverview wrapper
-  - BUG-5: Stale chart state on back-nav — added useEffect to sync props in MonthlyStitchChart and StitchingCalendar
-  - Green outline on Recharts bars — global `* { outline-color: var(--ring) }` bleeding into SVG. Added outline-hidden selectors to ChartContainer
-  - Tooltip crowding — added `gap-2` to tooltip label/value layout
-  - 1846 tests passing, build clean
-
-- **Phase 20 UAT** — 10/10 tests passed (1 cosmetic fix applied inline: bar opacity guard in MonthlyStitchChart)
+- **Phase 21 executed** — 4 plans, 3 waves, 1961 tests passing, human verified
+  - Plan 01 (W1): Types, search-params, 7 TDD query modules (personal bests, fastest completions, insights, estimates) — 51 tests
+  - Plan 02 (W2): YearScopeToggle, RecordsTable, RecordsOverview layout, page.tsx wiring — 18 tests
+  - Plan 03 (W3): Thread/designer/genre insight lists, completion estimates section, project detail estimate — 33 tests
+  - Plan 04 (W3): Record detection in createSession, confetti celebrations, log-session-modal — 12 tests (checkpoint)
+  - Bug fixes: CSP worker-src confetti (main-thread fallback), multi-toast consolidation, false celebration on multi-session days (CR-01), genre-insights missing date filter (WR-02), placeholder year columns removed from RecordsTable
+  - Code review: 1 critical (CR-01 fixed), 3 warnings (WR-01/WR-02 fixed, WR-03 cosmetic)
+  - Verification: 5/5 must-haves, all 9 requirements satisfied (REC-01–05, INS-01/02/03/05)
+  - **v1.5 milestone complete** — Phase 21 is the last phase
 
 ### Next Up — RESUME HERE
 
-1. Run `/gsd-ship` to create PR for Phase 20
+1. Run `/gsd-ship` to create PR for Phase 21 (v1.5 milestone)
+2. Consider `/gsd-complete-milestone` to archive v1.5
 
 ### Backlog
 
@@ -88,6 +81,8 @@
 - 999.28: DailyBreakdownEntry could extend CalendarSession — structural overlap; making relationship explicit reduces duplication
 - 999.29: Remove WHAT-comments from Phase 20 code — 13 redundant comments explaining what code does + 2 task-relative comments ("Existing"/"New" in Promise.all)
 - 999.30: Remove low-harm JSX section markers (~20) — technically against no-comments convention but low priority
+- 999.31: Stitch count validation against project total — no guard preventing logging more stitches than a project's total stitch count, which would push progress over 100%
+- 999.32: Hardcoded emerald-\* color classes in log-session-modal — 6+ locations violate semantic token convention (WR-03)
 
 ### Blockers
 
