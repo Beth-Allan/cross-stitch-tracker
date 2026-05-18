@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Statistics & Records
-status: executing
+status: "Phase 20 shipped — PR #39"
 stopped_at: Phase 20 UI-SPEC approved
-last_updated: "2026-05-17T23:44:20.005Z"
-last_activity: 2026-05-17 -- Phase 20 execution started
+last_updated: "2026-05-18T01:45:15.555Z"
+last_activity: 2026-05-17
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 10
-  completed_plans: 6
-  percent: 60
+  completed_plans: 10
+  percent: 100
 ---
 
 # Project State
@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-05-17)
 
 Phase: 20 (activity-visualization-calendar) — EXECUTING
 Plan: 1 of 4
-Status: Executing Phase 20
-Last activity: 2026-05-17 -- Phase 20 execution started
+Status: Phase 20 shipped — PR #39
+Last activity: 2026-05-17
 
 Progress: [█████░░░░░] 50%
 
