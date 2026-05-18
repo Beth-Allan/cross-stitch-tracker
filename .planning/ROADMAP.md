@@ -127,7 +127,7 @@ Plans:
   4. Completion estimates exclude already-completed projects from the list
   5. File deletion and photo upload errors in session-actions are surfaced to the user instead of silently swallowed
   6. Stats data refreshes when chart status changes or supply mutations occur (no stale cache)
-  7. Session logging rejects stitch counts that would push a project over 100% progress
+  7. Session logging warns when stitch counts would push a project over 100% progress
 **Plans:** 3/3 plans complete
 Plans:
 - [x] 23-01-PLAN.md -- Edge case tests: calendar year-rollover, record detection duplicates, completion estimate exclusions
