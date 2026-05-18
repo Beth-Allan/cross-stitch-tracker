@@ -209,9 +209,10 @@ export function LogSessionModal({
         } else {
           const result = await createSession(formData);
           if (result.success) {
-            toast.success("Session logged");
             if (result.brokenRecords && result.brokenRecords.length > 0) {
               fireCelebration(result.brokenRecords);
+            } else {
+              toast.success("Session logged");
             }
             onOpenChange(false);
             return;
