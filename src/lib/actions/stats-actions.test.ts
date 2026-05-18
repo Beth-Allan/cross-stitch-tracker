@@ -33,7 +33,22 @@ describe("stats-actions", () => {
       expect(result).toEqual({ success: true, data: mockData });
     });
 
-    it("returns error on invalid month", async () => {
+    it("throws when requireAuth rejects", async () => {
+      mockRequireAuth.mockRejectedValue(new Error("Unauthorized"));
+
+      const { fetchCalendarMonth } = await import("./stats-actions");
+      await expect(fetchCalendarMonth(5, 2026)).rejects.toThrow("Unauthorized");
+    });
+
+    it("returns error on month below minimum (0)", async () => {
+      const { fetchCalendarMonth } = await import("./stats-actions");
+      const result = await fetchCalendarMonth(0, 2026);
+
+      expect(result.success).toBe(false);
+      expect(mockGetCalendarDays).not.toHaveBeenCalled();
+    });
+
+    it("returns error on month above maximum (13)", async () => {
       const { fetchCalendarMonth } = await import("./stats-actions");
       const result = await fetchCalendarMonth(13, 2026);
 
@@ -41,13 +56,20 @@ describe("stats-actions", () => {
       expect(mockGetCalendarDays).not.toHaveBeenCalled();
     });
 
-    it("returns error when requireAuth rejects", async () => {
-      mockRequireAuth.mockRejectedValue(new Error("Unauthorized"));
-
+    it("returns error on year below minimum (2019)", async () => {
       const { fetchCalendarMonth } = await import("./stats-actions");
-      const result = await fetchCalendarMonth(5, 2026);
+      const result = await fetchCalendarMonth(5, 2019);
 
-      expect(result).toEqual({ success: false, error: "Failed to load calendar data" });
+      expect(result.success).toBe(false);
+      expect(mockGetCalendarDays).not.toHaveBeenCalled();
+    });
+
+    it("returns error on year above maximum (2101)", async () => {
+      const { fetchCalendarMonth } = await import("./stats-actions");
+      const result = await fetchCalendarMonth(5, 2101);
+
+      expect(result.success).toBe(false);
+      expect(mockGetCalendarDays).not.toHaveBeenCalled();
     });
   });
 
@@ -66,9 +88,32 @@ describe("stats-actions", () => {
       expect(result).toEqual({ success: true, data: mockData });
     });
 
-    it("returns error on invalid year", async () => {
+    it("throws when requireAuth rejects", async () => {
+      mockRequireAuth.mockRejectedValue(new Error("Unauthorized"));
+
+      const { fetchDailyBreakdown } = await import("./stats-actions");
+      await expect(fetchDailyBreakdown(5, 2026)).rejects.toThrow("Unauthorized");
+    });
+
+    it("returns error on year below minimum (2019)", async () => {
       const { fetchDailyBreakdown } = await import("./stats-actions");
       const result = await fetchDailyBreakdown(5, 2019);
+
+      expect(result.success).toBe(false);
+      expect(mockGetDailyBreakdown).not.toHaveBeenCalled();
+    });
+
+    it("returns error on year above maximum (2101)", async () => {
+      const { fetchDailyBreakdown } = await import("./stats-actions");
+      const result = await fetchDailyBreakdown(5, 2101);
+
+      expect(result.success).toBe(false);
+      expect(mockGetDailyBreakdown).not.toHaveBeenCalled();
+    });
+
+    it("returns error on month below minimum (0)", async () => {
+      const { fetchDailyBreakdown } = await import("./stats-actions");
+      const result = await fetchDailyBreakdown(0, 2026);
 
       expect(result.success).toBe(false);
       expect(mockGetDailyBreakdown).not.toHaveBeenCalled();
@@ -88,7 +133,22 @@ describe("stats-actions", () => {
       expect(result).toEqual({ success: true, data: mockData });
     });
 
-    it("returns error on invalid year", async () => {
+    it("throws when requireAuth rejects", async () => {
+      mockRequireAuth.mockRejectedValue(new Error("Unauthorized"));
+
+      const { fetchMonthlyTotals } = await import("./stats-actions");
+      await expect(fetchMonthlyTotals(2026)).rejects.toThrow("Unauthorized");
+    });
+
+    it("returns error on year below minimum (2019)", async () => {
+      const { fetchMonthlyTotals } = await import("./stats-actions");
+      const result = await fetchMonthlyTotals(2019);
+
+      expect(result.success).toBe(false);
+      expect(mockGetMonthlyTotals).not.toHaveBeenCalled();
+    });
+
+    it("returns error on year above maximum (2101)", async () => {
       const { fetchMonthlyTotals } = await import("./stats-actions");
       const result = await fetchMonthlyTotals(2101);
 
