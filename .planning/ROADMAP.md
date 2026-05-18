@@ -92,7 +92,7 @@ Full details: `milestones/v1.5-ROADMAP.md`
 
 **Milestone Goal:** Address all accumulated backlog items -- bug fixes, test gaps, code quality issues, UX polish, cache correctness, and silent failure handling -- to harden the app before building new features.
 
-- [ ] **Phase 22: Critical Fixes & Test Infrastructure** - Fix security gaps, TypeScript errors, stats resilience, and test infrastructure
+- [x] **Phase 22: Critical Fixes & Test Infrastructure** - Fix security gaps, TypeScript errors, stats resilience, and test infrastructure (completed 2026-05-18)
 - [ ] **Phase 23: Test Coverage & Reliability** - Fill test gaps and fix silent failures and cache staleness
 - [ ] **Phase 24: Code Quality** - Type narrowing, constant deduplication, discriminated unions, and comment cleanup
 - [ ] **Phase 25: Shopping Cart Scaling** - Shopping cart handles 75+ projects with search, filtering, and status grouping
@@ -110,11 +110,11 @@ Full details: `milestones/v1.5-ROADMAP.md`
   3. Stats page renders partial data when individual queries fail instead of showing an error page
   4. createMockPrisma() provides sensible defaults for $transaction and vacuous assertions are eliminated
   5. Stats actions return appropriate errors for unauthenticated requests and invalid Zod inputs
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
-- [ ] 22-01-PLAN.md -- Test infrastructure: $transaction defaults + mockTransaction helper + fix 3 test files
-- [ ] 22-02-PLAN.md -- Security + auth: supply ownership rejection tests + stats-actions auth restructuring
-- [ ] 22-03-PLAN.md -- Stats resilience: Promise.allSettled + settled() utility + nullable component props
+- [x] 22-01-PLAN.md -- Test infrastructure: $transaction defaults + mockTransaction helper + fix 3 test files
+- [x] 22-02-PLAN.md -- Security + auth: supply ownership rejection tests + stats-actions auth restructuring
+- [x] 22-03-PLAN.md -- Stats resilience: Promise.allSettled + settled() utility + nullable component props
 
 ### Phase 23: Test Coverage & Reliability
 **Goal**: Test coverage gaps are filled for edge cases across the app, and silent failures in session handling and cache staleness in stats are resolved
@@ -196,7 +196,7 @@ Phase 22 first (foundation). Phases 23, 24, 25, 26 depend only on Phase 22 and c
 | 19. Hero Stats & Collection Overview | v1.5 | 3/3 | Complete | 2026-05-17 |
 | 20. Activity Visualization & Calendar | v1.5 | 4/4 | Complete | 2026-05-18 |
 | 21. Records, Insights & Celebrations | v1.5 | 4/4 | Complete | 2026-05-18 |
-| 22. Critical Fixes & Test Infrastructure | v1.6 | 0/3 | Not started | - |
+| 22. Critical Fixes & Test Infrastructure | v1.6 | 3/3 | Complete   | 2026-05-18 |
 | 23. Test Coverage & Reliability | v1.6 | 0/? | Not started | - |
 | 24. Code Quality | v1.6 | 0/? | Not started | - |
 | 25. Shopping Cart Scaling | v1.6 | 0/? | Not started | - |
