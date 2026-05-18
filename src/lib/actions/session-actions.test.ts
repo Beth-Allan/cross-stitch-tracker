@@ -597,6 +597,212 @@ describe("session-actions", () => {
         expect(result.brokenRecords).toEqual([]);
       }
     });
+
+    it("logs warning when raw file cleanup fails", async () => {
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+      });
+
+      const mockSession = createMockStitchSession({
+        id: "session-1",
+        photoKey: "sessions/p1/raw-photo.jpg",
+      });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 100 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 100 }),
+          },
+        });
+      });
+
+      mockDeleteFile.mockRejectedValueOnce(new Error("R2 error"));
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 100,
+        timeSpentMinutes: null,
+        photoKey: "sessions/p1/raw-photo.jpg",
+      });
+
+      expect(result.success).toBe(true);
+      expect(warnSpy).toHaveBeenCalledWith(
+        "[R2] raw file cleanup failed:",
+        expect.any(String),
+        expect.any(Error),
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it("returns overTotal warning when session pushes progress past 100%", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+        stitchesCompleted: 900,
+        chart: { stitchCount: 1000 },
+      });
+
+      const mockSession = createMockStitchSession({ id: "new-session", stitchCount: 200 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 1100 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 1100 }),
+          },
+        });
+      });
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.warning).toBe("overTotal");
+      }
+    });
+
+    it("does not return warning when progress stays under 100%", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+        stitchesCompleted: 500,
+        chart: { stitchCount: 1000 },
+      });
+
+      const mockSession = createMockStitchSession({ id: "new-session", stitchCount: 200 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 700 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 700 }),
+          },
+        });
+      });
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.warning).toBeUndefined();
+      }
+    });
+
+    it("does not return warning when chart has no stitchCount", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+        stitchesCompleted: 900,
+        chart: { stitchCount: null },
+      });
+
+      const mockSession = createMockStitchSession({ id: "new-session", stitchCount: 200 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 1100 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 1100 }),
+          },
+        });
+      });
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.warning).toBeUndefined();
+      }
+    });
+
+    it("saves session even when overTotal warning is returned", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+        stitchesCompleted: 900,
+        chart: { stitchCount: 1000 },
+      });
+
+      const mockSession = createMockStitchSession({ id: "new-session", stitchCount: 200 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            create: vi.fn().mockResolvedValue(mockSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 1100 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 1100 }),
+          },
+        });
+      });
+
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
+      if (result.success) {
+        expect(result.warning).toBe("overTotal");
+        expect(result.session).toBeDefined();
+      }
+    });
   });
 
   // ─── updateSession ─────────────────────────────────────────────────────
@@ -845,6 +1051,52 @@ describe("session-actions", () => {
 
       expect(mockProcessAndStoreImage).not.toHaveBeenCalled();
     });
+
+    it("logs warning when raw file cleanup fails on update", async () => {
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
+        ...createMockStitchSession({ id: "session-1" }),
+        project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 0 },
+      });
+
+      const updatedSession = createMockStitchSession({
+        id: "session-1",
+        photoKey: "sessions/p1/new-photo.jpg",
+      });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            update: vi.fn().mockResolvedValue(updatedSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 200 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 200 }),
+          },
+        });
+      });
+
+      mockDeleteFile.mockRejectedValueOnce(new Error("R2 error"));
+
+      const { updateSession } = await import("./session-actions");
+      const result = await updateSession("session-1", {
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: 90,
+        photoKey: "sessions/p1/new-photo.jpg",
+      });
+
+      expect(result.success).toBe(true);
+      expect(warnSpy).toHaveBeenCalledWith(
+        "[R2] raw file cleanup failed:",
+        expect.any(String),
+        expect.any(Error),
+      );
+
+      warnSpy.mockRestore();
+    });
   });
 
   // ─── deleteSession ─────────────────────────────────────────────────────
@@ -913,6 +1165,94 @@ describe("session-actions", () => {
       expect(mockRevalidatePath).toHaveBeenCalledWith("/charts/chart-1");
       expect(mockRevalidatePath).toHaveBeenCalledWith("/sessions");
       expect(mockRevalidateTag).toHaveBeenCalledWith("stats", { expire: 0 });
+    });
+
+    it("cleans up R2 photo when session has photoKey", async () => {
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
+        ...createMockStitchSession({ id: "session-1", photoKey: "sessions/p1/photo.jpg" }),
+        project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 0 },
+      });
+
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            delete: vi.fn().mockResolvedValue({}),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 0 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 0 }),
+          },
+        });
+      });
+
+      const { deleteSession } = await import("./session-actions");
+      const result = await deleteSession("session-1");
+
+      expect(result.success).toBe(true);
+      expect(mockDeleteFile).toHaveBeenCalledWith("sessions/p1/photo.jpg");
+    });
+
+    it("succeeds when photo cleanup fails on delete", async () => {
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
+        ...createMockStitchSession({ id: "session-1", photoKey: "sessions/p1/photo.jpg" }),
+        project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 0 },
+      });
+
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            delete: vi.fn().mockResolvedValue({}),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 0 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 0 }),
+          },
+        });
+      });
+
+      mockDeleteFile.mockRejectedValueOnce(new Error("R2 error"));
+
+      const { deleteSession } = await import("./session-actions");
+      const result = await deleteSession("session-1");
+
+      expect(result.success).toBe(true);
+      expect(warnSpy).toHaveBeenCalledWith(
+        "[R2] raw file cleanup failed:",
+        expect.any(String),
+        expect.any(Error),
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it("skips photo cleanup when session has no photoKey", async () => {
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
+        ...createMockStitchSession({ id: "session-1", photoKey: null }),
+        project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 0 },
+      });
+
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            delete: vi.fn().mockResolvedValue({}),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 0 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 0 }),
+          },
+        });
+      });
+
+      const { deleteSession } = await import("./session-actions");
+      const result = await deleteSession("session-1");
+
+      expect(result.success).toBe(true);
+      expect(mockDeleteFile).not.toHaveBeenCalled();
     });
   });
 

@@ -214,6 +214,11 @@ export function LogSessionModal({
             } else {
               toast.success("Session logged");
             }
+            if (result.warning === "overTotal") {
+              toast.warning(
+                "This session pushes progress past 100% — is your stitch count accurate?",
+              );
+            }
             onOpenChange(false);
             return;
           }
