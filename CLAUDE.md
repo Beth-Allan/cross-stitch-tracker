@@ -2,50 +2,30 @@
 
 ## Current Status
 
-**Milestone:** v1.5 Statistics & Records
-**Last Updated:** 2026-05-17
-**Roadmap:** 6 milestones / 21 phases — v1.0 through v1.4 shipped, v1.5 Phase 19 planned
+**Milestone:** v1.5 Statistics & Records — SHIPPED
+**Last Updated:** 2026-05-18
+**Roadmap:** 6 milestones / 21 phases — all shipped (v1.0 through v1.5), tagged `v1.5`
 
 ### Done
 
 - **v1.0 MVP shipped** (2026-04-11): 4 phases, 23 plans, 395 tests, tagged `v1.0`
-  - Archived to: `.planning/milestones/v1.0-*`
   - Live at: https://cross-stitch-tracker-adolwyn.vercel.app
 - **v1.1 Browse & Organize shipped** (2026-04-16): 3 phases, 20 plans, 867 tests, tagged `v1.1`
-  - Archived to: `.planning/milestones/v1.1-*`
 - **v1.2 Track & Measure shipped** (2026-04-20): 2 phases, 20 plans, 1172 tests, tagged `v1.2`
-  - Phase 8: Session logging, Pattern Dive tabs, atomic progress tracking
-  - Phase 9: Main Dashboard, Project Dashboard, Shopping Cart upgrade (PR #18)
-  - Archived to: `.planning/milestones/v1.2-*`
+- **v1.3 Form & Supply Overhaul shipped** (2026-05-16): 5 phases, 19 plans, 1535 tests, tagged `v1.3`
+- **v1.4 Fixes & Polish shipped** (2026-05-17): 3 phases, 9 plans, 1641 tests, tagged `v1.4`
+- **v1.5 Statistics & Records shipped** (2026-05-18): 4 phases, 14 plans, 1967 tests, tagged `v1.5`
+  - All milestones archived to `.planning/milestones/`
   - Full details: `.planning/MILESTONES.md` and `.planning/RETROSPECTIVE.md`
 
 ### Done This Session
 
-- **Phase 21 executed** — 4 plans, 3 waves, 1961 tests passing, human verified
-  - Plan 01 (W1): Types, search-params, 7 TDD query modules (personal bests, fastest completions, insights, estimates) — 51 tests
-  - Plan 02 (W2): YearScopeToggle, RecordsTable, RecordsOverview layout, page.tsx wiring — 18 tests
-  - Plan 03 (W3): Thread/designer/genre insight lists, completion estimates section, project detail estimate — 33 tests
-  - Plan 04 (W3): Record detection in createSession, confetti celebrations, log-session-modal — 12 tests (checkpoint)
-  - Bug fixes: CSP worker-src confetti (main-thread fallback), multi-toast consolidation, false celebration on multi-session days (CR-01), genre-insights missing date filter (WR-02), placeholder year columns removed from RecordsTable
-  - Code review: 1 critical (CR-01 fixed), 3 warnings (WR-01/WR-02 fixed, WR-03 cosmetic)
-  - Verification: 5/5 must-haves, all 9 requirements satisfied (REC-01–05, INS-01/02/03/05)
-  - **v1.5 milestone complete** — Phase 21 is the last phase
-
-- **PR #40 shipped** — 5-agent review completed, 8 issues fixed:
-  - Wrapped `getProjectCompletionEstimate` in `.catch(() => null)` on chart detail page
-  - Added `console.warn` to confetti catch block
-  - Removed unnecessary `"use client"` from `records-table.tsx`
-  - Fixed import ordering in `record-celebration.tsx`
-  - Added try-catch-log-rethrow to `detectBrokenRecords`
-  - Removed duplicate `SizeCategory` from `stats.ts` (re-exports from `size-category.ts`)
-  - Added 3 tests for createSession record detection integration
-  - Added 3 tests for log-session-modal celebration path
-  - 12 remaining findings added to backlog (999.33–999.40)
+- **v1.5 milestone archived** — ROADMAP/REQUIREMENTS/phases archived, PROJECT.md evolved, RETROSPECTIVE.md updated, git tagged `v1.5`
 
 ### Next Up — RESUME HERE
 
-1. Merge PR #40 when CI passes
-2. Consider `/gsd-complete-milestone` to archive v1.5
+1. Merge PR #40 if not already merged
+2. Run `/gsd-new-milestone` to start next milestone
 
 ### Backlog
 
@@ -102,6 +82,9 @@
 - 999.38: Record-detection duplicate-stitch-count edge case test — two sessions today with same stitch count
 - 999.39: Completion-estimates already-completed project filter test — project with stitchesCompleted >= totalStitches should be excluded
 - 999.40: Pre-existing silent failures in session-actions — `deleteFile().catch(() => {})` orphans files silently; photo upload catch discards error context
+- 999.41: Stats cache staleness on chart status change — `updateChartStatus` missing `revalidateTag("stats")`, stale until TTL (300s hero, 3600s breakdowns)
+- 999.42: Stats cache staleness on supply mutations — supply-actions missing `revalidateTag("stats")`, thread insights stale until TTL
+- 999.43: ThreadInsightList items not clickable links — no thread detail page exists to link to (INS-06 partial)
 
 ### Blockers
 
