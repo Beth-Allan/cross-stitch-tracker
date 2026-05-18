@@ -26,3 +26,11 @@ export const designerBarConfig = {
 export const genreDistributionConfig = {
   count: { label: "Charts", color: "var(--chart-3)" },
 } satisfies ChartConfig;
+
+export const monthlyBarConfig = {
+  totalStitches: { label: "Stitches", color: "var(--chart-1)" },
+} satisfies ChartConfig;
+
+export const dayOfWeekConfig = {
+  avgStitches: { label: "Avg Stitches", color: "var(--chart-1)" },
+} satisfies ChartConfig;

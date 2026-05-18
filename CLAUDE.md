@@ -28,11 +28,20 @@
   - Code review: Fixed WR-01/WR-02 (cache key missing `limit` param in designer/genre queries)
   - Verification: 7/7 must-haves pass, all 7 requirements satisfied (HERO-01–06, INS-06)
 
+- **Phase 20 bug fixes** — All 5 human-verification bugs resolved + 2 bonus fixes
+  - BUG-1: Monthly drill-down — used `barData.payload` from Recharts instead of unreliable index param
+  - BUG-2/3: Links used `projectId` but `/charts/[id]` expects `chartId` — added `chartId` to types, queries, and all link hrefs
+  - BUG-4: Duplicate "Session History" heading — removed CardHeader from ActivityOverview wrapper
+  - BUG-5: Stale chart state on back-nav — added useEffect to sync props in MonthlyStitchChart and StitchingCalendar
+  - Green outline on Recharts bars — global `* { outline-color: var(--ring) }` bleeding into SVG. Added outline-hidden selectors to ChartContainer
+  - Tooltip crowding — added `gap-2` to tooltip label/value layout
+  - 1846 tests passing, build clean
+
+- **Phase 20 UAT** — 10/10 tests passed (1 cosmetic fix applied inline: bar opacity guard in MonthlyStitchChart)
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-discuss-phase 20` — discuss Activity Visualization & Calendar phase
-2. `/gsd-plan-phase 20` — plan after discuss
-3. `/gsd-execute-phase 20` — execute
+1. Run `/gsd-ship` to create PR for Phase 20
 
 ### Backlog
 
@@ -70,6 +79,15 @@
 - **999.19: Fix pre-existing TypeScript errors in test files (HIGH PRIORITY)** — dashboard-tabs.test.tsx (wrapper prop), chart-actions.test.ts (createMany mock), shopping-cart-actions.test.ts (error narrowing). 18 errors across 3 files.
 - 999.20: Focal point action bar blocks bottom of image — action bar overlaps hero image in edit mode, preventing focal point placement in bottom ~25%. Rework to position outside image or use floating controls.
 - 999.21: Fabric matching excludes valid candidates — Pattern Dive Fabric Requirements tab shows zero matches for projects without assigned fabric (null fabricCount short-circuits matching logic)
+- 999.22: Stats page Promise.all resilience — 10 parallel queries in single Promise.all; one failure crashes entire page. Consider Promise.allSettled or separating query groups.
+- 999.23: Deduplicate SORT_FIELDS/SORT_DIRS constants — duplicated between search-params.ts and session-history-table.tsx; export from search-params and import in component to prevent drift
+- 999.24: Stats action auth/validation test coverage — add tests for requireAuth rejection and Zod boundary violations in stats-actions
+- 999.25: Stats types: use literal unions for MonthLabel and DayLabel — MonthlyTotal.month and DayOfWeekData.dayOfWeek are string but constrained to finite values
+- 999.26: Stats types: consistent date representation — SessionHistoryItem.date is Date while CalendarDayData.date and DailyBreakdownEntry.date are string
+- 999.27: Calendar year-rollover navigation tests — add tests for Jan→Dec and Dec→Jan boundary cases in StitchingCalendar
+- 999.28: DailyBreakdownEntry could extend CalendarSession — structural overlap; making relationship explicit reduces duplication
+- 999.29: Remove WHAT-comments from Phase 20 code — 13 redundant comments explaining what code does + 2 task-relative comments ("Existing"/"New" in Promise.all)
+- 999.30: Remove low-harm JSX section markers (~20) — technically against no-comments convention but low priority
 
 ### Blockers
 
