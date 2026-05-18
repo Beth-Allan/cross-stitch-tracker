@@ -22,9 +22,10 @@ result: pass
 
 ### 3. Monthly Stitch Chart with Year Nav
 expected: 12-bar chart showing monthly totals. Left/right arrows navigate years. Current month's bar is full opacity, others slightly faded. Empty year shows "No stitching data for [year]".
-result: issue
+result: issue (fixed)
 reported: "Current month's bar is not full opacity."
 severity: cosmetic
+fix: "Added activeMonth === null guard so all bars are full opacity when none is selected (e0b7d1a)"
 
 ### 4. Monthly Bar Drill-Down
 expected: Click a non-zero bar — animated panel expands below showing daily breakdown: date, project name (clickable link to project page), stitch count. Click same bar again — panel collapses. Click different bar — switches to that month.
@@ -66,9 +67,12 @@ blocked: 0
 ## Gaps
 
 - truth: "Current month's bar is full opacity, others slightly faded"
-  status: failed
+  status: fixed
   reason: "User reported: Current month's bar is not full opacity."
   severity: cosmetic
   test: 3
-  artifacts: []
+  fix: "Added activeMonth === null guard in Cell fill ternary (e0b7d1a)"
+  artifacts:
+    - path: "src/components/features/stats/monthly-stitch-chart.tsx"
+      issue: "When activeMonth is null, all bars got faded color-mix treatment"
   missing: []
