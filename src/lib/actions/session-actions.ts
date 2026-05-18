@@ -87,7 +87,9 @@ export async function createSession(formData: unknown) {
             data: { photoKey: result.optimizedKey },
           });
           returnSession = { ...session, photoKey: result.optimizedKey };
-          await deleteFile(session.photoKey).catch(() => {});
+          await deleteFile(session.photoKey).catch((err) =>
+            console.warn("[R2] raw file cleanup failed:", session.photoKey, err),
+          );
         }
       } catch (err) {
         console.warn("Session photo optimization failed:", err);
@@ -175,7 +177,9 @@ export async function updateSession(sessionId: string, formData: unknown) {
             data: { photoKey: result.optimizedKey },
           });
           returnSession = { ...session, photoKey: result.optimizedKey };
-          await deleteFile(session.photoKey).catch(() => {});
+          await deleteFile(session.photoKey).catch((err) =>
+            console.warn("[R2] raw file cleanup failed:", session.photoKey, err),
+          );
         }
       } catch (err) {
         console.warn("Session photo optimization failed:", err);
@@ -223,6 +227,12 @@ export async function deleteSession(sessionId: string) {
 
       await recalculateProgress(tx, projectId);
     });
+
+    if (existing.photoKey) {
+      await deleteFile(existing.photoKey).catch((err) =>
+        console.warn("[R2] raw file cleanup failed:", existing.photoKey, err),
+      );
+    }
 
     revalidatePath(`/charts/${chartId}`);
     revalidatePath("/sessions");
