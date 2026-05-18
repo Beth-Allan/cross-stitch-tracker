@@ -148,10 +148,15 @@ Plans:
   5. User can see estimated completion dates for active projects when sufficient session data exists
 **Plans:** 4 plans
 Plans:
-- [x] 20-01-PLAN.md — Types, chart configs, queries, server actions, search-params cache
-- [ ] 20-02-PLAN.md — PaceCards, MonthlyStitchChart, MonthlyDrillDown, DayOfWeekChart
-- [x] 20-03-PLAN.md — StitchingCalendar, SessionHistoryTable, shadcn table\/pagination
-- [ ] 20-04-PLAN.md — ActivityOverview layout, page.tsx wiring, human verification
+**Wave 1**
+- [ ] 21-01-PLAN.md — Types, search-params, canvas-confetti install, 7 TDD query modules (personal bests, fastest completions, insights, estimates, available years)
+
+**Wave 2** *(blocked on Wave 1)*
+- [ ] 21-02-PLAN.md — YearScopeToggle, RecordsTable, RecordsOverview layout, page.tsx wiring
+
+**Wave 3** *(blocked on Wave 2 for layout wiring; Plan 04 only needs Wave 1)*
+- [ ] 21-03-PLAN.md — ThreadInsightList, DesignerInsightList, GenreInsightList, CompletionEstimatesSection, RecordsOverview final assembly
+- [ ] 21-04-PLAN.md — Record detection, celebration confetti/toast, createSession integration, human verification
 
 ## Progress
 
@@ -176,6 +181,6 @@ Plans:
 | 16. Input & Dashboard Fixes | v1.4 | 2/2 | Complete | 2026-05-17 |
 | 17. Image Focal Point | v1.4 | 3/3 | Complete | 2026-05-17 |
 | 18. Stats Engine & Charting Foundation | v1.5 | 3/3 | Complete    | 2026-05-17 |
-| 19. Hero Stats & Collection Overview | v1.5 | 0/3 | Planned | - |
+| 19. Hero Stats & Collection Overview | v1.5 | 3/3 | Complete | 2026-05-17 |
 | 20. Activity Visualization & Calendar | v1.5 | 4/4 | Complete   | 2026-05-18 |
-| 21. Records, Insights & Celebrations | v1.5 | 0/? | Not started | - |
+| 21. Records, Insights & Celebrations | v1.5 | 0/4 | Planned | - |
