@@ -38,9 +38,11 @@ describe("mockTransaction", () => {
       thread: { create: customCreate },
     });
 
-    const result = await mockPrisma.$transaction(async (tx: { thread: { create: typeof customCreate } }) => {
-      return tx.thread.create({ data: { name: "test" } });
-    });
+    const result = await mockPrisma.$transaction(
+      async (tx: { thread: { create: typeof customCreate } }) => {
+        return tx.thread.create({ data: { name: "test" } });
+      },
+    );
 
     expect(result).toEqual({ id: "new-thread" });
     expect(customCreate).toHaveBeenCalledWith({ data: { name: "test" } });
