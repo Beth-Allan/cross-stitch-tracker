@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Milestone:** v1.5 Statistics & Records — SHIPPED
+**Milestone:** v1.6 Cleanup & Hardening — PLANNING
 **Last Updated:** 2026-05-18
-**Roadmap:** 6 milestones / 21 phases — all shipped (v1.0 through v1.5), tagged `v1.5`
+**Roadmap:** 7 milestones / 26 phases — v1.0-v1.5 shipped, v1.6 in progress (Phases 22-26)
 
 ### Done
 
@@ -20,12 +20,13 @@
 
 ### Done This Session
 
-- **v1.5 milestone archived** — ROADMAP/REQUIREMENTS/phases archived, PROJECT.md evolved, RETROSPECTIVE.md updated, git tagged `v1.5`
+- **v1.6 milestone initialized** — PROJECT.md updated, 42 requirements defined, 5-phase roadmap created (Phases 22-26)
+- **Phase 22 planned** — 3 plans in 1 wave (all parallel): test infra, security+auth, stats resilience
+- **Phase 22 executed & verified** — 3/3 plans complete, 1995 tests passing, all 5 requirements verified
 
 ### Next Up — RESUME HERE
 
-1. Merge PR #40 if not already merged
-2. Run `/gsd-new-milestone` to start next milestone
+1. `/gsd-discuss-phase 23` — discuss Test Coverage & Reliability before planning
 
 ### Backlog
 
@@ -85,6 +86,12 @@
 - 999.41: Stats cache staleness on chart status change — `updateChartStatus` missing `revalidateTag("stats")`, stale until TTL (300s hero, 3600s breakdowns)
 - 999.42: Stats cache staleness on supply mutations — supply-actions missing `revalidateTag("stats")`, thread insights stale until TTL
 - 999.43: ThreadInsightList items not clickable links — no thread detail page exists to link to (INS-06 partial)
+- **999.44: Stats page project-list query unprotected (HIGH PRIORITY)** — `prisma.project.findMany` at stats/page.tsx:104 runs outside `Promise.allSettled`; DB failure crashes page despite resilience work. Include in allSettled or wrap with try/catch fallback.
+- 999.45: settled() silently discards error reasons — no logging when stats queries fail, making production debugging impossible. Add optional label param and `console.error` on rejection.
+- 999.46: stats-actions console.error logs full error objects — may leak Prisma internals to Vercel function logs. Sanitize to `error.message` only.
+- 999.47: shopping-cart-actions.test.ts `as` type assertion — weakens type safety vs discriminated union narrowing. Use `expect.objectContaining` or proper narrowing pattern.
+- 999.48: createMockStitchSession uses inline type instead of `Partial<StitchSession>` — won't catch schema drift unlike every other factory
+- 999.49: dashboard-tabs.test.tsx imports RenderOptions from @testing-library/react — violates project convention to import from `@/__tests__/test-utils`
 
 ### Blockers
 
