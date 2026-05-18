@@ -7,12 +7,14 @@ import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
 import { processAndStoreImage, deleteFile } from "@/lib/actions/upload-actions";
+import { detectBrokenRecords } from "@/lib/queries/stats/record-detection";
 import { sessionFormSchema } from "@/lib/validations/session";
 import type {
   StitchSessionRow,
   ActiveProjectForPicker,
   ProjectSessionStats,
 } from "@/types/session";
+import type { BrokenRecord } from "@/types/stats";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -92,10 +94,21 @@ export async function createSession(formData: unknown) {
       }
     }
 
+    let brokenRecords: BrokenRecord[] = [];
+    try {
+      brokenRecords = await detectBrokenRecords(user.id, {
+        date: new Date(validated.date),
+        stitchCount: validated.stitchCount,
+        projectId: validated.projectId,
+      });
+    } catch (err) {
+      console.warn("[stats] Record detection failed (non-blocking):", err);
+    }
+
     revalidatePath(`/charts/${project.chartId}`);
     revalidatePath("/sessions");
     revalidateTag("stats", { expire: 0 });
-    return { success: true as const, session: returnSession };
+    return { success: true as const, session: returnSession, brokenRecords };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };

@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createSession, updateSession, deleteSession } from "@/lib/actions/session-actions";
 import { getPresignedUploadUrl } from "@/lib/actions/upload-actions";
+import { fireCelebration } from "@/components/features/stats/record-celebration";
 import type { ActiveProjectForPicker } from "@/types/session";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -209,6 +210,9 @@ export function LogSessionModal({
           const result = await createSession(formData);
           if (result.success) {
             toast.success("Session logged");
+            if (result.brokenRecords && result.brokenRecords.length > 0) {
+              fireCelebration(result.brokenRecords);
+            }
             onOpenChange(false);
             return;
           }
