@@ -23,10 +23,14 @@
 - **v1.6 milestone initialized** — PROJECT.md updated, 42 requirements defined, 5-phase roadmap created (Phases 22-26)
 - **Phase 22 planned** — 3 plans in 1 wave (all parallel): test infra, security+auth, stats resilience
 - **Phase 22 executed & verified** — 3/3 plans complete, 1995 tests passing, all 5 requirements verified
+- **Phase 22 shipped** — PR #41 created, 4-agent review completed, all findings fixed, 2010 tests passing
+  - Fixed: unprotected projectList query (999.44), settled() error logging (999.45), error sanitization (999.46), type assertions (999.47), import convention (999.49)
+  - Added: partial failure tests, null-prop degradation tests, DataUnavailable a11y + copy
 
 ### Next Up — RESUME HERE
 
-1. `/gsd-discuss-phase 23` — discuss Test Coverage & Reliability before planning
+1. Merge PR #41 when CI passes
+2. `/gsd-discuss-phase 23` — discuss Test Coverage & Reliability before planning
 
 ### Backlog
 
@@ -37,9 +41,9 @@
 - 999.0.15: SearchToAdd side-by-side layout — desktop 2-column grid when active, mobile overlay fallback
 - 999.0.16: SearchToAdd highlight conflict — only show keyboard highlight after arrow key use
 - 999.0.17: StorageLocation/StitchingApp multi-user hardening — @@unique([userId, name]), ownership validation on writes
-- 999.0.18: Test infrastructure cleanup for $transaction — createMockPrisma() defaults, vacuous assertion fixes
+- ~~999.0.18: Test infrastructure cleanup for $transaction~~ — **Shipped in Phase 22**
 - 999.0.19: Refactor clickable card rows to avoid nested interactive elements (ARIA violation)
-- **999.0.20: Supply action ownership rejection tests (HIGH PRIORITY)** — zero tests verifying rejection when project belongs to different user
+- ~~**999.0.20: Supply action ownership rejection tests**~~ — **Shipped in Phase 22**
 - 999.0.21: EditableNumber invalid input feedback — visual indication when entry is rejected
 - 999.0.22: Clean up planning doc references in code comments
 - 999.0.23: Narrow strandCount type to literal union (1-6)
@@ -86,12 +90,12 @@
 - 999.41: Stats cache staleness on chart status change — `updateChartStatus` missing `revalidateTag("stats")`, stale until TTL (300s hero, 3600s breakdowns)
 - 999.42: Stats cache staleness on supply mutations — supply-actions missing `revalidateTag("stats")`, thread insights stale until TTL
 - 999.43: ThreadInsightList items not clickable links — no thread detail page exists to link to (INS-06 partial)
-- **999.44: Stats page project-list query unprotected (HIGH PRIORITY)** — `prisma.project.findMany` at stats/page.tsx:104 runs outside `Promise.allSettled`; DB failure crashes page despite resilience work. Include in allSettled or wrap with try/catch fallback.
-- 999.45: settled() silently discards error reasons — no logging when stats queries fail, making production debugging impossible. Add optional label param and `console.error` on rejection.
-- 999.46: stats-actions console.error logs full error objects — may leak Prisma internals to Vercel function logs. Sanitize to `error.message` only.
-- 999.47: shopping-cart-actions.test.ts `as` type assertion — weakens type safety vs discriminated union narrowing. Use `expect.objectContaining` or proper narrowing pattern.
+- ~~**999.44: Stats page project-list query unprotected**~~ — **Fixed in Phase 22 PR review**
+- ~~999.45: settled() silently discards error reasons~~ — **Fixed in Phase 22 PR review**
+- ~~999.46: stats-actions console.error logs full error objects~~ — **Fixed in Phase 22 PR review**
+- ~~999.47: shopping-cart-actions.test.ts `as` type assertion~~ — **Fixed in Phase 22 PR review**
 - 999.48: createMockStitchSession uses inline type instead of `Partial<StitchSession>` — won't catch schema drift unlike every other factory
-- 999.49: dashboard-tabs.test.tsx imports RenderOptions from @testing-library/react — violates project convention to import from `@/__tests__/test-utils`
+- ~~999.49: dashboard-tabs.test.tsx imports RenderOptions from @testing-library/react~~ — **Fixed in Phase 22 PR review**
 
 ### Blockers
 
