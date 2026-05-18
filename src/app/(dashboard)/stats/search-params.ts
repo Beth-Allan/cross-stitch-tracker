@@ -13,4 +13,5 @@ export const statsSearchParamsCache = createSearchParamsCache({
   sort: parseAsStringLiteral(SORT_FIELDS).withDefault("date"),
   dir: parseAsStringLiteral(SORT_DIRS).withDefault("desc"),
   project: parseAsString.withDefault("all"),
+  scope: parseAsString.withDefault("all"),
 });
