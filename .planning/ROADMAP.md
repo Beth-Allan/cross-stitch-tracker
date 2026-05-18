@@ -14,6 +14,7 @@ Design components from `product-plan/sections/` are imported and adapted as each
 - ✅ **v1.3 Form & Supply Overhaul** -- Phases 10-14 (shipped 2026-05-16)
 - ✅ **v1.4 Fixes & Polish** -- Phases 15-17 (shipped 2026-05-17)
 - ✅ **v1.5 Statistics & Records** -- Phases 18-21 (shipped 2026-05-18)
+- 🚧 **v1.6 Cleanup & Hardening** -- Phases 22-26 (in progress)
 
 ## Phases
 
@@ -87,7 +88,85 @@ Full details: `milestones/v1.5-ROADMAP.md`
 
 </details>
 
+### 🚧 v1.6 Cleanup & Hardening (In Progress)
+
+**Milestone Goal:** Address all accumulated backlog items -- bug fixes, test gaps, code quality issues, UX polish, cache correctness, and silent failure handling -- to harden the app before building new features.
+
+- [ ] **Phase 22: Critical Fixes & Test Infrastructure** - Fix security gaps, TypeScript errors, stats resilience, and test infrastructure
+- [ ] **Phase 23: Test Coverage & Reliability** - Fill test gaps and fix silent failures and cache staleness
+- [ ] **Phase 24: Code Quality** - Type narrowing, constant deduplication, discriminated unions, and comment cleanup
+- [ ] **Phase 25: Shopping Cart Scaling** - Shopping cart handles 75+ projects with search, filtering, and status grouping
+- [ ] **Phase 26: UX Polish** - ARIA compliance, visual consistency, and component UX improvements
+
+## Phase Details
+
+### Phase 22: Critical Fixes & Test Infrastructure
+**Goal**: The app's critical security, type-safety, and resilience gaps are closed, and the test infrastructure is reliable for subsequent test-writing phases
+**Depends on**: Nothing (first phase of v1.6)
+**Requirements**: CRIT-01, CRIT-03, CRIT-04, TEST-02, TEST-03
+**Success Criteria** (what must be TRUE):
+  1. Server actions reject supply operations when the project belongs to a different user
+  2. All three test files (dashboard-tabs, chart-actions, shopping-cart-actions) compile without TypeScript errors
+  3. Stats page renders partial data when individual queries fail instead of showing an error page
+  4. createMockPrisma() provides sensible defaults for $transaction and vacuous assertions are eliminated
+  5. Stats actions return appropriate errors for unauthenticated requests and invalid Zod inputs
+**Plans**: TBD
+
+### Phase 23: Test Coverage & Reliability
+**Goal**: Test coverage gaps are filled for edge cases across the app, and silent failures in session handling and cache staleness in stats are resolved
+**Depends on**: Phase 22
+**Requirements**: TEST-01, TEST-04, TEST-05, TEST-06, RELY-01, RELY-02, RELY-03, RELY-04
+**Success Criteria** (what must be TRUE):
+  1. Skein calculator tests cover fabricCount=0 and resolveDefaultBrandId edge cases
+  2. StitchingCalendar tests verify correct behavior when navigating across year boundaries (Jan-Dec, Dec-Jan)
+  3. Record detection correctly handles two sessions on the same day with identical stitch counts
+  4. Completion estimates exclude already-completed projects from the list
+  5. File deletion and photo upload errors in session-actions are surfaced to the user instead of silently swallowed
+  6. Stats data refreshes when chart status changes or supply mutations occur (no stale cache)
+  7. Session logging rejects stitch counts that would push a project over 100% progress
+**Plans**: TBD
+
+### Phase 24: Code Quality
+**Goal**: Stats types use precise TypeScript representations, shared utilities are deduplicated, and code comments follow project conventions
+**Depends on**: Phase 22
+**Requirements**: QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05, QUAL-06, QUAL-07, QUAL-08, QUAL-09, QUAL-10, QUAL-11, QUAL-12, QUAL-13, QUAL-14
+**Success Criteria** (what must be TRUE):
+  1. strandCount, MonthLabel, DayLabel, and BrokenRecordType use literal union types instead of broad string/number
+  2. PersonalBestRecord is a discriminated union with no nullable fields that should be required per variant
+  3. SORT_FIELDS/SORT_DIRS, buildDateFilter, and Scope type each have a single source of truth with no duplicated definitions
+  4. All WHAT-comments (~27), low-harm JSX section markers (~20), and planning doc references are removed from code
+  5. Hardcoded emerald-* classes in log-session-modal use semantic design tokens
+**Plans**: TBD
+
+### Phase 25: Shopping Cart Scaling
+**Goal**: The shopping cart is usable with 75+ projects through search, filtering, status grouping, and supply-type search
+**Depends on**: Phase 22
+**Requirements**: CRIT-02
+**Success Criteria** (what must be TRUE):
+  1. User can search projects by name in the shopping cart project list
+  2. Projects are grouped by status (Kitting, Stitching, Unstarted, etc.) for faster scanning
+  3. User can search/filter supplies by type in the By Supply aggregation view
+  4. Shopping cart remains responsive with 75+ selected projects
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 26: UX Polish
+**Goal**: Accessibility violations are fixed, visual inconsistencies are resolved, and interactive components provide clear affordances
+**Depends on**: Phase 22
+**Requirements**: UX-01, UX-02, UX-03, UX-04, UX-05, UX-06, UX-07, UX-08, UX-09, UX-10, UX-11, UX-12, UX-13, UX-14
+**Success Criteria** (what must be TRUE):
+  1. Clickable card rows use proper ARIA patterns without nested interactive elements
+  2. SearchToAdd keyboard highlight only activates after arrow key input, not on initial render or mouse hover
+  3. Focal point action bar does not obscure the bottom 25% of the cover image
+  4. What's Next cards match gallery card styling, and kitting labels show appropriate text at 0% progress
+  5. Supply table add row has a visible commit button, InlineCreateDialog labels are contextual per supply type, and EditableNumber shows feedback on rejected input
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
+
+**Execution Order:**
+Phase 22 first (foundation). Phases 23, 24, 25, 26 depend only on Phase 22 and can proceed in any order.
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -113,3 +192,8 @@ Full details: `milestones/v1.5-ROADMAP.md`
 | 19. Hero Stats & Collection Overview | v1.5 | 3/3 | Complete | 2026-05-17 |
 | 20. Activity Visualization & Calendar | v1.5 | 4/4 | Complete | 2026-05-18 |
 | 21. Records, Insights & Celebrations | v1.5 | 4/4 | Complete | 2026-05-18 |
+| 22. Critical Fixes & Test Infrastructure | v1.6 | 0/? | Not started | - |
+| 23. Test Coverage & Reliability | v1.6 | 0/? | Not started | - |
+| 24. Code Quality | v1.6 | 0/? | Not started | - |
+| 25. Shopping Cart Scaling | v1.6 | 0/? | Not started | - |
+| 26. UX Polish | v1.6 | 0/? | Not started | - |

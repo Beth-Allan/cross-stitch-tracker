@@ -70,17 +70,17 @@ Deferred to future milestone. Tracked but not in v1.6 roadmap.
 
 ### Feature Additions
 
-- **FEAT-01**: Duplicate chart detection — warn before creating a chart that may already exist (999.0.4)
-- **FEAT-02**: Quick-add missing supplies from project detail page — inline creation without navigating away (999.0.10)
-- **FEAT-03**: Collapsible projects in shopping list — collapsed as default state (999.0.12)
-- **FEAT-04**: SearchToAdd side-by-side layout — desktop 2-column grid, mobile overlay fallback (999.0.15)
-- **FEAT-05**: StorageLocation/StitchingApp multi-user hardening — @@unique, ownership validation (999.0.17)
-- **FEAT-06**: Supply detail modal — read-only view with "used in projects" list (999.1)
+- **FEAT-01**: Duplicate chart detection -- warn before creating a chart that may already exist (999.0.4)
+- **FEAT-02**: Quick-add missing supplies from project detail page -- inline creation without navigating away (999.0.10)
+- **FEAT-03**: Collapsible projects in shopping list -- collapsed as default state (999.0.12)
+- **FEAT-04**: SearchToAdd side-by-side layout -- desktop 2-column grid, mobile overlay fallback (999.0.15)
+- **FEAT-05**: StorageLocation/StitchingApp multi-user hardening -- @@unique, ownership validation (999.0.17)
+- **FEAT-06**: Supply detail modal -- read-only view with "used in projects" list (999.1)
 - **FEAT-07**: Bulk supply editor (999.2)
-- **FEAT-08**: Fabric type hierarchy — replace flat dropdown (999.3)
+- **FEAT-08**: Fabric type hierarchy -- replace flat dropdown (999.3)
 - **FEAT-09**: Estimated completion dates on project detail and dashboard cards (999.7)
-- **FEAT-10**: Auto-status from kitting activity — auto-transition project status (999.10)
-- **FEAT-11**: Per-brand skein length — skeinLengthMeters on ThreadBrand model (999.13)
+- **FEAT-10**: Auto-status from kitting activity -- auto-transition project status (999.10)
+- **FEAT-11**: Per-brand skein length -- skeinLengthMeters on ThreadBrand model (999.13)
 - **FEAT-12**: Auto-infer overCount from fabric count (999.14)
 
 ### Deferred from PROJECT.md
@@ -102,7 +102,7 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| New data models or schema additions | Cleanup milestone — no new entities |
+| New data models or schema additions | Cleanup milestone -- no new entities |
 | New pages or routes | Fix existing pages, don't add new ones |
 | Dependency additions | Quality fixes should use existing stack |
 | Multi-user features | Single-user app, not in scope for v1.6 |
@@ -113,13 +113,54 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (Populated by roadmapper) | | |
+| CRIT-01 | Phase 22 | Pending |
+| CRIT-02 | Phase 25 | Pending |
+| CRIT-03 | Phase 22 | Pending |
+| CRIT-04 | Phase 22 | Pending |
+| TEST-01 | Phase 23 | Pending |
+| TEST-02 | Phase 22 | Pending |
+| TEST-03 | Phase 22 | Pending |
+| TEST-04 | Phase 23 | Pending |
+| TEST-05 | Phase 23 | Pending |
+| TEST-06 | Phase 23 | Pending |
+| RELY-01 | Phase 23 | Pending |
+| RELY-02 | Phase 23 | Pending |
+| RELY-03 | Phase 23 | Pending |
+| RELY-04 | Phase 23 | Pending |
+| QUAL-01 | Phase 24 | Pending |
+| QUAL-02 | Phase 24 | Pending |
+| QUAL-03 | Phase 24 | Pending |
+| QUAL-04 | Phase 24 | Pending |
+| QUAL-05 | Phase 24 | Pending |
+| QUAL-06 | Phase 24 | Pending |
+| QUAL-07 | Phase 24 | Pending |
+| QUAL-08 | Phase 24 | Pending |
+| QUAL-09 | Phase 24 | Pending |
+| QUAL-10 | Phase 24 | Pending |
+| QUAL-11 | Phase 24 | Pending |
+| QUAL-12 | Phase 24 | Pending |
+| QUAL-13 | Phase 24 | Pending |
+| QUAL-14 | Phase 24 | Pending |
+| UX-01 | Phase 26 | Pending |
+| UX-02 | Phase 26 | Pending |
+| UX-03 | Phase 26 | Pending |
+| UX-04 | Phase 26 | Pending |
+| UX-05 | Phase 26 | Pending |
+| UX-06 | Phase 26 | Pending |
+| UX-07 | Phase 26 | Pending |
+| UX-08 | Phase 26 | Pending |
+| UX-09 | Phase 26 | Pending |
+| UX-10 | Phase 26 | Pending |
+| UX-11 | Phase 26 | Pending |
+| UX-12 | Phase 26 | Pending |
+| UX-13 | Phase 26 | Pending |
+| UX-14 | Phase 26 | Pending |
 
 **Coverage:**
 - v1.6 requirements: 42 total
-- Mapped to phases: 0
-- Unmapped: 42
+- Mapped to phases: 42
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-18*
-*Last updated: 2026-05-18 after initial definition*
+*Last updated: 2026-05-18 after roadmap creation*
