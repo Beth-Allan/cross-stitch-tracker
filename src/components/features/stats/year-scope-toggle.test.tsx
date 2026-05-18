@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@/__tests__/test-utils";
+import { render, screen, fireEvent, waitFor } from "@/__tests__/test-utils";
 import { withNuqsTestingAdapter } from "nuqs/adapters/testing";
 import { YearScopeToggle } from "./year-scope-toggle";
 
@@ -37,21 +37,23 @@ describe("YearScopeToggle", () => {
     expect(yearBtn).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("clicking a year button updates the URL scope param", async () => {
-    const onUrlUpdate = vi.fn();
-    const { user } = render(<YearScopeToggle availableYears={defaultYears} />, {
-      wrapper: withNuqsTestingAdapter({
-        onUrlUpdate,
-      }),
+  it("clicking a year button changes the active scope", async () => {
+    render(<YearScopeToggle availableYears={defaultYears} />, {
+      wrapper: withNuqsTestingAdapter(),
     });
 
-    await user.click(screen.getByRole("button", { name: "2026" }));
+    const yearBtn = screen.getByRole("button", { name: "2026" });
+    const allTimeBtn = screen.getByRole("button", { name: /All-time/i });
 
-    expect(onUrlUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        searchParams: expect.any(URLSearchParams),
-      }),
-    );
+    expect(allTimeBtn).toHaveAttribute("aria-pressed", "true");
+    expect(yearBtn).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(yearBtn);
+
+    await waitFor(() => {
+      expect(yearBtn).toHaveAttribute("aria-pressed", "true");
+    });
+    expect(allTimeBtn).toHaveAttribute("aria-pressed", "false");
   });
 
   it("shows selected year as active when scope is set via URL", () => {
