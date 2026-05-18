@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { requireAuth } from "@/lib/auth-guard";
@@ -387,6 +387,7 @@ export async function updateChartStatus(chartId: string, status: string) {
     });
 
     revalidatePath(`/charts/${chartId}`);
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     if (error instanceof z.ZodError) {
