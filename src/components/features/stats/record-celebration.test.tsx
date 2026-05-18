@@ -82,7 +82,7 @@ describe("fireCelebration", () => {
     fireCelebration(records);
 
     expect(mockToastCustom).toHaveBeenCalledTimes(1);
-    expect(mockToastCustom).toHaveBeenCalledWith(expect.any(Function), { duration: 6000 });
+    expect(mockToastCustom).toHaveBeenCalledWith(expect.any(Function), { duration: 8000 });
   });
 });
 

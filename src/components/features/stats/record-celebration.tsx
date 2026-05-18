@@ -50,7 +50,7 @@ export function fireCelebration(brokenRecords: BrokenRecord[]): void {
     (toastId) => (
       <CelebrationToast records={brokenRecords} onDismiss={() => toast.dismiss(toastId)} />
     ),
-    { duration: 6000 },
+    { duration: 8000 },
   );
 
   setTimeout(() => {
