@@ -13,3 +13,7 @@ export { getDailyBreakdown } from "./daily-breakdown";
 export { getPersonalBests } from "./personal-bests";
 export { getFastestCompletions } from "./fastest-completions";
 export { getAvailableYears } from "./available-years";
+export { getThreadInsights } from "./thread-insights";
+export { getDesignerInsights } from "./designer-insights";
+export { getGenreInsights } from "./genre-insights";
+export { getCompletionEstimates } from "./completion-estimates";
