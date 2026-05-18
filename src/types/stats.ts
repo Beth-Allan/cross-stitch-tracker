@@ -1,4 +1,5 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
+import type { SizeCategory } from "@/lib/utils/size-category";
 
 // ─── Hero Stats ───────────────────────────────────────────────────────────
 
@@ -149,7 +150,7 @@ export interface PersonalBestRecord {
 
 // ─── Fastest Completions ───────────────────────────────────────────────────
 
-export type SizeCategory = "Mini" | "Small" | "Medium" | "Large" | "BAP";
+export type { SizeCategory } from "@/lib/utils/size-category";
 
 export interface FastestCompletion {
   sizeCategory: SizeCategory;

@@ -1,11 +1,11 @@
 "use client";
 
 import confetti from "canvas-confetti";
-
-const fireConfetti = confetti.create(undefined, { useWorker: false, resize: true });
 import { Trophy, X } from "lucide-react";
 import { toast } from "sonner";
 import type { BrokenRecord } from "@/types/stats";
+
+const fireConfetti = confetti.create(undefined, { useWorker: false, resize: true });
 
 interface CelebrationToastProps {
   records: BrokenRecord[];
@@ -64,8 +64,8 @@ export function fireCelebration(brokenRecords: BrokenRecord[]): void {
         ticks: 120,
         zIndex: 9999,
       });
-    } catch {
-      // confetti is non-critical
+    } catch (err) {
+      console.warn("[celebration] Confetti animation failed:", err);
     }
   }, 150);
 }

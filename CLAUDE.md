@@ -31,9 +31,20 @@
   - Verification: 5/5 must-haves, all 9 requirements satisfied (REC-01–05, INS-01/02/03/05)
   - **v1.5 milestone complete** — Phase 21 is the last phase
 
+- **PR #40 shipped** — 5-agent review completed, 8 issues fixed:
+  - Wrapped `getProjectCompletionEstimate` in `.catch(() => null)` on chart detail page
+  - Added `console.warn` to confetti catch block
+  - Removed unnecessary `"use client"` from `records-table.tsx`
+  - Fixed import ordering in `record-celebration.tsx`
+  - Added try-catch-log-rethrow to `detectBrokenRecords`
+  - Removed duplicate `SizeCategory` from `stats.ts` (re-exports from `size-category.ts`)
+  - Added 3 tests for createSession record detection integration
+  - Added 3 tests for log-session-modal celebration path
+  - 12 remaining findings added to backlog (999.33–999.40)
+
 ### Next Up — RESUME HERE
 
-1. Run `/gsd-ship` to create PR for Phase 21 (v1.5 milestone)
+1. Merge PR #40 when CI passes
 2. Consider `/gsd-complete-milestone` to archive v1.5
 
 ### Backlog
@@ -72,17 +83,25 @@
 - **999.19: Fix pre-existing TypeScript errors in test files (HIGH PRIORITY)** — dashboard-tabs.test.tsx (wrapper prop), chart-actions.test.ts (createMany mock), shopping-cart-actions.test.ts (error narrowing). 18 errors across 3 files.
 - 999.20: Focal point action bar blocks bottom of image — action bar overlaps hero image in edit mode, preventing focal point placement in bottom ~25%. Rework to position outside image or use floating controls.
 - 999.21: Fabric matching excludes valid candidates — Pattern Dive Fabric Requirements tab shows zero matches for projects without assigned fabric (null fabricCount short-circuits matching logic)
-- 999.22: Stats page Promise.all resilience — 10 parallel queries in single Promise.all; one failure crashes entire page. Consider Promise.allSettled or separating query groups.
+- **999.22: Stats page Promise.all resilience (HIGH PRIORITY)** — 17 parallel queries in single Promise.all; one failure crashes entire page. Consider Promise.allSettled or separating query groups with Suspense boundaries.
 - 999.23: Deduplicate SORT_FIELDS/SORT_DIRS constants — duplicated between search-params.ts and session-history-table.tsx; export from search-params and import in component to prevent drift
 - 999.24: Stats action auth/validation test coverage — add tests for requireAuth rejection and Zod boundary violations in stats-actions
 - 999.25: Stats types: use literal unions for MonthLabel and DayLabel — MonthlyTotal.month and DayOfWeekData.dayOfWeek are string but constrained to finite values
 - 999.26: Stats types: consistent date representation — SessionHistoryItem.date is Date while CalendarDayData.date and DailyBreakdownEntry.date are string
 - 999.27: Calendar year-rollover navigation tests — add tests for Jan→Dec and Dec→Jan boundary cases in StitchingCalendar
 - 999.28: DailyBreakdownEntry could extend CalendarSession — structural overlap; making relationship explicit reduces duplication
-- 999.29: Remove WHAT-comments from Phase 20 code — 13 redundant comments explaining what code does + 2 task-relative comments ("Existing"/"New" in Promise.all)
+- 999.29: Remove WHAT-comments from Phase 20/21 code — 13 from Phase 20 + 14 from Phase 21 (record-detection.ts, personal-bests.ts). 2 comments in record-detection.ts to rewrite (JSDoc caller reference, skip-self explanation)
 - 999.30: Remove low-harm JSX section markers (~20) — technically against no-comments convention but low priority
 - 999.31: Stitch count validation against project total — no guard preventing logging more stitches than a project's total stitch count, which would push progress over 100%
 - 999.32: Hardcoded emerald-\* color classes in log-session-modal — 6+ locations violate semantic token convention (WR-03)
+- 999.33: PersonalBestRecord discriminated union — refactor into two variants (project-linked vs streaks) to eliminate 4 nullable fields and remove runtime null checks
+- 999.34: BrokenRecordType as Exclude — define as `Exclude<RecordType, "currentStreak">` instead of duplicating literals; narrow `unit` to `"stitches" | "days"` on both BrokenRecord and PersonalBestRecord
+- 999.35: CompletionEstimate presentational leak — move `~` prefix from `estimatedDate` data to component-side rendering
+- 999.36: Remove AvailableYearsData wrapper — return `number[]` directly from query, remove unnecessary indirection
+- 999.37: Extract shared `buildDateFilter` and `Scope` type — duplicated across 6 stats query modules
+- 999.38: Record-detection duplicate-stitch-count edge case test — two sessions today with same stitch count
+- 999.39: Completion-estimates already-completed project filter test — project with stitchesCompleted >= totalStitches should be excluded
+- 999.40: Pre-existing silent failures in session-actions — `deleteFile().catch(() => {})` orphans files silently; photo upload catch discards error context
 
 ### Blockers
 

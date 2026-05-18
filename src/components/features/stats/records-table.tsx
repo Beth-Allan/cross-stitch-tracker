@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { format } from "date-fns";
 import { Flame, Trophy, TrendingUp, Zap, Timer } from "lucide-react";

@@ -28,6 +28,11 @@ vi.mock("sonner", () => ({
   }),
 }));
 
+const mockFireCelebration = vi.fn();
+vi.mock("@/components/features/stats/record-celebration", () => ({
+  fireCelebration: (...args: unknown[]) => mockFireCelebration(...args),
+}));
+
 // ─── Test Data ──────────────────────────────────────────────────────────────
 
 const mockProjects: ActiveProjectForPicker[] = [
@@ -180,6 +185,86 @@ describe("LogSessionModal", () => {
     it('does not show "Delete session" link in create mode', () => {
       renderModal();
       expect(screen.queryByText("Delete session")).not.toBeInTheDocument();
+    });
+
+    it("fires celebration when createSession returns broken records", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      const brokenRecords = [
+        {
+          type: "bestSession",
+          label: "Best Session",
+          oldValue: 300,
+          newValue: 500,
+          unit: "stitches",
+        },
+      ];
+      mockCreateSession.mockResolvedValue({
+        success: true,
+        session: { id: "new-1" },
+        brokenRecords,
+      });
+
+      renderModal();
+
+      await user.click(screen.getByText("Select a project..."));
+      await user.click(screen.getByText("Autumn Sampler"));
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.type(stitchInput, "500");
+      await user.click(getSaveButton());
+
+      await waitFor(() => {
+        expect(mockFireCelebration).toHaveBeenCalledWith(brokenRecords);
+      });
+      const { toast } = await import("sonner");
+      expect(toast.success).not.toHaveBeenCalled();
+    });
+
+    it("shows success toast when createSession returns empty broken records", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      mockCreateSession.mockResolvedValue({
+        success: true,
+        session: { id: "new-1" },
+        brokenRecords: [],
+      });
+
+      renderModal();
+
+      await user.click(screen.getByText("Select a project..."));
+      await user.click(screen.getByText("Autumn Sampler"));
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.type(stitchInput, "100");
+      await user.click(getSaveButton());
+
+      const { toast } = await import("sonner");
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith("Session logged");
+      });
+      expect(mockFireCelebration).not.toHaveBeenCalled();
+    });
+
+    it("shows success toast when brokenRecords is undefined (backward compat)", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      mockCreateSession.mockResolvedValue({
+        success: true,
+        session: { id: "new-1" },
+      });
+
+      renderModal();
+
+      await user.click(screen.getByText("Select a project..."));
+      await user.click(screen.getByText("Autumn Sampler"));
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.type(stitchInput, "100");
+      await user.click(getSaveButton());
+
+      const { toast } = await import("sonner");
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith("Session logged");
+      });
+      expect(mockFireCelebration).not.toHaveBeenCalled();
     });
   });
 

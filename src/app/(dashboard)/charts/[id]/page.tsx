@@ -21,30 +21,35 @@ export default async function ChartDetailPage({ params }: { params: Promise<{ id
   const [user, chart] = await Promise.all([requireAuth(), getChart(id)]);
   if (!chart) notFound();
 
-  // Fetch all data in parallel (supplies, images, sessions, stats, active projects, estimate)
-  const [projectSupplies, imageUrls, sessionsResult, statsResult, projectsResult, completionEstimate] =
-    await Promise.all([
-      chart.project ? getProjectSupplies(chart.project.id) : null,
-      getPresignedImageUrls([chart.coverImageUrl, chart.coverThumbnailUrl]),
-      chart.project
-        ? getSessionsForProject(chart.project.id)
-        : { success: true as const, sessions: [] as StitchSessionRow[] },
-      chart.project
-        ? getProjectSessionStats(chart.project.id)
-        : {
-            success: true as const,
-            stats: {
-              totalStitches: 0,
-              sessionsLogged: 0,
-              avgPerSession: 0,
-              activeSince: null,
-            } as ProjectSessionStats,
-          },
-      getActiveProjectsForPicker(),
-      chart.project
-        ? getProjectCompletionEstimate(user.id, chart.project.id)
-        : null,
-    ]);
+  const [
+    projectSupplies,
+    imageUrls,
+    sessionsResult,
+    statsResult,
+    projectsResult,
+    completionEstimate,
+  ] = await Promise.all([
+    chart.project ? getProjectSupplies(chart.project.id) : null,
+    getPresignedImageUrls([chart.coverImageUrl, chart.coverThumbnailUrl]),
+    chart.project
+      ? getSessionsForProject(chart.project.id)
+      : { success: true as const, sessions: [] as StitchSessionRow[] },
+    chart.project
+      ? getProjectSessionStats(chart.project.id)
+      : {
+          success: true as const,
+          stats: {
+            totalStitches: 0,
+            sessionsLogged: 0,
+            avgPerSession: 0,
+            activeSince: null,
+          } as ProjectSessionStats,
+        },
+    getActiveProjectsForPicker(),
+    chart.project
+      ? getProjectCompletionEstimate(user.id, chart.project.id).catch(() => null)
+      : null,
+  ]);
 
   const sessions =
     sessionsResult.success && "sessions" in sessionsResult ? sessionsResult.sessions : [];
