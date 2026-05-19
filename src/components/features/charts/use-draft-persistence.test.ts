@@ -290,7 +290,7 @@ describe("use-draft-persistence", () => {
       ];
       const calcParams = {
         fabricCount: 16,
-        strandCount: 2,
+        strandCount: 2 as const,
         overCount: 1 as const,
         wastePercent: 20,
       };

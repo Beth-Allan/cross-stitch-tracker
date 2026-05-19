@@ -97,7 +97,7 @@ export function SuppliesTab({ project, supplies }: SuppliesTabProps) {
   const calcParams: Partial<CalcParams> = useMemo(
     () => ({
       fabricCount: project.fabric?.count ?? 14,
-      strandCount: project.strandCount,
+      strandCount: project.strandCount as CalcParams["strandCount"],
       overCount: project.overCount,
       wastePercent: project.wastePercent,
     }),

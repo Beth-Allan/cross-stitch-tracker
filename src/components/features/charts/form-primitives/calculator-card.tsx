@@ -44,7 +44,7 @@ export function CalculatorCard({
 
   const handleStrandsChange = useCallback(
     (value: number) => {
-      onCalcParamsChange({ ...calcParams, strandCount: value });
+      onCalcParamsChange({ ...calcParams, strandCount: value as CalcParams["strandCount"] });
     },
     [calcParams, onCalcParamsChange],
   );
