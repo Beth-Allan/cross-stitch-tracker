@@ -1,5 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, createMockStorageLocation } from "@/__tests__/mocks";
+import {
+  createMockPrisma,
+  createMockStorageLocation,
+  assertSuccess,
+  assertFailure,
+} from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -67,10 +72,8 @@ describe("storage-location-actions", () => {
 
       const result = await createStorageLocation({ name: "Bin A" });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.location.name).toBe("Bin A");
-      }
+      assertSuccess(result);
+      expect(result.location.name).toBe("Bin A");
       expect(mockPrisma.storageLocation.create).toHaveBeenCalledWith({
         data: { name: "Bin A", description: null, userId: "user-1" },
       });
@@ -81,10 +84,8 @@ describe("storage-location-actions", () => {
 
       const result = await createStorageLocation({ name: "" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Name is required");
     });
   });
 
@@ -108,10 +109,8 @@ describe("storage-location-actions", () => {
 
       const result = await updateStorageLocation("sl-1", { name: "   " });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Name is required");
     });
   });
 
@@ -143,10 +142,8 @@ describe("storage-location-actions", () => {
 
       const result = await deleteStorageLocation("sl-1");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Location not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Location not found");
     });
   });
 

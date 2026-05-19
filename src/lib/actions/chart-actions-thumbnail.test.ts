@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma } from "@/__tests__/mocks";
+import { createMockPrisma, assertSuccess } from "@/__tests__/mocks";
 
 // Mock auth to return authenticated session
 vi.mock("@/lib/auth", () => ({
@@ -101,10 +101,8 @@ describe("chart-actions thumbnail generation", () => {
 
       const result = await createChart(formData);
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.warning).toBe("Thumbnail could not be generated");
-      }
+      assertSuccess(result);
+      expect(result.warning).toBe("Thumbnail could not be generated");
       consoleSpy.mockRestore();
     });
 
@@ -119,10 +117,8 @@ describe("chart-actions thumbnail generation", () => {
 
       const result = await createChart(formData);
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.warning).toBeUndefined();
-      }
+      assertSuccess(result);
+      expect(result.warning).toBeUndefined();
     });
   });
 

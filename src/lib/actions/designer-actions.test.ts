@@ -1,5 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, createMockDesigner } from "@/__tests__/mocks";
+import {
+  createMockPrisma,
+  createMockDesigner,
+  assertSuccess,
+  assertFailure,
+} from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -71,11 +76,9 @@ describe("designer-actions", () => {
 
       const result = await createDesigner({ name: "Shannon Christine", notes: "Great designs" });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.designer.name).toBe("Shannon Christine");
-        expect(result.designer.notes).toBe("Great designs");
-      }
+      assertSuccess(result);
+      expect(result.designer.name).toBe("Shannon Christine");
+      expect(result.designer.notes).toBe("Great designs");
       expect(mockPrisma.designer.create).toHaveBeenCalledWith({
         data: { name: "Shannon Christine", website: null, notes: "Great designs" },
       });
@@ -88,10 +91,8 @@ describe("designer-actions", () => {
 
       const result = await createDesigner({ name: "Duplicate" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("A designer with that name already exists");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("A designer with that name already exists");
     });
 
     it("returns validation error for empty name", async () => {
@@ -99,10 +100,8 @@ describe("designer-actions", () => {
 
       const result = await createDesigner({ name: "" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Designer name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Designer name is required");
     });
   });
 
@@ -128,10 +127,8 @@ describe("designer-actions", () => {
 
       const result = await updateDesigner("d1", { name: "Existing Designer" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("A designer with that name already exists");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("A designer with that name already exists");
     });
 
     it("returns validation error for invalid input", async () => {
@@ -139,10 +136,8 @@ describe("designer-actions", () => {
 
       const result = await updateDesigner("d1", { name: "" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Designer name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Designer name is required");
     });
   });
 
@@ -173,10 +168,8 @@ describe("designer-actions", () => {
 
       const result = await deleteDesigner("nonexistent");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Designer not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Designer not found");
     });
   });
 

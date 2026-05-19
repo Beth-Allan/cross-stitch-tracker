@@ -1,5 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, createMockStitchingApp } from "@/__tests__/mocks";
+import {
+  createMockPrisma,
+  createMockStitchingApp,
+  assertSuccess,
+  assertFailure,
+} from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -67,10 +72,8 @@ describe("stitching-app-actions", () => {
 
       const result = await createStitchingApp({ name: "Markup R-XP" });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.app.name).toBe("Markup R-XP");
-      }
+      assertSuccess(result);
+      expect(result.app.name).toBe("Markup R-XP");
       expect(mockPrisma.stitchingApp.create).toHaveBeenCalledWith({
         data: { name: "Markup R-XP", description: null, userId: "user-1" },
       });
@@ -81,10 +84,8 @@ describe("stitching-app-actions", () => {
 
       const result = await createStitchingApp({ name: "" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Name is required");
     });
   });
 
@@ -132,10 +133,8 @@ describe("stitching-app-actions", () => {
 
       const result = await deleteStitchingApp("sa-1");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("App not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("App not found");
     });
   });
 

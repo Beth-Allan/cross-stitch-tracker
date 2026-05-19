@@ -1,5 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, createMockGenre } from "@/__tests__/mocks";
+import {
+  createMockPrisma,
+  createMockGenre,
+  assertSuccess,
+  assertFailure,
+} from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -68,10 +73,8 @@ describe("genre-actions", () => {
 
       const result = await createGenre({ name: "Fantasy" });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.genre.name).toBe("Fantasy");
-      }
+      assertSuccess(result);
+      expect(result.genre.name).toBe("Fantasy");
       expect(mockPrisma.genre.create).toHaveBeenCalledWith({
         data: { name: "Fantasy" },
       });
@@ -84,10 +87,8 @@ describe("genre-actions", () => {
 
       const result = await createGenre({ name: "Duplicate" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("A genre with that name already exists");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("A genre with that name already exists");
     });
 
     it("returns validation error for empty name", async () => {
@@ -95,10 +96,8 @@ describe("genre-actions", () => {
 
       const result = await createGenre({ name: "" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Genre name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Genre name is required");
     });
   });
 
@@ -124,10 +123,8 @@ describe("genre-actions", () => {
 
       const result = await updateGenre("g1", { name: "Existing Genre" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("A genre with that name already exists");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("A genre with that name already exists");
     });
 
     it("returns validation error for empty name", async () => {
@@ -135,10 +132,8 @@ describe("genre-actions", () => {
 
       const result = await updateGenre("g1", { name: "" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Genre name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Genre name is required");
     });
   });
 
@@ -169,10 +164,8 @@ describe("genre-actions", () => {
 
       const result = await deleteGenre("nonexistent");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Genre not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Genre not found");
     });
   });
 
