@@ -40,8 +40,8 @@ export default async function DashboardRoute() {
   // Preserve Start Next ordering from the server action
   const startNextCards = mainData.startNextProjects
     .map((p) => startNextChartsMap.get(p.chartId))
-    .filter(Boolean)
-    .map((c) => transformToGalleryCard(c!, imageUrls));
+    .filter((c): c is NonNullable<typeof c> => Boolean(c))
+    .map((c) => transformToGalleryCard(c, imageUrls));
 
   return (
     <DashboardTabs
