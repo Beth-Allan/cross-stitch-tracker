@@ -39,7 +39,7 @@ export function useSupplyTable(
   const [highlightIndex, setHighlightIndex] = useState(-1);
   const [isSearchError, setIsSearchError] = useState(false);
 
-  // useTransition for non-blocking search state updates (D-02)
+  // useTransition for non-blocking search state updates
   const [, startTransition] = useTransition();
 
   // Refs for debounce cleanup
@@ -48,7 +48,7 @@ export function useSupplyTable(
 
   // --- Debounced search ---
   // Using useEffect with searchText + supplyType as dependencies.
-  // The 150ms debounce prevents excessive adapter.searchSupplies calls (T-10-12).
+  // The 150ms debounce prevents excessive adapter.searchSupplies calls.
   useEffect(() => {
     // Clear previous timer
     if (debounceRef.current) {
@@ -100,7 +100,6 @@ export function useSupplyTable(
     setHighlightIndex(-1);
   }, [searchResults]);
 
-  // --- Keyboard navigation for highlight (D-01: single input architecture) ---
   const moveHighlight = useCallback(
     (direction: 1 | -1, displayItems: SupplySearchResult[], existingIds: Set<string>) => {
       setHighlightIndex((prev) => {
@@ -179,7 +178,7 @@ export function useSupplyTable(
       return { success: false, focusTarget: "search" };
     }
 
-    // T-10-11: Validate inputs before adapter calls
+    // Validate inputs before adapter calls
     const safeStitchCount = Math.max(0, stitchCount);
     const effectiveNeed = need > 0 ? need : 1;
 
@@ -220,7 +219,6 @@ export function useSupplyTable(
     setIsAutoCalc(true);
   }, []);
 
-  // --- Handle inline create (D-03: auto-add + refocus) ---
   const handleCreateSupply = useCallback(
     async (data: CreateSupplyData): Promise<void> => {
       try {
@@ -274,7 +272,6 @@ export function useSupplyTable(
     getFocusTarget,
     // Existing IDs passthrough for autocomplete
     existingSupplyIds,
-    // Highlight navigation (D-01: keyboard from table row input)
     highlightIndex,
     setHighlightIndex,
     moveHighlight,

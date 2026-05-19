@@ -267,7 +267,7 @@ export function ChartMergedForm({
     return 0;
   }, [form.values.stitchCount, form.values.stitchesWide, form.values.stitchesHigh]);
 
-  // Draft hydration on mount -- uses V2 format (D-07)
+  // Draft hydration on mount -- uses V2 format
   // Only fires in create mode -- edit mode loads from initialData via useChartForm
   useEffect(() => {
     if (hydratedRef.current) return;

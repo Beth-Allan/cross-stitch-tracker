@@ -583,7 +583,7 @@ export function createMockPrisma() {
     $transaction: vi.fn(),
   };
 
-  // D-05: Default $transaction handles both callback and array forms
+  // Default $transaction handles both callback and array forms
   mockPrisma.$transaction.mockImplementation((fn: unknown) =>
     typeof fn === "function"
       ? (fn as (tx: typeof mockPrisma) => unknown)(mockPrisma)

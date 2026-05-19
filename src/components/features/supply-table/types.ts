@@ -70,9 +70,9 @@ export type Result = { success: true; id?: string } | { success: false; error: s
 /**
  * Adapter interface abstracting data operations for the supply table.
  *
- * Phase 10: LocalStateAdapter (in-memory, for tests/isolation)
- * Phase 11: ServerActionAdapter (wired to supply-actions.ts)
- * Phase 13: CreationFlowAdapter (buffers until two-phase save)
+ * LocalStateAdapter (in-memory, for tests/isolation)
+ * ServerActionAdapter (wired to supply-actions.ts)
+ * CreationFlowAdapter (buffers until two-phase save)
  */
 export interface SupplyTableAdapter {
   addThread(threadId: string, stitchCount: number, need: number): Promise<Result>;

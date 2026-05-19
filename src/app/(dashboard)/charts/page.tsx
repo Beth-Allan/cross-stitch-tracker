@@ -12,8 +12,8 @@ import { FabricRequirementsTab } from "@/components/features/charts/fabric-requi
 import { StorageViewTab } from "@/components/features/charts/storage-view-tab";
 
 export default async function ChartsPage() {
-  // D-10: All four tab datasets fetched eagerly via Promise.all()
-  // Avoids Neon cold start waterfall — single parallel batch
+  // All four tab datasets fetched eagerly via Promise.all()
+  // Avoids Neon cold start waterfall -- single parallel batch
   const [charts, whatsNextProjects, fabricRequirements, storageGroups] = await Promise.all([
     getChartsForGallery(),
     getWhatsNextProjects(),
@@ -32,7 +32,6 @@ export default async function ChartsPage() {
 
   return (
     <div className="space-y-6">
-      {/* D-12: Page header */}
       <div>
         <h1 className="font-heading text-2xl font-semibold">Pattern Dive</h1>
         <p className="text-muted-foreground mt-1 text-sm">

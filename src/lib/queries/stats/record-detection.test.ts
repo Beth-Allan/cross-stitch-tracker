@@ -221,12 +221,6 @@ describe("detectBrokenRecords", () => {
       _sum: { stitchCount: 500 },
     });
 
-    // Two prior-day sessions with identical stitchCount (500 each) on May 16,
-    // plus the current session (500) on May 18.
-    // The self-skip logic only skips the first today-match, but the prior-day
-    // sessions are NOT on today so they are never skipped.
-    // previousBestSession = 500 (from prior sessions), today's session = 500 => no bestSession record
-    // previousBestDay = 1000 (500+500 on May 16), todayTotal = 500 => no bestDay record
     mockPrisma.stitchSession.findMany.mockResolvedValue([
       // Current session (today) -- returned first because orderBy date desc
       { date: new Date("2026-05-18T14:00:00Z"), stitchCount: 500 },
@@ -242,8 +236,6 @@ describe("detectBrokenRecords", () => {
       projectId: "proj-1",
     });
 
-    // No false positives — today's 500 does not beat prior best session of 500,
-    // and today's total of 500 does not beat prior best day of 1000
     expect(result).toEqual([]);
   });
 

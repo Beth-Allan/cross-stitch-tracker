@@ -100,7 +100,7 @@ export interface ProjectDetailProps {
   } | null;
 }
 
-// ─── Overview Tab Section Ordering (per D-06) ──────────────────────────────
+// ─── Overview Tab Section Ordering ──────────────────────────────────────────
 
 export type OverviewSection =
   | "kitting"

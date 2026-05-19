@@ -20,8 +20,8 @@ const HEADER_CLASS =
 
 /**
  * Root SupplyTable component composing all sub-components into the complete
- * unified supply table. Consumers (Phase 11 project detail, Phase 13 supply
- * takeover) import this as their single entry point.
+ * unified supply table. Consumers (project detail page, supply takeover flow)
+ * import this as their single entry point.
  *
  * Renders grouped sections (Thread/Beads/Specialty) with:
  * - Persistent add row with autocomplete search
@@ -113,7 +113,7 @@ export function SupplyTable({
           next.delete(newId);
           return next;
         });
-      }, 250); // 200ms animation + 50ms buffer (per D-09: 0.2s ease)
+      }, 250); // 200ms animation + 50ms buffer
     }
   }, []);
 

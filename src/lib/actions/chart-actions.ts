@@ -151,7 +151,7 @@ export async function createChart(formData: unknown) {
  *
  * Combines chart+project creation (via shared helper) with bulk supply junction
  * inserts across all three tables: ProjectThread, ProjectBead, ProjectSpecialty.
- * Per D-03/D-06: nothing is persisted until this atomic operation succeeds.
+ * Per atomic save: nothing is persisted until this atomic operation succeeds.
  */
 export async function createChartWithSupplies(formData: unknown, supplyPayload: unknown) {
   const user = await requireAuth();
@@ -163,7 +163,7 @@ export async function createChartWithSupplies(formData: unknown, supplyPayload: 
     const created = await prisma.$transaction(async (tx) => {
       const result = await createChartAndProject(tx, validated, user.id);
 
-      // Batch insert supply junction records (D-06, D-07)
+      // Batch insert supply junction records
       if (!result.project) {
         throw new Error("Project creation failed");
       }

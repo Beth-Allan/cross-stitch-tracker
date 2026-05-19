@@ -30,7 +30,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             return { id: "1", name: "Stitcher", email };
           }
 
-          // Generic failure (D-02): don't reveal which field is wrong
+          // Generic failure: don't reveal which field is wrong
           return null;
         } catch (error) {
           console.error("authorize error:", error);
@@ -55,7 +55,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days (D-03)
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: "/login",
