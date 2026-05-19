@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Cleanup & Hardening
-status: executing
+status: ready_to_plan
 stopped_at: Phase 24 context gathered
 last_updated: "2026-05-19T00:59:49.582Z"
 last_activity: 2026-05-19 -- Phase 24 execution started
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 10
   completed_plans: 6
   percent: 60
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 
 ## Current Position
 
-Phase: 24 (code-quality) — EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 24
-Last activity: 2026-05-19 -- Phase 24 execution started
+Phase: 25
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-05-19
 
 Progress: [░░░░░░░░░░] 0%
 
