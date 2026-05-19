@@ -136,6 +136,8 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
         wastePercent: this.calcParams.wastePercent,
       });
       updated = { ...row, stitchCount: value, need: recalculated };
+    } else if (field === "need" && row.type === "THREAD") {
+      updated = { ...row, need: value, isNeedOverridden: true };
     } else {
       updated = { ...row, [field]: value };
     }
