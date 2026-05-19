@@ -3,16 +3,8 @@ import { TZDate } from "@date-fns/tz";
 import { differenceInCalendarDays, format, addDays } from "date-fns";
 import { prisma } from "@/lib/db";
 import { getUserTimezone } from "./timezone";
+import { buildDateFilter } from "./utils";
 import type { CompletionEstimate } from "@/types/stats";
-
-function buildDateFilter(scope: string, tz: string): { gte: Date; lt: Date } | null {
-  if (scope === "all") return null;
-  const year = parseInt(scope, 10);
-  if (isNaN(year)) return null;
-  const yearStart = new TZDate(year, 0, 1, 0, 0, 0, tz);
-  const nextYearStart = new TZDate(year + 1, 0, 1, 0, 0, 0, tz);
-  return { gte: yearStart, lt: nextYearStart };
-}
 
 const MIN_SESSIONS = 3;
 
@@ -73,7 +65,7 @@ async function computeCompletionEstimates(
         stitchesCompleted: project.stitchesCompleted,
         totalStitches,
         percentComplete,
-        estimatedDate: `~${format(estimatedDate, "MMM yyyy")}`,
+        estimatedDate: format(estimatedDate, "MMM yyyy"),
         avgPerDay: Math.round(avgPerDay * 10) / 10,
         _daysRemaining: daysRemaining,
       });
@@ -149,7 +141,7 @@ export async function getProjectCompletionEstimate(
       stitchesCompleted: project.stitchesCompleted,
       totalStitches,
       percentComplete,
-      estimatedDate: `~${format(estimatedDate, "MMM yyyy")}`,
+      estimatedDate: format(estimatedDate, "MMM yyyy"),
       avgPerDay: Math.round(avgPerDay * 10) / 10,
     };
   } catch (error) {

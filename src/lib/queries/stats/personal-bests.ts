@@ -3,16 +3,8 @@ import { TZDate } from "@date-fns/tz";
 import { format, differenceInCalendarDays } from "date-fns";
 import { prisma } from "@/lib/db";
 import { getUserTimezone } from "./timezone";
-import type { PersonalBestRecord, RecordType } from "@/types/stats";
-
-function buildDateFilter(scope: string, tz: string): { gte: Date; lt: Date } | null {
-  if (scope === "all") return null;
-  const year = parseInt(scope, 10);
-  if (isNaN(year)) return null;
-  const yearStart = new TZDate(year, 0, 1, 0, 0, 0, tz);
-  const nextYearStart = new TZDate(year + 1, 0, 1, 0, 0, 0, tz);
-  return { gte: yearStart, lt: nextYearStart };
-}
+import { buildDateFilter } from "./utils";
+import type { PersonalBestRecord, ProjectLinkedRecord, AggregateRecord } from "@/types/stats";
 
 interface SessionRow {
   id: string;
@@ -46,27 +38,25 @@ async function computePersonalBests(userId: string, scope: string): Promise<Pers
       orderBy: { date: "desc" },
     });
 
-    const emptyRecord = (type: RecordType, label: string, unit: string): PersonalBestRecord => ({
-      type,
-      label,
-      value: 0,
-      unit,
-      date: null,
-      projectId: null,
-      chartId: null,
-      projectName: null,
-    });
+    const emptyProjectLinked = (
+      type: "bestDay" | "bestSession",
+      label: string,
+    ): ProjectLinkedRecord => ({ type, label, value: 0, unit: "stitches" });
+
+    const emptyAggregate = (
+      type: "longestStreak" | "currentStreak",
+      label: string,
+    ): AggregateRecord => ({ type, label, value: 0, unit: "days" });
 
     if (sessions.length === 0) {
       return [
-        emptyRecord("bestDay", "Best Day", "stitches"),
-        emptyRecord("bestSession", "Best Session", "stitches"),
-        emptyRecord("longestStreak", "Longest Streak", "days"),
-        emptyRecord("currentStreak", "Current Streak", "days"),
+        emptyProjectLinked("bestDay", "Best Day"),
+        emptyProjectLinked("bestSession", "Best Session"),
+        emptyAggregate("longestStreak", "Longest Streak"),
+        emptyAggregate("currentStreak", "Current Streak"),
       ];
     }
 
-    // --- Best Day ---
     const dayMap = new Map<string, { total: number; topSession: SessionRow }>();
     for (const s of sessions) {
       const localDate = format(new TZDate(s.date, tz), "yyyy-MM-dd");
@@ -81,7 +71,7 @@ async function computePersonalBests(userId: string, scope: string): Promise<Pers
       }
     }
 
-    let bestDayRecord = emptyRecord("bestDay", "Best Day", "stitches");
+    let bestDayRecord: ProjectLinkedRecord = emptyProjectLinked("bestDay", "Best Day");
     let bestDayTotal = 0;
     for (const [dateStr, { total, topSession }] of dayMap) {
       if (total > bestDayTotal) {
@@ -99,8 +89,7 @@ async function computePersonalBests(userId: string, scope: string): Promise<Pers
       }
     }
 
-    // --- Best Session ---
-    let bestSessionRecord = emptyRecord("bestSession", "Best Session", "stitches");
+    let bestSessionRecord: ProjectLinkedRecord = emptyProjectLinked("bestSession", "Best Session");
     let bestSessionStitches = 0;
     for (const s of sessions) {
       if (s.stitchCount > bestSessionStitches) {
@@ -118,7 +107,6 @@ async function computePersonalBests(userId: string, scope: string): Promise<Pers
       }
     }
 
-    // --- Streaks ---
     const uniqueDates = [
       ...new Set(sessions.map((s) => format(new TZDate(s.date, tz), "yyyy-MM-dd"))),
     ].sort();
@@ -143,18 +131,13 @@ async function computePersonalBests(userId: string, scope: string): Promise<Pers
       longestStreak = 0;
     }
 
-    const longestStreakRecord: PersonalBestRecord = {
+    const longestStreakRecord: AggregateRecord = {
       type: "longestStreak",
       label: "Longest Streak",
       value: longestStreak,
       unit: "days",
-      date: null,
-      projectId: null,
-      chartId: null,
-      projectName: null,
     };
 
-    // --- Current Streak ---
     let currentStreakValue = 0;
     if (scope === "all" && uniqueDates.length > 0) {
       const today = format(TZDate.tz(tz), "yyyy-MM-dd");
@@ -177,15 +160,11 @@ async function computePersonalBests(userId: string, scope: string): Promise<Pers
       }
     }
 
-    const currentStreakRecord: PersonalBestRecord = {
+    const currentStreakRecord: AggregateRecord = {
       type: "currentStreak",
       label: "Current Streak",
       value: currentStreakValue,
       unit: "days",
-      date: null,
-      projectId: null,
-      chartId: null,
-      projectName: null,
     };
 
     return [bestDayRecord, bestSessionRecord, longestStreakRecord, currentStreakRecord];

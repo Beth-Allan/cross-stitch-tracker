@@ -34,7 +34,7 @@ describe("getPersonalBests", () => {
     ]);
   });
 
-  it("returns zero values and null links when no sessions exist", async () => {
+  it("returns zero values when no sessions exist", async () => {
     mockPrisma.stitchSession.findMany.mockResolvedValue([]);
     mockPrisma.stitchSession.findFirst.mockResolvedValue(null);
 
@@ -43,9 +43,15 @@ describe("getPersonalBests", () => {
 
     for (const record of result) {
       expect(record.value).toBe(0);
-      expect(record.projectId).toBeNull();
-      expect(record.chartId).toBeNull();
-      expect(record.projectName).toBeNull();
+    }
+
+    const projectLinked = result.filter(
+      (r) => r.type === "bestDay" || r.type === "bestSession",
+    );
+    for (const record of projectLinked) {
+      expect(record.projectId).toBeUndefined();
+      expect(record.chartId).toBeUndefined();
+      expect(record.projectName).toBeUndefined();
     }
   });
 
@@ -185,7 +191,6 @@ describe("getPersonalBests", () => {
 
     const currentStreak = result.find((r) => r.type === "currentStreak")!;
     expect(currentStreak.value).toBe(0);
-    expect(currentStreak.date).toBeNull();
   });
 
   it('"2026" scope applies date boundaries to session query', async () => {
