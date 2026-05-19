@@ -36,7 +36,6 @@ describe("supply-actions", () => {
     });
   });
 
-
   describe("auth guard", () => {
     it("rejects unauthenticated calls to createThread", async () => {
       mockAuth.mockResolvedValueOnce(null);
@@ -127,7 +126,6 @@ describe("supply-actions", () => {
       await expect(getProjectSupplies("p1")).rejects.toThrow("Unauthorized");
     });
   });
-
 
   describe("createThread", () => {
     it("creates a thread with valid data and returns success", async () => {
@@ -320,7 +318,6 @@ describe("supply-actions", () => {
     });
   });
 
-
   describe("createBead", () => {
     it("creates a bead with valid data and returns success", async () => {
       const mockBead = createMockBead({ productCode: "00123" });
@@ -412,7 +409,6 @@ describe("supply-actions", () => {
       );
     });
   });
-
 
   describe("createSpecialtyItem", () => {
     it("creates a specialty item with valid data and returns success", async () => {
@@ -507,7 +503,6 @@ describe("supply-actions", () => {
       );
     });
   });
-
 
   describe("createSupplyBrand", () => {
     it("creates a brand with valid data and returns success", async () => {
@@ -626,7 +621,6 @@ describe("supply-actions", () => {
       });
     });
   });
-
 
   describe("addThreadToProject", () => {
     it("creates junction record with default quantity 1", async () => {
@@ -1109,7 +1103,6 @@ describe("supply-actions", () => {
     });
   });
 
-
   describe("createAndAddThread", () => {
     it("requires auth", async () => {
       mockAuth.mockResolvedValueOnce(null);
@@ -1195,7 +1188,6 @@ describe("supply-actions", () => {
     });
   });
 
-
   describe("createAndAddBead", () => {
     it("requires auth", async () => {
       mockAuth.mockResolvedValueOnce(null);
@@ -1279,7 +1271,6 @@ describe("supply-actions", () => {
       expect(result.record).toBeDefined();
     });
   });
-
 
   describe("createAndAddSpecialty", () => {
     it("requires auth", async () => {
@@ -1365,7 +1356,6 @@ describe("supply-actions", () => {
     });
   });
 
-
   describe("resolveDefaultBrandId (via public API)", () => {
     it("createThread with brandId='default' upserts Custom (Thread) brand", async () => {
       mockPrisma.supplyBrand.upsert.mockResolvedValueOnce({
@@ -1438,7 +1428,6 @@ describe("supply-actions", () => {
       });
     });
   });
-
 
   describe("cache invalidation", () => {
     it("createThread calls revalidateTag('stats') after successful creation", async () => {

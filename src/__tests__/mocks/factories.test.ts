@@ -1,10 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import {
-  createMockPrisma,
-  mockTransaction,
-  assertSuccess,
-  assertFailure,
-} from "./factories";
+import { createMockPrisma, mockTransaction, assertSuccess, assertFailure } from "./factories";
 
 describe("createMockPrisma", () => {
   describe("$transaction default behavior", () => {
@@ -84,14 +79,14 @@ describe("assertSuccess", () => {
 
   it("throws when passed a failure result", () => {
     const result = { success: false as const, error: "bad" };
-    expect(() => assertSuccess(result)).toThrow(
-      "Expected success result but got failure",
-    );
+    expect(() => assertSuccess(result)).toThrow("Expected success result but got failure");
   });
 
   it("narrows TypeScript type to success branch", () => {
-    const result: { success: true; data: string } | { success: false; error: string } =
-      { success: true, data: "hello" };
+    const result: { success: true; data: string } | { success: false; error: string } = {
+      success: true,
+      data: "hello",
+    };
     assertSuccess(result);
     expect(result.data).toBe("hello");
   });
@@ -105,14 +100,14 @@ describe("assertFailure", () => {
 
   it("throws when passed a success result", () => {
     const result = { success: true as const, data: "x" };
-    expect(() => assertFailure(result)).toThrow(
-      "Expected failure result but got success",
-    );
+    expect(() => assertFailure(result)).toThrow("Expected failure result but got success");
   });
 
   it("narrows TypeScript type to failure branch", () => {
-    const result: { success: true; data: string } | { success: false; error: string } =
-      { success: false, error: "oops" };
+    const result: { success: true; data: string } | { success: false; error: string } = {
+      success: false,
+      error: "oops",
+    };
     assertFailure(result);
     expect(result.error).toBe("oops");
   });

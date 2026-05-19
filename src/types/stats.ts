@@ -63,8 +63,19 @@ export interface LocalDateBoundaries {
 
 // ─── Monthly Totals ─────────────────────────────────────────────────────────
 
-export type MonthLabel = "Jan" | "Feb" | "Mar" | "Apr" | "May" | "Jun"
-  | "Jul" | "Aug" | "Sep" | "Oct" | "Nov" | "Dec";
+export type MonthLabel =
+  | "Jan"
+  | "Feb"
+  | "Mar"
+  | "Apr"
+  | "May"
+  | "Jun"
+  | "Jul"
+  | "Aug"
+  | "Sep"
+  | "Oct"
+  | "Nov"
+  | "Dec";
 
 export interface MonthlyTotal {
   month: MonthLabel;
@@ -225,4 +236,3 @@ export interface BrokenRecord {
   newValue: number;
   unit: string;
 }
-

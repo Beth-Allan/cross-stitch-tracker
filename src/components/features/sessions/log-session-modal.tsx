@@ -298,7 +298,7 @@ export function LogSessionModal({
                         placeholder="Search projects..."
                         value={projectSearch}
                         onChange={(e) => setProjectSearch(e.target.value)}
-                        className="bg-muted border-input w-full rounded-md border py-1.5 pr-3 pl-8 text-sm outline-none focus:ring-1 focus:ring-primary/40"
+                        className="bg-muted border-input focus:ring-primary/40 w-full rounded-md border py-1.5 pr-3 pl-8 text-sm outline-none focus:ring-1"
                         autoFocus
                       />
                     </div>
@@ -313,7 +313,7 @@ export function LogSessionModal({
                           setShowProjectDropdown(false);
                           setProjectSearch("");
                         }}
-                        className={`flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors hover:bg-accent ${
+                        className={`hover:bg-accent flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors ${
                           project.projectId === selectedProjectId
                             ? "bg-primary/10 text-primary"
                             : "text-foreground"
@@ -467,7 +467,7 @@ export function LogSessionModal({
                 <button
                   type="button"
                   onClick={handlePhotoClick}
-                  className="text-xs text-primary hover:underline"
+                  className="text-primary text-xs hover:underline"
                 >
                   Replace photo
                 </button>
@@ -477,7 +477,7 @@ export function LogSessionModal({
                 type="button"
                 onClick={handlePhotoClick}
                 disabled={isUploading}
-                className="border-border text-muted-foreground flex w-full items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-2 text-sm transition-colors hover:border-primary hover:text-primary"
+                className="border-border text-muted-foreground hover:border-primary hover:text-primary flex w-full items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-2 text-sm transition-colors"
               >
                 <Camera className="h-4 w-4" />
                 {isUploading ? "Uploading..." : "Add progress photo"}

@@ -1,10 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import {
-  createMockPrisma,
-  createMockGenre,
-  assertSuccess,
-  assertFailure,
-} from "@/__tests__/mocks";
+import { createMockPrisma, createMockGenre, assertSuccess, assertFailure } from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();

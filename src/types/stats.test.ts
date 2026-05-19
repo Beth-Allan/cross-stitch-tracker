@@ -28,8 +28,18 @@ describe("Activity Visualization Types", () => {
   describe("MonthLabel", () => {
     it("accepts all 12 month abbreviations", () => {
       const months: MonthLabel[] = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
       ];
       expect(months).toHaveLength(12);
     });
