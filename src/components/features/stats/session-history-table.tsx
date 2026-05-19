@@ -1,6 +1,6 @@
 "use client";
 
-import { useQueryState, parseAsInteger, parseAsString, parseAsStringLiteral } from "nuqs";
+import { useQueryStates, parseAsInteger, parseAsString, parseAsStringLiteral } from "nuqs";
 import Link from "next/link";
 import { ArrowUpDown, Camera } from "lucide-react";
 import { format, parseISO } from "date-fns";
@@ -32,30 +32,23 @@ interface SessionHistoryTableProps {
 }
 
 export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps) {
-  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
-  const [sort, setSort] = useQueryState(
-    "sort",
-    parseAsStringLiteral([...SORT_FIELDS]).withDefault("date"),
-  );
-  const [dir, setDir] = useQueryState(
-    "dir",
-    parseAsStringLiteral([...SORT_DIRS]).withDefault("desc"),
-  );
-  const [project, setProject] = useQueryState("project", parseAsString.withDefault("all"));
+  const [params, setParams] = useQueryStates({
+    page: parseAsInteger.withDefault(1),
+    sort: parseAsStringLiteral([...SORT_FIELDS]).withDefault("date"),
+    dir: parseAsStringLiteral([...SORT_DIRS]).withDefault("desc"),
+    project: parseAsString.withDefault("all"),
+  });
 
   function handleSort(field: SortField) {
-    if (sort === field) {
-      void setDir(dir === "asc" ? "desc" : "asc");
+    if (params.sort === field) {
+      void setParams({ dir: params.dir === "asc" ? "desc" : "asc", page: 1 });
     } else {
-      void setSort(field);
-      void setDir("desc");
+      void setParams({ sort: field, dir: "desc", page: 1 });
     }
-    void setPage(1);
   }
 
   function handleProjectFilter(value: string | null) {
-    void setProject(value ?? "all");
-    void setPage(1);
+    void setParams({ project: value ?? "all", page: 1 });
   }
 
   return (
@@ -65,7 +58,7 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
         <h3 className="font-heading text-sm font-semibold">Session History</h3>
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground text-xs">Project</span>
-          <Select value={project} onValueChange={handleProjectFilter}>
+          <Select value={params.project} onValueChange={handleProjectFilter}>
             <SelectTrigger size="sm">
               <SelectValue />
             </SelectTrigger>
@@ -89,20 +82,20 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
               <TableHead>
                 <button onClick={() => handleSort("date")} className="flex items-center gap-1">
                   Date
-                  {sort === "date" && <ArrowUpDown className="text-success h-3 w-3" />}
+                  {params.sort === "date" && <ArrowUpDown className="text-success h-3 w-3" />}
                 </button>
               </TableHead>
               <TableHead>Project</TableHead>
               <TableHead>
                 <button onClick={() => handleSort("stitches")} className="flex items-center gap-1">
                   Stitches
-                  {sort === "stitches" && <ArrowUpDown className="text-success h-3 w-3" />}
+                  {params.sort === "stitches" && <ArrowUpDown className="text-success h-3 w-3" />}
                 </button>
               </TableHead>
               <TableHead>
                 <button onClick={() => handleSort("time")} className="flex items-center gap-1">
                   Time
-                  {sort === "time" && <ArrowUpDown className="text-success h-3 w-3" />}
+                  {params.sort === "time" && <ArrowUpDown className="text-success h-3 w-3" />}
                 </button>
               </TableHead>
               <TableHead className="w-10" />
@@ -159,8 +152,8 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
             <Button
               variant="outline"
               size="sm"
-              onClick={() => void setPage(page - 1)}
-              disabled={page <= 1}
+              onClick={() => void setParams({ page: params.page - 1 })}
+              disabled={params.page <= 1}
               aria-label="Previous"
             >
               Previous
@@ -168,8 +161,8 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
             <Button
               variant="outline"
               size="sm"
-              onClick={() => void setPage(page + 1)}
-              disabled={page >= data.totalPages}
+              onClick={() => void setParams({ page: params.page + 1 })}
+              disabled={params.page >= data.totalPages}
               aria-label="Next"
             >
               Next
