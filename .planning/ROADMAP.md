@@ -137,13 +137,14 @@ Plans:
 ### Phase 24: Code Quality
 **Goal**: Stats types use precise TypeScript representations, shared utilities are deduplicated, and code comments follow project conventions
 **Depends on**: Phase 22
-**Requirements**: QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05, QUAL-06, QUAL-07, QUAL-08, QUAL-09, QUAL-10, QUAL-11, QUAL-12, QUAL-13, QUAL-14
+**Requirements**: QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05, QUAL-06, QUAL-07, QUAL-08, QUAL-09, QUAL-10, QUAL-11, QUAL-12, QUAL-13, QUAL-14, QUAL-15, QUAL-16
 **Success Criteria** (what must be TRUE):
   1. strandCount, MonthLabel, DayLabel, and BrokenRecordType use literal union types instead of broad string/number
   2. PersonalBestRecord is a discriminated union with no nullable fields that should be required per variant
   3. SORT_FIELDS/SORT_DIRS, buildDateFilter, and Scope type each have a single source of truth with no duplicated definitions
   4. All WHAT-comments (~27), low-harm JSX section markers (~20), and planning doc references are removed from code
   5. Hardcoded emerald-* classes in log-session-modal use semantic design tokens
+  6. assertSuccess/assertFailure test helpers exist and all vacuous assertion patterns are replaced project-wide
 **Plans**: TBD
 
 ### Phase 25: Shopping Cart Scaling

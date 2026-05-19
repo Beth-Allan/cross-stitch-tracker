@@ -46,6 +46,8 @@ Requirements for v1.6 Cleanup & Hardening. Each maps to roadmap phases.
 - [ ] **QUAL-12**: AvailableYearsData wrapper removed, returning number[] directly
 - [ ] **QUAL-13**: Shared buildDateFilter and Scope type extracted from 6 stats query modules
 - [ ] **QUAL-14**: Planning doc references cleaned from code comments
+- [ ] **QUAL-15**: assertSuccess/assertFailure test assertion helpers added to test infrastructure
+- [ ] **QUAL-16**: Project-wide vacuous assertion sweep (43 instances across 12 files) replaced with assertSuccess guards
 
 ### UX Polish
 
@@ -141,6 +143,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-12 | Phase 24 | Pending |
 | QUAL-13 | Phase 24 | Pending |
 | QUAL-14 | Phase 24 | Pending |
+| QUAL-15 | Phase 24 | Pending |
+| QUAL-16 | Phase 24 | Pending |
 | UX-01 | Phase 26 | Pending |
 | UX-02 | Phase 26 | Pending |
 | UX-03 | Phase 26 | Pending |
@@ -157,8 +161,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-14 | Phase 26 | Pending |
 
 **Coverage:**
-- v1.6 requirements: 42 total
-- Mapped to phases: 42
+- v1.6 requirements: 44 total
+- Mapped to phases: 44
 - Unmapped: 0
 
 ---
