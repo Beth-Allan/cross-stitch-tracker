@@ -33,7 +33,7 @@ Declared values (must be multiples of 4):
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px | Icon gaps, inline padding, gap-1 |
-| sm | 8px | Compact element spacing, gap-2, p-2 |
+| sm | 8px | Compact element spacing, gap-2, p-2, collapsible group header vertical padding (py-2) |
 | md | 16px | Default element spacing, p-4, gap-4 |
 | lg | 24px | Section padding, py-6, gap-6 |
 | xl | 32px | Layout gaps, gap-8 |
@@ -41,7 +41,6 @@ Declared values (must be multiples of 4):
 
 Exceptions:
 - Touch targets: 44px minimum on increment/decrement buttons (existing `min-h-[44px] min-w-[44px]` pattern on QuantityControl)
-- Collapsible group headers: 12px vertical padding (py-3) to keep groups compact when many are visible
 
 ---
 
@@ -50,15 +49,15 @@ Exceptions:
 | Role | Size | Weight | Line Height | Font |
 |------|------|--------|-------------|------|
 | Body | 14px (text-sm) | 400 (normal) | 1.5 (leading-normal) | Source Sans 3 |
-| Label | 11px (text-[11px]) | 700 (bold) | 1.3 | Source Sans 3 |
+| Label | 11px (text-[11px]) | 600 (semibold) | 1.3 | Source Sans 3 |
 | Heading | 16px (text-base) | 600 (semibold) | 1.2 | Fraunces |
-| Meta | 12px (text-xs) | 500 (medium) | 1.5 | Source Sans 3 |
+| Meta | 12px (text-xs) | 400 (normal) | 1.5 | Source Sans 3 |
 
 Phase-specific notes:
-- Group header labels use the existing `text-[11px] font-bold tracking-wider uppercase` pattern from SupplyGroup section headers
+- Group header labels use `text-[11px] font-semibold tracking-wider uppercase` (updated from font-bold to stay within 2-weight budget; visually equivalent at 11px)
 - Project names in accordion rows use `text-sm font-semibold` (14px, 600 weight)
 - Search input uses `text-sm` (14px) matching the existing Input component
-- Count badges use `font-mono text-[11px] font-bold` matching the existing Badge component in shopping-cart.tsx
+- Count badges use `font-mono text-[11px] font-semibold` (updated from font-bold to stay within 2-weight budget)
 
 ---
 
@@ -79,14 +78,14 @@ Accent reserved for:
 - "Select all" / "Select all in group" action links
 - Count badge in ShoppingForBar pills (`bg-selected text-selected-foreground`)
 
-Status-specific colors (used in group headers, reusing STATUS_CONFIG):
-- Kitting: `bg-amber-50 text-amber-700` (dark: `bg-amber-950/40 text-amber-300`)
-- Stitching: `bg-sky-50 text-sky-700` (dark: `bg-sky-950/40 text-sky-300`)
-- On Hold: `bg-orange-50 text-orange-700` (dark: `bg-orange-950/40 text-orange-300`)
-- Unstarted: `bg-muted text-muted-foreground`
-- Ready/Kitted: `bg-emerald-50 text-emerald-700` (dark: `bg-emerald-950/40 text-emerald-300`)
-- Finished: `bg-violet-50 text-violet-700` (dark: `bg-violet-950/40 text-violet-300`)
-- FFO: `bg-rose-50 text-rose-700` (dark: `bg-rose-950/40 text-rose-300`)
+Status-specific colors (used in group headers):
+- Consume `STATUS_CONFIG[status].bgClass`, `.textClass`, `.dotClass`, and `.darkBgClass` from `src/lib/utils/status.ts` directly. Do NOT hardcode raw Tailwind color scales (e.g., `bg-amber-50 text-amber-700`). The STATUS_CONFIG constant is the single source of truth for status colors and already includes dark mode variants. Apply as `cn(config.bgClass, config.darkBgClass, config.textClass)` on the group header element.
+
+---
+
+## Visual Focal Point
+
+The primary visual anchor is the search input — it sits at the top of the content area (below the ShoppingForBar) and is the first element the user reaches to tame the 75+ project list. Its position and full-width layout draw the eye as the entry point to all filtering and selection workflows.
 
 ---
 
@@ -215,6 +214,7 @@ The search input sits between the ShoppingForBar and the Tabs component. It is a
 ```
 
 - Group header: flex row with chevron, status dot + label, count badge, and right-aligned "Select all" link
+- Group header vertical padding: 8px (py-2) for compact headers when many groups are visible
 - Group body: existing ProjectAccordion card layout, unchanged
 - Gap between groups: 16px (gap-4)
 - Gap between cards within group: 8px (gap-2, matching existing)
