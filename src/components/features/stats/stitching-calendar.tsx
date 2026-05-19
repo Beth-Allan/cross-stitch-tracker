@@ -118,7 +118,6 @@ export function StitchingCalendar({ data, initialMonth, initialYear }: Stitching
 
   return (
     <div className="border-border bg-card overflow-hidden rounded-xl border">
-      {/* Month navigation header */}
       <div className="border-border flex items-center justify-between border-b px-5 py-3">
         <Button
           variant="ghost"
@@ -141,7 +140,6 @@ export function StitchingCalendar({ data, initialMonth, initialYear }: Stitching
         </Button>
       </div>
 
-      {/* Weekday headers */}
       <div className="border-border grid grid-cols-7 border-b">
         {WEEKDAYS.map((day) => (
           <div
@@ -153,7 +151,6 @@ export function StitchingCalendar({ data, initialMonth, initialYear }: Stitching
         ))}
       </div>
 
-      {/* Calendar grid */}
       <div className={`grid grid-cols-7 ${isPending ? "opacity-50" : ""}`}>
         {calendarCells.map((dayNum, i) => {
           if (dayNum === null) {
@@ -177,7 +174,6 @@ export function StitchingCalendar({ data, initialMonth, initialYear }: Stitching
                 isTodayDate ? "bg-success-muted" : ""
               }`}
             >
-              {/* Day number */}
               <div className="mb-1">
                 {isTodayDate ? (
                   <span
@@ -191,7 +187,6 @@ export function StitchingCalendar({ data, initialMonth, initialYear }: Stitching
                 )}
               </div>
 
-              {/* Session pills - full on sm+, dots on mobile */}
               {dayData?.sessions.map((session, si) => {
                 const colorIndex = projectColorMap.get(session.projectId) ?? 0;
                 return (
@@ -210,7 +205,6 @@ export function StitchingCalendar({ data, initialMonth, initialYear }: Stitching
                 );
               })}
 
-              {/* Mobile dots */}
               {dayData?.sessions && dayData.sessions.length > 0 && (
                 <div className="flex gap-0.5 sm:hidden">
                   {dayData.sessions.map((session, si) => {
@@ -232,12 +226,10 @@ export function StitchingCalendar({ data, initialMonth, initialYear }: Stitching
         })}
       </div>
 
-      {/* Empty state */}
       {isEmpty && (
         <div className="text-muted-foreground py-8 text-center text-sm">No sessions this month</div>
       )}
 
-      {/* Calendar legend */}
       {!isEmpty && (
         <div
           data-testid="calendar-legend"
