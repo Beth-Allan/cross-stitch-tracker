@@ -405,7 +405,7 @@ export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): Gal
 
 // ─── Session Factory ──────────────────────────────────────────────────────
 
-export function createMockStitchSession(overrides?: Partial<StitchSession>) {
+export function createMockStitchSession(overrides?: Partial<StitchSession>): StitchSession {
   return {
     id: "session-1",
     projectId: "project-1",
@@ -622,9 +622,7 @@ export function assertSuccess<T extends { success: boolean }>(
   result: T,
 ): asserts result is T & { success: true } {
   if (!result.success) {
-    throw new Error(
-      `Expected success result but got failure: ${JSON.stringify(result)}`,
-    );
+    throw new Error(`Expected success result but got failure: ${JSON.stringify(result)}`);
   }
 }
 
@@ -636,8 +634,6 @@ export function assertFailure<T extends { success: boolean }>(
   result: T,
 ): asserts result is T & { success: false } {
   if (result.success) {
-    throw new Error(
-      `Expected failure result but got success: ${JSON.stringify(result)}`,
-    );
+    throw new Error(`Expected failure result but got success: ${JSON.stringify(result)}`);
   }
 }
