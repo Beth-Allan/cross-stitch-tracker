@@ -5,8 +5,8 @@ import {
   parseAsStringLiteral,
 } from "nuqs/server";
 
-const SORT_FIELDS = ["date", "stitches", "time"] as const;
-const SORT_DIRS = ["asc", "desc"] as const;
+export const SORT_FIELDS = ["date", "stitches", "time"] as const;
+export const SORT_DIRS = ["asc", "desc"] as const;
 
 export const statsSearchParamsCache = createSearchParamsCache({
   page: parseAsInteger.withDefault(1),
