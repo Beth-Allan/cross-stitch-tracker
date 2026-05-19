@@ -24,7 +24,7 @@ describe("getAvailableYears", () => {
     const { getAvailableYears } = await import("./available-years");
     const result = await getAvailableYears("user-1");
 
-    expect(result).toEqual({ years: [] });
+    expect(result).toEqual([]);
   });
 
   it("returns distinct years descending from session dates", async () => {
@@ -38,7 +38,7 @@ describe("getAvailableYears", () => {
     const { getAvailableYears } = await import("./available-years");
     const result = await getAvailableYears("user-1");
 
-    expect(result.years).toEqual([2026, 2025]);
+    expect(result).toEqual([2026, 2025]);
   });
 
   it("deduplicates years from sessions in the same year", async () => {
@@ -51,6 +51,6 @@ describe("getAvailableYears", () => {
     const { getAvailableYears } = await import("./available-years");
     const result = await getAvailableYears("user-1");
 
-    expect(result.years).toEqual([2026]);
+    expect(result).toEqual([2026]);
   });
 });

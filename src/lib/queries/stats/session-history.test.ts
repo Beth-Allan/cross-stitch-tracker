@@ -8,6 +8,10 @@ vi.mock("next/cache", () => ({
   unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
 }));
 
+vi.mock("./timezone", () => ({
+  getUserTimezone: () => "America/Edmonton",
+}));
+
 describe("getSessionHistory", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -74,19 +78,19 @@ describe("getSessionHistory", () => {
     mockPrisma.stitchSession.findMany.mockResolvedValue([
       {
         id: "s1",
-        date: new Date("2026-05-10"),
+        date: new Date("2026-05-10T14:00:00Z"),
         stitchCount: 150,
         timeSpentMinutes: 45,
         photoKey: "photos/session-1.webp",
-        project: { id: "p1", chart: { name: "Project A" } },
+        project: { id: "p1", chartId: "c1", chart: { name: "Project A" } },
       },
       {
         id: "s2",
-        date: new Date("2026-05-11"),
+        date: new Date("2026-05-11T14:00:00Z"),
         stitchCount: 200,
         timeSpentMinutes: null,
         photoKey: null,
-        project: { id: "p2", chart: { name: "Project B" } },
+        project: { id: "p2", chartId: "c2", chart: { name: "Project B" } },
       },
     ]);
     mockPrisma.stitchSession.count.mockResolvedValue(2);
@@ -97,8 +101,9 @@ describe("getSessionHistory", () => {
     expect(result.sessions).toHaveLength(2);
     expect(result.sessions[0]).toEqual({
       id: "s1",
-      date: new Date("2026-05-10"),
+      date: "2026-05-10",
       projectId: "p1",
+      chartId: "c1",
       projectName: "Project A",
       stitchCount: 150,
       timeSpentMinutes: 45,
@@ -106,8 +111,9 @@ describe("getSessionHistory", () => {
     });
     expect(result.sessions[1]).toEqual({
       id: "s2",
-      date: new Date("2026-05-11"),
+      date: "2026-05-11",
       projectId: "p2",
+      chartId: "c2",
       projectName: "Project B",
       stitchCount: 200,
       timeSpentMinutes: null,

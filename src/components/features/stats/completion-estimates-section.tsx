@@ -38,7 +38,7 @@ export function CompletionEstimatesSection({ items }: CompletionEstimatesSection
                     {item.projectName}
                   </Link>
                   <span className="text-muted-foreground font-mono text-sm tabular-nums">
-                    {item.estimatedDate}
+                    ~{item.estimatedDate}
                   </span>
                 </div>
                 <div className="mb-1 flex items-center gap-2">

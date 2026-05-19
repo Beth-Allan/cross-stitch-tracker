@@ -12,7 +12,7 @@ const mockItems: CompletionEstimate[] = [
     stitchesCompleted: 4000,
     totalStitches: 5000,
     percentComplete: 80,
-    estimatedDate: "~Jun 2026",
+    estimatedDate: "Jun 2026",
     avgPerDay: 133.3,
   },
   {
@@ -22,7 +22,7 @@ const mockItems: CompletionEstimate[] = [
     stitchesCompleted: 17000,
     totalStitches: 50000,
     percentComplete: 34,
-    estimatedDate: "~Aug 2027",
+    estimatedDate: "Aug 2027",
     avgPerDay: 50,
   },
 ];

@@ -49,7 +49,7 @@ describe("getCompletionEstimates", () => {
     expect(result[0].totalStitches).toBe(10000);
     expect(result[0].percentComplete).toBe(30);
     expect(result[0].avgPerDay).toBeGreaterThan(0);
-    expect(result[0].estimatedDate).toMatch(/^~[A-Z][a-z]{2} \d{4}$/);
+    expect(result[0].estimatedDate).toMatch(/^[A-Z][a-z]{2} \d{4}$/);
   });
 
   it("excludes projects with fewer than 3 sessions", async () => {
@@ -117,7 +117,7 @@ describe("getCompletionEstimates", () => {
     const { getCompletionEstimates } = await import("./completion-estimates");
     const result = await getCompletionEstimates("user-1", "all");
 
-    expect(result[0].estimatedDate).toMatch(/^~[A-Z][a-z]{2} \d{4}$/);
+    expect(result[0].estimatedDate).toMatch(/^[A-Z][a-z]{2} \d{4}$/);
   });
 
   it("sorts by soonest estimated date first", async () => {
@@ -251,7 +251,7 @@ describe("getProjectCompletionEstimate", () => {
     expect(result!.chartId).toBe("c1");
     expect(result!.projectName).toBe("Big Project");
     expect(result!.percentComplete).toBe(30);
-    expect(result!.estimatedDate).toMatch(/^~[A-Z][a-z]{2} \d{4}$/);
+    expect(result!.estimatedDate).toMatch(/^[A-Z][a-z]{2} \d{4}$/);
   });
 
   it("returns null when project has no target stitches", async () => {

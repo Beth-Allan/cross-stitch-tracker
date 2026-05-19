@@ -2,9 +2,8 @@ import { unstable_cache } from "next/cache";
 import { TZDate } from "@date-fns/tz";
 import { prisma } from "@/lib/db";
 import { getUserTimezone } from "./timezone";
-import type { AvailableYearsData } from "@/types/stats";
 
-async function computeAvailableYears(userId: string): Promise<AvailableYearsData> {
+async function computeAvailableYears(userId: string): Promise<number[]> {
   try {
     const tz = getUserTimezone(userId);
 
@@ -15,7 +14,7 @@ async function computeAvailableYears(userId: string): Promise<AvailableYearsData
     });
 
     if (sessions.length === 0) {
-      return { years: [] };
+      return [];
     }
 
     const yearSet = new Set<number>();
@@ -25,7 +24,7 @@ async function computeAvailableYears(userId: string): Promise<AvailableYearsData
     }
 
     const years = [...yearSet].sort((a, b) => b - a);
-    return { years };
+    return years;
   } catch (error) {
     console.error("[stats] computeAvailableYears failed:", { userId, error });
     throw error;

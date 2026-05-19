@@ -29,20 +29,12 @@ const mockPersonalBests: PersonalBestRecord[] = [
     label: "Longest Streak",
     value: 45,
     unit: "days",
-    date: "2026-01-01",
-    projectId: "proj-1",
-    chartId: "chart-1",
-    projectName: "Spring Garden",
   },
   {
     type: "currentStreak",
     label: "Current Streak",
     value: 12,
     unit: "days",
-    date: null,
-    projectId: null,
-    chartId: null,
-    projectName: null,
   },
 ];
 
