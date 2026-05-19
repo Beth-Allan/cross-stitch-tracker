@@ -88,7 +88,7 @@ Full details: `milestones/v1.5-ROADMAP.md`
 
 </details>
 
-### 🚧 v1.6 Cleanup & Hardening (In Progress)
+### v1.6 Cleanup & Hardening (In Progress)
 
 **Milestone Goal:** Address all accumulated backlog items -- bug fixes, test gaps, code quality issues, UX polish, cache correctness, and silent failure handling -- to harden the app before building new features.
 
@@ -145,7 +145,12 @@ Plans:
   4. All WHAT-comments (~27), low-harm JSX section markers (~20), and planning doc references are removed from code
   5. Hardcoded emerald-* classes in log-session-modal use semantic design tokens
   6. assertSuccess/assertFailure test helpers exist and all vacuous assertion patterns are replaced project-wide
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 24-01-PLAN.md -- Type contracts: literal unions, discriminated union, shared buildDateFilter, SORT exports, convention rule
+- [ ] 24-02-PLAN.md -- Consumer updates: query modules, components, and page wired to new types and shared utils
+- [ ] 24-03-PLAN.md -- Comment cleanup: JSX markers, semantic tokens, WHAT-comments, planning doc references
+- [ ] 24-04-PLAN.md -- Test assertion guards: assertSuccess/assertFailure helpers + vacuous assertion sweep
 
 ### Phase 25: Shopping Cart Scaling
 **Goal**: The shopping cart is usable with 75+ projects through search, filtering, status grouping, and supply-type search
@@ -203,6 +208,6 @@ Phase 22 first (foundation). Phases 23, 24, 25, 26 depend only on Phase 22 and c
 | 21. Records, Insights & Celebrations | v1.5 | 4/4 | Complete | 2026-05-18 |
 | 22. Critical Fixes & Test Infrastructure | v1.6 | 3/3 | Complete    | 2026-05-18 |
 | 23. Test Coverage & Reliability | v1.6 | 3/3 | Complete    | 2026-05-18 |
-| 24. Code Quality | v1.6 | 0/? | Not started | - |
+| 24. Code Quality | v1.6 | 0/4 | Not started | - |
 | 25. Shopping Cart Scaling | v1.6 | 0/? | Not started | - |
 | 26. UX Polish | v1.6 | 0/? | Not started | - |
