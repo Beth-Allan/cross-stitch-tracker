@@ -67,8 +67,8 @@ export type ChartFormInput = z.infer<typeof chartFormSchema>;
 
 /**
  * Validates the batch supply payload for createChartWithSupplies.
- * Each array is capped at 500 items to prevent oversized payloads (T-13-03).
- * supplyId must be non-empty to prevent phantom junction records (T-13-02).
+ * Each array is capped at 500 items to prevent oversized payloads.
+ * supplyId must be non-empty to prevent phantom junction records.
  */
 export const batchSupplySchema = z.object({
   threads: z

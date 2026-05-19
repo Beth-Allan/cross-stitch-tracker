@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma } from "@/__tests__/mocks";
+import { createMockPrisma, assertFailure } from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -459,20 +459,16 @@ describe("shopping-cart-actions", () => {
       const { updateSupplyAcquired } = await import("./shopping-cart-actions");
       const result = await updateSupplyAcquired("thread", "junction-1", -1);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBeDefined();
-      }
+      assertFailure(result);
+      expect(result.error).toBeDefined();
     });
 
     it("rejects non-integer quantity (Zod validation error)", async () => {
       const { updateSupplyAcquired } = await import("./shopping-cart-actions");
       const result = await updateSupplyAcquired("thread", "junction-1", 1.5);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBeDefined();
-      }
+      assertFailure(result);
+      expect(result.error).toBeDefined();
     });
 
     it("updates quantityAcquired for thread type and revalidates /shopping path", async () => {

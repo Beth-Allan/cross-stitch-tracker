@@ -81,7 +81,20 @@ vi.mock("./monthly-drill-down", () => ({
     ),
 }));
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+] as const;
 
 const mockMonthlyData: MonthlyTotal[] = MONTHS.map((month) => ({
   month,

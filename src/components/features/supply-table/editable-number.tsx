@@ -13,8 +13,8 @@ import { useState, useEffect, useRef } from "react";
  * - Escape: reverts to original value
  * - Blur: saves if valid, reverts if invalid (NaN or negative)
  *
- * Threat mitigation T-10-01: validates parseInt result is non-negative
- * before calling onSave; reverts on invalid input.
+ * Validates parseInt result is non-negative before calling onSave;
+ * reverts on invalid input.
  */
 export function EditableNumber({
   value,

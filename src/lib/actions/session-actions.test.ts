@@ -1,5 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, createMockStitchSession } from "@/__tests__/mocks";
+import {
+  createMockPrisma,
+  createMockStitchSession,
+  assertSuccess,
+  assertFailure,
+} from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -126,10 +131,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Project not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Project not found");
     });
 
     it("createSession rejects when project does not exist", async () => {
@@ -144,10 +147,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Project not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Project not found");
     });
 
     it("updateSession rejects when session's project belongs to different user", async () => {
@@ -165,10 +166,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Session not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Session not found");
     });
 
     it("deleteSession rejects when session's project belongs to different user", async () => {
@@ -180,10 +179,8 @@ describe("session-actions", () => {
       const { deleteSession } = await import("./session-actions");
       const result = await deleteSession("session-1");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Session not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Session not found");
     });
 
     it("getSessionsForProject rejects when project belongs to different user", async () => {
@@ -195,10 +192,8 @@ describe("session-actions", () => {
       const { getSessionsForProject } = await import("./session-actions");
       const result = await getSessionsForProject("proj-1");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Project not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Project not found");
     });
 
     it("getProjectSessionStats rejects when project belongs to different user", async () => {
@@ -210,10 +205,8 @@ describe("session-actions", () => {
       const { getProjectSessionStats } = await import("./session-actions");
       const result = await getProjectSessionStats("proj-1");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Project not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Project not found");
     });
   });
 
@@ -230,10 +223,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBeTruthy();
-      }
+      assertFailure(result);
+      expect(result.error).toBeTruthy();
     });
 
     it("createSession rejects zero stitch count", async () => {
@@ -300,10 +291,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.session).toBeDefined();
-      }
+      assertSuccess(result);
+      expect(result.session).toBeDefined();
       expect(mockPrisma.$transaction).toHaveBeenCalled();
     });
 
@@ -509,10 +498,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.brokenRecords).toEqual(brokenRecords);
-      }
+      assertSuccess(result);
+      expect(result.brokenRecords).toEqual(brokenRecords);
       expect(mockDetectBrokenRecords).toHaveBeenCalledWith("user-1", {
         date: new Date("2026-04-10"),
         stitchCount: 500,
@@ -553,10 +540,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.brokenRecords).toEqual([]);
-      }
+      assertSuccess(result);
+      expect(result.brokenRecords).toEqual([]);
     });
 
     it("succeeds when detectBrokenRecords throws (non-blocking)", async () => {
@@ -592,10 +577,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.brokenRecords).toEqual([]);
-      }
+      assertSuccess(result);
+      expect(result.brokenRecords).toEqual([]);
     });
 
     it("logs warning when raw file cleanup fails", async () => {
@@ -679,10 +662,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.warning).toBe("overTotal");
-      }
+      assertSuccess(result);
+      expect(result.warning).toBe("overTotal");
     });
 
     it("does not return warning when progress stays under 100%", async () => {
@@ -718,10 +699,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.warning).toBeUndefined();
-      }
+      assertSuccess(result);
+      expect(result.warning).toBeUndefined();
     });
 
     it("does not return warning when chart has no stitchCount", async () => {
@@ -757,10 +736,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.warning).toBeUndefined();
-      }
+      assertSuccess(result);
+      expect(result.warning).toBeUndefined();
     });
 
     it("saves session even when overTotal warning is returned", async () => {
@@ -796,12 +773,10 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(true);
+      assertSuccess(result);
       expect(mockPrisma.$transaction).toHaveBeenCalled();
-      if (result.success) {
-        expect(result.warning).toBe("overTotal");
-        expect(result.session).toBeDefined();
-      }
+      expect(result.warning).toBe("overTotal");
+      expect(result.session).toBeDefined();
     });
   });
 
@@ -839,10 +814,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.session).toBeDefined();
-      }
+      assertSuccess(result);
+      expect(result.session).toBeDefined();
       expect(mockPrisma.$transaction).toHaveBeenCalled();
     });
 
@@ -858,10 +831,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Session not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Session not found");
     });
 
     it("calls revalidatePath after update", async () => {
@@ -934,10 +905,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.warning).toBe("overTotal");
-      }
+      assertSuccess(result);
+      expect(result.warning).toBe("overTotal");
     });
 
     it("does not return overTotal warning when updated stitch count stays under 100%", async () => {
@@ -976,10 +945,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.warning).toBeUndefined();
-      }
+      assertSuccess(result);
+      expect(result.warning).toBeUndefined();
     });
 
     it("optimizes new photo on update when photoKey is present", async () => {
@@ -1218,10 +1185,8 @@ describe("session-actions", () => {
       const { deleteSession } = await import("./session-actions");
       const result = await deleteSession("nonexistent");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Session not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Session not found");
     });
 
     it("calls revalidatePath after deletion", async () => {
@@ -1364,11 +1329,9 @@ describe("session-actions", () => {
       const { getSessionsForProject } = await import("./session-actions");
       const result = await getSessionsForProject("proj-1");
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.sessions).toHaveLength(2);
-        expect(result.sessions[0].projectName).toBe("My Pattern");
-      }
+      assertSuccess(result);
+      expect(result.sessions).toHaveLength(2);
+      expect(result.sessions[0].projectName).toBe("My Pattern");
     });
   });
 
@@ -1391,12 +1354,10 @@ describe("session-actions", () => {
       const { getAllSessions } = await import("./session-actions");
       const result = await getAllSessions();
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.sessions).toHaveLength(2);
-        expect(result.sessions[0].projectName).toBe("Pattern A");
-        expect(result.sessions[1].projectName).toBe("Pattern B");
-      }
+      assertSuccess(result);
+      expect(result.sessions).toHaveLength(2);
+      expect(result.sessions[0].projectName).toBe("Pattern A");
+      expect(result.sessions[1].projectName).toBe("Pattern B");
     });
   });
 
@@ -1430,13 +1391,11 @@ describe("session-actions", () => {
       const { getActiveProjectsForPicker } = await import("./session-actions");
       const result = await getActiveProjectsForPicker();
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.projects).toHaveLength(2);
-        expect(result.projects[0].chartName).toBe("WIP Pattern");
-        expect(result.projects[0].status).toBe("IN_PROGRESS");
-        expect(result.projects[1].chartName).toBe("Kitted Pattern");
-      }
+      assertSuccess(result);
+      expect(result.projects).toHaveLength(2);
+      expect(result.projects[0].chartName).toBe("WIP Pattern");
+      expect(result.projects[0].status).toBe("IN_PROGRESS");
+      expect(result.projects[1].chartName).toBe("Kitted Pattern");
     });
 
     it("filters by active statuses: IN_PROGRESS, ON_HOLD, KITTING, KITTED", async () => {
@@ -1474,13 +1433,11 @@ describe("session-actions", () => {
       const { getProjectSessionStats } = await import("./session-actions");
       const result = await getProjectSessionStats("proj-1");
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.stats.totalStitches).toBe(1500);
-        expect(result.stats.sessionsLogged).toBe(10);
-        expect(result.stats.avgPerSession).toBe(150);
-        expect(result.stats.activeSince).toEqual(new Date("2026-01-15"));
-      }
+      assertSuccess(result);
+      expect(result.stats.totalStitches).toBe(1500);
+      expect(result.stats.sessionsLogged).toBe(10);
+      expect(result.stats.avgPerSession).toBe(150);
+      expect(result.stats.activeSince).toEqual(new Date("2026-01-15"));
     });
 
     it("returns zero stats for a project with no sessions", async () => {
@@ -1498,13 +1455,11 @@ describe("session-actions", () => {
       const { getProjectSessionStats } = await import("./session-actions");
       const result = await getProjectSessionStats("proj-1");
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.stats.totalStitches).toBe(0);
-        expect(result.stats.sessionsLogged).toBe(0);
-        expect(result.stats.avgPerSession).toBe(0);
-        expect(result.stats.activeSince).toBeNull();
-      }
+      assertSuccess(result);
+      expect(result.stats.totalStitches).toBe(0);
+      expect(result.stats.sessionsLogged).toBe(0);
+      expect(result.stats.avgPerSession).toBe(0);
+      expect(result.stats.activeSince).toBeNull();
     });
   });
 });

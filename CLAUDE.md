@@ -38,9 +38,17 @@
   - Fixed: updateSession missing overTotal warning, missing toast.warning test, supply cache invalidation test coverage (1/22 → 4/22 representative)
   - Backlogged: 8 items (999.50-999.57) for upload-actions silent catch, completion estimate catch, photo cleanup, bare catches, etc.
 
+- **Phase 24 code review fixed** — 6/6 findings fixed (1 critical, 5 warnings)
+  - CR-01: CreationFlowAdapter `isNeedOverridden` data loss bug
+  - WR-01: type-safe filter predicate on dashboard page
+  - WR-02: atomic `useQueryStates` in SessionHistoryTable
+  - WR-03: type-safe `hydrateField` helper replacing `as any` in draft hydration
+  - WR-04: explicit `StitchSession` return type on mock factory
+  - WR-05: TODO(999.0.17) backlog reference for buried treasures ownership
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-discuss-phase 24` — discuss Phase 24 (Code Quality) before planning
+1. `/gsd-verify-work` — verify Phase 24 completion (re-verify after code review fixes)
 
 ### Backlog
 

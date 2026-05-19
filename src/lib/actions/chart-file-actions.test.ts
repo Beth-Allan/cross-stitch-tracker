@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma } from "@/__tests__/mocks";
+import { createMockPrisma, assertSuccess, assertFailure } from "@/__tests__/mocks";
 
 // Mock auth to return authenticated session
 vi.mock("@/lib/auth", () => ({
@@ -65,10 +65,8 @@ describe("chart-file-actions", () => {
         label: null,
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.file).toEqual(mockFile);
-      }
+      assertSuccess(result);
+      expect(result.file).toEqual(mockFile);
       expect(mockPrisma.chartFile.create).toHaveBeenCalledWith({
         data: {
           chartId: "chart-1",
@@ -95,10 +93,8 @@ describe("chart-file-actions", () => {
         label: null,
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Chart not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Chart not found");
     });
 
     it("returns error 'Chart not found' when user does not own the chart", async () => {
@@ -118,10 +114,8 @@ describe("chart-file-actions", () => {
         label: null,
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Chart not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Chart not found");
     });
 
     it("returns Zod error for invalid input (missing chartId)", async () => {
@@ -134,10 +128,8 @@ describe("chart-file-actions", () => {
         fileSize: 1000,
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBeDefined();
-      }
+      assertFailure(result);
+      expect(result.error).toBeDefined();
     });
 
     it("rejects url that does not start with files/ prefix", async () => {
@@ -152,10 +144,8 @@ describe("chart-file-actions", () => {
         label: null,
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Invalid file path");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Invalid file path");
     });
   });
 
@@ -190,10 +180,8 @@ describe("chart-file-actions", () => {
 
       const result = await deleteChartFile("file-1");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("File not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("File not found");
     });
 
     it("returns error when file does not exist", async () => {
@@ -203,10 +191,8 @@ describe("chart-file-actions", () => {
 
       const result = await deleteChartFile("nonexistent");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("File not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("File not found");
     });
   });
 
@@ -224,12 +210,10 @@ describe("chart-file-actions", () => {
 
       const result = await getChartFileDownloadUrl("file-1");
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.url).toBe("https://presigned.example.com/download");
-        expect(result.filename).toBe("test.pdf");
-        expect(result.mimeType).toBe("application/pdf");
-      }
+      assertSuccess(result);
+      expect(result.url).toBe("https://presigned.example.com/download");
+      expect(result.filename).toBe("test.pdf");
+      expect(result.mimeType).toBe("application/pdf");
     });
 
     it("returns error for unauthorized access", async () => {
@@ -245,10 +229,8 @@ describe("chart-file-actions", () => {
 
       const result = await getChartFileDownloadUrl("file-1");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("File not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("File not found");
     });
 
     it("returns structured error when R2 is not configured", async () => {
@@ -269,10 +251,8 @@ describe("chart-file-actions", () => {
 
       const result = await getChartFileDownloadUrl("file-1");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("File storage is not configured.");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("File storage is not configured.");
     });
   });
 });

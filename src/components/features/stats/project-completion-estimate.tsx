@@ -15,7 +15,7 @@ export function ProjectCompletionEstimate({ estimate }: ProjectCompletionEstimat
         <div className="mb-1 flex items-center justify-between">
           <span className="text-foreground text-sm font-medium">Est. completion</span>
           <span className="text-muted-foreground font-mono text-sm tabular-nums">
-            {estimate.estimatedDate}
+            ~{estimate.estimatedDate}
           </span>
         </div>
         <div className="flex items-center gap-2">

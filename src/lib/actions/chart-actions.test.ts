@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma } from "@/__tests__/mocks";
+import { createMockPrisma, assertSuccess, assertFailure } from "@/__tests__/mocks";
 
 // Mock auth to return null (unauthenticated)
 vi.mock("@/lib/auth", () => ({
@@ -117,10 +117,8 @@ describe("createChartWithSupplies", () => {
       specialty: [],
     });
 
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.chartId).toBe("chart-new");
-    }
+    assertSuccess(result);
+    expect(result.chartId).toBe("chart-new");
   });
 
   it("with thread supplies calls createMany with correct data shape", async () => {
@@ -208,10 +206,8 @@ describe("createChartWithSupplies", () => {
     const { createChartWithSupplies } = await import("./chart-actions");
     const result = await createChartWithSupplies(validChartInput, {});
 
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.chartId).toBe("chart-abc");
-    }
+    assertSuccess(result);
+    expect(result.chartId).toBe("chart-abc");
   });
 
   it("returns error on ZodError (invalid form data)", async () => {
@@ -219,14 +215,10 @@ describe("createChartWithSupplies", () => {
     // Pass invalid chart data (missing name)
     const result = await createChartWithSupplies({ chart: { name: "" }, project: {} }, {});
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error).toBeTruthy();
-    }
+    assertFailure(result);
+    expect(result.error).toBeTruthy();
   });
 });
-
-// ─── updateChartStatus cache invalidation ───────────────────────────────────
 
 describe("updateChartStatus cache invalidation", () => {
   beforeEach(async () => {

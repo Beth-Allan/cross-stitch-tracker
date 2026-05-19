@@ -8,14 +8,14 @@ import { MainDashboard } from "@/components/features/dashboard/main-dashboard";
 import { ProjectDashboard } from "@/components/features/dashboard/project-dashboard";
 
 export default async function DashboardRoute() {
-  // D-02: Independent data-fetching functions, fetched via Promise.all()
+  // Independent data-fetching functions, fetched via Promise.all()
   const [mainData, projectData, charts] = await Promise.all([
     getMainDashboardData(),
     getProjectDashboardData(),
     getChartsForGallery(),
   ]);
 
-  // Transform Start Next charts to GalleryCardData for GalleryCard reuse (D-05)
+  // Transform Start Next charts to GalleryCardData for GalleryCard reuse
   // Build lookup preserving the order from startNextProjects
   const startNextChartIds = new Set(mainData.startNextProjects.map((p) => p.chartId));
   const startNextChartsMap = new Map(
@@ -40,8 +40,8 @@ export default async function DashboardRoute() {
   // Preserve Start Next ordering from the server action
   const startNextCards = mainData.startNextProjects
     .map((p) => startNextChartsMap.get(p.chartId))
-    .filter(Boolean)
-    .map((c) => transformToGalleryCard(c!, imageUrls));
+    .filter((c): c is NonNullable<typeof c> => Boolean(c))
+    .map((c) => transformToGalleryCard(c, imageUrls));
 
   return (
     <DashboardTabs

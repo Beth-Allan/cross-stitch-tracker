@@ -8,6 +8,7 @@ import {
   createMockProjectThread,
   createMockProjectBead,
   createMockProjectSpecialty,
+  assertFailure,
 } from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
@@ -317,10 +318,8 @@ describe("shopping-actions", () => {
       const { markSupplyAcquired } = await import("./shopping-actions");
       const result = await markSupplyAcquired("thread", "nonexistent");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Record not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Record not found");
     });
   });
 });

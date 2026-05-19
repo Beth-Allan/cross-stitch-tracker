@@ -1,23 +1,14 @@
 import { unstable_cache } from "next/cache";
-import { TZDate } from "@date-fns/tz";
 import { prisma } from "@/lib/db";
 import { getUserTimezone } from "./timezone";
+import { buildDateFilter, type Scope } from "./utils";
 import type { DesignerInsight } from "@/types/stats";
-
-function buildDateFilter(scope: string, tz: string): { gte: Date; lt: Date } | null {
-  if (scope === "all") return null;
-  const year = parseInt(scope, 10);
-  if (isNaN(year)) return null;
-  const yearStart = new TZDate(year, 0, 1, 0, 0, 0, tz);
-  const nextYearStart = new TZDate(year + 1, 0, 1, 0, 0, 0, tz);
-  return { gte: yearStart, lt: nextYearStart };
-}
 
 const COMPLETED_STATUSES = ["FINISHED", "FFO"] as const;
 
 async function computeDesignerInsights(
   userId: string,
-  scope: string,
+  scope: Scope,
   limit: number,
 ): Promise<DesignerInsight[]> {
   try {
@@ -84,7 +75,7 @@ async function computeDesignerInsights(
   }
 }
 
-export function getDesignerInsights(userId: string, scope: string, limit = 10) {
+export function getDesignerInsights(userId: string, scope: Scope, limit = 10) {
   const currentYear = new Date().getFullYear();
   const year = parseInt(scope, 10);
   const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;

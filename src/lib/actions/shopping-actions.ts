@@ -71,7 +71,7 @@ const FABRIC_COUNT_OPTIONS = [
 export async function getShoppingList(): Promise<ShoppingListProject[]> {
   await requireAuth();
 
-  // Single query with eager loading per Research Pattern 4
+  // Single query with eager loading
   const projects = await prisma.project.findMany({
     where: {
       OR: [

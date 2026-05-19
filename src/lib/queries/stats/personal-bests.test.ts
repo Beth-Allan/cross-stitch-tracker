@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createMockPrisma } from "@/__tests__/mocks";
+import type { ProjectLinkedRecord, PersonalBestRecord } from "@/types/stats";
 
 const mockPrisma = createMockPrisma();
 vi.mock("@/lib/db", () => ({ prisma: mockPrisma }));
@@ -34,7 +35,7 @@ describe("getPersonalBests", () => {
     ]);
   });
 
-  it("returns zero values and null links when no sessions exist", async () => {
+  it("returns zero values when no sessions exist", async () => {
     mockPrisma.stitchSession.findMany.mockResolvedValue([]);
     mockPrisma.stitchSession.findFirst.mockResolvedValue(null);
 
@@ -43,9 +44,15 @@ describe("getPersonalBests", () => {
 
     for (const record of result) {
       expect(record.value).toBe(0);
-      expect(record.projectId).toBeNull();
-      expect(record.chartId).toBeNull();
-      expect(record.projectName).toBeNull();
+    }
+
+    const isProjectLinked = (r: PersonalBestRecord): r is ProjectLinkedRecord =>
+      r.type === "bestDay" || r.type === "bestSession";
+    const projectLinked = result.filter(isProjectLinked);
+    for (const record of projectLinked) {
+      expect(record.projectId).toBeUndefined();
+      expect(record.chartId).toBeUndefined();
+      expect(record.projectName).toBeUndefined();
     }
   });
 
@@ -108,9 +115,11 @@ describe("getPersonalBests", () => {
     const bestSession = result.find((r) => r.type === "bestSession")!;
     expect(bestSession.value).toBe(400);
     expect(bestSession.unit).toBe("stitches");
-    expect(bestSession.projectId).toBe("p1");
-    expect(bestSession.chartId).toBe("c1");
-    expect(bestSession.projectName).toBe("Project One");
+    expect(bestSession).toMatchObject({
+      projectId: "p1",
+      chartId: "c1",
+      projectName: "Project One",
+    });
   });
 
   it("calculates longest streak from consecutive days (3 consecutive = 3)", async () => {
@@ -185,7 +194,6 @@ describe("getPersonalBests", () => {
 
     const currentStreak = result.find((r) => r.type === "currentStreak")!;
     expect(currentStreak.value).toBe(0);
-    expect(currentStreak.date).toBeNull();
   });
 
   it('"2026" scope applies date boundaries to session query', async () => {

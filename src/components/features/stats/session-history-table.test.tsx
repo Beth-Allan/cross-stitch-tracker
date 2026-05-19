@@ -26,7 +26,7 @@ function createMockData(overrides?: Partial<SessionHistoryData>): SessionHistory
     sessions: [
       {
         id: "s1",
-        date: new Date("2026-05-15T10:00:00Z"),
+        date: "2026-05-15",
         projectId: "p1",
         chartId: "c1",
         projectName: "Dragon Sampler",
@@ -36,7 +36,7 @@ function createMockData(overrides?: Partial<SessionHistoryData>): SessionHistory
       },
       {
         id: "s2",
-        date: new Date("2026-05-14T10:00:00Z"),
+        date: "2026-05-14",
         projectId: "p2",
         chartId: "c2",
         projectName: "Winter Village",
@@ -46,7 +46,7 @@ function createMockData(overrides?: Partial<SessionHistoryData>): SessionHistory
       },
       {
         id: "s3",
-        date: new Date("2026-05-13T10:00:00Z"),
+        date: "2026-05-13",
         projectId: "p1",
         chartId: "c1",
         projectName: "Dragon Sampler",

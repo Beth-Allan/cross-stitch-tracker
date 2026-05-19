@@ -39,7 +39,7 @@ export interface DraftV2 {
 
 /**
  * Serialize current form values to localStorage under the draft key.
- * Fails silently if localStorage is full or unavailable (D-06).
+ * Fails silently if localStorage is full or unavailable.
  */
 export function saveDraft(values: ChartFormValues): void {
   try {
@@ -51,7 +51,7 @@ export function saveDraft(values: ChartFormValues): void {
 
 /**
  * Read draft from localStorage, parse JSON, merge with defaults for schema
- * evolution resilience, and null out stale reference IDs (D-07, D-08).
+ * evolution resilience, and null out stale reference IDs.
  *
  * Returns ChartFormValues if a valid draft exists, null otherwise.
  */
@@ -67,11 +67,10 @@ export function loadDraft(
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<ChartFormValues>;
 
-    // Merge with defaults so missing fields from old drafts get defaults
-    // (per Research pitfall 6: future schema evolution)
+    // Merge with defaults so missing fields from old drafts get safe values
     const merged: ChartFormValues = { ...defaults, ...parsed };
 
-    // Stale ID detection: null out IDs that no longer exist (per D-08)
+    // Stale ID detection: null out IDs that no longer exist
     if (merged.designerId && !validDesignerIds.includes(merged.designerId)) {
       merged.designerId = null;
     }
@@ -93,7 +92,7 @@ export function loadDraft(
 }
 
 /**
- * Remove the draft key from localStorage on successful Create (D-09).
+ * Remove the draft key from localStorage on successful Create.
  * Fails silently if localStorage is unavailable.
  */
 export function clearDraft(): void {
@@ -106,7 +105,7 @@ export function clearDraft(): void {
 
 /**
  * Serialize current form values, supply rows, and calc params to localStorage
- * as a versioned V2 draft. Supersedes saveDraft for the creation flow (D-05).
+ * as a versioned V2 draft. Supersedes saveDraft for the creation flow.
  */
 export function saveDraftV2(
   form: ChartFormValues,
@@ -128,7 +127,7 @@ export function saveDraftV2(
  * - V1 format (no version field): wraps in V2 shape with empty supplies
  * - Invalid/missing: returns null
  *
- * Applies stale ID detection same as loadDraft (D-08).
+ * Applies stale ID detection same as loadDraft.
  */
 export function loadDraftV2(
   defaults: ChartFormValues,

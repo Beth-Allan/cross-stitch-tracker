@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { chartFormSchema, batchSupplySchema } from "./chart";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
+import { assertSuccess } from "@/__tests__/mocks";
 
 const validChartBase = {
   name: "Test Chart",
@@ -89,10 +90,8 @@ describe("chartFormSchema", () => {
         chart: validChartBase,
         project: { ...validProject, storageLocationId: "loc-123" },
       });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.project.storageLocationId).toBe("loc-123");
-      }
+      assertSuccess(result);
+      expect(result.data.project.storageLocationId).toBe("loc-123");
     });
 
     it("accepts null stitchingAppId", () => {
@@ -108,10 +107,8 @@ describe("chartFormSchema", () => {
         chart: validChartBase,
         project: { ...validProject, stitchingAppId: "app-456" },
       });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.project.stitchingAppId).toBe("app-456");
-      }
+      assertSuccess(result);
+      expect(result.data.project.stitchingAppId).toBe("app-456");
     });
 
     it("accepts null fabricId", () => {
@@ -127,10 +124,8 @@ describe("chartFormSchema", () => {
         chart: validChartBase,
         project: { ...validProject, fabricId: "fab-789" },
       });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.project.fabricId).toBe("fab-789");
-      }
+      assertSuccess(result);
+      expect(result.data.project.fabricId).toBe("fab-789");
     });
 
     it("does NOT have projectBin field in project schema", () => {
@@ -138,9 +133,8 @@ describe("chartFormSchema", () => {
         chart: validChartBase,
         project: { ...validProject, projectBin: "Bin A" },
       });
-      if (result.success) {
-        expect(result.data.project).not.toHaveProperty("projectBin");
-      }
+      assertSuccess(result);
+      expect(result.data.project).not.toHaveProperty("projectBin");
     });
 
     it("does NOT have ipadApp field in project schema", () => {
@@ -148,9 +142,8 @@ describe("chartFormSchema", () => {
         chart: validChartBase,
         project: { ...validProject, ipadApp: "Saga" },
       });
-      if (result.success) {
-        expect(result.data.project).not.toHaveProperty("ipadApp");
-      }
+      assertSuccess(result);
+      expect(result.data.project).not.toHaveProperty("ipadApp");
     });
   });
 
@@ -224,12 +217,10 @@ describe("batchSupplySchema", () => {
 
   it("defaults missing arrays to empty", () => {
     const result = batchSupplySchema.safeParse({});
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.threads).toEqual([]);
-      expect(result.data.beads).toEqual([]);
-      expect(result.data.specialty).toEqual([]);
-    }
+    assertSuccess(result);
+    expect(result.data.threads).toEqual([]);
+    expect(result.data.beads).toEqual([]);
+    expect(result.data.specialty).toEqual([]);
   });
 
   it("rejects need < 1 for threads", () => {

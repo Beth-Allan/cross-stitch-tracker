@@ -8,6 +8,8 @@ import {
   createMockProjectThread,
   createMockProjectBead,
   createMockProjectSpecialty,
+  assertSuccess,
+  assertFailure,
 } from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
@@ -33,8 +35,6 @@ describe("supply-actions", () => {
       user: { id: "user-1", name: "Test", email: "test@test.com" },
     });
   });
-
-  // ─── Auth Guard ────────────────────────────────────────────────────────────
 
   describe("auth guard", () => {
     it("rejects unauthenticated calls to createThread", async () => {
@@ -127,8 +127,6 @@ describe("supply-actions", () => {
     });
   });
 
-  // ─── Thread CRUD ───────────────────────────────────────────────────────────
-
   describe("createThread", () => {
     it("creates a thread with valid data and returns success", async () => {
       const mockThread = createMockThread({ colorCode: "310", colorName: "Black" });
@@ -143,10 +141,8 @@ describe("supply-actions", () => {
         colorFamily: "BLACK",
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.thread.colorCode).toBe("310");
-      }
+      assertSuccess(result);
+      expect(result.thread.colorCode).toBe("310");
       expect(mockPrisma.thread.create).toHaveBeenCalledWith({
         data: {
           brandId: "brand-1",
@@ -173,10 +169,8 @@ describe("supply-actions", () => {
         colorFamily: "BLACK",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("A thread with that code already exists for this brand");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("A thread with that code already exists for this brand");
     });
 
     it("returns validation error for invalid hex color", async () => {
@@ -190,10 +184,8 @@ describe("supply-actions", () => {
         colorFamily: "BLACK",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toContain("hex color");
-      }
+      assertFailure(result);
+      expect(result.error).toContain("hex color");
     });
   });
 
@@ -242,10 +234,8 @@ describe("supply-actions", () => {
         colorFamily: "BLACK",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("A thread with that code already exists for this brand");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("A thread with that code already exists for this brand");
     });
   });
 
@@ -328,8 +318,6 @@ describe("supply-actions", () => {
     });
   });
 
-  // ─── Bead CRUD ─────────────────────────────────────────────────────────────
-
   describe("createBead", () => {
     it("creates a bead with valid data and returns success", async () => {
       const mockBead = createMockBead({ productCode: "00123" });
@@ -344,10 +332,8 @@ describe("supply-actions", () => {
         colorFamily: "RED",
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.bead.productCode).toBe("00123");
-      }
+      assertSuccess(result);
+      expect(result.bead.productCode).toBe("00123");
     });
 
     it("returns error for duplicate (P2002)", async () => {
@@ -365,10 +351,8 @@ describe("supply-actions", () => {
         colorFamily: "RED",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("A bead with that code already exists for this brand");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("A bead with that code already exists for this brand");
     });
   });
 
@@ -426,8 +410,6 @@ describe("supply-actions", () => {
     });
   });
 
-  // ─── Specialty Item CRUD ───────────────────────────────────────────────────
-
   describe("createSpecialtyItem", () => {
     it("creates a specialty item with valid data and returns success", async () => {
       const mockItem = createMockSpecialtyItem({ productCode: "K001" });
@@ -441,10 +423,8 @@ describe("supply-actions", () => {
         hexColor: "#FFD700",
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.specialtyItem.productCode).toBe("K001");
-      }
+      assertSuccess(result);
+      expect(result.specialtyItem.productCode).toBe("K001");
     });
 
     it("returns error for duplicate (P2002)", async () => {
@@ -461,10 +441,8 @@ describe("supply-actions", () => {
         hexColor: "#FFD700",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("A specialty item with that code already exists for this brand");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("A specialty item with that code already exists for this brand");
     });
   });
 
@@ -526,8 +504,6 @@ describe("supply-actions", () => {
     });
   });
 
-  // ─── Supply Brand CRUD ─────────────────────────────────────────────────────
-
   describe("createSupplyBrand", () => {
     it("creates a brand with valid data and returns success", async () => {
       const mockBrand = createMockSupplyBrand({ name: "DMC" });
@@ -539,10 +515,8 @@ describe("supply-actions", () => {
         supplyType: "THREAD",
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.brand.name).toBe("DMC");
-      }
+      assertSuccess(result);
+      expect(result.brand.name).toBe("DMC");
     });
 
     it("returns error for duplicate name (P2002)", async () => {
@@ -557,10 +531,8 @@ describe("supply-actions", () => {
         supplyType: "THREAD",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("A brand with that name already exists");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("A brand with that name already exists");
     });
 
     it("returns validation error for empty name", async () => {
@@ -571,10 +543,8 @@ describe("supply-actions", () => {
         supplyType: "THREAD",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Brand name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Brand name is required");
     });
   });
 
@@ -611,10 +581,8 @@ describe("supply-actions", () => {
         supplyType: "THREAD",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("A brand with that name already exists");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("A brand with that name already exists");
     });
   });
 
@@ -653,8 +621,6 @@ describe("supply-actions", () => {
       });
     });
   });
-
-  // ─── Junction Operations ───────────────────────────────────────────────────
 
   describe("addThreadToProject", () => {
     it("creates junction record with default quantity 1", async () => {
@@ -721,10 +687,8 @@ describe("supply-actions", () => {
         threadId: "t1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("This thread is already linked to this project");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("This thread is already linked to this project");
     });
   });
 
@@ -772,10 +736,8 @@ describe("supply-actions", () => {
         beadId: "b1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("This bead is already linked to this project");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("This bead is already linked to this project");
     });
   });
 
@@ -823,10 +785,8 @@ describe("supply-actions", () => {
         specialtyItemId: "s1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("This item is already linked to this project");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("This item is already linked to this project");
     });
   });
 
@@ -1143,8 +1103,6 @@ describe("supply-actions", () => {
     });
   });
 
-  // ─── createAndAddThread ─────────────────────────────────────────────────────
-
   describe("createAndAddThread", () => {
     it("requires auth", async () => {
       mockAuth.mockResolvedValueOnce(null);
@@ -1163,10 +1121,8 @@ describe("supply-actions", () => {
         brandId: "brand-1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Name is required");
     });
 
     it("checks project ownership before creating", async () => {
@@ -1179,10 +1135,8 @@ describe("supply-actions", () => {
         brandId: "brand-1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Project not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Project not found");
     });
 
     it("creates thread and links to project in a transaction", async () => {
@@ -1229,14 +1183,10 @@ describe("supply-actions", () => {
         brandId: "brand-1",
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.record).toBeDefined();
-      }
+      assertSuccess(result);
+      expect(result.record).toBeDefined();
     });
   });
-
-  // ─── createAndAddBead ──────────────────────────────────────────────────────
 
   describe("createAndAddBead", () => {
     it("requires auth", async () => {
@@ -1256,10 +1206,8 @@ describe("supply-actions", () => {
         brandId: "brand-1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Name is required");
     });
 
     it("checks project ownership before creating", async () => {
@@ -1272,10 +1220,8 @@ describe("supply-actions", () => {
         brandId: "brand-1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Project not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Project not found");
     });
 
     it("creates bead and links to project in a transaction", async () => {
@@ -1321,14 +1267,10 @@ describe("supply-actions", () => {
         brandId: "brand-1",
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.record).toBeDefined();
-      }
+      assertSuccess(result);
+      expect(result.record).toBeDefined();
     });
   });
-
-  // ─── createAndAddSpecialty ─────────────────────────────────────────────────
 
   describe("createAndAddSpecialty", () => {
     it("requires auth", async () => {
@@ -1348,10 +1290,8 @@ describe("supply-actions", () => {
         brandId: "brand-1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Name is required");
     });
 
     it("checks project ownership before creating", async () => {
@@ -1364,10 +1304,8 @@ describe("supply-actions", () => {
         brandId: "brand-1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Project not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Project not found");
     });
 
     it("creates specialty item and links to project in a transaction", async () => {
@@ -1413,14 +1351,10 @@ describe("supply-actions", () => {
         brandId: "brand-1",
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.record).toBeDefined();
-      }
+      assertSuccess(result);
+      expect(result.record).toBeDefined();
     });
   });
-
-  // ─── resolveDefaultBrandId (via public API) ─────────────────────────────────
 
   describe("resolveDefaultBrandId (via public API)", () => {
     it("createThread with brandId='default' upserts Custom (Thread) brand", async () => {
@@ -1494,8 +1428,6 @@ describe("supply-actions", () => {
       });
     });
   });
-
-  // ─── Cache Invalidation ─────────────────────────────────────────────────────
 
   describe("cache invalidation", () => {
     it("createThread calls revalidateTag('stats') after successful creation", async () => {

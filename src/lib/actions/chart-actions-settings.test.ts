@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, createMockProject } from "@/__tests__/mocks";
+import { createMockPrisma, createMockProject, assertFailure } from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -69,10 +69,8 @@ describe("updateProjectSettings", () => {
     );
     const { updateProjectSettings } = await import("./chart-actions");
     const result = await updateProjectSettings("chart-1", { strandCount: 3 });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error).toBe("Project not found");
-    }
+    assertFailure(result);
+    expect(result.error).toBe("Project not found");
   });
 
   it("returns success on valid input with owned project", async () => {

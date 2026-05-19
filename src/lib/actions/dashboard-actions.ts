@@ -78,7 +78,7 @@ async function getCurrentlyStitchingProjects(userId: string): Promise<CurrentlyS
 
 /**
  * Start Next: Projects flagged as wantToStartNext with UNSTARTED or KITTED status.
- * Returns top 2 per design decision D-05.
+ * Returns top 2.
  */
 async function getStartNextProjects(userId: string): Promise<StartNextProject[]> {
   const charts = await prisma.chart.findMany({
@@ -117,7 +117,7 @@ async function getStartNextProjects(userId: string): Promise<StartNextProject[]>
 
 /**
  * Buried Treasures: Oldest 10% of unstarted charts, max 5, sorted oldest-first.
- * Uses dynamic threshold per decision D-06. At least 1 is always returned.
+ * Uses dynamic threshold. At least 1 is always returned.
  */
 async function getBuriedTreasures(userId: string): Promise<BuriedTreasure[]> {
   // Get all charts that are unstarted (project with UNSTARTED status OR no project at all)
@@ -125,7 +125,7 @@ async function getBuriedTreasures(userId: string): Promise<BuriedTreasure[]> {
     where: {
       OR: [
         { project: { userId, status: "UNSTARTED" } },
-        { project: null }, // Safe: single-user app. Add Chart.userId if multi-user is added.
+        { project: null }, // TODO(999.0.17): add Chart.userId ownership check for multi-user
       ],
     },
     include: {
@@ -219,7 +219,7 @@ async function getCollectionStats(userId: string): Promise<CollectionStats> {
 
 /**
  * Random Spotlight: Returns a random project with chart, designer, and genre data.
- * Uses server-side random to avoid hydration mismatch (D-07).
+ * Uses server-side random to avoid hydration mismatch.
  */
 async function getRandomSpotlightProject(userId: string): Promise<SpotlightProject | null> {
   const count = await prisma.project.count({ where: { userId } });
@@ -273,7 +273,7 @@ async function getRandomSpotlightProject(userId: string): Promise<SpotlightProje
 
 /**
  * Main Dashboard: Fetches all data sections in parallel.
- * Uses Promise.all() per D-02 for optimal Neon cold start handling.
+ * Uses Promise.all() for optimal Neon cold start handling.
  */
 export async function getMainDashboardData(): Promise<MainDashboardData> {
   const user = await requireAuth();

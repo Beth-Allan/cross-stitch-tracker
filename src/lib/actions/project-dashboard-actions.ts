@@ -60,8 +60,8 @@ function assignBucketId(status: string, progressPercent: number): ProgressBucket
  * Single query fetches all user projects with includes. All aggregations are
  * computed in-memory from the result set — no N+1 queries.
  *
- * T-09-03: Single prisma.project.findMany with userId filter ensures data isolation.
- * T-09-04: requireAuth() called at function entry.
+ * Single prisma.project.findMany with userId filter ensures data isolation.
+ * requireAuth() called at function entry.
  */
 export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
   const user = await requireAuth();
@@ -214,7 +214,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
       };
     })
     .sort((a, b) => {
-      // D-15: Default sort by finishDate DESC (most recent first)
+      // Default sort by finishDate DESC (most recent first)
       if (!a.finishDate && !b.finishDate) return 0;
       if (!a.finishDate) return 1;
       if (!b.finishDate) return -1;

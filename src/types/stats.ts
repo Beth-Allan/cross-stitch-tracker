@@ -63,8 +63,22 @@ export interface LocalDateBoundaries {
 
 // ─── Monthly Totals ─────────────────────────────────────────────────────────
 
+export type MonthLabel =
+  | "Jan"
+  | "Feb"
+  | "Mar"
+  | "Apr"
+  | "May"
+  | "Jun"
+  | "Jul"
+  | "Aug"
+  | "Sep"
+  | "Oct"
+  | "Nov"
+  | "Dec";
+
 export interface MonthlyTotal {
-  month: string; // "Jan", "Feb", ... "Dec"
+  month: MonthLabel;
   totalStitches: number;
   year: number;
 }
@@ -87,7 +101,7 @@ export interface CalendarDayData {
 
 export interface SessionHistoryItem {
   id: string;
-  date: Date;
+  date: string; // "YYYY-MM-DD" in user timezone
   projectId: string;
   chartId: string;
   projectName: string;
@@ -118,35 +132,42 @@ export interface PaceMetricsData {
 
 // ─── Day of Week ────────────────────────────────────────────────────────────
 
+export type DayLabel = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+
 export interface DayOfWeekData {
-  dayOfWeek: string; // "Mon", "Tue", ... "Sun"
+  dayOfWeek: DayLabel;
   avgStitches: number;
 }
 
 // ─── Daily Breakdown (drill-down) ───────────────────────────────────────────
 
-export interface DailyBreakdownEntry {
+export interface DailyBreakdownEntry extends CalendarSession {
   date: string; // "YYYY-MM-DD"
-  projectId: string;
-  chartId: string;
-  projectName: string;
-  stitchCount: number;
 }
 
 // ─── Personal Bests ────────────────────────────────────────────────────────
 
 export type RecordType = "bestDay" | "bestSession" | "longestStreak" | "currentStreak";
 
-export interface PersonalBestRecord {
-  type: RecordType;
+export interface ProjectLinkedRecord {
+  type: "bestDay" | "bestSession";
   label: string;
   value: number;
   unit: string;
-  date: string | null;
-  projectId: string | null;
-  chartId: string | null;
-  projectName: string | null;
+  date?: string;
+  projectId?: string;
+  chartId?: string;
+  projectName?: string;
 }
+
+export interface AggregateRecord {
+  type: "longestStreak" | "currentStreak";
+  label: string;
+  value: number;
+  unit: string;
+}
+
+export type PersonalBestRecord = ProjectLinkedRecord | AggregateRecord;
 
 // ─── Fastest Completions ───────────────────────────────────────────────────
 
@@ -206,7 +227,7 @@ export interface CompletionEstimate {
 
 // ─── Broken Records (celebration system) ───────────────────────────────────
 
-export type BrokenRecordType = "bestDay" | "bestSession" | "longestStreak";
+export type BrokenRecordType = Exclude<RecordType, "currentStreak">;
 
 export interface BrokenRecord {
   type: BrokenRecordType;
@@ -214,10 +235,4 @@ export interface BrokenRecord {
   oldValue: number;
   newValue: number;
   unit: string;
-}
-
-// ─── Available Years ───────────────────────────────────────────────────────
-
-export interface AvailableYearsData {
-  years: number[];
 }

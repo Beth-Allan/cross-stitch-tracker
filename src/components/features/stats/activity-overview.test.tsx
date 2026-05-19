@@ -91,7 +91,7 @@ const mockSessionHistory: SessionHistoryData = {
   sessions: [
     {
       id: "s1",
-      date: new Date("2026-05-15"),
+      date: "2026-05-15",
       projectId: "p1",
       chartId: "c1",
       projectName: "My Project",

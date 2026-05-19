@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma } from "@/__tests__/mocks";
+import { createMockPrisma, assertSuccess, assertFailure } from "@/__tests__/mocks";
 
 // Mock auth to return authenticated session
 vi.mock("@/lib/auth", () => ({
@@ -64,10 +64,8 @@ describe("upload-actions failure modes", () => {
         projectId: "p1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toContain("Invalid image type");
-      }
+      assertFailure(result);
+      expect(result.error).toContain("Invalid image type");
     });
 
     it("returns error for invalid image type on sessions category", async () => {
@@ -81,10 +79,8 @@ describe("upload-actions failure modes", () => {
         projectId: "p1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toContain("Invalid image type");
-      }
+      assertFailure(result);
+      expect(result.error).toContain("Invalid image type");
     });
 
     it("returns error for invalid file type on files category", async () => {
@@ -98,10 +94,8 @@ describe("upload-actions failure modes", () => {
         projectId: "p1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toContain("Invalid file type");
-      }
+      assertFailure(result);
+      expect(result.error).toContain("Invalid file type");
     });
 
     it("returns error when R2 is not configured", async () => {
@@ -118,10 +112,8 @@ describe("upload-actions failure modes", () => {
         projectId: "p1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toContain("not configured");
-      }
+      assertFailure(result);
+      expect(result.error).toContain("not configured");
     });
 
     it("returns validation-specific message on Zod validation failure (not 'storage not configured')", async () => {
@@ -129,12 +121,10 @@ describe("upload-actions failure modes", () => {
 
       const result = await getPresignedUploadUrl({});
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(typeof result.error).toBe("string");
-        // Must NOT say "storage not configured" for a validation error
-        expect(result.error).not.toContain("not configured");
-      }
+      assertFailure(result);
+      expect(typeof result.error).toBe("string");
+      // Must NOT say "storage not configured" for a validation error
+      expect(result.error).not.toContain("not configured");
     });
 
     it("returns generic error and logs console.error on unexpected R2 error", async () => {
@@ -151,11 +141,9 @@ describe("upload-actions failure modes", () => {
         projectId: "p1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).not.toContain("not configured");
-        expect(result.error).toBe("Failed to generate upload URL");
-      }
+      assertFailure(result);
+      expect(result.error).not.toContain("not configured");
+      expect(result.error).toBe("Failed to generate upload URL");
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
@@ -170,10 +158,8 @@ describe("upload-actions failure modes", () => {
 
       const result = await getPresignedDownloadUrl("some-key");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toContain("not configured");
-      }
+      assertFailure(result);
+      expect(result.error).toContain("not configured");
     });
 
     it("returns generic error and logs on unexpected R2 error", async () => {
@@ -184,11 +170,9 @@ describe("upload-actions failure modes", () => {
 
       const result = await getPresignedDownloadUrl("some-key");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).not.toContain("not configured");
-        expect(result.error).toBe("Failed to generate download URL");
-      }
+      assertFailure(result);
+      expect(result.error).not.toContain("not configured");
+      expect(result.error).toBe("Failed to generate download URL");
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
@@ -204,10 +188,8 @@ describe("upload-actions failure modes", () => {
         key: "k1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toContain("Invalid field");
-      }
+      assertFailure(result);
+      expect(result.error).toContain("Invalid field");
     });
 
     it("returns error on DB failure during update", async () => {
@@ -346,13 +328,11 @@ describe("upload-actions failure modes", () => {
 
       const result = await processAndStoreImage("chart-1", "covers/chart-1/raw.png", "covers");
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.optimizedKey).toContain(".webp");
-        expect(result.optimizedKey).toContain("opt-");
-        expect(result.thumbnailKey).toContain(".webp");
-        expect(result.thumbnailKey).toContain("thumb-");
-      }
+      assertSuccess(result);
+      expect(result.optimizedKey).toContain(".webp");
+      expect(result.optimizedKey).toContain("opt-");
+      expect(result.thumbnailKey).toContain(".webp");
+      expect(result.thumbnailKey).toContain("thumb-");
       // 3 R2 calls: 1 get + 2 puts (no delete — caller's responsibility)
       expect(mockSend).toHaveBeenCalledTimes(3);
     });
@@ -385,10 +365,8 @@ describe("upload-actions failure modes", () => {
 
       const result = await processAndStoreImage("chart-1", "covers/chart-1/missing.png", "covers");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBeDefined();
-      }
+      assertFailure(result);
+      expect(result.error).toBeDefined();
     });
 
     it("returns error when response.Body is null", async () => {
@@ -397,10 +375,8 @@ describe("upload-actions failure modes", () => {
 
       const result = await processAndStoreImage("chart-1", "covers/chart-1/raw.png", "covers");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Original image not found in storage");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Original image not found in storage");
     });
 
     it("returns error when Sharp processing throws and does NOT delete original", async () => {

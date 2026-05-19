@@ -6,8 +6,8 @@ import { revalidatePath } from "next/cache";
 import type { WhatsNextProject, FabricRequirementRow, StorageGroup } from "@/types/session";
 
 /**
- * D-07: Only UNSTARTED and KITTED projects.
- * D-08: Ranked by (1) wantToStartNext, (2) kitting %, (3) dateAdded.
+ * Only UNSTARTED and KITTED projects.
+ * Ranked by (1) wantToStartNext, (2) kitting %, (3) dateAdded.
  */
 export async function getWhatsNextProjects(): Promise<WhatsNextProject[]> {
   const user = await requireAuth();
@@ -74,7 +74,7 @@ export async function getWhatsNextProjects(): Promise<WhatsNextProject[]> {
       };
     });
 
-  // D-08 ranking: wantToStartNext first, then kitting % desc, then dateAdded asc
+  // Ranking: wantToStartNext first, then kitting % desc, then dateAdded asc
   projects.sort((a, b) => {
     if (a.wantToStartNext !== b.wantToStartNext) return a.wantToStartNext ? -1 : 1;
     if (a.kittingPercent !== b.kittingPercent) return b.kittingPercent - a.kittingPercent;
@@ -301,7 +301,7 @@ export async function getStorageGroups(): Promise<StorageGroup[]> {
 
 /**
  * Links a fabric to a project, unlinking any previously linked fabric.
- * T-08-14: Verifies project ownership before linking.
+ * Verifies project ownership before linking.
  */
 export async function assignFabricToProject(fabricId: string, projectId: string) {
   const user = await requireAuth();

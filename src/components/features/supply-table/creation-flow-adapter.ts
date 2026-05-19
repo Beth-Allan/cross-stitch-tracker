@@ -13,11 +13,11 @@ import { calculateSkeins } from "@/lib/utils/skein-calculator";
  * Adapter for the chart creation flow that buffers supply rows in memory.
  *
  * Nothing is persisted until the final Create action calls createChartWithSupplies,
- * which wraps chart + supply creation in a single $transaction (D-03, D-04, D-06).
+ * which wraps chart + supply creation in a single $transaction.
  *
  * Search and create operations delegate to injected functions (typically wrappers
  * around existing server actions) so the adapter stays testable without mocking
- * server modules directly (D-08).
+ * server modules directly.
  */
 export class CreationFlowAdapter implements SupplyTableAdapter {
   private rows: Map<string, SupplyRow> = new Map();
@@ -136,6 +136,8 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
         wastePercent: this.calcParams.wastePercent,
       });
       updated = { ...row, stitchCount: value, need: recalculated };
+    } else if (field === "need" && row.type === "THREAD") {
+      updated = { ...row, need: value, isNeedOverridden: true };
     } else {
       updated = { ...row, [field]: value };
     }
@@ -180,7 +182,7 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
 
   /**
    * Populates the buffer from a serialized array.
-   * Used for draft restore from localStorage (D-05).
+   * Used for draft restore from localStorage.
    */
   loadRows(rows: SupplyRow[]): void {
     this.rows.clear();

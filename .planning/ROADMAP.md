@@ -88,13 +88,13 @@ Full details: `milestones/v1.5-ROADMAP.md`
 
 </details>
 
-### 🚧 v1.6 Cleanup & Hardening (In Progress)
+### v1.6 Cleanup & Hardening (In Progress)
 
 **Milestone Goal:** Address all accumulated backlog items -- bug fixes, test gaps, code quality issues, UX polish, cache correctness, and silent failure handling -- to harden the app before building new features.
 
 - [x] **Phase 22: Critical Fixes & Test Infrastructure** - Fix security gaps, TypeScript errors, stats resilience, and test infrastructure (completed 2026-05-18)
 - [x] **Phase 23: Test Coverage & Reliability** - Fill test gaps and fix silent failures and cache staleness (completed 2026-05-18)
-- [ ] **Phase 24: Code Quality** - Type narrowing, constant deduplication, discriminated unions, and comment cleanup
+- [x] **Phase 24: Code Quality** - Type narrowing, constant deduplication, discriminated unions, and comment cleanup (completed 2026-05-19)
 - [ ] **Phase 25: Shopping Cart Scaling** - Shopping cart handles 75+ projects with search, filtering, and status grouping
 - [ ] **Phase 26: UX Polish** - ARIA compliance, visual consistency, and component UX improvements
 
@@ -137,14 +137,20 @@ Plans:
 ### Phase 24: Code Quality
 **Goal**: Stats types use precise TypeScript representations, shared utilities are deduplicated, and code comments follow project conventions
 **Depends on**: Phase 22
-**Requirements**: QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05, QUAL-06, QUAL-07, QUAL-08, QUAL-09, QUAL-10, QUAL-11, QUAL-12, QUAL-13, QUAL-14
+**Requirements**: QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05, QUAL-06, QUAL-07, QUAL-08, QUAL-09, QUAL-10, QUAL-11, QUAL-12, QUAL-13, QUAL-14, QUAL-15, QUAL-16
 **Success Criteria** (what must be TRUE):
   1. strandCount, MonthLabel, DayLabel, and BrokenRecordType use literal union types instead of broad string/number
   2. PersonalBestRecord is a discriminated union with no nullable fields that should be required per variant
   3. SORT_FIELDS/SORT_DIRS, buildDateFilter, and Scope type each have a single source of truth with no duplicated definitions
   4. All WHAT-comments (~27), low-harm JSX section markers (~20), and planning doc references are removed from code
   5. Hardcoded emerald-* classes in log-session-modal use semantic design tokens
-**Plans**: TBD
+  6. assertSuccess/assertFailure test helpers exist and all vacuous assertion patterns are replaced project-wide
+**Plans:** 4/4 plans complete
+Plans:
+- [x] 24-01-PLAN.md -- Type contracts: literal unions, discriminated union, shared buildDateFilter, SORT exports, convention rule
+- [x] 24-02-PLAN.md -- Consumer updates: query modules, components, and page wired to new types and shared utils
+- [x] 24-03-PLAN.md -- Comment cleanup: JSX markers, semantic tokens, WHAT-comments, planning doc references
+- [x] 24-04-PLAN.md -- Test assertion guards: assertSuccess/assertFailure helpers + vacuous assertion sweep
 
 ### Phase 25: Shopping Cart Scaling
 **Goal**: The shopping cart is usable with 75+ projects through search, filtering, status grouping, and supply-type search
@@ -202,6 +208,6 @@ Phase 22 first (foundation). Phases 23, 24, 25, 26 depend only on Phase 22 and c
 | 21. Records, Insights & Celebrations | v1.5 | 4/4 | Complete | 2026-05-18 |
 | 22. Critical Fixes & Test Infrastructure | v1.6 | 3/3 | Complete    | 2026-05-18 |
 | 23. Test Coverage & Reliability | v1.6 | 3/3 | Complete    | 2026-05-18 |
-| 24. Code Quality | v1.6 | 0/? | Not started | - |
+| 24. Code Quality | v1.6 | 4/4 | Complete    | 2026-05-19 |
 | 25. Shopping Cart Scaling | v1.6 | 0/? | Not started | - |
 | 26. UX Polish | v1.6 | 0/? | Not started | - |

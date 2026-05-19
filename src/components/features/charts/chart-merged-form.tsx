@@ -17,7 +17,7 @@ import type {
 import type { ChartWithProject } from "@/types/chart";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { PROJECT_STATUSES, STATUS_CONFIG } from "@/lib/utils/status";
-import { useChartForm } from "./use-chart-form";
+import { useChartForm, type ChartFormValues } from "./use-chart-form";
 import { saveDraftV2, loadDraftV2, clearDraft } from "./use-draft-persistence";
 import { FormField } from "./form-primitives/form-field";
 import { SearchableSelect } from "./form-primitives/searchable-select";
@@ -267,7 +267,7 @@ export function ChartMergedForm({
     return 0;
   }, [form.values.stitchCount, form.values.stitchesWide, form.values.stitchesHigh]);
 
-  // Draft hydration on mount -- uses V2 format (D-07)
+  // Draft hydration on mount -- uses V2 format
   // Only fires in create mode -- edit mode loads from initialData via useChartForm
   useEffect(() => {
     if (hydratedRef.current) return;
@@ -329,13 +329,14 @@ export function ChartMergedForm({
     const draft = loadDraftV2(defaultValues, designerIds, storageIds, appIds, fabricIds);
     if (!draft) return;
 
-    // Hydrate each field from draft
-    const keys = Object.keys(draft.form) as (keyof typeof draft.form)[];
-    for (const key of keys) {
-      const val = draft.form[key];
-      if (val !== undefined) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        form.setField(key, val as any);
+    // Hydrate each field from draft using a type-safe setter that preserves
+    // the key-value correlation TypeScript can't infer from Object.keys()
+    function hydrateField<K extends keyof ChartFormValues>(key: K, source: ChartFormValues) {
+      form.setField(key, source[key]);
+    }
+    for (const key of Object.keys(draft.form) as (keyof ChartFormValues)[]) {
+      if (draft.form[key] !== undefined) {
+        hydrateField(key, draft.form);
       }
     }
 

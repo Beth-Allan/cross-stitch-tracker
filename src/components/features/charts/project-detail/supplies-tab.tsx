@@ -84,7 +84,7 @@ export function SuppliesTab({ project, supplies }: SuppliesTabProps) {
   const router = useRouter();
   const [sortOption, setSortOption] = useState<SupplySortOption>("added");
 
-  // Stabilize router.refresh reference to prevent adapter recreation (D-03)
+  // Stabilize router.refresh reference to prevent adapter recreation
   const stableRefresh = useCallback(() => router.refresh(), [router]);
 
   // Instantiate ServerActionAdapter with project.id and stable refresh
@@ -93,18 +93,18 @@ export function SuppliesTab({ project, supplies }: SuppliesTabProps) {
     [project.id, stableRefresh],
   );
 
-  // CalcParams derived from project fields (D-01: read-only, no settings bar)
+  // CalcParams derived from project fields
   const calcParams: Partial<CalcParams> = useMemo(
     () => ({
       fabricCount: project.fabric?.count ?? 14,
-      strandCount: project.strandCount,
+      strandCount: project.strandCount as CalcParams["strandCount"],
       overCount: project.overCount,
       wastePercent: project.wastePercent,
     }),
     [project.fabric?.count, project.strandCount, project.overCount, project.wastePercent],
   );
 
-  // Transform + sort supply rows (D-05, D-06: parent pre-sorts, table is sort-unaware)
+  // Transform + sort supply rows (parent pre-sorts, table is sort-unaware)
   const threads = useMemo(
     () => sortSupplyRows(supplies.threads.map(threadToSupplyRow), sortOption),
     [supplies.threads, sortOption],
@@ -120,7 +120,6 @@ export function SuppliesTab({ project, supplies }: SuppliesTabProps) {
 
   return (
     <div className="space-y-4">
-      {/* Sort toggle (D-04: carried from old tab) */}
       <div className="flex items-center justify-end gap-1">
         <button
           onClick={() => setSortOption("added")}
@@ -146,7 +145,6 @@ export function SuppliesTab({ project, supplies }: SuppliesTabProps) {
         </button>
       </div>
 
-      {/* Unified supply table (no CalculatorSettingsBar per D-02/D-03) */}
       <SupplyTable
         threads={threads}
         beads={beads}

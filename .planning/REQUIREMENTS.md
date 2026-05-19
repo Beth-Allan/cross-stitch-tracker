@@ -32,20 +32,22 @@ Requirements for v1.6 Cleanup & Hardening. Each maps to roadmap phases.
 
 ### Code Quality
 
-- [ ] **QUAL-01**: strandCount type narrowed to literal union 1-6
-- [ ] **QUAL-02**: SORT_FIELDS/SORT_DIRS exported from single source, not duplicated
-- [ ] **QUAL-03**: MonthLabel and DayLabel use literal union types instead of string
-- [ ] **QUAL-04**: Date representation is consistent across stats types
-- [ ] **QUAL-05**: DailyBreakdownEntry extends CalendarSession to eliminate structural overlap
-- [ ] **QUAL-06**: WHAT-comments removed from Phase 20/21 code (~27 comments)
-- [ ] **QUAL-07**: Low-harm JSX section markers removed (~20 comments)
-- [ ] **QUAL-08**: Hardcoded emerald-* classes in log-session-modal replaced with semantic tokens
-- [ ] **QUAL-09**: PersonalBestRecord refactored to discriminated union eliminating 4 nullable fields
-- [ ] **QUAL-10**: BrokenRecordType defined as Exclude<RecordType, "currentStreak">
-- [ ] **QUAL-11**: CompletionEstimate ~ prefix moved from data layer to component rendering
-- [ ] **QUAL-12**: AvailableYearsData wrapper removed, returning number[] directly
-- [ ] **QUAL-13**: Shared buildDateFilter and Scope type extracted from 6 stats query modules
-- [ ] **QUAL-14**: Planning doc references cleaned from code comments
+- [x] **QUAL-01**: strandCount type narrowed to literal union 1-6
+- [x] **QUAL-02**: SORT_FIELDS/SORT_DIRS exported from single source, not duplicated
+- [x] **QUAL-03**: MonthLabel and DayLabel use literal union types instead of string
+- [x] **QUAL-04**: Date representation is consistent across stats types
+- [x] **QUAL-05**: DailyBreakdownEntry extends CalendarSession to eliminate structural overlap
+- [x] **QUAL-06**: WHAT-comments removed from Phase 20/21 code (~27 comments)
+- [x] **QUAL-07**: Low-harm JSX section markers removed (~20 comments)
+- [x] **QUAL-08**: Hardcoded emerald-* classes in log-session-modal replaced with semantic tokens
+- [x] **QUAL-09**: PersonalBestRecord refactored to discriminated union eliminating 4 nullable fields
+- [x] **QUAL-10**: BrokenRecordType defined as Exclude<RecordType, "currentStreak">
+- [x] **QUAL-11**: CompletionEstimate ~ prefix moved from data layer to component rendering
+- [x] **QUAL-12**: AvailableYearsData wrapper removed, returning number[] directly
+- [x] **QUAL-13**: Shared buildDateFilter and Scope type extracted from 6 stats query modules
+- [x] **QUAL-14**: Planning doc references cleaned from code comments
+- [x] **QUAL-15**: assertSuccess/assertFailure test assertion helpers added to test infrastructure
+- [x] **QUAL-16**: Project-wide vacuous assertion sweep (43 instances across 12 files) replaced with assertSuccess guards
 
 ### UX Polish
 
@@ -127,20 +129,22 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RELY-02 | Phase 23 | Complete |
 | RELY-03 | Phase 23 | Complete |
 | RELY-04 | Phase 23 | Complete |
-| QUAL-01 | Phase 24 | Pending |
-| QUAL-02 | Phase 24 | Pending |
-| QUAL-03 | Phase 24 | Pending |
-| QUAL-04 | Phase 24 | Pending |
-| QUAL-05 | Phase 24 | Pending |
-| QUAL-06 | Phase 24 | Pending |
-| QUAL-07 | Phase 24 | Pending |
-| QUAL-08 | Phase 24 | Pending |
-| QUAL-09 | Phase 24 | Pending |
-| QUAL-10 | Phase 24 | Pending |
-| QUAL-11 | Phase 24 | Pending |
-| QUAL-12 | Phase 24 | Pending |
-| QUAL-13 | Phase 24 | Pending |
-| QUAL-14 | Phase 24 | Pending |
+| QUAL-01 | Phase 24 | Complete |
+| QUAL-02 | Phase 24 | Complete |
+| QUAL-03 | Phase 24 | Complete |
+| QUAL-04 | Phase 24 | Complete |
+| QUAL-05 | Phase 24 | Complete |
+| QUAL-06 | Phase 24 | Complete |
+| QUAL-07 | Phase 24 | Complete |
+| QUAL-08 | Phase 24 | Complete |
+| QUAL-09 | Phase 24 | Complete |
+| QUAL-10 | Phase 24 | Complete |
+| QUAL-11 | Phase 24 | Complete |
+| QUAL-12 | Phase 24 | Complete |
+| QUAL-13 | Phase 24 | Complete |
+| QUAL-14 | Phase 24 | Complete |
+| QUAL-15 | Phase 24 | Complete |
+| QUAL-16 | Phase 24 | Complete |
 | UX-01 | Phase 26 | Pending |
 | UX-02 | Phase 26 | Pending |
 | UX-03 | Phase 26 | Pending |
@@ -157,8 +161,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-14 | Phase 26 | Pending |
 
 **Coverage:**
-- v1.6 requirements: 42 total
-- Mapped to phases: 42
+- v1.6 requirements: 44 total
+- Mapped to phases: 44
 - Unmapped: 0
 
 ---

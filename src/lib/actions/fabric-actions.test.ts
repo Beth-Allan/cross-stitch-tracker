@@ -1,5 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, createMockFabricBrand, createMockFabric } from "@/__tests__/mocks";
+import {
+  createMockPrisma,
+  createMockFabricBrand,
+  createMockFabric,
+  assertSuccess,
+  assertFailure,
+} from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -65,10 +71,8 @@ describe("fabric-actions", () => {
 
       const result = await createFabricBrand({ name: "Zweigart" });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.brand.name).toBe("Zweigart");
-      }
+      assertSuccess(result);
+      expect(result.brand.name).toBe("Zweigart");
       expect(mockPrisma.fabricBrand.create).toHaveBeenCalledWith({
         data: { name: "Zweigart", website: null },
       });
@@ -87,10 +91,8 @@ describe("fabric-actions", () => {
         website: "https://charlescraftinc.com",
       });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.brand.website).toBe("https://charlescraftinc.com");
-      }
+      assertSuccess(result);
+      expect(result.brand.website).toBe("https://charlescraftinc.com");
     });
 
     it("returns error for duplicate name (P2002)", async () => {
@@ -100,10 +102,8 @@ describe("fabric-actions", () => {
 
       const result = await createFabricBrand({ name: "Zweigart" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("A brand with that name already exists.");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("A brand with that name already exists.");
     });
 
     it("returns validation error for empty name", async () => {
@@ -111,10 +111,8 @@ describe("fabric-actions", () => {
 
       const result = await createFabricBrand({ name: "" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Brand name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Brand name is required");
     });
 
     it("returns validation error for invalid website URL", async () => {
@@ -122,10 +120,8 @@ describe("fabric-actions", () => {
 
       const result = await createFabricBrand({ name: "Test", website: "not-a-url" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Must be a valid URL");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Must be a valid URL");
     });
   });
 
@@ -160,10 +156,8 @@ describe("fabric-actions", () => {
 
       const result = await updateFabricBrand("fb-1", { name: "Existing Brand" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("A brand with that name already exists.");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("A brand with that name already exists.");
     });
 
     it("returns validation error for invalid input", async () => {
@@ -171,10 +165,8 @@ describe("fabric-actions", () => {
 
       const result = await updateFabricBrand("fb-1", { name: "" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Brand name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Brand name is required");
     });
   });
 
@@ -198,10 +190,8 @@ describe("fabric-actions", () => {
 
       const result = await deleteFabricBrand("fb-1");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Failed to delete brand");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Failed to delete brand");
       consoleSpy.mockRestore();
     });
   });
@@ -322,10 +312,8 @@ describe("fabric-actions", () => {
 
       const result = await createFabric(validFabricData);
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.fabric.name).toBe("White Aida 14ct");
-      }
+      assertSuccess(result);
+      expect(result.fabric.name).toBe("White Aida 14ct");
       expect(mockPrisma.fabric.create).toHaveBeenCalledWith({
         data: validFabricData,
       });
@@ -365,12 +353,10 @@ describe("fabric-actions", () => {
       const dataWithProject = { ...validFabricData, linkedProjectId: "proj-1" };
       const result = await createFabric(dataWithProject);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe(
-          "This project already has fabric linked. Edit the existing fabric instead.",
-        );
-      }
+      assertFailure(result);
+      expect(result.error).toBe(
+        "This project already has fabric linked. Edit the existing fabric instead.",
+      );
     });
 
     it("returns validation error for missing name", async () => {
@@ -378,10 +364,8 @@ describe("fabric-actions", () => {
 
       const result = await createFabric({ ...validFabricData, name: "" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Name is required");
     });
 
     it("returns validation error for invalid count", async () => {
@@ -389,10 +373,8 @@ describe("fabric-actions", () => {
 
       const result = await createFabric({ ...validFabricData, count: 0 });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Count is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Count is required");
     });
 
     it("returns validation error for invalid type", async () => {
@@ -409,10 +391,8 @@ describe("fabric-actions", () => {
 
       const result = await createFabric({ ...validFabricData, linkedProjectId: "proj-1" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Project not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Project not found");
       expect(mockPrisma.fabric.create).not.toHaveBeenCalled();
     });
 
@@ -422,10 +402,8 @@ describe("fabric-actions", () => {
 
       const result = await createFabric({ ...validFabricData, linkedProjectId: "nonexistent" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Project not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Project not found");
       expect(mockPrisma.fabric.create).not.toHaveBeenCalled();
     });
 
@@ -500,12 +478,10 @@ describe("fabric-actions", () => {
         linkedProjectId: "proj-1",
       });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe(
-          "This project already has fabric linked. Edit the existing fabric instead.",
-        );
-      }
+      assertFailure(result);
+      expect(result.error).toBe(
+        "This project already has fabric linked. Edit the existing fabric instead.",
+      );
     });
 
     it("returns validation error for invalid input", async () => {
@@ -513,10 +489,8 @@ describe("fabric-actions", () => {
 
       const result = await updateFabric("fabric-1", { ...validUpdateData, name: "" });
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Name is required");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Name is required");
     });
 
     it("rejects update when fabric is linked to another user's project", async () => {
@@ -527,10 +501,8 @@ describe("fabric-actions", () => {
 
       const result = await updateFabric("fabric-1", validUpdateData);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Fabric not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Fabric not found");
       expect(mockPrisma.fabric.update).not.toHaveBeenCalled();
     });
   });
@@ -566,10 +538,8 @@ describe("fabric-actions", () => {
 
       const result = await deleteFabric("fabric-1");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Failed to delete fabric");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Failed to delete fabric");
       consoleSpy.mockRestore();
     });
 
@@ -581,10 +551,8 @@ describe("fabric-actions", () => {
 
       const result = await deleteFabric("fabric-1");
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Fabric not found");
-      }
+      assertFailure(result);
+      expect(result.error).toBe("Fabric not found");
       expect(mockPrisma.fabric.delete).not.toHaveBeenCalled();
     });
   });
