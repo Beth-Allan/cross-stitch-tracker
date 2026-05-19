@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
@@ -64,6 +64,7 @@ export async function createThread(formData: unknown) {
       data: { ...validated, brandId: resolvedBrandId },
     });
     revalidatePath("/supplies");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, thread };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -90,6 +91,7 @@ export async function updateThread(id: string, formData: unknown) {
       data: validated,
     });
     revalidatePath("/supplies");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, thread };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -112,6 +114,7 @@ export async function deleteThread(id: string) {
   try {
     await prisma.thread.delete({ where: { id } });
     revalidatePath("/supplies");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     console.error("deleteThread error:", error);
@@ -151,6 +154,7 @@ export async function createBead(formData: unknown) {
       data: { ...validated, brandId: resolvedBrandId },
     });
     revalidatePath("/supplies");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, bead };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -177,6 +181,7 @@ export async function updateBead(id: string, formData: unknown) {
       data: validated,
     });
     revalidatePath("/supplies");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, bead };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -199,6 +204,7 @@ export async function deleteBead(id: string) {
   try {
     await prisma.bead.delete({ where: { id } });
     revalidatePath("/supplies");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     console.error("deleteBead error:", error);
@@ -236,6 +242,7 @@ export async function createSpecialtyItem(formData: unknown) {
       data: { ...validated, brandId: resolvedBrandId },
     });
     revalidatePath("/supplies");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, specialtyItem };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -265,6 +272,7 @@ export async function updateSpecialtyItem(id: string, formData: unknown) {
       data: validated,
     });
     revalidatePath("/supplies");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, specialtyItem };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -290,6 +298,7 @@ export async function deleteSpecialtyItem(id: string) {
   try {
     await prisma.specialtyItem.delete({ where: { id } });
     revalidatePath("/supplies");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     console.error("deleteSpecialtyItem error:", error);
@@ -328,6 +337,7 @@ export async function createSupplyBrand(formData: unknown) {
     const brand = await prisma.supplyBrand.create({ data: validated });
     revalidatePath("/supplies");
     revalidatePath("/supplies/brands");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, brand };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -355,6 +365,7 @@ export async function updateSupplyBrand(id: string, formData: unknown) {
     });
     revalidatePath("/supplies");
     revalidatePath("/supplies/brands");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, brand };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -378,6 +389,7 @@ export async function deleteSupplyBrand(id: string) {
     await prisma.supplyBrand.delete({ where: { id } });
     revalidatePath("/supplies");
     revalidatePath("/supplies/brands");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     console.error("deleteSupplyBrand error:", error);
@@ -416,6 +428,7 @@ export async function addThreadToProject(formData: unknown) {
     const record = await prisma.projectThread.create({ data: validated });
     revalidatePath("/charts");
     revalidatePath("/shopping");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, record };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -453,6 +466,7 @@ export async function addBeadToProject(formData: unknown) {
     const record = await prisma.projectBead.create({ data: validated });
     revalidatePath("/charts");
     revalidatePath("/shopping");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, record };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -490,6 +504,7 @@ export async function addSpecialtyToProject(formData: unknown) {
     const record = await prisma.projectSpecialty.create({ data: validated });
     revalidatePath("/charts");
     revalidatePath("/shopping");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, record };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -560,6 +575,7 @@ export async function updateProjectSupplyQuantity(
 
     revalidatePath("/charts");
     revalidatePath("/shopping");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -588,6 +604,7 @@ export async function removeProjectThread(id: string) {
     await prisma.projectThread.delete({ where: { id } });
     revalidatePath("/charts");
     revalidatePath("/shopping");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     console.error("removeProjectThread error:", error);
@@ -613,6 +630,7 @@ export async function removeProjectBead(id: string) {
     await prisma.projectBead.delete({ where: { id } });
     revalidatePath("/charts");
     revalidatePath("/shopping");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     console.error("removeProjectBead error:", error);
@@ -638,6 +656,7 @@ export async function removeProjectSpecialty(id: string) {
     await prisma.projectSpecialty.delete({ where: { id } });
     revalidatePath("/charts");
     revalidatePath("/shopping");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     console.error("removeProjectSpecialty error:", error);
@@ -723,6 +742,7 @@ export async function createAndAddThread(formData: unknown) {
 
     revalidatePath("/charts");
     revalidatePath("/shopping");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, record: result };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -774,6 +794,7 @@ export async function createAndAddBead(formData: unknown) {
 
     revalidatePath("/charts");
     revalidatePath("/shopping");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, record: result };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -824,6 +845,7 @@ export async function createAndAddSpecialty(formData: unknown) {
 
     revalidatePath("/charts");
     revalidatePath("/shopping");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, record: result };
   } catch (error) {
     if (error instanceof z.ZodError) {

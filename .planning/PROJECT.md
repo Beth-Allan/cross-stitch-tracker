@@ -23,8 +23,9 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 **Last shipped:** v1.5 Statistics & Records (2026-05-18)
 **Phase 22 complete:** Critical Fixes & Test Infrastructure (2026-05-18)
+**Phase 23 complete:** Test Coverage & Reliability (2026-05-18)
 
-The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project selection, image optimization, multi-file working copies per chart, click-to-set focal point control for cover images, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights, and celebration confetti on record-breaking sessions. 1,995 tests, ~125k LOC TypeScript. Stats page resilient to individual query failures via Promise.allSettled.
+The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project selection, image optimization, multi-file working copies per chart, click-to-set focal point control for cover images, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights, and celebration confetti on record-breaking sessions. 2,029 tests, ~125k LOC TypeScript. Stats page resilient to individual query failures via Promise.allSettled. Session file errors logged instead of silently swallowed, stats cache invalidated on chart status and supply mutations, over-100% stitch count warning.
 
 ## Requirements
 
@@ -228,4 +229,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-18 after v1.6 milestone start*
+*Last updated: 2026-05-18 after Phase 23 completion*

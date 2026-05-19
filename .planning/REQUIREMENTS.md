@@ -16,19 +16,19 @@ Requirements for v1.6 Cleanup & Hardening. Each maps to roadmap phases.
 
 ### Test Coverage
 
-- [ ] **TEST-01**: Skein calculator has edge case tests for fabricCount=0 and resolveDefaultBrandId
+- [x] **TEST-01**: Skein calculator has edge case tests for fabricCount=0 and resolveDefaultBrandId
 - [x] **TEST-02**: Test infrastructure uses createMockPrisma() defaults and fixes vacuous assertions for $transaction
 - [x] **TEST-03**: Stats actions have tests for requireAuth rejection and Zod boundary violations
-- [ ] **TEST-04**: StitchingCalendar has tests for Jan-to-Dec and Dec-to-Jan year-rollover navigation
-- [ ] **TEST-05**: Record detection handles two sessions on same day with identical stitch counts
-- [ ] **TEST-06**: Completion estimates exclude projects where stitchesCompleted >= totalStitches
+- [x] **TEST-04**: StitchingCalendar has tests for Jan-to-Dec and Dec-to-Jan year-rollover navigation
+- [x] **TEST-05**: Record detection handles two sessions on same day with identical stitch counts
+- [x] **TEST-06**: Completion estimates exclude projects where stitchesCompleted >= totalStitches
 
 ### Reliability
 
-- [ ] **RELY-01**: Session-actions surface file deletion and photo upload errors instead of silently swallowing them
-- [ ] **RELY-02**: Stats cache invalidates when chart status changes via updateChartStatus
-- [ ] **RELY-03**: Stats cache invalidates when supply mutations occur in supply-actions
-- [ ] **RELY-04**: Session logging validates stitch count does not exceed project total
+- [x] **RELY-01**: Session-actions surface file deletion and photo upload errors instead of silently swallowing them
+- [x] **RELY-02**: Stats cache invalidates when chart status changes via updateChartStatus
+- [x] **RELY-03**: Stats cache invalidates when supply mutations occur in supply-actions
+- [x] **RELY-04**: Session logging validates stitch count does not exceed project total
 
 ### Code Quality
 
@@ -117,16 +117,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CRIT-02 | Phase 25 | Pending |
 | CRIT-03 | Phase 22 | Complete |
 | CRIT-04 | Phase 22 | Complete |
-| TEST-01 | Phase 23 | Pending |
+| TEST-01 | Phase 23 | Complete |
 | TEST-02 | Phase 22 | Complete |
 | TEST-03 | Phase 22 | Complete |
-| TEST-04 | Phase 23 | Pending |
-| TEST-05 | Phase 23 | Pending |
-| TEST-06 | Phase 23 | Pending |
-| RELY-01 | Phase 23 | Pending |
-| RELY-02 | Phase 23 | Pending |
-| RELY-03 | Phase 23 | Pending |
-| RELY-04 | Phase 23 | Pending |
+| TEST-04 | Phase 23 | Complete |
+| TEST-05 | Phase 23 | Complete |
+| TEST-06 | Phase 23 | Complete |
+| RELY-01 | Phase 23 | Complete |
+| RELY-02 | Phase 23 | Complete |
+| RELY-03 | Phase 23 | Complete |
+| RELY-04 | Phase 23 | Complete |
 | QUAL-01 | Phase 24 | Pending |
 | QUAL-02 | Phase 24 | Pending |
 | QUAL-03 | Phase 24 | Pending |

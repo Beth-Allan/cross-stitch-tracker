@@ -170,4 +170,34 @@ describe("StitchingCalendar", () => {
     expect(paddingCells.length).toBeGreaterThan(0);
     expect(paddingCells[0].className).toContain("bg-muted");
   });
+
+  it("navigates backward across year boundary (Jan -> Dec)", async () => {
+    const { fetchCalendarMonth } = await import("@/lib/actions/stats-actions");
+    const mockFetch = vi.mocked(fetchCalendarMonth);
+    mockFetch.mockResolvedValue({ success: true, data: [] });
+
+    render(<StitchingCalendar data={[]} initialMonth={1} initialYear={2026} />);
+
+    const prevBtn = screen.getByRole("button", { name: "Previous month" });
+    fireEvent.click(prevBtn);
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith(12, 2025);
+    });
+  });
+
+  it("navigates forward across year boundary (Dec -> Jan)", async () => {
+    const { fetchCalendarMonth } = await import("@/lib/actions/stats-actions");
+    const mockFetch = vi.mocked(fetchCalendarMonth);
+    mockFetch.mockResolvedValue({ success: true, data: [] });
+
+    render(<StitchingCalendar data={[]} initialMonth={12} initialYear={2026} />);
+
+    const nextBtn = screen.getByRole("button", { name: "Next month" });
+    fireEvent.click(nextBtn);
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith(1, 2027);
+    });
+  });
 });

@@ -55,7 +55,14 @@ export async function createSession(formData: unknown) {
     // Verify project ownership
     const project = await prisma.project.findUnique({
       where: { id: validated.projectId },
-      select: { id: true, userId: true, chartId: true, startingStitches: true },
+      select: {
+        id: true,
+        userId: true,
+        chartId: true,
+        startingStitches: true,
+        stitchesCompleted: true,
+        chart: { select: { stitchCount: true } },
+      },
     });
     if (!project || project.userId !== user.id) {
       return { success: false as const, error: "Project not found" };
@@ -87,7 +94,9 @@ export async function createSession(formData: unknown) {
             data: { photoKey: result.optimizedKey },
           });
           returnSession = { ...session, photoKey: result.optimizedKey };
-          await deleteFile(session.photoKey).catch(() => {});
+          await deleteFile(session.photoKey).catch((err) =>
+            console.warn("[R2] raw file cleanup failed:", session.photoKey, err),
+          );
         }
       } catch (err) {
         console.warn("Session photo optimization failed:", err);
@@ -105,10 +114,18 @@ export async function createSession(formData: unknown) {
       console.warn("[stats] Record detection failed (non-blocking):", err);
     }
 
+    let warning: "overTotal" | undefined;
+    if (
+      project.chart?.stitchCount &&
+      project.stitchesCompleted + validated.stitchCount > project.chart.stitchCount
+    ) {
+      warning = "overTotal";
+    }
+
     revalidatePath(`/charts/${project.chartId}`);
     revalidatePath("/sessions");
     revalidateTag("stats", { expire: 0 });
-    return { success: true as const, session: returnSession, brokenRecords };
+    return { success: true as const, session: returnSession, brokenRecords, warning };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };
@@ -130,7 +147,14 @@ export async function updateSession(sessionId: string, formData: unknown) {
       where: { id: sessionId },
       include: {
         project: {
-          select: { id: true, userId: true, chartId: true, startingStitches: true },
+          select: {
+            id: true,
+            userId: true,
+            chartId: true,
+            startingStitches: true,
+            stitchesCompleted: true,
+            chart: { select: { stitchCount: true } },
+          },
         },
       },
     });
@@ -175,17 +199,28 @@ export async function updateSession(sessionId: string, formData: unknown) {
             data: { photoKey: result.optimizedKey },
           });
           returnSession = { ...session, photoKey: result.optimizedKey };
-          await deleteFile(session.photoKey).catch(() => {});
+          await deleteFile(session.photoKey).catch((err) =>
+            console.warn("[R2] raw file cleanup failed:", session.photoKey, err),
+          );
         }
       } catch (err) {
         console.warn("Session photo optimization failed:", err);
       }
     }
 
+    let warning: "overTotal" | undefined;
+    const stitchDelta = validated.stitchCount - existing.stitchCount;
+    if (
+      existing.project.chart?.stitchCount &&
+      existing.project.stitchesCompleted + stitchDelta > existing.project.chart.stitchCount
+    ) {
+      warning = "overTotal";
+    }
+
     revalidatePath(`/charts/${chartId}`);
     revalidatePath("/sessions");
     revalidateTag("stats", { expire: 0 });
-    return { success: true as const, session: returnSession };
+    return { success: true as const, session: returnSession, warning };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };
@@ -223,6 +258,12 @@ export async function deleteSession(sessionId: string) {
 
       await recalculateProgress(tx, projectId);
     });
+
+    if (existing.photoKey) {
+      await deleteFile(existing.photoKey).catch((err) =>
+        console.warn("[R2] raw file cleanup failed:", existing.photoKey, err),
+      );
+    }
 
     revalidatePath(`/charts/${chartId}`);
     revalidatePath("/sessions");
