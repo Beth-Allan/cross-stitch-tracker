@@ -10,7 +10,7 @@ export type SupplyType = "THREAD" | "BEAD" | "SPECIALTY";
 
 export interface CalcParams {
   fabricCount: number; // default 14
-  strandCount: number; // default 2
+  strandCount: 1 | 2 | 3 | 4 | 5 | 6; // default 2
   overCount: 1 | 2; // default 1
   wastePercent: number; // default 20
 }
