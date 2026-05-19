@@ -1,27 +1,11 @@
 ---
 phase: 24-code-quality
 verified: 2026-05-19T02:05:17Z
-status: gaps_found
-score: 5/6 must-haves verified
+status: passed
+score: 6/6 must-haves verified
 overrides_applied: 0
-gaps:
-  - truth: "strandCount, MonthLabel, DayLabel, and BrokenRecordType use literal union types instead of broad string/number"
-    status: partial
-    reason: "Types are defined with correct literal unions in stats.ts and supply-table/types.ts. However, narrowing these types introduced 5 TypeScript compile errors in consumers that were not updated: calculator-card.tsx (strandCount: number passed where 1|2|3|4|5|6 required), supplies-tab.tsx (project.strandCount from Prisma is number), use-draft-persistence.test.ts (strandCount: 2 not inferred as literal), monthly-stitch-chart.test.tsx x2 (month: string fixtures don't satisfy MonthLabel). `npx tsc --noEmit` fails with 5 errors (excluding generated code)."
-    artifacts:
-      - path: "src/components/features/charts/form-primitives/calculator-card.tsx"
-        issue: "Line 47: onCalcParamsChange spread passes strandCount as number from EditableNumber (which returns number), not assignable to 1|2|3|4|5|6"
-      - path: "src/components/features/charts/project-detail/supplies-tab.tsx"
-        issue: "Line 97: project.strandCount is Prisma Int (number), not assignable to Partial<CalcParams> with literal union strandCount"
-      - path: "src/components/features/charts/use-draft-persistence.test.ts"
-        issue: "Line 298: test fixture { strandCount: 2 } inferred as number, not assignable to CalcParams parameter"
-      - path: "src/components/features/stats/monthly-stitch-chart.test.tsx"
-        issue: "Lines 86, 92: test fixtures use { month: string } which is not assignable to MonthlyTotal[] (requires MonthLabel literal union)"
-    missing:
-      - "calculator-card.tsx: Cast value to literal union or add validation in handleStrandsChange (e.g., value as 1|2|3|4|5|6)"
-      - "supplies-tab.tsx: Cast project.strandCount to literal union at the CalcParams construction site"
-      - "use-draft-persistence.test.ts: Add 'as const' or type assertion to strandCount: 2"
-      - "monthly-stitch-chart.test.tsx: Change fixture month values to typed MonthLabel values or cast to MonthLabel"
+gaps: []
+gap_resolution: "5 TypeScript errors from type narrowing fixed inline — casts added at Prisma/EditableNumber boundaries, test fixtures use `as const`"
 ---
 
 # Phase 24: Code Quality Verification Report
