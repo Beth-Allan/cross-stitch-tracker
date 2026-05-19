@@ -1,7 +1,7 @@
 /**
  * Public API for the Unified Supply Table component system.
  *
- * Consumers (Phase 11 project detail, Phase 13 supply takeover)
+ * Consumers (project detail page, supply takeover flow)
  * import from this barrel file. Internal sub-components
  * (AddRow, DataRow, SectionDivider, Footer) are implementation details
  * and are NOT exported.

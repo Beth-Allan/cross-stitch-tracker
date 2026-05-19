@@ -33,7 +33,7 @@ import {
  * Handles field name mapping (UI-friendly -> Prisma-style), type case mapping
  * (THREAD -> "thread"), and router.refresh() on success for data revalidation.
  *
- * Returns junction record IDs on add success for new-row animation wiring (D-07, D-10).
+ * Returns junction record IDs on add success for new-row animation wiring.
  */
 export class ServerActionAdapter implements SupplyTableAdapter {
   private calcParams: CalcParams | null = null;

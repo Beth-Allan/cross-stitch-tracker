@@ -24,7 +24,7 @@ export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [logModalOpen, setLogModalOpen] = useState(false);
 
-  // Listen for Quick Add "Log Stitches" custom event (D-08)
+  // Listen for Quick Add "Log Stitches" custom event
   useEffect(() => {
     function handleOpenLogModal() {
       setLogModalOpen(true);

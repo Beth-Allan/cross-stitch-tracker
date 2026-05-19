@@ -14,9 +14,8 @@ interface HeroCoverBannerProps {
 
 /**
  * Full-width cover banner for the project detail hero.
- * Renders the cover image with object-contain (never crop per D-01)
- * over a blurred background fill for visual weight.
- * Returns null when no image (per D-02: compact metadata-forward layout).
+ * Renders the cover image with object-contain over a blurred background
+ * fill for visual weight. Returns null when no image.
  */
 export function HeroCoverBanner({
   imageUrl,
@@ -27,7 +26,7 @@ export function HeroCoverBanner({
 }: HeroCoverBannerProps) {
   const [imgError, setImgError] = useState(false);
 
-  // D-02: Skip banner entirely when no cover image
+  // Skip banner entirely when no cover image
   if (!imageUrl || imgError) return null;
 
   return (
@@ -41,7 +40,7 @@ export function HeroCoverBanner({
         className="scale-110 object-cover opacity-60 blur-[20px]"
         unoptimized
       />
-      {/* Foreground image with object-contain (D-01: never crop) — priority for LCP */}
+      {/* Foreground image with object-contain -- priority for LCP */}
       <Image
         src={imageUrl}
         alt={`Cover for ${chartName}`}
