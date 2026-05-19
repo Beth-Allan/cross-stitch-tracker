@@ -125,7 +125,7 @@ async function getBuriedTreasures(userId: string): Promise<BuriedTreasure[]> {
     where: {
       OR: [
         { project: { userId, status: "UNSTARTED" } },
-        { project: null }, // Safe: single-user app. Add Chart.userId if multi-user is added.
+        { project: null }, // TODO(999.0.17): add Chart.userId ownership check for multi-user
       ],
     },
     include: {
