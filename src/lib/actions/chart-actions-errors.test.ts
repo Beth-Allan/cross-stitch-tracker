@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma } from "@/__tests__/mocks";
+import { createMockPrisma, assertFailure } from "@/__tests__/mocks";
 
 // Mock auth to return authenticated session
 vi.mock("@/lib/auth", () => ({
@@ -62,11 +62,9 @@ describe("chart-actions authenticated error paths", () => {
     const { createChart } = await import("./chart-actions");
     const result = await createChart({});
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(typeof result.error).toBe("string");
-      expect(result.error.length).toBeGreaterThan(0);
-    }
+    assertFailure(result);
+    expect(typeof result.error).toBe("string");
+    expect(result.error.length).toBeGreaterThan(0);
   });
 
   it("createChart returns error on DB failure", async () => {
@@ -82,10 +80,8 @@ describe("chart-actions authenticated error paths", () => {
     const { updateChart } = await import("./chart-actions");
     const result = await updateChart("chart-1", { bad: "data" });
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(typeof result.error).toBe("string");
-    }
+    assertFailure(result);
+    expect(typeof result.error).toBe("string");
   });
 
   it("updateChart returns error on DB failure", async () => {
