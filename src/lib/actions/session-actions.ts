@@ -147,7 +147,14 @@ export async function updateSession(sessionId: string, formData: unknown) {
       where: { id: sessionId },
       include: {
         project: {
-          select: { id: true, userId: true, chartId: true, startingStitches: true },
+          select: {
+            id: true,
+            userId: true,
+            chartId: true,
+            startingStitches: true,
+            stitchesCompleted: true,
+            chart: { select: { stitchCount: true } },
+          },
         },
       },
     });
@@ -201,10 +208,19 @@ export async function updateSession(sessionId: string, formData: unknown) {
       }
     }
 
+    let warning: "overTotal" | undefined;
+    const stitchDelta = validated.stitchCount - existing.stitchCount;
+    if (
+      existing.project.chart?.stitchCount &&
+      existing.project.stitchesCompleted + stitchDelta > existing.project.chart.stitchCount
+    ) {
+      warning = "overTotal";
+    }
+
     revalidatePath(`/charts/${chartId}`);
     revalidatePath("/sessions");
     revalidateTag("stats", { expire: 0 });
-    return { success: true as const, session: returnSession };
+    return { success: true as const, session: returnSession, warning };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };

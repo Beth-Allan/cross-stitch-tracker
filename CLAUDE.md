@@ -34,6 +34,9 @@
   - Plan 03: `revalidateTag("stats")` on chart status + all 22 supply mutations, resolveDefaultBrandId tests
   - Code review: 2 warnings (WR-01 pre-transaction race in overTotal, WR-02 missing createAndAdd\* revalidateTag test assertions)
   - ROADMAP SC 7 wording aligned with D-04 decision (warn, not reject)
+- **Phase 23 shipped** — PR #42 created, 4-agent review completed, findings fixed, 2037 tests passing
+  - Fixed: updateSession missing overTotal warning, missing toast.warning test, supply cache invalidation test coverage (1/22 → 4/22 representative)
+  - Backlogged: 8 items (999.50-999.57) for upload-actions silent catch, completion estimate catch, photo cleanup, bare catches, etc.
 
 ### Next Up — RESUME HERE
 
@@ -103,6 +106,14 @@
 - ~~999.47: shopping-cart-actions.test.ts `as` type assertion~~ — **Fixed in Phase 22 PR review**
 - 999.48: createMockStitchSession uses inline type instead of `Partial<StitchSession>` — won't catch schema drift unlike every other factory
 - ~~999.49: dashboard-tabs.test.tsx imports RenderOptions from @testing-library/react~~ — **Fixed in Phase 22 PR review**
+- 999.50: Remaining `.catch(() => {})` in upload-actions.ts:155 — same silent pattern fixed in session-actions; orphans raw files with no log trail
+- 999.51: `.catch(() => null)` in charts/[id]/page.tsx:50 — swallows all completion estimate errors; indistinguishable from "no data"
+- 999.52: Old photo not cleaned up from R2 when user replaces photo in updateSession — storage leak over time
+- 999.53: Bare `catch {}` blocks in log-session-modal.tsx (lines 166, 229, 249) — discard error details, no console.error for debugging
+- 999.54: `.catch()` on deleteFile misleading — function returns `{ success: false }`, doesn't throw; catch only fires on auth race
+- 999.55: processAndStoreImage `{ success: false }` silently ignored — no log when image optimization fails via return path
+- 999.56: Record-detection test verbose WHAT-comments — 6-line block at record-detection.test.ts:224-229 explains arithmetic the assertions prove
+- 999.57: New section-marker comments in chart-actions.test.ts:229 and supply-actions.test.ts:1423,1502 — consistent with style but counter to QUAL-07 cleanup
 
 ### Blockers
 

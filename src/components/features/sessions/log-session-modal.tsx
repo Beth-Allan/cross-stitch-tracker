@@ -200,6 +200,11 @@ export function LogSessionModal({
           const result = await updateSession(editSession.id, formData);
           if (result.success) {
             toast.success("Session updated");
+            if (result.warning === "overTotal") {
+              toast.warning(
+                "This session pushes progress past 100% — is your stitch count accurate?",
+              );
+            }
             onOpenChange(false);
             return;
           }

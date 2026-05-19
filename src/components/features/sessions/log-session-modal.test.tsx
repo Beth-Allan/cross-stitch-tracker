@@ -25,6 +25,7 @@ vi.mock("sonner", () => ({
   toast: Object.assign(vi.fn(), {
     success: vi.fn(),
     error: vi.fn(),
+    warning: vi.fn(),
   }),
 }));
 
@@ -244,6 +245,56 @@ describe("LogSessionModal", () => {
       expect(mockFireCelebration).not.toHaveBeenCalled();
     });
 
+    it("shows warning toast when createSession returns overTotal warning", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      mockCreateSession.mockResolvedValue({
+        success: true,
+        session: { id: "new-1" },
+        brokenRecords: [],
+        warning: "overTotal",
+      });
+
+      renderModal();
+
+      await user.click(screen.getByText("Select a project..."));
+      await user.click(screen.getByText("Autumn Sampler"));
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.type(stitchInput, "9000");
+      await user.click(getSaveButton());
+
+      const { toast } = await import("sonner");
+      await waitFor(() => {
+        expect(toast.warning).toHaveBeenCalledWith(
+          "This session pushes progress past 100% — is your stitch count accurate?",
+        );
+      });
+    });
+
+    it("does not show warning toast when createSession has no warning", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      mockCreateSession.mockResolvedValue({
+        success: true,
+        session: { id: "new-1" },
+        brokenRecords: [],
+      });
+
+      renderModal();
+
+      await user.click(screen.getByText("Select a project..."));
+      await user.click(screen.getByText("Autumn Sampler"));
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.type(stitchInput, "100");
+      await user.click(getSaveButton());
+
+      const { toast } = await import("sonner");
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith("Session logged");
+      });
+      expect(toast.warning).not.toHaveBeenCalled();
+    });
+
     it("shows success toast when brokenRecords is undefined (backward compat)", async () => {
       vi.useRealTimers();
       const user = userEvent.setup();
@@ -328,6 +379,30 @@ describe("LogSessionModal", () => {
       await waitFor(() => {
         expect(mockDeleteSession).toHaveBeenCalledWith("session-1");
       });
+    });
+
+    it("shows warning toast when updateSession returns overTotal warning", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      mockUpdateSession.mockResolvedValue({
+        success: true,
+        session: { id: "session-1" },
+        warning: "overTotal",
+      });
+      renderModal({ editSession, lockedProjectId: "proj-1" });
+
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.clear(stitchInput);
+      await user.type(stitchInput, "9000");
+      await user.click(screen.getByRole("button", { name: /save changes/i }));
+
+      const { toast } = await import("sonner");
+      await waitFor(() => {
+        expect(toast.warning).toHaveBeenCalledWith(
+          "This session pushes progress past 100% — is your stitch count accurate?",
+        );
+      });
+      expect(toast.success).toHaveBeenCalledWith("Session updated");
     });
 
     it("pre-populates time fields from timeSpentMinutes", () => {

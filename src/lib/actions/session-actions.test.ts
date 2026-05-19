@@ -898,6 +898,90 @@ describe("session-actions", () => {
       expect(mockRevalidateTag).toHaveBeenCalledWith("stats", { expire: 0 });
     });
 
+    it("returns overTotal warning when updated stitch count pushes past 100%", async () => {
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
+        ...createMockStitchSession({ id: "session-1", stitchCount: 50 }),
+        project: {
+          id: "proj-1",
+          userId: "user-1",
+          chartId: "chart-1",
+          startingStitches: 0,
+          stitchesCompleted: 950,
+          chart: { stitchCount: 1000 },
+        },
+      });
+
+      const updatedSession = createMockStitchSession({ id: "session-1", stitchCount: 200 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            update: vi.fn().mockResolvedValue(updatedSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 1100 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 1100 }),
+          },
+        });
+      });
+
+      const { updateSession } = await import("./session-actions");
+      const result = await updateSession("session-1", {
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 200,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.warning).toBe("overTotal");
+      }
+    });
+
+    it("does not return overTotal warning when updated stitch count stays under 100%", async () => {
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
+        ...createMockStitchSession({ id: "session-1", stitchCount: 50 }),
+        project: {
+          id: "proj-1",
+          userId: "user-1",
+          chartId: "chart-1",
+          startingStitches: 0,
+          stitchesCompleted: 500,
+          chart: { stitchCount: 1000 },
+        },
+      });
+
+      const updatedSession = createMockStitchSession({ id: "session-1", stitchCount: 100 });
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            update: vi.fn().mockResolvedValue(updatedSession),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 550 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 550 }),
+          },
+        });
+      });
+
+      const { updateSession } = await import("./session-actions");
+      const result = await updateSession("session-1", {
+        projectId: "proj-1",
+        date: "2026-04-10",
+        stitchCount: 100,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.warning).toBeUndefined();
+      }
+    });
+
     it("optimizes new photo on update when photoKey is present", async () => {
       mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
         ...createMockStitchSession({ id: "session-1" }),

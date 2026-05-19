@@ -1429,9 +1429,7 @@ describe("supply-actions", () => {
         name: "Custom (Thread)",
         supplyType: "THREAD",
       });
-      mockPrisma.thread.create.mockResolvedValueOnce(
-        createMockThread({ brandId: "brand-custom" }),
-      );
+      mockPrisma.thread.create.mockResolvedValueOnce(createMockThread({ brandId: "brand-custom" }));
       const { createThread } = await import("./supply-actions");
 
       await createThread({
@@ -1478,9 +1476,7 @@ describe("supply-actions", () => {
         name: "Custom (Bead)",
         supplyType: "BEAD",
       });
-      mockPrisma.bead.create.mockResolvedValueOnce(
-        createMockBead({ brandId: "brand-bead" }),
-      );
+      mockPrisma.bead.create.mockResolvedValueOnce(createMockBead({ brandId: "brand-bead" }));
       const { createBead } = await import("./supply-actions");
 
       await createBead({
@@ -1514,6 +1510,48 @@ describe("supply-actions", () => {
         hexColor: "#000000",
         colorFamily: "BLACK",
       });
+
+      expect(result.success).toBe(true);
+      expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+    });
+
+    it("deleteThread calls revalidateTag('stats') after successful deletion", async () => {
+      mockPrisma.thread.delete.mockResolvedValueOnce({});
+      const { deleteThread } = await import("./supply-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await deleteThread("t1");
+
+      expect(result.success).toBe(true);
+      expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+    });
+
+    it("updateBead calls revalidateTag('stats') after successful update", async () => {
+      mockPrisma.bead.update.mockResolvedValueOnce(createMockBead({ id: "b1" }));
+      const { updateBead } = await import("./supply-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await updateBead("b1", {
+        brandId: "brand-1",
+        productCode: "00123",
+        colorName: "Red",
+        hexColor: "#FF0000",
+        colorFamily: "RED",
+      });
+
+      expect(result.success).toBe(true);
+      expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+    });
+
+    it("addBeadToProject calls revalidateTag('stats') after successful link", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      mockPrisma.projectBead.create.mockResolvedValueOnce(
+        createMockProjectBead({ projectId: "p1", beadId: "b1" }),
+      );
+      const { addBeadToProject } = await import("./supply-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await addBeadToProject({ projectId: "p1", beadId: "b1" });
 
       expect(result.success).toBe(true);
       expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
