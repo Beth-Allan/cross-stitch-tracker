@@ -1,12 +1,12 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getUserTimezone } from "./timezone";
-import { buildDateFilter } from "./utils";
+import { buildDateFilter, type Scope } from "./utils";
 import type { ThreadInsight } from "@/types/stats";
 
 async function computeThreadInsights(
   userId: string,
-  scope: string,
+  scope: Scope,
   limit: number,
 ): Promise<ThreadInsight[]> {
   try {
@@ -63,7 +63,7 @@ async function computeThreadInsights(
   }
 }
 
-export function getThreadInsights(userId: string, scope: string, limit = 10) {
+export function getThreadInsights(userId: string, scope: Scope, limit = 10) {
   const currentYear = new Date().getFullYear();
   const year = parseInt(scope, 10);
   const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;

@@ -3,7 +3,7 @@ import { TZDate } from "@date-fns/tz";
 import { format, differenceInCalendarDays } from "date-fns";
 import { prisma } from "@/lib/db";
 import { getUserTimezone } from "./timezone";
-import { buildDateFilter } from "./utils";
+import { buildDateFilter, type Scope } from "./utils";
 import type { PersonalBestRecord, ProjectLinkedRecord, AggregateRecord } from "@/types/stats";
 
 interface SessionRow {
@@ -16,7 +16,7 @@ interface SessionRow {
   };
 }
 
-async function computePersonalBests(userId: string, scope: string): Promise<PersonalBestRecord[]> {
+async function computePersonalBests(userId: string, scope: Scope): Promise<PersonalBestRecord[]> {
   try {
     const tz = getUserTimezone(userId);
     const dateFilter = buildDateFilter(scope, tz);
@@ -174,7 +174,7 @@ async function computePersonalBests(userId: string, scope: string): Promise<Pers
   }
 }
 
-export function getPersonalBests(userId: string, scope: string) {
+export function getPersonalBests(userId: string, scope: Scope) {
   const currentYear = new Date().getFullYear();
   const year = parseInt(scope, 10);
   const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;

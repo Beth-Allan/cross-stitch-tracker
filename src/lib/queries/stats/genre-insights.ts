@@ -1,12 +1,12 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getUserTimezone } from "./timezone";
-import { buildDateFilter } from "./utils";
+import { buildDateFilter, type Scope } from "./utils";
 import type { GenreInsight } from "@/types/stats";
 
 async function computeGenreInsights(
   userId: string,
-  scope: string,
+  scope: Scope,
   limit: number,
 ): Promise<GenreInsight[]> {
   try {
@@ -71,7 +71,7 @@ async function computeGenreInsights(
   }
 }
 
-export function getGenreInsights(userId: string, scope: string, limit = 10) {
+export function getGenreInsights(userId: string, scope: Scope, limit = 10) {
   const currentYear = new Date().getFullYear();
   const year = parseInt(scope, 10);
   const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;

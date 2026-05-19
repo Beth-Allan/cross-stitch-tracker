@@ -214,7 +214,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
       };
     })
     .sort((a, b) => {
-      // D-15: Default sort by finishDate DESC (most recent first)
+      // Default sort by finishDate DESC (most recent first)
       if (!a.finishDate && !b.finishDate) return 0;
       if (!a.finishDate) return 1;
       if (!b.finishDate) return -1;

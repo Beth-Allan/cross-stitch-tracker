@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { chartFormSchema, batchSupplySchema } from "./chart";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
-import { assertSuccess } from "@/__tests__/mocks/factories";
+import { assertSuccess } from "@/__tests__/mocks";
 
 const validChartBase = {
   name: "Test Chart",

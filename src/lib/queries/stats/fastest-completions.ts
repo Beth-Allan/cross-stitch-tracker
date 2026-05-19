@@ -3,13 +3,13 @@ import { TZDate } from "@date-fns/tz";
 import { differenceInCalendarDays, format } from "date-fns";
 import { prisma } from "@/lib/db";
 import { getUserTimezone } from "./timezone";
-import { buildDateFilter } from "./utils";
+import { buildDateFilter, type Scope } from "./utils";
 import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
 import type { FastestCompletion, SizeCategory } from "@/types/stats";
 
 async function computeFastestCompletions(
   userId: string,
-  scope: string,
+  scope: Scope,
 ): Promise<FastestCompletion[]> {
   try {
     const tz = getUserTimezone(userId);
@@ -84,7 +84,7 @@ async function computeFastestCompletions(
   }
 }
 
-export function getFastestCompletions(userId: string, scope: string) {
+export function getFastestCompletions(userId: string, scope: Scope) {
   const currentYear = new Date().getFullYear();
   const year = parseInt(scope, 10);
   const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;

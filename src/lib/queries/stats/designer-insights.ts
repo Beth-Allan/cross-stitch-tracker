@@ -1,14 +1,14 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getUserTimezone } from "./timezone";
-import { buildDateFilter } from "./utils";
+import { buildDateFilter, type Scope } from "./utils";
 import type { DesignerInsight } from "@/types/stats";
 
 const COMPLETED_STATUSES = ["FINISHED", "FFO"] as const;
 
 async function computeDesignerInsights(
   userId: string,
-  scope: string,
+  scope: Scope,
   limit: number,
 ): Promise<DesignerInsight[]> {
   try {
@@ -75,7 +75,7 @@ async function computeDesignerInsights(
   }
 }
 
-export function getDesignerInsights(userId: string, scope: string, limit = 10) {
+export function getDesignerInsights(userId: string, scope: Scope, limit = 10) {
   const currentYear = new Date().getFullYear();
   const year = parseInt(scope, 10);
   const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;

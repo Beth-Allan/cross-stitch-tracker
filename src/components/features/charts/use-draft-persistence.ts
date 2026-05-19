@@ -67,8 +67,7 @@ export function loadDraft(
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<ChartFormValues>;
 
-    // Merge with defaults so missing fields from old drafts get defaults
-    // (per Research pitfall 6: future schema evolution)
+    // Merge with defaults so missing fields from old drafts get safe values
     const merged: ChartFormValues = { ...defaults, ...parsed };
 
     // Stale ID detection: null out IDs that no longer exist

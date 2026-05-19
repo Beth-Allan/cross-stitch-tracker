@@ -3,14 +3,14 @@ import { TZDate } from "@date-fns/tz";
 import { differenceInCalendarDays, format, addDays } from "date-fns";
 import { prisma } from "@/lib/db";
 import { getUserTimezone } from "./timezone";
-import { buildDateFilter } from "./utils";
+import { buildDateFilter, type Scope } from "./utils";
 import type { CompletionEstimate } from "@/types/stats";
 
 const MIN_SESSIONS = 3;
 
 async function computeCompletionEstimates(
   userId: string,
-  scope: string,
+  scope: Scope,
 ): Promise<CompletionEstimate[]> {
   try {
     const tz = getUserTimezone(userId);
@@ -80,7 +80,7 @@ async function computeCompletionEstimates(
   }
 }
 
-export function getCompletionEstimates(userId: string, scope: string) {
+export function getCompletionEstimates(userId: string, scope: Scope) {
   const currentYear = new Date().getFullYear();
   const year = parseInt(scope, 10);
   const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;

@@ -151,7 +151,7 @@ export async function createChart(formData: unknown) {
  *
  * Combines chart+project creation (via shared helper) with bulk supply junction
  * inserts across all three tables: ProjectThread, ProjectBead, ProjectSpecialty.
- * Per atomic save: nothing is persisted until this atomic operation succeeds.
+ * Nothing is persisted until this atomic $transaction succeeds.
  */
 export async function createChartWithSupplies(formData: unknown, supplyPayload: unknown) {
   const user = await requireAuth();
