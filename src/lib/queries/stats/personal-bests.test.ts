@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createMockPrisma } from "@/__tests__/mocks";
+import type { ProjectLinkedRecord, PersonalBestRecord } from "@/types/stats";
 
 const mockPrisma = createMockPrisma();
 vi.mock("@/lib/db", () => ({ prisma: mockPrisma }));
@@ -45,9 +46,9 @@ describe("getPersonalBests", () => {
       expect(record.value).toBe(0);
     }
 
-    const projectLinked = result.filter(
-      (r) => r.type === "bestDay" || r.type === "bestSession",
-    );
+    const isProjectLinked = (r: PersonalBestRecord): r is ProjectLinkedRecord =>
+      r.type === "bestDay" || r.type === "bestSession";
+    const projectLinked = result.filter(isProjectLinked);
     for (const record of projectLinked) {
       expect(record.projectId).toBeUndefined();
       expect(record.chartId).toBeUndefined();
@@ -114,9 +115,11 @@ describe("getPersonalBests", () => {
     const bestSession = result.find((r) => r.type === "bestSession")!;
     expect(bestSession.value).toBe(400);
     expect(bestSession.unit).toBe("stitches");
-    expect(bestSession.projectId).toBe("p1");
-    expect(bestSession.chartId).toBe("c1");
-    expect(bestSession.projectName).toBe("Project One");
+    expect(bestSession).toMatchObject({
+      projectId: "p1",
+      chartId: "c1",
+      projectName: "Project One",
+    });
   });
 
   it("calculates longest streak from consecutive days (3 consecutive = 3)", async () => {

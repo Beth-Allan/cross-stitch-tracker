@@ -3,7 +3,7 @@
 import { useQueryState, parseAsInteger, parseAsString, parseAsStringLiteral } from "nuqs";
 import Link from "next/link";
 import { ArrowUpDown, Camera } from "lucide-react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import {
   Table,
   TableHeader,
@@ -21,10 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatTime } from "@/lib/utils/format-time";
+import { SORT_FIELDS, SORT_DIRS } from "@/app/(dashboard)/stats/search-params";
 import type { SessionHistoryData } from "@/types/stats";
-
-const SORT_FIELDS = ["date", "stitches", "time"] as const;
-const SORT_DIRS = ["asc", "desc"] as const;
 
 type SortField = (typeof SORT_FIELDS)[number];
 
@@ -123,7 +121,7 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
               data.sessions.map((item) => (
                 <TableRow key={item.id} className="hover:bg-accent">
                   <TableCell className="text-muted-foreground whitespace-nowrap tabular-nums">
-                    {format(new Date(item.date), "MMM d, yyyy")}
+                    {format(parseISO(item.date), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell>
                     <Link

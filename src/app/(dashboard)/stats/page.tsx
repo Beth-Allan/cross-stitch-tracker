@@ -42,7 +42,6 @@ import type {
   DesignerInsight,
   GenreInsight,
   CompletionEstimate,
-  AvailableYearsData,
 } from "@/types/stats";
 
 export default async function StatsPage({
@@ -98,7 +97,7 @@ export default async function StatsPage({
   const designerInsights = settled<DesignerInsight[]>(results[13], "designerInsights");
   const genreInsights = settled<GenreInsight[]>(results[14], "genreInsights");
   const completionEstimates = settled<CompletionEstimate[]>(results[15], "completionEstimates");
-  const availableYears = settled<AvailableYearsData>(results[16], "availableYears");
+  const availableYears = settled<number[]>(results[16], "availableYears");
 
   let projectList: { id: string; name: string }[] = [];
   try {
@@ -155,7 +154,7 @@ export default async function StatsPage({
           designerInsights={designerInsights}
           genreInsights={genreInsights}
           completionEstimates={completionEstimates}
-          availableYears={availableYears?.years ?? null}
+          availableYears={availableYears ?? null}
           hasNoSessions={hasNoSessions}
         />
       }

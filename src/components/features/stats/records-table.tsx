@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Flame, Trophy, TrendingUp, Zap, Timer } from "lucide-react";
 import {
   Table,
@@ -39,9 +39,11 @@ function RecordValueCell({
   record: PersonalBestRecord | null;
   isAllTime: boolean;
 }) {
-  if (!record || (record.value === 0 && !record.date)) {
+  if (!record || record.value === 0) {
     return <span className="text-muted-foreground font-mono">--</span>;
   }
+
+  const isProjectLinked = record.type === "bestDay" || record.type === "bestSession";
 
   const valueSize = isAllTime
     ? "text-2xl font-mono font-semibold tabular-nums"
@@ -51,12 +53,12 @@ function RecordValueCell({
     <div className="flex flex-col gap-0.5">
       <span className={valueSize}>{formatRecordValue(record.value, record.unit)}</span>
       <span className="text-muted-foreground text-xs">{record.unit}</span>
-      {record.date && (
+      {isProjectLinked && record.date && (
         <span className="text-muted-foreground text-xs">
-          {format(new Date(record.date), "MMM d, yyyy")}
+          {format(parseISO(record.date), "MMM d, yyyy")}
         </span>
       )}
-      {record.projectName && record.chartId && (
+      {isProjectLinked && record.projectName && record.chartId && (
         <Link
           href={`/charts/${record.chartId}`}
           className="text-foreground hover:text-primary decoration-border hover:decoration-primary text-xs underline underline-offset-2 transition-colors"
