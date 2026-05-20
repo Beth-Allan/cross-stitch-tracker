@@ -271,12 +271,20 @@ function AggregatedSupplyRow({
             onUpdateAcquired(type, supply.items[0].junctionId, newValue);
           } else {
             const diff = newValue - supply.totalAcquired;
-            const firstItem = supply.items[0];
-            const newItemValue = Math.max(
-              0,
-              Math.min(firstItem.quantityRequired, firstItem.quantityAcquired + diff),
-            );
-            onUpdateAcquired(type, firstItem.junctionId, newItemValue);
+            if (diff > 0) {
+              const target =
+                supply.items.find((i) => i.quantityAcquired < i.quantityRequired) ??
+                supply.items[0];
+              const newItemValue = Math.min(
+                target.quantityRequired,
+                target.quantityAcquired + diff,
+              );
+              onUpdateAcquired(type, target.junctionId, newItemValue);
+            } else if (diff < 0) {
+              const target = supply.items.find((i) => i.quantityAcquired > 0) ?? supply.items[0];
+              const newItemValue = Math.max(0, target.quantityAcquired + diff);
+              onUpdateAcquired(type, target.junctionId, newItemValue);
+            }
           }
         }}
       />
