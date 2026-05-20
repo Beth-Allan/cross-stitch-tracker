@@ -1,8 +1,8 @@
 interface SelectionCounterProps {
   selectedCount: number;
   totalCount: number;
-  visibleCount?: number;
-  visibleSelectedCount?: number;
+  visibleCount: number;
+  visibleSelectedCount: number;
   isSearchActive: boolean;
 }
 
@@ -13,7 +13,7 @@ export function SelectionCounter({
   visibleSelectedCount,
   isSearchActive,
 }: SelectionCounterProps) {
-  if (isSearchActive && visibleCount !== undefined && visibleSelectedCount !== undefined) {
+  if (isSearchActive) {
     const showTotal = selectedCount !== visibleSelectedCount;
 
     return (

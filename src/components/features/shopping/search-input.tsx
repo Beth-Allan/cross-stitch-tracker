@@ -2,12 +2,14 @@
 
 import { Search, X } from "lucide-react";
 
-interface ProjectSearchInputProps {
+interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
+  placeholder: string;
+  ariaLabel: string;
 }
 
-export function ProjectSearchInput({ value, onChange }: ProjectSearchInputProps) {
+export function SearchInput({ value, onChange, placeholder, ariaLabel }: SearchInputProps) {
   return (
     <div className="relative w-full">
       <Search
@@ -18,12 +20,12 @@ export function ProjectSearchInput({ value, onChange }: ProjectSearchInputProps)
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Search projects..."
+        placeholder={placeholder}
         role="searchbox"
-        aria-label="Search projects"
+        aria-label={ariaLabel}
         className="border-border bg-card placeholder:text-muted-foreground focus:border-ring focus:ring-ring w-full rounded-lg border py-2 pr-8 pl-9 text-sm focus:ring-1 focus:outline-none"
       />
-      {value.length > 0 && (
+      {value && (
         <button
           type="button"
           onClick={() => onChange("")}

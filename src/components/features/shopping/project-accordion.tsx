@@ -18,6 +18,16 @@ import type {
 } from "@/types/dashboard";
 import type { ProjectStatus } from "@/generated/prisma/client";
 
+function buildIndex<T extends { projectId: string }>(items: T[]): Map<string, T[]> {
+  const map = new Map<string, T[]>();
+  for (const item of items) {
+    const arr = map.get(item.projectId);
+    if (arr) arr.push(item);
+    else map.set(item.projectId, [item]);
+  }
+  return map;
+}
+
 interface ProjectAccordionProps {
   projects: ShoppingCartProject[];
   selectedIds: Set<string>;
@@ -80,8 +90,6 @@ export function ProjectAccordion({
     });
   }, []);
 
-  const allSelectedProjectIds = new Set(selectedIds);
-
   const groupedProjects = useMemo(() => {
     const map = new Map<ProjectStatus, ShoppingCartProject[]>();
     for (const project of projects) {
@@ -91,6 +99,11 @@ export function ProjectAccordion({
     }
     return map;
   }, [projects]);
+
+  const threadsByProject = useMemo(() => buildIndex(threads), [threads]);
+  const beadsByProject = useMemo(() => buildIndex(beads), [beads]);
+  const specialtyByProject = useMemo(() => buildIndex(specialty), [specialty]);
+  const fabricsByProject = useMemo(() => buildIndex(fabrics), [fabrics]);
 
   const counterHeader = (
     <div className="mb-4 flex items-center justify-between">
@@ -148,12 +161,10 @@ export function ProjectAccordion({
                   const isExpanded = expandedIds.has(project.projectId);
                   const imageUrl = imageUrls[project.coverThumbnailUrl ?? ""];
 
-                  const projectThreads = threads.filter((t) => t.projectId === project.projectId);
-                  const projectBeads = beads.filter((b) => b.projectId === project.projectId);
-                  const projectSpecialty = specialty.filter(
-                    (s) => s.projectId === project.projectId,
-                  );
-                  const projectFabric = fabrics.find((f) => f.projectId === project.projectId);
+                  const projectThreads = threadsByProject.get(project.projectId) ?? [];
+                  const projectBeads = beadsByProject.get(project.projectId) ?? [];
+                  const projectSpecialty = specialtyByProject.get(project.projectId) ?? [];
+                  const projectFabric = fabricsByProject.get(project.projectId)?.[0];
 
                   const totalNeeds =
                     project.threadCount +
@@ -169,7 +180,6 @@ export function ProjectAccordion({
                         isSelected ? "border-selected-border" : "border-border",
                       )}
                     >
-                      {/* Header */}
                       <div className="bg-card flex items-center gap-3 p-3">
                         <button
                           type="button"
@@ -237,7 +247,6 @@ export function ProjectAccordion({
                         </button>
                       </div>
 
-                      {/* Expanded body */}
                       {isExpanded && isSelected && (
                         <div className="border-border/60 border-t">
                           {projectThreads.length > 0 && (
@@ -246,7 +255,7 @@ export function ProjectAccordion({
                               count={projectThreads.length}
                               supplies={projectThreads}
                               type="thread"
-                              allSelectedProjectIds={allSelectedProjectIds}
+                              allSelectedProjectIds={selectedIds}
                               allSupplies={threads}
                               onUpdateAcquired={onUpdateAcquired}
                               pendingIds={pendingIds}
@@ -259,7 +268,7 @@ export function ProjectAccordion({
                               count={projectBeads.length}
                               supplies={projectBeads}
                               type="bead"
-                              allSelectedProjectIds={allSelectedProjectIds}
+                              allSelectedProjectIds={selectedIds}
                               allSupplies={beads}
                               onUpdateAcquired={onUpdateAcquired}
                               pendingIds={pendingIds}
@@ -272,7 +281,7 @@ export function ProjectAccordion({
                               count={projectSpecialty.length}
                               supplies={projectSpecialty}
                               type="specialty"
-                              allSelectedProjectIds={allSelectedProjectIds}
+                              allSelectedProjectIds={selectedIds}
                               allSupplies={specialty}
                               onUpdateAcquired={onUpdateAcquired}
                               pendingIds={pendingIds}
@@ -306,7 +315,6 @@ export function ProjectAccordion({
                         </div>
                       )}
 
-                      {/* Expanded but not selected */}
                       {isExpanded && !isSelected && (
                         <div className="border-border/60 text-muted-foreground border-t px-4 py-6 text-center text-sm">
                           Select this project to see supply details
@@ -323,8 +331,6 @@ export function ProjectAccordion({
     </div>
   );
 }
-
-/* ─── SupplyGroup ────────────────────────────────────────── */
 
 function SupplyGroup({
   label,

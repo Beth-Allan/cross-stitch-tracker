@@ -15,7 +15,7 @@ import { ShoppingForBar } from "./shopping-for-bar";
 import { ProjectAccordion } from "./project-accordion";
 import { SupplyOverview } from "./supply-overview";
 import { ShoppingListTab } from "./shopping-list-tab";
-import { ProjectSearchInput } from "./project-search-input";
+import { SearchInput } from "./search-input";
 import { updateSupplyAcquired } from "@/lib/actions/shopping-cart-actions";
 import type { ShoppingCartData } from "@/types/dashboard";
 import type { ProjectStatus } from "@/generated/prisma/client";
@@ -25,8 +25,6 @@ const STORAGE_KEY = "shopping-cart-selected-projects";
 const VIEW_KEY = "shopping-cart-view-mode";
 
 type ViewMode = "by-project" | "by-supply";
-
-/* ─── usePersistedSelection ─────────────────────────────────────────────── */
 
 function usePersistedSelection(validProjectIds: string[]) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -66,8 +64,6 @@ function usePersistedSelection(validProjectIds: string[]) {
   return [selectedIds, setSelectedIds] as const;
 }
 
-/* ─── usePersistedViewMode ──────────────────────────────────────────────── */
-
 function usePersistedViewMode(): [ViewMode, (mode: ViewMode) => void] {
   const [viewMode, setViewMode] = useState<ViewMode>("by-project");
   const hydratedRef = useRef(false);
@@ -95,8 +91,6 @@ function usePersistedViewMode(): [ViewMode, (mode: ViewMode) => void] {
   return [viewMode, setViewMode];
 }
 
-/* ─── Badge ──────────────────────────────────────────────────────────────── */
-
 function Badge({ count }: { count: number }) {
   if (count === 0) return null;
   return (
@@ -105,8 +99,6 @@ function Badge({ count }: { count: number }) {
     </span>
   );
 }
-
-/* ─── ShoppingCart ───────────────────────────────────────────────────────── */
 
 interface ShoppingCartProps {
   data: ShoppingCartData;
@@ -136,9 +128,6 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
   const [supplySearchQuery, setSupplySearchQuery] = useState("");
   const deferredSupplySearch = useDeferredValue(supplySearchQuery);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<ProjectStatus>>(new Set());
-
-  /* ── Filtered projects ─────────────────────────────────── */
-
   const filteredProjects = useMemo(() => {
     if (!deferredSearch) return projectsWithNeeds;
     const lower = deferredSearch.toLowerCase();
@@ -151,9 +140,6 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
   );
 
   const isSearchActive = deferredSearch.length > 0;
-
-  /* ── Selection handlers ─────────────────────────────────── */
-
   const toggleProject = useCallback(
     (projectId: string) => {
       setSelectedIds((prev) => {
@@ -216,9 +202,6 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
       return next;
     });
   }, []);
-
-  /* ── Filtered data ──────────────────────────────────────── */
-
   const filteredThreads = useMemo(
     () =>
       data.threads.filter(
@@ -254,9 +237,6 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
       ),
     [data.fabrics, selectedIds, isSearchActive, filteredProjectIds],
   );
-
-  /* ── Server action handler ──────────────────────────────── */
-
   const handleUpdateAcquired = useCallback(
     (type: "thread" | "bead" | "specialty", junctionId: string, quantity: number) => {
       setFailedIds((prev) => {
@@ -277,7 +257,8 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
             setFailedIds((prev) => new Set(prev).add(junctionId));
             toast.error(result.error ?? "Failed to update supply");
           }
-        } catch {
+        } catch (e) {
+          console.error("updateSupplyAcquired failed:", e);
           setFailedIds((prev) => new Set(prev).add(junctionId));
           toast.error("Something went wrong. Try again.");
         } finally {
@@ -291,9 +272,6 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
     },
     [],
   );
-
-  /* ── Selected projects for bar ──────────────────────────── */
-
   const selectedProjects = useMemo(
     () => data.projects.filter((p) => selectedIds.has(p.projectId)),
     [data.projects, selectedIds],
@@ -305,9 +283,6 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
     () => filteredProjects.filter((p) => selectedIds.has(p.projectId)).length,
     [filteredProjects, selectedIds],
   );
-
-  /* ── Badge count for shopping list ──────────────────────── */
-
   const listBadge = useMemo(() => {
     const threadNeeds = filteredThreads.filter(
       (t) => t.quantityAcquired < t.quantityRequired,
@@ -319,9 +294,6 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
     const fabricNeeds = filteredFabrics.filter((f) => !f.hasFabric).length;
     return threadNeeds + beadNeeds + specialtyNeeds + fabricNeeds;
   }, [filteredThreads, filteredBeads, filteredSpecialty, filteredFabrics]);
-
-  /* ── Render ─────────────────────────────────────────────── */
-
   return (
     <div>
       <ShoppingForBar
@@ -331,7 +303,12 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
       />
 
       <div className="mt-4">
-        <ProjectSearchInput value={searchQuery} onChange={setSearchQuery} />
+        <SearchInput
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search projects..."
+          ariaLabel="Search projects"
+        />
       </div>
 
       <Tabs defaultValue="projects" className="mt-4">
@@ -348,7 +325,6 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
 
         <div className="pt-6 pb-12">
           <TabsContent value="projects">
-            {/* View toggle */}
             <div
               className="bg-muted mb-5 inline-flex rounded-lg p-1"
               role="group"

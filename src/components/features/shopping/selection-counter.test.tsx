@@ -8,6 +8,8 @@ describe("SelectionCounter", () => {
       <SelectionCounter
         selectedCount={3}
         totalCount={10}
+        visibleCount={10}
+        visibleSelectedCount={3}
         isSearchActive={false}
       />,
     );
@@ -20,6 +22,8 @@ describe("SelectionCounter", () => {
       <SelectionCounter
         selectedCount={0}
         totalCount={1}
+        visibleCount={1}
+        visibleSelectedCount={0}
         isSearchActive={false}
       />,
     );
@@ -38,9 +42,7 @@ describe("SelectionCounter", () => {
       />,
     );
 
-    expect(
-      screen.getByText("3 of 12 visible selected (5 total selected)"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("3 of 12 visible selected (5 total selected)")).toBeInTheDocument();
   });
 
   it("search mode when totalSelected equals visibleSelected omits the parenthetical", () => {
@@ -63,6 +65,8 @@ describe("SelectionCounter", () => {
       <SelectionCounter
         selectedCount={3}
         totalCount={10}
+        visibleCount={10}
+        visibleSelectedCount={3}
         isSearchActive={false}
       />,
     );
@@ -76,6 +80,8 @@ describe("SelectionCounter", () => {
       <SelectionCounter
         selectedCount={5}
         totalCount={10}
+        visibleCount={10}
+        visibleSelectedCount={5}
         isSearchActive={false}
       />,
     );

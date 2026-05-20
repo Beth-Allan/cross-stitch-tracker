@@ -254,7 +254,6 @@ describe("ShoppingCart", () => {
     await user.click(screen.getByText("By Supply Type"));
 
     expect(screen.getByText("By Supply Type")).toHaveAttribute("aria-pressed", "true");
-    // Supply overview shows section headers
     expect(screen.getByText(/Threads/)).toBeInTheDocument();
   });
 
@@ -346,7 +345,6 @@ describe("ShoppingCart", () => {
       const user = userEvent.setup();
       render(<ShoppingCart data={mockData} imageUrls={{}} />);
 
-      // The global select button shows "Select all" (status groups also have their own)
       expect(screen.getAllByText("Select all").length).toBeGreaterThan(0);
       expect(screen.queryByText("Select visible")).not.toBeInTheDocument();
 
@@ -377,11 +375,9 @@ describe("ShoppingCart", () => {
       await user.type(search, "Forest");
       await user.clear(search);
 
-      // All project names visible (Forest Sampler appears in both ShoppingForBar and project list)
       expect(screen.getAllByText("Forest Sampler").length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText("Ocean Waves")).toBeInTheDocument();
       expect(screen.getByText("Dragon Dreams")).toBeInTheDocument();
-      // Selection still intact
       expect(screen.getByLabelText("Remove Forest Sampler")).toBeInTheDocument();
     });
   });

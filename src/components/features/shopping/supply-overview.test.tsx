@@ -228,9 +228,7 @@ describe("SupplyOverview", () => {
     });
 
     it("supply search does NOT filter by project name", () => {
-      const threads = [
-        createMockSupplyNeed({ supplyId: "s1", projectName: "Forest Sampler" }),
-      ];
+      const threads = [createMockSupplyNeed({ supplyId: "s1", projectName: "Forest Sampler" })];
       render(
         <SupplyOverview
           {...defaultSupplyProps}
@@ -244,9 +242,7 @@ describe("SupplyOverview", () => {
     });
 
     it("supply sections with zero matches auto-hide during search", () => {
-      const threads = [
-        createMockSupplyNeed({ supplyId: "s1", brandName: "DMC", code: "310" }),
-      ];
+      const threads = [createMockSupplyNeed({ supplyId: "s1", brandName: "DMC", code: "310" })];
       const beads = [
         createMockSupplyNeed({
           supplyId: "s2",
@@ -303,7 +299,6 @@ describe("SupplyOverview", () => {
         />,
       );
 
-      // Fabric section hidden during supply search
       expect(screen.queryByText("Fabric")).not.toBeInTheDocument();
     });
 
@@ -339,9 +334,7 @@ describe("SupplyOverview", () => {
         />,
       );
 
-      // Aggregated total: 3+2=5 required, 1+0=1 acquired
       expect(screen.getByText("DMC 310")).toBeInTheDocument();
-      // The aggregated row should show total counts, not per-project
       expect(screen.getByText(/Project A, Project B/)).toBeInTheDocument();
     });
   });

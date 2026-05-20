@@ -4,7 +4,7 @@ import { Search, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
 import { EmptyState } from "@/components/ui/empty-state";
-import { SupplySearchInput } from "./supply-search-input";
+import { SearchInput } from "./search-input";
 import { QuantityControl } from "./quantity-control";
 import type { ShoppingSupplyNeed, ShoppingFabricNeed } from "@/types/dashboard";
 
@@ -117,7 +117,12 @@ export function SupplyOverview({
 
   return (
     <div className="flex flex-col gap-8">
-      <SupplySearchInput value={supplySearchQuery} onChange={onSupplySearchChange} />
+      <SearchInput
+        value={supplySearchQuery}
+        onChange={onSupplySearchChange}
+        placeholder="Search supplies..."
+        ariaLabel="Search supplies"
+      />
 
       {!hasFilteredResults && isSupplySearchActive ? (
         <EmptyState
@@ -163,8 +168,6 @@ export function SupplyOverview({
     </div>
   );
 }
-
-/* ─── SupplySection ─────��────────────────────────────────── */
 
 function SupplySection({
   label,
@@ -223,8 +226,6 @@ function SupplySection({
   );
 }
 
-/* ─── AggregatedSupplyRow ────────────────────────────────── */
-
 function AggregatedSupplyRow({
   supply,
   type,
@@ -270,20 +271,25 @@ function AggregatedSupplyRow({
           if (supply.items.length === 1) {
             onUpdateAcquired(type, supply.items[0].junctionId, newValue);
           } else {
-            const diff = newValue - supply.totalAcquired;
-            if (diff > 0) {
-              const target =
-                supply.items.find((i) => i.quantityAcquired < i.quantityRequired) ??
-                supply.items[0];
-              const newItemValue = Math.min(
-                target.quantityRequired,
-                target.quantityAcquired + diff,
-              );
-              onUpdateAcquired(type, target.junctionId, newItemValue);
-            } else if (diff < 0) {
-              const target = supply.items.find((i) => i.quantityAcquired > 0) ?? supply.items[0];
-              const newItemValue = Math.max(0, target.quantityAcquired + diff);
-              onUpdateAcquired(type, target.junctionId, newItemValue);
+            let remaining = newValue - supply.totalAcquired;
+            if (remaining > 0) {
+              for (const item of supply.items) {
+                if (remaining <= 0) break;
+                const capacity = item.quantityRequired - item.quantityAcquired;
+                if (capacity <= 0) continue;
+                const allocated = Math.min(capacity, remaining);
+                onUpdateAcquired(type, item.junctionId, item.quantityAcquired + allocated);
+                remaining -= allocated;
+              }
+            } else if (remaining < 0) {
+              let toRemove = -remaining;
+              for (const item of supply.items) {
+                if (toRemove <= 0) break;
+                if (item.quantityAcquired <= 0) continue;
+                const allocated = Math.min(item.quantityAcquired, toRemove);
+                onUpdateAcquired(type, item.junctionId, item.quantityAcquired - allocated);
+                toRemove -= allocated;
+              }
             }
           }
         }}
@@ -291,8 +297,6 @@ function AggregatedSupplyRow({
     </div>
   );
 }
-
-/* ─── FabricSection ��─────────────────────────────────────── */
 
 function FabricSection({ fabrics }: { fabrics: ShoppingFabricNeed[] }) {
   return (

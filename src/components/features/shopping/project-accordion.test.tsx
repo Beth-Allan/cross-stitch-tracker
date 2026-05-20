@@ -152,7 +152,7 @@ describe("ProjectAccordion", () => {
       expect(groups.length).toBeGreaterThanOrEqual(2);
     });
 
-    it("status groups appear in D-03 order (Kitting, Stitching, On Hold, Unstarted, Ready)", () => {
+    it("status groups appear in canonical order (Kitting, Stitching, On Hold, Unstarted, Ready)", () => {
       render(
         <ProjectAccordion
           {...defaultProps}

@@ -50,9 +50,15 @@
   - Plan 02: Full integration — search, status grouping, supply filtering, smart selection (37 new tests)
   - Code review: 1 critical + 4 warnings fixed (CR-01 aggregated supply quantity, WR-01 localStorage race, WR-02 semantic tokens, WR-03 dead branches, WR-04 type assertion)
 
+- **Phase 25 shipped** — PR #49 created, 6-agent review completed, all findings fixed, 2103 tests passing
+  - Fixed: WR-01 multi-item quantity distribution bug, WR-02 O(n\*m) supply lookup memoized, WR-03 redundant Set copy, WR-04 SelectionCounterProps required fields, WR-05 missing console.error
+  - Merged ProjectSearchInput + SupplySearchInput into single SearchInput component
+  - Removed 25 comment convention violations (section dividers, JSX markers, WHAT-comments, D-03 reference)
+  - Added 8 items to backlog (999.58-999.65)
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-ship` — create PR for Phase 25
+1. Merge PR #49 when CI passes
 2. `/gsd-discuss-phase 26` — discuss next phase (UX Polish)
 
 ### Backlog
@@ -80,7 +86,7 @@
 - 999.8: What's Next card styling — use same/similar gallery cards as Browse tab for visual consistency
 - 999.9: What's Next kitting label at 0% — "Kitting" label misleading when no supplies tracked; consider "Not kitted" or hiding label
 - 999.10: Auto-status from kitting activity — consider auto-transitioning project status to "Kitting" when user starts adding supplies/fabric
-- **999.11: Shopping cart scaling for large collections (HIGH PRIORITY)** — search/filter in project list, status grouping (Kitting/Stitching/Unstarted), supply-type search in By Supply view. Real dataset is 75+ projects in kitting stages.
+- ~~**999.11: Shopping cart scaling for large collections**~~ — **Shipped in Phase 25** (PR #49)
 - 999.12: Shopping-for bar pill styling — match mockup style (squared-off chips with border, contained card-like bar) instead of current full-round pills
 - 999.13: Per-brand skein length — add `skeinLengthMeters` to ThreadBrand (default 8m for DMC), use in skein calculator instead of hardcoded constant. Fixes inaccuracy for Weeks Dye Works/Gentle Art (5yd), Kreinik (10-11m), etc.
 - 999.14: Auto-infer overCount from fabric count — when fabric is linked to a project, auto-set overCount based on fabric count (≤25 → over 1, ≥28 → over 2). User can still override via settings bar toggle.
@@ -127,6 +133,14 @@
 - 999.55: processAndStoreImage `{ success: false }` silently ignored — no log when image optimization fails via return path
 - 999.56: Record-detection test verbose WHAT-comments — 6-line block at record-detection.test.ts:224-229 explains arithmetic the assertions prove
 - 999.57: New section-marker comments in chart-actions.test.ts:229 and supply-actions.test.ts:1423,1502 — consistent with style but counter to QUAL-07 cleanup
+- 999.58: SupplyOverview runs aggregation + filtering without useMemo — recomputes on every re-render from pendingIds/failedIds changes
+- 999.59: StatusGroup "Select all" is additive-only — no per-group deselect mechanism; consider toggle behavior
+- 999.60: AggregatedSupply.items type could use non-empty tuple `[T, ...T[]]` — encodes at-least-one invariant from aggregateSupplies
+- 999.61: Duplicated `onUpdateAcquired` callback type across 4 component prop interfaces — extract shared type alias
+- 999.62: Shopping cart test gap: aggregated quantity distribution logic untested — multi-item diff allocation in AggregatedSupplyRow
+- 999.63: Shopping cart test gap: project expand/collapse in ProjectAccordion untested — "not selected" message, supply details
+- 999.64: Shopping cart test gap: updateSupplyAcquired integration path untested — pending/error/toast flows mocked but never exercised
+- 999.65: Shopping cart test gap: QuantityControl inline edit on blur untested — mobile commit path
 
 ### Blockers
 
