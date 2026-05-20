@@ -436,17 +436,19 @@ import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 | A2 | `animate-in slide-in-from-bottom-1` from tw-animate-css will render the focal point action bar slide correctly as a non-absolute sibling | Architecture Patterns | Low: fallback to custom `.animate-slide-in` already in globals.css |
 | A3 | DesignerRow/GenreRow action buttons already have `aria-label` attributes | Code review of designer-list.tsx/genre-list.tsx | Low: verified in source, but mobile cards need double-checking |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **UX-11 Fabric Matching: Is This Actually Broken?**
    - What we know: The code has two branches -- `fabricCount` truthy uses exact count match, falsy uses all fabrics filtered by size fit. The CONTEXT.md says "null fabricCount short-circuits matching, returns zero candidates."
    - What's unclear: The code at line 174-192 does handle the null case by trying all fabrics. The requirement description may be based on stale understanding. Alternatively, the issue may be that `filter((f) => f.fitsWidth || f.fitsHeight)` at line 192 is too strict if stitch dimensions are such that no fabric fits.
    - Recommendation: Write a test with null fabricCount and verify actual behavior before writing a fix. If the code works correctly, the "fix" is adding test coverage (still satisfies UX-11).
+   - RESOLVED: The falsy branch's `.filter((f) => f.fitsWidth || f.fitsHeight)` is more restrictive than the truthy branch (which shows all including non-fitting). Plan 03 Task 2 removes the filter to match truthy branch behavior, with test-first verification of actual behavior before applying the fix.
 
 2. **UX-14 What's Next Card Restructuring Scope**
    - What we know: UI-SPEC specifies vertical card stack with `aspect-[4/3]` image, responsive grid, `bg-card border-border rounded-lg border` wrapper.
    - What's unclear: How much of the existing card content (star indicator, kitting progress bar, status badge) should change position vs. just get restyled.
    - Recommendation: Follow UI-SPEC layout precisely. Star indicator moves to image overlay or card header. Kitting progress moves to card footer. Status badge in footer matching GalleryCard pattern.
+   - RESOLVED: Plan 02 Task 3 follows UI-SPEC layout precisely with specific placement for each element. Star indicator moves to image overlay (absolute top-right), kitting progress to card body, status badge to footer matching GalleryCard pattern.
 
 ## Validation Architecture
 
