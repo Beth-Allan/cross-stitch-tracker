@@ -23,6 +23,7 @@ vi.mock("./portal-autocomplete", () => ({
     displayItems,
   }: {
     isOpen: boolean;
+    hasUsedArrowKeys: boolean;
     onSelect: (item: SupplySearchResult) => void;
     onCreateRequest: (text: string) => void;
     displayItems: SupplySearchResult[];
@@ -580,5 +581,138 @@ describe("SupplyTableAddRow", () => {
 
     // Input value should be cleared
     expect(searchInput).toHaveAttribute("value", "");
+  });
+
+  describe("keyboard-gated aria-activedescendant (UX-01)", () => {
+    it("aria-activedescendant is undefined when hasUsedArrowKeys is false (even if highlightIndex >= 0)", async () => {
+      const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+      vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+      renderAddRow();
+
+      const searchInput = screen.getByPlaceholderText("Search by code or name...");
+      await act(async () => {
+        fireEvent.change(searchInput, { target: { value: "310" } });
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(150);
+      });
+
+      // Before any arrow key usage, aria-activedescendant should not be set
+      expect(searchInput).not.toHaveAttribute("aria-activedescendant");
+    });
+
+    it("aria-activedescendant is set after ArrowDown key press", async () => {
+      const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+      vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+      renderAddRow();
+
+      const searchInput = screen.getByPlaceholderText("Search by code or name...");
+      await act(async () => {
+        fireEvent.change(searchInput, { target: { value: "310" } });
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(150);
+      });
+
+      // Press ArrowDown to activate keyboard navigation
+      await act(async () => {
+        fireEvent.keyDown(searchInput, { key: "ArrowDown" });
+      });
+
+      // Now aria-activedescendant should be set
+      expect(searchInput).toHaveAttribute(
+        "aria-activedescendant",
+        "portal-autocomplete-item-t1",
+      );
+    });
+
+    it("hasUsedArrowKeys resets to false when searchResults change", async () => {
+      const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+      vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+      renderAddRow();
+
+      const searchInput = screen.getByPlaceholderText("Search by code or name...");
+      await act(async () => {
+        fireEvent.change(searchInput, { target: { value: "310" } });
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(150);
+      });
+
+      // Press ArrowDown
+      await act(async () => {
+        fireEvent.keyDown(searchInput, { key: "ArrowDown" });
+      });
+
+      // Now type new search to change results
+      const newResults = [makeSearchResult({ id: "t2", code: "321", name: "Red" })];
+      vi.mocked(adapter.searchSupplies).mockResolvedValue(newResults);
+
+      await act(async () => {
+        fireEvent.change(searchInput, { target: { value: "321" } });
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(150);
+      });
+
+      // After results change, aria-activedescendant should be unset again
+      expect(searchInput).not.toHaveAttribute("aria-activedescendant");
+    });
+  });
+
+  describe("commit button (UX-07)", () => {
+    it("commit button is hidden when no supply is selected", () => {
+      renderAddRow();
+      expect(screen.queryByLabelText("Add supply to table")).not.toBeInTheDocument();
+    });
+
+    it("commit button is visible when a supply is selected", async () => {
+      const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+      vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+      renderAddRow();
+
+      const searchInput = screen.getByPlaceholderText("Search by code or name...");
+      await act(async () => {
+        fireEvent.change(searchInput, { target: { value: "310" } });
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(150);
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("autocomplete-item-t1"));
+      });
+
+      expect(screen.getByLabelText("Add supply to table")).toBeInTheDocument();
+    });
+
+    it("clicking commit button calls commitRow (same as Enter)", async () => {
+      const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+      vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+      renderAddRow();
+
+      const searchInput = screen.getByPlaceholderText("Search by code or name...");
+      await act(async () => {
+        fireEvent.change(searchInput, { target: { value: "310" } });
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(150);
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("autocomplete-item-t1"));
+      });
+
+      const commitButton = screen.getByLabelText("Add supply to table");
+      await act(async () => {
+        fireEvent.click(commitButton);
+      });
+
+      expect(adapter.addThread).toHaveBeenCalled();
+      expect(onRowAdded).toHaveBeenCalled();
+    });
   });
 });
