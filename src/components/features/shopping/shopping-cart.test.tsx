@@ -346,13 +346,14 @@ describe("ShoppingCart", () => {
       const user = userEvent.setup();
       render(<ShoppingCart data={mockData} imageUrls={{}} />);
 
-      expect(screen.getByText("Select all")).toBeInTheDocument();
+      // The global select button shows "Select all" (status groups also have their own)
+      expect(screen.getAllByText("Select all").length).toBeGreaterThan(0);
+      expect(screen.queryByText("Select visible")).not.toBeInTheDocument();
 
       const search = screen.getByRole("searchbox", { name: "Search projects" });
       await user.type(search, "Forest");
 
       expect(screen.getByText("Select visible")).toBeInTheDocument();
-      expect(screen.queryByText("Select all")).not.toBeInTheDocument();
     });
 
     it("SelectionCounter shows filtered/total counts during search", async () => {
@@ -376,9 +377,11 @@ describe("ShoppingCart", () => {
       await user.type(search, "Forest");
       await user.clear(search);
 
-      expect(screen.getByText("Forest Sampler")).toBeInTheDocument();
+      // All project names visible (Forest Sampler appears in both ShoppingForBar and project list)
+      expect(screen.getAllByText("Forest Sampler").length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText("Ocean Waves")).toBeInTheDocument();
       expect(screen.getByText("Dragon Dreams")).toBeInTheDocument();
+      // Selection still intact
       expect(screen.getByLabelText("Remove Forest Sampler")).toBeInTheDocument();
     });
   });

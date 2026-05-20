@@ -1,12 +1,15 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { CheckSquare, ChevronRight, Square } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { CheckSquare, ChevronRight, Search, Square } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
+import { StatusGroup, STATUS_GROUP_ORDER } from "./status-group";
+import { SelectionCounter } from "./selection-counter";
+import { EmptyState } from "@/components/ui/empty-state";
 import { QuantityControl } from "./quantity-control";
 import type {
   ShoppingCartProject,
@@ -25,6 +28,8 @@ interface ProjectAccordionProps {
   fabrics: ShoppingFabricNeed[];
   onToggle: (projectId: string) => void;
   onSelectAll: () => void;
+  selectAllLabel: string;
+  onSelectGroup: (projectIds: string[]) => void;
   onUpdateAcquired: (
     type: "thread" | "bead" | "specialty",
     junctionId: string,
@@ -32,6 +37,13 @@ interface ProjectAccordionProps {
   ) => void;
   pendingIds: Set<string>;
   failedIds: Set<string>;
+  collapsedGroups: Set<ProjectStatus>;
+  onToggleGroup: (status: ProjectStatus) => void;
+  isSearchActive: boolean;
+  selectedCount: number;
+  totalCount: number;
+  visibleCount: number;
+  visibleSelectedCount: number;
 }
 
 export function ProjectAccordion({
@@ -44,9 +56,18 @@ export function ProjectAccordion({
   fabrics,
   onToggle,
   onSelectAll,
+  selectAllLabel,
+  onSelectGroup,
   onUpdateAcquired,
   pendingIds,
   failedIds,
+  collapsedGroups,
+  onToggleGroup,
+  isSearchActive,
+  selectedCount,
+  totalCount,
+  visibleCount,
+  visibleSelectedCount,
 }: ProjectAccordionProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
 
@@ -61,24 +82,68 @@ export function ProjectAccordion({
 
   const allSelectedProjectIds = new Set(selectedIds);
 
+  const groupedProjects = useMemo(() => {
+    const map = new Map<ProjectStatus, ShoppingCartProject[]>();
+    for (const project of projects) {
+      const group = map.get(project.status) ?? [];
+      group.push(project);
+      map.set(project.status, group);
+    }
+    return map;
+  }, [projects]);
+
+  const counterHeader = (
+    <div className="mb-4 flex items-center justify-between">
+      <SelectionCounter
+        selectedCount={selectedCount}
+        totalCount={totalCount}
+        visibleCount={visibleCount}
+        visibleSelectedCount={visibleSelectedCount}
+        isSearchActive={isSearchActive}
+      />
+      <button
+        type="button"
+        onClick={onSelectAll}
+        className="text-progress-foreground hover:text-selected-foreground text-xs font-medium transition-colors"
+      >
+        {selectAllLabel}
+      </button>
+    </div>
+  );
+
+  if (projects.length === 0) {
+    return (
+      <div>
+        {counterHeader}
+        <EmptyState
+          icon={Search}
+          title="No projects match your search"
+          description="Try a different name or clear the search"
+        />
+      </div>
+    );
+  }
+
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-muted-foreground text-sm">
-          {selectedIds.size} of {projects.length} project
-          {projects.length !== 1 ? "s" : ""} selected
-        </p>
-        <button
-          type="button"
-          onClick={onSelectAll}
-          className="text-progress-foreground hover:text-selected-foreground text-xs font-medium transition-colors"
-        >
-          Select all
-        </button>
-      </div>
+      {counterHeader}
 
-      <div className="flex flex-col gap-2">
-        {projects.map((project) => {
+      <div className="flex flex-col gap-4">
+        {STATUS_GROUP_ORDER.map((status) => {
+          const groupProjects = groupedProjects.get(status);
+          if (!groupProjects || groupProjects.length === 0) return null;
+
+          return (
+            <StatusGroup
+              key={status}
+              status={status}
+              count={groupProjects.length}
+              isExpanded={!collapsedGroups.has(status)}
+              onToggle={() => onToggleGroup(status)}
+              onSelectAll={() => onSelectGroup(groupProjects.map((p) => p.projectId))}
+            >
+              <div className="flex flex-col gap-2">
+                {groupProjects.map((project) => {
           const isSelected = selectedIds.has(project.projectId);
           const isExpanded = expandedIds.has(project.projectId);
           const imageUrl = imageUrls[project.coverThumbnailUrl ?? ""];
@@ -252,6 +317,10 @@ export function ProjectAccordion({
                 </div>
               )}
             </div>
+          );
+                })}
+              </div>
+            </StatusGroup>
           );
         })}
       </div>
