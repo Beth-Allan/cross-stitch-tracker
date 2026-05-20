@@ -16,6 +16,10 @@ interface HeroCoverBannerProps {
  * Full-width cover banner for the project detail hero.
  * Renders the cover image with object-contain over a blurred background
  * fill for visual weight. Returns null when no image.
+ *
+ * overflow-hidden is on the inner image wrapper so the focal point
+ * action bar (rendered by FocalPointEditor) appears below the image
+ * in normal document flow and is not clipped.
  */
 export function HeroCoverBanner({
   imageUrl,
@@ -26,32 +30,34 @@ export function HeroCoverBanner({
 }: HeroCoverBannerProps) {
   const [imgError, setImgError] = useState(false);
 
-  // Skip banner entirely when no cover image
   if (!imageUrl || imgError) return null;
 
   return (
-    <div className="bg-muted relative max-h-64 w-full overflow-hidden rounded-lg max-[767px]:max-h-40 md:max-h-48">
-      {/* Blurred background fill (per RESEARCH.md Pitfall 1: use filter:blur on <img>, NOT backdrop-filter) */}
-      <Image
-        src={imageUrl}
-        alt=""
-        fill
-        aria-hidden="true"
-        className="scale-110 object-cover opacity-60 blur-[20px]"
-        unoptimized
-      />
-      {/* Foreground image with object-contain -- priority for LCP */}
-      <Image
-        src={imageUrl}
-        alt={`Cover for ${chartName}`}
-        width={1200}
-        height={800}
-        priority
-        className="relative mx-auto max-h-64 w-full object-contain max-[767px]:max-h-40 md:max-h-48"
-        onError={() => setImgError(true)}
-        unoptimized
-      />
-      {/* Focal point editor overlay — trigger button + edit mode UI */}
+    <div className="bg-muted group relative w-full rounded-lg">
+      {/* Inner image wrapper with overflow-hidden for zoom effect */}
+      <div className="max-h-64 overflow-hidden rounded-lg max-[767px]:max-h-40 md:max-h-48">
+        {/* Blurred background fill */}
+        <Image
+          src={imageUrl}
+          alt=""
+          fill
+          aria-hidden="true"
+          className="scale-110 object-cover opacity-60 blur-[20px]"
+          unoptimized
+        />
+        {/* Foreground image with object-contain */}
+        <Image
+          src={imageUrl}
+          alt={`Cover for ${chartName}`}
+          width={1200}
+          height={800}
+          priority
+          className="relative mx-auto max-h-64 w-full object-contain max-[767px]:max-h-40 md:max-h-48"
+          onError={() => setImgError(true)}
+          unoptimized
+        />
+      </div>
+      {/* Focal point editor: edit button (absolute), click area (absolute inset-0), action bar (normal flow below) */}
       <FocalPointEditor
         chartId={chartId}
         initialFocalPoint={

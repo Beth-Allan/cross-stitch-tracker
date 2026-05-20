@@ -98,7 +98,7 @@ export interface HeroStatsData {
 
 export type ProgressBucketId = "unstarted" | "0-25" | "25-50" | "50-75" | "75-100";
 
-export interface BucketProject {
+export interface BucketProject extends OptionalFocalPoint {
   projectId: string;
   chartId: string;
   projectName: string;

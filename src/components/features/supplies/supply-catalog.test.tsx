@@ -205,10 +205,9 @@ describe("SupplyCatalog", () => {
     expect(screen.getByText("No threads in your catalog")).toBeInTheDocument();
   });
 
-  /* ── Hydration-safe view mode persistence ── */
+  /* ── Synchronous view mode persistence (flash-free) ── */
 
-  it("initializes with DEFAULT_VIEWS regardless of localStorage values (hydration-safe)", () => {
-    // Pre-set localStorage as if user had previously chosen table views
+  it("initializes view modes from localStorage synchronously (no useEffect flash)", () => {
     localStorage.setItem("supply-view-threads", "table");
     localStorage.setItem("supply-view-beads", "grid");
 
@@ -221,16 +220,13 @@ describe("SupplyCatalog", () => {
       />,
     );
 
-    // The useState initializer should NOT read localStorage.
-    // Verify component renders without crashing (hydration-safe).
-    // The grid view button should be active initially for threads (DEFAULT_VIEWS.threads = "grid").
-    const gridButton = screen.getByRole("button", { name: "Grid view" });
-    expect(gridButton).toBeInTheDocument();
+    // The table view button should be active immediately for threads (from localStorage)
+    const tableButton = screen.getByRole("button", { name: "Table view" });
+    expect(tableButton.className).toContain("text-primary");
   });
 
-  it("restores view mode from localStorage after mount via useEffect", async () => {
-    // Pre-set localStorage to table for threads
-    localStorage.setItem("supply-view-threads", "table");
+  it("when localStorage has 'grid' stored for threads tab, initial viewModes.threads is 'grid'", () => {
+    localStorage.setItem("supply-view-threads", "grid");
 
     render(
       <SupplyCatalog
@@ -241,12 +237,42 @@ describe("SupplyCatalog", () => {
       />,
     );
 
-    // After useEffect runs, the table view button should be active
+    // Grid view button should be active (matching localStorage)
+    const gridButton = screen.getByRole("button", { name: "Grid view" });
+    expect(gridButton.className).toContain("text-primary");
+  });
+
+  it("when no localStorage value exists, default view mode is used", () => {
+    // No localStorage set — should use DEFAULT_VIEWS (threads = "grid")
+    render(
+      <SupplyCatalog
+        threads={mockThreads}
+        beads={mockBeads}
+        specialtyItems={mockSpecialty}
+        brands={brands}
+      />,
+    );
+
+    const gridButton = screen.getByRole("button", { name: "Grid view" });
+    expect(gridButton.className).toContain("text-primary");
+  });
+
+  it("URL param initialView takes precedence over localStorage for the specified tab", () => {
+    localStorage.setItem("supply-view-threads", "grid");
+
+    render(
+      <SupplyCatalog
+        threads={mockThreads}
+        beads={mockBeads}
+        specialtyItems={mockSpecialty}
+        brands={brands}
+        initialView="table"
+      />,
+    );
+
+    // initialView="table" should override localStorage "grid"
     const tableButton = screen.getByRole("button", { name: "Table view" });
-    // Wait for useEffect to apply localStorage values
-    await vi.waitFor(() => {
-      expect(tableButton.className).toContain("text-primary");
-    });
+    expect(tableButton.className).toContain("text-primary");
   });
 
   it("persists view mode changes to localStorage", async () => {
@@ -265,25 +291,5 @@ describe("SupplyCatalog", () => {
     await user.click(tableButton);
 
     expect(localStorage.getItem("supply-view-threads")).toBe("table");
-  });
-
-  it("does not use typeof window check in useState initializer", () => {
-    // This test verifies the fix by checking that the component source
-    // does not contain the problematic pattern. We test behavior instead:
-    // if localStorage has values but the initial render uses DEFAULT_VIEWS,
-    // the fix is working correctly.
-    localStorage.setItem("supply-view-threads", "table");
-
-    const { container } = render(
-      <SupplyCatalog
-        threads={mockThreads}
-        beads={mockBeads}
-        specialtyItems={mockSpecialty}
-        brands={brands}
-      />,
-    );
-
-    // Component should render successfully without errors
-    expect(container.firstChild).toBeTruthy();
   });
 });
