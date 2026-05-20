@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { BucketProject, ProgressBucketId } from "@/types/dashboard";
 import { CoverPlaceholder } from "@/components/features/gallery/cover-placeholder";
+import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 
 interface BucketProjectRowProps {
   project: BucketProject;
@@ -33,6 +34,7 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
             alt={project.projectName}
             loading="lazy"
             className="h-full w-full object-cover"
+            style={getObjectPositionStyle(project.focalPointX, project.focalPointY)}
           />
         ) : (
           <CoverPlaceholder status={project.status} />

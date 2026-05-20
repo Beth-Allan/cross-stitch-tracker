@@ -171,25 +171,23 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
                 fitsHeight: fits,
               };
             })
-        : unassignedFabrics
-            .map((f) => {
-              const reqW = Math.round((c.stitchesWide / f.count + MARGIN_TOTAL) * 10) / 10;
-              const reqH = Math.round((c.stitchesHigh / f.count + MARGIN_TOTAL) * 10) / 10;
-              const reqShort = Math.min(reqW, reqH);
-              const reqLong = Math.max(reqW, reqH);
-              const fits = f.shortestEdgeInches >= reqShort && f.longestEdgeInches >= reqLong;
-              return {
-                id: f.id,
-                name: f.name,
-                brandName: f.brand.name,
-                count: f.count,
-                shortestEdgeInches: f.shortestEdgeInches,
-                longestEdgeInches: f.longestEdgeInches,
-                fitsWidth: fits,
-                fitsHeight: fits,
-              };
-            })
-            .filter((f) => f.fitsWidth || f.fitsHeight);
+        : unassignedFabrics.map((f) => {
+            const reqW = Math.round((c.stitchesWide / f.count + MARGIN_TOTAL) * 10) / 10;
+            const reqH = Math.round((c.stitchesHigh / f.count + MARGIN_TOTAL) * 10) / 10;
+            const reqShort = Math.min(reqW, reqH);
+            const reqLong = Math.max(reqW, reqH);
+            const fits = f.shortestEdgeInches >= reqShort && f.longestEdgeInches >= reqLong;
+            return {
+              id: f.id,
+              name: f.name,
+              brandName: f.brand.name,
+              count: f.count,
+              shortestEdgeInches: f.shortestEdgeInches,
+              longestEdgeInches: f.longestEdgeInches,
+              fitsWidth: fits,
+              fitsHeight: fits,
+            };
+          });
 
       return {
         chartId: c.id,
