@@ -220,7 +220,7 @@ export function ProjectAccordion({
                               <span className="text-foreground truncate text-sm font-semibold">
                                 {project.projectName}
                               </span>
-                              <StatusBadge status={project.status as ProjectStatus} />
+                              <StatusBadge status={project.status} />
                             </div>
                             <p className="text-muted-foreground mt-0.5 text-xs">
                               {project.designerName}
