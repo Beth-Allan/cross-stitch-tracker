@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Search, ShoppingBag } from "lucide-react";
+import { Search, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -300,34 +300,21 @@ function FabricSection({ fabrics }: { fabrics: ShoppingFabricNeed[] }) {
       <h3 className="font-heading text-foreground mb-2 text-base font-semibold">
         Fabric
         <span className="text-muted-foreground ml-2 text-sm font-normal">
-          ({fabrics.filter((f) => !f.hasFabric).length} of {fabrics.length} need
-          {fabrics.length === 1 ? "s" : ""} fabric)
+          ({fabrics.length} need{fabrics.length === 1 ? "s" : ""} fabric)
         </span>
       </h3>
       <div className="flex flex-col gap-1">
         {fabrics.map((fabric) => (
           <div
             key={fabric.projectId}
-            className={cn(
-              "flex items-center gap-3 rounded-lg border p-4",
-              fabric.hasFabric ? "border-selected-border bg-selected" : "border-border bg-card",
-            )}
+            className="border-border bg-card flex items-center gap-3 rounded-lg border p-4"
           >
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-foreground text-sm font-semibold">{fabric.projectName}</span>
-                {fabric.hasFabric && (
-                  <span className="text-progress-foreground inline-flex items-center gap-1 text-xs">
-                    <Check className="h-3 w-3" />
-                    Has fabric
-                  </span>
-                )}
-              </div>
+              <span className="text-foreground text-sm font-semibold">{fabric.projectName}</span>
               <p className="text-muted-foreground mt-1 text-xs">
                 {fabric.stitchesWide} × {fabric.stitchesHigh} stitches
-                {fabric.fabricName && ` · ${fabric.fabricName}`}
               </p>
-              {!fabric.hasFabric && <p className="text-warning mt-1 text-xs">Needs fabric</p>}
+              <p className="text-warning mt-1 text-xs">Needs fabric</p>
             </div>
           </div>
         ))}

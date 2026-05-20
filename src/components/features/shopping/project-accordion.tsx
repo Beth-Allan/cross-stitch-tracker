@@ -285,23 +285,13 @@ export function ProjectAccordion({
                                 Fabric
                               </div>
                               <div className="text-sm">
-                                {projectFabric.hasFabric ? (
-                                  <span className="text-progress-foreground">
-                                    ✓ {projectFabric.fabricName ?? "Has fabric"}{" "}
-                                    <span className="text-muted-foreground">
-                                      · {projectFabric.stitchesWide} × {projectFabric.stitchesHigh}{" "}
-                                      stitches
-                                    </span>
+                                <span>
+                                  <span className="text-warning font-medium">Needs fabric</span>{" "}
+                                  <span className="text-muted-foreground">
+                                    · {projectFabric.stitchesWide} × {projectFabric.stitchesHigh}{" "}
+                                    stitches
                                   </span>
-                                ) : (
-                                  <span>
-                                    <span className="text-warning font-medium">Needs fabric</span>{" "}
-                                    <span className="text-muted-foreground">
-                                      · {projectFabric.stitchesWide} × {projectFabric.stitchesHigh}{" "}
-                                      stitches
-                                    </span>
-                                  </span>
-                                )}
+                                </span>
                               </div>
                             </div>
                           )}
