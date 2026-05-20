@@ -1,14 +1,24 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ShoppingForBar } from "./shopping-for-bar";
 import { ProjectAccordion } from "./project-accordion";
 import { SupplyOverview } from "./supply-overview";
 import { ShoppingListTab } from "./shopping-list-tab";
+import { ProjectSearchInput } from "./project-search-input";
 import { updateSupplyAcquired } from "@/lib/actions/shopping-cart-actions";
 import type { ShoppingCartData } from "@/types/dashboard";
+import type { ProjectStatus } from "@/generated/prisma/client";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "shopping-cart-selected-projects";
@@ -115,6 +125,26 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
   const [, startTransition] = useTransition();
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const [failedIds, setFailedIds] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearch = useDeferredValue(searchQuery);
+  const [supplySearchQuery, setSupplySearchQuery] = useState("");
+  const deferredSupplySearch = useDeferredValue(supplySearchQuery);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<ProjectStatus>>(new Set());
+
+  /* ── Filtered projects ─────────────────────────────────── */
+
+  const filteredProjects = useMemo(() => {
+    if (!deferredSearch) return projectsWithNeeds;
+    const lower = deferredSearch.toLowerCase();
+    return projectsWithNeeds.filter((p) => p.projectName.toLowerCase().includes(lower));
+  }, [projectsWithNeeds, deferredSearch]);
+
+  const filteredProjectIds = useMemo(
+    () => new Set(filteredProjects.map((p) => p.projectId)),
+    [filteredProjects],
+  );
+
+  const isSearchActive = deferredSearch.length > 0;
 
   /* ── Selection handlers ─────────────────────────────────── */
 
@@ -149,26 +179,78 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
     setSelectedIds(new Set(validProjectIds));
   }, [setSelectedIds, validProjectIds]);
 
+  const selectVisible = useCallback(() => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      for (const p of filteredProjects) {
+        next.add(p.projectId);
+      }
+      return next;
+    });
+  }, [setSelectedIds, filteredProjects]);
+
+  const selectGroup = useCallback(
+    (projectIds: string[]) => {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        for (const id of projectIds) {
+          next.add(id);
+        }
+        return next;
+      });
+    },
+    [setSelectedIds],
+  );
+
+  const toggleGroup = useCallback((status: ProjectStatus) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(status)) next.delete(status);
+      else next.add(status);
+      return next;
+    });
+  }, []);
+
   /* ── Filtered data ──────────────────────────────────────── */
 
   const filteredThreads = useMemo(
-    () => data.threads.filter((t) => selectedIds.has(t.projectId)),
-    [data.threads, selectedIds],
+    () =>
+      data.threads.filter(
+        (t) =>
+          selectedIds.has(t.projectId) &&
+          (!isSearchActive || filteredProjectIds.has(t.projectId)),
+      ),
+    [data.threads, selectedIds, isSearchActive, filteredProjectIds],
   );
 
   const filteredBeads = useMemo(
-    () => data.beads.filter((b) => selectedIds.has(b.projectId)),
-    [data.beads, selectedIds],
+    () =>
+      data.beads.filter(
+        (b) =>
+          selectedIds.has(b.projectId) &&
+          (!isSearchActive || filteredProjectIds.has(b.projectId)),
+      ),
+    [data.beads, selectedIds, isSearchActive, filteredProjectIds],
   );
 
   const filteredSpecialty = useMemo(
-    () => data.specialty.filter((s) => selectedIds.has(s.projectId)),
-    [data.specialty, selectedIds],
+    () =>
+      data.specialty.filter(
+        (s) =>
+          selectedIds.has(s.projectId) &&
+          (!isSearchActive || filteredProjectIds.has(s.projectId)),
+      ),
+    [data.specialty, selectedIds, isSearchActive, filteredProjectIds],
   );
 
   const filteredFabrics = useMemo(
-    () => data.fabrics.filter((f) => selectedIds.has(f.projectId)),
-    [data.fabrics, selectedIds],
+    () =>
+      data.fabrics.filter(
+        (f) =>
+          selectedIds.has(f.projectId) &&
+          (!isSearchActive || filteredProjectIds.has(f.projectId)),
+      ),
+    [data.fabrics, selectedIds, isSearchActive, filteredProjectIds],
   );
 
   /* ── Server action handler ──────────────────────────────── */
@@ -217,6 +299,11 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
 
   const hasSelection = selectedIds.size > 0;
 
+  const visibleSelectedCount = useMemo(
+    () => filteredProjects.filter((p) => selectedIds.has(p.projectId)).length,
+    [filteredProjects, selectedIds],
+  );
+
   /* ── Badge count for shopping list ──────────────────────── */
 
   const listBadge = useMemo(() => {
@@ -240,6 +327,10 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
         onRemove={removeProject}
         onClearAll={clearAll}
       />
+
+      <div className="mt-4">
+        <ProjectSearchInput value={searchQuery} onChange={setSearchQuery} />
+      </div>
 
       <Tabs defaultValue="projects" className="mt-4">
         <TabsList variant="line" className="w-full">
@@ -291,7 +382,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
 
             {viewMode === "by-project" ? (
               <ProjectAccordion
-                projects={projectsWithNeeds}
+                projects={filteredProjects}
                 selectedIds={selectedIds}
                 imageUrls={imageUrls}
                 threads={filteredThreads}
@@ -299,10 +390,19 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
                 specialty={filteredSpecialty}
                 fabrics={filteredFabrics}
                 onToggle={toggleProject}
-                onSelectAll={selectAll}
+                onSelectAll={isSearchActive ? selectVisible : selectAll}
+                selectAllLabel={isSearchActive ? "Select visible" : "Select all"}
+                onSelectGroup={selectGroup}
                 onUpdateAcquired={handleUpdateAcquired}
                 pendingIds={pendingIds}
                 failedIds={failedIds}
+                collapsedGroups={collapsedGroups}
+                onToggleGroup={toggleGroup}
+                isSearchActive={isSearchActive}
+                selectedCount={selectedIds.size}
+                totalCount={projectsWithNeeds.length}
+                visibleCount={filteredProjects.length}
+                visibleSelectedCount={visibleSelectedCount}
               />
             ) : (
               <SupplyOverview
@@ -313,6 +413,8 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
                 onUpdateAcquired={handleUpdateAcquired}
                 pendingIds={pendingIds}
                 failedIds={failedIds}
+                supplySearchQuery={deferredSupplySearch}
+                onSupplySearchChange={setSupplySearchQuery}
               />
             )}
           </TabsContent>

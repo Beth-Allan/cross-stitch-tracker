@@ -1,4 +1,5 @@
 import { render, screen } from "@/__tests__/test-utils";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { SupplyOverview } from "./supply-overview";
 import type { ShoppingSupplyNeed } from "@/types/dashboard";
@@ -31,6 +32,8 @@ describe("SupplyOverview", () => {
         onUpdateAcquired={vi.fn()}
         pendingIds={new Set()}
         failedIds={new Set()}
+        supplySearchQuery=""
+        onSupplySearchChange={vi.fn()}
       />,
     );
     expect(screen.getByText("Select projects to see supply needs")).toBeInTheDocument();
@@ -47,6 +50,8 @@ describe("SupplyOverview", () => {
         onUpdateAcquired={vi.fn()}
         pendingIds={new Set()}
         failedIds={new Set()}
+        supplySearchQuery=""
+        onSupplySearchChange={vi.fn()}
       />,
     );
     expect(screen.getByText("Threads")).toBeInTheDocument();
@@ -73,6 +78,8 @@ describe("SupplyOverview", () => {
         onUpdateAcquired={vi.fn()}
         pendingIds={new Set(["j-1"])}
         failedIds={new Set()}
+        supplySearchQuery=""
+        onSupplySearchChange={vi.fn()}
       />,
     );
     const spinners = container.querySelectorAll(".animate-spin");
@@ -99,6 +106,8 @@ describe("SupplyOverview", () => {
         onUpdateAcquired={vi.fn()}
         pendingIds={new Set()}
         failedIds={new Set()}
+        supplySearchQuery=""
+        onSupplySearchChange={vi.fn()}
       />,
     );
     const spinners = container.querySelectorAll(".animate-spin");
@@ -116,9 +125,224 @@ describe("SupplyOverview", () => {
         onUpdateAcquired={vi.fn()}
         pendingIds={new Set()}
         failedIds={new Set()}
+        supplySearchQuery=""
+        onSupplySearchChange={vi.fn()}
       />,
     );
     const row = container.querySelector(".bg-selected");
     expect(row).toBeInTheDocument();
+  });
+
+  describe("Supply search", () => {
+    const defaultSupplyProps = {
+      onUpdateAcquired: vi.fn(),
+      pendingIds: new Set<string>(),
+      failedIds: new Set<string>(),
+      onSupplySearchChange: vi.fn(),
+      fabrics: [],
+      specialty: [],
+    };
+
+    it("supply search input appears within the By Supply view", () => {
+      render(
+        <SupplyOverview
+          {...defaultSupplyProps}
+          threads={[createMockSupplyNeed()]}
+          beads={[]}
+          supplySearchQuery=""
+        />,
+      );
+      expect(screen.getByRole("searchbox", { name: "Search supplies" })).toBeInTheDocument();
+    });
+
+    it("typing in supply search filters aggregated supplies by brandName (case-insensitive)", () => {
+      const threads = [
+        createMockSupplyNeed({ supplyId: "s1", brandName: "DMC", code: "310" }),
+        createMockSupplyNeed({
+          supplyId: "s2",
+          junctionId: "j2",
+          brandName: "Weeks Dye Works",
+          code: "WDW-100",
+          colorName: "Garnet",
+        }),
+      ];
+      render(
+        <SupplyOverview
+          {...defaultSupplyProps}
+          threads={threads}
+          beads={[]}
+          supplySearchQuery="weeks"
+        />,
+      );
+
+      expect(screen.getByText("Weeks Dye Works WDW-100")).toBeInTheDocument();
+      expect(screen.queryByText("DMC 310")).not.toBeInTheDocument();
+    });
+
+    it("typing in supply search filters aggregated supplies by code", () => {
+      const threads = [
+        createMockSupplyNeed({ supplyId: "s1", brandName: "DMC", code: "310" }),
+        createMockSupplyNeed({
+          supplyId: "s2",
+          junctionId: "j2",
+          brandName: "DMC",
+          code: "blanc",
+          colorName: "White",
+        }),
+      ];
+      render(
+        <SupplyOverview
+          {...defaultSupplyProps}
+          threads={threads}
+          beads={[]}
+          supplySearchQuery="blanc"
+        />,
+      );
+
+      expect(screen.getByText("DMC blanc")).toBeInTheDocument();
+      expect(screen.queryByText("DMC 310")).not.toBeInTheDocument();
+    });
+
+    it("typing in supply search filters aggregated supplies by colorName", () => {
+      const threads = [
+        createMockSupplyNeed({ supplyId: "s1", colorName: "Black" }),
+        createMockSupplyNeed({
+          supplyId: "s2",
+          junctionId: "j2",
+          code: "321",
+          colorName: "Red",
+          hexColor: "#cc0000",
+        }),
+      ];
+      render(
+        <SupplyOverview
+          {...defaultSupplyProps}
+          threads={threads}
+          beads={[]}
+          supplySearchQuery="red"
+        />,
+      );
+
+      expect(screen.getByText("DMC 321")).toBeInTheDocument();
+      expect(screen.queryByText("DMC 310")).not.toBeInTheDocument();
+    });
+
+    it("supply search does NOT filter by project name", () => {
+      const threads = [
+        createMockSupplyNeed({ supplyId: "s1", projectName: "Forest Sampler" }),
+      ];
+      render(
+        <SupplyOverview
+          {...defaultSupplyProps}
+          threads={threads}
+          beads={[]}
+          supplySearchQuery="Forest"
+        />,
+      );
+
+      expect(screen.queryByText("DMC 310")).not.toBeInTheDocument();
+    });
+
+    it("supply sections with zero matches auto-hide during search", () => {
+      const threads = [
+        createMockSupplyNeed({ supplyId: "s1", brandName: "DMC", code: "310" }),
+      ];
+      const beads = [
+        createMockSupplyNeed({
+          supplyId: "s2",
+          junctionId: "j2",
+          brandName: "Mill Hill",
+          code: "00123",
+          colorName: "Crystal",
+        }),
+      ];
+      render(
+        <SupplyOverview
+          {...defaultSupplyProps}
+          threads={threads}
+          beads={beads}
+          supplySearchQuery="Mill"
+        />,
+      );
+
+      expect(screen.queryByText("Threads")).not.toBeInTheDocument();
+      expect(screen.getByText("Beads")).toBeInTheDocument();
+    });
+
+    it('all sections hidden shows EmptyState with "No supplies match your search"', () => {
+      const threads = [createMockSupplyNeed()];
+      render(
+        <SupplyOverview
+          {...defaultSupplyProps}
+          threads={threads}
+          beads={[]}
+          supplySearchQuery="nonexistent"
+        />,
+      );
+
+      expect(screen.getByText("No supplies match your search")).toBeInTheDocument();
+    });
+
+    it("fabric section is NOT filtered by supply search", () => {
+      render(
+        <SupplyOverview
+          {...defaultSupplyProps}
+          threads={[createMockSupplyNeed()]}
+          beads={[]}
+          fabrics={[
+            {
+              projectId: "p1",
+              projectName: "Test",
+              stitchesWide: 200,
+              stitchesHigh: 150,
+              hasFabric: false,
+              fabricName: null,
+            },
+          ]}
+          supplySearchQuery="dmc"
+        />,
+      );
+
+      // Fabric section hidden during supply search
+      expect(screen.queryByText("Fabric")).not.toBeInTheDocument();
+    });
+
+    it("search filters AFTER aggregation so totals remain correct for multi-project supplies", () => {
+      const threads = [
+        createMockSupplyNeed({
+          supplyId: "shared-s1",
+          junctionId: "j1",
+          brandName: "DMC",
+          code: "310",
+          projectId: "p1",
+          projectName: "Project A",
+          quantityRequired: 3,
+          quantityAcquired: 1,
+        }),
+        createMockSupplyNeed({
+          supplyId: "shared-s1",
+          junctionId: "j2",
+          brandName: "DMC",
+          code: "310",
+          projectId: "p2",
+          projectName: "Project B",
+          quantityRequired: 2,
+          quantityAcquired: 0,
+        }),
+      ];
+      render(
+        <SupplyOverview
+          {...defaultSupplyProps}
+          threads={threads}
+          beads={[]}
+          supplySearchQuery="310"
+        />,
+      );
+
+      // Aggregated total: 3+2=5 required, 1+0=1 acquired
+      expect(screen.getByText("DMC 310")).toBeInTheDocument();
+      // The aggregated row should show total counts, not per-project
+      expect(screen.getByText(/Project A, Project B/)).toBeInTheDocument();
+    });
   });
 });
