@@ -2,23 +2,10 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Star, ArrowUpDown, Scissors } from "lucide-react";
+import { Star, ArrowUpDown } from "lucide-react";
 import type { WhatsNextProject } from "@/types/session";
-import type { ProjectStatus } from "@/generated/prisma/client";
 import { StatusBadge } from "@/components/features/charts/status-badge";
-import { STATUS_GRADIENT_CLASSES } from "@/components/features/gallery/gallery-utils";
-
-// ─── Status gradient placeholders ───────────────────────────────────────────
-
-function CoverPlaceholder({ status }: { status: ProjectStatus }) {
-  return (
-    <div
-      className={`flex h-full w-full items-center justify-center ${STATUS_GRADIENT_CLASSES[status] ?? STATUS_GRADIENT_CLASSES.UNSTARTED}`}
-    >
-      <Scissors className="h-5 w-5 text-stone-400/25" strokeWidth={1} />
-    </div>
-  );
-}
+import { CoverPlaceholder } from "@/components/features/gallery/cover-placeholder";
 
 // ─── Sort logic ─────────────────────────────────────────────────────────────
 
@@ -122,7 +109,12 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
               key={project.chartId}
               className="border-border bg-card group overflow-hidden rounded-lg border transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-md"
             >
-              <Link href={`/charts/${project.chartId}`} className="block" tabIndex={-1} aria-hidden="true">
+              <Link
+                href={`/charts/${project.chartId}`}
+                className="block"
+                tabIndex={-1}
+                aria-hidden="true"
+              >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   {thumbnailUrl ? (
                     <img
@@ -157,7 +149,7 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
               <div className="flex flex-col gap-1.5 p-4">
                 <Link
                   href={`/charts/${project.chartId}`}
-                  className="font-heading text-foreground group-hover:text-primary text-sm font-semibold leading-snug transition-colors"
+                  className="font-heading text-foreground group-hover:text-primary text-sm leading-snug font-semibold transition-colors"
                 >
                   {project.chartName}
                 </Link>
