@@ -322,9 +322,13 @@ function DesignerRow({
   onDelete: () => void;
 }) {
   return (
-    <tr className="group hover:bg-muted/50 transition-colors">
+    <tr
+      className="group hover:bg-muted/50 transition-colors"
+      aria-labelledby={`designer-name-${designer.id}`}
+    >
       <td className="px-4 py-3">
         <Link
+          id={`designer-name-${designer.id}`}
           href={`/designers/${designer.id}`}
           className="text-foreground hover:text-primary text-sm font-medium transition-colors"
         >
@@ -394,10 +398,15 @@ function DesignerCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="border-border bg-card rounded-xl border p-4 shadow-sm">
+    <div
+      className="border-border bg-card rounded-xl border p-4 shadow-sm"
+      role="group"
+      aria-labelledby={`designer-name-${designer.id}`}
+    >
       <div className="mb-2 flex items-start justify-between">
         <div className="min-w-0 flex-1">
           <Link
+            id={`designer-name-${designer.id}`}
             href={`/designers/${designer.id}`}
             className="text-foreground hover:text-primary block truncate text-sm font-semibold transition-colors"
           >

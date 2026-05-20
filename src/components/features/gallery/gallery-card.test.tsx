@@ -9,12 +9,14 @@ vi.mock("next/link", () => ({
     href,
     children,
     className,
+    ...rest
   }: {
     href: string;
     children: React.ReactNode;
     className?: string;
+    [key: string]: unknown;
   }) => (
-    <a href={href} className={className}>
+    <a href={href} className={className} {...rest}>
       {children}
     </a>
   ),
@@ -219,8 +221,9 @@ describe("GalleryCard", () => {
         coverImageUrl: "https://example.com/image.jpg",
         name: "Test Chart",
       });
-      render(<GalleryCard card={card} />);
-      const img = screen.getByRole("img", { name: "Test Chart" });
+      const { container } = render(<GalleryCard card={card} />);
+      // Image is inside aria-hidden Link, so use container query
+      const img = container.querySelector('img[alt="Test Chart"]');
       expect(img).toBeInTheDocument();
       expect(img).toHaveAttribute("src", "https://example.com/image.jpg");
     });
@@ -273,8 +276,9 @@ describe("GalleryCard", () => {
         focalPointX: 0.3,
         focalPointY: 0.7,
       });
-      render(<GalleryCard card={card} />);
-      const img = screen.getByRole("img", { name: "Focal Test" });
+      const { container } = render(<GalleryCard card={card} />);
+      // Image is inside aria-hidden Link, so use container query
+      const img = container.querySelector('img[alt="Focal Test"]') as HTMLElement;
       expect(img).toHaveStyle({ objectPosition: "30% 70%" });
     });
 
@@ -285,9 +289,40 @@ describe("GalleryCard", () => {
         focalPointX: null,
         focalPointY: null,
       });
-      render(<GalleryCard card={card} />);
-      const img = screen.getByRole("img", { name: "No Focal Test" });
+      const { container } = render(<GalleryCard card={card} />);
+      // Image is inside aria-hidden Link, so use container query
+      const img = container.querySelector('img[alt="No Focal Test"]') as HTMLElement;
       expect(img.style.objectPosition).toBeFalsy();
+    });
+  });
+
+  describe("Image link target (UX-02)", () => {
+    it("image area is inside a link element pointing to /charts/{chartId}", () => {
+      const card = createMockGalleryCard({
+        chartId: "chart-img-link",
+        coverImageUrl: "https://example.com/image.jpg",
+        name: "Link Test",
+      });
+      const { container } = render(<GalleryCard card={card} />);
+      const imageLinks = container.querySelectorAll('a[href="/charts/chart-img-link"]');
+      // Should have 2 links: one wrapping image, one for name
+      expect(imageLinks.length).toBe(2);
+    });
+
+    it("image link has tabIndex={-1} and aria-hidden to avoid duplicate tab stops", () => {
+      const card = createMockGalleryCard({
+        chartId: "chart-img-a11y",
+        coverImageUrl: "https://example.com/image.jpg",
+        name: "A11y Test",
+      });
+      const { container } = render(<GalleryCard card={card} />);
+      const imageLinks = container.querySelectorAll('a[href="/charts/chart-img-a11y"]');
+      // The image link (first one) should have tabIndex -1 and aria-hidden
+      const imageLink = Array.from(imageLinks).find(
+        (link) => link.getAttribute("tabindex") === "-1",
+      );
+      expect(imageLink).toBeTruthy();
+      expect(imageLink?.getAttribute("aria-hidden")).toBe("true");
     });
   });
 });

@@ -103,94 +103,89 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
         </div>
       </div>
 
-      {/* Project cards */}
-      <div className="flex flex-col gap-3">
+      {/* Project cards — gallery-style vertical cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {sorted.map((project) => {
           const thumbnailUrl = project.coverThumbnailUrl
             ? imageUrls[project.coverThumbnailUrl]
             : null;
 
+          const kittingLabel =
+            project.kittingPercent === 100
+              ? "Fully kitted"
+              : project.kittingPercent === 0
+                ? "Not kitted"
+                : "Kitting";
+
           return (
-            <Link
+            <div
               key={project.chartId}
-              href={`/charts/${project.chartId}`}
-              className="group border-border bg-card flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-all duration-200 hover:border-emerald-200 hover:shadow-sm dark:hover:border-emerald-800"
+              className="border-border bg-card group overflow-hidden rounded-lg border transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-md"
             >
-              {/* Priority / star indicator */}
-              <div className="w-8 shrink-0 text-center">
-                {project.wantToStartNext ? (
-                  <Star
-                    data-testid={`star-icon-${project.chartId}`}
-                    className="inline h-4 w-4 text-amber-500"
-                    fill="currentColor"
-                    strokeWidth={0}
-                  />
-                ) : (
-                  <span className="text-muted-foreground/40 text-lg">&mdash;</span>
-                )}
-              </div>
+              <Link href={`/charts/${project.chartId}`} className="block" tabIndex={-1} aria-hidden="true">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  {thumbnailUrl ? (
+                    <img
+                      src={thumbnailUrl}
+                      alt={project.chartName}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <CoverPlaceholder status={project.status} />
+                  )}
 
-              {/* Cover thumbnail */}
-              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg">
-                {thumbnailUrl ? (
-                  <img
-                    src={thumbnailUrl}
-                    alt={project.chartName}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <CoverPlaceholder status={project.status} />
-                )}
-              </div>
+                  {/* Star badge for wantToStartNext */}
+                  {project.wantToStartNext && (
+                    <div className="absolute top-3 left-3">
+                      <Star
+                        data-testid={`star-icon-${project.chartId}`}
+                        className="h-5 w-5 text-amber-500 drop-shadow-sm"
+                        fill="currentColor"
+                        strokeWidth={0}
+                      />
+                    </div>
+                  )}
 
-              {/* Info */}
-              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <p className="font-heading text-foreground truncate text-sm font-semibold transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+                  {/* Status badge */}
+                  <div className="absolute top-3 right-3">
+                    <StatusBadge status={project.status} />
+                  </div>
+                </div>
+              </Link>
+
+              <div className="flex flex-col gap-1.5 p-4">
+                <Link
+                  href={`/charts/${project.chartId}`}
+                  className="font-heading text-foreground group-hover:text-primary text-sm font-semibold leading-snug transition-colors"
+                >
                   {project.chartName}
-                </p>
-                <p className="text-muted-foreground truncate text-xs">{project.designerName}</p>
+                </Link>
+                {project.designerName && (
+                  <p className="text-muted-foreground text-xs">{project.designerName}</p>
+                )}
                 <p className="text-muted-foreground/70 text-xs">
                   {project.totalStitches.toLocaleString()} stitches
                 </p>
-              </div>
 
-              {/* Kitting progress — compact badge on mobile, full bar on desktop */}
-              <div className="shrink-0 md:hidden">
-                <span
-                  className={`inline-block rounded-full px-2 py-0.5 font-mono text-xs font-medium tabular-nums ${
-                    project.kittingPercent === 100
-                      ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
-                      : "bg-amber-400/10 text-amber-600 dark:bg-amber-400/20 dark:text-amber-400"
-                  }`}
-                >
-                  {project.kittingPercent}%
-                </span>
-              </div>
-              <div className="hidden w-[120px] shrink-0 md:block">
-                <div className="flex items-center gap-2">
+                {/* Kitting progress bar */}
+                <div className="mt-1 flex items-center gap-2">
                   <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
                     <div
                       data-testid={`kitting-bar-${project.chartId}`}
                       className={`h-full rounded-full ${
-                        project.kittingPercent === 100 ? "bg-emerald-500" : "bg-amber-400"
+                        project.kittingPercent === 100 ? "bg-progress" : "bg-amber-400"
                       }`}
                       style={{ width: `${project.kittingPercent}%` }}
                     />
                   </div>
-                  <span className="text-muted-foreground font-mono text-xs font-medium tabular-nums">
+                  <span className="text-muted-foreground font-mono text-xs tabular-nums">
                     {project.kittingPercent}%
                   </span>
                 </div>
-                <p className="text-muted-foreground/70 mt-0.5 text-xs">
-                  {project.kittingPercent === 100 ? "Fully kitted" : "Kitting"}
-                </p>
+                <p className="text-muted-foreground/70 text-xs">{kittingLabel}</p>
               </div>
-
-              {/* Status badge */}
-              <div className="hidden shrink-0 sm:block">
-                <StatusBadge status={project.status} />
-              </div>
-            </Link>
+            </div>
           );
         })}
       </div>
