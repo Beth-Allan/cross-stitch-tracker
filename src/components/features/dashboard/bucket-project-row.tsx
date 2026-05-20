@@ -43,7 +43,7 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
 
       {/* Name + designer */}
       <div className="min-w-0 flex-1">
-        <p className="font-heading truncate text-sm font-semibold transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+        <p className="font-heading group-hover:text-primary truncate text-sm font-semibold transition-colors">
           {project.projectName}
         </p>
         {project.designerName && (
