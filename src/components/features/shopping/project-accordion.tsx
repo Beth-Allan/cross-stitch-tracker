@@ -144,180 +144,186 @@ export function ProjectAccordion({
             >
               <div className="flex flex-col gap-2">
                 {groupProjects.map((project) => {
-          const isSelected = selectedIds.has(project.projectId);
-          const isExpanded = expandedIds.has(project.projectId);
-          const imageUrl = imageUrls[project.coverThumbnailUrl ?? ""];
+                  const isSelected = selectedIds.has(project.projectId);
+                  const isExpanded = expandedIds.has(project.projectId);
+                  const imageUrl = imageUrls[project.coverThumbnailUrl ?? ""];
 
-          const projectThreads = threads.filter((t) => t.projectId === project.projectId);
-          const projectBeads = beads.filter((b) => b.projectId === project.projectId);
-          const projectSpecialty = specialty.filter((s) => s.projectId === project.projectId);
-          const projectFabric = fabrics.find((f) => f.projectId === project.projectId);
+                  const projectThreads = threads.filter((t) => t.projectId === project.projectId);
+                  const projectBeads = beads.filter((b) => b.projectId === project.projectId);
+                  const projectSpecialty = specialty.filter(
+                    (s) => s.projectId === project.projectId,
+                  );
+                  const projectFabric = fabrics.find((f) => f.projectId === project.projectId);
 
-          const totalNeeds =
-            project.threadCount +
-            project.beadCount +
-            project.specialtyCount +
-            (project.fabricNeeded ? 1 : 0);
+                  const totalNeeds =
+                    project.threadCount +
+                    project.beadCount +
+                    project.specialtyCount +
+                    (project.fabricNeeded ? 1 : 0);
 
-          return (
-            <div
-              key={project.projectId}
-              className={cn(
-                "overflow-hidden rounded-xl border",
-                isSelected ? "border-selected-border" : "border-border",
-              )}
-            >
-              {/* Header */}
-              <div className="bg-card flex items-center gap-3 p-3">
-                <button
-                  type="button"
-                  onClick={() => onToggle(project.projectId)}
-                  role="checkbox"
-                  aria-checked={isSelected}
-                  className={cn(
-                    "shrink-0",
-                    isSelected ? "text-progress-foreground" : "text-muted-foreground/40",
-                  )}
-                  aria-label={
-                    isSelected ? `Deselect ${project.projectName}` : `Select ${project.projectName}`
-                  }
-                >
-                  {isSelected ? (
-                    <CheckSquare className="h-5 w-5" />
-                  ) : (
-                    <Square className="h-5 w-5" />
-                  )}
-                </button>
+                  return (
+                    <div
+                      key={project.projectId}
+                      className={cn(
+                        "overflow-hidden rounded-xl border",
+                        isSelected ? "border-selected-border" : "border-border",
+                      )}
+                    >
+                      {/* Header */}
+                      <div className="bg-card flex items-center gap-3 p-3">
+                        <button
+                          type="button"
+                          onClick={() => onToggle(project.projectId)}
+                          role="checkbox"
+                          aria-checked={isSelected}
+                          className={cn(
+                            "shrink-0",
+                            isSelected ? "text-progress-foreground" : "text-muted-foreground/40",
+                          )}
+                          aria-label={
+                            isSelected
+                              ? `Deselect ${project.projectName}`
+                              : `Select ${project.projectName}`
+                          }
+                        >
+                          {isSelected ? (
+                            <CheckSquare className="h-5 w-5" />
+                          ) : (
+                            <Square className="h-5 w-5" />
+                          )}
+                        </button>
 
-                {imageUrl ? (
-                  <Image
-                    src={imageUrl}
-                    alt={project.projectName}
-                    width={40}
-                    height={40}
-                    className="shrink-0 rounded object-cover"
-                    style={getObjectPositionStyle(project.focalPointX, project.focalPointY)}
-                    loading="lazy"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="bg-muted h-10 w-10 shrink-0 rounded" />
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => toggleExpand(project.projectId)}
-                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
-                  aria-expanded={isExpanded}
-                  aria-label={`${isExpanded ? "Collapse" : "Expand"} ${project.projectName} supplies`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-foreground truncate text-sm font-semibold">
-                        {project.projectName}
-                      </span>
-                      <StatusBadge status={project.status as ProjectStatus} />
-                    </div>
-                    <p className="text-muted-foreground mt-0.5 text-xs">
-                      {project.designerName}
-                      {totalNeeds > 0 &&
-                        ` · ${totalNeeds} item${totalNeeds !== 1 ? "s" : ""} needed`}
-                    </p>
-                  </div>
-                  <ChevronRight
-                    className={cn(
-                      "text-muted-foreground h-4 w-4 shrink-0 transition-transform",
-                      isExpanded && "rotate-90",
-                    )}
-                  />
-                </button>
-              </div>
-
-              {/* Expanded body */}
-              {isExpanded && isSelected && (
-                <div className="border-border/60 border-t">
-                  {projectThreads.length > 0 && (
-                    <SupplyGroup
-                      label="Threads"
-                      count={projectThreads.length}
-                      supplies={projectThreads}
-                      type="thread"
-                      allSelectedProjectIds={allSelectedProjectIds}
-                      allSupplies={threads}
-                      onUpdateAcquired={onUpdateAcquired}
-                      pendingIds={pendingIds}
-                      failedIds={failedIds}
-                    />
-                  )}
-                  {projectBeads.length > 0 && (
-                    <SupplyGroup
-                      label="Beads"
-                      count={projectBeads.length}
-                      supplies={projectBeads}
-                      type="bead"
-                      allSelectedProjectIds={allSelectedProjectIds}
-                      allSupplies={beads}
-                      onUpdateAcquired={onUpdateAcquired}
-                      pendingIds={pendingIds}
-                      failedIds={failedIds}
-                    />
-                  )}
-                  {projectSpecialty.length > 0 && (
-                    <SupplyGroup
-                      label="Specialty"
-                      count={projectSpecialty.length}
-                      supplies={projectSpecialty}
-                      type="specialty"
-                      allSelectedProjectIds={allSelectedProjectIds}
-                      allSupplies={specialty}
-                      onUpdateAcquired={onUpdateAcquired}
-                      pendingIds={pendingIds}
-                      failedIds={failedIds}
-                    />
-                  )}
-                  {projectFabric && (
-                    <div className="border-border/30 border-t px-4 py-3">
-                      <div className="text-muted-foreground mb-2 text-[11px] font-bold tracking-wider uppercase">
-                        Fabric
-                      </div>
-                      <div className="text-sm">
-                        {projectFabric.hasFabric ? (
-                          <span className="text-progress-foreground">
-                            ✓ {projectFabric.fabricName ?? "Has fabric"}{" "}
-                            <span className="text-muted-foreground">
-                              · {projectFabric.stitchesWide} × {projectFabric.stitchesHigh} stitches
-                            </span>
-                          </span>
+                        {imageUrl ? (
+                          <Image
+                            src={imageUrl}
+                            alt={project.projectName}
+                            width={40}
+                            height={40}
+                            className="shrink-0 rounded object-cover"
+                            style={getObjectPositionStyle(project.focalPointX, project.focalPointY)}
+                            loading="lazy"
+                            unoptimized
+                          />
                         ) : (
-                          <span>
-                            <span className="font-medium text-amber-600">Needs fabric</span>{" "}
-                            <span className="text-muted-foreground">
-                              · {projectFabric.stitchesWide} × {projectFabric.stitchesHigh} stitches
-                            </span>
-                          </span>
+                          <div className="bg-muted h-10 w-10 shrink-0 rounded" />
                         )}
-                      </div>
-                    </div>
-                  )}
-                  {projectThreads.length === 0 &&
-                    projectBeads.length === 0 &&
-                    projectSpecialty.length === 0 &&
-                    !projectFabric && (
-                      <div className="text-muted-foreground px-4 py-6 text-center text-sm">
-                        No supply data for this project
-                      </div>
-                    )}
-                </div>
-              )}
 
-              {/* Expanded but not selected */}
-              {isExpanded && !isSelected && (
-                <div className="border-border/60 text-muted-foreground border-t px-4 py-6 text-center text-sm">
-                  Select this project to see supply details
-                </div>
-              )}
-            </div>
-          );
+                        <button
+                          type="button"
+                          onClick={() => toggleExpand(project.projectId)}
+                          className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                          aria-expanded={isExpanded}
+                          aria-label={`${isExpanded ? "Collapse" : "Expand"} ${project.projectName} supplies`}
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-foreground truncate text-sm font-semibold">
+                                {project.projectName}
+                              </span>
+                              <StatusBadge status={project.status as ProjectStatus} />
+                            </div>
+                            <p className="text-muted-foreground mt-0.5 text-xs">
+                              {project.designerName}
+                              {totalNeeds > 0 &&
+                                ` · ${totalNeeds} item${totalNeeds !== 1 ? "s" : ""} needed`}
+                            </p>
+                          </div>
+                          <ChevronRight
+                            className={cn(
+                              "text-muted-foreground h-4 w-4 shrink-0 transition-transform",
+                              isExpanded && "rotate-90",
+                            )}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Expanded body */}
+                      {isExpanded && isSelected && (
+                        <div className="border-border/60 border-t">
+                          {projectThreads.length > 0 && (
+                            <SupplyGroup
+                              label="Threads"
+                              count={projectThreads.length}
+                              supplies={projectThreads}
+                              type="thread"
+                              allSelectedProjectIds={allSelectedProjectIds}
+                              allSupplies={threads}
+                              onUpdateAcquired={onUpdateAcquired}
+                              pendingIds={pendingIds}
+                              failedIds={failedIds}
+                            />
+                          )}
+                          {projectBeads.length > 0 && (
+                            <SupplyGroup
+                              label="Beads"
+                              count={projectBeads.length}
+                              supplies={projectBeads}
+                              type="bead"
+                              allSelectedProjectIds={allSelectedProjectIds}
+                              allSupplies={beads}
+                              onUpdateAcquired={onUpdateAcquired}
+                              pendingIds={pendingIds}
+                              failedIds={failedIds}
+                            />
+                          )}
+                          {projectSpecialty.length > 0 && (
+                            <SupplyGroup
+                              label="Specialty"
+                              count={projectSpecialty.length}
+                              supplies={projectSpecialty}
+                              type="specialty"
+                              allSelectedProjectIds={allSelectedProjectIds}
+                              allSupplies={specialty}
+                              onUpdateAcquired={onUpdateAcquired}
+                              pendingIds={pendingIds}
+                              failedIds={failedIds}
+                            />
+                          )}
+                          {projectFabric && (
+                            <div className="border-border/30 border-t px-4 py-3">
+                              <div className="text-muted-foreground mb-2 text-[11px] font-bold tracking-wider uppercase">
+                                Fabric
+                              </div>
+                              <div className="text-sm">
+                                {projectFabric.hasFabric ? (
+                                  <span className="text-progress-foreground">
+                                    ✓ {projectFabric.fabricName ?? "Has fabric"}{" "}
+                                    <span className="text-muted-foreground">
+                                      · {projectFabric.stitchesWide} × {projectFabric.stitchesHigh}{" "}
+                                      stitches
+                                    </span>
+                                  </span>
+                                ) : (
+                                  <span>
+                                    <span className="text-warning font-medium">Needs fabric</span>{" "}
+                                    <span className="text-muted-foreground">
+                                      · {projectFabric.stitchesWide} × {projectFabric.stitchesHigh}{" "}
+                                      stitches
+                                    </span>
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          {projectThreads.length === 0 &&
+                            projectBeads.length === 0 &&
+                            projectSpecialty.length === 0 &&
+                            !projectFabric && (
+                              <div className="text-muted-foreground px-4 py-6 text-center text-sm">
+                                No supply data for this project
+                              </div>
+                            )}
+                        </div>
+                      )}
+
+                      {/* Expanded but not selected */}
+                      {isExpanded && !isSelected && (
+                        <div className="border-border/60 text-muted-foreground border-t px-4 py-6 text-center text-sm">
+                          Select this project to see supply details
+                        </div>
+                      )}
+                    </div>
+                  );
                 })}
               </div>
             </StatusGroup>

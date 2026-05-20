@@ -327,7 +327,7 @@ function FabricSection({ fabrics }: { fabrics: ShoppingFabricNeed[] }) {
                 {fabric.stitchesWide} × {fabric.stitchesHigh} stitches
                 {fabric.fabricName && ` · ${fabric.fabricName}`}
               </p>
-              {!fabric.hasFabric && <p className="mt-1 text-xs text-amber-600">Needs fabric</p>}
+              {!fabric.hasFabric && <p className="text-warning mt-1 text-xs">Needs fabric</p>}
             </div>
           </div>
         ))}
