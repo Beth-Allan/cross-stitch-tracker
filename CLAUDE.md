@@ -45,10 +45,15 @@
   - WR-03: type-safe `hydrateField` helper replacing `as any` in draft hydration
   - WR-04: explicit `StitchSession` return type on mock factory
   - WR-05: TODO(999.0.17) backlog reference for buried treasures ownership
+- **Phase 25 executed & verified** — 2/2 plans complete, 2108 tests passing, human-verified
+  - Plan 01: 4 standalone components — ProjectSearchInput, SupplySearchInput, StatusGroup, SelectionCounter (29 tests)
+  - Plan 02: Full integration — search, status grouping, supply filtering, smart selection (37 new tests)
+  - Code review: 1 critical + 4 warnings fixed (CR-01 aggregated supply quantity, WR-01 localStorage race, WR-02 semantic tokens, WR-03 dead branches, WR-04 type assertion)
 
 ### Next Up — RESUME HERE
 
-1. `/gsd-verify-work` — verify Phase 24 completion (re-verify after code review fixes)
+1. `/gsd-ship` — create PR for Phase 25
+2. `/gsd-discuss-phase 26` — discuss next phase (UX Polish)
 
 ### Backlog
 
