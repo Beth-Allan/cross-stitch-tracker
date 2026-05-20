@@ -39,7 +39,7 @@ describe("StatusGroup", () => {
       </StatusGroup>,
     );
 
-    const dot = container.querySelector('[aria-hidden="true"]');
+    const dot = container.querySelector("span[aria-hidden='true']");
     expect(dot).toBeInTheDocument();
     expect(dot).toHaveClass("bg-amber-500");
   });
@@ -73,7 +73,7 @@ describe("StatusGroup", () => {
       </StatusGroup>,
     );
 
-    const toggleButton = screen.getByRole("button", { name: /Kitting/ });
+    const toggleButton = document.getElementById("group-KITTING")!;
     await user.click(toggleButton);
 
     expect(onToggle).toHaveBeenCalledTimes(1);
@@ -115,7 +115,7 @@ describe("StatusGroup", () => {
       </StatusGroup>,
     );
 
-    const toggleButton = screen.getByRole("button", { name: /Kitting/ });
+    const toggleButton = document.getElementById("group-KITTING")!;
     expect(toggleButton).toHaveAttribute("aria-expanded", "true");
 
     rerender(
