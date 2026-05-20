@@ -161,9 +161,9 @@ Plans:
   2. Projects are grouped by status (Kitting, Stitching, Unstarted, etc.) for faster scanning
   3. User can search/filter supplies by type in the By Supply aggregation view
   4. Shopping cart remains responsive with 75+ selected projects
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
-- [ ] 25-01-PLAN.md -- New components: ProjectSearchInput, SupplySearchInput, StatusGroup, SelectionCounter with tests
+- [x] 25-01-PLAN.md -- New components: ProjectSearchInput, SupplySearchInput, StatusGroup, SelectionCounter with tests
 - [ ] 25-02-PLAN.md -- Integration: wire search, grouping, and smart selection into shopping cart + supply overview
 
 ### Phase 26: UX Polish
@@ -211,5 +211,5 @@ Phase 22 first (foundation). Phases 23, 24, 25, 26 depend only on Phase 22 and c
 | 22. Critical Fixes & Test Infrastructure | v1.6 | 3/3 | Complete    | 2026-05-18 |
 | 23. Test Coverage & Reliability | v1.6 | 3/3 | Complete    | 2026-05-18 |
 | 24. Code Quality | v1.6 | 4/4 | Complete    | 2026-05-19 |
-| 25. Shopping Cart Scaling | v1.6 | 0/2 | Not started | - |
+| 25. Shopping Cart Scaling | v1.6 | 1/2 | In Progress|  |
 | 26. UX Polish | v1.6 | 0/? | Not started | - |
