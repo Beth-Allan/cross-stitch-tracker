@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@/__tests__/test-utils";
+import { render, screen, waitFor, fireEvent } from "@/__tests__/test-utils";
 import { CoverImageUpload } from "./cover-image-upload";
 
 // ─── Mocks ─────────────────────────────────────────────────────────────────
@@ -86,6 +86,56 @@ describe("CoverImageUpload - cover image display fixes", () => {
       });
       expect(dropZone.className).toContain("h-48");
       expect(dropZone.className).not.toContain("h-32");
+    });
+  });
+
+  describe("dynamic aspect ratio (UX-13)", () => {
+    it("preview container has h-48 class before image loads (fallback)", () => {
+      render(
+        <CoverImageUpload {...defaultProps} currentImageUrl="https://example.com/test-image.jpg" />,
+      );
+      const img = screen.getByAltText("Cover image preview");
+      const container = img.closest("div");
+      expect(container!.className).toContain("h-48");
+    });
+
+    it("after image onLoad fires, container has aspectRatio style", () => {
+      render(
+        <CoverImageUpload {...defaultProps} currentImageUrl="https://example.com/test-image.jpg" />,
+      );
+      const img = screen.getByAltText("Cover image preview") as HTMLImageElement;
+      Object.defineProperty(img, "naturalWidth", { value: 800, configurable: true });
+      Object.defineProperty(img, "naturalHeight", { value: 600, configurable: true });
+      fireEvent.load(img);
+
+      const container = img.closest("div");
+      expect(container!.style.aspectRatio).toBe("800/600");
+    });
+
+    it("container has maxHeight '18rem' after image loads", () => {
+      render(
+        <CoverImageUpload {...defaultProps} currentImageUrl="https://example.com/test-image.jpg" />,
+      );
+      const img = screen.getByAltText("Cover image preview") as HTMLImageElement;
+      Object.defineProperty(img, "naturalWidth", { value: 800, configurable: true });
+      Object.defineProperty(img, "naturalHeight", { value: 600, configurable: true });
+      fireEvent.load(img);
+
+      const container = img.closest("div");
+      expect(container!.style.maxHeight).toBe("18rem");
+    });
+
+    it("container does NOT have h-48 class after image loads", () => {
+      render(
+        <CoverImageUpload {...defaultProps} currentImageUrl="https://example.com/test-image.jpg" />,
+      );
+      const img = screen.getByAltText("Cover image preview") as HTMLImageElement;
+      Object.defineProperty(img, "naturalWidth", { value: 800, configurable: true });
+      Object.defineProperty(img, "naturalHeight", { value: 600, configurable: true });
+      fireEvent.load(img);
+
+      const container = img.closest("div");
+      expect(container!.className).not.toContain("h-48");
     });
   });
 });
