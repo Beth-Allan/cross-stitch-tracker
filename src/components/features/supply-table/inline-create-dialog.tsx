@@ -13,6 +13,39 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { SupplyType, CreateSupplyData } from "./types";
 
+const LABEL_MAP: Record<
+  SupplyType,
+  {
+    title: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    codeLabel: string;
+    codePlaceholder: string;
+  }
+> = {
+  THREAD: {
+    title: "Create Thread",
+    nameLabel: "Color Name",
+    namePlaceholder: "e.g. Christmas Red",
+    codeLabel: "Color Code",
+    codePlaceholder: "e.g. 321 (optional)",
+  },
+  BEAD: {
+    title: "Create Bead",
+    nameLabel: "Bead Name",
+    namePlaceholder: "e.g. Glass Seed Bead",
+    codeLabel: "Product Code",
+    codePlaceholder: "e.g. 02013 (optional)",
+  },
+  SPECIALTY: {
+    title: "Create Specialty Item",
+    nameLabel: "Product Name",
+    namePlaceholder: "e.g. Kreinik Braid",
+    codeLabel: "Product Code",
+    codePlaceholder: "e.g. 002HL (optional)",
+  },
+};
+
 interface InlineCreateDialogProps {
   open: boolean;
   onClose: () => void;
@@ -58,6 +91,7 @@ export function InlineCreateDialog({
     });
   }
 
+  const labels = LABEL_MAP[supplyType];
   const typeLabel =
     supplyType === "THREAD" ? "thread" : supplyType === "BEAD" ? "bead" : "specialty item";
 
@@ -65,7 +99,7 @@ export function InlineCreateDialog({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>Create Supply</DialogTitle>
+          <DialogTitle>{labels.title}</DialogTitle>
           <DialogDescription>Create a new {typeLabel} and add it to the table.</DialogDescription>
         </DialogHeader>
 
@@ -75,7 +109,7 @@ export function InlineCreateDialog({
               htmlFor="inline-create-name"
               className="text-foreground mb-1 block text-sm font-medium"
             >
-              Name
+              {labels.nameLabel}
             </label>
             <Input
               id="inline-create-name"
@@ -84,7 +118,7 @@ export function InlineCreateDialog({
                 setName(e.target.value);
                 if (error) setError("");
               }}
-              placeholder="Supply name"
+              placeholder={labels.namePlaceholder}
               aria-invalid={!!error}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -101,13 +135,13 @@ export function InlineCreateDialog({
               htmlFor="inline-create-code"
               className="text-foreground mb-1 block text-sm font-medium"
             >
-              Code
+              {labels.codeLabel}
             </label>
             <Input
               id="inline-create-code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="Product code (optional)"
+              placeholder={labels.codePlaceholder}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();

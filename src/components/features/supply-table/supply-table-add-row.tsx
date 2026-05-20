@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { ArrowRight, Sparkles as SparklesIcon, X } from "lucide-react";
+import { ArrowRight, Check, Sparkles as SparklesIcon, X } from "lucide-react";
 import { SegmentedTypeToggle } from "./segmented-type-toggle";
 import { PortalAutocomplete } from "./portal-autocomplete";
 import { InlineCreateDialog } from "./inline-create-dialog";
@@ -54,6 +54,7 @@ export function SupplyTableAddRow({
     getFocusTarget,
     highlightIndex,
     moveHighlight,
+    hasUsedArrowKeys,
   } = useSupplyTable(adapter, calcParams, existingSupplyIds);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -206,7 +207,7 @@ export function SupplyTableAddRow({
                   aria-expanded={isAutocompleteOpen}
                   aria-controls="portal-autocomplete-listbox"
                   aria-activedescendant={
-                    highlightIndex >= 0 && displayItems[highlightIndex]
+                    hasUsedArrowKeys && highlightIndex >= 0 && displayItems[highlightIndex]
                       ? `portal-autocomplete-item-${displayItems[highlightIndex].id}`
                       : undefined
                   }
@@ -226,6 +227,7 @@ export function SupplyTableAddRow({
             existingIds={existingSupplyIds}
             searchText={searchText}
             highlightIndex={highlightIndex}
+            hasUsedArrowKeys={hasUsedArrowKeys}
             onSelect={selectItem}
             onCreateRequest={handleCreateRequest}
             onClose={() => setSearchText("")}
@@ -292,8 +294,19 @@ export function SupplyTableAddRow({
         {/* Cell 6: Status (6%) - empty in add row */}
         <td className="px-2 py-1.5" style={{ width: "6%" }} />
 
-        {/* Cell 7: Delete (32px) - empty in add row */}
-        <td className="px-1 py-1.5" style={{ width: "32px" }} />
+        {/* Cell 7: Commit button (32px) - visible when supply selected */}
+        <td className="px-1 py-1.5" style={{ width: "32px" }}>
+          {selectedItem && (
+            <button
+              type="button"
+              onClick={() => handleCommit()}
+              className="text-primary hover:bg-primary/10 rounded p-1 transition-colors"
+              aria-label="Add supply to table"
+            >
+              <Check className="h-4 w-4" />
+            </button>
+          )}
+        </td>
       </tr>
 
       <InlineCreateDialog
