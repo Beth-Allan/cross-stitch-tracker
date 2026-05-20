@@ -33,6 +33,13 @@ export function EditableNumber({
   const [optimistic, setOptimistic] = useState<number | null>(null);
   const [showRejection, setShowRejection] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const rejectionTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    return () => {
+      if (rejectionTimerRef.current) clearTimeout(rejectionTimerRef.current);
+    };
+  }, []);
 
   // Clear optimistic value once the prop catches up
   useEffect(() => {
@@ -66,7 +73,7 @@ export function EditableNumber({
           } else {
             setDraft(String(displayValue));
             setShowRejection(true);
-            setTimeout(() => setShowRejection(false), 600);
+            rejectionTimerRef.current = setTimeout(() => setShowRejection(false), 600);
           }
           setEditing(false);
         }}

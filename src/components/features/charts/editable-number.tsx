@@ -27,6 +27,13 @@ export function EditableNumber({
   const [draft, setDraft] = useState(String(value));
   const [showRejection, setShowRejection] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const rejectionTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    return () => {
+      if (rejectionTimerRef.current) clearTimeout(rejectionTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -51,7 +58,7 @@ export function EditableNumber({
             onSave(num);
           } else {
             setShowRejection(true);
-            setTimeout(() => setShowRejection(false), 600);
+            rejectionTimerRef.current = setTimeout(() => setShowRejection(false), 600);
           }
           setEditing(false);
         }}
