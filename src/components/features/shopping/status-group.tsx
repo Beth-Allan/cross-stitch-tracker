@@ -47,13 +47,8 @@ export function StatusGroup({
           ) : (
             <ChevronRight className="text-muted-foreground h-4 w-4" />
           )}
-          <span
-            aria-hidden="true"
-            className={cn("h-2 w-2 rounded-full", config.dotClass)}
-          />
-          <span className="text-[11px] font-semibold tracking-wider uppercase">
-            {config.label}
-          </span>
+          <span aria-hidden="true" className={cn("h-2 w-2 rounded-full", config.dotClass)} />
+          <span className="text-[11px] font-semibold tracking-wider uppercase">{config.label}</span>
           <span className="bg-muted text-muted-foreground rounded-full px-1.5 py-0.5 font-mono text-[11px] font-semibold">
             {count}
           </span>

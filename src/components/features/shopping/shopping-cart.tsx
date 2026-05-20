@@ -126,7 +126,6 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearch = useDeferredValue(searchQuery);
   const [supplySearchQuery, setSupplySearchQuery] = useState("");
-  const deferredSupplySearch = useDeferredValue(supplySearchQuery);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<ProjectStatus>>(new Set());
   const filteredProjects = useMemo(() => {
     if (!deferredSearch) return projectsWithNeeds;
@@ -391,7 +390,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
                 onUpdateAcquired={handleUpdateAcquired}
                 pendingIds={pendingIds}
                 failedIds={failedIds}
-                supplySearchQuery={deferredSupplySearch}
+                supplySearchQuery={supplySearchQuery}
                 onSupplySearchChange={setSupplySearchQuery}
               />
             )}

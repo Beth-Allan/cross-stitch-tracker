@@ -1,5 +1,6 @@
 "use client";
 
+import { useDeferredValue } from "react";
 import { Search, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
@@ -88,6 +89,8 @@ export function SupplyOverview({
   supplySearchQuery,
   onSupplySearchChange,
 }: SupplyOverviewProps) {
+  const deferredSearch = useDeferredValue(supplySearchQuery);
+
   const hasAny =
     threads.length > 0 || beads.length > 0 || specialty.length > 0 || fabrics.length > 0;
 
@@ -104,11 +107,11 @@ export function SupplyOverview({
   const aggregatedBeads = aggregateSupplies(beads);
   const aggregatedSpecialty = aggregateSupplies(specialty);
 
-  const filteredAggThreads = filterAggregatedSupplies(aggregatedThreads, supplySearchQuery);
-  const filteredAggBeads = filterAggregatedSupplies(aggregatedBeads, supplySearchQuery);
-  const filteredAggSpecialty = filterAggregatedSupplies(aggregatedSpecialty, supplySearchQuery);
+  const filteredAggThreads = filterAggregatedSupplies(aggregatedThreads, deferredSearch);
+  const filteredAggBeads = filterAggregatedSupplies(aggregatedBeads, deferredSearch);
+  const filteredAggSpecialty = filterAggregatedSupplies(aggregatedSpecialty, deferredSearch);
 
-  const isSupplySearchActive = supplySearchQuery.length > 0;
+  const isSupplySearchActive = deferredSearch.length > 0;
   const hasFilteredResults =
     filteredAggThreads.length > 0 ||
     filteredAggBeads.length > 0 ||

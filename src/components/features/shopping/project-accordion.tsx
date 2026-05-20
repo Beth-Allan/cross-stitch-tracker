@@ -130,8 +130,12 @@ export function ProjectAccordion({
         {counterHeader}
         <EmptyState
           icon={Search}
-          title="No projects match your search"
-          description="Try a different name or clear the search"
+          title={isSearchActive ? "No projects match your search" : "No projects need supplies"}
+          description={
+            isSearchActive
+              ? "Try a different name or clear the search"
+              : "Projects with supply needs will appear here"
+          }
         />
       </div>
     );

@@ -90,4 +90,4 @@ Items acknowledged and deferred at milestone close on 2026-05-18:
 
 Last session: 2026-05-19T03:21:12.337Z
 Stopped at: Phase 25 UI-SPEC approved
-Resume action: `/gsd-plan-phase 22`
+Resume action: `/gsd-discuss-phase 26`
