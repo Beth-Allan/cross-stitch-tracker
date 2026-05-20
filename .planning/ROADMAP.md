@@ -211,5 +211,5 @@ Phase 22 first (foundation). Phases 23, 24, 25, 26 depend only on Phase 22 and c
 | 22. Critical Fixes & Test Infrastructure | v1.6 | 3/3 | Complete    | 2026-05-18 |
 | 23. Test Coverage & Reliability | v1.6 | 3/3 | Complete    | 2026-05-18 |
 | 24. Code Quality | v1.6 | 4/4 | Complete    | 2026-05-19 |
-| 25. Shopping Cart Scaling | v1.6 | 2/2 | Complete   | 2026-05-20 |
+| 25. Shopping Cart Scaling | v1.6 | 2/2 | Complete    | 2026-05-20 |
 | 26. UX Polish | v1.6 | 0/? | Not started | - |
