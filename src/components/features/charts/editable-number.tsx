@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { cn } from "@/lib/utils";
 
 interface EditableNumberProps {
   value: number;
@@ -24,6 +25,7 @@ export function EditableNumber({
 }: EditableNumberProps) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(value));
+  const [showRejection, setShowRejection] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -47,6 +49,9 @@ export function EditableNumber({
           const num = parseInt(draft);
           if (!isNaN(num) && num >= min && (max === undefined || num <= max)) {
             onSave(num);
+          } else {
+            setShowRejection(true);
+            setTimeout(() => setShowRejection(false), 600);
           }
           setEditing(false);
         }}
@@ -68,8 +73,13 @@ export function EditableNumber({
         setDraft(String(value));
         setEditing(true);
       }}
-      className={`hover:bg-muted min-h-11 min-w-11 cursor-text rounded px-1.5 py-0.5 font-mono tabular-nums transition-colors ${className ?? ""}`}
+      className={cn(
+        "hover:bg-muted min-h-11 min-w-11 cursor-text rounded px-1.5 py-0.5 font-mono tabular-nums transition-colors",
+        showRejection && "border-destructive bg-destructive/10 animate-shake border",
+        className,
+      )}
       title="Click to edit"
+      aria-invalid={showRejection || undefined}
     >
       {formatDisplay ? formatDisplay(value) : value}
     </button>

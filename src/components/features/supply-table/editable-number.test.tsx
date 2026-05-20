@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@/__tests__/test-utils";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
+import { render, screen, fireEvent, act } from "@/__tests__/test-utils";
 import { EditableNumber } from "./editable-number";
 
 describe("EditableNumber", () => {
@@ -102,5 +102,104 @@ describe("EditableNumber", () => {
     render(<EditableNumber value={42} onSave={vi.fn()} ariaLabel="Count" />);
     const button = screen.getByRole("button", { name: "Count" });
     expect(button.className).toContain("hover:bg-primary/5");
+  });
+
+  describe("rejection feedback (UX-03)", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("entering invalid value (NaN) and blurring shows rejection flash with border + background tint", () => {
+      const onSave = vi.fn();
+      render(<EditableNumber value={5} onSave={onSave} ariaLabel="Qty" />);
+      fireEvent.click(screen.getByRole("button", { name: "Qty" }));
+      const input = screen.getByRole("spinbutton", { name: "Qty" });
+      fireEvent.change(input, { target: { value: "abc" } });
+      fireEvent.blur(input);
+
+      const button = screen.getByRole("button", { name: "Qty" });
+      expect(button.className).toContain("border-destructive");
+      expect(button.className).toContain("animate-shake");
+      expect(button.className).toContain("bg-destructive/10");
+    });
+
+    it("bg-destructive/10 background tint is present while showRejection is true", () => {
+      const onSave = vi.fn();
+      render(<EditableNumber value={5} onSave={onSave} ariaLabel="Qty" />);
+      fireEvent.click(screen.getByRole("button", { name: "Qty" }));
+      const input = screen.getByRole("spinbutton", { name: "Qty" });
+      fireEvent.change(input, { target: { value: "abc" } });
+      fireEvent.blur(input);
+
+      const button = screen.getByRole("button", { name: "Qty" });
+      expect(button.className).toContain("bg-destructive/10");
+    });
+
+    it("rejection flash disappears after 600ms", () => {
+      const onSave = vi.fn();
+      render(<EditableNumber value={5} onSave={onSave} ariaLabel="Qty" />);
+      fireEvent.click(screen.getByRole("button", { name: "Qty" }));
+      const input = screen.getByRole("spinbutton", { name: "Qty" });
+      fireEvent.change(input, { target: { value: "abc" } });
+      fireEvent.blur(input);
+
+      // Should have rejection classes immediately
+      let button = screen.getByRole("button", { name: "Qty" });
+      expect(button.className).toContain("animate-shake");
+
+      // Advance past 600ms
+      act(() => {
+        vi.advanceTimersByTime(600);
+      });
+
+      button = screen.getByRole("button", { name: "Qty" });
+      expect(button.className).not.toContain("animate-shake");
+      expect(button.className).not.toContain("border-destructive");
+      expect(button.className).not.toContain("bg-destructive/10");
+    });
+
+    it("entering valid value and blurring does NOT show rejection classes", () => {
+      const onSave = vi.fn();
+      render(<EditableNumber value={5} onSave={onSave} ariaLabel="Qty" />);
+      fireEvent.click(screen.getByRole("button", { name: "Qty" }));
+      const input = screen.getByRole("spinbutton", { name: "Qty" });
+      fireEvent.change(input, { target: { value: "15" } });
+      fireEvent.blur(input);
+
+      const button = screen.getByRole("button", { name: "Qty" });
+      expect(button.className).not.toContain("border-destructive");
+      expect(button.className).not.toContain("animate-shake");
+      expect(button.className).not.toContain("bg-destructive/10");
+    });
+
+    it("entering negative value and blurring shows rejection flash with background tint", () => {
+      const onSave = vi.fn();
+      render(<EditableNumber value={5} onSave={onSave} ariaLabel="Qty" />);
+      fireEvent.click(screen.getByRole("button", { name: "Qty" }));
+      const input = screen.getByRole("spinbutton", { name: "Qty" });
+      fireEvent.change(input, { target: { value: "-3" } });
+      fireEvent.blur(input);
+
+      const button = screen.getByRole("button", { name: "Qty" });
+      expect(button.className).toContain("border-destructive");
+      expect(button.className).toContain("animate-shake");
+      expect(button.className).toContain("bg-destructive/10");
+    });
+
+    it("aria-invalid is set during rejection", () => {
+      const onSave = vi.fn();
+      render(<EditableNumber value={5} onSave={onSave} ariaLabel="Qty" />);
+      fireEvent.click(screen.getByRole("button", { name: "Qty" }));
+      const input = screen.getByRole("spinbutton", { name: "Qty" });
+      fireEvent.change(input, { target: { value: "abc" } });
+      fireEvent.blur(input);
+
+      const button = screen.getByRole("button", { name: "Qty" });
+      expect(button).toHaveAttribute("aria-invalid", "true");
+    });
   });
 });
