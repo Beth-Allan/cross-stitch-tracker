@@ -74,9 +74,13 @@ function GenreRow({
   onDelete: () => void;
 }) {
   return (
-    <tr className="group border-border hover:bg-muted/50 border-b transition-colors">
+    <tr
+      className="group border-border hover:bg-muted/50 border-b transition-colors"
+      aria-labelledby={`genre-name-${genre.id}`}
+    >
       <td className="px-4 py-3">
         <Link
+          id={`genre-name-${genre.id}`}
           href={`/genres/${genre.id}`}
           className="text-foreground hover:text-primary text-sm font-medium transition-colors"
         >
@@ -122,10 +126,15 @@ function GenreCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="border-border bg-card rounded-xl border p-4 shadow-sm">
+    <div
+      className="border-border bg-card rounded-xl border p-4 shadow-sm"
+      role="group"
+      aria-labelledby={`genre-name-${genre.id}`}
+    >
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1">
           <Link
+            id={`genre-name-${genre.id}`}
             href={`/genres/${genre.id}`}
             className="text-foreground hover:text-primary text-sm font-semibold transition-colors"
           >
