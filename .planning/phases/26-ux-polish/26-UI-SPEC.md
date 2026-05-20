@@ -41,7 +41,7 @@ Declared values (must be multiples of 4):
 
 Exceptions:
 - Touch targets: 32px minimum for interactive elements (`h-8 w-8` for icon buttons like focal point trigger)
-- Supply table cell padding: 5px vertical (`py-[5px]`) per sketch findings density convention
+- Supply table cell padding uses a pre-existing `py-[5px]` inherited from sketch findings density convention. This is not a new Phase 26 spacing value and is not subject to this phase's grid alignment contract.
 
 ---
 
@@ -50,11 +50,15 @@ Exceptions:
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
 | Body | 14px | 400 (regular) | 1.5 | `text-sm` |
-| Label | 14px | 500 (medium) | 1.5 | `text-sm font-medium` |
+| Label | 14px | 600 (semibold) | 1.5 | `text-sm font-semibold` |
 | Heading (card) | 14px | 600 (semibold) | 1.375 (snug) | `text-sm font-semibold font-heading` |
 | Display (page) | 24px | 600 (semibold) | 1.33 | `text-2xl font-semibold font-heading` |
 | Caption | 12px | 400 (regular) | 1.5 | `text-xs` |
-| Mono (data) | 12px | 500 (medium) | 1.5 | `text-xs font-mono font-medium tabular-nums` |
+| Mono (data) | 12px | 400 (regular) | 1.5 | `text-xs font-mono tabular-nums` |
+
+Weights declared: **400 (regular)** and **600 (semibold)**. No other weights used.
+
+Label uses semibold (same weight as Heading card) and is differentiated from Heading by the absence of `font-heading` (body font vs heading font) and normal line-height (1.5 vs 1.375). Mono uses regular weight; the monospace typeface itself provides sufficient visual distinction.
 
 Source: Existing codebase patterns. All phase 26 components follow these sizes -- no new type scale values introduced.
 
