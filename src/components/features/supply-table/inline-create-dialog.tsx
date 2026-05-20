@@ -52,6 +52,8 @@ interface InlineCreateDialogProps {
   onSubmit: (data: CreateSupplyData) => void;
   supplyType: SupplyType;
   defaultCode?: string;
+  /** Brand ID used when creating the supply. Falls back to "default" if not provided. */
+  defaultBrandId?: string;
 }
 
 export function InlineCreateDialog({
@@ -60,6 +62,7 @@ export function InlineCreateDialog({
   onSubmit,
   supplyType,
   defaultCode,
+  defaultBrandId = "default",
 }: InlineCreateDialogProps) {
   const [name, setName] = useState("");
   const [code, setCode] = useState(defaultCode ?? "");
@@ -86,7 +89,7 @@ export function InlineCreateDialog({
     onSubmit({
       name: trimmedName,
       code: code.trim() || undefined,
-      brandId: "default",
+      brandId: defaultBrandId,
       hexColor: "#808080",
     });
   }
