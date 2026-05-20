@@ -95,7 +95,7 @@ Full details: `milestones/v1.5-ROADMAP.md`
 - [x] **Phase 22: Critical Fixes & Test Infrastructure** - Fix security gaps, TypeScript errors, stats resilience, and test infrastructure (completed 2026-05-18)
 - [x] **Phase 23: Test Coverage & Reliability** - Fill test gaps and fix silent failures and cache staleness (completed 2026-05-18)
 - [x] **Phase 24: Code Quality** - Type narrowing, constant deduplication, discriminated unions, and comment cleanup (completed 2026-05-19)
-- [ ] **Phase 25: Shopping Cart Scaling** - Shopping cart handles 75+ projects with search, filtering, and status grouping
+- [x] **Phase 25: Shopping Cart Scaling** - Shopping cart handles 75+ projects with search, filtering, and status grouping (completed 2026-05-20)
 - [ ] **Phase 26: UX Polish** - ARIA compliance, visual consistency, and component UX improvements
 
 ## Phase Details
@@ -161,8 +161,10 @@ Plans:
   2. Projects are grouped by status (Kitting, Stitching, Unstarted, etc.) for faster scanning
   3. User can search/filter supplies by type in the By Supply aggregation view
   4. Shopping cart remains responsive with 75+ selected projects
-**Plans**: TBD
-**UI hint**: yes
+**Plans:** 2/2 plans complete
+Plans:
+- [x] 25-01-PLAN.md -- New components: ProjectSearchInput, SupplySearchInput, StatusGroup, SelectionCounter with tests
+- [x] 25-02-PLAN.md -- Integration: wire search, grouping, and smart selection into shopping cart + supply overview
 
 ### Phase 26: UX Polish
 **Goal**: Accessibility violations are fixed, visual inconsistencies are resolved, and interactive components provide clear affordances
@@ -209,5 +211,5 @@ Phase 22 first (foundation). Phases 23, 24, 25, 26 depend only on Phase 22 and c
 | 22. Critical Fixes & Test Infrastructure | v1.6 | 3/3 | Complete    | 2026-05-18 |
 | 23. Test Coverage & Reliability | v1.6 | 3/3 | Complete    | 2026-05-18 |
 | 24. Code Quality | v1.6 | 4/4 | Complete    | 2026-05-19 |
-| 25. Shopping Cart Scaling | v1.6 | 0/? | Not started | - |
+| 25. Shopping Cart Scaling | v1.6 | 2/2 | Complete    | 2026-05-20 |
 | 26. UX Polish | v1.6 | 0/? | Not started | - |

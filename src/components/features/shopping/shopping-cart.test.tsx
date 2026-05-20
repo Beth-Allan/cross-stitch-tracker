@@ -64,6 +64,34 @@ const mockData: ShoppingCartData = {
       specialtyCount: 0,
       fabricNeeded: false,
     },
+    {
+      projectId: "p3",
+      chartId: "c3",
+      projectName: "Alpine Meadow",
+      designerName: "Northern Expressions",
+      coverThumbnailUrl: null,
+      focalPointX: null,
+      focalPointY: null,
+      status: "KITTING",
+      threadCount: 2,
+      beadCount: 0,
+      specialtyCount: 0,
+      fabricNeeded: true,
+    },
+    {
+      projectId: "p4",
+      chartId: "c4",
+      projectName: "Dragon Dreams",
+      designerName: "Heaven and Earth",
+      coverThumbnailUrl: null,
+      focalPointX: null,
+      focalPointY: null,
+      status: "UNSTARTED",
+      threadCount: 1,
+      beadCount: 0,
+      specialtyCount: 0,
+      fabricNeeded: false,
+    },
   ],
   threads: [
     {
@@ -105,6 +133,32 @@ const mockData: ShoppingCartData = {
       projectId: "p2",
       projectName: "Ocean Waves",
     },
+    {
+      junctionId: "jt4",
+      supplyId: "s4",
+      brandName: "DMC",
+      code: "699",
+      colorName: "Green",
+      hexColor: "#00cc00",
+      quantityRequired: 2,
+      quantityAcquired: 0,
+      unit: "skeins",
+      projectId: "p3",
+      projectName: "Alpine Meadow",
+    },
+    {
+      junctionId: "jt5",
+      supplyId: "s5",
+      brandName: "Weeks Dye Works",
+      code: "1234",
+      colorName: "Crimson",
+      hexColor: "#cc0000",
+      quantityRequired: 1,
+      quantityAcquired: 0,
+      unit: "skeins",
+      projectId: "p4",
+      projectName: "Dragon Dreams",
+    },
   ],
   beads: [
     {
@@ -128,6 +182,14 @@ const mockData: ShoppingCartData = {
       projectName: "Forest Sampler",
       stitchesWide: 200,
       stitchesHigh: 150,
+      hasFabric: false,
+      fabricName: null,
+    },
+    {
+      projectId: "p3",
+      projectName: "Alpine Meadow",
+      stitchesWide: 300,
+      stitchesHigh: 250,
       hasFabric: false,
       fabricName: null,
     },
@@ -192,7 +254,6 @@ describe("ShoppingCart", () => {
     await user.click(screen.getByText("By Supply Type"));
 
     expect(screen.getByText("By Supply Type")).toHaveAttribute("aria-pressed", "true");
-    // Supply overview shows section headers
     expect(screen.getByText(/Threads/)).toBeInTheDocument();
   });
 
@@ -210,5 +271,114 @@ describe("ShoppingCart", () => {
     localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
     render(<ShoppingCart data={mockData} imageUrls={{}} />);
     expect(screen.getByText("By Supply Type")).toHaveAttribute("aria-pressed", "true");
+  });
+
+  describe("Project search", () => {
+    it("typing in project search filters displayed projects by name", async () => {
+      const user = userEvent.setup();
+      render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+      const search = screen.getByRole("searchbox", { name: "Search projects" });
+      await user.type(search, "Forest");
+
+      expect(screen.getByText("Forest Sampler")).toBeInTheDocument();
+      expect(screen.queryByText("Ocean Waves")).not.toBeInTheDocument();
+      expect(screen.queryByText("Dragon Dreams")).not.toBeInTheDocument();
+    });
+
+    it("project search filters projects in By Supply view too", async () => {
+      const user = userEvent.setup();
+      localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1", "p2"]);
+      render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+      const search = screen.getByRole("searchbox", { name: "Search projects" });
+      await user.type(search, "Ocean");
+
+      await user.click(screen.getByText("By Supply Type"));
+
+      expect(screen.getByText("DMC 415")).toBeInTheDocument();
+      expect(screen.queryByText("DMC 310")).not.toBeInTheDocument();
+    });
+
+    it("clicking 'Select visible' when search is active selects only visible projects", async () => {
+      const user = userEvent.setup();
+      render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+      const search = screen.getByRole("searchbox", { name: "Search projects" });
+      await user.type(search, "Ocean");
+
+      await user.click(screen.getByText("Select visible"));
+
+      expect(screen.getByText("Shopping for:")).toBeInTheDocument();
+      expect(screen.getByLabelText("Remove Ocean Waves")).toBeInTheDocument();
+      expect(screen.queryByLabelText("Remove Forest Sampler")).not.toBeInTheDocument();
+    });
+
+    it("selecting projects then searching does not deselect hidden projects", async () => {
+      const user = userEvent.setup();
+      localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
+      render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+      const search = screen.getByRole("searchbox", { name: "Search projects" });
+      await user.type(search, "Ocean");
+
+      expect(screen.getByLabelText("Remove Forest Sampler")).toBeInTheDocument();
+    });
+
+    it("iterative selection works across multiple searches", async () => {
+      const user = userEvent.setup();
+      render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+      const search = screen.getByRole("searchbox", { name: "Search projects" });
+      await user.type(search, "Ocean");
+      await user.click(screen.getByText("Select visible"));
+
+      await user.clear(search);
+      await user.type(search, "Alpine");
+      await user.click(screen.getByText("Select visible"));
+
+      expect(screen.getByLabelText("Remove Ocean Waves")).toBeInTheDocument();
+      expect(screen.getByLabelText("Remove Alpine Meadow")).toBeInTheDocument();
+    });
+
+    it("'Select all' changes to 'Select visible' when search is active", async () => {
+      const user = userEvent.setup();
+      render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+      expect(screen.getAllByText("Select all").length).toBeGreaterThan(0);
+      expect(screen.queryByText("Select visible")).not.toBeInTheDocument();
+
+      const search = screen.getByRole("searchbox", { name: "Search projects" });
+      await user.type(search, "Forest");
+
+      expect(screen.getByText("Select visible")).toBeInTheDocument();
+    });
+
+    it("SelectionCounter shows filtered/total counts during search", async () => {
+      const user = userEvent.setup();
+      localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1", "p2"]);
+      render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+      const search = screen.getByRole("searchbox", { name: "Search projects" });
+      await user.type(search, "Ocean");
+
+      expect(screen.getByText(/1 of 1 visible selected/)).toBeInTheDocument();
+      expect(screen.getByText(/2 total selected/)).toBeInTheDocument();
+    });
+
+    it("clearing search shows all projects with previous selections intact", async () => {
+      const user = userEvent.setup();
+      localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
+      render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+      const search = screen.getByRole("searchbox", { name: "Search projects" });
+      await user.type(search, "Forest");
+      await user.clear(search);
+
+      expect(screen.getAllByText("Forest Sampler").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText("Ocean Waves")).toBeInTheDocument();
+      expect(screen.getByText("Dragon Dreams")).toBeInTheDocument();
+      expect(screen.getByLabelText("Remove Forest Sampler")).toBeInTheDocument();
+    });
   });
 });

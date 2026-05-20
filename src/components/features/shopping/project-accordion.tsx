@@ -1,12 +1,15 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { CheckSquare, ChevronRight, Square } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { CheckSquare, ChevronRight, Search, Square } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
+import { StatusGroup, STATUS_GROUP_ORDER } from "./status-group";
+import { SelectionCounter } from "./selection-counter";
+import { EmptyState } from "@/components/ui/empty-state";
 import { QuantityControl } from "./quantity-control";
 import type {
   ShoppingCartProject,
@@ -14,6 +17,16 @@ import type {
   ShoppingFabricNeed,
 } from "@/types/dashboard";
 import type { ProjectStatus } from "@/generated/prisma/client";
+
+function buildIndex<T extends { projectId: string }>(items: T[]): Map<string, T[]> {
+  const map = new Map<string, T[]>();
+  for (const item of items) {
+    const arr = map.get(item.projectId);
+    if (arr) arr.push(item);
+    else map.set(item.projectId, [item]);
+  }
+  return map;
+}
 
 interface ProjectAccordionProps {
   projects: ShoppingCartProject[];
@@ -25,6 +38,8 @@ interface ProjectAccordionProps {
   fabrics: ShoppingFabricNeed[];
   onToggle: (projectId: string) => void;
   onSelectAll: () => void;
+  selectAllLabel: string;
+  onSelectGroup: (projectIds: string[]) => void;
   onUpdateAcquired: (
     type: "thread" | "bead" | "specialty",
     junctionId: string,
@@ -32,6 +47,13 @@ interface ProjectAccordionProps {
   ) => void;
   pendingIds: Set<string>;
   failedIds: Set<string>;
+  collapsedGroups: Set<ProjectStatus>;
+  onToggleGroup: (status: ProjectStatus) => void;
+  isSearchActive: boolean;
+  selectedCount: number;
+  totalCount: number;
+  visibleCount: number;
+  visibleSelectedCount: number;
 }
 
 export function ProjectAccordion({
@@ -44,9 +66,18 @@ export function ProjectAccordion({
   fabrics,
   onToggle,
   onSelectAll,
+  selectAllLabel,
+  onSelectGroup,
   onUpdateAcquired,
   pendingIds,
   failedIds,
+  collapsedGroups,
+  onToggleGroup,
+  isSearchActive,
+  selectedCount,
+  totalCount,
+  visibleCount,
+  visibleSelectedCount,
 }: ProjectAccordionProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
 
@@ -59,207 +90,251 @@ export function ProjectAccordion({
     });
   }, []);
 
-  const allSelectedProjectIds = new Set(selectedIds);
+  const groupedProjects = useMemo(() => {
+    const map = new Map<ProjectStatus, ShoppingCartProject[]>();
+    for (const project of projects) {
+      const group = map.get(project.status) ?? [];
+      group.push(project);
+      map.set(project.status, group);
+    }
+    return map;
+  }, [projects]);
+
+  const threadsByProject = useMemo(() => buildIndex(threads), [threads]);
+  const beadsByProject = useMemo(() => buildIndex(beads), [beads]);
+  const specialtyByProject = useMemo(() => buildIndex(specialty), [specialty]);
+  const fabricsByProject = useMemo(() => buildIndex(fabrics), [fabrics]);
+
+  const counterHeader = (
+    <div className="mb-4 flex items-center justify-between">
+      <SelectionCounter
+        selectedCount={selectedCount}
+        totalCount={totalCount}
+        visibleCount={visibleCount}
+        visibleSelectedCount={visibleSelectedCount}
+        isSearchActive={isSearchActive}
+      />
+      <button
+        type="button"
+        onClick={onSelectAll}
+        className="text-progress-foreground hover:text-selected-foreground text-xs font-medium transition-colors"
+      >
+        {selectAllLabel}
+      </button>
+    </div>
+  );
+
+  if (projects.length === 0) {
+    return (
+      <div>
+        {counterHeader}
+        <EmptyState
+          icon={Search}
+          title={isSearchActive ? "No projects match your search" : "No projects need supplies"}
+          description={
+            isSearchActive
+              ? "Try a different name or clear the search"
+              : "Projects with supply needs will appear here"
+          }
+        />
+      </div>
+    );
+  }
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-muted-foreground text-sm">
-          {selectedIds.size} of {projects.length} project
-          {projects.length !== 1 ? "s" : ""} selected
-        </p>
-        <button
-          type="button"
-          onClick={onSelectAll}
-          className="text-progress-foreground hover:text-selected-foreground text-xs font-medium transition-colors"
-        >
-          Select all
-        </button>
-      </div>
+      {counterHeader}
 
-      <div className="flex flex-col gap-2">
-        {projects.map((project) => {
-          const isSelected = selectedIds.has(project.projectId);
-          const isExpanded = expandedIds.has(project.projectId);
-          const imageUrl = imageUrls[project.coverThumbnailUrl ?? ""];
-
-          const projectThreads = threads.filter((t) => t.projectId === project.projectId);
-          const projectBeads = beads.filter((b) => b.projectId === project.projectId);
-          const projectSpecialty = specialty.filter((s) => s.projectId === project.projectId);
-          const projectFabric = fabrics.find((f) => f.projectId === project.projectId);
-
-          const totalNeeds =
-            project.threadCount +
-            project.beadCount +
-            project.specialtyCount +
-            (project.fabricNeeded ? 1 : 0);
+      <div className="flex flex-col gap-4">
+        {STATUS_GROUP_ORDER.map((status) => {
+          const groupProjects = groupedProjects.get(status);
+          if (!groupProjects || groupProjects.length === 0) return null;
 
           return (
-            <div
-              key={project.projectId}
-              className={cn(
-                "overflow-hidden rounded-xl border",
-                isSelected ? "border-selected-border" : "border-border",
-              )}
+            <StatusGroup
+              key={status}
+              status={status}
+              count={groupProjects.length}
+              isExpanded={!collapsedGroups.has(status)}
+              onToggle={() => onToggleGroup(status)}
+              onSelectAll={() => onSelectGroup(groupProjects.map((p) => p.projectId))}
             >
-              {/* Header */}
-              <div className="bg-card flex items-center gap-3 p-3">
-                <button
-                  type="button"
-                  onClick={() => onToggle(project.projectId)}
-                  role="checkbox"
-                  aria-checked={isSelected}
-                  className={cn(
-                    "shrink-0",
-                    isSelected ? "text-progress-foreground" : "text-muted-foreground/40",
-                  )}
-                  aria-label={
-                    isSelected ? `Deselect ${project.projectName}` : `Select ${project.projectName}`
-                  }
-                >
-                  {isSelected ? (
-                    <CheckSquare className="h-5 w-5" />
-                  ) : (
-                    <Square className="h-5 w-5" />
-                  )}
-                </button>
+              <div className="flex flex-col gap-2">
+                {groupProjects.map((project) => {
+                  const isSelected = selectedIds.has(project.projectId);
+                  const isExpanded = expandedIds.has(project.projectId);
+                  const imageUrl = imageUrls[project.coverThumbnailUrl ?? ""];
 
-                {imageUrl ? (
-                  <Image
-                    src={imageUrl}
-                    alt={project.projectName}
-                    width={40}
-                    height={40}
-                    className="shrink-0 rounded object-cover"
-                    style={getObjectPositionStyle(project.focalPointX, project.focalPointY)}
-                    loading="lazy"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="bg-muted h-10 w-10 shrink-0 rounded" />
-                )}
+                  const projectThreads = threadsByProject.get(project.projectId) ?? [];
+                  const projectBeads = beadsByProject.get(project.projectId) ?? [];
+                  const projectSpecialty = specialtyByProject.get(project.projectId) ?? [];
+                  const projectFabric = fabricsByProject.get(project.projectId)?.[0];
 
-                <button
-                  type="button"
-                  onClick={() => toggleExpand(project.projectId)}
-                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
-                  aria-expanded={isExpanded}
-                  aria-label={`${isExpanded ? "Collapse" : "Expand"} ${project.projectName} supplies`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-foreground truncate text-sm font-semibold">
-                        {project.projectName}
-                      </span>
-                      <StatusBadge status={project.status as ProjectStatus} />
-                    </div>
-                    <p className="text-muted-foreground mt-0.5 text-xs">
-                      {project.designerName}
-                      {totalNeeds > 0 &&
-                        ` · ${totalNeeds} item${totalNeeds !== 1 ? "s" : ""} needed`}
-                    </p>
-                  </div>
-                  <ChevronRight
-                    className={cn(
-                      "text-muted-foreground h-4 w-4 shrink-0 transition-transform",
-                      isExpanded && "rotate-90",
-                    )}
-                  />
-                </button>
-              </div>
+                  const totalNeeds =
+                    project.threadCount +
+                    project.beadCount +
+                    project.specialtyCount +
+                    (project.fabricNeeded ? 1 : 0);
 
-              {/* Expanded body */}
-              {isExpanded && isSelected && (
-                <div className="border-border/60 border-t">
-                  {projectThreads.length > 0 && (
-                    <SupplyGroup
-                      label="Threads"
-                      count={projectThreads.length}
-                      supplies={projectThreads}
-                      type="thread"
-                      allSelectedProjectIds={allSelectedProjectIds}
-                      allSupplies={threads}
-                      onUpdateAcquired={onUpdateAcquired}
-                      pendingIds={pendingIds}
-                      failedIds={failedIds}
-                    />
-                  )}
-                  {projectBeads.length > 0 && (
-                    <SupplyGroup
-                      label="Beads"
-                      count={projectBeads.length}
-                      supplies={projectBeads}
-                      type="bead"
-                      allSelectedProjectIds={allSelectedProjectIds}
-                      allSupplies={beads}
-                      onUpdateAcquired={onUpdateAcquired}
-                      pendingIds={pendingIds}
-                      failedIds={failedIds}
-                    />
-                  )}
-                  {projectSpecialty.length > 0 && (
-                    <SupplyGroup
-                      label="Specialty"
-                      count={projectSpecialty.length}
-                      supplies={projectSpecialty}
-                      type="specialty"
-                      allSelectedProjectIds={allSelectedProjectIds}
-                      allSupplies={specialty}
-                      onUpdateAcquired={onUpdateAcquired}
-                      pendingIds={pendingIds}
-                      failedIds={failedIds}
-                    />
-                  )}
-                  {projectFabric && (
-                    <div className="border-border/30 border-t px-4 py-3">
-                      <div className="text-muted-foreground mb-2 text-[11px] font-bold tracking-wider uppercase">
-                        Fabric
-                      </div>
-                      <div className="text-sm">
-                        {projectFabric.hasFabric ? (
-                          <span className="text-progress-foreground">
-                            ✓ {projectFabric.fabricName ?? "Has fabric"}{" "}
-                            <span className="text-muted-foreground">
-                              · {projectFabric.stitchesWide} × {projectFabric.stitchesHigh} stitches
-                            </span>
-                          </span>
+                  return (
+                    <div
+                      key={project.projectId}
+                      className={cn(
+                        "overflow-hidden rounded-xl border",
+                        isSelected ? "border-selected-border" : "border-border",
+                      )}
+                    >
+                      <div className="bg-card flex items-center gap-3 p-3">
+                        <button
+                          type="button"
+                          onClick={() => onToggle(project.projectId)}
+                          role="checkbox"
+                          aria-checked={isSelected}
+                          className={cn(
+                            "shrink-0",
+                            isSelected ? "text-progress-foreground" : "text-muted-foreground/40",
+                          )}
+                          aria-label={
+                            isSelected
+                              ? `Deselect ${project.projectName}`
+                              : `Select ${project.projectName}`
+                          }
+                        >
+                          {isSelected ? (
+                            <CheckSquare className="h-5 w-5" />
+                          ) : (
+                            <Square className="h-5 w-5" />
+                          )}
+                        </button>
+
+                        {imageUrl ? (
+                          <Image
+                            src={imageUrl}
+                            alt={project.projectName}
+                            width={40}
+                            height={40}
+                            className="shrink-0 rounded object-cover"
+                            style={getObjectPositionStyle(project.focalPointX, project.focalPointY)}
+                            loading="lazy"
+                            unoptimized
+                          />
                         ) : (
-                          <span>
-                            <span className="font-medium text-amber-600">Needs fabric</span>{" "}
-                            <span className="text-muted-foreground">
-                              · {projectFabric.stitchesWide} × {projectFabric.stitchesHigh} stitches
-                            </span>
-                          </span>
+                          <div className="bg-muted h-10 w-10 shrink-0 rounded" />
                         )}
-                      </div>
-                    </div>
-                  )}
-                  {projectThreads.length === 0 &&
-                    projectBeads.length === 0 &&
-                    projectSpecialty.length === 0 &&
-                    !projectFabric && (
-                      <div className="text-muted-foreground px-4 py-6 text-center text-sm">
-                        No supply data for this project
-                      </div>
-                    )}
-                </div>
-              )}
 
-              {/* Expanded but not selected */}
-              {isExpanded && !isSelected && (
-                <div className="border-border/60 text-muted-foreground border-t px-4 py-6 text-center text-sm">
-                  Select this project to see supply details
-                </div>
-              )}
-            </div>
+                        <button
+                          type="button"
+                          onClick={() => toggleExpand(project.projectId)}
+                          className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                          aria-expanded={isExpanded}
+                          aria-label={`${isExpanded ? "Collapse" : "Expand"} ${project.projectName} supplies`}
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-foreground truncate text-sm font-semibold">
+                                {project.projectName}
+                              </span>
+                              <StatusBadge status={project.status} />
+                            </div>
+                            <p className="text-muted-foreground mt-0.5 text-xs">
+                              {project.designerName}
+                              {totalNeeds > 0 &&
+                                ` · ${totalNeeds} item${totalNeeds !== 1 ? "s" : ""} needed`}
+                            </p>
+                          </div>
+                          <ChevronRight
+                            className={cn(
+                              "text-muted-foreground h-4 w-4 shrink-0 transition-transform",
+                              isExpanded && "rotate-90",
+                            )}
+                          />
+                        </button>
+                      </div>
+
+                      {isExpanded && isSelected && (
+                        <div className="border-border/60 border-t">
+                          {projectThreads.length > 0 && (
+                            <SupplyGroup
+                              label="Threads"
+                              count={projectThreads.length}
+                              supplies={projectThreads}
+                              type="thread"
+                              allSelectedProjectIds={selectedIds}
+                              allSupplies={threads}
+                              onUpdateAcquired={onUpdateAcquired}
+                              pendingIds={pendingIds}
+                              failedIds={failedIds}
+                            />
+                          )}
+                          {projectBeads.length > 0 && (
+                            <SupplyGroup
+                              label="Beads"
+                              count={projectBeads.length}
+                              supplies={projectBeads}
+                              type="bead"
+                              allSelectedProjectIds={selectedIds}
+                              allSupplies={beads}
+                              onUpdateAcquired={onUpdateAcquired}
+                              pendingIds={pendingIds}
+                              failedIds={failedIds}
+                            />
+                          )}
+                          {projectSpecialty.length > 0 && (
+                            <SupplyGroup
+                              label="Specialty"
+                              count={projectSpecialty.length}
+                              supplies={projectSpecialty}
+                              type="specialty"
+                              allSelectedProjectIds={selectedIds}
+                              allSupplies={specialty}
+                              onUpdateAcquired={onUpdateAcquired}
+                              pendingIds={pendingIds}
+                              failedIds={failedIds}
+                            />
+                          )}
+                          {projectFabric && (
+                            <div className="border-border/30 border-t px-4 py-3">
+                              <div className="text-muted-foreground mb-2 text-[11px] font-bold tracking-wider uppercase">
+                                Fabric
+                              </div>
+                              <div className="text-sm">
+                                <span>
+                                  <span className="text-warning font-medium">Needs fabric</span>{" "}
+                                  <span className="text-muted-foreground">
+                                    · {projectFabric.stitchesWide} × {projectFabric.stitchesHigh}{" "}
+                                    stitches
+                                  </span>
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          {projectThreads.length === 0 &&
+                            projectBeads.length === 0 &&
+                            projectSpecialty.length === 0 &&
+                            !projectFabric && (
+                              <div className="text-muted-foreground px-4 py-6 text-center text-sm">
+                                No supply data for this project
+                              </div>
+                            )}
+                        </div>
+                      )}
+
+                      {isExpanded && !isSelected && (
+                        <div className="border-border/60 text-muted-foreground border-t px-4 py-6 text-center text-sm">
+                          Select this project to see supply details
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </StatusGroup>
           );
         })}
       </div>
     </div>
   );
 }
-
-/* ─── SupplyGroup ────────────────────────────────────────── */
 
 function SupplyGroup({
   label,

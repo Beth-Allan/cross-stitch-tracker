@@ -10,7 +10,7 @@ Requirements for v1.6 Cleanup & Hardening. Each maps to roadmap phases.
 ### Critical Fixes
 
 - [x] **CRIT-01**: Supply actions reject operations when project belongs to a different user
-- [ ] **CRIT-02**: Shopping cart scales to 75+ projects with search/filter, status grouping, and supply-type search
+- [x] **CRIT-02**: Shopping cart scales to 75+ projects with search/filter, status grouping, and supply-type search
 - [x] **CRIT-03**: TypeScript errors in dashboard-tabs.test, chart-actions.test, and shopping-cart-actions.test are resolved
 - [x] **CRIT-04**: Stats page degrades gracefully when individual queries fail instead of crashing entirely
 
@@ -116,7 +116,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CRIT-01 | Phase 22 | Complete |
-| CRIT-02 | Phase 25 | Pending |
+| CRIT-02 | Phase 25 | Complete |
 | CRIT-03 | Phase 22 | Complete |
 | CRIT-04 | Phase 22 | Complete |
 | TEST-01 | Phase 23 | Complete |

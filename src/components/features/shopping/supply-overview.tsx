@@ -1,8 +1,11 @@
 "use client";
 
-import { Check, ShoppingBag } from "lucide-react";
+import { useDeferredValue } from "react";
+import { Search, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SearchInput } from "./search-input";
 import { QuantityControl } from "./quantity-control";
 import type { ShoppingSupplyNeed, ShoppingFabricNeed } from "@/types/dashboard";
 
@@ -18,6 +21,8 @@ interface SupplyOverviewProps {
   ) => void;
   pendingIds: Set<string>;
   failedIds: Set<string>;
+  supplySearchQuery: string;
+  onSupplySearchChange: (value: string) => void;
 }
 
 interface AggregatedSupply {
@@ -59,6 +64,20 @@ function aggregateSupplies(supplies: ShoppingSupplyNeed[]): AggregatedSupply[] {
   return Array.from(map.values());
 }
 
+function filterAggregatedSupplies(
+  aggregated: AggregatedSupply[],
+  searchTerm: string,
+): AggregatedSupply[] {
+  if (!searchTerm) return aggregated;
+  const lower = searchTerm.toLowerCase();
+  return aggregated.filter(
+    (s) =>
+      s.brandName.toLowerCase().includes(lower) ||
+      s.code.toLowerCase().includes(lower) ||
+      s.colorName.toLowerCase().includes(lower),
+  );
+}
+
 export function SupplyOverview({
   threads,
   beads,
@@ -67,7 +86,11 @@ export function SupplyOverview({
   onUpdateAcquired,
   pendingIds,
   failedIds,
+  supplySearchQuery,
+  onSupplySearchChange,
 }: SupplyOverviewProps) {
+  const deferredSearch = useDeferredValue(supplySearchQuery);
+
   const hasAny =
     threads.length > 0 || beads.length > 0 || specialty.length > 0 || fabrics.length > 0;
 
@@ -84,44 +107,70 @@ export function SupplyOverview({
   const aggregatedBeads = aggregateSupplies(beads);
   const aggregatedSpecialty = aggregateSupplies(specialty);
 
+  const filteredAggThreads = filterAggregatedSupplies(aggregatedThreads, deferredSearch);
+  const filteredAggBeads = filterAggregatedSupplies(aggregatedBeads, deferredSearch);
+  const filteredAggSpecialty = filterAggregatedSupplies(aggregatedSpecialty, deferredSearch);
+
+  const isSupplySearchActive = deferredSearch.length > 0;
+  const hasFilteredResults =
+    filteredAggThreads.length > 0 ||
+    filteredAggBeads.length > 0 ||
+    filteredAggSpecialty.length > 0 ||
+    (!isSupplySearchActive && fabrics.length > 0);
+
   return (
     <div className="flex flex-col gap-8">
-      {aggregatedThreads.length > 0 && (
-        <SupplySection
-          label="Threads"
-          aggregated={aggregatedThreads}
-          type="thread"
-          onUpdateAcquired={onUpdateAcquired}
-          pendingIds={pendingIds}
-          failedIds={failedIds}
+      <SearchInput
+        value={supplySearchQuery}
+        onChange={onSupplySearchChange}
+        placeholder="Search supplies..."
+        ariaLabel="Search supplies"
+      />
+
+      {!hasFilteredResults && isSupplySearchActive ? (
+        <EmptyState
+          icon={Search}
+          title="No supplies match your search"
+          description="Try a different brand, code, or color name"
         />
+      ) : (
+        <>
+          {filteredAggThreads.length > 0 && (
+            <SupplySection
+              label="Threads"
+              aggregated={filteredAggThreads}
+              type="thread"
+              onUpdateAcquired={onUpdateAcquired}
+              pendingIds={pendingIds}
+              failedIds={failedIds}
+            />
+          )}
+          {filteredAggBeads.length > 0 && (
+            <SupplySection
+              label="Beads"
+              aggregated={filteredAggBeads}
+              type="bead"
+              onUpdateAcquired={onUpdateAcquired}
+              pendingIds={pendingIds}
+              failedIds={failedIds}
+            />
+          )}
+          {filteredAggSpecialty.length > 0 && (
+            <SupplySection
+              label="Specialty"
+              aggregated={filteredAggSpecialty}
+              type="specialty"
+              onUpdateAcquired={onUpdateAcquired}
+              pendingIds={pendingIds}
+              failedIds={failedIds}
+            />
+          )}
+          {fabrics.length > 0 && !isSupplySearchActive && <FabricSection fabrics={fabrics} />}
+        </>
       )}
-      {aggregatedBeads.length > 0 && (
-        <SupplySection
-          label="Beads"
-          aggregated={aggregatedBeads}
-          type="bead"
-          onUpdateAcquired={onUpdateAcquired}
-          pendingIds={pendingIds}
-          failedIds={failedIds}
-        />
-      )}
-      {aggregatedSpecialty.length > 0 && (
-        <SupplySection
-          label="Specialty"
-          aggregated={aggregatedSpecialty}
-          type="specialty"
-          onUpdateAcquired={onUpdateAcquired}
-          pendingIds={pendingIds}
-          failedIds={failedIds}
-        />
-      )}
-      {fabrics.length > 0 && <FabricSection fabrics={fabrics} />}
     </div>
   );
 }
-
-/* ─── SupplySection ─────��────────────────────────────────── */
 
 function SupplySection({
   label,
@@ -180,8 +229,6 @@ function SupplySection({
   );
 }
 
-/* ─── AggregatedSupplyRow ────────────────────────────────── */
-
 function AggregatedSupplyRow({
   supply,
   type,
@@ -227,13 +274,26 @@ function AggregatedSupplyRow({
           if (supply.items.length === 1) {
             onUpdateAcquired(type, supply.items[0].junctionId, newValue);
           } else {
-            const diff = newValue - supply.totalAcquired;
-            const firstItem = supply.items[0];
-            const newItemValue = Math.max(
-              0,
-              Math.min(firstItem.quantityRequired, firstItem.quantityAcquired + diff),
-            );
-            onUpdateAcquired(type, firstItem.junctionId, newItemValue);
+            let remaining = newValue - supply.totalAcquired;
+            if (remaining > 0) {
+              for (const item of supply.items) {
+                if (remaining <= 0) break;
+                const capacity = item.quantityRequired - item.quantityAcquired;
+                if (capacity <= 0) continue;
+                const allocated = Math.min(capacity, remaining);
+                onUpdateAcquired(type, item.junctionId, item.quantityAcquired + allocated);
+                remaining -= allocated;
+              }
+            } else if (remaining < 0) {
+              let toRemove = -remaining;
+              for (const item of supply.items) {
+                if (toRemove <= 0) break;
+                if (item.quantityAcquired <= 0) continue;
+                const allocated = Math.min(item.quantityAcquired, toRemove);
+                onUpdateAcquired(type, item.junctionId, item.quantityAcquired - allocated);
+                toRemove -= allocated;
+              }
+            }
           }
         }}
       />
@@ -241,42 +301,27 @@ function AggregatedSupplyRow({
   );
 }
 
-/* ─── FabricSection ��─────────────────────────────────────── */
-
 function FabricSection({ fabrics }: { fabrics: ShoppingFabricNeed[] }) {
   return (
     <div>
       <h3 className="font-heading text-foreground mb-2 text-base font-semibold">
         Fabric
         <span className="text-muted-foreground ml-2 text-sm font-normal">
-          ({fabrics.filter((f) => !f.hasFabric).length} of {fabrics.length} need
-          {fabrics.length === 1 ? "s" : ""} fabric)
+          ({fabrics.length} need{fabrics.length === 1 ? "s" : ""} fabric)
         </span>
       </h3>
       <div className="flex flex-col gap-1">
         {fabrics.map((fabric) => (
           <div
             key={fabric.projectId}
-            className={cn(
-              "flex items-center gap-3 rounded-lg border p-4",
-              fabric.hasFabric ? "border-selected-border bg-selected" : "border-border bg-card",
-            )}
+            className="border-border bg-card flex items-center gap-3 rounded-lg border p-4"
           >
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-foreground text-sm font-semibold">{fabric.projectName}</span>
-                {fabric.hasFabric && (
-                  <span className="text-progress-foreground inline-flex items-center gap-1 text-xs">
-                    <Check className="h-3 w-3" />
-                    Has fabric
-                  </span>
-                )}
-              </div>
+              <span className="text-foreground text-sm font-semibold">{fabric.projectName}</span>
               <p className="text-muted-foreground mt-1 text-xs">
                 {fabric.stitchesWide} × {fabric.stitchesHigh} stitches
-                {fabric.fabricName && ` · ${fabric.fabricName}`}
               </p>
-              {!fabric.hasFabric && <p className="mt-1 text-xs text-amber-600">Needs fabric</p>}
+              <p className="text-warning mt-1 text-xs">Needs fabric</p>
             </div>
           </div>
         ))}
