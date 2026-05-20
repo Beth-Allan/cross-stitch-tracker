@@ -1,8 +1,10 @@
 "use client";
 
-import { Check, ShoppingBag } from "lucide-react";
+import { Check, Search, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SupplySearchInput } from "./supply-search-input";
 import { QuantityControl } from "./quantity-control";
 import type { ShoppingSupplyNeed, ShoppingFabricNeed } from "@/types/dashboard";
 
@@ -18,6 +20,8 @@ interface SupplyOverviewProps {
   ) => void;
   pendingIds: Set<string>;
   failedIds: Set<string>;
+  supplySearchQuery: string;
+  onSupplySearchChange: (value: string) => void;
 }
 
 interface AggregatedSupply {
@@ -59,6 +63,20 @@ function aggregateSupplies(supplies: ShoppingSupplyNeed[]): AggregatedSupply[] {
   return Array.from(map.values());
 }
 
+function filterAggregatedSupplies(
+  aggregated: AggregatedSupply[],
+  searchTerm: string,
+): AggregatedSupply[] {
+  if (!searchTerm) return aggregated;
+  const lower = searchTerm.toLowerCase();
+  return aggregated.filter(
+    (s) =>
+      s.brandName.toLowerCase().includes(lower) ||
+      s.code.toLowerCase().includes(lower) ||
+      s.colorName.toLowerCase().includes(lower),
+  );
+}
+
 export function SupplyOverview({
   threads,
   beads,
@@ -67,6 +85,8 @@ export function SupplyOverview({
   onUpdateAcquired,
   pendingIds,
   failedIds,
+  supplySearchQuery,
+  onSupplySearchChange,
 }: SupplyOverviewProps) {
   const hasAny =
     threads.length > 0 || beads.length > 0 || specialty.length > 0 || fabrics.length > 0;
@@ -84,39 +104,62 @@ export function SupplyOverview({
   const aggregatedBeads = aggregateSupplies(beads);
   const aggregatedSpecialty = aggregateSupplies(specialty);
 
+  const filteredAggThreads = filterAggregatedSupplies(aggregatedThreads, supplySearchQuery);
+  const filteredAggBeads = filterAggregatedSupplies(aggregatedBeads, supplySearchQuery);
+  const filteredAggSpecialty = filterAggregatedSupplies(aggregatedSpecialty, supplySearchQuery);
+
+  const isSupplySearchActive = supplySearchQuery.length > 0;
+  const hasFilteredResults =
+    filteredAggThreads.length > 0 ||
+    filteredAggBeads.length > 0 ||
+    filteredAggSpecialty.length > 0 ||
+    (!isSupplySearchActive && fabrics.length > 0);
+
   return (
     <div className="flex flex-col gap-8">
-      {aggregatedThreads.length > 0 && (
-        <SupplySection
-          label="Threads"
-          aggregated={aggregatedThreads}
-          type="thread"
-          onUpdateAcquired={onUpdateAcquired}
-          pendingIds={pendingIds}
-          failedIds={failedIds}
+      <SupplySearchInput value={supplySearchQuery} onChange={onSupplySearchChange} />
+
+      {!hasFilteredResults && isSupplySearchActive ? (
+        <EmptyState
+          icon={Search}
+          title="No supplies match your search"
+          description="Try a different brand, code, or color name"
         />
+      ) : (
+        <>
+          {filteredAggThreads.length > 0 && (
+            <SupplySection
+              label="Threads"
+              aggregated={filteredAggThreads}
+              type="thread"
+              onUpdateAcquired={onUpdateAcquired}
+              pendingIds={pendingIds}
+              failedIds={failedIds}
+            />
+          )}
+          {filteredAggBeads.length > 0 && (
+            <SupplySection
+              label="Beads"
+              aggregated={filteredAggBeads}
+              type="bead"
+              onUpdateAcquired={onUpdateAcquired}
+              pendingIds={pendingIds}
+              failedIds={failedIds}
+            />
+          )}
+          {filteredAggSpecialty.length > 0 && (
+            <SupplySection
+              label="Specialty"
+              aggregated={filteredAggSpecialty}
+              type="specialty"
+              onUpdateAcquired={onUpdateAcquired}
+              pendingIds={pendingIds}
+              failedIds={failedIds}
+            />
+          )}
+          {fabrics.length > 0 && !isSupplySearchActive && <FabricSection fabrics={fabrics} />}
+        </>
       )}
-      {aggregatedBeads.length > 0 && (
-        <SupplySection
-          label="Beads"
-          aggregated={aggregatedBeads}
-          type="bead"
-          onUpdateAcquired={onUpdateAcquired}
-          pendingIds={pendingIds}
-          failedIds={failedIds}
-        />
-      )}
-      {aggregatedSpecialty.length > 0 && (
-        <SupplySection
-          label="Specialty"
-          aggregated={aggregatedSpecialty}
-          type="specialty"
-          onUpdateAcquired={onUpdateAcquired}
-          pendingIds={pendingIds}
-          failedIds={failedIds}
-        />
-      )}
-      {fabrics.length > 0 && <FabricSection fabrics={fabrics} />}
     </div>
   );
 }

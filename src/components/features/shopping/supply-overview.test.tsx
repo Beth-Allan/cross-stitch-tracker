@@ -78,6 +78,8 @@ describe("SupplyOverview", () => {
         onUpdateAcquired={vi.fn()}
         pendingIds={new Set(["j-1"])}
         failedIds={new Set()}
+        supplySearchQuery=""
+        onSupplySearchChange={vi.fn()}
       />,
     );
     const spinners = container.querySelectorAll(".animate-spin");
