@@ -4,8 +4,8 @@ milestone: v1.6
 milestone_name: Cleanup & Hardening
 status: executing
 stopped_at: Phase 25 UI-SPEC approved
-last_updated: "2026-05-19T03:52:29.230Z"
-last_activity: 2026-05-19 -- Phase 25 planning complete
+last_updated: "2026-05-20T00:49:21.967Z"
+last_activity: 2026-05-20 -- Phase 25 execution started
 progress:
   total_phases: 5
   completed_phases: 3
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 24 — code-quality
+**Current focus:** Phase 25 — shopping-cart-scaling
 
 ## Current Position
 
-Phase: 25
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-05-19 -- Phase 25 planning complete
+Phase: 25 (shopping-cart-scaling) — EXECUTING
+Plan: 1 of 2
+Status: Executing Phase 25
+Last activity: 2026-05-20 -- Phase 25 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
