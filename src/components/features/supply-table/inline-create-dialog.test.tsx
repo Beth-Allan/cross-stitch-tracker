@@ -35,24 +35,24 @@ describe("InlineCreateDialog", () => {
     vi.clearAllMocks();
   });
 
-  it("renders dialog when open=true with title 'Create Supply'", () => {
+  it("renders dialog when open=true with contextual title", () => {
     render(<InlineCreateDialog {...defaultProps} />);
-    expect(screen.getByText("Create Supply")).toBeInTheDocument();
+    expect(screen.getByText("Create Thread")).toBeInTheDocument();
   });
 
   it("does not render when open=false", () => {
     render(<InlineCreateDialog {...defaultProps} open={false} />);
-    expect(screen.queryByText("Create Supply")).not.toBeInTheDocument();
+    expect(screen.queryByText("Create Thread")).not.toBeInTheDocument();
   });
 
   it("has Name input field (required)", () => {
     render(<InlineCreateDialog {...defaultProps} />);
-    expect(screen.getByLabelText("Name")).toBeInTheDocument();
+    expect(screen.getByLabelText("Color Name")).toBeInTheDocument();
   });
 
   it("has Code input field (optional)", () => {
     render(<InlineCreateDialog {...defaultProps} />);
-    expect(screen.getByLabelText("Code")).toBeInTheDocument();
+    expect(screen.getByLabelText("Color Code")).toBeInTheDocument();
   });
 
   it("has 'Create & Add' submit button", () => {
@@ -70,8 +70,8 @@ describe("InlineCreateDialog", () => {
   it("submit calls onSubmit with correct data", async () => {
     render(<InlineCreateDialog {...defaultProps} />);
 
-    const nameInput = screen.getByLabelText("Name");
-    const codeInput = screen.getByLabelText("Code");
+    const nameInput = screen.getByLabelText("Color Name");
+    const codeInput = screen.getByLabelText("Color Code");
 
     fireEvent.change(nameInput, { target: { value: "Custom Thread" } });
     fireEvent.change(codeInput, { target: { value: "CT-001" } });
@@ -104,7 +104,7 @@ describe("InlineCreateDialog", () => {
   it("whitespace-only name shows validation error (trim validation)", async () => {
     render(<InlineCreateDialog {...defaultProps} />);
 
-    const nameInput = screen.getByLabelText("Name");
+    const nameInput = screen.getByLabelText("Color Name");
     fireEvent.change(nameInput, { target: { value: "   " } });
 
     const submitButton = screen.getByRole("button", { name: "Create & Add" });
@@ -118,7 +118,7 @@ describe("InlineCreateDialog", () => {
 
   it("pre-fills code from defaultCode prop", () => {
     render(<InlineCreateDialog {...defaultProps} defaultCode="ABC" />);
-    const codeInput = screen.getByLabelText("Code") as HTMLInputElement;
+    const codeInput = screen.getByLabelText("Color Code") as HTMLInputElement;
     expect(codeInput.value).toBe("ABC");
   });
 
@@ -128,7 +128,50 @@ describe("InlineCreateDialog", () => {
     // Open the dialog
     rerender(<InlineCreateDialog {...defaultProps} open={true} />);
 
-    const nameInput = screen.getByLabelText("Name") as HTMLInputElement;
+    const nameInput = screen.getByLabelText("Color Name") as HTMLInputElement;
     expect(nameInput.value).toBe("");
+  });
+
+  describe("contextual labels per supply type (UX-08)", () => {
+    it("THREAD type shows 'Create Thread' title, 'Color Name' label, and 'Color Code' label", () => {
+      render(<InlineCreateDialog {...defaultProps} supplyType="THREAD" />);
+      expect(screen.getByText("Create Thread")).toBeInTheDocument();
+      expect(screen.getByLabelText("Color Name")).toBeInTheDocument();
+      expect(screen.getByLabelText("Color Code")).toBeInTheDocument();
+    });
+
+    it("BEAD type shows 'Create Bead' title, 'Bead Name' label, and 'Product Code' label", () => {
+      render(<InlineCreateDialog {...defaultProps} supplyType="BEAD" />);
+      expect(screen.getByText("Create Bead")).toBeInTheDocument();
+      expect(screen.getByLabelText("Bead Name")).toBeInTheDocument();
+      expect(screen.getByLabelText("Product Code")).toBeInTheDocument();
+    });
+
+    it("SPECIALTY type shows 'Create Specialty Item' title, 'Product Name' label, and 'Product Code' label", () => {
+      render(<InlineCreateDialog {...defaultProps} supplyType="SPECIALTY" />);
+      expect(screen.getByText("Create Specialty Item")).toBeInTheDocument();
+      expect(screen.getByLabelText("Product Name")).toBeInTheDocument();
+      expect(screen.getByLabelText("Product Code")).toBeInTheDocument();
+    });
+
+    it("THREAD name placeholder is 'e.g. Christmas Red'", () => {
+      render(<InlineCreateDialog {...defaultProps} supplyType="THREAD" />);
+      expect(screen.getByPlaceholderText("e.g. Christmas Red")).toBeInTheDocument();
+    });
+
+    it("BEAD code placeholder is 'e.g. 02013 (optional)'", () => {
+      render(<InlineCreateDialog {...defaultProps} supplyType="BEAD" />);
+      expect(screen.getByPlaceholderText("e.g. 02013 (optional)")).toBeInTheDocument();
+    });
+
+    it("SPECIALTY name placeholder is 'e.g. Kreinik Braid'", () => {
+      render(<InlineCreateDialog {...defaultProps} supplyType="SPECIALTY" />);
+      expect(screen.getByPlaceholderText("e.g. Kreinik Braid")).toBeInTheDocument();
+    });
+
+    it("description still uses contextual type label", () => {
+      render(<InlineCreateDialog {...defaultProps} supplyType="BEAD" />);
+      expect(screen.getByText(/Create a new bead and add it to the table/)).toBeInTheDocument();
+    });
   });
 });
