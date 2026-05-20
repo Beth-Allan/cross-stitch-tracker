@@ -31,6 +31,7 @@ type ViewMode = "by-project" | "by-supply";
 function usePersistedSelection(validProjectIds: string[]) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const hydratedRef = useRef(false);
+  const initialRenderRef = useRef(true);
 
   useEffect(() => {
     if (hydratedRef.current) return;
@@ -50,6 +51,11 @@ function usePersistedSelection(validProjectIds: string[]) {
 
   useEffect(() => {
     if (!hydratedRef.current) return;
+    // Skip the first post-hydration write — selectedIds hasn't re-rendered yet
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
+      return;
+    }
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(selectedIds)));
     } catch {
@@ -217,8 +223,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
     () =>
       data.threads.filter(
         (t) =>
-          selectedIds.has(t.projectId) &&
-          (!isSearchActive || filteredProjectIds.has(t.projectId)),
+          selectedIds.has(t.projectId) && (!isSearchActive || filteredProjectIds.has(t.projectId)),
       ),
     [data.threads, selectedIds, isSearchActive, filteredProjectIds],
   );
@@ -227,8 +232,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
     () =>
       data.beads.filter(
         (b) =>
-          selectedIds.has(b.projectId) &&
-          (!isSearchActive || filteredProjectIds.has(b.projectId)),
+          selectedIds.has(b.projectId) && (!isSearchActive || filteredProjectIds.has(b.projectId)),
       ),
     [data.beads, selectedIds, isSearchActive, filteredProjectIds],
   );
@@ -237,8 +241,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
     () =>
       data.specialty.filter(
         (s) =>
-          selectedIds.has(s.projectId) &&
-          (!isSearchActive || filteredProjectIds.has(s.projectId)),
+          selectedIds.has(s.projectId) && (!isSearchActive || filteredProjectIds.has(s.projectId)),
       ),
     [data.specialty, selectedIds, isSearchActive, filteredProjectIds],
   );
@@ -247,8 +250,7 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
     () =>
       data.fabrics.filter(
         (f) =>
-          selectedIds.has(f.projectId) &&
-          (!isSearchActive || filteredProjectIds.has(f.projectId)),
+          selectedIds.has(f.projectId) && (!isSearchActive || filteredProjectIds.has(f.projectId)),
       ),
     [data.fabrics, selectedIds, isSearchActive, filteredProjectIds],
   );
