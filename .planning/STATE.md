@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Cleanup & Hardening
-status: "Phase 26 shipped — PR #50"
-stopped_at: Phase 26 complete, v1.6 milestone complete — ready for /gsd-ship or /gsd-complete-milestone
-last_updated: "2026-05-21T00:53:02.557Z"
+status: "Milestone complete — archived"
+stopped_at: v1.6 archived and tagged. Next step /gsd-new-milestone for v1.7+
+last_updated: "2026-05-20"
 last_activity: 2026-05-20
 progress:
   total_phases: 5
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-20)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** v1.6 Cleanup & Hardening — milestone complete
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 26
-Plan: Not started
-Status: Phase 26 shipped — PR #50
+Phase: 26 (final)
+Plan: All complete
+Status: Milestone complete — archived
 Last activity: 2026-05-20
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Milestone Structure
 
@@ -42,7 +42,7 @@ Progress: [░░░░░░░░░░] 0%
 | v1.3 | Form & Supply Overhaul | 10-14 | Shipped 2026-05-16 |
 | v1.4 | Fixes & Polish | 15-17 | Shipped 2026-05-17 |
 | v1.5 | Statistics & Records | 18-21 | Shipped 2026-05-18 |
-| v1.6 | Cleanup & Hardening | 22-26 | Complete 2026-05-20 |
+| v1.6 | Cleanup & Hardening | 22-26 | Shipped 2026-05-20 |
 
 ## Performance Metrics
 
@@ -61,7 +61,7 @@ Progress: [░░░░░░░░░░] 0%
 - `src/lib/queries/stats/` for query layer (pure functions, no "use server")
 - `unstable_cache` with `revalidateTag("stats")` on session mutations (5-min TTL + on-demand)
 - Recharts always Client Components (SSR incompatible)
-- `Promise.all` for parallel data fetching (17 queries on stats page)
+- `Promise.allSettled` for parallel data fetching (17 queries on stats page)
 - Two deps added: Recharts 3.8.0 (via shadcn chart), date-fns 4.1.0
 
 ### Decisions
@@ -76,19 +76,8 @@ None.
 
 - `.env.local` bcrypt hashes must escape `$` as `\$`
 
-## Deferred Items
-
-Items acknowledged and deferred at milestone close on 2026-05-18:
-
-| Category | Item | Status |
-|----------|------|--------|
-| debug | fabric-matching-excludes-valid | converted_to_backlog |
-| verification | Phase 19 (19-VERIFICATION.md) | human_needed |
-| verification | Phase 20 (20-VERIFICATION.md) | human_needed |
-| verification | Phase 21 (21-VERIFICATION.md) | human_needed |
-
 ## Session Continuity
 
 Last session: 2026-05-20
-Stopped at: Phase 26 complete, v1.6 milestone complete — ready for /gsd-ship or /gsd-complete-milestone
+Stopped at: v1.6 archived and tagged. Next step /gsd-new-milestone for v1.7+
 Resume file: None

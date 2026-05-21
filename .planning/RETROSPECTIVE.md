@@ -1,5 +1,53 @@
 # Retrospective
 
+## Milestone: v1.6 — Cleanup & Hardening
+
+**Shipped:** 2026-05-20
+**Phases:** 5 | **Plans:** 15
+**Timeline:** 3 days (2026-05-18 → 2026-05-20)
+**Tests:** 2,176 | **PRs:** #41, #42, Phase 24 (direct), #49, #50
+
+### What Was Built
+
+- Critical Fixes: Supply ownership validation, Promise.allSettled stats resilience with DataUnavailable fallback, createMockPrisma with $transaction defaults, stats-actions auth/Zod boundary tests
+- Test Coverage: Calendar year-rollover tests, record detection duplicate handling, completion estimate exclusion, session error visibility (console.warn instead of silent catch), over-100% progress guardrail with toast warning, stats cache invalidation on chart status + 22 supply mutations
+- Code Quality: Literal union types (MonthLabel, DayLabel, strandCount 1-6, BrokenRecordType), PersonalBestRecord discriminated union, shared buildDateFilter/Scope from 6 modules, SORT_FIELDS/SORT_DIRS deduplication, 47 WHAT-comments + 20 JSX markers removed, semantic token migration, assertSuccess/assertFailure helpers, 126 vacuous assertions eliminated across 12 files
+- Shopping Cart Scaling: ProjectSearchInput, SupplySearchInput, StatusGroup, SelectionCounter components; smart selection with iterative accumulation; cross-view filtering for 75+ projects
+- UX Polish: Keyboard-gated highlight, EditableNumber rejection flash, visible commit button, contextual InlineCreateDialog labels, ARIA group semantics, squared shopping pills, thread insight ranks, What's Next gallery cards with three-state kitting labels, focal point editor split, BucketProject focal point, supplies flash fix, fabric matching null fix
+
+### What Worked
+
+- **44/44 requirement completion** — First milestone with 100% requirement coverage at close. Clean audit with zero gaps. Requirements were well-scoped to existing backlog items with clear acceptance criteria.
+- **Wave-based parallelism** — Phases 23, 24, 25, 26 all depended only on Phase 22, enabling parallel execution. 4 phases ran concurrently after the foundation was laid.
+- **Code review catching real bugs** — Phase 22 PR review caught unprotected projectList query. Phase 25 review caught aggregated supply quantity distribution bug. Phase 26 review caught hardcoded emerald hover colors.
+- **Backlog-driven scope** — Every requirement traced to an existing 999.x backlog item. No scope ambiguity, no mid-milestone discovery.
+- **UI-SPEC for UX phase** — Phase 26 had a full UI-SPEC with 14 design decisions locked before implementation. Zero user questions needed during execution.
+
+### What Was Inefficient
+
+- **No milestone audit** — Skipped formal audit because all requirements were checked off. Previous milestones benefited from audits catching cross-phase gaps.
+- **Phase 24 PR process unclear** — Phase 24 shipped as "direct" without a clear PR number in the record, unlike the other 4 phases.
+- **3 UAT items blocked by R2** — Same issue as v1.4: dev environment doesn't have R2 configured, blocking visual verification of image-related features. Still not addressed structurally.
+- **Deferred items accumulating** — 23 new backlog items added during v1.6 (999.50-999.72), on top of existing backlog. The cleanup milestone created its own cleanup debt.
+
+### Patterns Established
+
+- **assertSuccess/assertFailure test helpers** — Type-narrowing assertion guards that eliminate vacuous assertions. Project-wide pattern replacing `expect(result.success).toBe(true)` + unsafe property access.
+- **settled() utility for Promise.allSettled** — Extracts fulfilled values and logs rejected reasons. Used in stats page for graceful degradation.
+- **Keyboard-gated highlight** — `hasUsedArrowKeys` ref prevents autocomplete highlight on type/mouse. Only arrow keys activate selection visual.
+- **StatusGroup with workflow progression** — Groups ordered by stitching workflow (Kitting → Stitching → Unstarted → etc.) for intuitive scanning.
+- **Three-state kitting labels** — "Not kitted" (0%), "Kitting" (1-99%), "Kitted" (100%) on What's Next cards.
+
+### Key Lessons
+
+1. **Cleanup milestones generate cleanup debt** — The deeper you audit, the more issues you find. 23 new backlog items emerged from fixing 44 requirements. Accept this as natural discovery.
+2. **100% requirement coverage is achievable with backlog-scoped milestones** — When requirements map 1:1 to known issues, there's no ambiguity about "done." Contrast with feature milestones where scope evolves.
+3. **R2 dev config is a recurring blocker** — 3rd milestone in a row where UAT is partially blocked. Either set up a dev R2 bucket or accept these items as permanently human-needed.
+4. **Discriminated unions pay immediate dividends** — PersonalBestRecord refactor eliminated 4 nullable fields and their runtime null checks. TypeScript's exhaustive checking caught 2 incomplete switches during the migration.
+5. **Code review continues to find real bugs** — Every phase's review caught at least one genuine issue (not style nits). Multi-agent review is worth the cost for shipped code.
+
+---
+
 ## Milestone: v1.5 — Statistics & Records
 
 **Shipped:** 2026-05-18
@@ -286,13 +334,13 @@
 
 ## Cross-Milestone Trends
 
-| Metric | v1.0 | v1.1 | v1.2 | v1.3 | v1.4 | v1.5 |
-|--------|------|------|------|------|------|------|
-| Phases | 4 | 3 | 2 | 5 | 3 | 4 |
-| Plans | 23 | 20 | 20 | 19 | 9 | 14 |
-| Tests | 395 | 867 | 1,172 | 1,535 | 1,641 | 1,967 |
-| Days | 22 | 5 | 4 | 13 | 2 | 2 |
-| Plans/day | ~1 | ~4 | ~5 | ~1.5 | ~4.5 | ~7 |
-| Commits | 225+ | 225 | 153 | 190 | 153 | ~170 |
-| PRs | 6 | 3 | 2 | 1 | 2 | 2 |
-| LOC | 48k | ~65k | 82k | ~90k | ~95k | ~125k |
+| Metric | v1.0 | v1.1 | v1.2 | v1.3 | v1.4 | v1.5 | v1.6 |
+|--------|------|------|------|------|------|------|------|
+| Phases | 4 | 3 | 2 | 5 | 3 | 4 | 5 |
+| Plans | 23 | 20 | 20 | 19 | 9 | 14 | 15 |
+| Tests | 395 | 867 | 1,172 | 1,535 | 1,641 | 1,967 | 2,176 |
+| Days | 22 | 5 | 4 | 13 | 2 | 2 | 3 |
+| Plans/day | ~1 | ~4 | ~5 | ~1.5 | ~4.5 | ~7 | ~5 |
+| Commits | 225+ | 225 | 153 | 190 | 153 | ~170 | ~111 |
+| PRs | 6 | 3 | 2 | 1 | 2 | 2 | 5 |
+| LOC | 48k | ~65k | 82k | ~90k | ~95k | ~125k | ~125k |

@@ -1,5 +1,23 @@
 # Milestones
 
+## v1.6 Cleanup & Hardening (Shipped: 2026-05-20)
+
+**Delivered:** Hardened the entire app — security fixes, test infrastructure, cache correctness, code quality improvements with precise TypeScript types, shopping cart scaling for 75+ projects, and comprehensive UX polish with ARIA compliance, rejection feedback, and visual consistency.
+
+**Stats:** 5 phases, 15 plans | ~111 commits | 2,176 tests | 3 days (2026-05-18 → 2026-05-20)
+
+**Key accomplishments:**
+
+1. **Critical Fixes & Test Infrastructure** — Supply ownership validation, Promise.allSettled stats resilience with graceful degradation, test infra with createMockPrisma defaults + mockTransaction helper, stats-actions auth/Zod boundary tests
+2. **Test Coverage & Reliability** — Edge case tests (calendar year-rollover, record detection duplicates, completion estimate exclusions), session error visibility (no more silent catches), over-100% progress guardrail with toast warning, stats cache invalidation on chart status + 22 supply mutations
+3. **Code Quality** — Literal union types (MonthLabel, DayLabel, strandCount, BrokenRecordType), PersonalBestRecord discriminated union, shared buildDateFilter/Scope extracted from 6 modules, SORT_FIELDS/SORT_DIRS deduplication, assertSuccess/assertFailure helpers, 126 vacuous assertions eliminated, 47 WHAT-comments + 20 JSX markers removed, semantic token migration
+4. **Shopping Cart Scaling** — Project search, status grouping with workflow progression, supply search, smart selection (select visible, per-group, iterative accumulation), cross-view filtering — cart usable with 75+ projects
+5. **UX Polish** — Keyboard-gated highlight, EditableNumber rejection flash, visible commit button, contextual InlineCreateDialog labels, ARIA group semantics on card rows, squared shopping pills, thread insight rank numbers, What's Next gallery cards with three-state kitting labels, focal point editor split, cover image dynamic aspect ratio, BucketProject focal point, supplies flash fix, fabric matching null fix
+
+**PRs:** #41 (Phase 22), #42 (Phase 23), Phase 24 (direct), #49 (Phase 25), #50 (Phase 26)
+
+---
+
 ## v1.5 Statistics & Records (Shipped: 2026-05-18)
 
 **Delivered:** A comprehensive statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records board, celebration confetti, and supply/designer/genre insights — making every stitch feel measured and rewarding.
