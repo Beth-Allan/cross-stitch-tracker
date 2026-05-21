@@ -2,8 +2,8 @@
 
 ## Current Status
 
-**Milestone:** v1.6 Cleanup & Hardening — PLANNING
-**Last Updated:** 2026-05-18
+**Milestone:** v1.6 Cleanup & Hardening — EXECUTING
+**Last Updated:** 2026-05-19
 **Roadmap:** 7 milestones / 26 phases — v1.0-v1.5 shipped, v1.6 in progress (Phases 22-26)
 
 ### Done
@@ -56,10 +56,33 @@
   - Removed 25 comment convention violations (section dividers, JSX markers, WHAT-comments, D-03 reference)
   - Added 8 items to backlog (999.58-999.65)
 
+- **Phase 26 UI-SPEC approved** — 6/6 dimensions passed, 1 non-blocking FLAG (UX-07 tooltip recommendation)
+  - Typography: 2 weights (400, 600), 3 sizes (12, 14, 24px)
+  - Spacing: 8-point scale, pre-existing 5px noted as inherited
+  - Copywriting: 14 elements defined (kitting labels, dialog titles, aria-labels)
+  - All 14 CONTEXT.md decisions (D-01 through D-14) captured — zero user questions needed
+
+- **Phase 26 planned** — 3 plans in 1 wave (all parallel): supply table UX, ARIA + visual consistency, layout + data fixes
+  - Plan 01: keyboard-gated highlight, EditableNumber rejection flash, commit button, contextual dialog labels (UX-01, UX-03, UX-07, UX-08)
+  - Plan 02: card row ARIA, shopping pills, thread insight ranks, What's Next gallery cards + kitting labels (UX-02, UX-05, UX-06, UX-12, UX-14)
+  - Plan 03: focal point editor split, cover image dynamic aspect ratio, BucketProject focal point, supplies flash fix, fabric matching (UX-04, UX-09, UX-10, UX-11, UX-13)
+
+- **Phase 26 code review fixed** — 6/6 findings fixed (1 critical, 5 warnings), 2173 tests passing
+  - CR-01: Hardcoded `emerald-*` hover → `text-primary` semantic token in BucketProjectRow
+  - WR-01: `stone-*`/`emerald-*` bucket colors → semantic tokens, remaining documented as exception
+  - WR-02 + WR-05: Local CoverPlaceholder duplicate replaced with shared import
+  - WR-03: setTimeout cleanup refs added to both EditableNumber components
+  - WR-04: `defaultBrandId` prop added to InlineCreateDialog
+
+- **Codebase mapped** — 7 documents in `.planning/codebase/` (STACK, INTEGRATIONS, ARCHITECTURE, STRUCTURE, CONVENTIONS, TESTING, CONCERNS)
+- **Fix: `sharp` moved from devDependencies to dependencies** — runtime import was incorrectly listed as dev-only
+
 ### Next Up — RESUME HERE
 
-1. Merge PR #49 when CI passes
-2. `/gsd-discuss-phase 26` — discuss next phase (UX Polish)
+1. Visual verification of Phase 26 UI changes (quality gates require browser check for UI phases)
+2. `/impeccable:audit` — phase-level visual audit before verification
+3. `/gsd-verify-work` — verify phase completion
+4. `/gsd-ship` — create PR for Phase 26
 
 ### Backlog
 
@@ -141,6 +164,8 @@
 - 999.63: Shopping cart test gap: project expand/collapse in ProjectAccordion untested — "not selected" message, supply details
 - 999.64: Shopping cart test gap: updateSupplyAcquired integration path untested — pending/error/toast flows mocked but never exercised
 - 999.65: Shopping cart test gap: QuantityControl inline edit on blur untested — mobile commit path
+- 999.66: Centralize status colors as CSS custom properties — raw Tailwind scales (`bg-amber-400 dark:bg-amber-500`, `bg-rose-500 dark:bg-rose-400`, etc.) are used for the 7-state status palette across gallery-card, bucket-project-row, whats-next-tab, and status-badge. Define `--status-kitting`, `--status-ffo`, etc. to single-source dark/light variants and reduce scattered `dark:` overrides
+- 999.67: Stats sections should populate from library data — thread colors, designer completion, stitched genres, etc. show nothing without tracked sessions. These should be available on a library basis (collection data), not only when the user has logged stitching sessions
 
 ### Blockers
 
