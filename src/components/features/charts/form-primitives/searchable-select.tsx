@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { ChevronDown, Plus, X } from "lucide-react";
 import {
   Command,
@@ -38,7 +38,8 @@ export function SearchableSelect({
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const listboxId = "searchable-select-listbox";
+  const instanceId = useId();
+  const listboxId = `searchable-select-listbox-${instanceId}`;
 
   const selectedLabel = options.find((o) => o.value === value)?.label;
 
