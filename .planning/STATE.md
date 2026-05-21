@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.6
-milestone_name: Cleanup & Hardening
-status: "Phase 26 shipped — PR #50"
-stopped_at: Phase 27 UI-SPEC approved
-last_updated: "2026-05-21T02:20:46.783Z"
+milestone: v1.7
+milestone_name: Fix & Polish
+status: ready_to_plan
+last_updated: "2026-05-21"
 last_activity: 2026-05-21
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 15
-  completed_plans: 15
-  percent: 100
+  total_phases: 4
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-20)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** v1.6 Cleanup & Hardening — milestone complete
+**Current focus:** v1.7 Fix & Polish — Phase 27 ready to plan
 
 ## Current Position
 
-Phase: 26
-Plan: Not started
-Status: Phase 26 shipped — PR #50
-Last activity: 2026-05-21
+Phase: 27 of 30 (Chart Form Fixes)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-05-21 — Roadmap created for v1.7
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -42,7 +41,8 @@ Progress: [░░░░░░░░░░] 0%
 | v1.3 | Form & Supply Overhaul | 10-14 | Shipped 2026-05-16 |
 | v1.4 | Fixes & Polish | 15-17 | Shipped 2026-05-17 |
 | v1.5 | Statistics & Records | 18-21 | Shipped 2026-05-18 |
-| v1.6 | Cleanup & Hardening | 22-26 | Complete 2026-05-20 |
+| v1.6 | Cleanup & Hardening | 22-26 | Shipped 2026-05-20 |
+| v1.7 | Fix & Polish | 27-30 | In progress |
 
 ## Performance Metrics
 
@@ -61,8 +61,7 @@ Progress: [░░░░░░░░░░] 0%
 - `src/lib/queries/stats/` for query layer (pure functions, no "use server")
 - `unstable_cache` with `revalidateTag("stats")` on session mutations (5-min TTL + on-demand)
 - Recharts always Client Components (SSR incompatible)
-- `Promise.all` for parallel data fetching (17 queries on stats page)
-- Two deps added: Recharts 3.8.0 (via shadcn chart), date-fns 4.1.0
+- `Promise.allSettled` for parallel data fetching (17 queries on stats page)
 
 ### Decisions
 
@@ -76,23 +75,8 @@ None.
 
 - `.env.local` bcrypt hashes must escape `$` as `\$`
 
-## Deferred Items
-
-Items acknowledged and deferred at v1.6 milestone close on 2026-05-21:
-
-| Category | Item | Status |
-|----------|------|--------|
-| debug | fabric-matching-excludes-valid | converted_to_backlog |
-| verification | Phase 19 (19-VERIFICATION.md) | human_needed |
-| verification | Phase 20 (20-VERIFICATION.md) | human_needed |
-| verification | Phase 21 (21-VERIFICATION.md) | human_needed |
-| verification | Phase 23 (23-VERIFICATION.md) | human_needed |
-| verification | Phase 25 (25-VERIFICATION.md) | human_needed |
-| uat | Phase 26 (26-UAT.md) | partial |
-| quick_tasks | 14 stale tasks from March-April 2026 | missing |
-
 ## Session Continuity
 
-Last session: 2026-05-21T02:14:38.118Z
-Stopped at: Phase 27 UI-SPEC approved
+Last session: 2026-05-20
+Stopped at: Phase 27 discussed + UI-SPEC approved. Ready to plan Phase 27.
 Resume file: .planning/phases/27-chart-form-fixes/27-UI-SPEC.md

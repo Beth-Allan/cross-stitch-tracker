@@ -12,7 +12,7 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 **Last shipped:** v1.6 Cleanup & Hardening (2026-05-20)
 **7 milestones shipped:** v1.0-v1.6 (26 phases, 122 plans)
-**Next:** Planning next milestone
+**Current:** v1.7 Fix & Polish (Phases 27-30)
 
 The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry and visible commit button, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project search, status grouping, supply search, smart selection, and squared pills, image optimization, multi-file working copies per chart, click-to-set focal point control for cover images with repositioned action bar, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights with rank numbers, and celebration confetti on record-breaking sessions. 2,176 tests, ~110k LOC TypeScript. Stats page resilient to individual query failures via Promise.allSettled. Session file errors logged instead of silently swallowed, stats cache invalidated on chart status and supply mutations, over-100% stitch count warning. ARIA-compliant card rows, three-state kitting labels, contextual supply creation dialogs.
 
@@ -91,7 +91,12 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 
 ### Active
 
-(Planning next milestone)
+**v1.7 Fix & Polish** — Fix user-reported bugs, resolve stats issues, polish UI rough edges, clean up code quality.
+
+- [ ] Quick-add designer from chart form, tab-to-search, designer thumbnails, stitch count calc, skeins display
+- [ ] Records tab population, chart axis integers, inline entity names, total stitches stat, days-in-library formatting
+- [ ] Colored status/size pills, digital copy indicator, supply sort, skein calc controls, file upload improvements
+- [ ] TypeScript test errors, silent failures, R2 photo cleanup, status color centralization, constant/hook extraction
 
 ### Deferred (no phase assigned)
 
@@ -231,4 +236,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-21 after v1.6 milestone archived*
+*Last updated: 2026-05-20 after v1.7 milestone restored*
