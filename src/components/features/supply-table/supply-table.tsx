@@ -163,14 +163,14 @@ export function SupplyTable({
         <table className="w-full border-collapse text-sm" style={{ tableLayout: "fixed" }}>
           <thead>
             <tr className="bg-card">
-              <th scope="col" style={{ width: "44%" }} className={HEADER_CLASS}>
+              <th scope="col" style={{ width: "41%" }} className={HEADER_CLASS}>
                 Colour
               </th>
               <th scope="col" style={{ width: "14%" }} className={HEADER_CLASS}>
                 Stitches
               </th>
               <th scope="col" style={{ width: "24px" }} className={HEADER_CLASS} />
-              <th scope="col" style={{ width: "13%" }} className={HEADER_CLASS}>
+              <th scope="col" style={{ width: "16%" }} className={HEADER_CLASS}>
                 Need
               </th>
               <th scope="col" style={{ width: "10%" }} className={HEADER_CLASS}>

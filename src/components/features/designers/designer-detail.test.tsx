@@ -3,7 +3,7 @@ import { render, screen } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { DesignerDetail } from "./designer-detail";
 import { createMockDesignerChart } from "@/__tests__/mocks";
-import type { DesignerDetail as DesignerDetailType, DesignerChart } from "@/types/designer";
+import type { DesignerDetail as DesignerDetailType } from "@/types/designer";
 
 const mockDeleteDesigner = vi.fn();
 const mockUpdateDesigner = vi.fn();
@@ -241,7 +241,7 @@ describe("DesignerDetail", () => {
             name: "Fallback Chart",
             coverThumbnailUrl: null,
             coverImageUrl: "https://r2.example.com/full-image.webp",
-          } as Partial<DesignerChart>),
+          }),
         ],
         chartCount: 1,
       });

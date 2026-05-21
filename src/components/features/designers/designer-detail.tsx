@@ -297,12 +297,12 @@ function ChartRow({ chart }: { chart: DesignerChart }) {
       href={`/charts/${chart.id}`}
       className="border-border hover:bg-muted/50 flex items-center gap-3 rounded-lg border p-3 transition-colors"
     >
-      {/* Thumbnail */}
-      {chart.coverThumbnailUrl ? (
+      {/* Thumbnail — prefer thumbnail, fall back to full cover image */}
+      {(chart.coverThumbnailUrl ?? chart.coverImageUrl) ? (
         <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={chart.coverThumbnailUrl}
+            src={(chart.coverThumbnailUrl ?? chart.coverImageUrl)!}
             alt={chart.name}
             className="h-full w-full object-cover"
             style={getObjectPositionStyle(chart.focalPointX, chart.focalPointY)}
