@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Cleanup & Hardening
-status: milestone_complete
-stopped_at: Phase 26 UI-SPEC approved
-last_updated: "2026-05-20T03:29:24.487Z"
-last_activity: 2026-05-20 -- Phase 26 execution started
+status: "Phase 26 shipped — PR #50"
+stopped_at: Phase 26 complete, v1.6 milestone complete — ready for /gsd-ship or /gsd-complete-milestone
+last_updated: "2026-05-21T00:53:02.557Z"
+last_activity: 2026-05-20
 progress:
   total_phases: 5
   completed_phases: 5
   total_plans: 15
-  completed_plans: 12
+  completed_plans: 15
   percent: 100
 ---
 
@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-05-20)
 
 Phase: 26
 Plan: Not started
-Status: Milestone complete
-Last activity: 2026-05-21
+Status: Phase 26 shipped — PR #50
+Last activity: 2026-05-20
 
 Progress: [░░░░░░░░░░] 0%
 
