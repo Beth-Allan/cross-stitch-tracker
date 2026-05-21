@@ -123,7 +123,10 @@ Full details: `milestones/v1.6-ROADMAP.md`
   3. Designer detail pages show the correct chart cover thumbnail for each chart (not wrong/missing images)
   4. Total stitch count on the chart form auto-updates when user changes per-colour stitch counts in supply entry
   5. Auto-calculated skeins value displays fully (not clipped or truncated) in the supply takeover skein calculator card
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 27-01-PLAN.md -- Designer inline creation, tab focus, and supply stitch total hint
+- [ ] 27-02-PLAN.md -- Designer detail thumbnails and Need column width
 **UI hint**: yes
 
 ### Phase 28: Stats Corrections
@@ -198,7 +201,7 @@ Phases execute in numeric order: 27 → 28 → 29 → 30
 | 24. Code Quality | v1.6 | 4/4 | Complete | 2026-05-19 |
 | 25. Shopping Cart Scaling | v1.6 | 2/2 | Complete | 2026-05-20 |
 | 26. UX Polish | v1.6 | 3/3 | Complete | 2026-05-20 |
-| 27. Chart Form Fixes | v1.7 | 0/0 | Not started | - |
+| 27. Chart Form Fixes | v1.7 | 0/2 | Planned | - |
 | 28. Stats Corrections | v1.7 | 0/0 | Not started | - |
 | 29. UI Polish | v1.7 | 0/0 | Not started | - |
 | 30. Code Quality | v1.7 | 0/0 | Not started | - |
