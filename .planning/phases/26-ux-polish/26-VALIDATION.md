@@ -17,17 +17,17 @@ created: 2026-05-19
 
 | Property | Value |
 |----------|-------|
-| **Framework** | jest 29.x (via next/jest) |
-| **Config file** | jest.config.ts |
-| **Quick run command** | `npm test -- --testPathPattern` |
+| **Framework** | Vitest 3.1.1 |
+| **Config file** | vitest.config.ts |
+| **Quick run command** | `npx vitest run <file>` |
 | **Full suite command** | `npm test` |
-| **Estimated runtime** | ~45 seconds |
+| **Estimated runtime** | ~30 seconds |
 
 ---
 
 ## Sampling Rate
 
-- **After every task commit:** Run `npm test -- --testPathPattern {changed file}`
+- **After every task commit:** Run `npx vitest run {changed file}`
 - **After every plan wave:** Run `npm test`
 - **Before `/gsd-verify-work`:** Full suite must be green
 - **Max feedback latency:** 45 seconds

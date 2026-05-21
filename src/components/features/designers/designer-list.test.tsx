@@ -243,21 +243,21 @@ describe("DesignerList", () => {
     it("DesignerRow tr has aria-labelledby matching the name Link's id", () => {
       const { container } = render(<DesignerList designers={mockDesigners} />);
       // tr elements keep implicit row role; aria-labelledby added without role="group"
-      const tr = container.querySelector('tr[aria-labelledby="designer-name-d1"]');
+      const tr = container.querySelector('tr[aria-labelledby="designer-row-d1"]');
       expect(tr).toBeTruthy();
     });
 
     it("DesignerRow name Link has an id attribute containing the designer id", () => {
       render(<DesignerList designers={mockDesigners} />);
       const links = screen.getAllByText("Heaven and Earth Designs");
-      const linkWithId = links.find((l) => l.getAttribute("id") === "designer-name-d1");
+      const linkWithId = links.find((l) => l.getAttribute("id") === "designer-row-d1");
       expect(linkWithId).toBeTruthy();
     });
 
     it("DesignerCard outer div has role='group' and aria-labelledby", () => {
       render(<DesignerList designers={mockDesigners} />);
       const groups = screen.getAllByRole("group");
-      const d2Group = groups.find((g) => g.getAttribute("aria-labelledby") === "designer-name-d2");
+      const d2Group = groups.find((g) => g.getAttribute("aria-labelledby") === "designer-card-d2");
       expect(d2Group).toBeTruthy();
     });
   });

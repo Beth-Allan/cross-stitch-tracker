@@ -198,21 +198,21 @@ describe("GenreList", () => {
     it("GenreRow tr has aria-labelledby", () => {
       const { container } = render(<GenreList genres={mockGenres} />);
       // tr elements keep implicit row role; aria-labelledby added without role="group"
-      const tr = container.querySelector('tr[aria-labelledby="genre-name-g1"]');
+      const tr = container.querySelector('tr[aria-labelledby="genre-row-g1"]');
       expect(tr).toBeTruthy();
     });
 
     it("GenreRow name Link has id attribute", () => {
       render(<GenreList genres={mockGenres} />);
       const links = screen.getAllByText("Fantasy");
-      const linkWithId = links.find((l) => l.getAttribute("id") === "genre-name-g1");
+      const linkWithId = links.find((l) => l.getAttribute("id") === "genre-row-g1");
       expect(linkWithId).toBeTruthy();
     });
 
     it("GenreCard outer div has role='group' and aria-labelledby", () => {
       render(<GenreList genres={mockGenres} />);
       const groups = screen.getAllByRole("group");
-      const g2Group = groups.find((g) => g.getAttribute("aria-labelledby") === "genre-name-g2");
+      const g2Group = groups.find((g) => g.getAttribute("aria-labelledby") === "genre-card-g2");
       expect(g2Group).toBeTruthy();
     });
   });

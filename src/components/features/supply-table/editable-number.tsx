@@ -73,6 +73,7 @@ export function EditableNumber({
           } else {
             setDraft(String(displayValue));
             setShowRejection(true);
+            if (rejectionTimerRef.current) clearTimeout(rejectionTimerRef.current);
             rejectionTimerRef.current = setTimeout(() => setShowRejection(false), 600);
           }
           setEditing(false);

@@ -67,7 +67,7 @@
 - canvas-confetti 1.9.4 - Confetti animation on personal bests in `src/components/features/stats/record-celebration.tsx`
 - nanoid 5.1.9 - Random ID generation for R2 object keys
 - bcryptjs 3.0.3 - Password hash comparison in `src/lib/auth.ts`
-- sharp 0.34.5 (devDependency) - Server-side image optimization in `src/lib/actions/upload-actions.ts`; resizes uploads to WebP before storing in R2
+- sharp 0.34.5 - Server-side image optimization in `src/lib/actions/upload-actions.ts`; resizes uploads to WebP before storing in R2
 
 **Fonts (Google Fonts via `next/font`):**
 - Fraunces - Heading font (`--font-heading`)

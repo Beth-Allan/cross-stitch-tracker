@@ -324,11 +324,11 @@ function DesignerRow({
   return (
     <tr
       className="group hover:bg-muted/50 transition-colors"
-      aria-labelledby={`designer-name-${designer.id}`}
+      aria-labelledby={`designer-row-${designer.id}`}
     >
       <td className="px-4 py-3">
         <Link
-          id={`designer-name-${designer.id}`}
+          id={`designer-row-${designer.id}`}
           href={`/designers/${designer.id}`}
           className="text-foreground hover:text-primary text-sm font-medium transition-colors"
         >
@@ -401,12 +401,12 @@ function DesignerCard({
     <div
       className="border-border bg-card rounded-xl border p-4"
       role="group"
-      aria-labelledby={`designer-name-${designer.id}`}
+      aria-labelledby={`designer-card-${designer.id}`}
     >
       <div className="mb-2 flex items-start justify-between">
         <div className="min-w-0 flex-1">
           <Link
-            id={`designer-name-${designer.id}`}
+            id={`designer-card-${designer.id}`}
             href={`/designers/${designer.id}`}
             className="text-foreground hover:text-primary block truncate text-sm font-semibold transition-colors"
           >

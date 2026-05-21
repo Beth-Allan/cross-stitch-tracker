@@ -124,6 +124,7 @@ export function CoverImageUpload({
         const objectUrl = URL.createObjectURL(file);
         setPreview(objectUrl);
         setAspectRatio(null);
+        setImgError(false);
         setState("complete");
         onUploadComplete(result.key);
       } catch {
