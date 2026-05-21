@@ -45,7 +45,7 @@ export function SearchableSelect({
 
   const handleTriggerKeyDown = (e: React.KeyboardEvent) => {
     // Forward printable characters to the search input by opening the popover
-    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    if (e.key.length === 1 && e.key !== " " && !e.ctrlKey && !e.metaKey && !e.altKey) {
       e.preventDefault();
       setOpen(true);
       setSearch(e.key);

@@ -254,6 +254,30 @@ describe("SearchableSelect", () => {
       });
     });
 
+    it("does not forward Space key as a typed character", () => {
+      render(
+        <SearchableSelect
+          options={defaultOptions}
+          value={null}
+          onChange={mockOnChange}
+          onAddNew={mockOnAddNew}
+        />,
+      );
+
+      const trigger = screen.getByTestId("popover-trigger");
+      trigger.focus();
+
+      const event = new KeyboardEvent("keydown", {
+        key: " ",
+        bubbles: true,
+        cancelable: true,
+      });
+      trigger.dispatchEvent(event);
+
+      // Space should toggle dropdown, not set search to " "
+      expect((screen.getByTestId("command-input") as HTMLInputElement).value).toBe("");
+    });
+
     it("does not open on non-printable keys", () => {
       render(
         <SearchableSelect
