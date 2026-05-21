@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Cleanup & Hardening
 status: "Phase 26 shipped — PR #50"
-stopped_at: Phase 26 complete, v1.6 milestone complete — ready for /gsd-ship or /gsd-complete-milestone
-last_updated: "2026-05-21T00:53:02.557Z"
+stopped_at: Phase 27 context gathered
+last_updated: "2026-05-21T02:08:07.926Z"
 last_activity: 2026-05-20
 progress:
   total_phases: 5
@@ -89,6 +89,6 @@ Items acknowledged and deferred at milestone close on 2026-05-18:
 
 ## Session Continuity
 
-Last session: 2026-05-20
-Stopped at: Phase 26 complete, v1.6 milestone complete — ready for /gsd-ship or /gsd-complete-milestone
-Resume file: None
+Last session: 2026-05-21T02:08:07.921Z
+Stopped at: Phase 27 context gathered
+Resume file: .planning/phases/27-chart-form-fixes/27-CONTEXT.md
