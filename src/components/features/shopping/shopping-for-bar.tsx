@@ -22,7 +22,7 @@ export function ShoppingForBar({ selectedProjects, onRemove, onClearAll }: Shopp
         <div className="flex items-center gap-2">
           <ShoppingBag className="text-muted-foreground h-4 w-4" />
           <span className="text-muted-foreground text-sm">
-            No projects selected — choose projects below to start your shopping trip
+            No projects selected. Choose projects below to start your shopping trip
           </span>
         </div>
       ) : (
@@ -31,15 +31,16 @@ export function ShoppingForBar({ selectedProjects, onRemove, onClearAll }: Shopp
             Shopping for:
           </span>
           {selectedProjects.map((project) => (
+            // Intentionally deviates from DesignOS rounded-full pills -- squared chips better fit shopping cart UI convention.
             <span
               key={project.projectId}
-              className="bg-selected text-selected-foreground flex items-center gap-1 rounded-full px-3 py-1 text-sm"
+              className="bg-selected text-selected-foreground border-selected-border flex items-center gap-1 rounded-lg border px-3 py-1 text-sm"
             >
               {project.projectName}
               <button
                 type="button"
                 onClick={() => onRemove(project.projectId)}
-                className="text-selected-foreground hover:text-foreground focus-visible:ring-ring rounded-full transition-colors outline-none focus-visible:ring-2"
+                className="text-selected-foreground hover:text-foreground focus-visible:ring-ring rounded-sm transition-colors outline-none focus-visible:ring-2"
                 aria-label={`Remove ${project.projectName}`}
               >
                 <X className="h-3.5 w-3.5" />

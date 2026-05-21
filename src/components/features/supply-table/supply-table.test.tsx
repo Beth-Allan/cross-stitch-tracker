@@ -162,7 +162,7 @@ function createMockAdapter(): SupplyTableAdapter {
       name: "New Supply",
       brandName: "Custom",
       brandId: "b1",
-      hexColor: "#808080",
+      hexColor: "#79796e",
     }),
   };
 }

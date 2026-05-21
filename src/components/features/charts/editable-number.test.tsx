@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import userEvent from "@testing-library/user-event";
-import { render, screen } from "@/__tests__/test-utils";
+import { render, screen, fireEvent, act } from "@/__tests__/test-utils";
 import { EditableNumber } from "./editable-number";
 
 describe("EditableNumber", () => {
@@ -57,5 +57,93 @@ describe("EditableNumber", () => {
       "aria-label",
       "Quantity needed for DMC 310",
     );
+  });
+
+  describe("rejection feedback (UX-03)", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("entering value below min and blurring shows rejection flash with background tint", () => {
+      const onSave = vi.fn();
+      render(<EditableNumber value={5} onSave={onSave} min={1} max={100} />);
+      fireEvent.click(screen.getByRole("button", { name: "5" }));
+      const input = screen.getByRole("spinbutton");
+      fireEvent.change(input, { target: { value: "0" } });
+      fireEvent.blur(input);
+
+      const button = screen.getByRole("button", { name: "5" });
+      expect(button.className).toContain("border-destructive");
+      expect(button.className).toContain("animate-shake");
+      expect(button.className).toContain("bg-destructive/10");
+    });
+
+    it("entering value above max and blurring shows rejection flash with background tint", () => {
+      const onSave = vi.fn();
+      render(<EditableNumber value={5} onSave={onSave} min={1} max={10} />);
+      fireEvent.click(screen.getByRole("button", { name: "5" }));
+      const input = screen.getByRole("spinbutton");
+      fireEvent.change(input, { target: { value: "15" } });
+      fireEvent.blur(input);
+
+      const button = screen.getByRole("button", { name: "5" });
+      expect(button.className).toContain("border-destructive");
+      expect(button.className).toContain("animate-shake");
+      expect(button.className).toContain("bg-destructive/10");
+    });
+
+    it("entering valid value within range does NOT show rejection or background tint", () => {
+      const onSave = vi.fn();
+      render(<EditableNumber value={5} onSave={onSave} min={1} max={100} />);
+      fireEvent.click(screen.getByRole("button", { name: "5" }));
+      const input = screen.getByRole("spinbutton");
+      fireEvent.change(input, { target: { value: "50" } });
+      fireEvent.blur(input);
+
+      // After valid save, the button should show the new value (via onSave callback)
+      // and not have rejection classes
+      expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
+      const button = screen.getByTitle("Click to edit");
+      expect(button.className).not.toContain("border-destructive");
+      expect(button.className).not.toContain("animate-shake");
+      expect(button.className).not.toContain("bg-destructive/10");
+    });
+
+    it("rejection flash clears after 600ms", () => {
+      const onSave = vi.fn();
+      render(<EditableNumber value={5} onSave={onSave} min={1} max={10} />);
+      fireEvent.click(screen.getByRole("button", { name: "5" }));
+      const input = screen.getByRole("spinbutton");
+      fireEvent.change(input, { target: { value: "20" } });
+      fireEvent.blur(input);
+
+      let button = screen.getByRole("button", { name: "5" });
+      expect(button.className).toContain("animate-shake");
+
+      act(() => {
+        vi.advanceTimersByTime(600);
+      });
+
+      button = screen.getByRole("button", { name: "5" });
+      expect(button.className).not.toContain("animate-shake");
+      expect(button.className).not.toContain("border-destructive");
+      expect(button.className).not.toContain("bg-destructive/10");
+    });
+
+    it("aria-invalid is set during rejection", () => {
+      const onSave = vi.fn();
+      render(<EditableNumber value={5} onSave={onSave} min={1} max={10} />);
+      fireEvent.click(screen.getByRole("button", { name: "5" }));
+      const input = screen.getByRole("spinbutton");
+      fireEvent.change(input, { target: { value: "20" } });
+      fireEvent.blur(input);
+
+      const button = screen.getByRole("button", { name: "5" });
+      expect(button).toHaveAttribute("aria-invalid", "true");
+    });
   });
 });

@@ -167,45 +167,47 @@ export function GalleryCard({ card }: GalleryCardProps) {
         celebrationClasses ?? "border-border border"
       }`}
     >
-      {/* Cover image area */}
-      <div className="relative aspect-[4/3] overflow-hidden">
-        {hasRealImage ? (
-          <Image
-            src={card.coverImageUrl!}
-            alt={card.name}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
-            style={getObjectPositionStyle(card.focalPointX, card.focalPointY)}
-            onError={() => setImgFailed(true)}
-            unoptimized
-          />
-        ) : (
-          <CoverPlaceholder status={card.status} />
-        )}
+      {/* Cover image area — wrapped in supplementary Link for larger click target */}
+      <Link href={`/charts/${card.chartId}`} className="block" tabIndex={-1} aria-hidden="true">
+        <div className="relative aspect-[4/3] overflow-hidden">
+          {hasRealImage ? (
+            <Image
+              src={card.coverImageUrl!}
+              alt={card.name}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
+              style={getObjectPositionStyle(card.focalPointX, card.focalPointY)}
+              onError={() => setImgFailed(true)}
+              unoptimized
+            />
+          ) : (
+            <CoverPlaceholder status={card.status} />
+          )}
 
-        {/* Gradient overlay on real images */}
-        {hasRealImage && (
-          <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/20 to-transparent" />
-        )}
+          {/* Gradient overlay on real images */}
+          {hasRealImage && (
+            <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/20 to-transparent" />
+          )}
 
-        {/* Status badge -- top left */}
-        <div className="absolute top-3 left-3">
-          <StatusBadge status={card.status} />
+          {/* Status badge -- top left */}
+          <div className="absolute top-3 left-3">
+            <StatusBadge status={card.status} />
+          </div>
+
+          {/* Size badge -- top right */}
+          <div className="absolute top-3 right-3">
+            <Tooltip>
+              <TooltipTrigger
+                render={<span />}
+                className="bg-background/90 text-muted-foreground cursor-default rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-widest uppercase"
+              >
+                {card.sizeCategory}
+              </TooltipTrigger>
+              <TooltipContent>{SIZE_TOOLTIP_TEXT[card.sizeCategory]}</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
-
-        {/* Size badge -- top right */}
-        <div className="absolute top-3 right-3">
-          <Tooltip>
-            <TooltipTrigger
-              render={<span />}
-              className="bg-background/90 text-muted-foreground cursor-default rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-widest uppercase"
-            >
-              {card.sizeCategory}
-            </TooltipTrigger>
-            <TooltipContent>{SIZE_TOOLTIP_TEXT[card.sizeCategory]}</TooltipContent>
-          </Tooltip>
-        </div>
-      </div>
+      </Link>
 
       {/* Card body */}
       <div className="bg-card flex flex-1 flex-col gap-1.5 p-4">

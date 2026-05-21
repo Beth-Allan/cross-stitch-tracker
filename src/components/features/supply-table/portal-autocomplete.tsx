@@ -12,6 +12,7 @@ interface PortalAutocompleteProps {
   existingIds: Set<string>;
   searchText: string;
   highlightIndex: number;
+  hasUsedArrowKeys: boolean;
   onSelect: (item: SupplySearchResult) => void;
   onCreateRequest: (searchText: string) => void;
   onClose: () => void;
@@ -25,6 +26,7 @@ export function PortalAutocomplete({
   existingIds,
   searchText,
   highlightIndex,
+  hasUsedArrowKeys,
   onSelect,
   onCreateRequest,
   onClose,
@@ -101,7 +103,7 @@ export function PortalAutocomplete({
         ) : displayItems.length > 0 ? (
           displayItems.map((item, index) => {
             const disabled = isDisabled(item);
-            const highlighted = index === highlightIndex;
+            const highlighted = hasUsedArrowKeys && index === highlightIndex;
             const itemId = `portal-autocomplete-item-${item.id}`;
 
             return (
@@ -130,7 +132,7 @@ export function PortalAutocomplete({
                     {item.code}
                   </span>
                   {!disabled && item.name && (
-                    <span className="text-muted-foreground text-xs"> &mdash; {item.name}</span>
+                    <span className="text-muted-foreground text-xs"> · {item.name}</span>
                   )}
                 </span>
                 {disabled && <span className="text-muted-foreground shrink-0 text-xs">Added</span>}

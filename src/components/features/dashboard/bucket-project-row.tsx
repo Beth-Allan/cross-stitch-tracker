@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { BucketProject, ProgressBucketId } from "@/types/dashboard";
 import { CoverPlaceholder } from "@/components/features/gallery/cover-placeholder";
+import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 
 interface BucketProjectRowProps {
   project: BucketProject;
@@ -8,10 +9,12 @@ interface BucketProjectRowProps {
   bucketId: ProgressBucketId;
 }
 
+// Per-bucket progress colors: amber/sky/violet are intentional palette choices with
+// no single semantic role — only stone-* and emerald-* replaced with tokens.
 const BUCKET_BAR_COLORS: Record<ProgressBucketId, string> = {
-  unstarted: "bg-stone-300 dark:bg-stone-600",
+  unstarted: "bg-muted-foreground/30",
   "0-25": "bg-amber-400 dark:bg-amber-500",
-  "25-50": "bg-emerald-400 dark:bg-emerald-500",
+  "25-50": "bg-progress",
   "50-75": "bg-sky-400 dark:bg-sky-500",
   "75-100": "bg-violet-400 dark:bg-violet-500",
 };
@@ -33,6 +36,7 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
             alt={project.projectName}
             loading="lazy"
             className="h-full w-full object-cover"
+            style={getObjectPositionStyle(project.focalPointX, project.focalPointY)}
           />
         ) : (
           <CoverPlaceholder status={project.status} />
@@ -41,7 +45,7 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
 
       {/* Name + designer */}
       <div className="min-w-0 flex-1">
-        <p className="font-heading truncate text-sm font-semibold transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+        <p className="font-heading group-hover:text-primary truncate text-sm font-semibold transition-colors">
           {project.projectName}
         </p>
         {project.designerName && (

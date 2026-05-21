@@ -5,8 +5,7 @@ import { Crosshair } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { updateFocalPoint } from "@/lib/actions/focal-point-actions";
-import { FocalPointMarker } from "./focal-point-marker";
-import { CropGuideOverlay } from "./crop-guide-overlay";
+import { FocalPointClickArea } from "./focal-point-click-area";
 
 interface FocalPointEditorProps {
   chartId: string;
@@ -15,10 +14,12 @@ interface FocalPointEditorProps {
 }
 
 /**
- * Focal point editor overlay for the hero banner.
+ * Focal point editor for the hero banner.
  * Provides click-to-set interface with crosshair marker, crop guide preview,
- * and save/cancel/reset controls. Renders as overlay elements on top of the
- * hero image — does NOT render the image itself.
+ * and save/cancel/reset controls. Renders as a Fragment with:
+ *   - Edit button (absolute, top-right) when not in edit mode
+ *   - FocalPointClickArea (absolute inset-0) when in edit mode
+ *   - Action bar (normal flow, below image) when in edit mode
  */
 export function FocalPointEditor({ chartId, initialFocalPoint, imageUrl }: FocalPointEditorProps) {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -30,7 +31,6 @@ export function FocalPointEditor({ chartId, initialFocalPoint, imageUrl }: Focal
   const [isPending, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Measure container size on edit mode entry and track resize
   useEffect(() => {
     if (!isEditMode || !containerRef.current) return;
     const el = containerRef.current;
@@ -110,12 +110,10 @@ export function FocalPointEditor({ chartId, initialFocalPoint, imageUrl }: Focal
     }
   }
 
-  // No image = no editor
   if (!imageUrl) return null;
 
   return (
-    <div onKeyDown={handleKeyDown}>
-      {/* Edit mode trigger button — top-right of hero banner */}
+    <>
       {!isEditMode && (
         <button
           onClick={handleEnterEditMode}
@@ -127,40 +125,22 @@ export function FocalPointEditor({ chartId, initialFocalPoint, imageUrl }: Focal
         </button>
       )}
 
-      {/* Edit mode: click area overlay + marker + crop guide */}
       {isEditMode && (
-        <div
-          ref={containerRef}
-          className="absolute inset-0 z-10 cursor-crosshair"
-          role="button"
-          tabIndex={0}
-          aria-label="Click to place focal point"
-          onClick={handleImageClick}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              // Place at center as keyboard default
-              setPendingPoint({ x: 0.5, y: 0.5 });
-            }
-          }}
-        >
-          {pendingPoint && containerSize.width > 0 && (
-            <>
-              <CropGuideOverlay
-                focalPointX={pendingPoint.x}
-                focalPointY={pendingPoint.y}
-                containerWidth={containerSize.width}
-                containerHeight={containerSize.height}
-              />
-              <FocalPointMarker x={pendingPoint.x} y={pendingPoint.y} />
-            </>
-          )}
-        </div>
+        <FocalPointClickArea
+          pendingPoint={pendingPoint}
+          containerSize={containerSize}
+          onImageClick={handleImageClick}
+          onKeyDown={handleKeyDown}
+          onPlace={() => setPendingPoint({ x: 0.5, y: 0.5 })}
+          containerRef={containerRef}
+        />
       )}
 
-      {/* Action bar — below the image, in layout flow */}
       {isEditMode && (
-        <div className="border-border bg-card/90 animate-in slide-in-from-bottom-1 absolute right-0 bottom-0 left-0 z-20 mt-2 flex items-center gap-2 rounded-b-lg border-t p-2 backdrop-blur-sm duration-200">
+        <div
+          className="border-border bg-card/90 animate-in slide-in-from-bottom-1 flex items-center gap-2 border-t p-2 backdrop-blur-sm duration-200"
+          onKeyDown={handleKeyDown}
+        >
           <Button size="sm" onClick={handleSave} disabled={isPending || !pendingPoint}>
             {isPending ? "Saving..." : "Save"}
           </Button>
@@ -179,11 +159,10 @@ export function FocalPointEditor({ chartId, initialFocalPoint, imageUrl }: Focal
         </div>
       )}
 
-      {/* Screen reader announcement for focal point placement */}
       <div aria-live="polite" className="sr-only">
         {pendingPoint &&
           `Focal point set at ${Math.round(pendingPoint.x * 100)}%, ${Math.round(pendingPoint.y * 100)}%`}
       </div>
-    </div>
+    </>
   );
 }

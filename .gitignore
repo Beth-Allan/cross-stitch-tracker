@@ -169,6 +169,10 @@ src/generated/
 
 # Worktrees
 .worktrees/
+.claude/worktrees/
 
 # Superpowers brainstorm sessions
 .superpowers/
+
+# Impeccable critique reports
+.impeccable/

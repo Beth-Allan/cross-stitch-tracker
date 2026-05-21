@@ -61,6 +61,7 @@ describe("PortalAutocomplete", () => {
     existingIds: new Set<string>(),
     searchText: "",
     highlightIndex: -1,
+    hasUsedArrowKeys: false,
     onSelect: vi.fn(),
     onCreateRequest: vi.fn(),
     onClose: vi.fn(),
@@ -97,8 +98,15 @@ describe("PortalAutocomplete", () => {
     expect(options.length).toBe(4);
   });
 
-  it("accepts highlightIndex prop and highlights the correct option", () => {
-    render(<PortalAutocomplete {...defaultProps} highlightIndex={1} anchorRef={anchorRef} />);
+  it("accepts highlightIndex prop and highlights the correct option when hasUsedArrowKeys is true", () => {
+    render(
+      <PortalAutocomplete
+        {...defaultProps}
+        highlightIndex={1}
+        hasUsedArrowKeys={true}
+        anchorRef={anchorRef}
+      />,
+    );
     const options = screen.getAllByRole("option");
     expect(options[1]).toHaveAttribute("data-highlighted", "true");
     expect(options[0]).not.toHaveAttribute("data-highlighted");
@@ -212,5 +220,64 @@ describe("PortalAutocomplete", () => {
     expect(disabledOption).toBeDefined();
     fireEvent.click(disabledOption!);
     expect(defaultProps.onSelect).not.toHaveBeenCalled();
+  });
+
+  describe("keyboard-gated highlight (UX-01)", () => {
+    it("renders no highlighted item when hasUsedArrowKeys is false and highlightIndex is 0", () => {
+      render(
+        <PortalAutocomplete
+          {...defaultProps}
+          highlightIndex={0}
+          hasUsedArrowKeys={false}
+          anchorRef={anchorRef}
+        />,
+      );
+      const options = screen.getAllByRole("option");
+      options.forEach((opt) => {
+        expect(opt).not.toHaveAttribute("data-highlighted", "true");
+      });
+    });
+
+    it("renders highlighted item when hasUsedArrowKeys is true and highlightIndex is 0", () => {
+      render(
+        <PortalAutocomplete
+          {...defaultProps}
+          highlightIndex={0}
+          hasUsedArrowKeys={true}
+          anchorRef={anchorRef}
+        />,
+      );
+      const options = screen.getAllByRole("option");
+      expect(options[0]).toHaveAttribute("data-highlighted", "true");
+    });
+
+    it("aria-selected is false on all items when hasUsedArrowKeys is false", () => {
+      render(
+        <PortalAutocomplete
+          {...defaultProps}
+          highlightIndex={0}
+          hasUsedArrowKeys={false}
+          anchorRef={anchorRef}
+        />,
+      );
+      const options = screen.getAllByRole("option");
+      options.forEach((opt) => {
+        expect(opt).toHaveAttribute("aria-selected", "false");
+      });
+    });
+
+    it("aria-selected is true on highlighted item when hasUsedArrowKeys is true", () => {
+      render(
+        <PortalAutocomplete
+          {...defaultProps}
+          highlightIndex={1}
+          hasUsedArrowKeys={true}
+          anchorRef={anchorRef}
+        />,
+      );
+      const options = screen.getAllByRole("option");
+      expect(options[1]).toHaveAttribute("aria-selected", "true");
+      expect(options[0]).toHaveAttribute("aria-selected", "false");
+    });
   });
 });

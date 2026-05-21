@@ -17,6 +17,8 @@ function createMockProject(overrides?: Partial<BucketProject>): BucketProject {
     stitchesCompleted: 5000,
     lastSessionDate: new Date("2026-04-10"),
     stitchingDays: 15,
+    focalPointX: null,
+    focalPointY: null,
     ...overrides,
   };
 }

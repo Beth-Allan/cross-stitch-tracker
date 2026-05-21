@@ -20,9 +20,12 @@ export function ThreadInsightList({ items }: ThreadInsightListProps) {
           <p className="text-muted-foreground py-4 text-sm">No supply data yet</p>
         ) : (
           <div className="space-y-1">
-            {items.map((item) => (
+            {items.map((item, index) => (
               <div key={item.threadId} className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground w-5 font-mono text-xs tabular-nums">
+                    {index + 1}.
+                  </span>
                   {item.hexColor ? (
                     <div
                       className="border-border h-4 w-4 shrink-0 rounded-sm border"

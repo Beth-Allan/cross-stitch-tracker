@@ -67,7 +67,7 @@ export function buildCreateFn() {
         colorName: data.name,
         colorCode: data.code || "CUSTOM",
         brandId: data.brandId,
-        hexColor: data.hexColor ?? "#808080",
+        hexColor: data.hexColor ?? "#79796e",
         colorFamily: "NEUTRAL" as const,
       });
       if (!result.success) throw new Error(result.error);
@@ -86,7 +86,7 @@ export function buildCreateFn() {
         colorName: data.name,
         productCode: data.code || "CUSTOM",
         brandId: data.brandId,
-        hexColor: data.hexColor ?? "#808080",
+        hexColor: data.hexColor ?? "#79796e",
         colorFamily: "NEUTRAL" as const,
       });
       if (!result.success) throw new Error(result.error);
@@ -104,7 +104,7 @@ export function buildCreateFn() {
       colorName: data.name,
       productCode: data.code || "CUSTOM",
       brandId: data.brandId,
-      hexColor: data.hexColor ?? "#808080",
+      hexColor: data.hexColor ?? "#79796e",
     });
     if (!result.success) throw new Error(result.error);
     return {

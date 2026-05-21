@@ -255,4 +255,46 @@ describe("FocalPointEditor", () => {
     expect(screen.queryByRole("button", { name: /save/i })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /set focal point/i })).toBeInTheDocument();
   });
+
+  describe("focal point editor split (UX-10)", () => {
+    it("renders FocalPointClickArea component in edit mode", () => {
+      render(<FocalPointEditor {...defaultProps} />);
+      fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
+      expect(
+        screen.getByRole("button", { name: /click to place focal point/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("renders action bar with Save/Cancel/Reset buttons in edit mode", () => {
+      render(<FocalPointEditor {...defaultProps} />);
+      fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
+      expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /reset to center/i })).toBeInTheDocument();
+    });
+
+    it("action bar does NOT have class 'absolute'", () => {
+      const { container } = render(<FocalPointEditor {...defaultProps} />);
+      fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
+      const actionBar = screen.getByRole("button", { name: /save/i }).closest("div.border-t");
+      expect(actionBar).toBeTruthy();
+      expect(actionBar!.className).not.toContain("absolute");
+    });
+
+    it("action bar has border-t class for visual treatment", () => {
+      const { container } = render(<FocalPointEditor {...defaultProps} />);
+      fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
+      const actionBar = screen.getByRole("button", { name: /save/i }).closest("div.border-t");
+      expect(actionBar).toBeTruthy();
+      expect(actionBar!.className).toContain("border-t");
+    });
+
+    it("click area has absolute inset-0 class", () => {
+      render(<FocalPointEditor {...defaultProps} />);
+      fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
+      const clickArea = screen.getByRole("button", { name: /click to place focal point/i });
+      expect(clickArea.className).toContain("absolute");
+      expect(clickArea.className).toContain("inset-0");
+    });
+  });
 });

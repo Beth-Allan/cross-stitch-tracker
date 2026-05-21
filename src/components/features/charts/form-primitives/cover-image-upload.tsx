@@ -36,6 +36,7 @@ export function CoverImageUpload({
   const [error, setError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [aspectRatio, setAspectRatio] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Resolve R2 key to presigned URL on mount when editing an existing chart
@@ -122,6 +123,8 @@ export function CoverImageUpload({
 
         const objectUrl = URL.createObjectURL(file);
         setPreview(objectUrl);
+        setAspectRatio(null);
+        setImgError(false);
         setState("complete");
         onUploadComplete(result.key);
       } catch {
@@ -161,6 +164,7 @@ export function CoverImageUpload({
       URL.revokeObjectURL(preview);
     }
     setPreview(null);
+    setAspectRatio(null);
     setState("idle");
     setError(null);
     onRemove();
@@ -196,12 +200,22 @@ export function CoverImageUpload({
           <Loader2 className="text-muted-foreground/50 size-6 animate-spin" />
         </div>
       ) : state === "complete" && preview && !imgError ? (
-        <div className="border-border bg-muted relative h-48 overflow-hidden rounded-lg border-2">
+        <div
+          className={cn(
+            "border-border bg-muted relative overflow-hidden rounded-lg border-2",
+            !aspectRatio && "h-48",
+          )}
+          style={aspectRatio ? { aspectRatio, maxHeight: "18rem" } : undefined}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={preview}
             alt="Cover image preview"
             className="h-full w-full object-contain"
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              setAspectRatio(`${img.naturalWidth}/${img.naturalHeight}`);
+            }}
             onError={() => setImgError(true)}
           />
           <button

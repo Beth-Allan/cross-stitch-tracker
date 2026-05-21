@@ -51,20 +51,20 @@ Requirements for v1.6 Cleanup & Hardening. Each maps to roadmap phases.
 
 ### UX Polish
 
-- [ ] **UX-01**: SearchToAdd keyboard highlight only appears after arrow key use
-- [ ] **UX-02**: Clickable card rows refactored to avoid nested interactive elements (ARIA)
-- [ ] **UX-03**: EditableNumber shows visual indication when input is rejected
-- [ ] **UX-04**: Supplies page eliminates first-load view flash
-- [ ] **UX-05**: What's Next kitting label shows appropriate text at 0% progress
-- [ ] **UX-06**: Shopping-for bar pills match mockup style with squared-off chip design
-- [ ] **UX-07**: Supply table add row has visible commit button for mouse-first users
-- [ ] **UX-08**: InlineCreateDialog field labels are contextual per supply type
-- [ ] **UX-09**: BucketProject cards apply focal point styling from cover images
-- [ ] **UX-10**: Focal point action bar repositioned to not block bottom 25% of image
-- [ ] **UX-11**: Fabric matching logic handles null fabricCount without short-circuiting
-- [ ] **UX-12**: ThreadInsightList items either link to detail page or don't appear clickable
-- [ ] **UX-13**: Cover image preview uses correct aspect ratio
-- [ ] **UX-14**: What's Next cards use gallery card styling for visual consistency
+- [x] **UX-01**: SearchToAdd keyboard highlight only appears after arrow key use
+- [x] **UX-02**: Clickable card rows refactored to avoid nested interactive elements (ARIA)
+- [x] **UX-03**: EditableNumber shows visual indication when input is rejected
+- [x] **UX-04**: Supplies page eliminates first-load view flash
+- [x] **UX-05**: What's Next kitting label shows appropriate text at 0% progress
+- [x] **UX-06**: Shopping-for bar pills match mockup style with squared-off chip design
+- [x] **UX-07**: Supply table add row has visible commit button for mouse-first users
+- [x] **UX-08**: InlineCreateDialog field labels are contextual per supply type
+- [x] **UX-09**: BucketProject cards apply focal point styling from cover images
+- [x] **UX-10**: Focal point action bar repositioned to not block bottom 25% of image
+- [x] **UX-11**: Fabric matching logic handles null fabricCount without short-circuiting
+- [x] **UX-12**: ThreadInsightList items either link to detail page or don't appear clickable
+- [x] **UX-13**: Cover image preview uses correct aspect ratio
+- [x] **UX-14**: What's Next cards use gallery card styling for visual consistency
 
 ## Future Requirements
 
@@ -145,20 +145,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-14 | Phase 24 | Complete |
 | QUAL-15 | Phase 24 | Complete |
 | QUAL-16 | Phase 24 | Complete |
-| UX-01 | Phase 26 | Pending |
-| UX-02 | Phase 26 | Pending |
-| UX-03 | Phase 26 | Pending |
-| UX-04 | Phase 26 | Pending |
-| UX-05 | Phase 26 | Pending |
-| UX-06 | Phase 26 | Pending |
-| UX-07 | Phase 26 | Pending |
-| UX-08 | Phase 26 | Pending |
-| UX-09 | Phase 26 | Pending |
-| UX-10 | Phase 26 | Pending |
-| UX-11 | Phase 26 | Pending |
-| UX-12 | Phase 26 | Pending |
-| UX-13 | Phase 26 | Pending |
-| UX-14 | Phase 26 | Pending |
+| UX-01 | Phase 26 | Complete |
+| UX-02 | Phase 26 | Complete |
+| UX-03 | Phase 26 | Complete |
+| UX-04 | Phase 26 | Complete |
+| UX-05 | Phase 26 | Complete |
+| UX-06 | Phase 26 | Complete |
+| UX-07 | Phase 26 | Complete |
+| UX-08 | Phase 26 | Complete |
+| UX-09 | Phase 26 | Complete |
+| UX-10 | Phase 26 | Complete |
+| UX-11 | Phase 26 | Complete |
+| UX-12 | Phase 26 | Complete |
+| UX-13 | Phase 26 | Complete |
+| UX-14 | Phase 26 | Complete |
 
 **Coverage:**
 - v1.6 requirements: 44 total

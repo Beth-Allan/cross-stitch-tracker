@@ -106,7 +106,7 @@ export const createAndAddThreadSchema = z.object({
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/)
     .optional()
-    .default("#808080"),
+    .default("#79796e"),
   brandId: z.string().min(1, "Brand is required"),
   colorFamily: z.enum(COLOR_FAMILIES).optional().default("NEUTRAL"),
 });

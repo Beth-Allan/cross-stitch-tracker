@@ -44,29 +44,24 @@ describe("WhatsNextTab", () => {
     expect(screen.getByText("Test Designer")).toBeInTheDocument();
   });
 
-  it("renders kitting bar emerald at 100%", () => {
+  it("renders 'Fully kitted' label at 100%", () => {
     const projects = [makeProject({ kittingPercent: 100 })];
     render(<WhatsNextTab projects={projects} imageUrls={{}} />);
-
     expect(screen.getByText("Fully kitted")).toBeInTheDocument();
-    const bar = screen.getByTestId("kitting-bar-chart-1");
-    expect(bar.className).toContain("bg-emerald-500");
   });
 
-  it("renders kitting bar amber below 100%", () => {
+  it("renders 'Kitting' label between 1-99%", () => {
     const projects = [makeProject({ kittingPercent: 50 })];
     render(<WhatsNextTab projects={projects} imageUrls={{}} />);
-
     expect(screen.getByText("Kitting")).toBeInTheDocument();
-    const bar = screen.getByTestId("kitting-bar-chart-1");
-    expect(bar.className).toContain("bg-amber-400");
   });
 
   it("shows star icon for wantToStartNext projects", () => {
     const projects = [makeProject({ wantToStartNext: true })];
-    render(<WhatsNextTab projects={projects} imageUrls={{}} />);
+    const { container } = render(<WhatsNextTab projects={projects} imageUrls={{}} />);
 
-    expect(screen.getByTestId("star-icon-chart-1")).toBeInTheDocument();
+    const starIcon = container.querySelector('[data-testid="star-icon-chart-1"]');
+    expect(starIcon).toBeInTheDocument();
   });
 
   it("renders sort dropdown with 5 options", () => {
@@ -112,8 +107,9 @@ describe("WhatsNextTab", () => {
     const projects = [makeProject({ chartId: "chart-abc" })];
     render(<WhatsNextTab projects={projects} imageUrls={{}} />);
 
-    const link = screen.getByRole("link");
-    expect(link).toHaveAttribute("href", "/charts/chart-abc");
+    const links = screen.getAllByRole("link");
+    const chartLink = links.find((l) => l.getAttribute("href") === "/charts/chart-abc");
+    expect(chartLink).toBeTruthy();
   });
 
   it("sorts by totalStitches when Largest First selected", () => {
@@ -128,7 +124,66 @@ describe("WhatsNextTab", () => {
     });
 
     const links = screen.getAllByRole("link");
-    expect(links[0]).toHaveAttribute("href", "/charts/large");
-    expect(links[1]).toHaveAttribute("href", "/charts/small");
+    const linkHrefs = links.map((l) => l.getAttribute("href"));
+    const largeIdx = linkHrefs.indexOf("/charts/large");
+    const smallIdx = linkHrefs.indexOf("/charts/small");
+    expect(largeIdx).toBeLessThan(smallIdx);
+  });
+
+  describe("Three-state kitting label (UX-05)", () => {
+    it("shows 'Not kitted' at 0%", () => {
+      const projects = [makeProject({ kittingPercent: 0 })];
+      render(<WhatsNextTab projects={projects} imageUrls={{}} />);
+      expect(screen.getByText("Not kitted")).toBeInTheDocument();
+    });
+
+    it("shows 'Kitting' at 50%", () => {
+      const projects = [makeProject({ kittingPercent: 50 })];
+      render(<WhatsNextTab projects={projects} imageUrls={{}} />);
+      expect(screen.getByText("Kitting")).toBeInTheDocument();
+    });
+
+    it("shows 'Fully kitted' at 100%", () => {
+      const projects = [makeProject({ kittingPercent: 100 })];
+      render(<WhatsNextTab projects={projects} imageUrls={{}} />);
+      expect(screen.getByText("Fully kitted")).toBeInTheDocument();
+    });
+  });
+
+  describe("Gallery card layout (UX-14)", () => {
+    it("card wrapper has bg-card, rounded-lg, border classes", () => {
+      const projects = [makeProject()];
+      const { container } = render(<WhatsNextTab projects={projects} imageUrls={{}} />);
+      const card = container.querySelector(".bg-card.rounded-lg.border");
+      expect(card).toBeInTheDocument();
+    });
+
+    it("image area has aspect-[4/3] class", () => {
+      const projects = [makeProject()];
+      const { container } = render(<WhatsNextTab projects={projects} imageUrls={{}} />);
+      const imageArea = container.querySelector(".aspect-\\[4\\/3\\]");
+      expect(imageArea).toBeInTheDocument();
+    });
+
+    it("cards render in a grid container", () => {
+      const projects = [makeProject()];
+      const { container } = render(<WhatsNextTab projects={projects} imageUrls={{}} />);
+      const grid = container.querySelector(".grid");
+      expect(grid).toBeInTheDocument();
+    });
+
+    it("project name is rendered as a Link inside the card body", () => {
+      const projects = [makeProject({ chartName: "Gallery Style Card" })];
+      render(<WhatsNextTab projects={projects} imageUrls={{}} />);
+      const link = screen.getByRole("link", { name: "Gallery Style Card" });
+      expect(link).toBeInTheDocument();
+    });
+
+    it("does not contain hardcoded emerald hover classes", () => {
+      const projects = [makeProject()];
+      const { container } = render(<WhatsNextTab projects={projects} imageUrls={{}} />);
+      expect(container.innerHTML).not.toContain("text-emerald-700");
+      expect(container.innerHTML).not.toContain("text-emerald-400");
+    });
   });
 });

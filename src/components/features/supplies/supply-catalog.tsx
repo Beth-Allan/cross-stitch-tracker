@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search, Grid3X3, List, Plus, CircleDot, Gem, Sparkles, Tags } from "lucide-react";
 import { toast } from "sonner";
@@ -186,31 +186,27 @@ export function SupplyCatalog({
   const searchParams = useSearchParams();
   const [activeTab, setActiveTabRaw] = useState<SupplyTab>("threads");
 
-  // Initialize view modes: URL param > localStorage > default
+  // Initialize view modes synchronously from localStorage to prevent flash
   const [viewModes, setViewModes] = useState<Record<SupplyTab, ViewMode>>(() => {
     const modes = { ...DEFAULT_VIEWS };
     if (initialView) {
       modes.threads = initialView;
     }
-    return modes;
-  });
-
-  // Restore non-active tab preferences from localStorage (no flash since they're not visible)
-  useEffect(() => {
-    const restored = { ...viewModes };
-    let changed = false;
-    for (const tab of TAB_CONFIG) {
-      // Skip the active tab if URL param was provided (URL wins)
-      if (tab.key === "threads" && initialView) continue;
-      const stored = localStorage.getItem(STORAGE_KEYS[tab.key]);
-      if (stored === "grid" || stored === "table") {
-        restored[tab.key] = stored;
-        changed = true;
+    if (typeof window !== "undefined") {
+      try {
+        for (const tab of TAB_CONFIG) {
+          if (tab.key === "threads" && initialView) continue;
+          const stored = localStorage.getItem(STORAGE_KEYS[tab.key]);
+          if (stored === "grid" || stored === "table") {
+            modes[tab.key] = stored;
+          }
+        }
+      } catch {
+        // localStorage unavailable (private browsing, CSP) — use defaults
       }
     }
-    if (changed) setViewModes(restored);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return modes;
+  });
   const [search, setSearch] = useState("");
   const [colorFamilyFilter, setColorFamilyFilter] = useState<ColorFamily | "">("");
   const [brandFilter, setBrandFilter] = useState<string>("");
@@ -238,7 +234,11 @@ export function SupplyCatalog({
   const setViewMode = useCallback(
     (tab: SupplyTab, mode: ViewMode) => {
       setViewModes((prev) => ({ ...prev, [tab]: mode }));
-      localStorage.setItem(STORAGE_KEYS[tab], mode);
+      try {
+        localStorage.setItem(STORAGE_KEYS[tab], mode);
+      } catch {
+        // localStorage unavailable — view mode still works for this session via state
+      }
       // Sync to URL for the active tab so refresh preserves it
       const params = new URLSearchParams(searchParams.toString());
       params.set("view", mode);

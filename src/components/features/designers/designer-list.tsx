@@ -322,9 +322,13 @@ function DesignerRow({
   onDelete: () => void;
 }) {
   return (
-    <tr className="group hover:bg-muted/50 transition-colors">
+    <tr
+      className="group hover:bg-muted/50 transition-colors"
+      aria-labelledby={`designer-row-${designer.id}`}
+    >
       <td className="px-4 py-3">
         <Link
+          id={`designer-row-${designer.id}`}
           href={`/designers/${designer.id}`}
           className="text-foreground hover:text-primary text-sm font-medium transition-colors"
         >
@@ -343,20 +347,20 @@ function DesignerRow({
             <ExternalLink className="h-3 w-3" />
           </a>
         ) : (
-          <span className="text-muted-foreground text-sm">&mdash;</span>
+          <span className="text-muted-foreground/50 text-sm">None</span>
         )}
       </td>
       <td className="px-4 py-3">
         <span className="text-muted-foreground text-sm">{designer.chartCount}</span>
       </td>
       <td className="px-4 py-3">
-        <span className="text-muted-foreground text-sm">&mdash;</span>
+        <span className="text-muted-foreground/50 text-sm">None</span>
       </td>
       <td className="px-4 py-3">
-        <span className="text-muted-foreground text-sm">&mdash;</span>
+        <span className="text-muted-foreground/50 text-sm">None</span>
       </td>
       <td className="px-4 py-3">
-        <span className="text-muted-foreground text-sm">&mdash;</span>
+        <span className="text-muted-foreground/50 text-sm">None</span>
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center justify-end gap-1 transition-opacity group-focus-within:opacity-100 md:opacity-40 md:group-hover:opacity-100">
@@ -394,10 +398,15 @@ function DesignerCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="border-border bg-card rounded-xl border p-4 shadow-sm">
+    <div
+      className="border-border bg-card rounded-xl border p-4"
+      role="group"
+      aria-labelledby={`designer-card-${designer.id}`}
+    >
       <div className="mb-2 flex items-start justify-between">
         <div className="min-w-0 flex-1">
           <Link
+            id={`designer-card-${designer.id}`}
             href={`/designers/${designer.id}`}
             className="text-foreground hover:text-primary block truncate text-sm font-semibold transition-colors"
           >

@@ -37,6 +37,7 @@ export function useSupplyTable(
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [createSearchText, setCreateSearchText] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
+  const [hasUsedArrowKeys, setHasUsedArrowKeys] = useState(false);
   const [isSearchError, setIsSearchError] = useState(false);
 
   // useTransition for non-blocking search state updates
@@ -95,13 +96,14 @@ export function useSupplyTable(
     };
   }, [searchText, supplyType, adapter]);
 
-  // --- Reset highlightIndex when search results change ---
   useEffect(() => {
     setHighlightIndex(-1);
+    setHasUsedArrowKeys(false);
   }, [searchResults]);
 
   const moveHighlight = useCallback(
     (direction: 1 | -1, displayItems: SupplySearchResult[], existingIds: Set<string>) => {
+      setHasUsedArrowKeys(true);
       setHighlightIndex((prev) => {
         if (direction === 1 && prev < 0) {
           // Find first addable item
@@ -275,5 +277,6 @@ export function useSupplyTable(
     highlightIndex,
     setHighlightIndex,
     moveHighlight,
+    hasUsedArrowKeys,
   };
 }

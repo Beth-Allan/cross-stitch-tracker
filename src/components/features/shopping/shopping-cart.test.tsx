@@ -381,4 +381,26 @@ describe("ShoppingCart", () => {
       expect(screen.getByLabelText("Remove Forest Sampler")).toBeInTheDocument();
     });
   });
+
+  describe("Shopping-for bar pill styling (UX-06)", () => {
+    it("pill elements have rounded-lg class (not rounded-full)", () => {
+      localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
+      const { container } = render(<ShoppingCart data={mockData} imageUrls={{}} />);
+      const pills = container.querySelectorAll('[class*="bg-selected"]');
+      const pill = Array.from(pills).find((el) => el.textContent?.includes("Forest Sampler"));
+      expect(pill).toBeTruthy();
+      expect(pill?.className).toContain("rounded-lg");
+      expect(pill?.className).not.toContain("rounded-full");
+    });
+
+    it("pill elements have border and border-selected-border classes", () => {
+      localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
+      const { container } = render(<ShoppingCart data={mockData} imageUrls={{}} />);
+      const pills = container.querySelectorAll('[class*="bg-selected"]');
+      const pill = Array.from(pills).find((el) => el.textContent?.includes("Forest Sampler"));
+      expect(pill).toBeTruthy();
+      expect(pill?.className).toContain("border");
+      expect(pill?.className).toContain("border-selected-border");
+    });
+  });
 });

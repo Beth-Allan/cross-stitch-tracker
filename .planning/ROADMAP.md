@@ -96,7 +96,7 @@ Full details: `milestones/v1.5-ROADMAP.md`
 - [x] **Phase 23: Test Coverage & Reliability** - Fill test gaps and fix silent failures and cache staleness (completed 2026-05-18)
 - [x] **Phase 24: Code Quality** - Type narrowing, constant deduplication, discriminated unions, and comment cleanup (completed 2026-05-19)
 - [x] **Phase 25: Shopping Cart Scaling** - Shopping cart handles 75+ projects with search, filtering, and status grouping (completed 2026-05-20)
-- [ ] **Phase 26: UX Polish** - ARIA compliance, visual consistency, and component UX improvements
+- [x] **Phase 26: UX Polish** - ARIA compliance, visual consistency, and component UX improvements (completed 2026-05-20)
 
 ## Phase Details
 
@@ -176,7 +176,11 @@ Plans:
   3. Focal point action bar does not obscure the bottom 25% of the cover image
   4. What's Next cards match gallery card styling, and kitting labels show appropriate text at 0% progress
   5. Supply table add row has a visible commit button, InlineCreateDialog labels are contextual per supply type, and EditableNumber shows feedback on rejected input
-**Plans**: TBD
+**Plans:** 3/3 plans complete
+Plans:
+- [x] 26-01-PLAN.md -- Supply table UX: keyboard-gated highlight, EditableNumber rejection flash, commit button, contextual dialog labels
+- [x] 26-02-PLAN.md -- ARIA + visual consistency: card row ARIA, shopping pills, thread insight ranks, What's Next gallery cards + kitting labels
+- [x] 26-03-PLAN.md -- Layout + data fixes: focal point editor split, cover image dynamic aspect ratio, BucketProject focal point, supplies flash fix, fabric matching
 **UI hint**: yes
 
 ## Progress
@@ -212,4 +216,4 @@ Phase 22 first (foundation). Phases 23, 24, 25, 26 depend only on Phase 22 and c
 | 23. Test Coverage & Reliability | v1.6 | 3/3 | Complete    | 2026-05-18 |
 | 24. Code Quality | v1.6 | 4/4 | Complete    | 2026-05-19 |
 | 25. Shopping Cart Scaling | v1.6 | 2/2 | Complete    | 2026-05-20 |
-| 26. UX Polish | v1.6 | 0/? | Not started | - |
+| 26. UX Polish | v1.6 | 3/3 | Complete    | 2026-05-20 |

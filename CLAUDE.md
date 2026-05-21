@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Milestone:** v1.6 Cleanup & Hardening — PLANNING
-**Last Updated:** 2026-05-18
-**Roadmap:** 7 milestones / 26 phases — v1.0-v1.5 shipped, v1.6 in progress (Phases 22-26)
+**Milestone:** v1.6 Cleanup & Hardening — COMPLETE
+**Last Updated:** 2026-05-20
+**Roadmap:** 7 milestones / 26 phases — v1.0-v1.6 shipped
 
 ### Done
 
@@ -56,10 +56,37 @@
   - Removed 25 comment convention violations (section dividers, JSX markers, WHAT-comments, D-03 reference)
   - Added 8 items to backlog (999.58-999.65)
 
+- **Phase 26 UI-SPEC approved** — 6/6 dimensions passed, 1 non-blocking FLAG (UX-07 tooltip recommendation)
+  - Typography: 2 weights (400, 600), 3 sizes (12, 14, 24px)
+  - Spacing: 8-point scale, pre-existing 5px noted as inherited
+  - Copywriting: 14 elements defined (kitting labels, dialog titles, aria-labels)
+  - All 14 CONTEXT.md decisions (D-01 through D-14) captured — zero user questions needed
+
+- **Phase 26 planned** — 3 plans in 1 wave (all parallel): supply table UX, ARIA + visual consistency, layout + data fixes
+  - Plan 01: keyboard-gated highlight, EditableNumber rejection flash, commit button, contextual dialog labels (UX-01, UX-03, UX-07, UX-08)
+  - Plan 02: card row ARIA, shopping pills, thread insight ranks, What's Next gallery cards + kitting labels (UX-02, UX-05, UX-06, UX-12, UX-14)
+  - Plan 03: focal point editor split, cover image dynamic aspect ratio, BucketProject focal point, supplies flash fix, fabric matching (UX-04, UX-09, UX-10, UX-11, UX-13)
+
+- **Phase 26 code review fixed** — 6/6 findings fixed (1 critical, 5 warnings), 2173 tests passing
+  - CR-01: Hardcoded `emerald-*` hover → `text-primary` semantic token in BucketProjectRow
+  - WR-01: `stone-*`/`emerald-*` bucket colors → semantic tokens, remaining documented as exception
+  - WR-02 + WR-05: Local CoverPlaceholder duplicate replaced with shared import
+  - WR-03: setTimeout cleanup refs added to both EditableNumber components
+  - WR-04: `defaultBrandId` prop added to InlineCreateDialog
+
+- **Phase 26 verified** — UAT complete: 11/14 passed, 0 issues, 3 blocked (R2 not configured on dev)
+- **v1.6 milestone transition** — Phase 26 marked complete, PROJECT.md evolved, STATE.md updated
+- **Codebase mapped** — 7 documents in `.planning/codebase/` (STACK, INTEGRATIONS, ARCHITECTURE, STRUCTURE, CONVENTIONS, TESTING, CONCERNS)
+- **Fix: `sharp` moved from devDependencies to dependencies** — runtime import was incorrectly listed as dev-only
+- **Backlog 999.67 added** — stats sections should populate from library data, not only with tracked sessions
+
+- **Phase 26 shipped** — PR #50 created, 6-agent review completed, findings fixed, 2176 tests passing
+  - Fixed: CR-01 keyboard focal point placement restored (Enter/Space → center), localStorage try/catch, comment convention violations, merged duplicate key handlers, simplified onClick wrapper
+  - Backlogged: 5 items (999.68-999.72) for hex constant extraction, useRejectionFlash hook, OptionalFocalPoint union, LocalStateAdapter type safety, SSR hydration tradeoff
+
 ### Next Up — RESUME HERE
 
-1. Merge PR #49 when CI passes
-2. `/gsd-discuss-phase 26` — discuss next phase (UX Polish)
+1. `/gsd-complete-milestone v1.6` — archive milestone and prepare for next
 
 ### Backlog
 
@@ -68,12 +95,12 @@
 - 999.0.10: Quick-add missing supplies from project detail page — inline creation without navigating away
 - 999.0.12: Collapsible projects in shopping list — collapsed as default state
 - 999.0.15: SearchToAdd side-by-side layout — desktop 2-column grid when active, mobile overlay fallback
-- 999.0.16: SearchToAdd highlight conflict — only show keyboard highlight after arrow key use
+- ~~999.0.16: SearchToAdd highlight conflict — only show keyboard highlight after arrow key use~~ — **Shipped in Phase 26**
 - 999.0.17: StorageLocation/StitchingApp multi-user hardening — @@unique([userId, name]), ownership validation on writes
 - ~~999.0.18: Test infrastructure cleanup for $transaction~~ — **Shipped in Phase 22**
 - 999.0.19: Refactor clickable card rows to avoid nested interactive elements (ARIA violation)
 - ~~**999.0.20: Supply action ownership rejection tests**~~ — **Shipped in Phase 22**
-- 999.0.21: EditableNumber invalid input feedback — visual indication when entry is rejected
+- ~~999.0.21: EditableNumber invalid input feedback — visual indication when entry is rejected~~ — **Shipped in Phase 26**
 - 999.0.22: Clean up planning doc references in code comments
 - 999.0.23: Narrow strandCount type to literal union (1-6)
 - 999.0.24: Add skein calculator edge case tests (fabricCount=0, resolveDefaultBrandId)
@@ -141,6 +168,13 @@
 - 999.63: Shopping cart test gap: project expand/collapse in ProjectAccordion untested — "not selected" message, supply details
 - 999.64: Shopping cart test gap: updateSupplyAcquired integration path untested — pending/error/toast flows mocked but never exercised
 - 999.65: Shopping cart test gap: QuantityControl inline edit on blur untested — mobile commit path
+- 999.66: Centralize status colors as CSS custom properties — raw Tailwind scales (`bg-amber-400 dark:bg-amber-500`, `bg-rose-500 dark:bg-rose-400`, etc.) are used for the 7-state status palette across gallery-card, bucket-project-row, whats-next-tab, and status-badge. Define `--status-kitting`, `--status-ffo`, etc. to single-source dark/light variants and reduce scattered `dark:` overrides
+- 999.67: Stats sections should populate from library data — thread colors, designer completion, stitched genres, etc. show nothing without tracked sessions. These should be available on a library basis (collection data), not only when the user has logged stitching sessions
+- 999.68: Extract `DEFAULT_SUPPLY_HEX` constant — `"#79796e"` appears in 7+ files (chart-merged-form, inline-create-dialog, local-state-adapter, supply-actions, supply.ts). Single-source to prevent drift.
+- 999.69: Extract `useRejectionFlash` hook — duplicated rejection flash pattern (state + 600ms timer + cleanup + classes) across both `charts/editable-number.tsx` and `supply-table/editable-number.tsx`
+- 999.70: OptionalFocalPoint discriminated union — current type allows `focalPointX: 42, focalPointY: null` invalid state across 7 dashboard types. Replace with `{x: number, y: number} | {x: null, y: null}`
+- 999.71: LocalStateAdapter.updateQuantity type safety — remove `as unknown as Record<string, unknown>` assertion, use constrained `field` parameter for direct indexing
+- 999.72: Supply catalog SSR hydration — `typeof window` in useState initializer causes hydration mismatch. Consider `useSyncExternalStore` with `getServerSnapshot` or document as intentional tradeoff vs. flash
 
 ### Blockers
 

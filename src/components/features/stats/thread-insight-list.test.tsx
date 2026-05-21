@@ -105,4 +105,23 @@ describe("ThreadInsightList", () => {
 
     expect(screen.getByText("Top Thread Colors")).toBeInTheDocument();
   });
+
+  describe("Rank numbers (UX-12)", () => {
+    it("first thread insight item shows rank number '1.'", () => {
+      render(<ThreadInsightList items={mockItems} />);
+      expect(screen.getByText("1.")).toBeInTheDocument();
+    });
+
+    it("third thread insight item shows rank number '3.'", () => {
+      render(<ThreadInsightList items={mockItems} />);
+      expect(screen.getByText("3.")).toBeInTheDocument();
+    });
+
+    it("rank number has text-muted-foreground and font-mono classes", () => {
+      render(<ThreadInsightList items={mockItems} />);
+      const rank = screen.getByText("1.");
+      expect(rank.className).toContain("text-muted-foreground");
+      expect(rank.className).toContain("font-mono");
+    });
+  });
 });
