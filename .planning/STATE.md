@@ -4,8 +4,8 @@ milestone: v1.7
 milestone_name: Fix & Polish
 status: executing
 stopped_at: Phase 27 discussed + UI-SPEC approved. Ready to plan Phase 27.
-last_updated: "2026-05-21T02:54:25.645Z"
-last_activity: 2026-05-21 -- Phase 27 planning complete
+last_updated: "2026-05-21T02:56:38.786Z"
+last_activity: 2026-05-21 -- Phase 27 execution started
 progress:
   total_phases: 4
   completed_phases: 0
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-20)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** v1.7 Fix & Polish — Phase 27 ready to plan
+**Current focus:** Phase 27 — chart-form-fixes
 
 ## Current Position
 
-Phase: 27 of 30 (Chart Form Fixes)
-Plan: 0 of TBD in current phase
-Status: Ready to execute
-Last activity: 2026-05-21 -- Phase 27 planning complete
+Phase: 27 (chart-form-fixes) — EXECUTING
+Plan: 1 of 2
+Status: Executing Phase 27
+Last activity: 2026-05-21 -- Phase 27 execution started
 
 Progress: [░░░░░░░░░░] 0%
 

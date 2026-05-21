@@ -106,7 +106,7 @@ Full details: `milestones/v1.6-ROADMAP.md`
 
 **Milestone Goal:** Fix user-reported bugs, resolve stats issues, and polish UI rough edges across the shipped app.
 
-- [ ] **Phase 27: Chart Form Fixes** - Fix designer quick-add, tab focus, thumbnails, stitch count calculation, and skeins display
+- [x] **Phase 27: Chart Form Fixes** - Fix designer quick-add, tab focus, thumbnails, stitch count calculation, and skeins display (completed 2026-05-21)
 - [ ] **Phase 28: Stats Corrections** - Fix records tab population, chart axis values, inline entity names, total stitches stat, and days-in-library formatting
 - [ ] **Phase 29: UI Polish** - Colored status/size pills, digital copy indicator, supply sort fix, skein calc controls on project supplies, file upload improvements
 - [ ] **Phase 30: Code Quality** - Resolve TypeScript test errors, fix silent failures, clean up R2 photo orphans, centralize status colors, extract shared constants and hooks
@@ -125,8 +125,8 @@ Full details: `milestones/v1.6-ROADMAP.md`
   5. Auto-calculated skeins value displays fully (not clipped or truncated) in the supply takeover skein calculator card
 **Plans**: 2 plans
 Plans:
-- [ ] 27-01-PLAN.md -- Designer inline creation, tab focus, and supply stitch total hint
-- [ ] 27-02-PLAN.md -- Designer detail thumbnails and Need column width
+- [x] 27-01-PLAN.md -- Designer inline creation, tab focus, and supply stitch total hint
+- [x] 27-02-PLAN.md -- Designer detail thumbnails and Need column width
 **UI hint**: yes
 
 ### Phase 28: Stats Corrections
@@ -201,7 +201,7 @@ Phases execute in numeric order: 27 → 28 → 29 → 30
 | 24. Code Quality | v1.6 | 4/4 | Complete | 2026-05-19 |
 | 25. Shopping Cart Scaling | v1.6 | 2/2 | Complete | 2026-05-20 |
 | 26. UX Polish | v1.6 | 3/3 | Complete | 2026-05-20 |
-| 27. Chart Form Fixes | v1.7 | 0/2 | Planned | - |
+| 27. Chart Form Fixes | v1.7 | 2/2 | Complete   | 2026-05-21 |
 | 28. Stats Corrections | v1.7 | 0/0 | Not started | - |
 | 29. UI Polish | v1.7 | 0/0 | Not started | - |
 | 30. Code Quality | v1.7 | 0/0 | Not started | - |
