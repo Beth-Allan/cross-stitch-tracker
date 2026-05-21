@@ -96,7 +96,6 @@ export function useSupplyTable(
     };
   }, [searchText, supplyType, adapter]);
 
-  // --- Reset highlightIndex and arrow key state when search results change ---
   useEffect(() => {
     setHighlightIndex(-1);
     setHasUsedArrowKeys(false);

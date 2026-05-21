@@ -80,10 +80,13 @@
 - **Fix: `sharp` moved from devDependencies to dependencies** — runtime import was incorrectly listed as dev-only
 - **Backlog 999.67 added** — stats sections should populate from library data, not only with tracked sessions
 
+- **Phase 26 shipped** — PR #50 created, 6-agent review completed, findings fixed, 2176 tests passing
+  - Fixed: CR-01 keyboard focal point placement restored (Enter/Space → center), localStorage try/catch, comment convention violations, merged duplicate key handlers, simplified onClick wrapper
+  - Backlogged: 5 items (999.68-999.72) for hex constant extraction, useRejectionFlash hook, OptionalFocalPoint union, LocalStateAdapter type safety, SSR hydration tradeoff
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-ship` — create PR for Phase 26
-2. `/gsd-complete-milestone v1.6` — archive milestone and prepare for next
+1. `/gsd-complete-milestone v1.6` — archive milestone and prepare for next
 
 ### Backlog
 
@@ -167,6 +170,11 @@
 - 999.65: Shopping cart test gap: QuantityControl inline edit on blur untested — mobile commit path
 - 999.66: Centralize status colors as CSS custom properties — raw Tailwind scales (`bg-amber-400 dark:bg-amber-500`, `bg-rose-500 dark:bg-rose-400`, etc.) are used for the 7-state status palette across gallery-card, bucket-project-row, whats-next-tab, and status-badge. Define `--status-kitting`, `--status-ffo`, etc. to single-source dark/light variants and reduce scattered `dark:` overrides
 - 999.67: Stats sections should populate from library data — thread colors, designer completion, stitched genres, etc. show nothing without tracked sessions. These should be available on a library basis (collection data), not only when the user has logged stitching sessions
+- 999.68: Extract `DEFAULT_SUPPLY_HEX` constant — `"#79796e"` appears in 7+ files (chart-merged-form, inline-create-dialog, local-state-adapter, supply-actions, supply.ts). Single-source to prevent drift.
+- 999.69: Extract `useRejectionFlash` hook — duplicated rejection flash pattern (state + 600ms timer + cleanup + classes) across both `charts/editable-number.tsx` and `supply-table/editable-number.tsx`
+- 999.70: OptionalFocalPoint discriminated union — current type allows `focalPointX: 42, focalPointY: null` invalid state across 7 dashboard types. Replace with `{x: number, y: number} | {x: null, y: null}`
+- 999.71: LocalStateAdapter.updateQuantity type safety — remove `as unknown as Record<string, unknown>` assertion, use constrained `field` parameter for direct indexing
+- 999.72: Supply catalog SSR hydration — `typeof window` in useState initializer causes hydration mismatch. Consider `useSyncExternalStore` with `getServerSnapshot` or document as intentional tradeoff vs. flash
 
 ### Blockers
 

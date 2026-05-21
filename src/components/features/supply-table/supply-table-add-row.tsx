@@ -99,18 +99,7 @@ export function SupplyTableAddRow({
     });
   }
 
-  function handleStitchesKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleCommit();
-    } else if (e.key === "Escape") {
-      e.preventDefault();
-      handleEscape();
-    }
-    // Tab is browser default -- advances to need field
-  }
-
-  function handleNeedKeyDown(e: React.KeyboardEvent) {
+  function handleFieldKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Enter") {
       e.preventDefault();
       handleCommit();
@@ -245,7 +234,7 @@ export function SupplyTableAddRow({
               min={0}
               value={stitchCount || ""}
               onChange={(e) => setStitchCount(Number(e.target.value) || 0)}
-              onKeyDown={handleStitchesKeyDown}
+              onKeyDown={handleFieldKeyDown}
               placeholder={supplyType === "BEAD" ? "Bead count" : "Stitches"}
               aria-label={supplyType === "BEAD" ? "Bead count" : "Stitch count for thread"}
               className={inputClassName}
@@ -272,7 +261,7 @@ export function SupplyTableAddRow({
                 min={1}
                 value={need}
                 onChange={(e) => setNeedManual(Number(e.target.value) || 1)}
-                onKeyDown={handleNeedKeyDown}
+                onKeyDown={handleFieldKeyDown}
                 className={inputClassName}
                 aria-label="Need"
               />
@@ -300,7 +289,7 @@ export function SupplyTableAddRow({
           {selectedItem && (
             <button
               type="button"
-              onClick={() => handleCommit()}
+              onClick={handleCommit}
               className="text-primary hover:bg-primary/10 rounded p-1 transition-colors"
               aria-label="Add supply to table"
             >

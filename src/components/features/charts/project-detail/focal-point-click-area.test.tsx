@@ -8,6 +8,7 @@ describe("FocalPointClickArea", () => {
     containerSize: { width: 400, height: 300 },
     onImageClick: vi.fn(),
     onKeyDown: vi.fn(),
+    onPlace: vi.fn(),
     containerRef: { current: null } as React.RefObject<HTMLDivElement | null>,
   };
 
@@ -56,5 +57,31 @@ describe("FocalPointClickArea", () => {
     );
     const marker = container.querySelector("[aria-hidden='true']");
     expect(marker).not.toBeInTheDocument();
+  });
+
+  it("calls onPlace when Enter is pressed for keyboard focal point placement", () => {
+    const onPlace = vi.fn();
+    render(<FocalPointClickArea {...defaultProps} onPlace={onPlace} />);
+    const clickArea = screen.getByRole("button", { name: /click to place focal point/i });
+    fireEvent.keyDown(clickArea, { key: "Enter" });
+    expect(onPlace).toHaveBeenCalledOnce();
+  });
+
+  it("calls onPlace when Space is pressed for keyboard focal point placement", () => {
+    const onPlace = vi.fn();
+    render(<FocalPointClickArea {...defaultProps} onPlace={onPlace} />);
+    const clickArea = screen.getByRole("button", { name: /click to place focal point/i });
+    fireEvent.keyDown(clickArea, { key: " " });
+    expect(onPlace).toHaveBeenCalledOnce();
+  });
+
+  it("delegates non-activation keys to onKeyDown without calling onPlace", () => {
+    const onKeyDown = vi.fn();
+    const onPlace = vi.fn();
+    render(<FocalPointClickArea {...defaultProps} onKeyDown={onKeyDown} onPlace={onPlace} />);
+    const clickArea = screen.getByRole("button", { name: /click to place focal point/i });
+    fireEvent.keyDown(clickArea, { key: "Escape" });
+    expect(onKeyDown).toHaveBeenCalled();
+    expect(onPlace).not.toHaveBeenCalled();
   });
 });

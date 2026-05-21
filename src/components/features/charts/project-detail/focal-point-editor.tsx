@@ -131,6 +131,7 @@ export function FocalPointEditor({ chartId, initialFocalPoint, imageUrl }: Focal
           containerSize={containerSize}
           onImageClick={handleImageClick}
           onKeyDown={handleKeyDown}
+          onPlace={() => setPendingPoint({ x: 0.5, y: 0.5 })}
           containerRef={containerRef}
         />
       )}

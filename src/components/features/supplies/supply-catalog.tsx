@@ -193,12 +193,16 @@ export function SupplyCatalog({
       modes.threads = initialView;
     }
     if (typeof window !== "undefined") {
-      for (const tab of TAB_CONFIG) {
-        if (tab.key === "threads" && initialView) continue;
-        const stored = localStorage.getItem(STORAGE_KEYS[tab.key]);
-        if (stored === "grid" || stored === "table") {
-          modes[tab.key] = stored;
+      try {
+        for (const tab of TAB_CONFIG) {
+          if (tab.key === "threads" && initialView) continue;
+          const stored = localStorage.getItem(STORAGE_KEYS[tab.key]);
+          if (stored === "grid" || stored === "table") {
+            modes[tab.key] = stored;
+          }
         }
+      } catch {
+        // localStorage unavailable (private browsing, CSP) — use defaults
       }
     }
     return modes;
@@ -230,7 +234,11 @@ export function SupplyCatalog({
   const setViewMode = useCallback(
     (tab: SupplyTab, mode: ViewMode) => {
       setViewModes((prev) => ({ ...prev, [tab]: mode }));
-      localStorage.setItem(STORAGE_KEYS[tab], mode);
+      try {
+        localStorage.setItem(STORAGE_KEYS[tab], mode);
+      } catch {
+        // localStorage unavailable — view mode still works for this session via state
+      }
       // Sync to URL for the active tab so refresh preserves it
       const params = new URLSearchParams(searchParams.toString());
       params.set("view", mode);

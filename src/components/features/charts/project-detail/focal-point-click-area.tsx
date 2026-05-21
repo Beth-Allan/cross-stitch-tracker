@@ -8,6 +8,7 @@ interface FocalPointClickAreaProps {
   containerSize: { width: number; height: number };
   onImageClick: (event: React.MouseEvent<HTMLDivElement>) => void;
   onKeyDown: (event: React.KeyboardEvent) => void;
+  onPlace: () => void;
   containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -21,6 +22,7 @@ export function FocalPointClickArea({
   containerSize,
   onImageClick,
   onKeyDown,
+  onPlace,
   containerRef,
 }: FocalPointClickAreaProps) {
   return (
@@ -29,15 +31,14 @@ export function FocalPointClickArea({
       className="absolute inset-0 z-10 cursor-crosshair"
       role="button"
       tabIndex={0}
-      aria-label="Click to place focal point"
+      aria-label="Click to place focal point, or press Enter to place at center"
       onClick={onImageClick}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          onKeyDown(e);
-        } else {
-          onKeyDown(e);
+          onPlace();
         }
+        onKeyDown(e);
       }}
     >
       {pendingPoint && containerSize.width > 0 && (

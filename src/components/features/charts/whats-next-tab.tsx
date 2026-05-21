@@ -7,8 +7,6 @@ import type { WhatsNextProject } from "@/types/session";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { CoverPlaceholder } from "@/components/features/gallery/cover-placeholder";
 
-// ─── Sort logic ─────────────────────────────────────────────────────────────
-
 type WhatsNextSort = "kitting" | "oldest" | "newest" | "largest" | "smallest";
 
 const SORT_OPTIONS: { value: WhatsNextSort; label: string }[] = [
@@ -45,8 +43,6 @@ function sortProjects(projects: WhatsNextProject[], sort: WhatsNextSort): WhatsN
   }
   return sorted;
 }
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 interface WhatsNextTabProps {
   projects: WhatsNextProject[];
@@ -91,7 +87,6 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
         </div>
       </div>
 
-      {/* Project cards — gallery-style vertical cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {sorted.map((project) => {
           const thumbnailUrl = project.coverThumbnailUrl
@@ -128,7 +123,6 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
                     <CoverPlaceholder status={project.status} />
                   )}
 
-                  {/* Star badge for wantToStartNext */}
                   {project.wantToStartNext && (
                     <div className="absolute top-3 left-3">
                       <Star
@@ -140,7 +134,6 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
                     </div>
                   )}
 
-                  {/* Status badge */}
                   <div className="absolute top-3 right-3">
                     <StatusBadge status={project.status} />
                   </div>
@@ -161,7 +154,6 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
                   {project.totalStitches.toLocaleString()} stitches
                 </p>
 
-                {/* Kitting progress bar */}
                 <div className="mt-1 flex items-center gap-2">
                   <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
                     <div
