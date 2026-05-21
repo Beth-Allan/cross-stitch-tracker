@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Cleanup & Hardening
 status: "Phase 26 shipped — PR #50"
-stopped_at: Phase 27 context gathered
-last_updated: "2026-05-21T02:08:07.926Z"
-last_activity: 2026-05-20
+stopped_at: Phase 27 UI-SPEC approved
+last_updated: "2026-05-21T02:20:46.783Z"
+last_activity: 2026-05-21
 progress:
   total_phases: 5
   completed_phases: 5
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-05-20)
 Phase: 26
 Plan: Not started
 Status: Phase 26 shipped — PR #50
-Last activity: 2026-05-20
+Last activity: 2026-05-21
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -78,7 +78,7 @@ None.
 
 ## Deferred Items
 
-Items acknowledged and deferred at milestone close on 2026-05-18:
+Items acknowledged and deferred at v1.6 milestone close on 2026-05-21:
 
 | Category | Item | Status |
 |----------|------|--------|
@@ -86,9 +86,13 @@ Items acknowledged and deferred at milestone close on 2026-05-18:
 | verification | Phase 19 (19-VERIFICATION.md) | human_needed |
 | verification | Phase 20 (20-VERIFICATION.md) | human_needed |
 | verification | Phase 21 (21-VERIFICATION.md) | human_needed |
+| verification | Phase 23 (23-VERIFICATION.md) | human_needed |
+| verification | Phase 25 (25-VERIFICATION.md) | human_needed |
+| uat | Phase 26 (26-UAT.md) | partial |
+| quick_tasks | 14 stale tasks from March-April 2026 | missing |
 
 ## Session Continuity
 
-Last session: 2026-05-21T02:08:07.921Z
-Stopped at: Phase 27 context gathered
-Resume file: .planning/phases/27-chart-form-fixes/27-CONTEXT.md
+Last session: 2026-05-21T02:14:38.118Z
+Stopped at: Phase 27 UI-SPEC approved
+Resume file: .planning/phases/27-chart-form-fixes/27-UI-SPEC.md
