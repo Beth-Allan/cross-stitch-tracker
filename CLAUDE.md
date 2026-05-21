@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Milestone:** v1.6 Cleanup & Hardening — EXECUTING
-**Last Updated:** 2026-05-19
-**Roadmap:** 7 milestones / 26 phases — v1.0-v1.5 shipped, v1.6 in progress (Phases 22-26)
+**Milestone:** v1.6 Cleanup & Hardening — COMPLETE
+**Last Updated:** 2026-05-20
+**Roadmap:** 7 milestones / 26 phases — v1.0-v1.6 shipped
 
 ### Done
 
@@ -74,15 +74,16 @@
   - WR-03: setTimeout cleanup refs added to both EditableNumber components
   - WR-04: `defaultBrandId` prop added to InlineCreateDialog
 
+- **Phase 26 verified** — UAT complete: 11/14 passed, 0 issues, 3 blocked (R2 not configured on dev)
+- **v1.6 milestone transition** — Phase 26 marked complete, PROJECT.md evolved, STATE.md updated
 - **Codebase mapped** — 7 documents in `.planning/codebase/` (STACK, INTEGRATIONS, ARCHITECTURE, STRUCTURE, CONVENTIONS, TESTING, CONCERNS)
 - **Fix: `sharp` moved from devDependencies to dependencies** — runtime import was incorrectly listed as dev-only
+- **Backlog 999.67 added** — stats sections should populate from library data, not only with tracked sessions
 
 ### Next Up — RESUME HERE
 
-1. Visual verification of Phase 26 UI changes (quality gates require browser check for UI phases)
-2. `/impeccable:audit` — phase-level visual audit before verification
-3. `/gsd-verify-work` — verify phase completion
-4. `/gsd-ship` — create PR for Phase 26
+1. `/gsd-ship` — create PR for Phase 26
+2. `/gsd-complete-milestone v1.6` — archive milestone and prepare for next
 
 ### Backlog
 
@@ -91,12 +92,12 @@
 - 999.0.10: Quick-add missing supplies from project detail page — inline creation without navigating away
 - 999.0.12: Collapsible projects in shopping list — collapsed as default state
 - 999.0.15: SearchToAdd side-by-side layout — desktop 2-column grid when active, mobile overlay fallback
-- 999.0.16: SearchToAdd highlight conflict — only show keyboard highlight after arrow key use
+- ~~999.0.16: SearchToAdd highlight conflict — only show keyboard highlight after arrow key use~~ — **Shipped in Phase 26**
 - 999.0.17: StorageLocation/StitchingApp multi-user hardening — @@unique([userId, name]), ownership validation on writes
 - ~~999.0.18: Test infrastructure cleanup for $transaction~~ — **Shipped in Phase 22**
 - 999.0.19: Refactor clickable card rows to avoid nested interactive elements (ARIA violation)
 - ~~**999.0.20: Supply action ownership rejection tests**~~ — **Shipped in Phase 22**
-- 999.0.21: EditableNumber invalid input feedback — visual indication when entry is rejected
+- ~~999.0.21: EditableNumber invalid input feedback — visual indication when entry is rejected~~ — **Shipped in Phase 26**
 - 999.0.22: Clean up planning doc references in code comments
 - 999.0.23: Narrow strandCount type to literal union (1-6)
 - 999.0.24: Add skein calculator edge case tests (fabricCount=0, resolveDefaultBrandId)
