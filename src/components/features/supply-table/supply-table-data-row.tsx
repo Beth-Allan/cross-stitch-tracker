@@ -36,7 +36,7 @@ export function SupplyTableDataRow({
 
   return (
     <tr className={`group ${isNew ? "animate-slide-in" : ""}`}>
-      {/* Column 1 - Colour (44%) */}
+      {/* Column 1 - Colour (41%) */}
       <td className="border-muted border-b px-3 py-[5px]">
         <div className="flex items-center gap-2">
           <ColorSwatch hexColor={row.hexColor} size="sm" />
@@ -74,7 +74,7 @@ export function SupplyTableDataRow({
         )}
       </td>
 
-      {/* Column 4 - Need (13%) */}
+      {/* Column 4 - Need (16%) */}
       <td className="border-muted border-b px-3 py-[5px] [font-variant-numeric:tabular-nums]">
         <div className="flex items-center gap-1">
           <EditableNumber
