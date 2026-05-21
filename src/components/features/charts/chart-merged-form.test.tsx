@@ -1120,6 +1120,90 @@ describe("ChartMergedForm", () => {
     });
   });
 
+  // --- Designer inline creation dialog tests (BUG-01) ---
+
+  describe("designer inline creation dialog", () => {
+    it("opens InlineDesignerDialog when Add New clicked in designer field", async () => {
+      const user = userEvent.setup();
+      render(<ChartMergedForm {...defaultFormProps} />);
+
+      // The designer SearchableSelect has an "Add New" button
+      const addNewButton = screen.getByText("Add New");
+      await user.click(addNewButton);
+
+      // After clicking, the InlineDesignerDialog should be open
+      // The dialog has a title "Add New Designer"
+      await waitFor(() => {
+        expect(screen.getByText("Add New Designer")).toBeInTheDocument();
+      });
+    });
+
+    it("pre-fills dialog with search term", async () => {
+      const user = userEvent.setup();
+      render(<ChartMergedForm {...defaultFormProps} />);
+
+      // Type a designer name in the command input
+      const input = screen.getByTestId("command-input");
+      await user.type(input, "Jane Doe");
+
+      // Click Add "Jane Doe"
+      const addButton = screen.getByText('Add "Jane Doe"');
+      await user.click(addButton);
+
+      // The dialog should open with "Jane Doe" pre-filled in the name input
+      await waitFor(() => {
+        expect(screen.getByText("Add New Designer")).toBeInTheDocument();
+      });
+      const designerNameInput = screen.getByLabelText(/^name$/i);
+      expect(designerNameInput).toHaveValue("Jane Doe");
+    });
+
+    it("auto-selects new designer after creation via dialog", async () => {
+      const { createDesigner: mockCreateDesignerFn } = await import(
+        "@/lib/actions/designer-actions"
+      );
+      const mockCreateDesigner = vi.mocked(mockCreateDesignerFn);
+      mockCreateDesigner.mockResolvedValue({
+        success: true as const,
+        designer: {
+          id: "new-d",
+          name: "Jane Doe",
+          website: null,
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+
+      const user = userEvent.setup();
+      render(<ChartMergedForm {...defaultFormProps} />);
+
+      // Open designer dialog
+      const addNewButton = screen.getByText("Add New");
+      await user.click(addNewButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("Add New Designer")).toBeInTheDocument();
+      });
+
+      // Type designer name and submit
+      const designerNameInput = screen.getByLabelText(/^name$/i);
+      await user.clear(designerNameInput);
+      await user.type(designerNameInput, "Jane Doe");
+      await user.click(screen.getByRole("button", { name: /add designer/i }));
+
+      // After creation, the designer field should show "Jane Doe"
+      await waitFor(() => {
+        expect(mockCreateDesigner).toHaveBeenCalledTimes(1);
+      });
+
+      // The designer should now be selected in the SearchableSelect
+      await waitFor(() => {
+        expect(screen.getByText("Jane Doe")).toBeInTheDocument();
+      });
+    });
+  });
+
   // --- Supply mode conditional rendering test (GAP 5) ---
 
   it("supply mode uses conditional rendering (no Activity wrapper for supply content)", async () => {
