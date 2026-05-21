@@ -42,11 +42,21 @@ export function SearchableSelect({
 
   const selectedLabel = options.find((o) => o.value === value)?.label;
 
+  const handleTriggerKeyDown = (e: React.KeyboardEvent) => {
+    // Forward printable characters to the search input by opening the popover
+    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      setOpen(true);
+      setSearch(e.key);
+    }
+  };
+
   return (
     <div className="flex items-center gap-1.5">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           role="combobox"
+          onKeyDown={handleTriggerKeyDown}
           aria-expanded={open}
           aria-haspopup="listbox"
           aria-controls={open ? listboxId : undefined}

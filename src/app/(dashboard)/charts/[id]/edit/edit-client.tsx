@@ -12,6 +12,7 @@ interface EditChartPageClientProps {
   storageLocations: StorageLocationWithStats[];
   stitchingApps: StitchingAppWithStats[];
   unassignedFabrics: (Fabric & { brand: FabricBrand })[];
+  supplyStitchTotal: number;
 }
 
 export function EditChartPageClient({
@@ -21,6 +22,7 @@ export function EditChartPageClient({
   storageLocations,
   stitchingApps,
   unassignedFabrics,
+  supplyStitchTotal,
 }: EditChartPageClientProps) {
   return (
     <ChartMergedForm
@@ -31,6 +33,7 @@ export function EditChartPageClient({
       storageLocations={storageLocations}
       stitchingApps={stitchingApps}
       unassignedFabrics={unassignedFabrics}
+      initialSupplyStitchTotal={supplyStitchTotal}
     />
   );
 }
