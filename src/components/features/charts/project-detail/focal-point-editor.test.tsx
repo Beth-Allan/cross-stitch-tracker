@@ -260,7 +260,9 @@ describe("FocalPointEditor", () => {
     it("renders FocalPointClickArea component in edit mode", () => {
       render(<FocalPointEditor {...defaultProps} />);
       fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
-      expect(screen.getByRole("button", { name: /click to place focal point/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /click to place focal point/i }),
+      ).toBeInTheDocument();
     });
 
     it("renders action bar with Save/Cancel/Reset buttons in edit mode", () => {

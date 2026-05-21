@@ -168,12 +168,7 @@ export function GalleryCard({ card }: GalleryCardProps) {
       }`}
     >
       {/* Cover image area — wrapped in supplementary Link for larger click target */}
-      <Link
-        href={`/charts/${card.chartId}`}
-        className="block"
-        tabIndex={-1}
-        aria-hidden="true"
-      >
+      <Link href={`/charts/${card.chartId}`} className="block" tabIndex={-1} aria-hidden="true">
         <div className="relative aspect-[4/3] overflow-hidden">
           {hasRealImage ? (
             <Image

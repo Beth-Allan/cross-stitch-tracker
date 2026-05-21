@@ -250,18 +250,14 @@ describe("DesignerList", () => {
     it("DesignerRow name Link has an id attribute containing the designer id", () => {
       render(<DesignerList designers={mockDesigners} />);
       const links = screen.getAllByText("Heaven and Earth Designs");
-      const linkWithId = links.find(
-        (l) => l.getAttribute("id") === "designer-name-d1",
-      );
+      const linkWithId = links.find((l) => l.getAttribute("id") === "designer-name-d1");
       expect(linkWithId).toBeTruthy();
     });
 
     it("DesignerCard outer div has role='group' and aria-labelledby", () => {
       render(<DesignerList designers={mockDesigners} />);
       const groups = screen.getAllByRole("group");
-      const d2Group = groups.find(
-        (g) => g.getAttribute("aria-labelledby") === "designer-name-d2",
-      );
+      const d2Group = groups.find((g) => g.getAttribute("aria-labelledby") === "designer-name-d2");
       expect(d2Group).toBeTruthy();
     });
   });

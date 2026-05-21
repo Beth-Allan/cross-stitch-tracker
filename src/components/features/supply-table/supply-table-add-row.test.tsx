@@ -622,10 +622,7 @@ describe("SupplyTableAddRow", () => {
       });
 
       // Now aria-activedescendant should be set
-      expect(searchInput).toHaveAttribute(
-        "aria-activedescendant",
-        "portal-autocomplete-item-t1",
-      );
+      expect(searchInput).toHaveAttribute("aria-activedescendant", "portal-autocomplete-item-t1");
     });
 
     it("hasUsedArrowKeys resets to false when searchResults change", async () => {
