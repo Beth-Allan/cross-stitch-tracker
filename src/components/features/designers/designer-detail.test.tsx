@@ -186,4 +186,69 @@ describe("DesignerDetail", () => {
     expect(chartLinks[1].textContent).toContain("Autumn Fairy");
     expect(chartLinks[2].textContent).toContain("Spring Garden");
   });
+
+  describe("chart thumbnails (BUG-04)", () => {
+    it("renders correct thumbnail for each chart", () => {
+      const designer = createDesignerDetail({
+        charts: [
+          createMockDesignerChart({
+            id: "c1",
+            name: "Forest",
+            coverThumbnailUrl: "https://r2.example.com/thumb-forest.webp",
+          }),
+          createMockDesignerChart({
+            id: "c2",
+            name: "Ocean",
+            coverThumbnailUrl: "https://r2.example.com/thumb-ocean.webp",
+          }),
+        ],
+        chartCount: 2,
+      });
+      render(<DesignerDetail designer={designer} />);
+
+      const forestImg = screen.getByAltText("Forest");
+      expect(forestImg).toHaveAttribute("src", "https://r2.example.com/thumb-forest.webp");
+
+      const oceanImg = screen.getByAltText("Ocean");
+      expect(oceanImg).toHaveAttribute("src", "https://r2.example.com/thumb-ocean.webp");
+    });
+
+    it("renders placeholder for chart without thumbnail", () => {
+      const designer = createDesignerDetail({
+        charts: [
+          createMockDesignerChart({
+            id: "c1",
+            name: "No Cover Chart",
+            coverThumbnailUrl: null,
+          }),
+        ],
+        chartCount: 1,
+      });
+      render(<DesignerDetail designer={designer} />);
+
+      expect(screen.queryByRole("img")).not.toBeInTheDocument();
+
+      // Placeholder div with muted background should be present
+      const placeholders = document.querySelectorAll(".bg-muted");
+      expect(placeholders.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("falls back to coverImageUrl when coverThumbnailUrl is null", () => {
+      const designer = createDesignerDetail({
+        charts: [
+          createMockDesignerChart({
+            id: "c1",
+            name: "Fallback Chart",
+            coverThumbnailUrl: null,
+            coverImageUrl: "https://r2.example.com/full-image.webp",
+          }),
+        ],
+        chartCount: 1,
+      });
+      render(<DesignerDetail designer={designer} />);
+
+      const img = screen.getByAltText("Fallback Chart");
+      expect(img).toHaveAttribute("src", "https://r2.example.com/full-image.webp");
+    });
+  });
 });

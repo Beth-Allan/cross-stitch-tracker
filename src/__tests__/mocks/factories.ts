@@ -58,6 +58,7 @@ export function createMockDesignerChart(overrides?: Partial<DesignerChart>): Des
     id: "chart-1",
     name: "Test Chart",
     coverThumbnailUrl: null,
+    coverImageUrl: null,
     focalPointX: null,
     focalPointY: null,
     stitchCount: 5000,

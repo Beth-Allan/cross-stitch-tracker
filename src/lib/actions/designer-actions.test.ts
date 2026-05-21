@@ -235,6 +235,82 @@ describe("designer-actions", () => {
 
       expect(result).toBeNull();
     });
+
+    it("returns coverThumbnailUrl for each chart", async () => {
+      const designerData = {
+        id: "d1",
+        name: "Test Designer",
+        website: null,
+        notes: null,
+        charts: [
+          {
+            id: "c1",
+            name: "Chart A",
+            coverThumbnailUrl: "https://r2.example.com/thumb-a.webp",
+            coverImageUrl: "https://r2.example.com/full-a.webp",
+            focalPointX: null,
+            focalPointY: null,
+            stitchCount: 5000,
+            stitchesWide: 100,
+            stitchesHigh: 50,
+            project: null,
+            genres: [],
+          },
+          {
+            id: "c2",
+            name: "Chart B",
+            coverThumbnailUrl: "https://r2.example.com/thumb-b.webp",
+            coverImageUrl: null,
+            focalPointX: null,
+            focalPointY: null,
+            stitchCount: 3000,
+            stitchesWide: 60,
+            stitchesHigh: 50,
+            project: null,
+            genres: [],
+          },
+        ],
+      };
+      mockPrisma.designer.findUnique.mockResolvedValueOnce(designerData);
+      const { getDesigner } = await import("./designer-actions");
+
+      const result = await getDesigner("d1");
+
+      expect(result).not.toBeNull();
+      expect(result!.charts[0].coverThumbnailUrl).toBe("https://r2.example.com/thumb-a.webp");
+      expect(result!.charts[1].coverThumbnailUrl).toBe("https://r2.example.com/thumb-b.webp");
+    });
+
+    it("returns coverImageUrl for each chart as fallback", async () => {
+      const designerData = {
+        id: "d1",
+        name: "Test Designer",
+        website: null,
+        notes: null,
+        charts: [
+          {
+            id: "c1",
+            name: "Chart With Full Only",
+            coverThumbnailUrl: null,
+            coverImageUrl: "https://r2.example.com/full-a.webp",
+            focalPointX: null,
+            focalPointY: null,
+            stitchCount: 5000,
+            stitchesWide: 100,
+            stitchesHigh: 50,
+            project: null,
+            genres: [],
+          },
+        ],
+      };
+      mockPrisma.designer.findUnique.mockResolvedValueOnce(designerData);
+      const { getDesigner } = await import("./designer-actions");
+
+      const result = await getDesigner("d1");
+
+      expect(result).not.toBeNull();
+      expect(result!.charts[0].coverImageUrl).toBe("https://r2.example.com/full-a.webp");
+    });
   });
 
   describe("getDesignersWithStats", () => {
