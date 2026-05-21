@@ -90,7 +90,7 @@ export function InlineCreateDialog({
       name: trimmedName,
       code: code.trim() || undefined,
       brandId: defaultBrandId,
-      hexColor: "#808080",
+      hexColor: "#79796e",
     });
   }
 

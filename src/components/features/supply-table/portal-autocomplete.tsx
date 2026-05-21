@@ -132,7 +132,7 @@ export function PortalAutocomplete({
                     {item.code}
                   </span>
                   {!disabled && item.name && (
-                    <span className="text-muted-foreground text-xs"> &mdash; {item.name}</span>
+                    <span className="text-muted-foreground text-xs"> · {item.name}</span>
                   )}
                 </span>
                 {disabled && <span className="text-muted-foreground shrink-0 text-xs">Added</span>}

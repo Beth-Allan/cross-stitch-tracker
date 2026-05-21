@@ -127,7 +127,7 @@ function GenreCard({
 }) {
   return (
     <div
-      className="border-border bg-card rounded-xl border p-4 shadow-sm"
+      className="border-border bg-card rounded-xl border p-4"
       role="group"
       aria-labelledby={`genre-name-${genre.id}`}
     >

@@ -84,7 +84,7 @@ describe("InlineCreateDialog", () => {
         name: "Custom Thread",
         code: "CT-001",
         brandId: "default",
-        hexColor: "#808080",
+        hexColor: "#79796e",
       });
     });
   });

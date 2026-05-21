@@ -347,20 +347,20 @@ function DesignerRow({
             <ExternalLink className="h-3 w-3" />
           </a>
         ) : (
-          <span className="text-muted-foreground text-sm">&mdash;</span>
+          <span className="text-muted-foreground/50 text-sm">None</span>
         )}
       </td>
       <td className="px-4 py-3">
         <span className="text-muted-foreground text-sm">{designer.chartCount}</span>
       </td>
       <td className="px-4 py-3">
-        <span className="text-muted-foreground text-sm">&mdash;</span>
+        <span className="text-muted-foreground/50 text-sm">None</span>
       </td>
       <td className="px-4 py-3">
-        <span className="text-muted-foreground text-sm">&mdash;</span>
+        <span className="text-muted-foreground/50 text-sm">None</span>
       </td>
       <td className="px-4 py-3">
-        <span className="text-muted-foreground text-sm">&mdash;</span>
+        <span className="text-muted-foreground/50 text-sm">None</span>
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center justify-end gap-1 transition-opacity group-focus-within:opacity-100 md:opacity-40 md:group-hover:opacity-100">
@@ -399,7 +399,7 @@ function DesignerCard({
 }) {
   return (
     <div
-      className="border-border bg-card rounded-xl border p-4 shadow-sm"
+      className="border-border bg-card rounded-xl border p-4"
       role="group"
       aria-labelledby={`designer-name-${designer.id}`}
     >

@@ -148,7 +148,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
       name: data.name,
       brandName: "Custom",
       brandId: data.brandId,
-      hexColor: data.hexColor ?? "#808080",
+      hexColor: data.hexColor ?? "#79796e",
     };
     this.getPool(type).push(result);
     return result;

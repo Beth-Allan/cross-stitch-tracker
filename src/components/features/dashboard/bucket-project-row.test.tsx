@@ -9,7 +9,7 @@ const baseBucketProject: BucketProject = {
   projectName: "Summer Garden",
   designerName: "Designer A",
   coverThumbnailUrl: null,
-  status: "WIP",
+  status: "IN_PROGRESS",
   progressPercent: 45,
   totalStitches: 10000,
   stitchesCompleted: 4500,
@@ -29,7 +29,13 @@ describe("BucketProjectRow", () => {
         focalPointY: 0.7,
       };
 
-      render(<BucketProjectRow project={project} imageUrl="https://example.com/cover.jpg" bucketId="25-50" />);
+      render(
+        <BucketProjectRow
+          project={project}
+          imageUrl="https://example.com/cover.jpg"
+          bucketId="25-50"
+        />,
+      );
 
       const img = screen.getByAltText("Summer Garden");
       expect(img.style.objectPosition).toBe("30% 70%");
@@ -43,7 +49,13 @@ describe("BucketProjectRow", () => {
         focalPointY: null,
       };
 
-      render(<BucketProjectRow project={project} imageUrl="https://example.com/cover.jpg" bucketId="25-50" />);
+      render(
+        <BucketProjectRow
+          project={project}
+          imageUrl="https://example.com/cover.jpg"
+          bucketId="25-50"
+        />,
+      );
 
       const img = screen.getByAltText("Summer Garden");
       expect(img.style.objectPosition).toBe("");

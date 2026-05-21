@@ -79,6 +79,7 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as WhatsNextSort)}
+            aria-label="Sort projects by"
             className="border-border bg-card text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm"
           >
             {SORT_OPTIONS.map((o) => (

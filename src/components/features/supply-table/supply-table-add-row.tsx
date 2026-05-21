@@ -247,6 +247,7 @@ export function SupplyTableAddRow({
               onChange={(e) => setStitchCount(Number(e.target.value) || 0)}
               onKeyDown={handleStitchesKeyDown}
               placeholder={supplyType === "BEAD" ? "Bead count" : "Stitches"}
+              aria-label={supplyType === "BEAD" ? "Bead count" : "Stitch count for thread"}
               className={inputClassName}
             />
           ) : selectedItem && supplyType === "SPECIALTY" ? (

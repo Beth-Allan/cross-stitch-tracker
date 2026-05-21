@@ -33,7 +33,7 @@ export function EditableNumber({
   const [optimistic, setOptimistic] = useState<number | null>(null);
   const [showRejection, setShowRejection] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const rejectionTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const rejectionTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     return () => {

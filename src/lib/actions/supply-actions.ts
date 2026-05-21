@@ -775,7 +775,7 @@ export async function createAndAddBead(formData: unknown) {
         data: {
           productCode: validated.code || "CUSTOM",
           colorName: validated.name,
-          hexColor: "#808080",
+          hexColor: "#79796e",
           brandId: resolvedBrandId,
           colorFamily: "NEUTRAL",
         },
@@ -827,7 +827,7 @@ export async function createAndAddSpecialty(formData: unknown) {
         data: {
           productCode: validated.code || "CUSTOM",
           colorName: validated.name,
-          hexColor: "#808080",
+          hexColor: "#79796e",
           brandId: resolvedBrandId,
         },
         include: { brand: true },

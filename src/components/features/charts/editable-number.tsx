@@ -27,7 +27,7 @@ export function EditableNumber({
   const [draft, setDraft] = useState(String(value));
   const [showRejection, setShowRejection] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const rejectionTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const rejectionTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     return () => {
