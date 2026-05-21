@@ -53,6 +53,119 @@ vi.mock("@/lib/actions/upload-actions", () => ({
   getPresignedUploadUrl: vi.fn(),
 }));
 
+// Mock InlineDesignerDialog to render a simplified version testable in jsdom
+vi.mock("./inline-designer-dialog", () => ({
+  InlineDesignerDialog: ({
+    open,
+    onOpenChange,
+    initialName,
+    onSubmit,
+  }: {
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    initialName?: string;
+    onSubmit: (name: string, website?: string) => Promise<void>;
+  }) =>
+    open ? (
+      <div data-testid="designer-dialog">
+        <h2>Add New Designer</h2>
+        <input
+          aria-label="Name"
+          defaultValue={initialName}
+          data-testid="designer-dialog-name"
+        />
+        <button
+          type="button"
+          onClick={async () => {
+            const input = document.querySelector(
+              '[data-testid="designer-dialog-name"]',
+            ) as HTMLInputElement;
+            await onSubmit(input?.value ?? initialName ?? "");
+            onOpenChange?.(false);
+          }}
+        >
+          Add Designer
+        </button>
+        <button type="button" onClick={() => onOpenChange?.(false)}>
+          Cancel
+        </button>
+      </div>
+    ) : null,
+}));
+
+// Mock Popover/Command for SearchableSelect to always show content inline
+vi.mock("@/components/ui/command", () => ({
+  Command: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="command">{children}</div>
+  ),
+  CommandInput: ({
+    value,
+    onValueChange,
+    placeholder,
+  }: {
+    value: string;
+    onValueChange: (v: string) => void;
+    placeholder?: string;
+  }) => (
+    <input
+      data-testid="command-input"
+      value={value}
+      onChange={(e) => onValueChange(e.target.value)}
+      placeholder={placeholder}
+    />
+  ),
+  CommandList: ({ children, ...props }: { children: React.ReactNode; id?: string; role?: string }) => (
+    <div {...props}>{children}</div>
+  ),
+  CommandEmpty: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  CommandGroup: ({
+    children,
+    forceMount: _fm,
+    ...props
+  }: {
+    children: React.ReactNode;
+    forceMount?: boolean;
+  }) => <div {...props}>{children}</div>,
+  CommandItem: ({
+    children,
+    onSelect,
+    forceMount: _fm,
+    ...props
+  }: {
+    children: React.ReactNode;
+    onSelect?: () => void;
+    forceMount?: boolean;
+    value?: string;
+    className?: string;
+  }) => (
+    <div role="option" aria-selected={false} onClick={onSelect} {...props}>
+      {children}
+    </div>
+  ),
+  CommandSeparator: () => <div data-testid="command-separator" />,
+}));
+
+vi.mock("@/components/ui/popover", () => ({
+  Popover: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PopoverTrigger: ({
+    children,
+    onKeyDown: _onKeyDown,
+    ...props
+  }: {
+    children: React.ReactNode;
+    disabled?: boolean;
+    className?: string;
+    onKeyDown?: (e: React.KeyboardEvent) => void;
+  }) => (
+    <button data-testid="popover-trigger" {...props}>
+      {children}
+    </button>
+  ),
+  PopoverContent: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="popover-content">{children}</div>
+  ),
+}));
+
 const mockDesigners = [createMockDesigner({ id: "d1", name: "Designer One" })];
 
 const mockGenres = [
@@ -1127,12 +1240,13 @@ describe("ChartMergedForm", () => {
       const user = userEvent.setup();
       render(<ChartMergedForm {...defaultFormProps} />);
 
-      // The designer SearchableSelect has an "Add New" button
-      const addNewButton = screen.getByText("Add New");
-      await user.click(addNewButton);
+      // With mocked Popover always showing, multiple "Add New" buttons exist
+      // The designer field is the first SearchableSelect in the form
+      const addNewButtons = screen.getAllByText("Add New");
+      // Designer is the first field with Add New
+      await user.click(addNewButtons[0]);
 
       // After clicking, the InlineDesignerDialog should be open
-      // The dialog has a title "Add New Designer"
       await waitFor(() => {
         expect(screen.getByText("Add New Designer")).toBeInTheDocument();
       });
@@ -1142,19 +1256,19 @@ describe("ChartMergedForm", () => {
       const user = userEvent.setup();
       render(<ChartMergedForm {...defaultFormProps} />);
 
-      // Type a designer name in the command input
-      const input = screen.getByTestId("command-input");
-      await user.type(input, "Jane Doe");
+      // Type a designer name in the first command input (designer field)
+      const inputs = screen.getAllByTestId("command-input");
+      await user.type(inputs[0], "Jane Doe");
 
-      // Click Add "Jane Doe"
-      const addButton = screen.getByText('Add "Jane Doe"');
+      // Click Add "Jane Doe" -- the first matching one is the designer field
+      const addButton = screen.getAllByText('Add "Jane Doe"')[0];
       await user.click(addButton);
 
-      // The dialog should open with "Jane Doe" pre-filled in the name input
+      // The dialog should open with "Jane Doe" pre-filled
       await waitFor(() => {
         expect(screen.getByText("Add New Designer")).toBeInTheDocument();
       });
-      const designerNameInput = screen.getByLabelText(/^name$/i);
+      const designerNameInput = screen.getByTestId("designer-dialog-name");
       expect(designerNameInput).toHaveValue("Jane Doe");
     });
 
@@ -1178,28 +1292,30 @@ describe("ChartMergedForm", () => {
       const user = userEvent.setup();
       render(<ChartMergedForm {...defaultFormProps} />);
 
-      // Open designer dialog
-      const addNewButton = screen.getByText("Add New");
-      await user.click(addNewButton);
+      // Open designer dialog via the first Add New button
+      const addNewButtons = screen.getAllByText("Add New");
+      await user.click(addNewButtons[0]);
 
       await waitFor(() => {
         expect(screen.getByText("Add New Designer")).toBeInTheDocument();
       });
 
-      // Type designer name and submit
-      const designerNameInput = screen.getByLabelText(/^name$/i);
+      // Type designer name in the dialog and submit
+      const designerNameInput = screen.getByTestId("designer-dialog-name");
       await user.clear(designerNameInput);
       await user.type(designerNameInput, "Jane Doe");
       await user.click(screen.getByRole("button", { name: /add designer/i }));
 
-      // After creation, the designer field should show "Jane Doe"
+      // After creation, the createDesigner action should have been called
       await waitFor(() => {
         expect(mockCreateDesigner).toHaveBeenCalledTimes(1);
       });
 
       // The designer should now be selected in the SearchableSelect
+      // (appears as both the trigger label and an option, so use getAllByText)
       await waitFor(() => {
-        expect(screen.getByText("Jane Doe")).toBeInTheDocument();
+        const matches = screen.getAllByText("Jane Doe");
+        expect(matches.length).toBeGreaterThanOrEqual(1);
       });
     });
   });

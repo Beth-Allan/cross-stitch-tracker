@@ -15,6 +15,7 @@ interface StitchCountFieldsProps {
   onWidthChange: (value: string) => void;
   onHeightChange: (value: string) => void;
   onCountChange: (value: string) => void;
+  supplyStitchTotal?: number;
   errors?: {
     stitchesWide?: string;
     stitchesHigh?: string;
@@ -29,6 +30,7 @@ export function StitchCountFields({
   onWidthChange,
   onHeightChange,
   onCountChange,
+  supplyStitchTotal,
   errors,
 }: StitchCountFieldsProps) {
   const { count: effectiveCount, approximate: isAutoCalculated } = getEffectiveStitchCount(
@@ -89,7 +91,11 @@ export function StitchCountFields({
           onChange={(e) => onCountChange(e.target.value)}
           placeholder={isAutoCalculated ? effectiveCount.toLocaleString() : "0"}
           aria-describedby={
-            [errors?.stitchCount && "stitch-count-error", "stitch-count-hint"]
+            [
+              errors?.stitchCount && "stitch-count-error",
+              "stitch-count-hint",
+              supplyStitchTotal != null && supplyStitchTotal > 0 && "stitch-count-supply-hint",
+            ]
               .filter(Boolean)
               .join(" ") || undefined
           }
@@ -107,6 +113,14 @@ export function StitchCountFields({
               </span>
             )}
           </div>
+        )}
+        {supplyStitchTotal != null && supplyStitchTotal > 0 && (
+          <p
+            id="stitch-count-supply-hint"
+            className="text-muted-foreground mt-1.5 text-xs"
+          >
+            Supply total: {supplyStitchTotal.toLocaleString()} stitches
+          </p>
         )}
       </FormField>
     </div>

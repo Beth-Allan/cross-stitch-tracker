@@ -33,6 +33,7 @@ import { ManageSuppliesLink } from "./manage-supplies-link";
 import { SummaryBar } from "./form-primitives/summary-bar";
 import { CalculatorCard } from "./form-primitives/calculator-card";
 import { InlineNameDialog } from "./inline-name-dialog";
+import { InlineDesignerDialog } from "./inline-designer-dialog";
 import {
   SupplyTable,
   CreationFlowAdapter,
@@ -127,6 +128,7 @@ interface ChartMergedFormProps {
   unassignedFabrics: (Fabric & { brand: FabricBrand })[];
   mode?: "create" | "edit";
   initialData?: ChartWithProject;
+  initialSupplyStitchTotal?: number;
 }
 
 export function ChartMergedForm({
@@ -137,6 +139,7 @@ export function ChartMergedForm({
   unassignedFabrics,
   mode: modeProp,
   initialData,
+  initialSupplyStitchTotal,
 }: ChartMergedFormProps) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
@@ -167,6 +170,8 @@ export function ChartMergedForm({
   const [storageDialogName, setStorageDialogName] = useState("");
   const [appDialogOpen, setAppDialogOpen] = useState(false);
   const [appDialogName, setAppDialogName] = useState("");
+  const [designerDialogOpen, setDesignerDialogOpen] = useState(false);
+  const [designerDialogName, setDesignerDialogName] = useState("");
 
   // Instantiate adapter once via ref
   if (!adapterRef.current) {
@@ -259,6 +264,11 @@ export function ChartMergedForm({
     if (!form.values.designerId) return null;
     return form.designers.find((d) => d.id === form.values.designerId)?.name ?? null;
   }, [form.values.designerId, form.designers]);
+
+  const supplyStitchTotal = useMemo(
+    () => supplyRows.reduce((sum, row) => sum + row.stitchCount, 0),
+    [supplyRows],
+  );
 
   const effectiveStitchCount = useMemo(() => {
     if (form.values.stitchCount > 0) return form.values.stitchCount;
@@ -468,8 +478,17 @@ export function ChartMergedForm({
                 options={designerOptions}
                 value={form.values.designerId}
                 onChange={(v) => form.setField("designerId", v)}
-                onAddNew={(searchTerm) => void form.handleAddDesigner(searchTerm)}
+                onAddNew={(searchTerm) => {
+                  setDesignerDialogName(searchTerm);
+                  setDesignerDialogOpen(true);
+                }}
                 placeholder="Select designer..."
+              />
+              <InlineDesignerDialog
+                open={designerDialogOpen}
+                onOpenChange={setDesignerDialogOpen}
+                initialName={designerDialogName}
+                onSubmit={form.handleAddDesigner}
               />
             </FormField>
 
@@ -506,6 +525,7 @@ export function ChartMergedForm({
               stitchesWide={form.values.stitchesWide}
               stitchesHigh={form.values.stitchesHigh}
               stitchCount={form.values.stitchCount}
+              supplyStitchTotal={isEdit ? (initialSupplyStitchTotal ?? 0) : supplyStitchTotal}
               onWidthChange={(v) => form.setField("stitchesWide", parseInt(v) || 0)}
               onHeightChange={(v) => form.setField("stitchesHigh", parseInt(v) || 0)}
               onCountChange={(v) => form.setField("stitchCount", parseInt(v) || 0)}
