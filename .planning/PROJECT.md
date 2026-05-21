@@ -26,8 +26,9 @@ A stitcher can manage their entire chart collection and supplies faster and more
 **Phase 23 complete:** Test Coverage & Reliability (2026-05-18)
 **Phase 24 complete:** Code Quality (2026-05-19) — precise literal unions, shared buildDateFilter, semantic tokens, 126 vacuous assertions eliminated
 **Phase 25 complete:** Shopping Cart Scaling (2026-05-20) — project search, status grouping, supply search, smart selection for 75+ project collections
+**Phase 26 complete:** UX Polish (2026-05-20) — keyboard-gated highlight, rejection flash, contextual labels, ARIA compliance, gallery cards on What's Next, focal point editor split, fabric matching fix
 
-The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project search, status grouping, supply search, and smart selection, image optimization, multi-file working copies per chart, click-to-set focal point control for cover images, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights, and celebration confetti on record-breaking sessions. 2,108 tests, ~125k LOC TypeScript. Stats page resilient to individual query failures via Promise.allSettled. Session file errors logged instead of silently swallowed, stats cache invalidated on chart status and supply mutations, over-100% stitch count warning.
+The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry and visible commit button, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project search, status grouping, supply search, smart selection, and squared pills, image optimization, multi-file working copies per chart, click-to-set focal point control for cover images with repositioned action bar, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights with rank numbers, and celebration confetti on record-breaking sessions. 2,173 tests, ~125k LOC TypeScript. Stats page resilient to individual query failures via Promise.allSettled. Session file errors logged instead of silently swallowed, stats cache invalidated on chart status and supply mutations, over-100% stitch count warning. ARIA-compliant card rows, three-state kitting labels, contextual supply creation dialogs.
 
 ## Requirements
 
@@ -213,6 +214,10 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 | Server Components for stats layout | StatsOverview, ActivityOverview, RecordsOverview are all Server Components; only charts and interactive controls are Client | ✓ Good |
 | canvas-confetti for celebrations | Lightweight (6KB), main-thread fallback avoids CSP worker-src issues | ✓ Good |
 | Record detection in createSession | detectBrokenRecords runs after session insert, returns broken records for client-side celebration | ✓ Good |
+| Keyboard-gated autocomplete highlight | hasUsedArrowKeys flag prevents highlight on type/mouse; only arrow keys activate selection | ✓ Good |
+| FocalPointEditor split into overlay + action bar | Action bar in document flow below image; full image clickable for focal point placement | ✓ Good |
+| Synchronous localStorage in useState initializer | Eliminates view mode flash on first load; SSR-safe with typeof window guard | ✓ Good |
+| aria-labelledby without role override on tr | Preserves implicit row role for table semantics; role="group" only on mobile card divs | ✓ Good |
 
 ## Evolution
 
@@ -231,4 +236,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-20 after Phase 25 completion*
+*Last updated: 2026-05-20 after Phase 26 completion (v1.6 milestone complete)*
