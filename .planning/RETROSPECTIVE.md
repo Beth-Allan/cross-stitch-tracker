@@ -1,5 +1,52 @@
 # Retrospective
 
+## Milestone: v1.6 — Cleanup & Hardening
+
+**Shipped:** 2026-05-20
+**Phases:** 5 | **Plans:** 15
+**Timeline:** 3 days (2026-05-18 → 2026-05-20)
+**Tests:** 2,176 | **PRs:** #41, #42, #44, #49, #50
+
+### What Was Built
+
+- Critical Fixes & Test Infrastructure: supply ownership validation, Promise.allSettled stats resilience, createMockPrisma() $transaction defaults, mockTransaction helper, 3 test file fixes
+- Test Coverage & Reliability: edge case tests (calendar year-rollover, record detection duplicates, completion estimate exclusions), R2 file error surfacing, deleteSession photo cleanup, over-100% progress guardrail, revalidateTag on chart status + supply mutations
+- Code Quality: 16 type improvements (literal unions for strandCount/MonthLabel/DayLabel, PersonalBestRecord discriminated union, shared buildDateFilter/Scope), SORT_FIELDS deduplication, 47 comment removals, semantic tokens, assertSuccess/assertFailure + 43-instance vacuous assertion sweep
+- Shopping Cart Scaling: project search, status grouping, supply-type search, smart selection with dual-mode counter, responsive with 75+ projects
+- UX Polish: 14 items — ARIA card rows, keyboard-gated highlight, EditableNumber rejection flash, visible commit button, contextual InlineCreateDialog labels, focal point editor split, cover image aspect ratio, BucketProject focal point, fabric matching fix, What's Next gallery cards + kitting labels
+
+### What Worked
+
+- **Highest quality milestone** — 44/44 requirements shipped, all checked off at close. Every phase had context, every plan had verification. Zero requirements dropped.
+- **Parallel phase execution** — Phases 23-26 all depended only on Phase 22, enabling any-order execution. Shopping cart and UX polish ran independently.
+- **Code review catching real bugs** — CR-01 in Phase 24 (CreationFlowAdapter data loss), CR-01 in Phase 26 (hardcoded hover color). Multi-agent review continues to find genuine issues.
+- **UI-SPEC for frontend phases** — Phase 25 and 26 both had UI-SPECs. Shopping cart scaling had design contracts for search, grouping, and selection before any code was written.
+- **Sketch findings skill** — Cross-stitch-tracker sketch findings auto-loaded during UI phases, carrying forward validated design decisions from earlier experiments.
+
+### What Was Inefficient
+
+- **SUMMARY.md one-liner quality (7th time)** — Auto-extracted accomplishments for MILESTONES.md were garbled again. Manual rewrite required. Root cause unchanged: SUMMARY frontmatter format doesn't match extractor.
+- **18 stale quick tasks still open** — Same 14 from v1.5 plus 4 more. Now acknowledged and deferred. Should have been mass-closed at v1.4.
+- **Verification gaps from v1.5 carried forward** — Phase 19, 20, 21 verification still "human_needed". Phase 23 and 25 added to the list. These pile up because visual verification requires a running app.
+
+### Patterns Established
+
+- **assertSuccess/assertFailure test helpers** — Guards that narrow server action return types before assertions. Eliminates vacuous `expect(result).toEqual(...)` patterns that pass on undefined.
+- **Literal union types for constrained domains** — strandCount (1-6), MonthLabel, DayLabel, BrokenRecordType. Catches invalid values at compile time.
+- **revalidateTag("stats") convention** — Every mutation that affects stats data (chart status, supply mutations, session CRUD) calls revalidateTag. Established pattern for cache consistency.
+- **Keyboard-gated highlight** — `hasUsedArrowKeys` flag in autocomplete/search components. Only shows keyboard selection highlight after arrow key use, not on type or mouse hover.
+- **StatusGroup collapsible pattern** — Projects grouped by status with collapse/expand, "Select all" per group, count badges. Reusable for any entity list that needs status grouping.
+
+### Key Lessons
+
+1. **Cleanup milestones are fast** — 5 phases in 3 days at ~5 plans/day. No new features means less design ambiguity and fewer integration surprises. Good cadence to alternate feature milestones with hardening.
+2. **Backlog accumulation is real** — 70+ items by v1.6 close. The 999.xx numbering system works for capture but makes prioritization hard. Consider periodic backlog triage.
+3. **Type precision pays off immediately** — Literal unions caught 2 bugs during consumer updates (Phase 24). The migration effort was ~2 hours; the prevented bugs would have been harder to diagnose.
+4. **Visual verification needs automation** — 5 phases with "human_needed" verification. Screenshot comparison or Playwright visual tests would reduce this pile.
+5. **Accept SUMMARY.md extraction as broken** — 7 milestones, same issue. Write MILESTONES.md entries manually and stop expecting the extractor to produce usable one-liners.
+
+---
+
 ## Milestone: v1.5 — Statistics & Records
 
 **Shipped:** 2026-05-18
