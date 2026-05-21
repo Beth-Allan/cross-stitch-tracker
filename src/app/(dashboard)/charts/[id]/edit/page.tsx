@@ -25,14 +25,15 @@ export default async function EditChartPage({ params }: { params: Promise<{ id: 
     ],
   );
 
-  // Sum per-colour stitch counts from project thread supplies for the hint
+  // Safe: getChart() above already verified userId ownership of this project.
+  // The projectId used here comes from that verified chart, not from user input.
   const supplyStitchTotal = chart.project
-    ? (
+    ? ((
         await prisma.projectThread.aggregate({
           where: { projectId: chart.project.id },
           _sum: { stitchCount: true },
         })
-      )._sum.stitchCount ?? 0
+      )._sum.stitchCount ?? 0)
     : 0;
 
   return (
