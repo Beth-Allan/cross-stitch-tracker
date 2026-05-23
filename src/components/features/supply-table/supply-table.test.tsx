@@ -433,6 +433,20 @@ describe("SupplyTable", () => {
     });
   });
 
+  describe("column widths (BUG-06)", () => {
+    it("Need column has 16% width", () => {
+      render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
+      const needHeader = screen.getByText("Need");
+      expect(needHeader.closest("th")).toHaveStyle({ width: "16%" });
+    });
+
+    it("Colour column has 41% width", () => {
+      render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
+      const colourHeader = screen.getByText("Colour");
+      expect(colourHeader.closest("th")).toHaveStyle({ width: "41%" });
+    });
+  });
+
   describe("calcParams wiring", () => {
     it("calls adapter.setCalcParams when adapter has that method", () => {
       const adapterWithCalc = {

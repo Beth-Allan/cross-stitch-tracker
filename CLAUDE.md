@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Milestone:** v1.6 Cleanup & Hardening — COMPLETE
-**Last Updated:** 2026-05-20
-**Roadmap:** 7 milestones / 26 phases — v1.0-v1.6 shipped
+**Milestone:** v1.7 Fix & Polish — IN PROGRESS
+**Last Updated:** 2026-05-21
+**Roadmap:** 8 milestones / 30 phases — v1.0-v1.6 shipped
 
 ### Done
 
@@ -84,9 +84,29 @@
   - Fixed: CR-01 keyboard focal point placement restored (Enter/Space → center), localStorage try/catch, comment convention violations, merged duplicate key handlers, simplified onClick wrapper
   - Backlogged: 5 items (999.68-999.72) for hex constant extraction, useRejectionFlash hook, OptionalFocalPoint union, LocalStateAdapter type safety, SSR hydration tradeoff
 
+- **v1.7 milestone restored** — ROADMAP.md, REQUIREMENTS.md, STATE.md, PROJECT.md recovered from git (clobbered by v1.6 archive commit)
+
+- **Phase 27 planned** — 2 plans in 1 wave (all parallel): designer field fixes + stitch hint, display fixes
+  - Plan 01: designer inline creation dialog wiring (BUG-01), tab-to-type focus (BUG-02), supply stitch total hint (BUG-05)
+  - Plan 02: designer detail thumbnails (BUG-04), Need column width for skeins display (BUG-06)
+
+- **Phase 27 code review fixed** — 4/4 findings fixed (1 critical, 3 warnings), 2198 tests passing
+  - CR-01: Supply table column widths aligned (41%/16%) across header + body rows
+  - WR-01: `useId()` for unique listbox IDs per SearchableSelect instance
+  - WR-02: Safety comment on raw prisma query (upstream ownership check)
+  - WR-03: Space key excluded from type-to-search character forwarding + test added
+
+- **Phase 27 verified** — UAT complete: 4/5 passed, 0 issues, 1 blocked (R2 not configured on dev)
+- **Phase 27 marked complete** — STATE.md transitioned to Phase 28, backlog items 999.73-999.74 added
+
+- **Phase 27 shipped** — PR #52 created, 6-agent review completed, findings fixed, 2198 tests passing
+  - Fixed: CR-01 unhandled Prisma aggregate try-catch, WR-01 extract thumbnailSrc variable
+  - Backlogged: 999.75 InlineDesignerDialog controlled-only simplification
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-complete-milestone v1.6` — archive milestone and prepare for next
+1. Merge PR #52
+2. `/gsd-discuss-phase 28` — Start Stats Corrections phase
 
 ### Backlog
 
@@ -175,6 +195,9 @@
 - 999.70: OptionalFocalPoint discriminated union — current type allows `focalPointX: 42, focalPointY: null` invalid state across 7 dashboard types. Replace with `{x: number, y: number} | {x: null, y: null}`
 - 999.71: LocalStateAdapter.updateQuantity type safety — remove `as unknown as Record<string, unknown>` assertion, use constrained `field` parameter for direct indexing
 - 999.72: Supply catalog SSR hydration — `typeof window` in useState initializer causes hydration mismatch. Consider `useSyncExternalStore` with `getServerSnapshot` or document as intentional tradeoff vs. flash
+- 999.73: Supply stitch total hint discoverability — hint only visible in Details mode, not while viewing supplies. Show supply total in SummaryBar or supply mode footer so users know to check/update stitch count
+- 999.74: Chart form gap at top of page — white space above breadcrumb/SummaryBar in supply mode. Not a Phase 27 regression (Activity component predates it). Investigate layout/padding source
+- 999.75: InlineDesignerDialog controlled-only simplification — always used in controlled mode, remove uncontrolled path (trigger, uncontrolledOpen, isControlled branching). Also replace useState ref hack with useRef
 
 ### Blockers
 

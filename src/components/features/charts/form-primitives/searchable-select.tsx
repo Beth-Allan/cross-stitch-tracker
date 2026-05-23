@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { ChevronDown, Plus, X } from "lucide-react";
 import {
   Command,
@@ -38,15 +38,26 @@ export function SearchableSelect({
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const listboxId = "searchable-select-listbox";
+  const instanceId = useId();
+  const listboxId = `searchable-select-listbox-${instanceId}`;
 
   const selectedLabel = options.find((o) => o.value === value)?.label;
+
+  const handleTriggerKeyDown = (e: React.KeyboardEvent) => {
+    // Forward printable characters to the search input by opening the popover
+    if (e.key.length === 1 && e.key !== " " && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      setOpen(true);
+      setSearch(e.key);
+    }
+  };
 
   return (
     <div className="flex items-center gap-1.5">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           role="combobox"
+          onKeyDown={handleTriggerKeyDown}
           aria-expanded={open}
           aria-haspopup="listbox"
           aria-controls={open ? listboxId : undefined}

@@ -224,6 +224,88 @@ describe("SearchableSelect", () => {
     });
   });
 
+  describe("tab focus and type-to-search", () => {
+    it("sets search value on printable keydown on trigger", async () => {
+      render(
+        <SearchableSelect
+          options={defaultOptions}
+          value={null}
+          onChange={mockOnChange}
+          onAddNew={mockOnAddNew}
+        />,
+      );
+
+      const trigger = screen.getByTestId("popover-trigger");
+      // Simulate typing a printable character while trigger has focus
+      trigger.focus();
+
+      // Fire keydown with a printable character
+      const event = new KeyboardEvent("keydown", {
+        key: "a",
+        bubbles: true,
+        cancelable: true,
+      });
+      trigger.dispatchEvent(event);
+
+      // The search state should update with "a" and the popover should open
+      // In our mocked environment, the command-input reflects the search state
+      await waitFor(() => {
+        expect((screen.getByTestId("command-input") as HTMLInputElement).value).toBe("a");
+      });
+    });
+
+    it("does not forward Space key as a typed character", () => {
+      render(
+        <SearchableSelect
+          options={defaultOptions}
+          value={null}
+          onChange={mockOnChange}
+          onAddNew={mockOnAddNew}
+        />,
+      );
+
+      const trigger = screen.getByTestId("popover-trigger");
+      trigger.focus();
+
+      const event = new KeyboardEvent("keydown", {
+        key: " ",
+        bubbles: true,
+        cancelable: true,
+      });
+      trigger.dispatchEvent(event);
+
+      // Space should toggle dropdown, not set search to " "
+      expect((screen.getByTestId("command-input") as HTMLInputElement).value).toBe("");
+    });
+
+    it("does not open on non-printable keys", () => {
+      render(
+        <SearchableSelect
+          options={defaultOptions}
+          value={null}
+          onChange={mockOnChange}
+          onAddNew={mockOnAddNew}
+        />,
+      );
+
+      const trigger = screen.getByTestId("popover-trigger");
+      trigger.focus();
+
+      // Fire keydown with non-printable keys
+      for (const key of ["Tab", "Escape", "Shift"]) {
+        const event = new KeyboardEvent("keydown", {
+          key,
+          bubbles: true,
+          cancelable: true,
+        });
+        trigger.dispatchEvent(event);
+      }
+
+      // The search input should still be empty
+      expect((screen.getByTestId("command-input") as HTMLInputElement).value).toBe("");
+    });
+  });
+
   describe("Clear button", () => {
     it("shows clear button when a value is selected", () => {
       render(<SearchableSelect options={defaultOptions} value="opt-1" onChange={mockOnChange} />);

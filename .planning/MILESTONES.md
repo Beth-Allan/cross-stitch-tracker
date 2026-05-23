@@ -1,5 +1,24 @@
 # Milestones
 
+## v1.6 Cleanup & Hardening (Shipped: 2026-05-20)
+
+**Delivered:** Comprehensive hardening pass — security gaps closed, test infrastructure modernized, 16 type quality improvements, shopping cart scaled to 75+ projects, and 14 UX polish items addressing ARIA compliance, visual consistency, and component affordances.
+
+**Stats:** 5 phases, 15 plans | 168 commits | 2,176 tests | 3 days (2026-05-18 → 2026-05-20)
+
+**Key accomplishments:**
+
+1. **Critical Fixes & Test Infrastructure** — Supply ownership validation, Promise.allSettled stats resilience, createMockPrisma() with $transaction defaults, mockTransaction() helper, 3 test files fixed
+2. **Test Coverage & Reliability** — Edge case tests (calendar year-rollover, duplicate record detection, completion estimate exclusions), R2 file error surfacing, deleteSession photo cleanup, over-100% progress guardrail, revalidateTag on chart status + supply mutations
+3. **Code Quality** — Literal unions (strandCount, MonthLabel, DayLabel), PersonalBestRecord discriminated union, shared buildDateFilter/Scope, SORT_FIELDS deduplication, 47 WHAT-comments + JSX markers removed, semantic tokens in log-session-modal, assertSuccess/assertFailure helpers, vacuous assertion sweep (43 instances)
+4. **Shopping Cart Scaling** — Project search, status grouping (Kitting/Stitching/Unstarted), supply-type search, smart selection with dual-mode counter, responsive with 75+ projects
+5. **UX Polish** — ARIA card rows, keyboard-gated SearchToAdd highlight, EditableNumber rejection flash, visible commit button, contextual InlineCreateDialog labels, focal point editor split, cover image aspect ratio, BucketProject focal point, fabric matching fix, What's Next gallery cards + kitting labels
+
+**Known deferred items at close:** 18 (see STATE.md Deferred Items)
+**PRs:** #41 (Phase 22), #42 (Phase 23), #44 (Phase 24), #49 (Phase 25), #50 (Phase 26)
+
+---
+
 ## v1.5 Statistics & Records (Shipped: 2026-05-18)
 
 **Delivered:** A comprehensive statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records board, celebration confetti, and supply/designer/genre insights — making every stitch feel measured and rewarding.

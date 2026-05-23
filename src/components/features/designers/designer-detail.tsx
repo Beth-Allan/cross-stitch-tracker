@@ -292,17 +292,18 @@ function ChartRow({ chart }: { chart: DesignerChart }) {
       ? Math.round((chart.stitchesCompleted / effectiveCount) * 100)
       : null;
 
+  const thumbnailSrc = chart.coverThumbnailUrl ?? chart.coverImageUrl;
+
   return (
     <Link
       href={`/charts/${chart.id}`}
       className="border-border hover:bg-muted/50 flex items-center gap-3 rounded-lg border p-3 transition-colors"
     >
-      {/* Thumbnail */}
-      {chart.coverThumbnailUrl ? (
+      {thumbnailSrc ? (
         <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={chart.coverThumbnailUrl}
+            src={thumbnailSrc}
             alt={chart.name}
             className="h-full w-full object-cover"
             style={getObjectPositionStyle(chart.focalPointX, chart.focalPointY)}

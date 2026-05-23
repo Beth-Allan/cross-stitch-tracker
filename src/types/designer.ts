@@ -13,6 +13,7 @@ export type DesignerChart = OptionalFocalPoint & {
   id: string;
   name: string;
   coverThumbnailUrl: string | null;
+  coverImageUrl: string | null;
   stitchCount: number;
   stitchesWide: number;
   stitchesHigh: number;

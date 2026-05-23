@@ -158,8 +158,8 @@ export function SupplyTableAddRow({
         data-testid="supply-table-add-row"
         className="bg-primary/[0.03] border-primary/20 border-b-2"
       >
-        {/* Cell 1: Type toggle + Search/Selected item (44%) */}
-        <td className="px-2 py-1.5" style={{ width: "44%" }}>
+        {/* Cell 1: Type toggle + Search/Selected item (41%) */}
+        <td className="px-2 py-1.5" style={{ width: "41%" }}>
           {selectedItem ? (
             <div className="flex items-center gap-2">
               <ColorSwatch hexColor={selectedItem.hexColor} size="sm" />
@@ -251,8 +251,8 @@ export function SupplyTableAddRow({
           ) : null}
         </td>
 
-        {/* Cell 4: Need (13%) */}
-        <td className="px-2 py-1.5" style={{ width: "13%" }}>
+        {/* Cell 4: Need (16%) */}
+        <td className="px-2 py-1.5" style={{ width: "16%" }}>
           {selectedItem ? (
             <div className="flex items-center gap-1">
               <input
