@@ -96,9 +96,13 @@
   - WR-02: Safety comment on raw prisma query (upstream ownership check)
   - WR-03: Space key excluded from type-to-search character forwarding + test added
 
+- **Phase 27 verified** — UAT complete: 4/5 passed, 0 issues, 1 blocked (R2 not configured on dev)
+- **Phase 27 marked complete** — STATE.md transitioned to Phase 28, backlog items 999.73-999.74 added
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-verify-work` — Verify Phase 27 completion
+1. `/gsd-ship` — Create PR for Phase 27 and run multi-agent review
+2. `/gsd-discuss-phase 28` — Start Stats Corrections phase
 
 ### Backlog
 
