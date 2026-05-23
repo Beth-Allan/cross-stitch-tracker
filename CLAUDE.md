@@ -99,9 +99,13 @@
 - **Phase 27 verified** — UAT complete: 4/5 passed, 0 issues, 1 blocked (R2 not configured on dev)
 - **Phase 27 marked complete** — STATE.md transitioned to Phase 28, backlog items 999.73-999.74 added
 
+- **Phase 27 shipped** — PR #52 created, 6-agent review completed, findings fixed, 2198 tests passing
+  - Fixed: CR-01 unhandled Prisma aggregate try-catch, WR-01 extract thumbnailSrc variable
+  - Backlogged: 999.75 InlineDesignerDialog controlled-only simplification
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-ship` — Create PR for Phase 27 and run multi-agent review
+1. Merge PR #52
 2. `/gsd-discuss-phase 28` — Start Stats Corrections phase
 
 ### Backlog
@@ -193,6 +197,7 @@
 - 999.72: Supply catalog SSR hydration — `typeof window` in useState initializer causes hydration mismatch. Consider `useSyncExternalStore` with `getServerSnapshot` or document as intentional tradeoff vs. flash
 - 999.73: Supply stitch total hint discoverability — hint only visible in Details mode, not while viewing supplies. Show supply total in SummaryBar or supply mode footer so users know to check/update stitch count
 - 999.74: Chart form gap at top of page — white space above breadcrumb/SummaryBar in supply mode. Not a Phase 27 regression (Activity component predates it). Investigate layout/padding source
+- 999.75: InlineDesignerDialog controlled-only simplification — always used in controlled mode, remove uncontrolled path (trigger, uncontrolledOpen, isControlled branching). Also replace useState ref hack with useRef
 
 ### Blockers
 
