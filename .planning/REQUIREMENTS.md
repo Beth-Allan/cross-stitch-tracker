@@ -9,12 +9,12 @@ Requirements for v1.7 Fix & Polish. Each maps to roadmap phases.
 
 ### Bug Fixes
 
-- [ ] **BUG-01**: User can quick-add a designer from the chart form
-- [ ] **BUG-02**: User can tab into the Designer field on /charts/new and immediately type to search
+- [x] **BUG-01**: User can quick-add a designer from the chart form
+- [x] **BUG-02**: User can tab into the Designer field on /charts/new and immediately type to search
 - [ ] **BUG-03**: User can sort supplies by Added order and A-Z on project detail supplies tab
-- [ ] **BUG-04**: User sees correct chart thumbnails on designer detail pages (/designers/{id})
-- [ ] **BUG-05**: User sees stitch count auto-calculated from per-colour supply stitch counts
-- [ ] **BUG-06**: User sees full auto-calculated skeins value (not truncated) when adding supplies in create chart
+- [x] **BUG-04**: User sees correct chart thumbnails on designer detail pages (/designers/{id})
+- [x] **BUG-05**: User sees stitch count auto-calculated from per-colour supply stitch counts
+- [x] **BUG-06**: User sees full auto-calculated skeins value (not truncated) when adding supplies in create chart
 
 ### Stats Fixes
 
@@ -72,12 +72,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BUG-01 | Phase 27 | Pending |
-| BUG-02 | Phase 27 | Pending |
+| BUG-01 | Phase 27 | Complete |
+| BUG-02 | Phase 27 | Complete |
 | BUG-03 | Phase 29 | Pending |
-| BUG-04 | Phase 27 | Pending |
-| BUG-05 | Phase 27 | Pending |
-| BUG-06 | Phase 27 | Pending |
+| BUG-04 | Phase 27 | Complete |
+| BUG-05 | Phase 27 | Complete |
+| BUG-06 | Phase 27 | Complete |
 | STAT-01 | Phase 28 | Pending |
 | STAT-02 | Phase 28 | Pending |
 | STAT-03 | Phase 28 | Pending |
