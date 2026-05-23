@@ -115,10 +115,7 @@ export function StitchCountFields({
           </div>
         )}
         {supplyStitchTotal != null && supplyStitchTotal > 0 && (
-          <p
-            id="stitch-count-supply-hint"
-            className="text-muted-foreground mt-1.5 text-xs"
-          >
+          <p id="stitch-count-supply-hint" className="text-muted-foreground mt-1.5 text-xs">
             Supply total: {supplyStitchTotal.toLocaleString()} stitches
           </p>
         )}

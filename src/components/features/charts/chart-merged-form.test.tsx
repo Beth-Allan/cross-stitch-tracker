@@ -69,11 +69,7 @@ vi.mock("./inline-designer-dialog", () => ({
     open ? (
       <div data-testid="designer-dialog">
         <h2>Add New Designer</h2>
-        <input
-          aria-label="Name"
-          defaultValue={initialName}
-          data-testid="designer-dialog-name"
-        />
+        <input aria-label="Name" defaultValue={initialName} data-testid="designer-dialog-name" />
         <button
           type="button"
           onClick={async () => {
@@ -114,9 +110,14 @@ vi.mock("@/components/ui/command", () => ({
       placeholder={placeholder}
     />
   ),
-  CommandList: ({ children, ...props }: { children: React.ReactNode; id?: string; role?: string }) => (
-    <div {...props}>{children}</div>
-  ),
+  CommandList: ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    id?: string;
+    role?: string;
+  }) => <div {...props}>{children}</div>,
   CommandEmpty: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   CommandGroup: ({
     children,
@@ -1273,9 +1274,8 @@ describe("ChartMergedForm", () => {
     });
 
     it("auto-selects new designer after creation via dialog", async () => {
-      const { createDesigner: mockCreateDesignerFn } = await import(
-        "@/lib/actions/designer-actions"
-      );
+      const { createDesigner: mockCreateDesignerFn } =
+        await import("@/lib/actions/designer-actions");
       const mockCreateDesigner = vi.mocked(mockCreateDesignerFn);
       mockCreateDesigner.mockResolvedValue({
         success: true as const,

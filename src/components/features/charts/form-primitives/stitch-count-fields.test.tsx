@@ -54,9 +54,7 @@ describe("StitchCountFields", () => {
     });
 
     it("hint element has correct id for aria-describedby", () => {
-      const { container } = render(
-        <StitchCountFields {...defaultProps} supplyStitchTotal={500} />,
-      );
+      const { container } = render(<StitchCountFields {...defaultProps} supplyStitchTotal={500} />);
 
       const hintEl = container.querySelector("#stitch-count-supply-hint");
       expect(hintEl).toBeTruthy();
