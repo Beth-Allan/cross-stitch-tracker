@@ -107,7 +107,7 @@ Full details: `milestones/v1.6-ROADMAP.md`
 **Milestone Goal:** Fix user-reported bugs, resolve stats issues, and polish UI rough edges across the shipped app.
 
 - [x] **Phase 27: Chart Form Fixes** - Fix designer quick-add, tab focus, thumbnails, stitch count calculation, and skeins display (completed 2026-05-21)
-- [ ] **Phase 28: Stats Corrections** - Fix records tab population, chart axis values, inline entity names, total stitches stat, and days-in-library formatting
+- [x] **Phase 28: Stats Corrections** - Fix records tab population, chart axis values, inline entity names, total stitches stat, and days-in-library formatting (completed 2026-05-24)
 - [ ] **Phase 29: UI Polish** - Colored status/size pills, digital copy indicator, supply sort fix, skein calc controls on project supplies, file upload improvements
 - [ ] **Phase 30: Code Quality** - Resolve TypeScript test errors, fix silent failures, clean up R2 photo orphans, centralize status colors, extract shared constants and hooks
 
@@ -155,7 +155,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 28-02-PLAN.md -- Component restructuring: StatusFilterPills, Overview/Records tab rewiring
+- [x] 28-02-PLAN.md -- Component restructuring: StatusFilterPills, Overview/Records tab rewiring
 
 **UI hint**: yes
 
@@ -225,6 +225,6 @@ Phases execute in numeric order: 27 → 28 → 29 → 30
 | 25. Shopping Cart Scaling | v1.6 | 2/2 | Complete | 2026-05-20 |
 | 26. UX Polish | v1.6 | 3/3 | Complete | 2026-05-20 |
 | 27. Chart Form Fixes | v1.7 | 2/2 | Complete    | 2026-05-23 |
-| 28. Stats Corrections | v1.7 | 2/3 | In Progress|  |
+| 28. Stats Corrections | v1.7 | 3/3 | Complete   | 2026-05-24 |
 | 29. UI Polish | v1.7 | 0/0 | Not started | - |
 | 30. Code Quality | v1.7 | 0/0 | Not started | - |
