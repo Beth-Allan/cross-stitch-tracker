@@ -139,7 +139,11 @@ Plans:
   3. Collection breakdown charts show entity names directly on/near bars instead of in separate linked lists
   4. Stats overview displays total stitches across all projects as a hero counter
   5. Days-in-library displays as a large prominent number with a small descriptive label beneath it
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 28-01-PLAN.md -- Data layer: status groups utility, insight query rewrites, collection total
+- [ ] 28-02-PLAN.md -- Component restructuring: StatusFilterPills, Overview/Records tab rewiring
+- [ ] 28-03-PLAN.md -- Chart axis fixes and days-in-library formatAge fix
 **UI hint**: yes
 
 ### Phase 29: UI Polish
@@ -202,6 +206,6 @@ Phases execute in numeric order: 27 → 28 → 29 → 30
 | 25. Shopping Cart Scaling | v1.6 | 2/2 | Complete | 2026-05-20 |
 | 26. UX Polish | v1.6 | 3/3 | Complete | 2026-05-20 |
 | 27. Chart Form Fixes | v1.7 | 2/2 | Complete    | 2026-05-23 |
-| 28. Stats Corrections | v1.7 | 0/0 | Not started | - |
+| 28. Stats Corrections | v1.7 | 0/3 | Not started | - |
 | 29. UI Polish | v1.7 | 0/0 | Not started | - |
 | 30. Code Quality | v1.7 | 0/0 | Not started | - |
