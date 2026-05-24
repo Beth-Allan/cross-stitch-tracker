@@ -139,10 +139,18 @@
   - Fixed: WR-01 getUnassignedFabrics error logging, WR-02 upload error logging with filename, WR-03/WR-04 misleading comments, WR-05 unnecessary variable alias, WR-06 deduplicated rollback+toast
   - Backlogged: 5 items (999.76-999.80) for co-dependent props, persistFields typing, calc param error tests, server action tests, zip validation test
 
+- **PR #54 merged** — Phase 29 shipped to main
+- **Branch created** — `feature/phase-30` off main
+- **Phase 30 discussed** — context gathered, 15 decisions locked (D-01 through D-15)
+  - Status colors: CSS custom properties in globals.css, all 7 statuses, all consumers updated including log-session-modal
+  - Silent failures: QUAL-02 targets only (3 files), console.error + toast.error in modal, graceful null for chart page
+  - R2 orphans: delete old photo after new succeeds, session + chart cover scope
+  - Extractions: DEFAULT_SUPPLY_HEX to `src/lib/constants.ts`, useRejectionFlash to `src/components/hooks/`
+  - TS error: 1 remaining (status-groups.test.ts), fix with `as unknown as` cast
+
 ### Next Up — RESUME HERE
 
-1. Merge PR #54
-2. `/gsd-discuss-phase` — Phase 30: Code Quality
+1. `/gsd-plan-phase 30` — Plan the code quality work
 
 ### Backlog
 
