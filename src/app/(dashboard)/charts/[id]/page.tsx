@@ -51,7 +51,7 @@ export default async function ChartDetailPage({ params }: { params: Promise<{ id
     chart.project
       ? getProjectCompletionEstimate(user.id, chart.project.id).catch(() => null)
       : null,
-    chart.project ? getUnassignedFabrics(chart.project.id) : [],
+    chart.project ? getUnassignedFabrics(chart.project.id).catch(() => []) : [],
   ]);
 
   const sessions =

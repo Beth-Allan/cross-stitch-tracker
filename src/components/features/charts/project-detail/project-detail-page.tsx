@@ -16,12 +16,7 @@ import type {
   ActiveProjectForPicker,
 } from "@/types/session";
 import type { CompletionEstimate } from "@/types/stats";
-
-interface FabricOption {
-  value: string;
-  label: string;
-  count: number;
-}
+import type { FabricOption } from "@/components/features/supply-table";
 
 interface ProjectDetailPageProps {
   chart: ChartWithProject;

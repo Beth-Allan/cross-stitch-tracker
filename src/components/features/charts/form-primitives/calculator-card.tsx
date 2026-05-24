@@ -3,13 +3,7 @@
 import { useCallback } from "react";
 import { SearchableSelect } from "./searchable-select";
 import { EditableNumber } from "@/components/features/charts/editable-number";
-import type { CalcParams } from "@/components/features/supply-table/types";
-
-interface FabricOption {
-  value: string;
-  label: string;
-  count: number;
-}
+import type { CalcParams, FabricOption } from "@/components/features/supply-table/types";
 
 interface CalculatorCardProps {
   calcParams: CalcParams;

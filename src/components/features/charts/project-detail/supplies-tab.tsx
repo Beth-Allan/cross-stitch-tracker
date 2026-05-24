@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, useTransition, useRef, useEffect } from
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { SupplyTable } from "@/components/features/supply-table";
-import type { SupplyRow, CalcParams } from "@/components/features/supply-table";
+import type { SupplyRow, CalcParams, FabricOption } from "@/components/features/supply-table";
 import { ServerActionAdapter } from "@/components/features/supply-table/server-action-adapter";
 import { CalculatorCard } from "@/components/features/charts/form-primitives/calculator-card";
 import { updateProjectSettings } from "@/lib/actions/chart-actions";
@@ -14,12 +14,6 @@ import type {
   ProjectBeadWithBead,
   ProjectSpecialtyWithItem,
 } from "@/types/supply";
-
-interface FabricOption {
-  value: string;
-  label: string;
-  count: number;
-}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -125,8 +119,14 @@ export function SuppliesTab({ project, supplies, fabricOptions, chartId }: Suppl
     serverParamsRef.current = serverCalcParams;
   }, [serverCalcParams]);
 
-  // Use local state during pending transitions, server state otherwise
-  const calcParams: CalcParams = isPending ? localCalcParams : serverCalcParams;
+  // Sync local state from server when server data changes (after successful save)
+  useEffect(() => {
+    if (!isPending) {
+      setLocalCalcParams(serverCalcParams);
+    }
+  }, [serverCalcParams, isPending]);
+
+  const calcParams = localCalcParams;
 
   const handleCalcParamsChange = useCallback(
     (newParams: CalcParams) => {

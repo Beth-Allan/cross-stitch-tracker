@@ -18,6 +18,7 @@ export type {
   SupplyRow,
   SupplySearchResult,
   CalcParams,
+  FabricOption,
   CreateSupplyData,
   SupplyType,
   Result,
