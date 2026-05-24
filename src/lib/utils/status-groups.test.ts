@@ -33,13 +33,13 @@ describe("resolveStatusFilter", () => {
   });
 
   it("ignores unknown group names at runtime", () => {
-    expect(resolveStatusFilter(["invalid"] as StatusGroup[])).toEqual([]);
+    expect(resolveStatusFilter(["invalid"] as unknown as StatusGroup[])).toEqual([]);
   });
 
   it("ignores unknown groups while keeping valid ones at runtime", () => {
-    expect(resolveStatusFilter(["invalid", "not-started", "bogus"] as StatusGroup[])).toEqual([
-      "UNSTARTED",
-    ]);
+    expect(
+      resolveStatusFilter(["invalid", "not-started", "bogus"] as unknown as StatusGroup[]),
+    ).toEqual(["UNSTARTED"]);
   });
 });
 

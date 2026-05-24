@@ -153,6 +153,35 @@
   --status-on-hold: oklch(0.646 0.222 41.12); /* orange-500 */
   --status-finished: oklch(0.536 0.245 293.54); /* violet-600 */
   --status-ffo: oklch(0.592 0.249 0.58); /* rose-600 */
+
+  /* Status Color Variants (bg, dot, text) */
+  --status-unstarted-bg: oklch(0.984 0.003 247.858); /* slate-50 */
+  --status-unstarted-dot: oklch(0.554 0.046 257.417); /* slate-500 */
+  --status-unstarted-text: oklch(0.372 0.044 257.287); /* slate-700 */
+
+  --status-kitting-bg: oklch(0.987 0.022 95.277); /* amber-50 */
+  --status-kitting-dot: oklch(0.769 0.188 70.08); /* amber-500 */
+  --status-kitting-text: oklch(0.555 0.163 48.998); /* amber-700 */
+
+  --status-kitted-bg: oklch(0.979 0.021 166.113); /* emerald-50 */
+  --status-kitted-dot: oklch(0.696 0.17 162.48); /* emerald-500 */
+  --status-kitted-text: oklch(0.508 0.118 165.612); /* emerald-700 */
+
+  --status-in-progress-bg: oklch(0.977 0.013 236.62); /* sky-50 */
+  --status-in-progress-dot: oklch(0.685 0.169 237.323); /* sky-500 */
+  --status-in-progress-text: oklch(0.5 0.134 242.749); /* sky-700 */
+
+  --status-on-hold-bg: oklch(0.98 0.016 73.684); /* orange-50 */
+  --status-on-hold-dot: oklch(0.75 0.183 55.934); /* orange-400 */
+  --status-on-hold-text: oklch(0.553 0.195 38.402); /* orange-700 */
+
+  --status-finished-bg: oklch(0.969 0.016 293.756); /* violet-50 */
+  --status-finished-dot: oklch(0.606 0.25 292.717); /* violet-500 */
+  --status-finished-text: oklch(0.491 0.27 292.581); /* violet-700 */
+
+  --status-ffo-bg: oklch(0.969 0.015 12.422); /* rose-50 */
+  --status-ffo-dot: oklch(0.645 0.246 16.439); /* rose-500 */
+  --status-ffo-text: oklch(0.514 0.222 16.935); /* rose-700 */
 }
 
 /* ============================================
@@ -233,6 +262,35 @@
   --sidebar-accent-foreground: oklch(0.765 0.152 163.22); /* emerald-400 — active nav text */
   --sidebar-border: oklch(0.374 0.01 67.56); /* stone-700 */
   --sidebar-ring: oklch(0.648 0.15 163.8); /* emerald-500 */
+
+  /* Status Color Variants (bg, dot, text) — dark mode */
+  --status-unstarted-bg: oklch(0.129 0.042 264.695 / 0.4); /* slate-950/40 */
+  --status-unstarted-dot: oklch(0.704 0.04 256.788); /* slate-400 */
+  --status-unstarted-text: oklch(0.869 0.022 252.894); /* slate-300 */
+
+  --status-kitting-bg: oklch(0.279 0.077 45.635 / 0.4); /* amber-950/40 */
+  --status-kitting-dot: oklch(0.828 0.189 84.429); /* amber-400 */
+  --status-kitting-text: oklch(0.879 0.169 91.605); /* amber-300 */
+
+  --status-kitted-bg: oklch(0.262 0.051 172.552 / 0.4); /* emerald-950/40 */
+  --status-kitted-dot: oklch(0.765 0.177 163.223); /* emerald-400 */
+  --status-kitted-text: oklch(0.845 0.143 164.978); /* emerald-300 */
+
+  --status-in-progress-bg: oklch(0.293 0.066 243.157 / 0.4); /* sky-950/40 */
+  --status-in-progress-dot: oklch(0.746 0.16 232.661); /* sky-400 */
+  --status-in-progress-text: oklch(0.828 0.111 230.318); /* sky-300 */
+
+  --status-on-hold-bg: oklch(0.266 0.079 36.259 / 0.4); /* orange-950/40 */
+  --status-on-hold-dot: oklch(0.75 0.183 55.934); /* orange-400 */
+  --status-on-hold-text: oklch(0.837 0.128 66.29); /* orange-300 */
+
+  --status-finished-bg: oklch(0.283 0.141 291.089 / 0.4); /* violet-950/40 */
+  --status-finished-dot: oklch(0.702 0.183 293.541); /* violet-400 */
+  --status-finished-text: oklch(0.811 0.111 293.571); /* violet-300 */
+
+  --status-ffo-bg: oklch(0.271 0.105 12.094 / 0.4); /* rose-950/40 */
+  --status-ffo-dot: oklch(0.712 0.194 13.428); /* rose-400 */
+  --status-ffo-text: oklch(0.81 0.117 11.638); /* rose-300 */
 }
 
 @layer base {

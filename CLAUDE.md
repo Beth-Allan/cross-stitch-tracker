@@ -3,7 +3,7 @@
 ## Current Status
 
 **Milestone:** v1.7 Fix & Polish — IN PROGRESS
-**Last Updated:** 2026-05-23
+**Last Updated:** 2026-05-24
 **Roadmap:** 8 milestones / 30 phases — v1.0-v1.6 shipped
 
 ### Done
@@ -139,10 +139,30 @@
   - Fixed: WR-01 getUnassignedFabrics error logging, WR-02 upload error logging with filename, WR-03/WR-04 misleading comments, WR-05 unnecessary variable alias, WR-06 deduplicated rollback+toast
   - Backlogged: 5 items (999.76-999.80) for co-dependent props, persistFields typing, calc param error tests, server action tests, zip validation test
 
+- **PR #54 merged** — Phase 29 shipped to main
+- **Branch created** — `feature/phase-30` off main
+- **Phase 30 discussed** — context gathered, 15 decisions locked (D-01 through D-15)
+  - Status colors: CSS custom properties in globals.css, all 7 statuses, all consumers updated including log-session-modal
+  - Silent failures: QUAL-02 targets only (3 files), console.error + toast.error in modal, graceful null for chart page
+  - R2 orphans: delete old photo after new succeeds, session + chart cover scope
+  - Extractions: DEFAULT_SUPPLY_HEX to `src/lib/constants.ts`, useRejectionFlash to `src/components/hooks/`
+  - TS error: 1 remaining (status-groups.test.ts), fix with `as unknown as` cast
+
+- **Phase 30 planned** — 3 plans in 1 wave (all parallel): status color CSS properties, silent failure + R2 orphan fixes, shared extractions
+  - Plan 01: CSS custom properties for 7 statuses (bg/dot/text + dark), STATUS_CONFIG migration, gallery-card + whats-next-tab consumer updates (QUAL-04)
+  - Plan 02: Silent catch fixes in 3 files, R2 photo orphan cleanup for session + chart cover, status-groups.test.ts TS error (QUAL-01, QUAL-02, QUAL-03)
+  - Plan 03: DEFAULT_SUPPLY_HEX to constants.ts (16 occurrences), useRejectionFlash hook extraction (QUAL-05, QUAL-06)
+
+- **Phase 30 executed & verified** — 3/3 plans complete, 2283 tests passing, all 5 requirements verified
+  - Plan 01: 42 CSS custom properties (7 statuses × 3 variants × 2 modes), STATUS_CONFIG migrated, darkBgClass removed, 4 consumers updated
+  - Plan 02: Silent catches fixed in 3 target files, R2 orphan cleanup for session photos + chart covers, status-groups.test.ts TS error fixed
+  - Plan 03: DEFAULT_SUPPLY_HEX single-sourced (16 occurrences → 1), useRejectionFlash hook shared (2 EditableNumbers simplified)
+  - Code review: 1 warning fixed (WR-01 dark mode on-hold-dot copy-paste), 1 advisory (WR-02 D-04 design decision)
+  - Post-merge fix: 5 test assertions updated for CSS variable migration (status-badge, status-group, hero-status-badge)
+
 ### Next Up — RESUME HERE
 
-1. Merge PR #54
-2. `/gsd-discuss-phase` — Phase 30: Code Quality
+1. `/gsd-ship` — Create PR for Phase 30 and run multi-agent review
 
 ### Backlog
 

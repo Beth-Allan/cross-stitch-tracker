@@ -127,7 +127,7 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
                     <div className="absolute top-3 left-3">
                       <Star
                         data-testid={`star-icon-${project.chartId}`}
-                        className="h-5 w-5 text-amber-500 drop-shadow-sm"
+                        className="h-5 w-5 text-[var(--status-kitting)] drop-shadow-sm"
                         fill="currentColor"
                         strokeWidth={0}
                       />
@@ -159,7 +159,9 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
                     <div
                       data-testid={`kitting-bar-${project.chartId}`}
                       className={`h-full rounded-full ${
-                        project.kittingPercent === 100 ? "bg-progress" : "bg-amber-400"
+                        project.kittingPercent === 100
+                          ? "bg-progress"
+                          : "bg-[var(--status-kitting-dot)]"
                       }`}
                       style={{ width: `${project.kittingPercent}%` }}
                     />

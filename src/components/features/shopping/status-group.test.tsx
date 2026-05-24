@@ -41,7 +41,7 @@ describe("StatusGroup", () => {
 
     const dot = container.querySelector("span[aria-hidden='true']");
     expect(dot).toBeInTheDocument();
-    expect(dot).toHaveClass("bg-amber-500");
+    expect(dot).toHaveClass("bg-[var(--status-kitting-dot)]");
   });
 
   it("renders children when expanded (isExpanded=true)", () => {

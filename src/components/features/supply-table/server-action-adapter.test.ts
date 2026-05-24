@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 import { ServerActionAdapter } from "./server-action-adapter";
 import type { SupplySearchResult } from "./types";
 
@@ -508,7 +509,7 @@ describe("ServerActionAdapter", () => {
             id: "new-b-1",
             productCode: "B01",
             colorName: "Custom Bead",
-            hexColor: "#79796e",
+            hexColor: DEFAULT_SUPPLY_HEX,
             brandId: "brand-2",
             brand: { id: "brand-2", name: "Mill Hill" },
           },
@@ -538,7 +539,7 @@ describe("ServerActionAdapter", () => {
             id: "new-s-1",
             productCode: "S01",
             colorName: "Custom Specialty",
-            hexColor: "#79796e",
+            hexColor: DEFAULT_SUPPLY_HEX,
             brandId: "brand-3",
             brand: { id: "brand-3", name: "Kreinik" },
           },

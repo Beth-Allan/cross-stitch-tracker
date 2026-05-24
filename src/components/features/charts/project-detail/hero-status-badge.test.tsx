@@ -47,6 +47,6 @@ describe("HeroStatusBadge", () => {
     const { container } = render(<HeroStatusBadge chartId="c1" currentStatus="KITTED" />);
     const dot = container.querySelector("[aria-hidden='true']");
     expect(dot).toBeInTheDocument();
-    expect(dot?.className).toContain("bg-emerald-500");
+    expect(dot?.className).toContain("bg-[var(--status-kitted-dot)]");
   });
 });

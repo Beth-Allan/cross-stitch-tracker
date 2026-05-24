@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FileText, Sparkles } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { StatusBadge } from "@/components/features/charts/status-badge";
+import { STATUS_CONFIG } from "@/lib/utils/status";
 import { CoverPlaceholder } from "./cover-placeholder";
 import { KittingDots } from "./kitting-dots";
 import { getObjectPositionStyle } from "@/lib/utils/focal-point";
@@ -121,16 +122,10 @@ function FinishedFooter({ card }: { card: GalleryCardData }) {
           aria-valuemax={100}
           aria-label="Stitching progress"
         >
-          <div
-            className={`h-full w-full rounded-full ${
-              isFFO ? "bg-rose-500 dark:bg-rose-400" : "bg-violet-500 dark:bg-violet-400"
-            }`}
-          />
+          <div className={`h-full w-full rounded-full ${STATUS_CONFIG[card.status].dotClass}`} />
         </div>
         <span
-          className={`font-mono text-xs font-medium tabular-nums ${
-            isFFO ? "text-rose-600 dark:text-rose-400" : "text-violet-600 dark:text-violet-400"
-          }`}
+          className={`font-mono text-xs font-medium tabular-nums ${STATUS_CONFIG[card.status].textClass}`}
         >
           100%
         </span>

@@ -152,7 +152,9 @@ export async function confirmUpload(input: { chartId: string; field: string; key
             },
           });
           // DB write succeeded — safe to delete raw original
-          await deleteFile(input.key).catch(() => {});
+          await deleteFile(input.key).catch((err) =>
+            console.warn("[R2] raw file cleanup failed:", input.key, err),
+          );
         }
         // If processing failed, the raw key is already saved from the first update above
       } catch (err) {

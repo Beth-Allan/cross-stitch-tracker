@@ -54,6 +54,7 @@ import {
   createBead,
   createSpecialtyItem,
 } from "@/lib/actions/supply-actions";
+import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 
 /**
  * Build the createFn callback that maps CreateSupplyData fields to the
@@ -68,7 +69,7 @@ export function buildCreateFn() {
         colorName: data.name,
         colorCode: data.code || "CUSTOM",
         brandId: data.brandId,
-        hexColor: data.hexColor ?? "#79796e",
+        hexColor: data.hexColor ?? DEFAULT_SUPPLY_HEX,
         colorFamily: "NEUTRAL" as const,
       });
       if (!result.success) throw new Error(result.error);
@@ -87,7 +88,7 @@ export function buildCreateFn() {
         colorName: data.name,
         productCode: data.code || "CUSTOM",
         brandId: data.brandId,
-        hexColor: data.hexColor ?? "#79796e",
+        hexColor: data.hexColor ?? DEFAULT_SUPPLY_HEX,
         colorFamily: "NEUTRAL" as const,
       });
       if (!result.success) throw new Error(result.error);
@@ -105,7 +106,7 @@ export function buildCreateFn() {
       colorName: data.name,
       productCode: data.code || "CUSTOM",
       brandId: data.brandId,
-      hexColor: data.hexColor ?? "#79796e",
+      hexColor: data.hexColor ?? DEFAULT_SUPPLY_HEX,
     });
     if (!result.success) throw new Error(result.error);
     return {

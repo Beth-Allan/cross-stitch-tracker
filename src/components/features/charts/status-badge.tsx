@@ -18,7 +18,6 @@ export function StatusBadge({ status, size = "sm" }: StatusBadgeProps) {
         sizeClasses,
         config.bgClass,
         config.textClass,
-        config.darkBgClass,
       )}
     >
       <span

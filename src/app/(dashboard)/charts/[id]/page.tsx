@@ -49,7 +49,10 @@ export default async function ChartDetailPage({ params }: { params: Promise<{ id
         },
     getActiveProjectsForPicker(),
     chart.project
-      ? getProjectCompletionEstimate(user.id, chart.project.id).catch(() => null)
+      ? getProjectCompletionEstimate(user.id, chart.project.id).catch((error) => {
+          console.error("Completion estimate failed:", error);
+          return null;
+        })
       : null,
     chart.project
       ? getUnassignedFabrics(chart.project.id).catch((error) => {

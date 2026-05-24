@@ -163,7 +163,8 @@ export function LogSessionModal({
 
       setPhotoKey(result.key);
       setPhotoPreview(URL.createObjectURL(file));
-    } catch {
+    } catch (error) {
+      console.error("Photo upload failed:", error);
       toast.error("Photo upload failed. You can try again or save without a photo.");
     } finally {
       setIsUploading(false);
@@ -231,7 +232,8 @@ export function LogSessionModal({
             "Session could not be saved. Check that stitch count is a positive number and a project is selected.",
           );
         }
-      } catch {
+      } catch (error) {
+        console.error("Session save failed:", error);
         toast.error("Session could not be saved. Check your connection and try again.");
       }
     });
@@ -251,7 +253,8 @@ export function LogSessionModal({
           return;
         }
         toast.error("Session could not be deleted. Check your connection and try again.");
-      } catch {
+      } catch (error) {
+        console.error("Session delete failed:", error);
         toast.error("Session could not be deleted. Check your connection and try again.");
       }
     });
@@ -315,7 +318,7 @@ export function LogSessionModal({
                         }}
                         className={`hover:bg-accent flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors ${
                           project.projectId === selectedProjectId
-                            ? "bg-primary/10 text-primary"
+                            ? "bg-[var(--status-in-progress-bg)] text-[var(--status-in-progress-text)]"
                             : "text-foreground"
                         }`}
                       >
@@ -467,7 +470,7 @@ export function LogSessionModal({
                 <button
                   type="button"
                   onClick={handlePhotoClick}
-                  className="text-primary text-xs hover:underline"
+                  className="text-xs text-[var(--status-in-progress-text)] hover:underline"
                 >
                   Replace photo
                 </button>
@@ -477,7 +480,7 @@ export function LogSessionModal({
                 type="button"
                 onClick={handlePhotoClick}
                 disabled={isUploading}
-                className="border-border text-muted-foreground hover:border-primary hover:text-primary flex w-full items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-2 text-sm transition-colors"
+                className="border-border text-muted-foreground flex w-full items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-2 text-sm transition-colors hover:border-[var(--status-in-progress-dot)] hover:text-[var(--status-in-progress-text)]"
               >
                 <Camera className="h-4 w-4" />
                 {isUploading ? "Uploading..." : "Add progress photo"}

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 
 const SUPPLY_TYPES = ["THREAD", "BEAD", "SPECIALTY"] as const;
 const COLOR_FAMILIES = [
@@ -106,7 +107,7 @@ export const createAndAddThreadSchema = z.object({
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/)
     .optional()
-    .default("#79796e"),
+    .default(DEFAULT_SUPPLY_HEX),
   brandId: z.string().min(1, "Brand is required"),
   colorFamily: z.enum(COLOR_FAMILIES).optional().default("NEUTRAL"),
 });

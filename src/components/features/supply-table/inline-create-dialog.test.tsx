@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@/__tests__/test-utils";
+import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 import { InlineCreateDialog } from "./inline-create-dialog";
 
 // Mock the Dialog components to render inline for testing
@@ -84,7 +85,7 @@ describe("InlineCreateDialog", () => {
         name: "Custom Thread",
         code: "CT-001",
         brandId: "default",
-        hexColor: "#79796e",
+        hexColor: DEFAULT_SUPPLY_HEX,
       });
     });
   });
