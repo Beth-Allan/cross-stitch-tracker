@@ -170,13 +170,14 @@ describe("series-actions", () => {
       const result = await deleteSeries("s1");
 
       expect(result.success).toBe(true);
-      expect(mockPrisma.$transaction).toHaveBeenCalledWith([
-        mockPrisma.chart.updateMany({
-          where: { seriesId: "s1" },
-          data: { seriesId: null },
-        }),
-        mockPrisma.series.delete({ where: { id: "s1" } }),
-      ]);
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
+      expect(mockPrisma.chart.updateMany).toHaveBeenCalledWith({
+        where: { seriesId: "s1" },
+        data: { seriesId: null },
+      });
+      expect(mockPrisma.series.delete).toHaveBeenCalledWith({
+        where: { id: "s1" },
+      });
     });
 
     it("returns error for non-existent ID", async () => {
