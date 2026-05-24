@@ -44,6 +44,9 @@ export function ThreadInsightList({ items }: ThreadInsightListProps) {
                 </div>
                 <span className="text-muted-foreground font-mono text-xs whitespace-nowrap tabular-nums">
                   {item.projectCount} {item.projectCount === 1 ? "project" : "projects"}
+                  {item.totalStitches > 0 && (
+                    <> (~{item.totalStitches.toLocaleString()} stitches)</>
+                  )}
                 </span>
               </div>
             ))}

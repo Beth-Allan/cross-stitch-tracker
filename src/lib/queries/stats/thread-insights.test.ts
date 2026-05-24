@@ -29,9 +29,9 @@ describe("getThreadInsights", () => {
 
   it("returns threads ranked by project count descending", async () => {
     mockPrisma.projectThread.groupBy.mockResolvedValue([
-      { threadId: "t1", _count: { projectId: 10 } },
-      { threadId: "t2", _count: { projectId: 5 } },
-      { threadId: "t3", _count: { projectId: 2 } },
+      { threadId: "t1", _count: { projectId: 10 }, _sum: { stitchCount: 5000 } },
+      { threadId: "t2", _count: { projectId: 5 }, _sum: { stitchCount: 2500 } },
+      { threadId: "t3", _count: { projectId: 2 }, _sum: { stitchCount: 800 } },
     ]);
     mockPrisma.thread.findMany.mockResolvedValue([
       {
@@ -72,7 +72,7 @@ describe("getThreadInsights", () => {
 
   it("includes brandName, colorCode, colorName, hexColor from thread + brand", async () => {
     mockPrisma.projectThread.groupBy.mockResolvedValue([
-      { threadId: "t1", _count: { projectId: 3 } },
+      { threadId: "t1", _count: { projectId: 3 }, _sum: { stitchCount: 1200 } },
     ]);
     mockPrisma.thread.findMany.mockResolvedValue([
       {
@@ -94,12 +94,13 @@ describe("getThreadInsights", () => {
       colorName: "Medium Blue",
       hexColor: "#3366CC",
       projectCount: 3,
+      totalStitches: 1200,
     });
   });
 
   it("respects limit parameter", async () => {
     mockPrisma.projectThread.groupBy.mockResolvedValue([
-      { threadId: "t1", _count: { projectId: 10 } },
+      { threadId: "t1", _count: { projectId: 10 }, _sum: { stitchCount: 5000 } },
     ]);
     mockPrisma.thread.findMany.mockResolvedValue([
       {

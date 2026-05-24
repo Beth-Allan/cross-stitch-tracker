@@ -20,6 +20,7 @@ async function computeThreadInsights(
         },
       },
       _count: { projectId: true },
+      _sum: { stitchCount: true },
       orderBy: { _count: { projectId: "desc" } },
       take: limit,
     });
@@ -52,6 +53,7 @@ async function computeThreadInsights(
           colorName: thread.colorName,
           hexColor: thread.hexColor,
           projectCount: r._count.projectId,
+          totalStitches: r._sum?.stitchCount ?? 0,
         };
       })
       .filter((item): item is ThreadInsight => item !== null);

@@ -123,6 +123,7 @@ const mockThreadInsights: ThreadInsight[] = [
     colorName: "Black",
     hexColor: "#000000",
     projectCount: 5,
+    totalStitches: 1800,
   },
 ];
 

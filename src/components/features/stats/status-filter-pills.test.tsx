@@ -6,7 +6,9 @@ const mockSetStatusFilter = vi.fn();
 vi.mock("nuqs", () => ({
   useQueryState: vi.fn(() => [[] as string[], mockSetStatusFilter]),
   parseAsArrayOf: vi.fn(() => ({
-    withDefault: vi.fn(),
+    withOptions: vi.fn(() => ({
+      withDefault: vi.fn(),
+    })),
   })),
   parseAsStringLiteral: vi.fn(),
 }));

@@ -12,10 +12,10 @@ function createMockProps() {
 }
 
 describe("LifetimeCounters", () => {
-  it('renders 4 counter cards with labels "COLLECTION TOTAL", "SESSIONS", "TIME STITCHING", "COMPLETED"', () => {
+  it('renders 4 counter cards with labels "STITCHES IN COLLECTION", "SESSIONS", "TIME STITCHING", "COMPLETED"', () => {
     render(<LifetimeCounters {...createMockProps()} />);
 
-    expect(screen.getByText("COLLECTION TOTAL")).toBeInTheDocument();
+    expect(screen.getByText("STITCHES IN COLLECTION")).toBeInTheDocument();
     expect(screen.getByText("SESSIONS")).toBeInTheDocument();
     expect(screen.getByText("TIME STITCHING")).toBeInTheDocument();
     expect(screen.getByText("COMPLETED")).toBeInTheDocument();
@@ -62,7 +62,7 @@ describe("LifetimeCounters", () => {
   it("applies uppercase tracking-wider to labels", () => {
     render(<LifetimeCounters {...createMockProps()} />);
 
-    const label = screen.getByText("COLLECTION TOTAL");
+    const label = screen.getByText("STITCHES IN COLLECTION");
     expect(label.className).toContain("uppercase");
     expect(label.className).toContain("tracking-wider");
   });
@@ -70,7 +70,7 @@ describe("LifetimeCounters", () => {
   it("applies ring-1 ring-foreground/10 and rounded-xl to cards", () => {
     render(<LifetimeCounters {...createMockProps()} />);
 
-    const label = screen.getByText("COLLECTION TOTAL");
+    const label = screen.getByText("STITCHES IN COLLECTION");
     const card = label.parentElement as HTMLElement;
     expect(card.className).toContain("ring-1");
     expect(card.className).toContain("ring-foreground/10");

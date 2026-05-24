@@ -12,7 +12,9 @@ const PILL_OPTIONS = [
 export function StatusFilterPills() {
   const [statusFilter, setStatusFilter] = useQueryState(
     "status",
-    parseAsArrayOf(parseAsStringLiteral([...STATUS_GROUPS]), ",").withDefault([]),
+    parseAsArrayOf(parseAsStringLiteral([...STATUS_GROUPS]), ",")
+      .withOptions({ shallow: false })
+      .withDefault([]),
   );
 
   const isAllActive = statusFilter.length === 0;

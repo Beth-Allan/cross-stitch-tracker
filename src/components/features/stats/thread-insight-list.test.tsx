@@ -12,6 +12,7 @@ const mockItems: ThreadInsight[] = [
     colorName: "Black",
     hexColor: "#000000",
     projectCount: 12,
+    totalStitches: 4500,
   },
   {
     threadId: "t2",
@@ -20,6 +21,7 @@ const mockItems: ThreadInsight[] = [
     colorName: "Winter White",
     hexColor: "#F5F5DC",
     projectCount: 8,
+    totalStitches: 2100,
   },
   {
     threadId: "t3",
@@ -28,6 +30,7 @@ const mockItems: ThreadInsight[] = [
     colorName: "Red",
     hexColor: "",
     projectCount: 1,
+    totalStitches: 0,
   },
 ];
 
@@ -49,6 +52,7 @@ describe("ThreadInsightList", () => {
         colorName: "Black",
         hexColor: "#000000",
         projectCount: 12,
+        totalStitches: 4500,
       },
     ];
     const { container } = render(<ThreadInsightList items={singleItem} />);
@@ -69,6 +73,7 @@ describe("ThreadInsightList", () => {
         colorName: "Red",
         hexColor: "",
         projectCount: 1,
+        totalStitches: 0,
       },
     ];
     const { container } = render(<ThreadInsightList items={fallbackItem} />);
@@ -86,12 +91,13 @@ describe("ThreadInsightList", () => {
     expect(screen.getByText("DMC 310 -- Black")).toBeInTheDocument();
   });
 
-  it("shows project count right-aligned (e.g., '12 projects')", () => {
+  it("shows project count and stitch estimate right-aligned", () => {
     render(<ThreadInsightList items={mockItems} />);
 
-    expect(screen.getByText("12 projects")).toBeInTheDocument();
-    expect(screen.getByText("8 projects")).toBeInTheDocument();
-    expect(screen.getByText("1 project")).toBeInTheDocument();
+    expect(screen.getByText(/12 projects/)).toBeInTheDocument();
+    expect(screen.getByText(/~4,500 stitches/)).toBeInTheDocument();
+    expect(screen.getByText(/8 projects/)).toBeInTheDocument();
+    expect(screen.getByText(/1 project/)).toBeInTheDocument();
   });
 
   it("renders empty state message when items is empty", () => {

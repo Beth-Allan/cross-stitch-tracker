@@ -9,7 +9,11 @@ interface LifetimeCountersProps {
 }
 
 const COUNTER_CARDS = [
-  { key: "collectionTotalStitches" as const, label: "COLLECTION TOTAL", format: "number" as const },
+  {
+    key: "collectionTotalStitches" as const,
+    label: "STITCHES IN COLLECTION",
+    format: "number" as const,
+  },
   { key: "totalSessions" as const, label: "SESSIONS", format: "number" as const },
   { key: "totalTimeMinutes" as const, label: "TIME STITCHING", format: "time" as const },
   { key: "projectsCompleted" as const, label: "COMPLETED", format: "number" as const },

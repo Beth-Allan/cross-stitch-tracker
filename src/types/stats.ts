@@ -193,6 +193,7 @@ export interface ThreadInsight {
   colorName: string;
   hexColor: string;
   projectCount: number;
+  totalStitches: number;
 }
 
 // ─── Designer Insights ─────────────────────────────────────────────────────
