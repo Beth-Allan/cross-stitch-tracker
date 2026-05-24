@@ -53,7 +53,7 @@ export default async function StatsPage({
 
   // Parse URL search params for session table state
   const parsedParams = await statsSearchParamsCache.parse(searchParams);
-  const { page, sort, dir, project, scope } = parsedParams;
+  const { page, sort, dir, project, scope, status } = parsedParams;
 
   // Current date values for calendar/chart initial state
   const now = new Date();
@@ -74,9 +74,9 @@ export default async function StatsPage({
     getDayOfWeekPattern(user.id),
     getPersonalBests(user.id, scope),
     getFastestCompletions(user.id, scope),
-    getThreadInsights(user.id, scope),
-    getDesignerInsights(user.id, scope),
-    getGenreInsights(user.id, scope),
+    getThreadInsights(user.id, status),
+    getDesignerInsights(user.id, status),
+    getGenreInsights(user.id, status),
     getCompletionEstimates(user.id, scope),
     getAvailableYears(user.id),
   ]);

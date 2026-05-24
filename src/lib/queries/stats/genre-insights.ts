@@ -1,32 +1,27 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
-import { buildDateFilter, type Scope } from "./utils";
+import { resolveStatusFilter } from "@/lib/utils/status-groups";
 import type { GenreInsight } from "@/types/stats";
 
 async function computeGenreInsights(
   userId: string,
-  scope: Scope,
+  statusGroups: string[],
   limit: number,
 ): Promise<GenreInsight[]> {
   try {
-    const tz = getUserTimezone(userId);
-    const dateFilter = buildDateFilter(scope, tz);
+    const statusFilter = resolveStatusFilter(statusGroups);
 
     const projects = await prisma.project.findMany({
       where: {
         userId,
         chart: { genres: { some: {} } },
+        ...(statusFilter.length > 0 ? { status: { in: statusFilter } } : {}),
       },
       include: {
         chart: {
           include: {
             genres: { select: { id: true, name: true } },
           },
-        },
-        sessions: {
-          where: dateFilter ? { date: dateFilter } : undefined,
-          select: { stitchCount: true },
         },
       },
     });
@@ -39,19 +34,16 @@ async function computeGenreInsights(
       const genres = project.chart.genres;
       if (genres.length === 0) continue;
 
-      const projectStitches = project.sessions.reduce(
-        (sum: number, s: { stitchCount: number }) => sum + s.stitchCount,
-        0,
-      );
+      const chartStitches = project.chart.stitchCount ?? 0;
 
       for (const genre of genres) {
         const existing = genreMap.get(genre.id);
         if (existing) {
-          existing.totalStitches += projectStitches;
+          existing.totalStitches += chartStitches;
         } else {
           genreMap.set(genre.id, {
             name: genre.name,
-            totalStitches: projectStitches,
+            totalStitches: chartStitches,
           });
         }
       }
@@ -66,19 +58,22 @@ async function computeGenreInsights(
       .sort((a, b) => b.totalStitches - a.totalStitches)
       .slice(0, limit);
   } catch (error) {
-    console.error("[stats] computeGenreInsights failed:", { userId, scope, limit, error });
+    console.error("[stats] computeGenreInsights failed:", {
+      userId,
+      statusGroups,
+      limit,
+      error,
+    });
     throw error;
   }
 }
 
-export function getGenreInsights(userId: string, scope: Scope, limit = 10) {
-  const currentYear = new Date().getFullYear();
-  const year = parseInt(scope, 10);
-  const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;
+export function getGenreInsights(userId: string, statusGroups: string[], limit = 10) {
+  const cacheKey = statusGroups.length > 0 ? statusGroups.sort().join(",") : "all";
 
   return unstable_cache(
-    () => computeGenreInsights(userId, scope, limit),
-    [`stats-genre-insights-${userId}-${scope}-${limit}`],
-    { tags: ["stats"], revalidate },
+    () => computeGenreInsights(userId, statusGroups, limit),
+    [`stats-genre-insights-${userId}-${cacheKey}-${limit}`],
+    { tags: ["stats"], revalidate: 300 },
   )();
 }

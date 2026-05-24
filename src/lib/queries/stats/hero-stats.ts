@@ -8,32 +8,38 @@ async function computeHeroStats(userId: string): Promise<StatsHeroData> {
     const tz = getUserTimezone(userId);
     const { todayStart, todayEnd, weekStart, monthStart, yearStart } = getLocalDayBoundaries(tz);
 
-    const [today, week, month, year, lifetime, completedCount] = await Promise.all([
-      prisma.stitchSession.aggregate({
-        where: { project: { userId }, date: { gte: todayStart, lt: todayEnd } },
-        _sum: { stitchCount: true },
-      }),
-      prisma.stitchSession.aggregate({
-        where: { project: { userId }, date: { gte: weekStart } },
-        _sum: { stitchCount: true },
-      }),
-      prisma.stitchSession.aggregate({
-        where: { project: { userId }, date: { gte: monthStart } },
-        _sum: { stitchCount: true },
-      }),
-      prisma.stitchSession.aggregate({
-        where: { project: { userId }, date: { gte: yearStart } },
-        _sum: { stitchCount: true },
-      }),
-      prisma.stitchSession.aggregate({
-        where: { project: { userId } },
-        _sum: { stitchCount: true, timeSpentMinutes: true },
-        _count: { id: true },
-      }),
-      prisma.project.count({
-        where: { userId, status: { in: ["FINISHED", "FFO"] } },
-      }),
-    ]);
+    const [today, week, month, year, lifetime, completedCount, collectionTotal] = await Promise.all(
+      [
+        prisma.stitchSession.aggregate({
+          where: { project: { userId }, date: { gte: todayStart, lt: todayEnd } },
+          _sum: { stitchCount: true },
+        }),
+        prisma.stitchSession.aggregate({
+          where: { project: { userId }, date: { gte: weekStart } },
+          _sum: { stitchCount: true },
+        }),
+        prisma.stitchSession.aggregate({
+          where: { project: { userId }, date: { gte: monthStart } },
+          _sum: { stitchCount: true },
+        }),
+        prisma.stitchSession.aggregate({
+          where: { project: { userId }, date: { gte: yearStart } },
+          _sum: { stitchCount: true },
+        }),
+        prisma.stitchSession.aggregate({
+          where: { project: { userId } },
+          _sum: { stitchCount: true, timeSpentMinutes: true },
+          _count: { id: true },
+        }),
+        prisma.project.count({
+          where: { userId, status: { in: ["FINISHED", "FFO"] } },
+        }),
+        prisma.chart.aggregate({
+          where: { projects: { some: { userId } } },
+          _sum: { stitchCount: true },
+        }),
+      ],
+    );
 
     return {
       stitchesToday: today._sum.stitchCount ?? 0,
@@ -44,6 +50,7 @@ async function computeHeroStats(userId: string): Promise<StatsHeroData> {
       totalSessions: lifetime._count.id,
       totalTimeMinutes: lifetime._sum.timeSpentMinutes ?? 0,
       projectsCompleted: completedCount,
+      collectionTotalStitches: collectionTotal._sum.stitchCount ?? 0,
     };
   } catch (error) {
     console.error("[stats] computeHeroStats failed:", { userId, error });

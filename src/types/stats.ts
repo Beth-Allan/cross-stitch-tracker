@@ -12,6 +12,7 @@ export interface StatsHeroData {
   totalSessions: number;
   totalTimeMinutes: number;
   projectsCompleted: number;
+  collectionTotalStitches: number;
 }
 
 // ─── Collection Breakdown ─────────────────────────────────────────────────
