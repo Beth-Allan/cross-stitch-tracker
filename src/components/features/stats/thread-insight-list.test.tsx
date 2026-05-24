@@ -95,7 +95,7 @@ describe("ThreadInsightList", () => {
     render(<ThreadInsightList items={mockItems} />);
 
     expect(screen.getByText(/12 projects/)).toBeInTheDocument();
-    expect(screen.getByText(/~4,500 stitches/)).toBeInTheDocument();
+    expect(screen.getByText(/4,500 stitches/)).toBeInTheDocument();
     expect(screen.getByText(/8 projects/)).toBeInTheDocument();
     expect(screen.getByText(/1 project/)).toBeInTheDocument();
   });
