@@ -39,7 +39,7 @@ export function ThreadInsightList({ items }: ThreadInsightListProps) {
                     />
                   )}
                   <span className="text-foreground text-sm">
-                    {item.brandName} {item.colorCode} -- {item.colorName}
+                    {item.brandName} {item.colorCode}
                   </span>
                 </div>
                 <div className="text-muted-foreground flex shrink-0 flex-col items-end font-mono text-xs tabular-nums">

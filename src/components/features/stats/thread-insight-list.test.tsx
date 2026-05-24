@@ -38,9 +38,9 @@ describe("ThreadInsightList", () => {
   it("renders up to 10 thread items with rank numbers", () => {
     render(<ThreadInsightList items={mockItems} />);
 
-    expect(screen.getByText("DMC 310 -- Black")).toBeInTheDocument();
-    expect(screen.getByText("DMC 3865 -- Winter White")).toBeInTheDocument();
-    expect(screen.getByText("DMC 321 -- Red")).toBeInTheDocument();
+    expect(screen.getByText("DMC 310")).toBeInTheDocument();
+    expect(screen.getByText("DMC 3865")).toBeInTheDocument();
+    expect(screen.getByText("DMC 321")).toBeInTheDocument();
   });
 
   it("renders color swatch div with backgroundColor from hexColor", () => {
@@ -85,10 +85,10 @@ describe("ThreadInsightList", () => {
     expect(swatch.className).toContain("bg-muted");
   });
 
-  it("shows brand code + color name (e.g., 'DMC 310 -- Black')", () => {
+  it("shows brand and code (e.g., 'DMC 310')", () => {
     render(<ThreadInsightList items={mockItems} />);
 
-    expect(screen.getByText("DMC 310 -- Black")).toBeInTheDocument();
+    expect(screen.getByText("DMC 310")).toBeInTheDocument();
   });
 
   it("shows project count and stitch estimate right-aligned", () => {
