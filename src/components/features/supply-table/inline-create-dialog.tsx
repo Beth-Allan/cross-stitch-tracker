@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 import type { SupplyType, CreateSupplyData } from "./types";
 
 const LABEL_MAP: Record<
@@ -90,7 +91,7 @@ export function InlineCreateDialog({
       name: trimmedName,
       code: code.trim() || undefined,
       brandId: defaultBrandId,
-      hexColor: "#79796e",
+      hexColor: DEFAULT_SUPPLY_HEX,
     });
   }
 

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, within, fireEvent, waitFor, act } from "@/__tests__/test-utils";
+import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 import { SupplyTable } from "./supply-table";
 import { LocalStateAdapter } from "./local-state-adapter";
 import type { SupplyRow, SupplySearchResult, SupplyTableAdapter } from "./types";
@@ -162,7 +163,7 @@ function createMockAdapter(): SupplyTableAdapter {
       name: "New Supply",
       brandName: "Custom",
       brandId: "b1",
-      hexColor: "#79796e",
+      hexColor: DEFAULT_SUPPLY_HEX,
     }),
   };
 }

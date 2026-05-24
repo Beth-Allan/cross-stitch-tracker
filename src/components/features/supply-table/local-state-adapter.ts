@@ -1,3 +1,4 @@
+import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 import type {
   SupplyTableAdapter,
   SupplyType,
@@ -148,7 +149,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
       name: data.name,
       brandName: "Custom",
       brandId: data.brandId,
-      hexColor: data.hexColor ?? "#79796e",
+      hexColor: data.hexColor ?? DEFAULT_SUPPLY_HEX,
     };
     this.getPool(type).push(result);
     return result;

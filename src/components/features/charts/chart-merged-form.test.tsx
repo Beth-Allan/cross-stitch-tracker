@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
+import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 import { ChartMergedForm } from "./chart-merged-form";
 import {
   createMockDesigner,
@@ -1010,7 +1011,7 @@ describe("ChartMergedForm", () => {
           id: "new-b-1",
           productCode: "00001",
           colorName: "Red Glass",
-          hexColor: "#79796e",
+          hexColor: DEFAULT_SUPPLY_HEX,
           colorFamily: "RED",
           brandId: "brand-2",
           createdAt: new Date(),
@@ -1032,7 +1033,7 @@ describe("ChartMergedForm", () => {
           colorName: "Red Glass",
           productCode: "00001",
           brandId: "brand-2",
-          hexColor: "#79796e",
+          hexColor: DEFAULT_SUPPLY_HEX,
           colorFamily: "NEUTRAL",
         }),
       );
@@ -1051,7 +1052,7 @@ describe("ChartMergedForm", () => {
           productCode: "KR-001",
           colorName: "Gold Braid",
           description: "Metallic braid",
-          hexColor: "#79796e",
+          hexColor: DEFAULT_SUPPLY_HEX,
           brandId: "brand-3",
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -1072,7 +1073,7 @@ describe("ChartMergedForm", () => {
           colorName: "Gold Braid",
           productCode: "KR-001",
           brandId: "brand-3",
-          hexColor: "#79796e",
+          hexColor: DEFAULT_SUPPLY_HEX,
         }),
       );
       const callArg = mockCreateSpecialty.mock.calls[0][0] as Record<string, unknown>;

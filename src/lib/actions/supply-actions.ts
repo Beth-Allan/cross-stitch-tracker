@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 import { naturalSortByCode } from "@/lib/utils/natural-sort";
 import {
   threadSchema,
@@ -775,7 +776,7 @@ export async function createAndAddBead(formData: unknown) {
         data: {
           productCode: validated.code || "CUSTOM",
           colorName: validated.name,
-          hexColor: "#79796e",
+          hexColor: DEFAULT_SUPPLY_HEX,
           brandId: resolvedBrandId,
           colorFamily: "NEUTRAL",
         },
@@ -827,7 +828,7 @@ export async function createAndAddSpecialty(formData: unknown) {
         data: {
           productCode: validated.code || "CUSTOM",
           colorName: validated.name,
-          hexColor: "#79796e",
+          hexColor: DEFAULT_SUPPLY_HEX,
           brandId: resolvedBrandId,
         },
         include: { brand: true },
