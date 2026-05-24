@@ -381,7 +381,7 @@ series: {
 
 **If this table is empty:** All claims in this research were verified or cited -- no user confirmation needed.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should `getSeriesWithStats` join designer name eagerly?**
    - What we know: `getDesignersWithStats` does NOT join other relations, just `_count`

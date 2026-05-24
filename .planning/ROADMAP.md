@@ -127,65 +127,87 @@ Full details: `milestones/v1.7-ROADMAP.md`
 ## Phase Details
 
 ### Phase 31: Data Foundation & Fixes
+
 **Goal**: Series entity exists with full CRUD, dual progress computation is defined, and pre-existing bugs are resolved
 **Depends on**: Nothing (first phase of v1.8)
 **Requirements**: SERIES-01, SERIES-03, SERIES-04, SERIES-10, FIX-01, FIX-02
 **Success Criteria** (what must be TRUE):
+
   1. User can create a series with name, optional total count, and optional designer link via server action
   2. User can edit a series name, total count, and designer link via server action
   3. User can delete a series and its charts become unassigned (not deleted)
   4. Dual progress values (owned/total + finished/owned) are computed correctly for any series configuration
   5. Pre-existing TypeScript test errors are resolved and stats page query groups are separated for resilience
-**Plans**: 3 plans
-Plans:
+
+**Plans**: 3 plansPlans:
+**Wave 1**
+
 - [ ] 31-01-PLAN.md — Schema, types, validation, test factories
 - [ ] 31-02-PLAN.md — Series progress computation utility (TDD)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
 
 ### Phase 32: Series Management Pages
+
 **Goal**: Users can browse and manage their series collection through dedicated pages
 **Depends on**: Phase 31
 **Requirements**: SERIES-02, SERIES-05
 **Success Criteria** (what must be TRUE):
+
   1. User can view all series on a /series management page with name, designer, and progress indicators
   2. User can view a series detail page showing all assigned charts with dual progress (owned/total + finished/owned)
   3. User can inline-edit series name and delete series from the management pages
+
 **Plans**: 3 plans
 Plans:
+
 - [ ] 31-01-PLAN.md — Schema, types, validation, test factories
 - [ ] 31-02-PLAN.md — Series progress computation utility (TDD)
 - [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
+
 **UI hint**: yes
 
 ### Phase 33: Chart Form Integration
+
 **Goal**: Users can assign and remove series from charts without leaving the form
 **Depends on**: Phase 31
 **Requirements**: SERIES-06, SERIES-07
 **Success Criteria** (what must be TRUE):
+
   1. User can assign a chart to a series via SearchableSelect dropdown on the chart form
   2. User can create a new series inline from the chart form without navigating away
   3. User can clear a chart's series assignment from the chart form
   4. Series assignment persists correctly on both chart creation and chart edit
+
 **Plans**: 3 plans
 Plans:
+
 - [ ] 31-01-PLAN.md — Schema, types, validation, test factories
 - [ ] 31-02-PLAN.md — Series progress computation utility (TDD)
 - [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
+
 **UI hint**: yes
 
 ### Phase 34: Browse & Pattern Dive Integration
+
 **Goal**: Users can discover and browse their collection organized by series
 **Depends on**: Phase 31, Phase 33
 **Requirements**: SERIES-08, SERIES-09
 **Success Criteria** (what must be TRUE):
+
   1. User can view a Series tab on Pattern Dive showing series cards with dual progress indicators
   2. User can click a series card to navigate to its detail page
   3. User can filter the Browse tab by series using the existing filter bar
+
 **Plans**: 3 plans
 Plans:
+
 - [ ] 31-01-PLAN.md — Schema, types, validation, test factories
 - [ ] 31-02-PLAN.md — Series progress computation utility (TDD)
 - [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
+
 **UI hint**: yes
 
 ## Progress
