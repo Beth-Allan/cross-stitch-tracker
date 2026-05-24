@@ -10,13 +10,18 @@ interface BuriedTreasuresSectionProps {
   imageUrls: Record<string, string>;
 }
 
-/**
- * Format age for display. < 30 days -> "X days", < 365 days -> "X months", else "X years".
- */
+/** Returns the unit label for a days-in-library value ("days", "months", or "years"). */
 function formatAge(days: number): string {
-  if (days < 30) return `${days} days`;
-  if (days < 365) return `${Math.floor(days / 30)} months`;
-  return `${Math.floor(days / 365)} years`;
+  if (days < 30) return "days";
+  if (days < 365) return "months";
+  return "years";
+}
+
+/** Returns the display number for a days-in-library value, converted to the appropriate unit. */
+function formatAgeNumber(days: number): number {
+  if (days < 30) return days;
+  if (days < 365) return Math.floor(days / 30);
+  return Math.floor(days / 365);
 }
 
 /**
@@ -76,7 +81,7 @@ export function BuriedTreasuresSection({ treasures, imageUrls }: BuriedTreasures
               {/* Age badge - hidden on mobile */}
               <div className="flex shrink-0 flex-col items-end gap-0.5 text-right max-md:hidden">
                 <span className="text-muted-foreground font-mono text-sm font-bold tabular-nums">
-                  {t.daysInLibrary.toLocaleString()}
+                  {formatAgeNumber(t.daysInLibrary).toLocaleString()}
                 </span>
                 <span className="text-muted-foreground/70 text-[10px]">
                   {formatAge(t.daysInLibrary)} in library
