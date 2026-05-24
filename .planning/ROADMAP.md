@@ -172,8 +172,7 @@ Plans:
   4. Project supplies card includes skein calculation adjustment controls (fabric count, over 1/2, waste percentage)
   5. User can upload files up to 50MB, including .zip files as digital working copies
 
-**Plans**: 3 plans
-Plans:
+**Plans**: 3 plansPlans:
 
 - [ ] 29-01-PLAN.md -- Gallery card visual polish: status/size badge colors and digital copy indicator
 - [ ] 29-02-PLAN.md -- Supply tab: CalculatorCard integration and sort fix

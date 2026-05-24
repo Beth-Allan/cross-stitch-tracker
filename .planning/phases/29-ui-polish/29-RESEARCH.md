@@ -368,22 +368,13 @@ export const ALLOWED_CHART_FILE_EXTENSIONS = [
 | A3 | `updateProjectSettings` schema needs no changes for calc param persistence (already accepts strandCount, overCount, wastePercent) | Architecture Patterns | None -- verified by reading schema definition |
 | A4 | `updateProjectSettings` does NOT handle fabricId changes -- a separate mechanism is needed | Common Pitfalls | Medium -- fabric change on CalculatorCard requires either extending updateProjectSettings or using a separate action |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **BUG-03: What exactly is broken with supply sorting?**
-   - What we know: Sort controls exist at supplies-tab.tsx lines 123-146. `sortSupplyRows()` at line 74 implements both modes. The code looks correct.
-   - What's unclear: Whether the bug is that sorting doesn't visually change anything (server already returns sorted data that matches "Added" order), the controls are hidden at certain breakpoints, or the sort state resets on re-render.
-   - Recommendation: Investigate during execution. The TDD approach should write tests for both sort modes first, then fix whatever fails.
+1. **BUG-03: What exactly is broken with supply sorting?** — RESOLVED: Investigate during execution. TDD approach writes tests for both sort modes first, then fixes whatever fails.
 
-2. **Fabric change persistence on CalculatorCard**
-   - What we know: `updateProjectSettings` handles strandCount, overCount, wastePercent. Fabric assignment is handled separately via `fabric.update({ linkedProjectId })` in the chart form's save action.
-   - What's unclear: Whether to extend `updateProjectSettings` to handle fabricId, create a new action, or reuse existing fabric linking logic from chart-actions.
-   - Recommendation: Extend `updateProjectSettings` schema to include optional `fabricId` field. The action already does project ownership verification and can handle the fabric link/unlink atomically. This keeps the CalculatorCard wiring simple -- one action for all param changes.
+2. **Fabric change persistence on CalculatorCard** — RESOLVED: The CalculatorCard on the project detail Supplies tab persists numeric calc params only (fabricCount, strandCount, overCount, wastePercent) via `updateProjectSettings`. Fabric assignment (fabricId) is a separate concern handled by the chart form's save action. The fabric selector in CalculatorCard is a lookup tool — selecting a fabric updates the count for immediate calculation but does not reassign the project's fabric. This is intentional: fabric assignment is a higher-intent action that belongs in the chart edit form.
 
-3. **Gallery grid size badge update scope**
-   - What we know: Gallery card (line 198-208), list view (line 289-298), and table view (line 431-439) all have inline grey size badge styling. Only the gallery card uses `bg-background/90`.
-   - What's unclear: Whether list and table views should also use colored size badges or keep grey (they use `bg-muted text-muted-foreground` and `text-muted-foreground` respectively).
-   - Recommendation: Apply colored SIZE_COLORS to all three views for consistency. The UI-SPEC mentions gallery card integration; ROADMAP says "gallery cards and Pattern Dive" which uses all three views.
+3. **Gallery grid size badge update scope** — RESOLVED: Apply colored SIZE_COLORS to all three gallery views (card, list, table) for consistency. ROADMAP says "gallery cards and Pattern Dive" which uses all three views.
 
 ## Validation Architecture
 

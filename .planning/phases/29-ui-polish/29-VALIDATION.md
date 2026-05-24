@@ -2,8 +2,8 @@
 phase: 29
 slug: ui-polish
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-23
 ---
 
@@ -17,18 +17,18 @@ created: 2026-05-23
 
 | Property | Value |
 |----------|-------|
-| **Framework** | jest 29.x (via next/jest) |
-| **Config file** | jest.config.ts |
-| **Quick run command** | `npm test -- --testPathPattern='<pattern>' --bail` |
-| **Full suite command** | `npm test` |
+| **Framework** | Vitest 3.x |
+| **Config file** | vitest.config.ts |
+| **Quick run command** | `npm test -- --run <pattern>` |
+| **Full suite command** | `npm test -- --run` |
 | **Estimated runtime** | ~45 seconds |
 
 ---
 
 ## Sampling Rate
 
-- **After every task commit:** Run `npm test -- --testPathPattern='<pattern>' --bail`
-- **After every plan wave:** Run `npm test`
+- **After every task commit:** Run `npm test -- --run <pattern>`
+- **After every plan wave:** Run `npm test -- --run`
 - **Before `/gsd-verify-work`:** Full suite must be green
 - **Max feedback latency:** 45 seconds
 
