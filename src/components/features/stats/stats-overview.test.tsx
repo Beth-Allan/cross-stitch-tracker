@@ -6,9 +6,11 @@ import type {
   SizeBreakdownItem,
   DesignerBreakdownItem,
   GenreBreakdownItem,
+  ThreadInsight,
+  DesignerInsight,
+  GenreInsight,
 } from "@/types/stats";
 
-// Mock all child components
 vi.mock("./metrics-bar", () => ({
   MetricsBar: (props: Record<string, unknown>) => (
     <div
@@ -25,7 +27,7 @@ vi.mock("./lifetime-counters", () => ({
   LifetimeCounters: (props: Record<string, unknown>) => (
     <div
       data-testid="lifetime-counters"
-      data-stitches={props.totalLifetimeStitches}
+      data-stitches={props.collectionTotalStitches}
       data-sessions={props.totalSessions}
       data-time={props.totalTimeMinutes}
       data-completed={props.projectsCompleted}
@@ -51,10 +53,20 @@ vi.mock("./genre-distribution-chart", () => ({
   GenreDistributionChart: () => <div data-testid="genre-distribution-chart" />,
 }));
 
-vi.mock("./ranked-list", () => ({
-  RankedList: (props: Record<string, unknown>) => (
-    <div data-testid="ranked-list" data-label={props.label} />
-  ),
+vi.mock("./thread-insight-list", () => ({
+  ThreadInsightList: () => <div data-testid="thread-insight-list" />,
+}));
+
+vi.mock("./designer-insight-list", () => ({
+  DesignerInsightList: () => <div data-testid="designer-insight-list" />,
+}));
+
+vi.mock("./genre-insight-list", () => ({
+  GenreInsightList: () => <div data-testid="genre-insight-list" />,
+}));
+
+vi.mock("./status-filter-pills", () => ({
+  StatusFilterPills: () => <div data-testid="status-filter-pills" />,
 }));
 
 vi.mock("./data-unavailable", () => ({
@@ -71,6 +83,7 @@ const mockHeroStats: StatsHeroData = {
   stitchesThisMonth: 4500,
   stitchesThisYear: 28000,
   totalLifetimeStitches: 125000,
+  collectionTotalStitches: 500000,
   totalSessions: 340,
   totalTimeMinutes: 15600,
   projectsCompleted: 12,
@@ -102,17 +115,55 @@ const mockGenreBreakdown: GenreBreakdownItem[] = [
   { genreId: "g2", name: "Sampler", count: 10 },
 ];
 
+const mockThreadInsights: ThreadInsight[] = [
+  {
+    threadId: "t1",
+    brandName: "DMC",
+    colorCode: "310",
+    colorName: "Black",
+    hexColor: "#000000",
+    projectCount: 5,
+  },
+];
+
+const mockDesignerInsights: DesignerInsight[] = [
+  {
+    designerId: "d1",
+    name: "Shannon Christine",
+    totalProjects: 10,
+    completedProjects: 3,
+    completionRate: 30,
+  },
+];
+
+const mockGenreInsights: GenreInsight[] = [
+  {
+    genreId: "g1",
+    name: "Fantasy",
+    projectCount: 8,
+    totalStitches: 50000,
+  },
+];
+
+function renderOverview(overrides: Partial<Parameters<typeof StatsOverview>[0]> = {}) {
+  return render(
+    <StatsOverview
+      heroStats={mockHeroStats}
+      collectionBreakdown={mockCollectionBreakdown}
+      sizeBreakdown={mockSizeBreakdown}
+      designerBreakdown={mockDesignerBreakdown}
+      genreBreakdown={mockGenreBreakdown}
+      threadInsights={mockThreadInsights}
+      designerInsights={mockDesignerInsights}
+      genreInsights={mockGenreInsights}
+      {...overrides}
+    />,
+  );
+}
+
 describe("StatsOverview", () => {
   it("renders MetricsBar with correct heroStats props", () => {
-    render(
-      <StatsOverview
-        heroStats={mockHeroStats}
-        collectionBreakdown={mockCollectionBreakdown}
-        sizeBreakdown={mockSizeBreakdown}
-        designerBreakdown={mockDesignerBreakdown}
-        genreBreakdown={mockGenreBreakdown}
-      />,
-    );
+    renderOverview();
 
     const metricsBar = screen.getByTestId("metrics-bar");
     expect(metricsBar).toHaveAttribute("data-today", "150");
@@ -121,123 +172,64 @@ describe("StatsOverview", () => {
     expect(metricsBar).toHaveAttribute("data-year", "28000");
   });
 
-  it("renders LifetimeCounters with correct heroStats props", () => {
-    render(
-      <StatsOverview
-        heroStats={mockHeroStats}
-        collectionBreakdown={mockCollectionBreakdown}
-        sizeBreakdown={mockSizeBreakdown}
-        designerBreakdown={mockDesignerBreakdown}
-        genreBreakdown={mockGenreBreakdown}
-      />,
-    );
+  it("renders LifetimeCounters with collectionTotalStitches from heroStats", () => {
+    renderOverview();
 
     const counters = screen.getByTestId("lifetime-counters");
-    expect(counters).toHaveAttribute("data-stitches", "125000");
+    expect(counters).toHaveAttribute("data-stitches", "500000");
     expect(counters).toHaveAttribute("data-sessions", "340");
     expect(counters).toHaveAttribute("data-time", "15600");
     expect(counters).toHaveAttribute("data-completed", "12");
   });
 
   it("renders CollectionStatusChart with collectionBreakdown data", () => {
-    render(
-      <StatsOverview
-        heroStats={mockHeroStats}
-        collectionBreakdown={mockCollectionBreakdown}
-        sizeBreakdown={mockSizeBreakdown}
-        designerBreakdown={mockDesignerBreakdown}
-        genreBreakdown={mockGenreBreakdown}
-      />,
-    );
+    renderOverview();
 
     const chart = screen.getByTestId("collection-status-chart");
     expect(chart).toHaveAttribute("data-total", "15");
   });
 
   it("renders SizeCategoryChart with sizeBreakdown data", () => {
-    render(
-      <StatsOverview
-        heroStats={mockHeroStats}
-        collectionBreakdown={mockCollectionBreakdown}
-        sizeBreakdown={mockSizeBreakdown}
-        designerBreakdown={mockDesignerBreakdown}
-        genreBreakdown={mockGenreBreakdown}
-      />,
-    );
-
+    renderOverview();
     expect(screen.getByTestId("size-category-chart")).toBeInTheDocument();
   });
 
   it("renders DesignerBreakdownChart with designerBreakdown data", () => {
-    render(
-      <StatsOverview
-        heroStats={mockHeroStats}
-        collectionBreakdown={mockCollectionBreakdown}
-        sizeBreakdown={mockSizeBreakdown}
-        designerBreakdown={mockDesignerBreakdown}
-        genreBreakdown={mockGenreBreakdown}
-      />,
-    );
-
+    renderOverview();
     expect(screen.getByTestId("designer-breakdown-chart")).toBeInTheDocument();
   });
 
   it("renders GenreDistributionChart with genreBreakdown data", () => {
-    render(
-      <StatsOverview
-        heroStats={mockHeroStats}
-        collectionBreakdown={mockCollectionBreakdown}
-        sizeBreakdown={mockSizeBreakdown}
-        designerBreakdown={mockDesignerBreakdown}
-        genreBreakdown={mockGenreBreakdown}
-      />,
-    );
-
+    renderOverview();
     expect(screen.getByTestId("genre-distribution-chart")).toBeInTheDocument();
   });
 
-  it("renders 2 RankedList instances (designers and genres)", () => {
-    render(
-      <StatsOverview
-        heroStats={mockHeroStats}
-        collectionBreakdown={mockCollectionBreakdown}
-        sizeBreakdown={mockSizeBreakdown}
-        designerBreakdown={mockDesignerBreakdown}
-        genreBreakdown={mockGenreBreakdown}
-      />,
-    );
+  it("does NOT render RankedList", () => {
+    renderOverview();
+    expect(screen.queryByTestId("ranked-list")).not.toBeInTheDocument();
+  });
 
-    const rankedLists = screen.getAllByTestId("ranked-list");
-    expect(rankedLists).toHaveLength(2);
-    expect(rankedLists[0]).toHaveAttribute("data-label", "Top Designers by Chart Count");
-    expect(rankedLists[1]).toHaveAttribute("data-label", "Genre Distribution by Chart Count");
+  it("renders insight lists when props provided", () => {
+    renderOverview();
+
+    expect(screen.getByTestId("thread-insight-list")).toBeInTheDocument();
+    expect(screen.getByTestId("designer-insight-list")).toBeInTheDocument();
+    expect(screen.getByTestId("genre-insight-list")).toBeInTheDocument();
+  });
+
+  it("renders StatusFilterPills", () => {
+    renderOverview();
+    expect(screen.getByTestId("status-filter-pills")).toBeInTheDocument();
   });
 
   it("renders 2x2 grid container with md:grid-cols-2", () => {
-    const { container } = render(
-      <StatsOverview
-        heroStats={mockHeroStats}
-        collectionBreakdown={mockCollectionBreakdown}
-        sizeBreakdown={mockSizeBreakdown}
-        designerBreakdown={mockDesignerBreakdown}
-        genreBreakdown={mockGenreBreakdown}
-      />,
-    );
-
+    const { container } = renderOverview();
     const grid = container.querySelector(".md\\:grid-cols-2");
     expect(grid).toBeInTheDocument();
   });
 
   it("shows DataUnavailable for heroStats when null", () => {
-    render(
-      <StatsOverview
-        heroStats={null}
-        collectionBreakdown={mockCollectionBreakdown}
-        sizeBreakdown={mockSizeBreakdown}
-        designerBreakdown={mockDesignerBreakdown}
-        genreBreakdown={mockGenreBreakdown}
-      />,
-    );
+    renderOverview({ heroStats: null });
 
     const unavailable = screen.getAllByTestId("data-unavailable");
     expect(unavailable.some((el) => el.getAttribute("data-label") === "Stats summary")).toBe(true);
@@ -246,15 +238,7 @@ describe("StatsOverview", () => {
   });
 
   it("shows DataUnavailable for collectionBreakdown when null", () => {
-    render(
-      <StatsOverview
-        heroStats={mockHeroStats}
-        collectionBreakdown={null}
-        sizeBreakdown={mockSizeBreakdown}
-        designerBreakdown={mockDesignerBreakdown}
-        genreBreakdown={mockGenreBreakdown}
-      />,
-    );
+    renderOverview({ collectionBreakdown: null });
 
     const unavailable = screen.getAllByTestId("data-unavailable");
     expect(unavailable.some((el) => el.getAttribute("data-label") === "Collection status")).toBe(
@@ -264,30 +248,40 @@ describe("StatsOverview", () => {
   });
 
   it("shows DataUnavailable for each null prop independently", () => {
-    render(
-      <StatsOverview
-        heroStats={null}
-        collectionBreakdown={null}
-        sizeBreakdown={null}
-        designerBreakdown={null}
-        genreBreakdown={null}
-      />,
-    );
+    renderOverview({
+      heroStats: null,
+      collectionBreakdown: null,
+      sizeBreakdown: null,
+      designerBreakdown: null,
+      genreBreakdown: null,
+      threadInsights: null,
+      designerInsights: null,
+      genreInsights: null,
+    });
 
     const unavailable = screen.getAllByTestId("data-unavailable");
-    expect(unavailable).toHaveLength(5);
+    expect(unavailable).toHaveLength(8);
+  });
+
+  it("shows DataUnavailable when insight props are null", () => {
+    renderOverview({
+      threadInsights: null,
+      designerInsights: null,
+      genreInsights: null,
+    });
+
+    const unavailable = screen.getAllByTestId("data-unavailable");
+    const insightLabels = unavailable.map((el) => el.getAttribute("data-label"));
+    expect(insightLabels).toContain("Thread insights");
+    expect(insightLabels).toContain("Designer insights");
+    expect(insightLabels).toContain("Genre insights");
   });
 
   it("renders normal content alongside null props", () => {
-    render(
-      <StatsOverview
-        heroStats={mockHeroStats}
-        collectionBreakdown={null}
-        sizeBreakdown={mockSizeBreakdown}
-        designerBreakdown={null}
-        genreBreakdown={mockGenreBreakdown}
-      />,
-    );
+    renderOverview({
+      collectionBreakdown: null,
+      designerBreakdown: null,
+    });
 
     expect(screen.getByTestId("metrics-bar")).toBeInTheDocument();
     expect(screen.getByTestId("size-category-chart")).toBeInTheDocument();
