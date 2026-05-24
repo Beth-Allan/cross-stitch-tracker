@@ -4,7 +4,7 @@ import { LifetimeCounters } from "./lifetime-counters";
 
 function createMockProps() {
   return {
-    totalLifetimeStitches: 54321,
+    collectionTotalStitches: 54321,
     totalSessions: 128,
     totalTimeMinutes: 2535,
     projectsCompleted: 7,
@@ -12,10 +12,10 @@ function createMockProps() {
 }
 
 describe("LifetimeCounters", () => {
-  it('renders 4 counter cards with labels "TOTAL STITCHES", "SESSIONS", "TIME STITCHING", "COMPLETED"', () => {
+  it('renders 4 counter cards with labels "STITCHES IN COLLECTION", "SESSIONS", "TIME STITCHING", "COMPLETED"', () => {
     render(<LifetimeCounters {...createMockProps()} />);
 
-    expect(screen.getByText("TOTAL STITCHES")).toBeInTheDocument();
+    expect(screen.getByText("STITCHES IN COLLECTION")).toBeInTheDocument();
     expect(screen.getByText("SESSIONS")).toBeInTheDocument();
     expect(screen.getByText("TIME STITCHING")).toBeInTheDocument();
     expect(screen.getByText("COMPLETED")).toBeInTheDocument();
@@ -33,7 +33,7 @@ describe("LifetimeCounters", () => {
   it('shows "0" for counters and "0h" for time when all values are 0', () => {
     render(
       <LifetimeCounters
-        totalLifetimeStitches={0}
+        collectionTotalStitches={0}
         totalSessions={0}
         totalTimeMinutes={0}
         projectsCompleted={0}
@@ -62,7 +62,7 @@ describe("LifetimeCounters", () => {
   it("applies uppercase tracking-wider to labels", () => {
     render(<LifetimeCounters {...createMockProps()} />);
 
-    const label = screen.getByText("TOTAL STITCHES");
+    const label = screen.getByText("STITCHES IN COLLECTION");
     expect(label.className).toContain("uppercase");
     expect(label.className).toContain("tracking-wider");
   });
@@ -70,7 +70,7 @@ describe("LifetimeCounters", () => {
   it("applies ring-1 ring-foreground/10 and rounded-xl to cards", () => {
     render(<LifetimeCounters {...createMockProps()} />);
 
-    const label = screen.getByText("TOTAL STITCHES");
+    const label = screen.getByText("STITCHES IN COLLECTION");
     const card = label.parentElement as HTMLElement;
     expect(card.className).toContain("ring-1");
     expect(card.className).toContain("ring-foreground/10");

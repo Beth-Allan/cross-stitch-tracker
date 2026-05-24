@@ -12,6 +12,7 @@ export interface StatsHeroData {
   totalSessions: number;
   totalTimeMinutes: number;
   projectsCompleted: number;
+  collectionTotalStitches: number;
 }
 
 // ─── Collection Breakdown ─────────────────────────────────────────────────
@@ -192,6 +193,7 @@ export interface ThreadInsight {
   colorName: string;
   hexColor: string;
   projectCount: number;
+  totalStitches: number;
 }
 
 // ─── Designer Insights ─────────────────────────────────────────────────────

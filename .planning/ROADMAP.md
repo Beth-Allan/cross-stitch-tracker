@@ -107,64 +107,87 @@ Full details: `milestones/v1.6-ROADMAP.md`
 **Milestone Goal:** Fix user-reported bugs, resolve stats issues, and polish UI rough edges across the shipped app.
 
 - [x] **Phase 27: Chart Form Fixes** - Fix designer quick-add, tab focus, thumbnails, stitch count calculation, and skeins display (completed 2026-05-21)
-- [ ] **Phase 28: Stats Corrections** - Fix records tab population, chart axis values, inline entity names, total stitches stat, and days-in-library formatting
+- [x] **Phase 28: Stats Corrections** - Fix records tab population, chart axis values, inline entity names, total stitches stat, and days-in-library formatting (completed 2026-05-24)
 - [ ] **Phase 29: UI Polish** - Colored status/size pills, digital copy indicator, supply sort fix, skein calc controls on project supplies, file upload improvements
 - [ ] **Phase 30: Code Quality** - Resolve TypeScript test errors, fix silent failures, clean up R2 photo orphans, centralize status colors, extract shared constants and hooks
 
 ## Phase Details
 
 ### Phase 27: Chart Form Fixes
+
 **Goal**: Chart creation and editing form works correctly for all input fields and displays accurate data on related pages
 **Depends on**: Nothing (first phase of v1.7)
 **Requirements**: BUG-01, BUG-02, BUG-04, BUG-05, BUG-06
 **Success Criteria** (what must be TRUE):
+
   1. User can type a new designer name in the Designer field on /charts/new and create it inline without leaving the form
   2. User can tab into the Designer field and immediately type to search existing designers (no extra click needed)
   3. Designer detail pages show the correct chart cover thumbnail for each chart (not wrong/missing images)
   4. Total stitch count on the chart form auto-updates when user changes per-colour stitch counts in supply entry
   5. Auto-calculated skeins value displays fully (not clipped or truncated) in the supply takeover skein calculator card
+
 **Plans**: 2 plans
 Plans:
+
 - [x] 27-01-PLAN.md -- Designer inline creation, tab focus, and supply stitch total hint
 - [x] 27-02-PLAN.md -- Designer detail thumbnails and Need column width
+
 **UI hint**: yes
 
 ### Phase 28: Stats Corrections
+
 **Goal**: Statistics page displays accurate, well-formatted data across all three tabs
 **Depends on**: Nothing (independent of Phase 27)
 **Requirements**: STAT-01, STAT-02, STAT-03, STAT-04, STAT-05
 **Success Criteria** (what must be TRUE):
+
   1. Records tab shows populated thread statistics, personal bests, and insights sections (not empty/missing)
   2. Collection breakdown chart Y-axes display only integer tick values for discrete data (no 0.5, 1.5 labels)
   3. Collection breakdown charts show entity names directly on/near bars instead of in separate linked lists
   4. Stats overview displays total stitches across all projects as a hero counter
   5. Days-in-library displays as a large prominent number with a small descriptive label beneath it
-**Plans**: TBD
+
+**Plans**: 3 plansPlans:
+**Wave 1**
+
+- [x] 28-01-PLAN.md -- Data layer: status groups utility, insight query rewrites, collection total
+- [x] 28-03-PLAN.md -- Chart axis fixes and days-in-library formatAge fix
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 28-02-PLAN.md -- Component restructuring: StatusFilterPills, Overview/Records tab rewiring
+
 **UI hint**: yes
 
 ### Phase 29: UI Polish
+
 **Goal**: Gallery cards, project detail supplies, and file uploads are visually polished and functionally complete
 **Depends on**: Nothing (independent of Phases 27-28)
 **Requirements**: UI-01, UI-02, UI-03, UI-04, UI-05, BUG-03
 **Success Criteria** (what must be TRUE):
+
   1. Status and size category pills on gallery cards and Pattern Dive use their designated colors (not grey)
   2. Gallery cards show a visual indicator when a chart has an uploaded digital working copy
   3. User can sort supplies by "Added" order and alphabetically (A-Z) on the project detail Supplies tab
   4. Project supplies card includes skein calculation adjustment controls (fabric count, over 1/2, waste percentage)
   5. User can upload files up to 15MB, including .zip files as digital working copies
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 30: Code Quality
+
 **Goal**: Codebase has zero TypeScript test errors, no silent failure patterns, and shared design tokens/utilities replace scattered duplicates
 **Depends on**: Phases 27-29 (builds on code changed in earlier phases)
 **Requirements**: QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05, QUAL-06
 **Success Criteria** (what must be TRUE):
+
   1. `npm run build` and test suite produce zero TypeScript errors across all test files (dashboard-tabs, chart-actions, shopping-cart-actions)
   2. No `.catch(() => {})`, `.catch(() => null)`, or bare `catch {}` patterns remain in upload-actions, chart page, or log-session-modal
   3. Replacing a session photo deletes the old image from R2 (no orphaned files)
   4. Status colors defined as CSS custom properties and consumed from a single source (not scattered Tailwind color scales)
   5. DEFAULT_SUPPLY_HEX extracted to a shared constant, and useRejectionFlash extracted to a shared hook
+
 **Plans**: TBD
 
 ## Progress
@@ -202,6 +225,6 @@ Phases execute in numeric order: 27 → 28 → 29 → 30
 | 25. Shopping Cart Scaling | v1.6 | 2/2 | Complete | 2026-05-20 |
 | 26. UX Polish | v1.6 | 3/3 | Complete | 2026-05-20 |
 | 27. Chart Form Fixes | v1.7 | 2/2 | Complete    | 2026-05-23 |
-| 28. Stats Corrections | v1.7 | 0/0 | Not started | - |
+| 28. Stats Corrections | v1.7 | 3/3 | Complete    | 2026-05-24 |
 | 29. UI Polish | v1.7 | 0/0 | Not started | - |
 | 30. Code Quality | v1.7 | 0/0 | Not started | - |

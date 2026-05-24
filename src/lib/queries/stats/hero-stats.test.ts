@@ -33,6 +33,9 @@ describe("getHeroStats", () => {
       _count: { id: 0 },
     });
     mockPrisma.project.count.mockResolvedValue(0);
+    mockPrisma.chart.aggregate.mockResolvedValue({
+      _sum: { stitchCount: null },
+    });
 
     const { getHeroStats } = await import("./hero-stats");
     const result = await getHeroStats("user-1");
@@ -46,6 +49,7 @@ describe("getHeroStats", () => {
       totalSessions: 0,
       totalTimeMinutes: 0,
       projectsCompleted: 0,
+      collectionTotalStitches: 0,
     });
   });
 
@@ -61,6 +65,9 @@ describe("getHeroStats", () => {
         _count: { id: 42 },
       }); // lifetime
     mockPrisma.project.count.mockResolvedValue(3);
+    mockPrisma.chart.aggregate.mockResolvedValue({
+      _sum: { stitchCount: 500000 },
+    });
 
     const { getHeroStats } = await import("./hero-stats");
     const result = await getHeroStats("user-1");
@@ -83,6 +90,9 @@ describe("getHeroStats", () => {
         _count: { id: 25 },
       });
     mockPrisma.project.count.mockResolvedValue(0);
+    mockPrisma.chart.aggregate.mockResolvedValue({
+      _sum: { stitchCount: null },
+    });
 
     const { getHeroStats } = await import("./hero-stats");
     const result = await getHeroStats("user-1");
@@ -101,6 +111,9 @@ describe("getHeroStats", () => {
         _count: { id: 10 },
       });
     mockPrisma.project.count.mockResolvedValue(0);
+    mockPrisma.chart.aggregate.mockResolvedValue({
+      _sum: { stitchCount: null },
+    });
 
     const { getHeroStats } = await import("./hero-stats");
     const result = await getHeroStats("user-1");
@@ -114,6 +127,9 @@ describe("getHeroStats", () => {
       _count: { id: 0 },
     });
     mockPrisma.project.count.mockResolvedValue(7);
+    mockPrisma.chart.aggregate.mockResolvedValue({
+      _sum: { stitchCount: null },
+    });
 
     const { getHeroStats } = await import("./hero-stats");
     const result = await getHeroStats("user-1");
@@ -124,12 +140,51 @@ describe("getHeroStats", () => {
     });
   });
 
+  it("returns collectionTotalStitches from chart.aggregate sum", async () => {
+    mockPrisma.stitchSession.aggregate.mockResolvedValue({
+      _sum: { stitchCount: null, timeSpentMinutes: null },
+      _count: { id: 0 },
+    });
+    mockPrisma.project.count.mockResolvedValue(0);
+    mockPrisma.chart.aggregate.mockResolvedValue({
+      _sum: { stitchCount: 500000 },
+    });
+
+    const { getHeroStats } = await import("./hero-stats");
+    const result = await getHeroStats("user-1");
+
+    expect(result.collectionTotalStitches).toBe(500000);
+    expect(mockPrisma.chart.aggregate).toHaveBeenCalledWith({
+      where: { project: { userId: "user-1" } },
+      _sum: { stitchCount: true },
+    });
+  });
+
+  it("defaults collectionTotalStitches to 0 when aggregate returns null", async () => {
+    mockPrisma.stitchSession.aggregate.mockResolvedValue({
+      _sum: { stitchCount: null, timeSpentMinutes: null },
+      _count: { id: 0 },
+    });
+    mockPrisma.project.count.mockResolvedValue(0);
+    mockPrisma.chart.aggregate.mockResolvedValue({
+      _sum: { stitchCount: null },
+    });
+
+    const { getHeroStats } = await import("./hero-stats");
+    const result = await getHeroStats("user-1");
+
+    expect(result.collectionTotalStitches).toBe(0);
+  });
+
   it("passes timezone-aware date boundaries to Prisma WHERE clauses", async () => {
     mockPrisma.stitchSession.aggregate.mockResolvedValue({
       _sum: { stitchCount: null, timeSpentMinutes: null },
       _count: { id: 0 },
     });
     mockPrisma.project.count.mockResolvedValue(0);
+    mockPrisma.chart.aggregate.mockResolvedValue({
+      _sum: { stitchCount: null },
+    });
 
     const { getHeroStats } = await import("./hero-stats");
     await getHeroStats("user-1");

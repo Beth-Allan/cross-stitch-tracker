@@ -5,7 +5,10 @@ import { CollectionStatusChart } from "./collection-status-chart";
 import { SizeCategoryChart } from "./size-category-chart";
 import { DesignerBreakdownChart } from "./designer-breakdown-chart";
 import { GenreDistributionChart } from "./genre-distribution-chart";
-import { RankedList } from "./ranked-list";
+import { ThreadInsightList } from "./thread-insight-list";
+import { DesignerInsightList } from "./designer-insight-list";
+import { GenreInsightList } from "./genre-insight-list";
+import { StatusFilterPills } from "./status-filter-pills";
 import { DataUnavailable } from "./data-unavailable";
 import type {
   StatsHeroData,
@@ -13,6 +16,9 @@ import type {
   SizeBreakdownItem,
   DesignerBreakdownItem,
   GenreBreakdownItem,
+  ThreadInsight,
+  DesignerInsight,
+  GenreInsight,
 } from "@/types/stats";
 
 interface StatsOverviewProps {
@@ -21,6 +27,9 @@ interface StatsOverviewProps {
   sizeBreakdown: SizeBreakdownItem[] | null;
   designerBreakdown: DesignerBreakdownItem[] | null;
   genreBreakdown: GenreBreakdownItem[] | null;
+  threadInsights: ThreadInsight[] | null;
+  designerInsights: DesignerInsight[] | null;
+  genreInsights: GenreInsight[] | null;
 }
 
 export function StatsOverview({
@@ -29,6 +38,9 @@ export function StatsOverview({
   sizeBreakdown,
   designerBreakdown,
   genreBreakdown,
+  threadInsights,
+  designerInsights,
+  genreInsights,
 }: StatsOverviewProps) {
   return (
     <div className="space-y-8">
@@ -41,7 +53,7 @@ export function StatsOverview({
             stitchesThisYear={heroStats.stitchesThisYear}
           />
           <LifetimeCounters
-            totalLifetimeStitches={heroStats.totalLifetimeStitches}
+            collectionTotalStitches={heroStats.collectionTotalStitches}
             totalSessions={heroStats.totalSessions}
             totalTimeMinutes={heroStats.totalTimeMinutes}
             projectsCompleted={heroStats.projectsCompleted}
@@ -88,15 +100,6 @@ export function StatsOverview({
             </CardHeader>
             <CardContent>
               <DesignerBreakdownChart data={designerBreakdown} />
-              <RankedList
-                items={designerBreakdown.map((d) => ({
-                  id: d.designerId,
-                  name: d.name,
-                  count: d.count,
-                  href: `/designers/${d.designerId}`,
-                }))}
-                label="Top Designers by Chart Count"
-              />
             </CardContent>
           </Card>
         ) : (
@@ -110,19 +113,32 @@ export function StatsOverview({
             </CardHeader>
             <CardContent>
               <GenreDistributionChart data={genreBreakdown} />
-              <RankedList
-                items={genreBreakdown.map((g) => ({
-                  id: g.genreId,
-                  name: g.name,
-                  count: g.count,
-                  href: `/genres/${g.genreId}`,
-                }))}
-                label="Genre Distribution by Chart Count"
-              />
             </CardContent>
           </Card>
         ) : (
           <DataUnavailable label="Genre distribution" />
+        )}
+      </div>
+
+      <div className="flex justify-end">
+        <StatusFilterPills />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {threadInsights !== null ? (
+          <ThreadInsightList items={threadInsights} />
+        ) : (
+          <DataUnavailable label="Thread insights" />
+        )}
+        {designerInsights !== null ? (
+          <DesignerInsightList items={designerInsights} />
+        ) : (
+          <DataUnavailable label="Designer insights" />
+        )}
+        {genreInsights !== null ? (
+          <GenreInsightList items={genreInsights} />
+        ) : (
+          <DataUnavailable label="Genre insights" />
         )}
       </div>
     </div>

@@ -1,25 +1,23 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
-import { buildDateFilter, type Scope } from "./utils";
+import { resolveStatusFilter, type StatusGroup } from "@/lib/utils/status-groups";
 import type { DesignerInsight } from "@/types/stats";
 
 const COMPLETED_STATUSES = ["FINISHED", "FFO"] as const;
 
 async function computeDesignerInsights(
   userId: string,
-  scope: Scope,
+  statusGroups: StatusGroup[],
   limit: number,
 ): Promise<DesignerInsight[]> {
   try {
-    const tz = getUserTimezone(userId);
-    const dateFilter = buildDateFilter(scope, tz);
+    const statusFilter = resolveStatusFilter(statusGroups);
 
     const projects = await prisma.project.findMany({
       where: {
         userId,
         chart: { designerId: { not: null } },
-        ...(dateFilter ? { sessions: { some: { date: dateFilter } } } : {}),
+        ...(statusFilter.length > 0 ? { status: { in: statusFilter } } : {}),
       },
       select: {
         id: true,
@@ -70,19 +68,22 @@ async function computeDesignerInsights(
       .sort((a, b) => b.completionRate - a.completionRate)
       .slice(0, limit);
   } catch (error) {
-    console.error("[stats] computeDesignerInsights failed:", { userId, scope, limit, error });
+    console.error("[stats] computeDesignerInsights failed:", {
+      userId,
+      statusGroups,
+      limit,
+      error: error instanceof Error ? error.message : String(error),
+    });
     throw error;
   }
 }
 
-export function getDesignerInsights(userId: string, scope: Scope, limit = 10) {
-  const currentYear = new Date().getFullYear();
-  const year = parseInt(scope, 10);
-  const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;
+export function getDesignerInsights(userId: string, statusGroups: StatusGroup[], limit = 10) {
+  const cacheKey = statusGroups.length > 0 ? [...statusGroups].sort().join(",") : "all";
 
   return unstable_cache(
-    () => computeDesignerInsights(userId, scope, limit),
-    [`stats-designer-insights-${userId}-${scope}-${limit}`],
-    { tags: ["stats"], revalidate },
+    () => computeDesignerInsights(userId, statusGroups, limit),
+    [`stats-designer-insights-${userId}-${cacheKey}-${limit}`],
+    { tags: ["stats"], revalidate: 300 },
   )();
 }

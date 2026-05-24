@@ -22,7 +22,7 @@ describe("getDesignerInsights", () => {
     mockPrisma.project.findMany.mockResolvedValue([]);
 
     const { getDesignerInsights } = await import("./designer-insights");
-    const result = await getDesignerInsights("user-1", "all");
+    const result = await getDesignerInsights("user-1", []);
 
     expect(result).toEqual([]);
   });
@@ -57,7 +57,7 @@ describe("getDesignerInsights", () => {
     ]);
 
     const { getDesignerInsights } = await import("./designer-insights");
-    const result = await getDesignerInsights("user-1", "all");
+    const result = await getDesignerInsights("user-1", []);
 
     expect(result.length).toBeGreaterThanOrEqual(2);
 
@@ -74,76 +74,11 @@ describe("getDesignerInsights", () => {
 
   it("includes fraction parts (totalProjects, completedProjects)", async () => {
     mockPrisma.project.findMany.mockResolvedValue([
-      {
-        id: "p1",
+      ...Array.from({ length: 14 }, (_, i) => ({
+        id: `p${i + 1}`,
         status: "FINISHED",
         chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p2",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p3",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p4",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p5",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p6",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p7",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p8",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p9",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p10",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p11",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p12",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p13",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
-      {
-        id: "p14",
-        status: "FINISHED",
-        chart: { designerId: "d1", designer: { id: "d1", name: "Test" } },
-      },
+      })),
       {
         id: "p15",
         status: "IN_PROGRESS",
@@ -162,7 +97,7 @@ describe("getDesignerInsights", () => {
     ]);
 
     const { getDesignerInsights } = await import("./designer-insights");
-    const result = await getDesignerInsights("user-1", "all");
+    const result = await getDesignerInsights("user-1", []);
 
     expect(result[0].totalProjects).toBe(17);
     expect(result[0].completedProjects).toBe(14);
@@ -204,11 +139,32 @@ describe("getDesignerInsights", () => {
     ]);
 
     const { getDesignerInsights } = await import("./designer-insights");
-    const result = await getDesignerInsights("user-1", "all");
+    const result = await getDesignerInsights("user-1", []);
 
     expect(result[0].name).toBe("High Rate");
     expect(result[0].completionRate).toBe(100);
     expect(result[1].name).toBe("Low Rate");
     expect(result[1].completionRate).toBe(25);
+  });
+
+  it("queries all projects when statusGroups is empty (no status filter)", async () => {
+    mockPrisma.project.findMany.mockResolvedValue([]);
+
+    const { getDesignerInsights } = await import("./designer-insights");
+    await getDesignerInsights("user-1", []);
+
+    const call = mockPrisma.project.findMany.mock.calls[0][0];
+    expect(call.where).not.toHaveProperty("status");
+    expect(call.where).not.toHaveProperty("sessions");
+  });
+
+  it("filters by resolved statuses when statusGroups is provided", async () => {
+    mockPrisma.project.findMany.mockResolvedValue([]);
+
+    const { getDesignerInsights } = await import("./designer-insights");
+    await getDesignerInsights("user-1", ["complete"]);
+
+    const call = mockPrisma.project.findMany.mock.calls[0][0];
+    expect(call.where.status).toEqual({ in: ["FINISHED", "FFO"] });
   });
 });

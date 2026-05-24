@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Fix & Polish
-status: Phase 27 shipped — PR #52
-stopped_at: Phase 27 shipped — PR #52. Ready to discuss Phase 28.
-last_updated: 2026-05-23T23:45:00.000Z
-last_activity: 2026-05-23 -- Phase 27 shipped — PR #52
+status: "Phase 28 shipped — PR #53"
+last_updated: "2026-05-24T03:12:06.812Z"
+last_activity: 2026-05-23
 progress:
   total_phases: 4
-  completed_phases: 0
-  total_plans: 2
-  completed_plans: 2
-  percent: 0
+  completed_phases: 1
+  total_plans: 5
+  completed_plans: 5
+  percent: 25
 ---
 
 # Project State
@@ -21,13 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-20)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 28 — stats corrections
+**Current focus:** Phase 29 — ui polish
 
 ## Current Position
 
-Phase: 28
+Phase: 29
 Plan: Not started
-Status: Ready to plan
+Status: Phase 28 shipped — PR #53
 Last activity: 2026-05-23
 
 Progress: [██░░░░░░░░] 1/4 phases (25%)
@@ -79,5 +78,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-05-23
-Stopped at: Phase 27 verified and marked complete. Ready to discuss Phase 28.
-Resume file: None
+Stopped at: Phase 28 UI-SPEC approved
+Resume file: .planning/phases/28-stats-corrections/28-UI-SPEC.md

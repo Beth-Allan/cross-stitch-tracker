@@ -341,6 +341,7 @@ describe("Records & Insights Types", () => {
         colorName: "Black",
         hexColor: "#000000",
         projectCount: 12,
+        totalStitches: 4500,
       };
       expect(item.threadId).toBe("t1");
       expect(item.brandName).toBe("DMC");

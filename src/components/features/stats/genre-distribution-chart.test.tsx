@@ -15,7 +15,13 @@ vi.mock("recharts", () => ({
       {children}
     </div>
   ),
-  XAxis: ({ type }: { type?: string }) => <div data-testid="x-axis" data-type={type} />,
+  XAxis: ({ type, allowDecimals }: { type?: string; allowDecimals?: boolean }) => (
+    <div
+      data-testid="x-axis"
+      data-type={type}
+      data-allow-decimals={allowDecimals === false ? "false" : "true"}
+    />
+  ),
   YAxis: ({ type, dataKey }: { type?: string; dataKey?: string }) => (
     <div data-testid="y-axis" data-type={type} data-key={dataKey} />
   ),
@@ -72,6 +78,13 @@ describe("GenreDistributionChart", () => {
 
     expect(screen.getByText("No genres yet")).toBeInTheDocument();
     expect(screen.queryByTestId("chart-container")).not.toBeInTheDocument();
+  });
+
+  it("disallows decimal tick values on the numeric X-axis", () => {
+    render(<GenreDistributionChart data={mockGenreData} />);
+
+    const xAxis = screen.getByTestId("x-axis");
+    expect(xAxis).toHaveAttribute("data-allow-decimals", "false");
   });
 
   it('renders Bar with dataKey="count" and fill="var(--chart-3)"', () => {

@@ -39,12 +39,19 @@ export function ThreadInsightList({ items }: ThreadInsightListProps) {
                     />
                   )}
                   <span className="text-foreground text-sm">
-                    {item.brandName} {item.colorCode} -- {item.colorName}
+                    {item.brandName} {item.colorCode}
                   </span>
                 </div>
-                <span className="text-muted-foreground font-mono text-xs whitespace-nowrap tabular-nums">
-                  {item.projectCount} {item.projectCount === 1 ? "project" : "projects"}
-                </span>
+                <div className="text-muted-foreground flex shrink-0 flex-col items-end font-mono text-xs tabular-nums">
+                  <span>
+                    {item.projectCount} {item.projectCount === 1 ? "project" : "projects"}
+                  </span>
+                  {item.totalStitches > 0 && (
+                    <span className="text-muted-foreground/70 text-[10px]">
+                      {item.totalStitches.toLocaleString()} stitches
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>

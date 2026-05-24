@@ -1,39 +1,22 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { YearScopeToggle } from "./year-scope-toggle";
 import { RecordsTable } from "./records-table";
-import { ThreadInsightList } from "./thread-insight-list";
-import { DesignerInsightList } from "./designer-insight-list";
-import { GenreInsightList } from "./genre-insight-list";
 import { CompletionEstimatesSection } from "./completion-estimates-section";
 import { DataUnavailable } from "./data-unavailable";
-import type {
-  PersonalBestRecord,
-  FastestCompletion,
-  ThreadInsight,
-  DesignerInsight,
-  GenreInsight,
-  CompletionEstimate,
-} from "@/types/stats";
+import type { PersonalBestRecord, FastestCompletion, CompletionEstimate } from "@/types/stats";
 
 interface RecordsOverviewProps {
   personalBests: PersonalBestRecord[] | null;
   fastestCompletions: FastestCompletion[] | null;
-  threadInsights: ThreadInsight[] | null;
-  designerInsights: DesignerInsight[] | null;
-  genreInsights: GenreInsight[] | null;
   completionEstimates: CompletionEstimate[] | null;
-  availableYears: number[] | null;
+  totalSessionStitches: number | null;
   hasNoSessions: boolean;
 }
 
 export function RecordsOverview({
   personalBests,
   fastestCompletions,
-  threadInsights,
-  designerInsights,
-  genreInsights,
   completionEstimates,
-  availableYears,
+  totalSessionStitches,
   hasNoSessions,
 }: RecordsOverviewProps) {
   if (hasNoSessions) {
@@ -49,12 +32,15 @@ export function RecordsOverview({
 
   return (
     <div className="space-y-8">
-      {availableYears !== null ? (
-        <div className="mb-4 flex justify-end">
-          <YearScopeToggle availableYears={availableYears} />
+      {totalSessionStitches !== null ? (
+        <div className="bg-card ring-foreground/10 rounded-xl p-4 ring-1">
+          <p className="text-muted-foreground text-xs tracking-wider uppercase">STITCHES LOGGED</p>
+          <p className="text-foreground mt-1 font-mono text-lg font-semibold tabular-nums">
+            {totalSessionStitches.toLocaleString()}
+          </p>
         </div>
       ) : (
-        <DataUnavailable label="Year filter" />
+        <DataUnavailable label="Stitches logged" />
       )}
 
       {personalBests !== null && fastestCompletions !== null ? (
@@ -66,24 +52,6 @@ export function RecordsOverview({
       ) : (
         <DataUnavailable label="Personal records" />
       )}
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {threadInsights !== null ? (
-          <ThreadInsightList items={threadInsights} />
-        ) : (
-          <DataUnavailable label="Thread insights" />
-        )}
-        {designerInsights !== null ? (
-          <DesignerInsightList items={designerInsights} />
-        ) : (
-          <DataUnavailable label="Designer insights" />
-        )}
-        {genreInsights !== null ? (
-          <GenreInsightList items={genreInsights} />
-        ) : (
-          <DataUnavailable label="Genre insights" />
-        )}
-      </div>
 
       {completionEstimates !== null ? (
         <CompletionEstimatesSection items={completionEstimates} />

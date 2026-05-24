@@ -436,6 +436,7 @@ export function createMockPrisma() {
       updateMany: vi.fn(),
       delete: vi.fn(),
       groupBy: vi.fn(),
+      aggregate: vi.fn(),
     },
     project: {
       findUnique: vi.fn(),

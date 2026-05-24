@@ -22,16 +22,16 @@ describe("getThreadInsights", () => {
     mockPrisma.projectThread.groupBy.mockResolvedValue([]);
 
     const { getThreadInsights } = await import("./thread-insights");
-    const result = await getThreadInsights("user-1", "all");
+    const result = await getThreadInsights("user-1", []);
 
     expect(result).toEqual([]);
   });
 
   it("returns threads ranked by project count descending", async () => {
     mockPrisma.projectThread.groupBy.mockResolvedValue([
-      { threadId: "t1", _count: { projectId: 10 } },
-      { threadId: "t2", _count: { projectId: 5 } },
-      { threadId: "t3", _count: { projectId: 2 } },
+      { threadId: "t1", _count: { projectId: 10 }, _sum: { stitchCount: 5000 } },
+      { threadId: "t2", _count: { projectId: 5 }, _sum: { stitchCount: 2500 } },
+      { threadId: "t3", _count: { projectId: 2 }, _sum: { stitchCount: 800 } },
     ]);
     mockPrisma.thread.findMany.mockResolvedValue([
       {
@@ -58,7 +58,7 @@ describe("getThreadInsights", () => {
     ]);
 
     const { getThreadInsights } = await import("./thread-insights");
-    const result = await getThreadInsights("user-1", "all");
+    const result = await getThreadInsights("user-1", []);
 
     expect(result).toHaveLength(3);
     expect(result[0].threadId).toBe("t1");
@@ -72,7 +72,7 @@ describe("getThreadInsights", () => {
 
   it("includes brandName, colorCode, colorName, hexColor from thread + brand", async () => {
     mockPrisma.projectThread.groupBy.mockResolvedValue([
-      { threadId: "t1", _count: { projectId: 3 } },
+      { threadId: "t1", _count: { projectId: 3 }, _sum: { stitchCount: 1200 } },
     ]);
     mockPrisma.thread.findMany.mockResolvedValue([
       {
@@ -85,7 +85,7 @@ describe("getThreadInsights", () => {
     ]);
 
     const { getThreadInsights } = await import("./thread-insights");
-    const result = await getThreadInsights("user-1", "all");
+    const result = await getThreadInsights("user-1", []);
 
     expect(result[0]).toEqual({
       threadId: "t1",
@@ -94,12 +94,13 @@ describe("getThreadInsights", () => {
       colorName: "Medium Blue",
       hexColor: "#3366CC",
       projectCount: 3,
+      totalStitches: 1200,
     });
   });
 
   it("respects limit parameter", async () => {
     mockPrisma.projectThread.groupBy.mockResolvedValue([
-      { threadId: "t1", _count: { projectId: 10 } },
+      { threadId: "t1", _count: { projectId: 10 }, _sum: { stitchCount: 5000 } },
     ]);
     mockPrisma.thread.findMany.mockResolvedValue([
       {
@@ -112,10 +113,43 @@ describe("getThreadInsights", () => {
     ]);
 
     const { getThreadInsights } = await import("./thread-insights");
-    await getThreadInsights("user-1", "all", 5);
+    await getThreadInsights("user-1", [], 5);
 
     expect(mockPrisma.projectThread.groupBy).toHaveBeenCalledWith(
       expect.objectContaining({ take: 5 }),
     );
+  });
+
+  it("queries all projects when statusGroups is empty (no status filter)", async () => {
+    mockPrisma.projectThread.groupBy.mockResolvedValue([]);
+
+    const { getThreadInsights } = await import("./thread-insights");
+    await getThreadInsights("user-1", []);
+
+    const call = mockPrisma.projectThread.groupBy.mock.calls[0][0];
+    expect(call.where.project).toEqual({ userId: "user-1" });
+  });
+
+  it("filters by resolved statuses when statusGroups is provided", async () => {
+    mockPrisma.projectThread.groupBy.mockResolvedValue([]);
+
+    const { getThreadInsights } = await import("./thread-insights");
+    await getThreadInsights("user-1", ["not-started"]);
+
+    const call = mockPrisma.projectThread.groupBy.mock.calls[0][0];
+    expect(call.where.project).toEqual({
+      userId: "user-1",
+      status: { in: ["UNSTARTED"] },
+    });
+  });
+
+  it("does not include session-gated where clause", async () => {
+    mockPrisma.projectThread.groupBy.mockResolvedValue([]);
+
+    const { getThreadInsights } = await import("./thread-insights");
+    await getThreadInsights("user-1", []);
+
+    const call = mockPrisma.projectThread.groupBy.mock.calls[0][0];
+    expect(call.where.project).not.toHaveProperty("sessions");
   });
 });
