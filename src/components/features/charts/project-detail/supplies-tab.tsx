@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useTransition, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { SupplyTable } from "@/components/features/supply-table";
 import type { SupplyRow, CalcParams } from "@/components/features/supply-table";
 import { ServerActionAdapter } from "@/components/features/supply-table/server-action-adapter";
+import { CalculatorCard } from "@/components/features/charts/form-primitives/calculator-card";
+import { updateProjectSettings } from "@/lib/actions/chart-actions";
 import type { ProjectDetailProps, SupplySortOption } from "./types";
 import type {
   ProjectThreadWithThread,
@@ -12,11 +15,19 @@ import type {
   ProjectSpecialtyWithItem,
 } from "@/types/supply";
 
+interface FabricOption {
+  value: string;
+  label: string;
+  count: number;
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface SuppliesTabProps {
   project: NonNullable<ProjectDetailProps["chart"]["project"]>;
   supplies: NonNullable<ProjectDetailProps["supplies"]>;
+  fabricOptions?: FabricOption[];
+  chartId?: string;
 }
 
 // ─── Data Transform Helpers ───────────────────────────────────────────────────
@@ -80,9 +91,10 @@ function sortSupplyRows(items: SupplyRow[], sortOption: SupplySortOption): Suppl
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function SuppliesTab({ project, supplies }: SuppliesTabProps) {
+export function SuppliesTab({ project, supplies, fabricOptions, chartId }: SuppliesTabProps) {
   const router = useRouter();
   const [sortOption, setSortOption] = useState<SupplySortOption>("added");
+  const [isPending, startTransition] = useTransition();
 
   // Stabilize router.refresh reference to prevent adapter recreation
   const stableRefresh = useCallback(() => router.refresh(), [router]);
@@ -93,8 +105,8 @@ export function SuppliesTab({ project, supplies }: SuppliesTabProps) {
     [project.id, stableRefresh],
   );
 
-  // CalcParams derived from project fields
-  const calcParams: Partial<CalcParams> = useMemo(
+  // CalculatorCard local state for calc params (optimistic updates)
+  const serverCalcParams: CalcParams = useMemo(
     () => ({
       fabricCount: project.fabric?.count ?? 14,
       strandCount: project.strandCount as CalcParams["strandCount"],
@@ -103,6 +115,61 @@ export function SuppliesTab({ project, supplies }: SuppliesTabProps) {
     }),
     [project.fabric?.count, project.strandCount, project.overCount, project.wastePercent],
   );
+
+  const [localCalcParams, setLocalCalcParams] = useState<CalcParams>(serverCalcParams);
+  const [localFabricId, setLocalFabricId] = useState<string | null>(project.fabric?.id ?? null);
+
+  // Keep ref to latest server params for rollback
+  const serverParamsRef = useRef(serverCalcParams);
+  useEffect(() => {
+    serverParamsRef.current = serverCalcParams;
+  }, [serverCalcParams]);
+
+  // Use local state during pending transitions, server state otherwise
+  const calcParams: CalcParams = isPending ? localCalcParams : serverCalcParams;
+
+  const handleCalcParamsChange = useCallback(
+    (newParams: CalcParams) => {
+      if (!chartId) return;
+      setLocalCalcParams(newParams);
+
+      // Only persist fields that exist as Project columns
+      const persistFields: Record<string, number> = {};
+      if (newParams.strandCount !== serverParamsRef.current.strandCount) {
+        persistFields.strandCount = newParams.strandCount;
+      }
+      if (newParams.overCount !== serverParamsRef.current.overCount) {
+        persistFields.overCount = newParams.overCount;
+      }
+      if (newParams.wastePercent !== serverParamsRef.current.wastePercent) {
+        persistFields.wastePercent = newParams.wastePercent;
+      }
+
+      if (Object.keys(persistFields).length === 0) return;
+
+      startTransition(async () => {
+        try {
+          const result = await updateProjectSettings(chartId, persistFields);
+          if (!result.success) {
+            setLocalCalcParams(serverParamsRef.current);
+            toast.error("Couldn't save settings. Please try again.");
+          }
+        } catch (error) {
+          console.error("SuppliesTab calc param save failed:", error);
+          setLocalCalcParams(serverParamsRef.current);
+          toast.error("Couldn't save settings. Please try again.");
+        }
+      });
+    },
+    [chartId],
+  );
+
+  const handleFabricChange = useCallback((fabricId: string | null, fabricCount?: number) => {
+    setLocalFabricId(fabricId);
+    if (fabricCount != null) {
+      setLocalCalcParams((prev) => ({ ...prev, fabricCount }));
+    }
+  }, []);
 
   // Transform + sort supply rows (parent pre-sorts, table is sort-unaware)
   const threads = useMemo(
@@ -120,6 +187,16 @@ export function SuppliesTab({ project, supplies }: SuppliesTabProps) {
 
   return (
     <div className="space-y-4">
+      {fabricOptions && chartId && (
+        <CalculatorCard
+          calcParams={calcParams}
+          onCalcParamsChange={handleCalcParamsChange}
+          fabricId={localFabricId}
+          onFabricChange={handleFabricChange}
+          fabricOptions={fabricOptions}
+        />
+      )}
+
       <div className="flex items-center justify-end gap-1">
         <button
           onClick={() => setSortOption("added")}
