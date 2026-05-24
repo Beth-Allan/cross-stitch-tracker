@@ -10,11 +10,10 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 ## Current State
 
-**Last shipped:** v1.6 Cleanup & Hardening (2026-05-20)
-**7 milestones shipped:** v1.0-v1.6 (26 phases, 122 plans)
-**Current:** v1.7 Fix & Polish (Phases 27-30) — Phase 29 complete (2026-05-24)
+**Last shipped:** v1.7 Fix & Polish (2026-05-24)
+**8 milestones shipped:** v1.0-v1.7 (30 phases, 133 plans)
 
-The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters) with colored status/size badges and digital copy indicators, project detail with tabbed layout, session logging, and inline skein calculator controls, unified supply table with keyboard-first entry and visible commit button, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project search, status grouping, supply search, smart selection, and squared pills, image optimization, multi-file working copies per chart (up to 50MB, including .zip), click-to-set focal point control for cover images with repositioned action bar, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights with stitch counts, status filter pills, and celebration confetti on record-breaking sessions. 2,269 tests, ~110k LOC TypeScript. Stats insights now populate from library data (not just session-tracked projects) with status group filtering. Integer-only chart axes. Collection total stitch counter. Days-in-library display fix.
+The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters) with colored status/size badges and digital copy indicators, project detail with tabbed layout, session logging, and inline skein calculator controls, unified supply table with keyboard-first entry and visible commit button, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project search, status grouping, supply search, smart selection, and squared pills, image optimization, multi-file working copies per chart (up to 50MB, including .zip), click-to-set focal point control for cover images with repositioned action bar, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights with stitch counts, status filter pills, and celebration confetti on record-breaking sessions. 2,283 tests, ~110k LOC TypeScript. Status colors centralized as CSS custom properties. Stats insights populate from library data with status group filtering. R2 photo orphans cleaned up on replacement.
 
 ## Requirements
 
@@ -91,15 +90,11 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - ✓ Chart form fixes (designer quick-add, tab focus, thumbnails, stitch count calc, skeins display) — v1.7
 - ✓ Stats corrections (records tab, integer axes, inline names, total stitches, days-in-library) — v1.7
 - ✓ UI polish (colored status/size pills, digital copy indicator, CalculatorCard on supplies tab, 50MB+zip upload) — v1.7
+- ✓ Code quality (TS test errors, silent failures, R2 orphan cleanup, status color CSS vars, shared constant + hook) — v1.7
 
 ### Active
 
-**v1.7 Fix & Polish** — Fix user-reported bugs, resolve stats issues, polish UI rough edges, clean up code quality.
-
-- ✓ Quick-add designer from chart form, tab-to-search, designer thumbnails, stitch count calc, skeins display — v1.7
-- ✓ Records tab population, chart axis integers, inline entity names, total stitches stat, days-in-library formatting — v1.7
-- ✓ Colored status/size pills, digital copy indicator, supply sort, skein calc controls, file upload improvements — v1.7
-- [ ] TypeScript test errors, silent failures, R2 photo cleanup, status color centralization, constant/hook extraction
+No active milestone. Next milestone to be defined via `/gsd-new-milestone`.
 
 ### Deferred (no phase assigned)
 
@@ -134,14 +129,14 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 
 ## Context
 
-**Current state (v1.6 shipped):**
-- 2,176 tests, ~110k LOC TypeScript, deployed to Vercel
+**Current state (v1.7 shipped):**
+- 2,283 tests, ~110k LOC TypeScript, deployed to Vercel
 - Tech stack: Next.js 16, Prisma 7, Tailwind v4, Auth.js v5 beta, shadcn/ui v4 (Base UI)
 - Database: PostgreSQL on Neon (prod), Cloudflare R2 (file storage)
-- 70+ backlog items captured (see CLAUDE.md backlog section)
-- Stats dashboard: resilient via Promise.allSettled, cache invalidated on chart status + supply mutations
+- 80+ backlog items captured (see CLAUDE.md backlog section)
+- Stats dashboard: library-wide insights with StatusFilterPills, Promise.allSettled, cache invalidation
 - Shopping cart: scales to 75+ projects with search, status grouping, supply search
-- Code quality: precise TypeScript types (literal unions, discriminated unions), shared utilities, comment conventions enforced
+- Code quality: CSS custom properties for status colors, zero silent catches in target files, shared constants/hooks, precise TypeScript types
 - All features intact: gallery, project detail, supply table, merged form, dashboards, shopping cart, session logging, focal point, file management, statistics
 
 **Design system:** Emerald/amber/stone palette. Fraunces headings, Source Sans 3 body, JetBrains Mono hero stats. 7 status colors. Full semantic design tokens (bg-card, text-muted-foreground, etc.). 44px+ touch targets on interactive elements.
@@ -239,4 +234,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-20 after v1.7 milestone restored*
+*Last updated: 2026-05-24 after v1.7 milestone*

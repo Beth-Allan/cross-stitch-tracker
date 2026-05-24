@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Fix & Polish
 status: shipped
-last_updated: "2026-05-24T22:00:00.000Z"
-last_activity: 2026-05-24 -- Phase 30 shipped — PR #55
+last_updated: "2026-05-24T23:00:00.000Z"
+last_activity: 2026-05-24 -- v1.7 milestone archived
 progress:
   total_phases: 4
   completed_phases: 4
@@ -17,17 +17,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-20)
+See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 30 — code quality (COMPLETE)
+**Current focus:** Milestone complete — next milestone to be defined
 
 ## Current Position
 
-Phase: 30
+Phase: 30 (final)
 Plan: All complete (3/3)
-Status: Verified and complete
-Last activity: 2026-05-24 -- Phase 30 verified (5/5 must-haves)
+Status: Milestone shipped and archived
+Last activity: 2026-05-24 -- v1.7 milestone archived
 
 Progress: [██████████] 4/4 phases (100%)
 
@@ -42,7 +42,7 @@ Progress: [██████████] 4/4 phases (100%)
 | v1.4 | Fixes & Polish | 15-17 | Shipped 2026-05-17 |
 | v1.5 | Statistics & Records | 18-21 | Shipped 2026-05-18 |
 | v1.6 | Cleanup & Hardening | 22-26 | Shipped 2026-05-20 |
-| v1.7 | Fix & Polish | 27-30 | In progress |
+| v1.7 | Fix & Polish | 27-30 | Shipped 2026-05-24 |
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [██████████] 4/4 phases (100%)
 **Velocity (v1.4):** 9 plans / 2 days (~4.5/day)
 **Velocity (v1.5):** 14 plans / 2 days (~7/day)
 **Velocity (v1.6):** 15 plans / 3 days (~5/day)
+**Velocity (v1.7):** 11 plans / 5 days (~2/day)
 
 ## Accumulated Context
 
@@ -62,6 +63,7 @@ Progress: [██████████] 4/4 phases (100%)
 - `unstable_cache` with `revalidateTag("stats")` on session mutations (5-min TTL + on-demand)
 - Recharts always Client Components (SSR incompatible)
 - `Promise.allSettled` for parallel data fetching (17 queries on stats page)
+- Status colors as CSS custom properties in globals.css, consumed via STATUS_CONFIG
 
 ### Decisions
 
@@ -77,6 +79,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-24T21:00:00.000Z
-Stopped at: Phase 30 context gathered
-Resume file: .planning/phases/30-code-quality/30-CONTEXT.md
+Last session: 2026-05-24T23:00:00.000Z
+Stopped at: Milestone v1.7 archived
+Resume file: N/A — start next milestone with /gsd-new-milestone

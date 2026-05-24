@@ -1,5 +1,22 @@
 # Milestones
 
+## v1.7 Fix & Polish (Shipped: 2026-05-24)
+
+**Delivered:** User-reported bugs fixed, stats page corrected and enriched with library-wide insights, UI polished with colored status badges and digital copy indicators, and code quality improved with centralized status colors, shared constants, and silent failure elimination.
+
+**Stats:** 4 phases, 11 plans | 109 commits | 2,283 tests | 5 days (2026-05-20 → 2026-05-24)
+
+**Key accomplishments:**
+
+1. **Chart Form Fixes** — Designer quick-add dialog wired into chart form, tab-to-type focus forwarding on SearchableSelect, designer detail thumbnail fallback, supply stitch total hint, skeins display column width fix
+2. **Stats Corrections** — Library-wide insights via status-groups utility (no longer session-gated), StatusFilterPills for server-side filtering, integer chart axes, collection total stitch counter, days-in-library formatting fix
+3. **UI Polish** — Colored status/size badges on gallery cards and Pattern Dive, digital copy indicator (FileText icon), CalculatorCard on project detail Supplies tab with optimistic persistence, 50MB file limit + .zip upload support
+4. **Code Quality** — 42 CSS custom properties for 7 status colors (3 variants × 2 modes), silent catch fixes in 3 target files with console.error + toast, R2 photo orphan cleanup on replacement, DEFAULT_SUPPLY_HEX single-sourced (16→1), useRejectionFlash hook shared
+
+**PRs:** #52 (Phase 27), #53 (Phase 28), #54 (Phase 29), #55 (Phase 30)
+
+---
+
 ## v1.6 Cleanup & Hardening (Shipped: 2026-05-20)
 
 **Delivered:** Comprehensive hardening pass — security gaps closed, test infrastructure modernized, 16 type quality improvements, shopping cart scaled to 75+ projects, and 14 UX polish items addressing ARIA compliance, visual consistency, and component affordances.

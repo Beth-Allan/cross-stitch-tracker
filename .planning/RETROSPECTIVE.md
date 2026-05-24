@@ -1,5 +1,48 @@
 # Retrospective
 
+## Milestone: v1.7 — Fix & Polish
+
+**Shipped:** 2026-05-24
+**Phases:** 4 | **Plans:** 11
+**Timeline:** 5 days (2026-05-20 → 2026-05-24)
+**Tests:** 2,283 | **PRs:** #52, #53, #54, #55
+
+### What Was Built
+
+- Chart Form Fixes: InlineDesignerDialog wiring, SearchableSelect tab-to-type focus forwarding, designer detail thumbnail fallback, supply stitch total hint, Need column width fix
+- Stats Corrections: status-groups utility for library-wide insights, StatusFilterPills with server re-render, integer chart axes, collection total counter, formatAge/formatAgeNumber split
+- UI Polish: colored status/size badges, digital copy indicator, CalculatorCard on project detail Supplies tab with optimistic persistence, 50MB+zip upload
+- Code Quality: 42 CSS custom properties for status colors, silent catch fixes (3 files), R2 orphan cleanup, DEFAULT_SUPPLY_HEX single-sourced, useRejectionFlash hook shared
+
+### What Worked
+
+- **Bug-fix milestones are efficient** — 11 plans in 5 days. Clear scope (bugs have a "done" state), minimal design ambiguity, straightforward verification.
+- **PR review catching real bugs** — CR-01 in Phase 28 (mock type errors causing false-pass tests), CR-01 in Phase 29 (calcParams isPending ordering bug), CR-01 in Phase 30 (R2 cleanup inside wrong try block). Multi-agent review continues to earn its keep.
+- **Phase independence** — All 4 phases could have run in parallel (only Phase 30 declared a dependency). This meant no blocking on earlier phases.
+- **Status color centralization** — CSS custom properties pattern established cleanly. 42 variables, one source of truth, 4 consumers updated. Good foundation for future theming.
+
+### What Was Inefficient
+
+- **REQUIREMENTS.md not updated during execution** — QUAL-01 through QUAL-06 still showed "Pending" despite Phase 30 being fully verified. Manual reconciliation needed at milestone close.
+- **Phase 30 branch management** — Had to cherry-pick context from old feature/phase-28 branch after PR merge. The branching strategy of one branch per milestone would have avoided this.
+- **v1.7 milestone recovery** — ROADMAP.md/REQUIREMENTS.md/STATE.md were clobbered by v1.6 archive commit and needed git recovery. Root cause: milestone archive didn't account for in-progress next-milestone files.
+
+### Patterns Established
+
+- **CSS custom properties for semantic colors** — `--status-{name}-{bg|dot|text}` pattern in globals.css with light/dark variants via `@media (prefers-color-scheme: dark)`. STATUS_CONFIG consumes via `var()`.
+- **R2 orphan cleanup on replacement** — Delete old file after new file succeeds (not before). Applied to session photos and chart covers.
+- **Shared hook extraction pattern** — `useRejectionFlash` in `src/components/hooks/` — timer + state + cleanup extracted from duplicated component-level logic.
+- **StatusFilterPills with shallow:false** — Forces Next.js server re-render on filter change (not just URL update). Required for server-side data filtering.
+
+### Key Lessons
+
+1. **Keep traceability current during execution** — Update requirement checkboxes when plans complete, not at milestone close. Saves reconciliation time.
+2. **Milestone archive must preserve next-milestone files** — The v1.6 archive accidentally overwrote v1.7 setup files. Archive workflows should check for and preserve in-progress work.
+3. **Fix milestones validate the product** — Every bug fixed in v1.7 was discovered by actually using the app. Regular "use it and fix what hurts" cycles are valuable.
+4. **CSS custom properties > Tailwind config for runtime theming** — Direct CSS vars are more transparent, debuggable in DevTools, and don't require Tailwind rebuild.
+
+---
+
 ## Milestone: v1.6 — Cleanup & Hardening
 
 **Shipped:** 2026-05-20
