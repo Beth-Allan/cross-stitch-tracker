@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.7
-milestone_name: Fix & Polish
-status: shipped
-last_updated: "2026-05-24T22:00:00.000Z"
-last_activity: 2026-05-24 -- Phase 30 shipped — PR #55
+milestone: v1.8
+milestone_name: Series & Collections
+status: planning
+last_updated: "2026-05-24T21:57:53.862Z"
+last_activity: 2026-05-24
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 11
-  completed_plans: 11
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,12 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-20)
 
 ## Current Position
 
-Phase: 30
-Plan: All complete (3/3)
-Status: Verified and complete
-Last activity: 2026-05-24 -- Phase 30 verified (5/5 must-haves)
-
-Progress: [██████████] 4/4 phases (100%)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-24 — Milestone v1.8 started
 
 ## Milestone Structure
 

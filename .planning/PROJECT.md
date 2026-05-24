@@ -91,18 +91,36 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - ✓ Chart form fixes (designer quick-add, tab focus, thumbnails, stitch count calc, skeins display) — v1.7
 - ✓ Stats corrections (records tab, integer axes, inline names, total stitches, days-in-library) — v1.7
 - ✓ UI polish (colored status/size pills, digital copy indicator, CalculatorCard on supplies tab, 50MB+zip upload) — v1.7
+- ✓ Code quality (TS test errors, silent failures, R2 orphan cleanup, status color CSS vars, shared constant + hook) — v1.7
+
+## Current Milestone: v1.8 Series & Collections
+
+**Goal:** Give stitchers a way to organize charts into series/collections, track completion progress, and browse their collection by series.
+
+**Target features:**
+- Series CRUD (name, optional total count, optional designer link)
+- Chart-to-series assignment via chart form (SearchableSelect with inline "Add New")
+- Series progress tracking ("8 of 15" with optional total)
+- Pattern Dive Series tab with progress cards
+- Browse tab series filter
+- Series detail/management pages
+- Fix: TS test errors (999.19) and Stats Promise.all resilience (999.22)
 
 ### Active
 
-**v1.7 Fix & Polish** — Fix user-reported bugs, resolve stats issues, polish UI rough edges, clean up code quality.
-
-- ✓ Quick-add designer from chart form, tab-to-search, designer thumbnails, stitch count calc, skeins display — v1.7
-- ✓ Records tab population, chart axis integers, inline entity names, total stitches stat, days-in-library formatting — v1.7
-- ✓ Colored status/size pills, digital copy indicator, supply sort, skein calc controls, file upload improvements — v1.7
-- [ ] TypeScript test errors, silent failures, R2 photo cleanup, status color centralization, constant/hook extraction
+- [ ] Series entity with name, optional total count, optional designer
+- [ ] Chart-to-series assignment from chart form with SearchableSelect + inline create
+- [ ] Series progress display ("8 of 15" or "8 charts" for open-ended)
+- [ ] Pattern Dive Series tab with series cards and progress indicators
+- [ ] Series filter on Browse tab
+- [ ] Series detail page showing assigned charts
+- [ ] Series management page with CRUD
+- [ ] Fix pre-existing TypeScript errors in test files (999.19)
+- [ ] Stats page query group separation for resilience (999.22)
 
 ### Deferred (no phase assigned)
 
+- [ ] Stacked/collapsible series cards in Pattern Dive (future polish)
 - [ ] Comprehensive year in review tab with 8 stat sections and year selector
 - [ ] Contextual stats sprinkled into existing pages (Pattern Dive, project detail, dashboard)
 - [ ] Goal tracking (project-specific and global, milestone targets, frequency goals)
@@ -110,7 +128,6 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - [ ] Multi-style rotation management (Focus+Rotate, Milestone, Daily, Round Robin, Random, Seasonal)
 - [ ] Achievement trophy case with auto-tracked milestones, streaks, and records
 - [ ] Reusable advanced filter bar with configurable dimensions and dismissible chips
-- [ ] Series/collection management with completion tracking
 - [ ] Auto-calculated kitted status and kitting progress indicators (8 conditions)
 - [ ] SAL support (multi-part charts, evolving stitch counts and supply needs)
 
@@ -239,4 +256,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-20 after v1.7 milestone restored*
+*Last updated: 2026-05-24 after v1.8 milestone started*
