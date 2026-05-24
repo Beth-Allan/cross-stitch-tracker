@@ -103,10 +103,17 @@
   - Fixed: CR-01 unhandled Prisma aggregate try-catch, WR-01 extract thumbnailSrc variable
   - Backlogged: 999.75 InlineDesignerDialog controlled-only simplification
 
+### Done This Session (2026-05-23 cont.)
+
+- **PR #52 merged** — Phase 27 shipped to main
+- **Branch created** — `feature/phase-28` off main, cherry-picked Phase 28 context from old branch
+- **Phase 28 UI-SPEC approved** — 6/6 dimensions passed, 2 non-blocking FLAGs (Overview visual hierarchy, inherited 6px pill spacing)
+  - StatusFilterPills spec, insight relocation, chart axis fixes, hero stat, Collection Total rename, RankedList removal, days-in-library fix
+  - All 14 CONTEXT.md decisions (D-01 through D-14) captured — zero user questions needed
+
 ### Next Up — RESUME HERE
 
-1. Merge PR #52
-2. `/gsd-discuss-phase 28` — Start Stats Corrections phase
+1. `/gsd-plan-phase 28` — Plan Stats Corrections phase
 
 ### Backlog
 
