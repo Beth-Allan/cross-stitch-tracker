@@ -1,175 +1,103 @@
 # Feature Landscape
 
-**Domain:** Statistics & data visualization for craft/hobby tracking apps
-**Researched:** 2026-05-17
-**Confidence:** HIGH (cross-referenced DesignOS spec, competitor apps, fitness tracker patterns)
+**Domain:** Series/collection management for cross-stitch project tracking
+**Researched:** 2026-05-24
+**Confidence:** HIGH (cross-referenced DesignOS spec, competitor apps, book/hobby tracker patterns, Ravelry)
 
 ## Table Stakes
 
-Features users expect in a statistics dashboard for a hobby tracker. Missing = product feels incomplete or pointless.
+Features a stitcher expects from series management. Missing = feature feels incomplete or confusing.
 
-| Feature | Why Expected | Complexity | Data Source | Notes |
-|---------|--------------|------------|-------------|-------|
-| Lifetime hero counters (total stitches, sessions, days) | Every stats dashboard opens with headline numbers. StitchPal, Strava, Cross Stitch Journal all do this. Users want instant "wow I've done a lot." | Low | `StitchSession` aggregate | JetBrains Mono, large numbers. Already designed in DesignOS HeroStats. |
-| Rolling time-window stats (today/week/month/year) | Gives immediacy. "What have I done recently?" is the #1 question. Strava, Cross Stitch Journal, Pattern Keeper all show this. | Low | `StitchSession` filtered by date range | Already designed. Requires efficient date-range queries. |
-| Monthly bar chart (stitch totals per month) | Visual progress over time is universal. Every fitness tracker and Cross Stitch Journal uses monthly aggregation as primary chart. | Medium | `StitchSession` grouped by month | Already designed with click-to-drill-down popover. Pure CSS bars vs charting library is a key decision. |
-| Stitching calendar (daily activity view) | GitHub contribution pattern. Cross Stitch Journal uses it for streaks. Visual consistency tracking is deeply motivating. | Medium | `StitchSession` grouped by date | Already designed as full monthly grid with project color-coding. |
-| Session history table (sortable, filterable) | Users need to verify/edit logged data. StitchPal and Cross Stitch Journal both show session lists. | Low | `StitchSession` with joins | Already designed. Needs pagination for power users with 100s of sessions. |
-| Personal bests / records | Strava's core hook. Cross Stitch Journal tracks "longest streak." StitchPal implies records via calculated averages. Stats nerds need a trophy case. | Medium | Computed from `StitchSession` scan | Already designed: 3-card grid with trophy/flame/star icons. Categories: best day (this year + all time), longest streak. |
-| Current/longest streak | Cross Stitch Journal added this as a headline feature. Strava uses weekly streaks. Streaks drive habit formation without heavy gamification. | Low | `StitchSession` consecutive date analysis | Subset of personal bests. Low complexity but high motivational value. |
-| Project-level session stats (per-project mini dashboard) | StitchPal's core feature. Users want to see "how fast am I going on THIS project?" Total, count, average per session, first/last date. | Low | `StitchSession` filtered by projectId | Already built as ProjectSessionsTab in v1.2. |
-| Collection overview (status breakdown, size breakdown) | Ravelry shows project counts by status. User has 500+ charts across 7 statuses -- needs aggregate view. | Low | `Project` + `Chart` counts | Already designed in StatCards. Queries are simple counts/groups. |
-| Stitch rate / speed calculation | Cross-stitch specific. 100-250 stitches/hour is the range. StitchPal and Stitchmate both calculate this. Users measure improvement over time. | Low | `StitchSession` where timeSpentMinutes is not null | Only possible when user logs time. Display as average stitches/hour. |
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Series CRUD (name, edit, delete) | Bare minimum to organize collections into named groups | Low | Follows established Designer/Genre CRUD pattern already in app. DesignOS has SeriesList + SeriesDetail designs. |
+| Chart-to-series assignment from chart form | Primary workflow is "I'm adding a chart and want to tag it to a series" | Low | Use existing SearchableSelect pattern with inline "Add New" (same as designer/genre). One chart belongs to one series. |
+| Series progress display ("8 of 15" or "8 charts") | Core value proposition of series tracking -- seeing how complete you are | Low | Two modes: fixed-total (user sets expected count, e.g., "15 in this series") and open-ended (just count owned charts). DesignOS shows `finishedCount of memberCount`. |
+| Series list/management page | Dedicated place to browse, sort, and manage all series | Low | DesignOS SeriesList has sort by name/completion/members and card-based grid layout. Mirrors Designer/Genre management pages. |
+| Series detail page with member chart list | Click into a series to see all its charts, their status, and progress | Med | DesignOS SeriesDetail shows member cards with thumbnails, status badges, WIP progress bars, and ability to add/remove charts. Follows DesignerDetail pattern. |
+| Series filter on Browse tab | When browsing 500+ charts, filter by series to see just one collection | Low | Add to existing FilterBar alongside status and size multi-select dropdowns. Uses same MultiSelectDropdown component. |
+| Pattern Dive Series tab | Central "series progress dashboard" within Pattern Dive | Med | New tab alongside Browse/What's Next/Fabric/Storage. Shows series progress cards with completion bars. |
+| Optional designer link on series | Most series come from one designer, but not always | Low | Optional FK to Designer. Displayed on series cards and detail page. Helps with attribution. |
+| Remove chart from series (from series detail) | Users will make mistakes assigning charts and need to fix them | Low | Confirmation dialog clarifying "chart won't be deleted, just unlinked." DesignOS shows this with trash icon on hover. |
+| Optional total count on series | "Celtic Santas" has 12 total patterns; user may only own 8. Want to see "8 of 12 owned, 5 of 12 finished." | Low | Nullable integer. When null, progress is just "N charts" (open-ended). When set, enables "owned vs total" and "finished vs total" framing. |
 
 ## Differentiators
 
-Features that set the product apart. Not expected by every user, but valued by "stats nerds" who want their data to feel rewarding and comprehensive.
+Features that set this apart from the basic "tag your charts" approach. Not expected, but valued.
 
-| Feature | Value Proposition | Complexity | Data Source | Notes |
-|---------|-------------------|------------|-------------|-------|
-| Year in Review (annual summary) | Strava's most-shared feature ("Year in Sport"). Spotify Wrapped proved annual recaps create emotional attachment. No cross-stitch app does this well. | High | All models, full-year scan | Already fully designed: hero stats, monthly pace, project timeline, top projects, favourite supplies, highlights, year selector. High complexity = many data queries. |
-| "New record!" celebration toast on session log | Strava shows achievement banners immediately on activity upload. Creates dopamine hit at the moment of logging. No stitching app celebrates records in real-time. | Medium | Compare new session against stored bests | Requires post-save comparison logic. Toast with confetti or glow effect. Categories: best day, best session, new project milestone. |
-| Project timeline visualization (Gantt-like) | Shows when you worked on each project across a year. Unique to this domain -- most stitchers don't track this anywhere. Makes rotation patterns visible. | Medium | `StitchSession` grouped by project + date range | Already designed in Year in Review. Horizontal bars across 12-month grid. |
-| Stitching pace trends (month-over-month velocity) | Shows if you're stitching more or less than before. Strava uses "fitness" and "fatigue" curves. Stitchers care about seasonal patterns (summer slumps, winter marathons). | Medium | `StitchSession` daily averages per month | Already designed as bar chart with "trending up/down" indicator. |
-| Favourite supplies analysis (most-used threads/beads) | No other stitching app surfaces this. Ravelry tracks yarn usage. Shows your DMC colour palette across projects -- fun discovery. | Medium | `ProjectThread` + `ProjectBead` join counts | Already designed in Year in Review. Color swatches + project counts. |
-| Day-of-week pattern analysis | Fitness trackers show when you exercise most. "You stitch most on Saturdays" is genuinely interesting self-knowledge. | Low | `StitchSession` grouped by dayOfWeek | Not in DesignOS yet -- would be a small stat card. Simple GROUP BY. |
-| Designer/genre breakdown stats | "Your favourite designer is [X]" and "60% of your collection is samplers" -- collection personality profiling. | Low | `Chart` joins to `Designer` + `Genre` | Partially in StatCards design. Simple join + count. |
-| Estimated completion dates | StitchPal's differentiator. "At your current pace, you'll finish on [date]." Deeply motivating for BAP stitchers. | Medium | `StitchSession` rate calculation + `Chart.stitchCount` - `Project.stitchesCompleted` | Already in backlog (999.7). Depends on consistent session logging. Inaccurate without sufficient data. |
-| Heatmap calendar (GitHub contribution style) | Denser than the existing stitching calendar -- shows intensity via color shading across months. Instantly communicates consistency at a year-level glance. | Medium | `StitchSession` count/sum per day | Alternative/complement to the designed calendar. Color intensity = stitch volume. |
-| Top-3 annual records (Strava "Annual Best Efforts") | Strava recently added year-scoped records alongside all-time records. Shows "best version of you this year" without comparing to all-time peaks that may feel unbeatable. | Low | `StitchSession` filtered by year, top N | Extension of personal bests. Already partially supported by "Best Day This Year" in sample data. |
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Dual progress tracking (owned vs finished) | With optional total count, show both "8 of 12 owned" AND "5 of 12 finished." Most trackers only track one dimension. | Low | Key insight: a stitcher may own 8 of 12 charts in a series but only have finished 5. Both numbers matter -- one for collecting, one for completing. |
+| Series progress bar on series cards | Visual completion bar on every series card in the list and Pattern Dive tab | Low | DesignOS already specifies this. Emerald progress bar matching the app's design system. Satisfying visual feedback. |
+| Per-member status badges in series detail | Each chart in the series shows its project status (Unstarted/Kitting/WIP/Finished/FFO) and WIP progress | Low | DesignOS shows status badges + inline progress bars for WIP charts. Reuse existing StatusBadge and SizeBadge components. |
+| Sort series by completion | "Show me my most-complete series first" -- motivational for finishing collections | Low | DesignOS sort controls include completion percentage. Helps prioritize which series to focus on. |
+| Series stats integration | Surface series data in the Stats page (e.g., "3 series completed this year," "most active series") | Med | Extends existing stats queries. Not in initial scope but valuable for stitchers who collect by series. Defer to future milestone. |
+| Bulk chart assignment to series | Select multiple charts from Browse tab and assign them to a series in one action | High | Useful for initial data entry when user has 30+ series to populate, but complex UI. Defer -- individual assignment from chart form is sufficient for steady-state workflow. |
+| Series stitch total | Aggregate total stitches across all charts in a series; show as headline stat on series detail | Low | Computed at query time from member chart stitch counts. Gives a sense of series scale ("this series is 180,000 stitches total"). |
+| Multi-series membership | Allow a chart to belong to multiple series | Med | Current requirement says one series per chart (M:1 via optional FK). Multi-series would need a junction table. Not needed for this user's workflow -- series are distinct designer collections. |
 
 ## Anti-Features
 
-Features to explicitly NOT build for this milestone.
+Features to explicitly NOT build. These create complexity without matching how stitchers actually work.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| Social leaderboards / comparisons | Single-user app. Social comparison adds complexity and can be demotivating ("I only stitch 50/hour compared to Reddit averages"). The app is personal, not competitive. | Focus on personal records and self-improvement trends. |
-| Achievement badge/trophy system with unlock mechanics | Heavy gamification (Habitica model) risks making stitching feel like a chore. Extrinsic motivation undermines intrinsic satisfaction. The "stats nerd" wants data, not game mechanics. | Personal bests with celebration moments (toasts) instead of persistent badge collection. |
-| AI-generated insights / smart recommendations | "You should stitch more on Wednesdays" feels patronizing. The data should speak for itself without the app being prescriptive about user behavior. | Present patterns (day-of-week chart) and let user draw their own conclusions. |
-| Real-time stitching timer (built into stats page) | Timer belongs to session logging UX, not stats consumption. StitchPal's timer is a separate mode. Mixing input and output confuses the stats dashboard role. | Keep timer in Log Session modal (already exists with optional timeSpentMinutes). |
-| Projected "finish date" with countdown widget | Projections based on sparse data are wildly inaccurate and anxiety-inducing. A BAP with 3 sessions logged showing "estimated finish: 2034" is demoralizing. | Show estimated completion only when sufficient data exists (10+ sessions). Present as informational, not as a deadline/countdown. |
-| Share card / social export generation | Adds image generation complexity (canvas, og:image). Deferred to post-stats milestone per PROJECT.md "Out of Scope." | Keep stats private and personal for now. Add sharing later if demanded. |
-| Comparison across projects ("Project A vs Project B") | Comparing a mini (500 stitches) to a BAP (80k stitches) is meaningless. Per-project stats exist on their detail pages. | Each project has its own session tab with mini stats. No cross-project comparison needed. |
-| Historical supply price tracking | Prices change, brands differ by country, sales happen. Tracking supply costs accurately is a data entry nightmare for 500+ charts worth of supplies. | If supply costs are ever added, keep it simple: optional per-project total, not per-item price history. |
-| Rotation schedule integration in stats | Stats should observe behavior, not prescribe it. Rotation management is a separate feature domain (deferred in PROJECT.md). | Stats can show project distribution patterns without telling users what to stitch next. |
+| Series ordering within a series | Imposing an order on charts within a series (e.g., "chart 3 of 12") adds data entry burden for no practical benefit. Stitchers work on whichever chart appeals to them, not sequentially. | Sort by name, status, or stitch count in the series detail view. Let display order be dynamic. |
+| Series-level supply aggregation | Calculating total supplies needed across all charts in a series is technically cool but practically useless. Each chart is an independent project with its own supplies. | Keep supply tracking per-project. Surface per-chart supply status in the series member list if useful. |
+| Series-level session logging | "Log a session for the Celtic Santas series" makes no sense. Sessions are always for a specific project. | Keep session logging per-project. Series progress updates automatically as member projects progress. |
+| Automatic series detection | Trying to guess which charts belong together based on designer/name patterns. Too error-prone with 500+ charts and would create false groupings. | Manual assignment via SearchableSelect. User knows their collection best. |
+| Series hierarchy / nested series | "Celtic Santas" inside a "Celtic Collection" parent series. Over-engineering for a flat list of ~30 series. | Flat series list. If a designer has multiple series, the optional designer link provides implicit grouping. |
+| Series cover images | Adding cover photo management to series adds storage and UI complexity for minimal value. The card grid with progress bars is sufficiently informative. | Show thumbnails of member charts on the series card or detail page instead. The series card in DesignOS works well without a cover image. |
+| Drag-and-drop series reordering | Custom ordering of the series list via drag-and-drop. Over-engineered for ~30 series with good sort options. | Sort by name, completion, or member count covers all practical needs. |
+| SAL-to-series conversion | SALs (multi-part single projects) and series (multiple independent projects) are fundamentally different concepts. Converting between them would create data integrity issues. | Keep SAL and Series as completely separate concepts. A SAL part is NOT a series member. |
 
 ## Feature Dependencies
 
 ```
-StitchSession data exists (v1.2 shipped)
-  --> Hero counters (no additional dependencies)
-  --> Monthly bar chart (no additional dependencies)
-  --> Stitching calendar (no additional dependencies)
-  --> Session history (no additional dependencies)
-  --> Personal bests (requires: streak algorithm, max-finding queries)
-  --> Stitch rate (requires: sessions with timeSpentMinutes logged)
-
-Personal bests computed
-  --> "New record!" toast (requires: compare new session against current bests)
-
-Project + Chart data exists (v1.0 shipped)
-  --> Collection overview stats (no additional dependencies)
-  --> Designer/genre breakdown (no additional dependencies)
-
-ProjectThread + ProjectBead linked (v1.0 shipped)
-  --> Favourite supplies analysis (no additional dependencies)
-
-All of the above
-  --> Year in Review (requires: all queries scoped to year, year selector UI)
+Series model (Prisma schema)
+  -> Chart-to-series FK
+    -> Chart form SearchableSelect integration
+    -> Series filter on Browse tab
+  -> Series CRUD actions
+    -> Series management page
+    -> Series detail page
+  -> Pattern Dive Series tab (depends on series model + CRUD)
 ```
 
-## Feature Categories
+Key dependency chain: Schema first, then CRUD actions, then UI in parallel (form integration + management pages + Pattern Dive tab + Browse filter).
 
-### Category 1: Activity Stats (session-derived)
-Source: `StitchSession` table exclusively.
-- Hero counters
-- Monthly bar chart
-- Stitching calendar / heatmap
-- Session history
-- Personal bests + streaks
-- Stitch rate
-- Day-of-week patterns
-- Stitching pace trends
-- "New record!" toast
-
-### Category 2: Collection Stats (project/chart-derived)
-Source: `Project` + `Chart` + `Designer` + `Genre`.
-- Status breakdown (pie/donut or card grid)
-- Size category distribution
-- Designer favourites
-- Genre distribution
-- Projects started/finished per year
-
-### Category 3: Supply Insights (junction-table-derived)
-Source: `ProjectThread` + `ProjectBead` + `ProjectSpecialty` + joins to supply tables.
-- Most-used threads/beads
-- Color palette distribution
-- Supply-per-project counts
-- Most colors in a project
-
-### Category 4: Synthesis / Cross-Domain
-Source: Multiple tables combined.
-- Year in Review (all categories)
-- Project timeline (sessions x projects x time)
-- Estimated completion (sessions x project.stitchCount)
-- Celebration toasts (sessions x personal bests)
+All series features depend on existing infrastructure:
+- SearchableSelect component (chart form pattern)
+- FilterBar + MultiSelectDropdown (Browse tab)
+- PatternDiveTabs (tab container)
+- DesignerDetail pattern (detail page structure)
+- StatusBadge, SizeBadge (member chart display)
+- InlineNameEdit pattern (series rename)
+- DeleteConfirmationDialog (series deletion)
 
 ## MVP Recommendation
 
-**Phase 1 priority -- build the stats computation engine + Overview tab:**
-1. Hero counters (today/week/month/year) -- instant gratification, low complexity
-2. Personal bests (best day this year, best day all time, longest streak) -- motivational hook
-3. Monthly bar chart with drill-down -- visual storytelling
-4. Collection overview stat cards -- leverages existing data
+Prioritize (all table stakes, ship together as one coherent feature):
 
-**Phase 2 priority -- Calendar + deeper insights:**
-5. Stitching calendar (full monthly grid with project color-coding)
-6. Session history (sortable table with pagination)
-7. "New record!" celebration toast (wired into session logging flow)
-8. Stitch rate calculation (average stitches/hour)
+1. **Series model + CRUD** -- Prisma schema, server actions, Zod validation
+2. **Chart form integration** -- SearchableSelect with inline "Add New" for series
+3. **Series management page** -- List with sort controls, add modal (mirrors Designers page)
+4. **Series detail page** -- Member chart list with status, progress, add/remove (mirrors DesignerDetail)
+5. **Pattern Dive Series tab** -- Progress cards with completion bars
+6. **Browse tab series filter** -- MultiSelectDropdown for series
 
-**Phase 3 priority -- Year in Review:**
-9. Year in Review with all 8 sections (per DesignOS design)
-10. Project timeline visualization
-11. Favourite supplies analysis
-12. Pace trends with trend indicators
-
-**Defer to later milestone:**
-- Day-of-week patterns (low priority, easy to add later)
-- Estimated completion dates (needs robust data; add when users have more sessions)
-- Heatmap calendar (alternative view -- existing calendar design is sufficient)
-- Supply cost tracking (requires schema changes)
-
-## What Makes a "Stats Nerd" Delighted
-
-Based on research across Strava, GitHub, fitness trackers, and cross-stitch apps:
-
-1. **Immediate feedback** -- "New record!" toast the moment you log a session that beats a personal best. Strava does this with activity upload; it's the single most motivating feature.
-
-2. **Big numbers in monospace font** -- The hero counter row. Making lifetime totals feel impressive. "You've stitched 247,832 stitches" in JetBrains Mono 30px hits different than body text.
-
-3. **Visual consistency patterns** -- The calendar/heatmap. Seeing a row of colored days makes consistency feel tangible. GitHub proved this drives behavior even without gamification.
-
-4. **Annual narrative** -- Year in Review creates a story: "This was your year." Emotional, shareable (even if just mentally), and creates anticipation for next year. Spotify, Strava, GitHub all do this.
-
-5. **Records that accumulate** -- Personal bests grow over time. Unlike badges (which you unlock and forget), records invite beating. "My best day is 1,247 -- can I beat it?" creates intrinsic challenge.
-
-6. **Clickable deep-links** -- Every stat that mentions a project/thread/designer should link to that entity. Stats are a discovery surface, not a dead end.
-
-7. **Trend indicators** -- "Trending up" vs "slowing down" on pace. Not prescriptive ("you should stitch more") but observational ("here's what's happening").
+Defer:
+- **Series stats integration**: Adds query complexity; series progress is visible enough on the Series tab and detail pages. Ship in a future milestone if wanted.
+- **Bulk chart assignment**: Individual assignment covers steady-state; user can add charts one-by-one during initial setup. Tedious for 30 series but only happens once.
+- **Multi-series membership**: User's series are distinct designer collections with no overlap. If needed later, migrate FK to junction table.
+- **Series stitch total**: Nice-to-have stat but not blocking. Can add to series detail page in a polish pass.
 
 ## Sources
 
-- [StitchPal (App Store)](https://apps.apple.com/us/app/stitchpal/id1550536005) -- estimated completion, daily progress logging, stitch rate
-- [Cross Stitch Journal (App Store)](https://apps.apple.com/us/app/cross-stitch-journal/id6443886471) -- streaks, progress charts, project status tracking
-- [Pattern Keeper](https://patternkeeper.app/) -- stitch count tracking, percentage complete
-- [MyCozyApp](https://mycozyapp.com/) -- progress tracking, celebration on completion
-- [Strava Best Efforts](https://support.strava.com/hc/en-us/articles/19685360245005-Best-Efforts-Overview) -- personal records, annual bests, top-3 lifetime
-- [Strava Year in Sport](https://support.strava.com/hc/en-us/articles/22067973274509-Your-Year-in-Sport) -- annual recap, personalized narrative
-- [Strava Gamification Case Study (Trophy)](https://trophy.so/blog/strava-gamification-case-study) -- weekly streaks, badges, motivation design
-- [Ravelry Community Stats](https://blog.ravelry.com/2022-community-stats/) -- aggregate yarn/project tracking
-- [GitHub Calendar Heatmap patterns](https://github.com/topics/heatmap-calendar) -- consistency visualization
-- [Cross Stitch Speed Metrics](https://sirithre.com/speed-test-how-to-measure-your-average-cross-stitch-rate-and-why/) -- stitch rate benchmarks (100-250/hr typical)
-- [Stash2Go Features](https://www.stash2go.com/features.html) -- Ravelry companion app stats
-- DesignOS: `product-plan/sections/stitching-sessions-and-statistics/` -- all component designs, types, and sample data
+- DesignOS design specs: `product-plan/sections/fabric-series-and-reference-data/components/SeriesList.tsx`, `SeriesDetail.tsx`
+- DesignOS types: `product-plan/sections/fabric-series-and-reference-data/types.ts` (Series, SeriesMember interfaces)
+- Existing app patterns: DesignerDetail, FilterBar, PatternDiveTabs, SearchableSelect
+- Project requirements: `CROSS_STITCH_TRACKER_PLAN.md` Section 4.1 (Series Support)
+- Cross-stitch app ecosystem: Cross Stitch Journal, X-Stitch Plus, StashCache, MyCozyApp, Pattern Keeper
+- Analogous domains: Ravelry (bundles/favorites/queue), Figure Case (hobby collection grouping), book series tracker apps (Bookly, Book Tracker)
+- UX patterns: Progress tracker design best practices (UXPin)

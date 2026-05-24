@@ -1,179 +1,150 @@
-# Technology Stack: v1.5 Statistics & Records
+# Technology Stack
 
-**Project:** Cross Stitch Tracker
-**Researched:** 2026-05-17
+**Project:** Cross Stitch Tracker v1.8 — Series & Collections
+**Researched:** 2026-05-24
 **Confidence:** HIGH
 
-## Executive Summary
+## Verdict: No New Dependencies Required
 
-v1.5 needs **one new npm dependency** (Recharts via shadcn/ui chart component) and **one utility library** (date-fns for date arithmetic). The key insight from reviewing the DesignOS reference: every visualization in the existing designs (MonthlyChart, StitchingCalendar, PersonalBests, YearInReview) is implemented as **CSS-only div-based charts** with calculated heights and inline styles. This was the right call for the initial design -- the bar charts are simple proportional divs, the calendar is a CSS grid, and progress bars are width-percentage divs.
+Series/collection management is architecturally identical to designers, genres, storage locations, and stitching apps — all entities the project already handles well. Every capability needed for series exists in the current stack. Adding dependencies would be net-negative (bundle growth, maintenance burden, zero capability gain).
 
-However, the v1.5 milestone scope calls for "charting library integration for complex visualizations" including interactive tooltips, rolling averages overlaid on bar charts, day-of-week distribution, and collection breakdown donuts. These go beyond what CSS-only charts handle well. Recharts via the shadcn/ui `chart` component is the right choice: it is already the charting library that shadcn/ui wraps, uses Recharts v3 which supports React 19, and provides theme-aware tooltips and responsive containers that match the existing design system.
+## Existing Stack — Fully Sufficient
 
-The calendar view in the designs is a **month-view calendar grid** (not a GitHub-style heatmap), so no heatmap library is needed. All calendar logic can be built with date-fns + CSS grid.
+### Core Framework (no changes)
+| Technology | Version | Purpose | Series Role |
+|------------|---------|---------|-------------|
+| Next.js | 16.2.4 | App Router, Server Components | Series pages, server actions, data fetching |
+| TypeScript | 5.9.3 | Type safety | Series types, Zod schemas |
+| Prisma | 7.7.0 | ORM + migrations | Series model, Chart relation, queries |
+| PostgreSQL (Neon) | — | Database | Series table, indexes |
 
-## Recommended Stack Additions
+### UI Layer (no changes)
+| Technology | Version | Purpose | Series Role |
+|------------|---------|---------|-------------|
+| Tailwind CSS | 4.2.3 | Styling | Series cards, progress bars, detail pages |
+| shadcn/ui v4 | (Base UI 1.4.1) | Component primitives | Tabs, Dialog, Command (SearchableSelect) |
+| lucide-react | 1.8.0 | Icons | Library icon for series list (already used in DesignOS design) |
+| nuqs | 2.8.9 | URL state management | Series tab in Pattern Dive, series filter param on Browse |
+| cmdk | 1.1.1 | Command palette / combobox | SearchableSelect for series picker in chart form |
 
-### Charting (NEW)
+### Data Layer (no changes)
+| Technology | Version | Purpose | Series Role |
+|------------|---------|---------|-------------|
+| Zod | 3.24.4 | Validation | Series create/update schemas |
+| next-auth | 5.0.0-beta.30 | Auth | requireAuth() on series actions |
 
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| recharts | 3.8.x | Interactive bar charts, donut/pie charts, line charts, radial bars | shadcn/ui ships a `chart` component that wraps Recharts v3. Not an abstraction layer -- you compose directly with Recharts components. React 19 supported via `peerDependencies: "^19.0.0"`. Already the ecosystem standard for shadcn-based apps. |
-| shadcn/ui chart | (copy-paste) | ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend | Theme-aware chart wrapper that integrates CSS variables (`--chart-1` through `--chart-5`) with Recharts. Handles responsive sizing, tooltip styling consistent with design system. Installed via `npx shadcn@latest add chart`. |
+## Reusable Patterns — Already Built
 
-### Date Utilities (NEW)
+These existing patterns directly apply to series with zero new code infrastructure:
 
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| date-fns | 4.1.0 | Date arithmetic for calendar grids, week boundaries, interval generation, month/year grouping | Functional API with excellent tree-shaking -- only imports used functions. No wrapper objects (unlike dayjs). Functions like `eachDayOfInterval`, `startOfWeek`, `format`, `differenceInCalendarMonths`, `getDay`, `startOfMonth`, `endOfMonth`, `isSameDay` are exactly what the calendar and time-series aggregation need. ESM-first in v4 with first-class TypeScript types. |
+| Pattern | Used By | Series Application |
+|---------|---------|-------------------|
+| `SearchableSelect` + inline "Add New" | Designer, StorageLocation, StitchingApp, FabricBrand | Series picker on chart form |
+| `InlineNameEdit` | StorageLocation, StitchingApp | Series rename on detail page |
+| `DeleteEntityDialog` | StorageLocation, StitchingApp | Series delete confirmation |
+| `MultiSelectDropdown` | Status filter, Size filter on Browse tab | Series filter on Browse tab |
+| `PatternDiveTabs` | Browse, What's Next, Fabric, Storage | Add "Series" tab |
+| Server action pattern (requireAuth + Zod + Prisma) | All 15+ action files | series-actions.ts |
+| Entity detail page layout (`/storage/[id]`, `/apps/[id]`) | Storage, Apps | `/series/[id]` page |
+| Entity list page layout (`/storage`, `/apps`) | Storage, Apps | `/series` management page |
+| Progress bar (CSS `width: ${percent}%`) | Gallery cards, project detail | Series completion progress |
+| nuqs URL state (`parseAsStringLiteral`) | Pattern Dive tabs, gallery sort | Series tab + filter |
 
-### NOT Adding
+## What NOT to Add
 
-| Technology | Why Not |
-|------------|---------|
-| @uiw/react-heat-map | Designs show a month-view calendar grid, not a GitHub-style heatmap. No heatmap is in scope. |
-| react-calendar-heatmap | Same -- no heatmap in designs. |
-| visx / @visx/heatmap | Low-level D3 wrapper. Massive overkill for the chart types needed. 2-3x development time vs Recharts for equivalent output. |
-| nivo | Beautiful defaults but large bundle size and heavy abstraction. Recharts is lighter and shadcn already wraps it. |
-| Chart.js / react-chartjs-2 | Canvas-based (not SVG). Harder to style with Tailwind/CSS variables. No shadcn integration. |
-| Apache ECharts | Overkill for single-user app. Heavy bundle. Imperative API doesn't fit React component model well. |
-| dayjs | date-fns tree-shakes better for the specific functions needed. dayjs's plugin system adds complexity. |
-| Framer Motion | CSS transitions sufficient for bar height animations and chart entry effects. The design reference uses inline `transition` properties, not spring physics. No animation library warranted. |
-| react-sparklines | Recharts mini-AreaChart with hidden axes achieves the same result. One fewer dependency. |
+| Temptation | Why NOT | What to Use Instead |
+|------------|---------|-------------------|
+| React Query / TanStack Query | Server Components + server actions already handle all data | Prisma queries in Server Components |
+| drag-and-drop library (dnd-kit) | Series ordering is alphabetical/by-completion, not manual | `useMemo` sort like SeriesList design |
+| Charting library for progress | Simple CSS progress bars match the design | `div` with `width: ${percent}%` (already used) |
+| State management (Zustand, Jotai) | Series has no complex client state | React `useState` + server actions |
+| Form library (react-hook-form) | Chart form uses controlled state; series form is just a name field | Inline `useState` like `InlineNameEdit` |
+| Animation library (framer-motion) | Progress bars use CSS `transition-all` (per DesignOS design) | Tailwind `transition-all` class |
+| Virtualization (react-window) | Series collections are small (tens, not hundreds) | Simple `.map()` rendering |
 
-## Integration Architecture
+## Schema Addition (Prisma — no new deps)
 
-### Server/Client Split for Charts
+Series requires one new model and one new field on Chart. This follows the exact pattern of Designer-to-Chart:
 
-Charts are interactive (tooltips, hover states, click handlers) so they must be Client Components. But the **data aggregation** happens server-side:
+```prisma
+model Series {
+  id          String   @id @default(cuid())
+  name        String
+  totalCount  Int?     // Optional: total charts in series (for "8 of 15")
+  designer    Designer? @relation(fields: [designerId], references: [id])
+  designerId  String?
+  userId      String
+  charts      Chart[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-```
-Server Component (stats page.tsx)
-  --> Prisma queries: sessions, projects, supplies
-  --> Server-side aggregation: group by month, calculate rolling averages, compute personal bests
-  --> Pass pre-computed data as props
-
-Client Component ("use client" chart wrapper)
-  --> Receives aggregated data via props
-  --> Renders Recharts components
-  --> Handles tooltip interactions, hover states
-```
-
-This keeps the Recharts bundle out of the initial page load for users who navigate via SSR, and all expensive database queries + aggregation run on the server with zero client-side data processing.
-
-### CSS Charts vs Recharts Decision Matrix
-
-| Visualization | Use CSS-Only | Use Recharts | Rationale |
-|---------------|-------------|-------------|-----------|
-| Hero stat counters | Yes | -- | Pure text display, no chart needed |
-| Monthly bar chart (basic) | Possible | **Yes** | Design shows interactive click-to-expand popover. Recharts tooltip/click handlers are more maintainable than custom DOM positioning. |
-| Monthly bar chart (with rolling avg overlay) | -- | **Yes** | Line + bar combo chart. CSS-only would be painful. |
-| Stitching calendar (month grid) | **Yes** | -- | CSS grid with date-fns for date math. The design is already a grid of clickable day cells. Recharts adds nothing here. |
-| Personal bests cards | **Yes** | -- | Static card layout. Pure CSS. |
-| Collection breakdown donut | -- | **Yes** | Recharts PieChart with innerRadius. Clean SVG with interactive segments. |
-| Day-of-week distribution | -- | **Yes** | Recharts BarChart. Small bar chart with 7 bars. |
-| Status breakdown donut | -- | **Yes** | Same as collection donut -- PieChart with innerRadius. |
-| Year in Review bars | Possible | **Yes** | Consistency with Overview tab charts. Same component, different data. |
-| Stitching pace line | -- | **Yes** | Recharts LineChart for trend visualization. |
-| Project timeline (Gantt-style) | **Yes** | -- | The design uses positioned divs with percentage-based left/width. CSS is simpler and matches the design exactly. |
-| Sparklines in stat cards | -- | **Yes** | Recharts AreaChart with height ~40px, no axes. Minimal config. |
-
-### shadcn/ui Chart Theme Integration
-
-The shadcn `chart` component uses CSS variables for colors:
-
-```css
-/* Already using semantic tokens -- extend for chart palette */
---chart-1: /* emerald-400 */
---chart-2: /* amber-400 */
---chart-3: /* sky-400 */
---chart-4: /* violet-400 */
---chart-5: /* rose-400 */
+  @@unique([userId, name])
+}
 ```
 
-These map directly to the design's project color palette (emerald/blue/amber/violet/rose) used in the StitchingCalendar legend. The chart colors will be consistent across dark/light modes automatically.
+Chart gets: `series Series? @relation(fields: [seriesId], references: [id])` + `seriesId String?`
 
-### date-fns Usage Patterns
+This mirrors Designer (optional many-to-one from Chart), with the addition of `userId` for ownership (like StorageLocation/StitchingApp) and `totalCount` for open-ended vs. known-size series.
 
-Key functions needed for statistics aggregation:
+## Integration Points
 
-```typescript
-import {
-  eachDayOfInterval,      // Generate array of days for calendar grid
-  eachMonthOfInterval,    // Generate month boundaries for bar charts
-  startOfMonth,           // Month boundary for Prisma WHERE clauses
-  endOfMonth,             // Month boundary for Prisma WHERE clauses
-  startOfWeek,            // Week boundary for "this week" hero stat
-  format,                 // Display formatting ("MMM yyyy", "EEE", etc.)
-  getDay,                 // Day-of-week for distribution chart
-  differenceInCalendarDays, // Streak calculation
-  isSameDay,              // Today highlight in calendar
-  subMonths,              // Rolling average window
-  parseISO,               // Parse stored date strings
-} from 'date-fns'
+### 1. Chart Form — SearchableSelect (existing component)
+The chart form already uses `SearchableSelect` for designer, storage location, and stitching app. Series is the same pattern: optional single-select with "Add New" inline creation. The DesignOS `ChartAddForm.tsx` already shows this field.
+
+### 2. Pattern Dive — New Tab (extend existing component)
+`PatternDiveTabs` currently has 4 tabs. Adding "Series" means:
+- Add `"series"` to `PATTERN_DIVE_TABS` const
+- Add `Library` icon import (already available in lucide-react)
+- Add `seriesContent` prop
+- Server Component in `charts/page.tsx` fetches series data in existing `Promise.all()`
+
+### 3. Browse Tab Filter — MultiSelectDropdown (existing component)
+`FilterBar` currently has status and size filters. Adding series filter follows the same `MultiSelectDropdown` pattern with series options passed as props.
+
+### 4. Series Management Pages — Entity CRUD (existing pattern)
+`/series` and `/series/[id]` follow the identical layout pattern as `/storage` and `/apps`:
+- List page with entity cards + add button
+- Detail page with `InlineNameEdit`, `DeleteEntityDialog`, and member list
+
+### 5. Series Progress — Calculated at Query Time (existing convention)
+`completionPercent`, `finishedCount`, `memberCount` are computed from the Chart/Project relation at query time, never stored. This matches the project's "calculated fields at query time" convention.
+
+## Installation
+
+```bash
+# No new packages to install.
+# Only schema change needed:
+npx prisma db push
+npx prisma generate
 ```
-
-All functions are individually importable. Tree-shaking ensures only used functions end up in the bundle. Server-side aggregation uses these for Prisma query boundaries; client-side uses `format` for display labels.
 
 ## Alternatives Considered
 
 | Category | Recommended | Alternative | Why Not |
 |----------|-------------|-------------|---------|
-| Charting | Recharts 3 (via shadcn) | visx | visx is lower-level D3 primitives -- 2-3x dev time for same result. No shadcn integration. |
-| Charting | Recharts 3 (via shadcn) | nivo | Larger bundle, heavier abstraction. Recharts gives more control over custom rendering. |
-| Charting | Recharts 3 (via shadcn) | CSS-only everything | Would work for simple bars but breaks down for combo charts (bar+line), interactive donuts, and sparklines. Maintenance burden grows as chart complexity increases. |
-| Date utils | date-fns 4.1 | dayjs | dayjs needs plugins for locale/format features. date-fns tree-shakes better per-function. Functional API matches project style. |
-| Date utils | date-fns 4.1 | Native Intl/Date | Missing `eachDayOfInterval`, `startOfWeek`, `differenceInCalendarDays`. Would need to reimplement 10+ utility functions. |
-| Calendar | Custom CSS grid | fullcalendar | Massive library for a read-only calendar display. Our calendar is view-only with session data -- CSS grid + date-fns is sufficient. |
-| Heatmap | Not needed | @uiw/react-heat-map | Design shows month-view calendar, not contribution graph. |
-| Animation | CSS transitions | Framer Motion | Designs use `transition: 150ms` inline. No spring physics or complex sequences needed. CSS is sufficient and zero-dependency. |
-
-## Installation
-
-```bash
-# Add shadcn chart component (installs recharts as dependency)
-npx shadcn@latest add chart
-
-# Pin recharts to exact version after shadcn install
-# Check installed version and remove caret from package.json
-
-# Date utilities
-npm install date-fns@4.1.0
-# Then remove caret from package.json (project convention: exact versions)
-```
-
-**Post-install checklist:**
-1. Verify recharts version in package.json -- remove `^` prefix (project convention)
-2. Verify date-fns version in package.json -- remove `^` prefix
-3. Verify no React 19 peer dependency warnings
-4. Add chart CSS variables to globals.css (shadcn installer may do this automatically)
-
-## Bundle Impact Assessment
-
-| Package | Gzipped Size | Tree-Shakeable | Import Pattern |
-|---------|-------------|----------------|----------------|
-| recharts | ~40KB gzipped (full) | Partial -- import specific chart types | `import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts'` |
-| date-fns | ~2-5KB typical usage | Excellent -- per-function imports | `import { format, startOfMonth } from 'date-fns'` |
-| shadcn chart | ~2KB | Copy-paste component | `import { ChartContainer, ChartTooltip } from '@/components/ui/chart'` |
-
-Total new JS: approximately 45KB gzipped. Acceptable for a single-user PWA. Charts are client-only components, so they only load on pages that use them (code-splitting via Next.js dynamic imports if needed).
+| Series-Chart relation | Direct FK on Chart (like designerId) | Junction table (many-to-many) | Requirements say a chart belongs to ONE series. M:M adds complexity with no use case. |
+| Series total count | Optional `totalCount` field | Always count from linked charts | Some series have charts the user doesn't own yet. "8 of 15" needs the 15 from somewhere. |
+| Series progress storage | Calculated at query time | Stored `completionPercent` field | Project convention is calculated fields. Avoids staleness. Series are small (tens of charts max). |
+| Series ownership | `userId` field (like StorageLocation) | No ownership field | Multi-user-aware architecture requires it. Matches established pattern. |
+| Series designer link | Optional FK to Designer | No designer link | Many series are by one designer. Saves clicking into series to find out. Useful for "Designer X's series" views. |
 
 ## Confidence Assessment
 
-| Claim | Confidence | Source |
-|-------|------------|--------|
-| Recharts 3.x supports React 19 | HIGH | GitHub package.json peerDependencies: `"^19.0.0"` |
-| shadcn/ui chart uses Recharts v3 | HIGH | Official shadcn docs + GitHub issues |
-| date-fns 4.1 is latest stable | HIGH | npm registry + GitHub releases |
-| CSS-only calendar is sufficient | HIGH | DesignOS reference already implements it as CSS grid |
-| No heatmap library needed | HIGH | DesignOS screenshots show month-view calendar, not contribution graph |
-| CSS transitions sufficient for animations | HIGH | DesignOS reference uses inline `transition` properties |
+| Area | Confidence | Reason |
+|------|------------|--------|
+| No new deps needed | HIGH | Examined all 7 series features against existing component inventory; every pattern exists |
+| Schema design | HIGH | Mirrors Designer model (validated over 30 phases); totalCount follows requirements glossary |
+| Integration points | HIGH | Each integration uses an existing, tested component with identical usage pattern |
+| Reusable components | HIGH | Verified InlineNameEdit, DeleteEntityDialog, SearchableSelect, MultiSelectDropdown source code |
 
 ## Sources
 
-- [Recharts GitHub - peerDependencies](https://github.com/recharts/recharts/blob/main/package.json) -- React 19 support confirmed
-- [shadcn/ui Chart Component](https://ui.shadcn.com/docs/components/radix/chart) -- Official docs, Recharts v3 integration
-- [Recharts Documentation](https://recharts.org/) -- Context7 verified, 114 code snippets
-- [date-fns Documentation](https://date-fns.org/) -- Context7 verified, 140 code snippets
-- [date-fns v4 Release](https://blog.date-fns.org/v40-with-time-zone-support/) -- ESM-first, tree-shaking improvements
-- DesignOS reference: `product-plan/sections/stitching-sessions-and-statistics/` -- All chart designs reviewed
+- Prisma schema: `prisma/schema.prisma` (current state)
+- DesignOS series components: `product-plan/sections/fabric-series-and-reference-data/components/SeriesList.tsx`, `SeriesDetail.tsx`
+- DesignOS types: `product-plan/sections/fabric-series-and-reference-data/types.ts`
+- DesignOS chart form: `product-plan/sections/project-management/components/ChartAddForm.tsx` (series field)
+- Existing entity patterns: `src/components/features/storage/`, `src/components/features/apps/`
+- Pattern Dive tabs: `src/components/features/charts/pattern-dive-tabs.tsx`
+- Filter bar: `src/components/features/gallery/filter-bar.tsx`
+- SearchableSelect: `src/components/features/charts/form-primitives/searchable-select.tsx`
+- Requirements: `CROSS_STITCH_TRACKER_PLAN.md` section 4.1 (Series Support)

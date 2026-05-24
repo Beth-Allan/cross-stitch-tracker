@@ -160,9 +160,40 @@
   - Code review: 1 warning fixed (WR-01 dark mode on-hold-dot copy-paste), 1 advisory (WR-02 D-04 design decision)
   - Post-merge fix: 5 test assertions updated for CSS variable migration (status-badge, status-group, hero-status-badge)
 
+### Done This Session (2026-05-24 cont.)
+
+- **Branch created** — `feature/phase-31` off main
+- **Phase 31 discussed** — context gathered, 13 decisions locked (D-01 through D-13)
+  - Dual progress: FINISHED + FFO = finished, all assigned charts = owned, open-ended shows "8 charts, 3 finished"
+  - Series-designer: nullable FK to Designer, no enforcement, always manual
+  - Name constraints: @unique (like Designer), optional notes field
+  - FIX-01 + FIX-02: already resolved, verify and close only
+
+- **Phase 31 planned** — 3 plans in 2 waves: schema+types+factories (Wave 1 parallel), CRUD actions+FIX verification (Wave 2)
+  - Plan 01 (W1): Series Prisma model, types, Zod validation, test factory updates, db push
+  - Plan 02 (W1): computeSeriesProgress TDD (pure utility, parallel with Plan 01)
+  - Plan 03 (W2): Series CRUD actions TDD + FIX-01/FIX-02 verification closure
+
+- **Phase 31 code review fixed** — 5/5 findings fixed (1 critical, 4 warnings), 29 tests passing
+  - CR-01: Vacuous $transaction assertion in deleteSeries test → separate mock call assertions
+  - WR-01: Duplicate SeriesProgress type → single source in `@/types/series`
+  - WR-02: Unsanitized console.error in series-actions → Phase 22 error message pattern
+  - WR-03 + WR-04: Empty designerId/notes normalized to null via Zod `.transform()`
+
+- **Phase 31 verified** — UAT complete: 7/7 passed, 0 issues, 2312 tests passing
+  - Create/update/delete series, dual progress computation, Zod validation all confirmed
+  - FIX-01 (999.19 TS errors) verified: `tsc --noEmit` exits 0
+  - FIX-02 (999.22 stats resilience) verified: `Promise.allSettled` at stats/page.tsx:60
+
+- **Phase 31 security verified** — 9/9 threats closed (5 mitigated, 4 accepted), SECURITY.md created
+  - T-31-01/02/08: Zod validation (.trim/.min/.max) on name and notes
+  - T-31-04: requireAuth() on all 4 CRUD actions
+  - T-31-05: seriesSchema.parse() on create/update
+  - T-31-03/06/07/SC: Accepted risks (pure function, single-user, no new packages)
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-ship` — Create PR for Phase 30 and run multi-agent review
+1. `/gsd-ship` — Create PR for Phase 31
 
 ### Backlog
 

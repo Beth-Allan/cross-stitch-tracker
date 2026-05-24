@@ -1,59 +1,40 @@
 # Requirements: Cross Stitch Tracker
 
-**Defined:** 2026-05-20
+**Defined:** 2026-05-24
 **Core Value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
 
-## v1.7 Requirements
+## v1.8 Requirements
 
-Requirements for v1.7 Fix & Polish. Each maps to roadmap phases.
+Requirements for milestone v1.8 Series & Collections. Each maps to roadmap phases.
 
-### Bug Fixes
+### Series
 
-- [x] **BUG-01**: User can quick-add a designer from the chart form
-- [x] **BUG-02**: User can tab into the Designer field on /charts/new and immediately type to search
-- [x] **BUG-03**: User can sort supplies by Added order and A-Z on project detail supplies tab
-- [x] **BUG-04**: User sees correct chart thumbnails on designer detail pages (/designers/{id})
-- [x] **BUG-05**: User sees stitch count auto-calculated from per-colour supply stitch counts
-- [x] **BUG-06**: User sees full auto-calculated skeins value (not truncated) when adding supplies in create chart
+- [ ] **SERIES-01**: User can create a series with name, optional total count, and optional designer link
+- [ ] **SERIES-02**: User can view all series on a management page with progress indicators
+- [ ] **SERIES-03**: User can edit a series (name, total count, designer link)
+- [ ] **SERIES-04**: User can delete a series (charts become unassigned, not deleted)
+- [ ] **SERIES-05**: User can view a series detail page showing assigned charts with dual progress (owned/total + finished/owned)
+- [ ] **SERIES-06**: User can assign a chart to a series from the chart form via SearchableSelect with inline "Add New"
+- [ ] **SERIES-07**: User can remove a chart's series assignment from the chart form
+- [ ] **SERIES-08**: User can browse series via a dedicated Series tab on Pattern Dive showing progress cards
+- [ ] **SERIES-09**: User can filter the Browse tab by series
+- [ ] **SERIES-10**: User can see dual progress for each series — owned count vs total, and finished count vs owned
 
-### Stats Fixes
+### Fixes
 
-- [x] **STAT-01**: User sees records tab items (thread stats, personal bests, insights) populated on stats page
-- [x] **STAT-02**: Collection breakdown chart axes use integer values for discrete data (designers, genres, collections)
-- [x] **STAT-03**: Collection breakdown charts display entity names inline rather than in separate linked lists
-- [x] **STAT-04**: User sees total stitches across all projects on the stats page
-- [x] **STAT-05**: Days-in-library displays as large prominent number with small "days in library" label
-
-### UI Polish
-
-- [x] **UI-01**: Status and size pills on gallery cards and pattern dive use colored styling instead of grey
-- [x] **UI-02**: Gallery cards show indicator when a digital working copy has been uploaded
-- [x] **UI-03**: Project supplies card includes skein calculation adjustment controls (count, over 1/2, waste)
-- [x] **UI-04**: File upload limit increased to 50MB
-- [x] **UI-05**: .zip files accepted as valid upload format for digital working copies
-
-### Code Quality
-
-- [ ] **QUAL-01**: Pre-existing TypeScript errors in test files resolved (dashboard-tabs, chart-actions, shopping-cart-actions)
-- [ ] **QUAL-02**: Remaining silent error patterns fixed (.catch(() => {}) in upload-actions, .catch(() => null) in chart page, bare catch in log-session-modal)
-- [ ] **QUAL-03**: Old photo cleaned up from R2 when user replaces session photo
-- [ ] **QUAL-04**: Status colors centralized as CSS custom properties (replacing scattered Tailwind scales)
-- [ ] **QUAL-05**: DEFAULT_SUPPLY_HEX constant extracted (single-sourced from 7+ files)
-- [ ] **QUAL-06**: useRejectionFlash hook extracted (deduplicated from two EditableNumber components)
+- [ ] **FIX-01**: Fix pre-existing TypeScript errors in 3 test files (999.19)
+- [ ] **FIX-02**: Separate stats page query groups for resilience (999.22)
 
 ## Future Requirements
 
-Deferred to v1.8+. Tracked but not in current roadmap.
+Deferred to future release. Tracked but not in current roadmap.
 
-### New Features
+### Series Enhancements
 
-- **FEAT-01**: Gallery card sizes (S/M/L) with different info density and size filter
-- **FEAT-02**: "Recently Added" dashboard section (5-10 most recently added projects)
-- **FEAT-03**: Supply completeness indicator (distinguish "all supplies added" from "still being entered")
-- **FEAT-04**: Blended stitches management (one strand each of two colors)
-- **FEAT-05**: Back stitch and French knot tracking in supply entry
-- **FEAT-06**: Color heat map visualization (popular hex colors across library)
-- **FEAT-07**: Stats architecture redesign (consolidate scattered stats across dashboard/stats/project pages)
+- **SERIES-F01**: Stacked/collapsible series cards in Pattern Dive Browse tab
+- **SERIES-F02**: Individual gap tracking for missing series entries
+- **SERIES-F03**: Bulk chart-to-series assignment for initial data population
+- **SERIES-F04**: Series insights in statistics dashboard (completion rates, most-collected designers)
 
 ## Out of Scope
 
@@ -61,10 +42,13 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Stats consolidation/redesign | Needs design exploration first — deferred to dedicated milestone |
-| New supply types (blended, backstitch, knots) | Schema changes + UI design needed — not a fix |
-| Gallery card size variants | New feature, not a fix — needs design |
-| Multi-user hardening | Single-user app, low priority |
+| Series ordering / sequencing | Stitchers don't work series in order — charts are independent |
+| Series-level supply aggregation | Supply tracking is per-project, not per-series |
+| Series-level session logging | Sessions are per-project, not per-series |
+| Nested series hierarchy | Flat list with 30+ series is sufficient; nesting adds complexity |
+| Auto-detection of series from chart names | Error-prone; manual assignment is clearer |
+| Many-to-many chart-to-series | A chart belongs to at most one series; simplifies data model |
+| Stats page series integration | Deferred — pre-wire cache invalidation but no UI in v1.8 |
 
 ## Traceability
 
@@ -72,34 +56,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BUG-01 | Phase 27 | Complete |
-| BUG-02 | Phase 27 | Complete |
-| BUG-03 | Phase 29 | Complete |
-| BUG-04 | Phase 27 | Complete |
-| BUG-05 | Phase 27 | Complete |
-| BUG-06 | Phase 27 | Complete |
-| STAT-01 | Phase 28 | Complete |
-| STAT-02 | Phase 28 | Complete |
-| STAT-03 | Phase 28 | Complete |
-| STAT-04 | Phase 28 | Complete |
-| STAT-05 | Phase 28 | Complete |
-| UI-01 | Phase 29 | Complete |
-| UI-02 | Phase 29 | Complete |
-| UI-03 | Phase 29 | Complete |
-| UI-04 | Phase 29 | Complete |
-| UI-05 | Phase 29 | Complete |
-| QUAL-01 | Phase 30 | Pending |
-| QUAL-02 | Phase 30 | Pending |
-| QUAL-03 | Phase 30 | Pending |
-| QUAL-04 | Phase 30 | Pending |
-| QUAL-05 | Phase 30 | Pending |
-| QUAL-06 | Phase 30 | Pending |
+| SERIES-01 | Phase 31 | Pending |
+| SERIES-02 | Phase 32 | Pending |
+| SERIES-03 | Phase 31 | Pending |
+| SERIES-04 | Phase 31 | Pending |
+| SERIES-05 | Phase 32 | Pending |
+| SERIES-06 | Phase 33 | Pending |
+| SERIES-07 | Phase 33 | Pending |
+| SERIES-08 | Phase 34 | Pending |
+| SERIES-09 | Phase 34 | Pending |
+| SERIES-10 | Phase 31 | Pending |
+| FIX-01 | Phase 31 | Pending |
+| FIX-02 | Phase 31 | Pending |
 
 **Coverage:**
-- v1.7 requirements: 22 total
-- Mapped to phases: 22
+- v1.8 requirements: 12 total
+- Mapped to phases: 12
 - Unmapped: 0
 
 ---
-*Requirements defined: 2026-05-20*
-*Last updated: 2026-05-21 after roadmap creation*
+*Requirements defined: 2026-05-24*
+*Last updated: 2026-05-24 after roadmap creation*

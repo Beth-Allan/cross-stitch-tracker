@@ -173,6 +173,7 @@ describe("transformToGalleryCard", () => {
     kitColorCount: null,
     dateAdded: new Date("2026-01-15"),
     notes: null,
+    seriesId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     designer: {

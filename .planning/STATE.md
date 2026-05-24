@@ -1,35 +1,35 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.7
-milestone_name: Fix & Polish
-status: shipped
-last_updated: "2026-05-24T22:00:00.000Z"
-last_activity: 2026-05-24 -- Phase 30 shipped — PR #55
+milestone: v1.8
+milestone_name: Series & Collections
+status: executing
+last_updated: "2026-05-24T23:55:00.000Z"
+last_activity: 2026-05-24 -- Phase 31 shipped — PR #56
 progress:
   total_phases: 4
-  completed_phases: 4
-  total_plans: 11
-  completed_plans: 11
-  percent: 100
+  completed_phases: 1
+  total_plans: 3
+  completed_plans: 3
+  percent: 25
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-20)
+See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 30 — code quality (COMPLETE)
+**Current focus:** Phase 31 — data-foundation-fixes (shipped)
 
 ## Current Position
 
-Phase: 30
-Plan: All complete (3/3)
-Status: Verified and complete
-Last activity: 2026-05-24 -- Phase 30 verified (5/5 must-haves)
+Phase: 31 (data-foundation-fixes) — SHIPPED (PR #56)
+Plan: 3 of 3
+Status: Phase 31 shipped — PR #56
+Last activity: 2026-05-24 -- Phase 31 shipped — PR #56
 
-Progress: [██████████] 4/4 phases (100%)
+Progress: [██░░░░░░░░] 25%
 
 ## Milestone Structure
 
@@ -42,7 +42,8 @@ Progress: [██████████] 4/4 phases (100%)
 | v1.4 | Fixes & Polish | 15-17 | Shipped 2026-05-17 |
 | v1.5 | Statistics & Records | 18-21 | Shipped 2026-05-18 |
 | v1.6 | Cleanup & Hardening | 22-26 | Shipped 2026-05-20 |
-| v1.7 | Fix & Polish | 27-30 | In progress |
+| v1.7 | Fix & Polish | 27-30 | Shipped 2026-05-24 |
+| v1.8 | Series & Collections | 31-34 | In progress |
 
 ## Performance Metrics
 
@@ -53,15 +54,15 @@ Progress: [██████████] 4/4 phases (100%)
 **Velocity (v1.4):** 9 plans / 2 days (~4.5/day)
 **Velocity (v1.5):** 14 plans / 2 days (~7/day)
 **Velocity (v1.6):** 15 plans / 3 days (~5/day)
+**Velocity (v1.7):** 11 plans / 4 days (~2.75/day)
 
 ## Accumulated Context
 
 ### Key Architecture
 
-- `src/lib/queries/stats/` for query layer (pure functions, no "use server")
-- `unstable_cache` with `revalidateTag("stats")` on session mutations (5-min TTL + on-demand)
-- Recharts always Client Components (SSR incompatible)
-- `Promise.allSettled` for parallel data fetching (17 queries on stats page)
+- Series mirrors Designer/Genre pattern: dedicated management page + detail page + inline create from chart form
+- Dual progress: owned/total (collection completeness) + finished/owned (stitching progress)
+- Series is optional one-to-many from Chart (a chart belongs to at most one series)
 
 ### Decisions
 
@@ -77,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-24T21:00:00.000Z
-Stopped at: Phase 30 context gathered
-Resume file: .planning/phases/30-code-quality/30-CONTEXT.md
+Last session: 2026-05-24T22:38:04.712Z
+Stopped at: Phase 31 context gathered
+Resume file: .planning/phases/31-data-foundation-fixes/31-CONTEXT.md
