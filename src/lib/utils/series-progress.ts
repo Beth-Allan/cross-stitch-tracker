@@ -3,11 +3,7 @@
  * Pure function with no side effects or async behavior.
  */
 
-export type SeriesProgress = {
-  ownedCount: number;
-  finishedCount: number;
-  totalCount: number | null;
-};
+import type { SeriesProgress } from "@/types/series";
 
 export const FINISHED_STATUSES = new Set(["FINISHED", "FFO"]);
 
