@@ -39,11 +39,11 @@ function validateFile(file: File): string | null {
   const isValidMime = (ALLOWED_CHART_FILE_TYPES as readonly string[]).includes(file.type);
 
   if (!isValidExtension && !isValidMime) {
-    return "Unsupported file type. Accepted: PDF, images, .pat, .xsd, .css, .saga";
+    return "Unsupported file type. Accepted: PDF, images, .pat, .xsd, .css, .saga, .zip";
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    return "File exceeds 10MB limit.";
+    return "File exceeds 50MB limit.";
   }
 
   return null;
@@ -118,7 +118,8 @@ export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: Chart
           mimeType: file.type || "application/octet-stream",
           fileSize: file.size,
         } satisfies UploadedFile;
-      } catch {
+      } catch (error) {
+        console.error(`File upload failed for ${file.name}:`, error);
         setInProgress((prev) =>
           prev.map((f) =>
             f.id === localId

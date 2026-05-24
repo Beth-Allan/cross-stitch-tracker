@@ -54,7 +54,32 @@ vi.mock("sonner", () => ({
   toast: {
     success: vi.fn(),
     error: vi.fn(),
+    warning: vi.fn(),
   },
+}));
+
+vi.mock("@/components/features/charts/form-primitives/calculator-card", () => ({
+  CalculatorCard: ({
+    calcParams,
+    fabricOptions,
+  }: {
+    calcParams: {
+      strandCount: number;
+      overCount: number;
+      wastePercent: number;
+      fabricCount: number;
+    };
+    fabricOptions: Array<{ value: string; label: string; count: number }>;
+  }) => (
+    <div data-testid="calculator-card">
+      <span>Skein Calculator</span>
+      <span data-testid="calc-strands">{calcParams.strandCount}</span>
+      <span data-testid="calc-over">{calcParams.overCount}</span>
+      <span data-testid="calc-waste">{calcParams.wastePercent}</span>
+      <span data-testid="calc-fabric-count">{calcParams.fabricCount}</span>
+      <span data-testid="calc-fabric-options">{fabricOptions.length}</span>
+    </div>
+  ),
 }));
 
 // ─── Test Data ────────────────────────────────────────────────────────────────
@@ -402,6 +427,69 @@ describe("SuppliesTab", () => {
       expect(screen.queryByText(/fabric count/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/strand count/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/over \d/i)).not.toBeInTheDocument();
+    });
+  });
+
+  describe("CalculatorCard integration", () => {
+    it("renders CalculatorCard when fabricOptions and chartId are provided", () => {
+      render(
+        <SuppliesTab
+          project={defaultProject}
+          supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
+          fabricOptions={[]}
+          chartId="test-chart-id"
+        />,
+      );
+      expect(screen.getByTestId("calculator-card")).toBeInTheDocument();
+      expect(screen.getByText("Skein Calculator")).toBeInTheDocument();
+    });
+
+    it("does not render CalculatorCard when fabricOptions is not provided", () => {
+      render(
+        <SuppliesTab
+          project={defaultProject}
+          supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
+        />,
+      );
+      expect(screen.queryByTestId("calculator-card")).not.toBeInTheDocument();
+    });
+
+    it("passes calc params from project to CalculatorCard", () => {
+      const customProject = {
+        ...defaultProject,
+        strandCount: 3,
+        overCount: 1 as const,
+        wastePercent: 30,
+        fabric: { id: "fab-1", name: "Aida", count: 18, brand: { name: "Zweigart" } },
+      };
+      render(
+        <SuppliesTab
+          project={customProject}
+          supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
+          fabricOptions={[{ value: "fab-1", label: "Zweigart Aida (18ct)", count: 18 }]}
+          chartId="test-chart-id"
+        />,
+      );
+      expect(screen.getByTestId("calc-strands")).toHaveTextContent("3");
+      expect(screen.getByTestId("calc-over")).toHaveTextContent("1");
+      expect(screen.getByTestId("calc-waste")).toHaveTextContent("30");
+      expect(screen.getByTestId("calc-fabric-count")).toHaveTextContent("18");
+    });
+
+    it("passes fabric options to CalculatorCard", () => {
+      const fabricOptions = [
+        { value: "fab-1", label: "Zweigart Aida (14ct)", count: 14 },
+        { value: "fab-2", label: "Zweigart Aida (18ct)", count: 18 },
+      ];
+      render(
+        <SuppliesTab
+          project={defaultProject}
+          supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
+          fabricOptions={fabricOptions}
+          chartId="test-chart-id"
+        />,
+      );
+      expect(screen.getByTestId("calc-fabric-options")).toHaveTextContent("2");
     });
   });
 });

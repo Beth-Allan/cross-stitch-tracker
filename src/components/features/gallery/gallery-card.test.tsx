@@ -268,6 +268,20 @@ describe("GalleryCard", () => {
     });
   });
 
+  describe("Digital copy indicator", () => {
+    it("renders 'Digital copy' text when hasDigitalCopy is true", () => {
+      const card = createMockGalleryCard({ hasDigitalCopy: true });
+      render(<GalleryCard card={card} />);
+      expect(screen.getByText("Digital copy")).toBeInTheDocument();
+    });
+
+    it("does not render 'Digital copy' text when hasDigitalCopy is false", () => {
+      const card = createMockGalleryCard({ hasDigitalCopy: false });
+      render(<GalleryCard card={card} />);
+      expect(screen.queryByText("Digital copy")).not.toBeInTheDocument();
+    });
+  });
+
   describe("Focal point", () => {
     it("applies objectPosition style when focal point is provided", () => {
       const card = createMockGalleryCard({

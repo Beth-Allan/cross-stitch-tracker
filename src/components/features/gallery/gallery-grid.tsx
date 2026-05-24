@@ -8,6 +8,7 @@ import { LinkButton } from "@/components/ui/link-button";
 import { ListRowKebabMenu } from "@/components/features/charts/list-row-kebab-menu";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { STATUS_CONFIG } from "@/lib/utils/status";
+import { SIZE_COLORS } from "@/lib/utils/size-category";
 import { STATUS_GRADIENT_CLASSES } from "./gallery-utils";
 import { KittingDotIcon, getKittingTooltipText } from "./kitting-dots";
 import { GalleryCard } from "./gallery-card";
@@ -290,7 +291,7 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
             <Tooltip>
               <TooltipTrigger
                 render={<span />}
-                className="bg-muted text-muted-foreground cursor-default rounded-full px-2 py-0.5 text-center text-[10px] font-bold tracking-widest uppercase"
+                className={`${SIZE_COLORS[card.sizeCategory].bg} ${SIZE_COLORS[card.sizeCategory].text} cursor-default rounded-full px-2 py-0.5 text-center text-[10px] font-bold tracking-widest uppercase`}
               >
                 {card.sizeCategory}
               </TooltipTrigger>
@@ -432,7 +433,7 @@ function TableView({
                 <Tooltip>
                   <TooltipTrigger
                     render={<span />}
-                    className="text-muted-foreground cursor-default text-xs"
+                    className={`${SIZE_COLORS[card.sizeCategory].bg} ${SIZE_COLORS[card.sizeCategory].text} cursor-default rounded-full px-2 py-0.5 text-xs`}
                   >
                     {card.sizeCategory}
                   </TooltipTrigger>

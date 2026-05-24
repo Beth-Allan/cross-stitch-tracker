@@ -326,6 +326,29 @@ describe("transformToGalleryCard", () => {
     expect(card.focalPointX).toBeNull();
     expect(card.focalPointY).toBeNull();
   });
+
+  it("maps _count.files > 0 to hasDigitalCopy: true", () => {
+    const chartWithFiles: GalleryChartData = {
+      ...baseChart,
+      _count: { files: 3 },
+    };
+    const card = transformToGalleryCard(chartWithFiles, imageUrls);
+    expect(card.hasDigitalCopy).toBe(true);
+  });
+
+  it("maps _count.files === 0 to hasDigitalCopy: false", () => {
+    const chartNoFiles: GalleryChartData = {
+      ...baseChart,
+      _count: { files: 0 },
+    };
+    const card = transformToGalleryCard(chartNoFiles, imageUrls);
+    expect(card.hasDigitalCopy).toBe(false);
+  });
+
+  it("maps missing _count to hasDigitalCopy: false", () => {
+    const card = transformToGalleryCard(baseChart, imageUrls);
+    expect(card.hasDigitalCopy).toBe(false);
+  });
 });
 
 // ─── compareFn ──────────────────────────────────────────────────────────────

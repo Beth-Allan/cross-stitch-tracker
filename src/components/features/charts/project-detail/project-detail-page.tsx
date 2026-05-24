@@ -16,6 +16,7 @@ import type {
   ActiveProjectForPicker,
 } from "@/types/session";
 import type { CompletionEstimate } from "@/types/stats";
+import type { FabricOption } from "@/components/features/supply-table";
 
 interface ProjectDetailPageProps {
   chart: ChartWithProject;
@@ -25,6 +26,7 @@ interface ProjectDetailPageProps {
   sessionStats: ProjectSessionStats;
   activeProjects: ActiveProjectForPicker[];
   completionEstimate?: CompletionEstimate | null;
+  fabricOptions?: FabricOption[];
 }
 
 export function ProjectDetailPage({
@@ -35,6 +37,7 @@ export function ProjectDetailPage({
   sessionStats,
   activeProjects,
   completionEstimate,
+  fabricOptions,
 }: ProjectDetailPageProps) {
   const router = useRouter();
   // Track status locally so overview tab reorders sections on status change
@@ -76,7 +79,12 @@ export function ProjectDetailPage({
         }
         suppliesContent={
           project && supplies ? (
-            <SuppliesTab project={project} supplies={supplies} />
+            <SuppliesTab
+              project={project}
+              supplies={supplies}
+              fabricOptions={fabricOptions}
+              chartId={chart.id}
+            />
           ) : (
             <div className="text-muted-foreground py-12 text-center">
               <p className="font-heading text-lg font-semibold">No project linked</p>

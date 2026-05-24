@@ -123,9 +123,26 @@
   - Code review: 1 critical + 4 warnings fixed (mock type errors, sort mutation, dead scope param, error sanitization, semantic token)
   - Additional fixes: Prisma `projects` → `project` relation name, stale cache guard, thread insights show stitch count, color name removed from display
 
+### Done This Session (2026-05-24 cont.)
+
+- **Phase 28 shipped** — PR created via `/gsd-ship`
+
+- **Phase 29 executed & verified** — 3/3 plans complete, 2269 tests passing, all 5 requirements verified
+  - Plan 01: Colored status badges (UNSTARTED = slate), SIZE_COLORS lightened to -50, digital copy indicator (FileText + "Digital copy")
+  - Plan 02: CalculatorCard wired into project detail Supplies tab with optimistic persistence, fabric options threaded from page
+  - Plan 03: MAX_FILE_SIZE 10MB → 50MB, zip MIME types added to client + server validation, error messages updated
+  - Code review: 1 critical + 2 warnings fixed (CR-01 calcParams isPending bug, WR-01 getUnassignedFabrics catch, WR-02 FabricOption dedup)
+  - BUG-03 sort investigation confirmed working correctly (no bug)
+  - 3 human verification items blocked (R2 not configured on dev)
+
+- **Phase 29 shipped** — PR #54 created, 6-agent review completed, all findings fixed, 2269 tests passing
+  - Fixed: WR-01 getUnassignedFabrics error logging, WR-02 upload error logging with filename, WR-03/WR-04 misleading comments, WR-05 unnecessary variable alias, WR-06 deduplicated rollback+toast
+  - Backlogged: 5 items (999.76-999.80) for co-dependent props, persistFields typing, calc param error tests, server action tests, zip validation test
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-ship` — Create PR for Phase 28, run multi-agent review
+1. Merge PR #54
+2. `/gsd-discuss-phase` — Phase 30: Code Quality
 
 ### Backlog
 
@@ -217,6 +234,11 @@
 - 999.73: Supply stitch total hint discoverability — hint only visible in Details mode, not while viewing supplies. Show supply total in SummaryBar or supply mode footer so users know to check/update stitch count
 - 999.74: Chart form gap at top of page — white space above breadcrumb/SummaryBar in supply mode. Not a Phase 27 regression (Activity component predates it). Investigate layout/padding source
 - 999.75: InlineDesignerDialog controlled-only simplification — always used in controlled mode, remove uncontrolled path (trigger, uncontrolledOpen, isControlled branching). Also replace useState ref hack with useRef
+- 999.76: SuppliesTab co-dependent optional props — group `fabricOptions` + `chartId` into single optional `calculator?: { fabricOptions: FabricOption[]; chartId: string }` to eliminate invalid prop combinations
+- 999.77: SuppliesTab persistFields type narrowing — `Record<string, number>` should be `Partial<Pick<CalcParams, 'strandCount' | 'overCount' | 'wastePercent'>>`
+- 999.78: handleCalcParamsChange error/rollback test coverage — test `!result.success` rollback, catch rollback, and missing `chartId` no-op paths
+- 999.79: updateProjectSettings server action test coverage — auth rejection, ownership validation, Zod boundary, and Prisma error handling
+- 999.80: Client-side zip validation test — verify `.zip` file passes `validateFile` in chart-file-upload component
 
 ### Blockers
 

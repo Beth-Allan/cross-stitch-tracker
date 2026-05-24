@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getChart } from "@/lib/actions/chart-actions";
 import { getPresignedImageUrls } from "@/lib/actions/upload-actions";
 import { getProjectSupplies } from "@/lib/actions/supply-actions";
+import { getUnassignedFabrics } from "@/lib/actions/fabric-actions";
 import {
   getSessionsForProject,
   getProjectSessionStats,
@@ -28,6 +29,7 @@ export default async function ChartDetailPage({ params }: { params: Promise<{ id
     statsResult,
     projectsResult,
     completionEstimate,
+    unassignedFabrics,
   ] = await Promise.all([
     chart.project ? getProjectSupplies(chart.project.id) : null,
     getPresignedImageUrls([chart.coverImageUrl, chart.coverThumbnailUrl]),
@@ -49,6 +51,12 @@ export default async function ChartDetailPage({ params }: { params: Promise<{ id
     chart.project
       ? getProjectCompletionEstimate(user.id, chart.project.id).catch(() => null)
       : null,
+    chart.project
+      ? getUnassignedFabrics(chart.project.id).catch((error) => {
+          console.error("Failed to load unassigned fabrics:", error);
+          return [];
+        })
+      : [],
   ]);
 
   const sessions =
@@ -67,6 +75,12 @@ export default async function ChartDetailPage({ params }: { params: Promise<{ id
       ? { ...imageUrls, ...(await getPresignedImageUrls(sessionPhotoKeys)) }
       : imageUrls;
 
+  const fabricOptions = unassignedFabrics.map((f) => ({
+    value: f.id,
+    label: `${f.brand.name} ${f.name} (${f.count}ct)`,
+    count: f.count,
+  }));
+
   return (
     <ProjectDetailPage
       chart={chart}
@@ -76,6 +90,7 @@ export default async function ChartDetailPage({ params }: { params: Promise<{ id
       sessionStats={sessionStats}
       activeProjects={activeProjects}
       completionEstimate={completionEstimate}
+      fabricOptions={fabricOptions}
     />
   );
 }

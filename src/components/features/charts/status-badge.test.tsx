@@ -20,4 +20,25 @@ describe("StatusBadge", () => {
     const dot = container.querySelector("[aria-hidden]");
     expect(dot).toBeInTheDocument();
   });
+
+  it("renders UNSTARTED with slate background instead of bg-muted", () => {
+    const { container } = render(<StatusBadge status="UNSTARTED" />);
+    const badge = container.firstChild as HTMLElement;
+    expect(badge.className).toContain("bg-slate-50");
+    expect(badge.className).not.toContain("bg-muted");
+  });
+
+  it("renders UNSTARTED with slate text classes", () => {
+    const { container } = render(<StatusBadge status="UNSTARTED" />);
+    const badge = container.firstChild as HTMLElement;
+    expect(badge.className).toContain("text-slate-700");
+    expect(badge.className).toContain("dark:bg-slate-900/40");
+  });
+
+  it("renders KITTING with amber background (no regression)", () => {
+    const { container } = render(<StatusBadge status="KITTING" />);
+    const badge = container.firstChild as HTMLElement;
+    expect(badge.className).toContain("bg-amber-50");
+    expect(badge.className).toContain("text-amber-700");
+  });
 });

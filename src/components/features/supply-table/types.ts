@@ -15,6 +15,12 @@ export interface CalcParams {
   wastePercent: number; // default 20
 }
 
+export interface FabricOption {
+  value: string;
+  label: string;
+  count: number;
+}
+
 export const DEFAULT_CALC_PARAMS: CalcParams = {
   fabricCount: 14,
   strandCount: 2,

@@ -12,9 +12,9 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 **Last shipped:** v1.6 Cleanup & Hardening (2026-05-20)
 **7 milestones shipped:** v1.0-v1.6 (26 phases, 122 plans)
-**Current:** v1.7 Fix & Polish (Phases 27-30) — Phase 28 complete (2026-05-24)
+**Current:** v1.7 Fix & Polish (Phases 27-30) — Phase 29 complete (2026-05-24)
 
-The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters), project detail with tabbed layout and session logging, unified supply table with keyboard-first entry and visible commit button, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project search, status grouping, supply search, smart selection, and squared pills, image optimization, multi-file working copies per chart, click-to-set focal point control for cover images with repositioned action bar, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights with stitch counts, status filter pills, and celebration confetti on record-breaking sessions. 2,242 tests, ~110k LOC TypeScript. Stats insights now populate from library data (not just session-tracked projects) with status group filtering. Integer-only chart axes. Collection total stitch counter. Days-in-library display fix.
+The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters) with colored status/size badges and digital copy indicators, project detail with tabbed layout, session logging, and inline skein calculator controls, unified supply table with keyboard-first entry and visible commit button, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project search, status grouping, supply search, smart selection, and squared pills, image optimization, multi-file working copies per chart (up to 50MB, including .zip), click-to-set focal point control for cover images with repositioned action bar, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights with stitch counts, status filter pills, and celebration confetti on record-breaking sessions. 2,269 tests, ~110k LOC TypeScript. Stats insights now populate from library data (not just session-tracked projects) with status group filtering. Integer-only chart axes. Collection total stitch counter. Days-in-library display fix.
 
 ## Requirements
 
@@ -88,14 +88,17 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - ✓ Edge case test coverage (calendar rollover, record detection, completion estimates, skein calculator) — v1.6
 - ✓ Silent failure fixes (R2 file errors surfaced, stats cache invalidation on mutations) — v1.6
 - ✓ UX polish (ARIA card rows, keyboard-gated highlight, rejection flash, focal point editor split, fabric matching) — v1.6
+- ✓ Chart form fixes (designer quick-add, tab focus, thumbnails, stitch count calc, skeins display) — v1.7
+- ✓ Stats corrections (records tab, integer axes, inline names, total stitches, days-in-library) — v1.7
+- ✓ UI polish (colored status/size pills, digital copy indicator, CalculatorCard on supplies tab, 50MB+zip upload) — v1.7
 
 ### Active
 
 **v1.7 Fix & Polish** — Fix user-reported bugs, resolve stats issues, polish UI rough edges, clean up code quality.
 
-- [ ] Quick-add designer from chart form, tab-to-search, designer thumbnails, stitch count calc, skeins display
-- [ ] Records tab population, chart axis integers, inline entity names, total stitches stat, days-in-library formatting
-- [ ] Colored status/size pills, digital copy indicator, supply sort, skein calc controls, file upload improvements
+- ✓ Quick-add designer from chart form, tab-to-search, designer thumbnails, stitch count calc, skeins display — v1.7
+- ✓ Records tab population, chart axis integers, inline entity names, total stitches stat, days-in-library formatting — v1.7
+- ✓ Colored status/size pills, digital copy indicator, supply sort, skein calc controls, file upload improvements — v1.7
 - [ ] TypeScript test errors, silent failures, R2 photo cleanup, status color centralization, constant/hook extraction
 
 ### Deferred (no phase assigned)

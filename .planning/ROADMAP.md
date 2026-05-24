@@ -108,7 +108,7 @@ Full details: `milestones/v1.6-ROADMAP.md`
 
 - [x] **Phase 27: Chart Form Fixes** - Fix designer quick-add, tab focus, thumbnails, stitch count calculation, and skeins display (completed 2026-05-21)
 - [x] **Phase 28: Stats Corrections** - Fix records tab population, chart axis values, inline entity names, total stitches stat, and days-in-library formatting (completed 2026-05-24)
-- [ ] **Phase 29: UI Polish** - Colored status/size pills, digital copy indicator, supply sort fix, skein calc controls on project supplies, file upload improvements
+- [x] **Phase 29: UI Polish** - Colored status/size pills, digital copy indicator, supply sort fix, skein calc controls on project supplies, file upload improvements (completed 2026-05-24)
 - [ ] **Phase 30: Code Quality** - Resolve TypeScript test errors, fix silent failures, clean up R2 photo orphans, centralize status colors, extract shared constants and hooks
 
 ## Phase Details
@@ -170,9 +170,14 @@ Plans:
   2. Gallery cards show a visual indicator when a chart has an uploaded digital working copy
   3. User can sort supplies by "Added" order and alphabetically (A-Z) on the project detail Supplies tab
   4. Project supplies card includes skein calculation adjustment controls (fabric count, over 1/2, waste percentage)
-  5. User can upload files up to 15MB, including .zip files as digital working copies
+  5. User can upload files up to 50MB, including .zip files as digital working copies
 
-**Plans**: TBD
+**Plans**: 3 plansPlans:
+
+- [x] 29-01-PLAN.md -- Gallery card visual polish: status/size badge colors and digital copy indicator
+- [x] 29-02-PLAN.md -- Supply tab: CalculatorCard integration and sort fix
+- [x] 29-03-PLAN.md -- File upload: 50MB limit and zip support
+
 **UI hint**: yes
 
 ### Phase 30: Code Quality
@@ -226,5 +231,5 @@ Phases execute in numeric order: 27 → 28 → 29 → 30
 | 26. UX Polish | v1.6 | 3/3 | Complete | 2026-05-20 |
 | 27. Chart Form Fixes | v1.7 | 2/2 | Complete    | 2026-05-23 |
 | 28. Stats Corrections | v1.7 | 3/3 | Complete    | 2026-05-24 |
-| 29. UI Polish | v1.7 | 0/0 | Not started | - |
+| 29. UI Polish | v1.7 | 3/3 | Complete    | 2026-05-24 |
 | 30. Code Quality | v1.7 | 0/0 | Not started | - |

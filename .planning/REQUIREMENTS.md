@@ -11,7 +11,7 @@ Requirements for v1.7 Fix & Polish. Each maps to roadmap phases.
 
 - [x] **BUG-01**: User can quick-add a designer from the chart form
 - [x] **BUG-02**: User can tab into the Designer field on /charts/new and immediately type to search
-- [ ] **BUG-03**: User can sort supplies by Added order and A-Z on project detail supplies tab
+- [x] **BUG-03**: User can sort supplies by Added order and A-Z on project detail supplies tab
 - [x] **BUG-04**: User sees correct chart thumbnails on designer detail pages (/designers/{id})
 - [x] **BUG-05**: User sees stitch count auto-calculated from per-colour supply stitch counts
 - [x] **BUG-06**: User sees full auto-calculated skeins value (not truncated) when adding supplies in create chart
@@ -26,11 +26,11 @@ Requirements for v1.7 Fix & Polish. Each maps to roadmap phases.
 
 ### UI Polish
 
-- [ ] **UI-01**: Status and size pills on gallery cards and pattern dive use colored styling instead of grey
-- [ ] **UI-02**: Gallery cards show indicator when a digital working copy has been uploaded
-- [ ] **UI-03**: Project supplies card includes skein calculation adjustment controls (count, over 1/2, waste)
-- [ ] **UI-04**: File upload limit increased to 15MB
-- [ ] **UI-05**: .zip files accepted as valid upload format for digital working copies
+- [x] **UI-01**: Status and size pills on gallery cards and pattern dive use colored styling instead of grey
+- [x] **UI-02**: Gallery cards show indicator when a digital working copy has been uploaded
+- [x] **UI-03**: Project supplies card includes skein calculation adjustment controls (count, over 1/2, waste)
+- [x] **UI-04**: File upload limit increased to 50MB
+- [x] **UI-05**: .zip files accepted as valid upload format for digital working copies
 
 ### Code Quality
 
@@ -74,7 +74,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | BUG-01 | Phase 27 | Complete |
 | BUG-02 | Phase 27 | Complete |
-| BUG-03 | Phase 29 | Pending |
+| BUG-03 | Phase 29 | Complete |
 | BUG-04 | Phase 27 | Complete |
 | BUG-05 | Phase 27 | Complete |
 | BUG-06 | Phase 27 | Complete |
@@ -83,11 +83,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STAT-03 | Phase 28 | Complete |
 | STAT-04 | Phase 28 | Complete |
 | STAT-05 | Phase 28 | Complete |
-| UI-01 | Phase 29 | Pending |
-| UI-02 | Phase 29 | Pending |
-| UI-03 | Phase 29 | Pending |
-| UI-04 | Phase 29 | Pending |
-| UI-05 | Phase 29 | Pending |
+| UI-01 | Phase 29 | Complete |
+| UI-02 | Phase 29 | Complete |
+| UI-03 | Phase 29 | Complete |
+| UI-04 | Phase 29 | Complete |
+| UI-05 | Phase 29 | Complete |
 | QUAL-01 | Phase 30 | Pending |
 | QUAL-02 | Phase 30 | Pending |
 | QUAL-03 | Phase 30 | Pending |
