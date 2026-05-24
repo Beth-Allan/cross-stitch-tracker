@@ -3,6 +3,7 @@ import type {
   Project,
   Designer,
   Genre,
+  Series,
   SupplyBrand,
   Thread,
   Bead,
@@ -33,6 +34,19 @@ export function createMockDesigner(overrides?: Partial<Designer>): Designer {
     id: "d1",
     name: "Test Designer",
     website: null,
+    notes: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
+export function createMockSeries(overrides?: Partial<Series>): Series {
+  return {
+    id: "series-1",
+    name: "Test Series",
+    totalCount: null,
+    designerId: null,
     notes: null,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -450,6 +464,13 @@ export function createMockPrisma() {
       groupBy: vi.fn(),
     },
     designer: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
+    series: {
       create: vi.fn(),
       findMany: vi.fn(),
       findUnique: vi.fn(),
