@@ -136,7 +136,11 @@ Full details: `milestones/v1.7-ROADMAP.md`
   3. User can delete a series and its charts become unassigned (not deleted)
   4. Dual progress values (owned/total + finished/owned) are computed correctly for any series configuration
   5. Pre-existing TypeScript test errors are resolved and stats page query groups are separated for resilience
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 31-01-PLAN.md — Schema, types, validation, test factories
+- [ ] 31-02-PLAN.md — Series progress computation utility (TDD)
+- [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
 
 ### Phase 32: Series Management Pages
 **Goal**: Users can browse and manage their series collection through dedicated pages
@@ -146,7 +150,11 @@ Full details: `milestones/v1.7-ROADMAP.md`
   1. User can view all series on a /series management page with name, designer, and progress indicators
   2. User can view a series detail page showing all assigned charts with dual progress (owned/total + finished/owned)
   3. User can inline-edit series name and delete series from the management pages
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 31-01-PLAN.md — Schema, types, validation, test factories
+- [ ] 31-02-PLAN.md — Series progress computation utility (TDD)
+- [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
 **UI hint**: yes
 
 ### Phase 33: Chart Form Integration
@@ -158,7 +166,11 @@ Full details: `milestones/v1.7-ROADMAP.md`
   2. User can create a new series inline from the chart form without navigating away
   3. User can clear a chart's series assignment from the chart form
   4. Series assignment persists correctly on both chart creation and chart edit
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 31-01-PLAN.md — Schema, types, validation, test factories
+- [ ] 31-02-PLAN.md — Series progress computation utility (TDD)
+- [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
 **UI hint**: yes
 
 ### Phase 34: Browse & Pattern Dive Integration
@@ -169,7 +181,11 @@ Full details: `milestones/v1.7-ROADMAP.md`
   1. User can view a Series tab on Pattern Dive showing series cards with dual progress indicators
   2. User can click a series card to navigate to its detail page
   3. User can filter the Browse tab by series using the existing filter bar
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 31-01-PLAN.md — Schema, types, validation, test factories
+- [ ] 31-02-PLAN.md — Series progress computation utility (TDD)
+- [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
 **UI hint**: yes
 
 ## Progress
