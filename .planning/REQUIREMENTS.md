@@ -18,11 +18,11 @@ Requirements for v1.7 Fix & Polish. Each maps to roadmap phases.
 
 ### Stats Fixes
 
-- [ ] **STAT-01**: User sees records tab items (thread stats, personal bests, insights) populated on stats page
-- [ ] **STAT-02**: Collection breakdown chart axes use integer values for discrete data (designers, genres, collections)
-- [ ] **STAT-03**: Collection breakdown charts display entity names inline rather than in separate linked lists
-- [ ] **STAT-04**: User sees total stitches across all projects on the stats page
-- [ ] **STAT-05**: Days-in-library displays as large prominent number with small "days in library" label
+- [x] **STAT-01**: User sees records tab items (thread stats, personal bests, insights) populated on stats page
+- [x] **STAT-02**: Collection breakdown chart axes use integer values for discrete data (designers, genres, collections)
+- [x] **STAT-03**: Collection breakdown charts display entity names inline rather than in separate linked lists
+- [x] **STAT-04**: User sees total stitches across all projects on the stats page
+- [x] **STAT-05**: Days-in-library displays as large prominent number with small "days in library" label
 
 ### UI Polish
 
@@ -78,11 +78,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BUG-04 | Phase 27 | Complete |
 | BUG-05 | Phase 27 | Complete |
 | BUG-06 | Phase 27 | Complete |
-| STAT-01 | Phase 28 | Pending |
-| STAT-02 | Phase 28 | Pending |
-| STAT-03 | Phase 28 | Pending |
-| STAT-04 | Phase 28 | Pending |
-| STAT-05 | Phase 28 | Pending |
+| STAT-01 | Phase 28 | Complete |
+| STAT-02 | Phase 28 | Complete |
+| STAT-03 | Phase 28 | Complete |
+| STAT-04 | Phase 28 | Complete |
+| STAT-05 | Phase 28 | Complete |
 | UI-01 | Phase 29 | Pending |
 | UI-02 | Phase 29 | Pending |
 | UI-03 | Phase 29 | Pending |
