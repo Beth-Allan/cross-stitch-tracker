@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryState, parseAsArrayOf, parseAsStringLiteral } from "nuqs";
-import { STATUS_GROUPS } from "@/lib/utils/status-groups";
+import { STATUS_GROUPS, type StatusGroup } from "@/lib/utils/status-groups";
 
 const PILL_OPTIONS = [
   { value: "not-started" as const, label: "Not Started" },
@@ -17,10 +17,12 @@ export function StatusFilterPills() {
 
   const isAllActive = statusFilter.length === 0;
 
-  function toggleGroup(group: string) {
+  function toggleGroup(group: StatusGroup) {
     void setStatusFilter((prev) => {
       const current = prev ?? [];
-      return current.includes(group) ? current.filter((v) => v !== group) : [...current, group];
+      return current.includes(group)
+        ? (current.filter((v) => v !== group) as StatusGroup[])
+        : [...current, group];
     });
   }
 

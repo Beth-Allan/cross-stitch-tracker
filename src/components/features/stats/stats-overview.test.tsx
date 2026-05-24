@@ -140,7 +140,6 @@ const mockGenreInsights: GenreInsight[] = [
   {
     genreId: "g1",
     name: "Fantasy",
-    projectCount: 8,
     totalStitches: 50000,
   },
 ];

@@ -23,8 +23,8 @@ const mockedUseQueryState = vi.mocked(useQueryState);
 describe("StatusFilterPills", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockedUseQueryState.mockReturnValue([[] as string[], mockSetStatusFilter] as ReturnType<
-      typeof useQueryState<string[]>
+    mockedUseQueryState.mockReturnValue([[], mockSetStatusFilter] as unknown as ReturnType<
+      typeof useQueryState
     >);
   });
 
@@ -63,9 +63,9 @@ describe("StatusFilterPills", () => {
 
   it("shows group pill as active when in statusFilter", () => {
     mockedUseQueryState.mockReturnValue([
-      ["not-started"] as string[],
+      ["not-started"],
       mockSetStatusFilter,
-    ] as ReturnType<typeof useQueryState<string[]>>);
+    ] as unknown as ReturnType<typeof useQueryState>);
 
     render(<StatusFilterPills />);
 
@@ -86,9 +86,9 @@ describe("StatusFilterPills", () => {
 
   it("calls setStatusFilter(null) when clicking All", () => {
     mockedUseQueryState.mockReturnValue([
-      ["not-started"] as string[],
+      ["not-started"],
       mockSetStatusFilter,
-    ] as ReturnType<typeof useQueryState<string[]>>);
+    ] as unknown as ReturnType<typeof useQueryState>);
 
     render(<StatusFilterPills />);
 

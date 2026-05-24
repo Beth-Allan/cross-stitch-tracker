@@ -100,6 +100,7 @@ const mockHeroStats: StatsHeroData = {
   totalSessions: 200,
   totalTimeMinutes: 6000,
   projectsCompleted: 5,
+  collectionTotalStitches: 500000,
 };
 
 const mockCollectionBreakdown: CollectionBreakdownData = {

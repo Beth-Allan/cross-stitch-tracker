@@ -72,7 +72,7 @@ export function BuriedTreasuresSection({ treasures, imageUrls }: BuriedTreasures
 
               {/* Name + designer */}
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <p className="font-heading text-foreground truncate text-sm font-semibold transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+                <p className="font-heading text-foreground group-hover:text-primary truncate text-sm font-semibold transition-colors">
                   {t.chartName}
                 </p>
                 <p className="text-muted-foreground truncate text-xs">{t.designerName}</p>

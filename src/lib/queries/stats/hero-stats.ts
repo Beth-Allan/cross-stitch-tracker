@@ -35,7 +35,7 @@ async function computeHeroStats(userId: string): Promise<StatsHeroData> {
           where: { userId, status: { in: ["FINISHED", "FFO"] } },
         }),
         prisma.chart.aggregate({
-          where: { projects: { some: { userId } } },
+          where: { project: { userId } },
           _sum: { stitchCount: true },
         }),
       ],
@@ -50,7 +50,7 @@ async function computeHeroStats(userId: string): Promise<StatsHeroData> {
       totalSessions: lifetime._count.id,
       totalTimeMinutes: lifetime._sum.timeSpentMinutes ?? 0,
       projectsCompleted: completedCount,
-      collectionTotalStitches: collectionTotal._sum.stitchCount ?? 0,
+      collectionTotalStitches: collectionTotal._sum?.stitchCount ?? 0,
     };
   } catch (error) {
     console.error("[stats] computeHeroStats failed:", { userId, error });

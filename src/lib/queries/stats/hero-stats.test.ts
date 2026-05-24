@@ -155,7 +155,7 @@ describe("getHeroStats", () => {
 
     expect(result.collectionTotalStitches).toBe(500000);
     expect(mockPrisma.chart.aggregate).toHaveBeenCalledWith({
-      where: { projects: { some: { userId: "user-1" } } },
+      where: { project: { userId: "user-1" } },
       _sum: { stitchCount: true },
     });
   });

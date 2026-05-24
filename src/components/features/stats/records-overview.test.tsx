@@ -20,10 +20,11 @@ import { RecordsOverview } from "./records-overview";
 
 const mockPersonalBests: PersonalBestRecord[] = [
   {
-    type: "dailyStitches",
+    type: "bestDay",
+    label: "Best Day",
     value: 500,
     unit: "stitches",
-    achievedAt: new Date("2026-01-15"),
+    date: "2026-01-15",
     projectId: "p1",
     projectName: "Test Project",
   },
@@ -31,25 +32,26 @@ const mockPersonalBests: PersonalBestRecord[] = [
 
 const mockFastestCompletions: FastestCompletion[] = [
   {
+    sizeCategory: "Medium" as const,
     projectId: "p1",
+    chartId: "c1",
     projectName: "Test Project",
-    totalStitches: 10000,
     daysToComplete: 30,
-    averagePerDay: 333,
-    completedAt: new Date("2026-01-15"),
+    startDate: "2025-12-16",
+    finishDate: "2026-01-15",
   },
 ];
 
 const mockCompletionEstimates: CompletionEstimate[] = [
   {
     projectId: "p1",
+    chartId: "c1",
     projectName: "Test Project",
     totalStitches: 50000,
     stitchesCompleted: 25000,
     percentComplete: 50,
     estimatedDate: "~2026-06-01",
-    averagePerDay: 200,
-    daysRemaining: 125,
+    avgPerDay: 200,
   },
 ];
 

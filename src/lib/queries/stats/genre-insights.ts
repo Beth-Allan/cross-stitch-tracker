@@ -62,14 +62,14 @@ async function computeGenreInsights(
       userId,
       statusGroups,
       limit,
-      error,
+      error: error instanceof Error ? error.message : String(error),
     });
     throw error;
   }
 }
 
 export function getGenreInsights(userId: string, statusGroups: string[], limit = 10) {
-  const cacheKey = statusGroups.length > 0 ? statusGroups.sort().join(",") : "all";
+  const cacheKey = statusGroups.length > 0 ? [...statusGroups].sort().join(",") : "all";
 
   return unstable_cache(
     () => computeGenreInsights(userId, statusGroups, limit),
