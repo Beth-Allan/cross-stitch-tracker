@@ -142,8 +142,8 @@ Full details: `milestones/v1.7-ROADMAP.md`
 **Plans**: 3 plansPlans:
 **Wave 1**
 
-- [ ] 31-01-PLAN.md — Schema, types, validation, test factories
-- [ ] 31-02-PLAN.md — Series progress computation utility (TDD)
+- [x] 31-01-PLAN.md — Schema, types, validation, test factories
+- [x] 31-02-PLAN.md — Series progress computation utility (TDD)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -163,8 +163,8 @@ Full details: `milestones/v1.7-ROADMAP.md`
 **Plans**: 3 plans
 Plans:
 
-- [ ] 31-01-PLAN.md — Schema, types, validation, test factories
-- [ ] 31-02-PLAN.md — Series progress computation utility (TDD)
+- [x] 31-01-PLAN.md — Schema, types, validation, test factories
+- [x] 31-02-PLAN.md — Series progress computation utility (TDD)
 - [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
 
 **UI hint**: yes
@@ -249,7 +249,7 @@ Phases execute in numeric order: 31 -> 32 -> 33 -> 34
 | 28. Stats Corrections | v1.7 | 3/3 | Complete | 2026-05-24 |
 | 29. UI Polish | v1.7 | 3/3 | Complete | 2026-05-24 |
 | 30. Code Quality | v1.7 | 3/3 | Complete | 2026-05-24 |
-| 31. Data Foundation & Fixes | v1.8 | 0/? | Not started | - |
+| 31. Data Foundation & Fixes | v1.8 | 2/3 | In Progress|  |
 | 32. Series Management Pages | v1.8 | 0/? | Not started | - |
 | 33. Chart Form Integration | v1.8 | 0/? | Not started | - |
 | 34. Browse & Pattern Dive Integration | v1.8 | 0/? | Not started | - |
