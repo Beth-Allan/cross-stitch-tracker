@@ -25,7 +25,7 @@ export function LifetimeCounters(props: LifetimeCountersProps) {
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {COUNTER_CARDS.map((card) => {
-          const value = props[card.key];
+          const value = props[card.key] ?? 0;
           const formatted = card.format === "time" ? formatTime(value) : value.toLocaleString();
 
           return (
