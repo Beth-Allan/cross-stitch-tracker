@@ -159,6 +159,16 @@ describe("series-actions", () => {
       assertFailure(result);
       expect(result.error).toBe("Series name is required");
     });
+
+    it("returns generic error on unexpected failure", async () => {
+      mockPrisma.series.update.mockRejectedValueOnce(new Error("Connection lost"));
+      const { updateSeries } = await import("./series-actions");
+
+      const result = await updateSeries("s1", { name: "Valid Name" });
+
+      assertFailure(result);
+      expect(result.error).toBe("Failed to update series");
+    });
   });
 
   describe("deleteSeries", () => {
@@ -188,6 +198,17 @@ describe("series-actions", () => {
 
       assertFailure(result);
       expect(result.error).toBe("Series not found");
+    });
+
+    it("returns generic error when transaction fails", async () => {
+      mockPrisma.series.findUnique.mockResolvedValueOnce(createMockSeries({ id: "s1" }));
+      mockPrisma.$transaction.mockRejectedValueOnce(new Error("Lock timeout"));
+      const { deleteSeries } = await import("./series-actions");
+
+      const result = await deleteSeries("s1");
+
+      assertFailure(result);
+      expect(result.error).toBe("Failed to delete series");
     });
   });
 
@@ -249,6 +270,13 @@ describe("series-actions", () => {
       expect(mockComputeSeriesProgress).toHaveBeenCalledTimes(2);
       expect(mockComputeSeriesProgress).toHaveBeenCalledWith(seriesData[0].charts, 10);
       expect(mockComputeSeriesProgress).toHaveBeenCalledWith(seriesData[1].charts, null);
+    });
+
+    it("propagates errors from findMany", async () => {
+      mockPrisma.series.findMany.mockRejectedValueOnce(new Error("DB unavailable"));
+      const { getSeriesWithStats } = await import("./series-actions");
+
+      await expect(getSeriesWithStats()).rejects.toThrow("DB unavailable");
     });
   });
 });

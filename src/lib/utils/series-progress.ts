@@ -1,22 +1,12 @@
-/**
- * Dual progress computation for series: owned/total + finished/owned.
- * Pure function with no side effects or async behavior.
- */
-
+import type { ProjectStatus } from "@/generated/prisma/client";
 import type { SeriesProgress } from "@/types/series";
 
-export const FINISHED_STATUSES = new Set(["FINISHED", "FFO"]);
+export const FINISHED_STATUSES = new Set<ProjectStatus>(["FINISHED", "FFO"]);
 
 type ChartWithProject = {
-  project: { status: string } | null;
+  project: { status: ProjectStatus } | null;
 };
 
-/**
- * Computes series progress from assigned charts and optional total count.
- * - ownedCount: number of charts assigned to the series
- * - finishedCount: charts with FINISHED or FFO project status
- * - totalCount: passthrough of the series' known total (null = open-ended)
- */
 export function computeSeriesProgress(
   charts: ChartWithProject[],
   totalCount: number | null,

@@ -20,9 +20,9 @@ describe("computeSeriesProgress", () => {
 
   it("counts FINISHED and FFO as finished", () => {
     const charts = [
-      { project: { status: "FINISHED" } },
-      { project: { status: "FFO" } },
-      { project: { status: "IN_PROGRESS" } },
+      { project: { status: "FINISHED" as const } },
+      { project: { status: "FFO" as const } },
+      { project: { status: "IN_PROGRESS" as const } },
     ];
     expect(computeSeriesProgress(charts, null)).toEqual({
       ownedCount: 3,
@@ -33,9 +33,9 @@ describe("computeSeriesProgress", () => {
 
   it("passes through totalCount when set", () => {
     const charts = [
-      { project: { status: "FINISHED" } },
-      { project: { status: "FFO" } },
-      { project: { status: "IN_PROGRESS" } },
+      { project: { status: "FINISHED" as const } },
+      { project: { status: "FFO" as const } },
+      { project: { status: "IN_PROGRESS" as const } },
     ];
     expect(computeSeriesProgress(charts, 5)).toEqual({
       ownedCount: 3,
@@ -54,7 +54,7 @@ describe("computeSeriesProgress", () => {
   });
 
   it("does not count UNSTARTED as finished", () => {
-    const charts = [{ project: { status: "UNSTARTED" } }];
+    const charts = [{ project: { status: "UNSTARTED" as const } }];
     expect(computeSeriesProgress(charts, null)).toEqual({
       ownedCount: 1,
       finishedCount: 0,
@@ -64,10 +64,10 @@ describe("computeSeriesProgress", () => {
 
   it("counts multiple FINISHED statuses correctly", () => {
     const charts = [
-      { project: { status: "FINISHED" } },
-      { project: { status: "FFO" } },
-      { project: { status: "FINISHED" } },
-      { project: { status: "KITTING" } },
+      { project: { status: "FINISHED" as const } },
+      { project: { status: "FFO" as const } },
+      { project: { status: "FINISHED" as const } },
+      { project: { status: "KITTING" as const } },
     ];
     expect(computeSeriesProgress(charts, 12)).toEqual({
       ownedCount: 4,
