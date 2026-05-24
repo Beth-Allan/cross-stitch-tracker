@@ -123,9 +123,13 @@ describe("RecordsOverview", () => {
     expect(screen.queryByTestId("genre-insight-list")).not.toBeInTheDocument();
   });
 
-  it("hero stat hidden when totalSessionStitches is null", () => {
+  it("shows DataUnavailable when totalSessionStitches is null", () => {
     renderRecords({ totalSessionStitches: null });
 
     expect(screen.queryByText("STITCHES LOGGED")).not.toBeInTheDocument();
+    const unavailable = screen.getAllByTestId("data-unavailable");
+    expect(unavailable.some((el) => el.getAttribute("data-label") === "Stitches logged")).toBe(
+      true,
+    );
   });
 });

@@ -35,7 +35,6 @@ const mockGetThreadInsights = vi.fn();
 const mockGetDesignerInsights = vi.fn();
 const mockGetGenreInsights = vi.fn();
 const mockGetCompletionEstimates = vi.fn();
-const mockGetAvailableYears = vi.fn();
 vi.mock("@/lib/queries/stats", () => ({
   getHeroStats: (...args: unknown[]) => mockGetHeroStats(...args),
   getCollectionBreakdown: (...args: unknown[]) => mockGetCollectionBreakdown(...args),
@@ -53,7 +52,6 @@ vi.mock("@/lib/queries/stats", () => ({
   getDesignerInsights: (...args: unknown[]) => mockGetDesignerInsights(...args),
   getGenreInsights: (...args: unknown[]) => mockGetGenreInsights(...args),
   getCompletionEstimates: (...args: unknown[]) => mockGetCompletionEstimates(...args),
-  getAvailableYears: (...args: unknown[]) => mockGetAvailableYears(...args),
 }));
 
 // Mock search params cache
@@ -178,13 +176,12 @@ describe("StatsPage server component", () => {
     mockGetDesignerInsights.mockResolvedValue([]);
     mockGetGenreInsights.mockResolvedValue([]);
     mockGetCompletionEstimates.mockResolvedValue([]);
-    mockGetAvailableYears.mockResolvedValue([]);
     mockParse.mockResolvedValue({
       page: 1,
       sort: "date",
       dir: "desc",
       project: "all",
-      scope: "all-time",
+      status: [],
     });
     mockFindMany.mockResolvedValue([{ id: "p1", chart: { name: "Test Project" } }]);
   });
@@ -229,6 +226,9 @@ describe("StatsPage server component", () => {
     expect(mockGetSessionHistory).toHaveBeenCalledWith("user-123", 1, "date", "desc", null);
     expect(mockGetPaceMetrics).toHaveBeenCalledWith("user-123");
     expect(mockGetDayOfWeekPattern).toHaveBeenCalledWith("user-123");
+    expect(mockGetThreadInsights).toHaveBeenCalledWith("user-123", []);
+    expect(mockGetDesignerInsights).toHaveBeenCalledWith("user-123", []);
+    expect(mockGetGenreInsights).toHaveBeenCalledWith("user-123", []);
   });
 
   it("propagates auth error and does not call queries when requireAuth rejects", async () => {
@@ -312,7 +312,6 @@ describe("StatsPage server component", () => {
       mockGetDesignerInsights,
       mockGetGenreInsights,
       mockGetCompletionEstimates,
-      mockGetAvailableYears,
     ];
     queryMocks.forEach((mock) => mock.mockRejectedValue(new Error("total failure")));
 

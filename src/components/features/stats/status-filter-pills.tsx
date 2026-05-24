@@ -9,6 +9,11 @@ const PILL_OPTIONS = [
   { value: "complete" as const, label: "Complete" },
 ];
 
+const PILL_ACTIVE =
+  "bg-selected text-selected-foreground border-selected-border rounded-lg border px-3 py-1.5 text-sm font-medium shadow-sm";
+const PILL_INACTIVE =
+  "text-muted-foreground hover:text-foreground rounded-lg px-3 py-1.5 text-sm font-medium";
+
 export function StatusFilterPills() {
   const [statusFilter, setStatusFilter] = useQueryState(
     "status",
@@ -38,11 +43,7 @@ export function StatusFilterPills() {
         type="button"
         aria-pressed={isAllActive}
         onClick={() => void setStatusFilter(null)}
-        className={
-          isAllActive
-            ? "bg-selected text-selected-foreground border-selected-border rounded-lg border px-3 py-1.5 text-sm font-medium shadow-sm"
-            : "text-muted-foreground hover:text-foreground rounded-lg px-3 py-1.5 text-sm font-medium"
-        }
+        className={isAllActive ? PILL_ACTIVE : PILL_INACTIVE}
       >
         All
       </button>
@@ -54,11 +55,7 @@ export function StatusFilterPills() {
             type="button"
             aria-pressed={isActive}
             onClick={() => toggleGroup(value)}
-            className={
-              isActive
-                ? "bg-selected text-selected-foreground border-selected-border rounded-lg border px-3 py-1.5 text-sm font-medium shadow-sm"
-                : "text-muted-foreground hover:text-foreground rounded-lg px-3 py-1.5 text-sm font-medium"
-            }
+            className={isActive ? PILL_ACTIVE : PILL_INACTIVE}
           >
             {label}
           </button>

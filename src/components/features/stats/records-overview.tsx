@@ -32,13 +32,15 @@ export function RecordsOverview({
 
   return (
     <div className="space-y-8">
-      {totalSessionStitches !== null && (
+      {totalSessionStitches !== null ? (
         <div className="bg-card ring-foreground/10 rounded-xl p-4 ring-1">
           <p className="text-muted-foreground text-xs tracking-wider uppercase">STITCHES LOGGED</p>
           <p className="text-foreground mt-1 font-mono text-lg font-semibold tabular-nums">
             {totalSessionStitches.toLocaleString()}
           </p>
         </div>
+      ) : (
+        <DataUnavailable label="Stitches logged" />
       )}
 
       {personalBests !== null && fastestCompletions !== null ? (

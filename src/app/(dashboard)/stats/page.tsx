@@ -17,7 +17,6 @@ import {
   getDesignerInsights,
   getGenreInsights,
   getCompletionEstimates,
-  getAvailableYears,
 } from "@/lib/queries/stats";
 import { settled } from "@/lib/utils/settled";
 import { StatsPageShell } from "@/components/features/stats/stats-page-shell";
@@ -51,16 +50,13 @@ export default async function StatsPage({
 }) {
   const user = await requireAuth();
 
-  // Parse URL search params for session table state
   const parsedParams = await statsSearchParamsCache.parse(searchParams);
   const { page, sort, dir, project, status } = parsedParams;
 
-  // Current date values for calendar/chart initial state
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1; // 1-based for calendar
 
-  // Run all queries in parallel with graceful degradation
   const results = await Promise.allSettled([
     getHeroStats(user.id),
     getCollectionBreakdown(user.id),
@@ -78,7 +74,6 @@ export default async function StatsPage({
     getDesignerInsights(user.id, status),
     getGenreInsights(user.id, status),
     getCompletionEstimates(user.id, "all"),
-    getAvailableYears(user.id),
   ]);
 
   const heroStats = settled<StatsHeroData>(results[0], "heroStats");
@@ -97,7 +92,6 @@ export default async function StatsPage({
   const designerInsights = settled<DesignerInsight[]>(results[13], "designerInsights");
   const genreInsights = settled<GenreInsight[]>(results[14], "genreInsights");
   const completionEstimates = settled<CompletionEstimate[]>(results[15], "completionEstimates");
-  const _availableYears = settled<number[]>(results[16], "availableYears");
 
   let projectList: { id: string; name: string }[] = [];
   try {

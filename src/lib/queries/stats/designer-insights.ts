@@ -1,13 +1,13 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
-import { resolveStatusFilter } from "@/lib/utils/status-groups";
+import { resolveStatusFilter, type StatusGroup } from "@/lib/utils/status-groups";
 import type { DesignerInsight } from "@/types/stats";
 
 const COMPLETED_STATUSES = ["FINISHED", "FFO"] as const;
 
 async function computeDesignerInsights(
   userId: string,
-  statusGroups: string[],
+  statusGroups: StatusGroup[],
   limit: number,
 ): Promise<DesignerInsight[]> {
   try {
@@ -78,7 +78,7 @@ async function computeDesignerInsights(
   }
 }
 
-export function getDesignerInsights(userId: string, statusGroups: string[], limit = 10) {
+export function getDesignerInsights(userId: string, statusGroups: StatusGroup[], limit = 10) {
   const cacheKey = statusGroups.length > 0 ? [...statusGroups].sort().join(",") : "all";
 
   return unstable_cache(

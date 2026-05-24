@@ -53,7 +53,10 @@ async function computeHeroStats(userId: string): Promise<StatsHeroData> {
       collectionTotalStitches: collectionTotal._sum?.stitchCount ?? 0,
     };
   } catch (error) {
-    console.error("[stats] computeHeroStats failed:", { userId, error });
+    console.error("[stats] computeHeroStats failed:", {
+      userId,
+      error: error instanceof Error ? error.message : String(error),
+    });
     throw error;
   }
 }

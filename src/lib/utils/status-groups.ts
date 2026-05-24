@@ -12,11 +12,7 @@ const STATUS_GROUP_MAP: Record<StatusGroup, ProjectStatus[]> = {
 
 /**
  * Resolves an array of status group names to their corresponding ProjectStatus values.
- * Unknown group names are silently ignored.
  */
-export function resolveStatusFilter(groups: string[]): ProjectStatus[] {
-  return groups.flatMap((group) => {
-    const statuses = STATUS_GROUP_MAP[group as StatusGroup];
-    return statuses ?? [];
-  });
+export function resolveStatusFilter(groups: StatusGroup[]): ProjectStatus[] {
+  return groups.flatMap((group) => STATUS_GROUP_MAP[group] ?? []);
 }

@@ -1,11 +1,11 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
-import { resolveStatusFilter } from "@/lib/utils/status-groups";
+import { resolveStatusFilter, type StatusGroup } from "@/lib/utils/status-groups";
 import type { ThreadInsight } from "@/types/stats";
 
 async function computeThreadInsights(
   userId: string,
-  statusGroups: string[],
+  statusGroups: StatusGroup[],
   limit: number,
 ): Promise<ThreadInsight[]> {
   try {
@@ -68,7 +68,7 @@ async function computeThreadInsights(
   }
 }
 
-export function getThreadInsights(userId: string, statusGroups: string[], limit = 10) {
+export function getThreadInsights(userId: string, statusGroups: StatusGroup[], limit = 10) {
   const cacheKey = statusGroups.length > 0 ? [...statusGroups].sort().join(",") : "all";
 
   return unstable_cache(
