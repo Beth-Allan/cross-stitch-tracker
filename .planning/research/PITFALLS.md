@@ -1,326 +1,317 @@
-# Domain Pitfalls
+# Domain Pitfalls: Series & Collection Management
 
-**Domain:** Statistics dashboard, visual charts, personal bests -- adding charting library and aggregate queries to existing Next.js App Router application
-**Researched:** 2026-05-17
-**Confidence:** HIGH (verified against project codebase patterns, Neon documentation, charting library ecosystem research, Next.js App Router streaming docs)
+**Domain:** Adding series/collection entity to existing cross-stitch tracker
+**Researched:** 2026-05-24
+**Codebase version:** v1.7 (2,283 tests, ~110k LOC, ~20 entities)
+
+---
 
 ## Critical Pitfalls
 
 Mistakes that cause rewrites or major issues.
 
-### Pitfall 1: Charting Library Hydration Mismatch in App Router
+### Pitfall 1: Chart form seriesId breaks draft persistence
 
-**What goes wrong:**
-Charting libraries (Recharts, Visx, Chart.js) use browser APIs (DOM measurement, `window.innerWidth`, `ResizeObserver`) internally. When rendered in a Server Component or pre-rendered during SSR, the server output differs from client output, causing React hydration mismatches and console errors. In App Router, this manifests as either a runtime error or visual flash where charts render incorrectly then re-render.
+**What goes wrong:** Adding `seriesId` to `ChartFormValues` (currently 24 fields) without updating draft persistence causes stale drafts to silently lose the field, or worse, crash on load when the shape doesn't match.
 
-**Why it happens:**
-Next.js App Router renders Server Components on the server by default. Chart components that measure container width or use `window` produce different output server-side (where these APIs don't exist) vs client-side. The project's existing pattern is "Server Components by default, 'use client' only for interactivity" -- a chart component *requires* client-side rendering but developers may forget to properly isolate it.
+**Why it happens:** Draft persistence in `use-draft-persistence.ts` uses a V2 format with `ChartFormValues` serialized to localStorage. The `loadDraft()` function merges saved values with defaults and nulls out stale reference IDs (`validDesignerIds`, `validStorageIds`, etc.). A new `seriesId` field needs the same stale-ID-nulling treatment, and the list of valid series IDs must be passed from the server component.
 
-**Consequences:**
-- Hydration mismatch warnings flooding the console
-- Charts flash or render at wrong dimensions on first paint
-- In worst case, React bails out of hydration and re-renders entire subtree, causing CLS (Cumulative Layout Shift)
-- Responsive container sizing breaks because server has no viewport dimensions
+**Consequences:** User saves a draft with series selected, series gets deleted before they return, draft loads with an orphaned seriesId that doesn't match any option in SearchableSelect. The selector shows the ID as selected but with no label, or the form submits with a dangling FK.
 
 **Prevention:**
-```tsx
-// CORRECT: Dynamic import with ssr: false for chart wrapper
-import dynamic from "next/dynamic";
+1. Add `seriesId: string | null` to `ChartFormValues` with `default(null)` so existing drafts merge cleanly
+2. Add `validSeriesIds: string[]` parameter to `loadDraft()` / `loadDraftV2()` and null out stale series references
+3. Pass series list from the server page components (`charts/new/page.tsx` and `charts/[id]/edit/page.tsx`) where designers/genres are already fetched
 
-const MonthlyBarChart = dynamic(
-  () => import("@/components/features/stats/monthly-bar-chart"),
-  {
-    ssr: false,
-    loading: () => <ChartSkeleton height={240} />,
-  }
-);
-```
+**Detection:** Test with a saved draft that references a deleted series. If it loads without error but the SearchableSelect shows blank/broken, the stale-ID check is missing.
 
-Always create a dedicated client component file for each chart type, mark it `"use client"`, and import it via `next/dynamic` with `ssr: false` from the Server Component page. The `loading` prop provides the skeleton that streams with the page shell.
-
-**Detection:**
-- Console warning: "Text content does not match server-rendered HTML"
-- Charts visually "jump" on page load
-- `ResponsiveContainer` (Recharts) renders at 0 width initially
+**Phase impact:** Must be addressed in the chart form integration phase, not as an afterthought.
 
 ---
 
-### Pitfall 2: Neon Cold Start Waterfall on Multiple Aggregate Queries
+### Pitfall 2: Pattern Dive tab addition breaks eager data loading
 
-**What goes wrong:**
-The statistics page requires 6-10+ aggregate queries (lifetime totals, monthly breakdowns, personal bests, designer stats, genre stats). If these run sequentially, Neon's cold start (300-800ms) compounds with each query's execution time. A stats page with 8 queries taking 100ms each becomes 800ms + 300-800ms cold start = 1.1-1.6 seconds blocking before any content renders.
+**What goes wrong:** Adding a 5th tab (Series) to Pattern Dive means the `charts/page.tsx` server component must fetch series data alongside the existing 4 datasets. The current `Promise.all` fetches all 4 tab datasets eagerly. Adding a 5th query increases cold-start latency on a page that's already doing 4 parallel queries + a presigned URL batch.
 
-**Why it happens:**
-Neon scales compute to zero after 5 minutes of inactivity. The first query after idle triggers a cold start. The project already uses `Promise.all()` for the main dashboard (decision D-02 in PROJECT.md) -- but a new developer adding stats queries might not follow this pattern, or might split queries across separate server actions called from different Suspense boundaries, each triggering its own cold start if the connection wasn't warmed.
-
-The project uses `@prisma/adapter-neon` (HTTP-based serverless driver), which means each Prisma call is a separate HTTP request to Neon -- there's no persistent TCP connection to amortize cold start across. However, Neon's compute wakes on first request and stays warm for subsequent requests in the same invocation.
-
-**Consequences:**
-- Stats page takes 2-3 seconds on cold start instead of 0.5-1 second
-- User sees blank loading state for too long after inactivity
-- If queries are split across multiple server actions in separate Suspense boundaries, each boundary may appear independently slow
-
-**Prevention:**
+**Why it happens:** The current architecture in `charts/page.tsx`:
 ```typescript
-// CORRECT: Single server action, single cold start, parallel queries
-export async function getStatsDashboardData(): Promise<StatsDashboardData> {
-  const user = await requireAuth();
-
-  // All queries fire in parallel -- Neon wakes once, handles all
-  const [lifetime, monthly, records, designers, genres] = await Promise.all([
-    getLifetimeStats(user.id),
-    getMonthlyActivity(user.id),
-    getPersonalBests(user.id),
-    getDesignerInsights(user.id),
-    getGenreBreakdown(user.id),
-  ]);
-
-  return { lifetime, monthly, records, designers, genres };
-}
+const [charts, whatsNextProjects, fabricRequirements, storageGroups] = await Promise.all([
+  getChartsForGallery(),
+  getWhatsNextProjects(),
+  getFabricRequirements(),
+  getStorageGroups(),
+]);
 ```
+All tabs are rendered server-side and passed as `browseContent`, `whatsNextContent`, etc. to `PatternDiveTabs`. Adding series data requires another query in this batch AND another content prop to the tab component.
 
-Keep the existing `Promise.all()` pattern. Bundle related queries into a single server action per logical "section" of the stats page. The first query in the batch warms Neon; subsequent queries in the same `Promise.all()` hit a warm compute.
+**Consequences:** If the series query is slow or fails, it blocks the entire page. The `PatternDiveTabs` component interface grows from 4 content props to 5. The `imageKeys` collection at lines 25-30 must also include series member thumbnails. With 500+ charts and 30+ series, the presigned URL batch grows.
 
-**Detection:**
-- Stats page consistently slow after 5+ minutes of inactivity
-- Individual Suspense boundaries resolving sequentially instead of together
-- Network waterfall visible in browser DevTools showing sequential DB calls
+**Prevention:**
+1. Add series query to the existing `Promise.all` -- this is the established pattern, and one additional query is acceptable
+2. Add `seriesContent` prop to `PatternDiveTabs` following the existing prop pattern
+3. Update `PATTERN_DIVE_TABS` const array and `TAB_CONFIG` in `pattern-dive-tabs.tsx` -- both are exhaustive (note the `contentMap` object must be extended)
+4. Include series member thumbnail URLs in the `imageKeys` collection
+5. Verify the presigned URL batch doesn't get unreasonably large (currently covers all 4 tabs' images in one call)
+
+**Detection:** If Pattern Dive load time increases noticeably (>200ms), profile the series query independently.
 
 ---
 
-### Pitfall 3: Bundle Size Explosion from Charting Library
+### Pitfall 3: Gallery filter state explosion from adding series dimension
 
-**What goes wrong:**
-Adding Recharts naively imports the entire library (~50KB gzipped, ~165KB parsed). Combined with its D3 subdependencies, the client bundle for the stats page balloons by 100-200KB. Since this project has had *zero new npm dependencies* added in the last two milestones (v1.3 and v1.4 both achieved this), a single charting library could represent 30-50% growth in client JavaScript.
+**What goes wrong:** Adding a "Series" filter to the Browse tab requires touching 6+ tightly coupled files that form the gallery filter pipeline, and missing any one of them creates a silent filter that doesn't work.
 
-**Why it happens:**
-Recharts bundles all chart types together. Importing `import { BarChart, LineChart, AreaChart } from 'recharts'` pulls the entire library unless you use specific subpath imports. Tree-shaking helps but isn't perfect with Recharts' internal D3 dependencies. Additionally, if chart components aren't properly code-split, they bloat the shared chunk used across all pages.
+**Why it happens:** The gallery filter system spans:
+1. `gallery-types.ts` -- `GalleryCardData` interface (needs `seriesId: string | null` and `seriesName: string | null`)
+2. `gallery-utils.ts` -- `transformToGalleryCard()` function (needs series data from query)
+3. `gallery-utils.ts` -- `filterAndSort()` function (needs series filter logic)
+4. `use-gallery-filters.ts` -- new `seriesFilter` URL state via nuqs
+5. `filter-bar.tsx` -- new `MultiSelectDropdown` for series
+6. `filter-chips.tsx` -- series chips with remove handler
+7. `project-gallery.tsx` -- wire new filter state through
+8. `chart-actions.ts` -- `getChartsForGallery()` must include series in query
 
-**Consequences:**
-- Time-to-Interactive increases on all pages if chart code lands in shared bundle
-- Stats page JavaScript exceeds reasonable budget (target: <200KB for page-specific JS)
-- Mobile performance degrades (single-user app but used on iPhone)
-- Build time increases noticeably
+**Consequences:** The `GalleryChartData` type in `types/chart.ts` doesn't currently include series. Adding it requires changing the Prisma query in `getChartsForGallery()` to include series data. But the Chart model doesn't have a seriesId yet (that's the schema migration). If you build the UI before the schema, the types won't match. If you add the schema first, existing tests break.
 
 **Prevention:**
+1. Schema migration (add `seriesId` to Chart, create Series model) MUST come before gallery filter work
+2. Add `seriesName` to `GalleryCardData` interface -- it's a flat string like `designerName`, not a relation
+3. Add series to `getChartsForGallery()` include -- `series: { select: { id: true, name: true } }` parallel to existing `designer: true`
+4. Follow the exact same pattern as the existing Status and Size filters for the URL state: `parseAsArrayOf(parseAsString, ",")` with `toggleSeries` callback
+5. Update `clearFilters` to also clear series filter
+6. Update `hasActiveFilters` check to include series
 
-1. **Route-level code splitting**: Chart components only load on the `/stats` route. Use `next/dynamic` with `ssr: false` -- this automatically code-splits.
-
-2. **Consider Visx over Recharts**: Visx is modular by design (~15KB for what you actually use). You import only the packages needed: `@visx/bar`, `@visx/axis`, `@visx/scale`. Trade-off: steeper learning curve, more manual work, but dramatically smaller bundle.
-
-3. **Audit with bundle analyzer**:
-```bash
-# After adding chart library
-ANALYZE=true npm run build
-# Check that chart code only appears in stats page chunk
-```
-
-4. **CSS-first for simple visualizations**: The project already has CSS-only `ProgressBar` and SVG `StatusDonut`. Continue using CSS for bar charts, donuts, and simple counters. Only reach for a library for complex interactive charts (heatmap calendar, time-series with tooltips).
-
-**Detection:**
-- `npm run build` output shows significantly larger first-load JS
-- Lighthouse Performance score drops
-- Bundle analyzer shows recharts/d3 in shared chunks
+**Detection:** After adding the filter, test: (1) filtering by series shows only charts in that series, (2) the filter chip appears and can be removed, (3) clearing all filters clears series too, (4) the URL contains `?series=SeriesName` when active.
 
 ---
 
-### Pitfall 4: "Calculated at Query Time" Constraint Meets N-Thousand Sessions
+### Pitfall 4: seriesId on Chart vs. Series-to-Chart many-to-many relationship decision
 
-**What goes wrong:**
-The project constraint is "calculated fields at query time, never stored in DB." For basic stats (project count, total stitches), this works fine with 500 projects. But time-series statistics require aggregating *all sessions* -- potentially thousands of records -- on every page load. Monthly bar charts need `GROUP BY month` across the full session history. Personal bests need scanning all sessions to find maximums. As session count grows, query time grows linearly.
+**What goes wrong:** Choosing the wrong cardinality for Chart-to-Series causes either a premature data model constraint (1:many) or unnecessary complexity (many:many).
 
-**Why it happens:**
-The existing dashboard fetches all projects with their sessions included (`include: { sessions: { ... } }`) and aggregates in-memory in JavaScript. This pattern (established in `project-dashboard-actions.ts`) works because project count is bounded (~500) and sessions per project are manageable. But a *global* stats view aggregating across ALL sessions for ALL projects simultaneously is a different magnitude.
-
-With 500 projects and an average of 20 sessions each = 10,000 sessions to scan. A power user stitching daily for 2 years = 730+ sessions per project. The constraint says "don't store aggregates" but doesn't say "don't use SQL aggregation" -- the distinction matters.
+**Why it happens:** The DesignOS types show `Series` with `memberCount`/`finishedCount` and `SeriesMember` linking chartId to series. The PROJECT.md requirements say "series membership" (singular). But the domain reality is: a chart could theoretically belong to multiple series (e.g., "Mini Bottles" AND "Celtic Collection"), though this is rare.
 
 **Consequences:**
-- Stats page response time grows linearly with session count
-- Neon pageserver overhead compounds on large sequential scans
-- In-memory aggregation in JS burns server CPU and increases response size (serializing thousands of session objects)
-- Eventually hits Vercel function timeout (10s default, 60s max on free tier)
+- **1:many (seriesId FK on Chart):** Simpler schema, simpler queries, simpler form (SearchableSelect, not multi-select). But if a chart legitimately belongs to two series, the user is stuck.
+- **Many:many (junction table):** More complex schema, query includes become nested, form needs a multi-select instead of SearchableSelect, progress tracking becomes complex.
 
-**Prevention:**
+**Prevention:** Use 1:many (`seriesId` nullable FK on Chart). Rationale:
+1. The DesignOS design shows a single SearchableSelect for series assignment, not a multi-picker
+2. The user's domain description says "a collection of independent but related patterns" -- charts belong to ONE series
+3. The existing pattern for designer (1:many FK on Chart) is the established codebase convention
+4. If many:many is ever needed, migrating from FK to junction table is straightforward -- the reverse is painful
+5. Keep `seriesId` nullable since most charts won't belong to a series
 
-Use **SQL-level aggregation** (Prisma `aggregate()` and `groupBy()`) rather than fetching all records and aggregating in JavaScript. This keeps the "calculated at query time" spirit while being dramatically more efficient:
-
-```typescript
-// BAD: Fetch all sessions, aggregate in JS
-const sessions = await prisma.stitchSession.findMany({ where: { ... } });
-const monthlyTotals = sessions.reduce((acc, s) => { /* group by month */ }, {});
-
-// GOOD: Let PostgreSQL do the aggregation
-const monthlyTotals = await prisma.stitchSession.groupBy({
-  by: ["date"], // Note: need raw query for date_trunc
-  where: { project: { userId: user.id } },
-  _sum: { stitchCount: true },
-});
-
-// BEST: Use $queryRaw for date_trunc when Prisma groupBy can't express it
-const monthly = await prisma.$queryRaw`
-  SELECT date_trunc('month', date) AS month,
-         SUM("stitchCount") AS total_stitches,
-         COUNT(*) AS session_count
-  FROM "StitchSession"
-  WHERE "projectId" IN (SELECT id FROM "Project" WHERE "userId" = ${userId})
-  GROUP BY month
-  ORDER BY month
-`;
-```
-
-The constraint "never stored in DB" is about not adding `totalStitchesThisMonth` columns -- it doesn't prohibit efficient SQL aggregation computed fresh on each request.
-
-**Detection:**
-- Stats page response time >500ms with moderate session count
-- Server action returning >100KB of serialized data
-- Prisma query logging shows `findMany` returning thousands of rows for stats
+**Detection:** Ask the user: "Can a chart belong to multiple series?" If "no" (expected), 1:many is correct.
 
 ---
 
-### Pitfall 5: Timezone Bugs in Date-Based Aggregation
+### Pitfall 5: Zod schema and chart-actions transaction miss seriesId
 
-**What goes wrong:**
-Sessions are stored with a `DateTime` field (`date` column). When aggregating by day/week/month, timezone handling determines which "day" a session belongs to. A session logged at 11pm Pacific (06:00 UTC next day) will be counted in the wrong day/month if aggregation uses UTC. Monthly charts show wrong boundaries. "Stitches today" counter is wrong near midnight. Day-of-week heatmaps shift by one day.
+**What goes wrong:** Adding `seriesId` to the Prisma schema but forgetting to thread it through the Zod validation schema (`chartFormSchema`) and both `createChartAndProject()` / `updateChart()` actions means the field is silently dropped on save.
 
-**Why it happens:**
-PostgreSQL stores `DateTime` as `timestamptz` (UTC internally). `date_trunc('day', date)` truncates in UTC by default. The user is in a single timezone but the app doesn't explicitly handle timezone conversion in queries. The existing code does `s.date.toISOString().split("T")[0]` for counting "distinct stitching days" -- this works for counting *unique* days (off-by-one is unlikely to create duplicates) but fails for *boundary accuracy* in charts.
+**Why it happens:** The save pipeline has 4 layers that must all handle seriesId:
+1. `chartFormSchema` in `lib/validations/chart.ts` -- Zod schema for form validation
+2. `createChartAndProject()` helper in `chart-actions.ts` -- the shared creation function used by both `createChart()` and `createChartWithSupplies()`
+3. `updateChart()` in `chart-actions.ts` -- the edit save path (separate from create)
+4. `ChartFormValues` interface in `use-chart-form.ts` -- the client-side form state type
 
-The session form stores dates as ISO strings validated by Zod. When Prisma stores them, they're UTC. The 8-hour offset between Pacific time and UTC means sessions between 4pm-midnight Pacific are stored as "next day" in UTC.
+Currently, `createChartAndProject()` explicitly lists every field in the `tx.chart.create({ data: { ... } })` call (lines 37-65). It does NOT use a spread -- each field is explicitly mapped. This means adding `seriesId` to Prisma without adding it to the create data object means it's silently ignored.
 
-**Consequences:**
-- Monthly bar chart shows slightly wrong totals at month boundaries
-- "Personal best: most stitches in a day" could split a single day's work across two days
-- Day-of-week analysis (e.g., "you stitch most on Saturdays") shifts by a day
-- User notices discrepancy between what they logged and what charts show
-- Subtle: may not be caught in testing if tests use UTC-friendly timestamps
+**Consequences:** User selects a series in the form, saves, and the series assignment is lost. No error thrown -- the field is simply not in the Prisma create/update data object.
 
 **Prevention:**
+1. Add `seriesId: z.string().nullable().default(null)` to the `chart` object in `chartFormSchema`
+2. Add `seriesId: chart.seriesId` to the `tx.chart.create({ data: { ... } })` in `createChartAndProject()`
+3. Add `seriesId: chart.seriesId` to the `tx.chart.update({ data: { ... } })` in `updateChart()`
+4. Add `seriesId: string | null` to `ChartFormValues`
+5. Write a test that creates a chart with seriesId and verifies it persists
 
-1. **Establish a canonical timezone**: Since this is single-user, define a `USER_TIMEZONE` constant (e.g., `'America/Los_Angeles'`) and use it consistently in all date aggregation.
-
-2. **Use AT TIME ZONE in raw queries**:
-```sql
-SELECT date_trunc('day', date AT TIME ZONE 'America/Los_Angeles') AS local_day,
-       SUM("stitchCount") AS stitches
-FROM "StitchSession"
-WHERE ...
-GROUP BY local_day
-ORDER BY local_day
-```
-
-3. **In-memory alternative** (if avoiding raw SQL): Convert to local date strings *before* grouping:
-```typescript
-function toLocalDateKey(date: Date, tz: string): string {
-  return date.toLocaleDateString("en-CA", { timeZone: tz }); // "2026-05-17"
-}
-```
-
-4. **Test with boundary timestamps**: Always include a test case with a session at 11:30pm local time to verify it groups into the correct day.
-
-**Detection:**
-- Session logged "today" doesn't appear in "today's stats" near midnight
-- Monthly totals don't match when manually counted
-- Day-of-week pattern seems shifted by one
+**Detection:** Integration test: create chart with series -> fetch chart -> assert seriesId matches.
 
 ---
 
 ## Moderate Pitfalls
 
-### Pitfall 6: Information Overload on Stats Dashboard
+### Pitfall 6: Series progress calculation for open-ended vs. fixed collections
 
-**What goes wrong:**
-Shipping all planned stats (lifetime counters, collection overview, activity charts, velocity trends, designer insights, genre insights, personal bests) on a single page creates cognitive overload. The user is overwhelmed rather than delighted. Information density that works in a Notion database feels cluttered in a designed dashboard.
+**What goes wrong:** Series with a known total (e.g., "7 Mini Bottles") calculate progress differently from open-ended series (e.g., "Nora Corbett Fairies" where the designer keeps releasing new ones). Treating them identically produces misleading percentages.
 
-**Prevention:**
-- Progressive disclosure: show hero stats immediately, hide deep-dive sections behind expandable cards or tab navigation
-- Limit to 3-4 "glanceable" stats above the fold
-- Use the existing `DashboardTabs` pattern (Main/Progress tabs) to segment stats into logical sections
-- Ship minimal viable stats first (lifetime totals + monthly chart), add depth in later iterations
-
-### Pitfall 7: Stale Suspense Boundaries Blocking Interactive Content
-
-**What goes wrong:**
-Wrapping each stats section in its own `<Suspense>` boundary seems correct for streaming, but if 8 sections each show their own loading skeleton, the page becomes a seizure of popping-in content. Alternatively, a single Suspense boundary around everything means the user sees nothing until ALL queries resolve.
+**Why it happens:** The DesignOS shows "3 of 7 finished (43%)" but the PROJECT.md says "optional total count." If totalCount is null, what does the progress bar show? If it's based on finished/memberCount, an open-ended series with 3 of 3 owned shows 100% -- but there are 20 more patterns the user doesn't own yet.
 
 **Prevention:**
-- Group related stats into 2-3 logical Suspense boundaries (not 1, not 8)
-- Above-the-fold hero stats in the first boundary (resolves fastest -- simple counts)
-- Charts and breakdowns in a second boundary (heavier queries)
-- Personal bests / deep insights in a third boundary (can load last)
-- Use consistent skeleton heights to avoid layout shift as sections resolve
+- Series model needs `totalCount: Int?` (nullable)
+- When `totalCount` is set: progress = `finishedCount / totalCount`, display "X of Y finished (Z%)"
+- When `totalCount` is null: display "X charts (Y finished)" without a percentage or progress bar
+- The progress bar should only appear when `totalCount` is set
+- The DesignOS design shows "X of Y finished" -- adapt to "X charts (Y finished)" when no total
 
-### Pitfall 8: Recharts ResponsiveContainer Race Condition
+**Detection:** Create an open-ended series with 3 charts, 2 finished. If the UI shows "67%" that's misleading -- it should show "3 charts, 2 finished" or similar.
 
-**What goes wrong:**
-Recharts' `<ResponsiveContainer>` measures its parent container width on mount. When used inside a dynamically imported component with `ssr: false`, the container may not have its final layout dimensions when the chart mounts (especially inside Suspense boundaries that just resolved). Chart renders at width=0 or a stale width.
+---
 
-**Prevention:**
-```tsx
-// Add explicit width/height to the container wrapper
-<div className="h-[240px] w-full">
-  <ResponsiveContainer width="100%" height="100%">
-    <BarChart data={data}>...</BarChart>
-  </ResponsiveContainer>
-</div>
+### Pitfall 7: Cache invalidation gaps when series assignments change
+
+**What goes wrong:** The stats dashboard, Pattern Dive, and gallery all cache data. Changing a chart's series assignment must invalidate all affected caches, but the current `revalidatePath` calls in `updateChart()` don't know about a `/series` page or the Pattern Dive series tab.
+
+**Why it happens:** The existing cache invalidation in `updateChart()` (lines 348-350):
+```typescript
+revalidatePath("/charts");
+revalidatePath(`/charts/${chartId}`);
+revalidatePath("/fabric");
 ```
-- Always wrap `ResponsiveContainer` in a div with explicit dimensions via CSS
-- Alternatively, skip `ResponsiveContainer` entirely and pass explicit `width`/`height` props to the chart, computed from a `useRef` + `useLayoutEffect` measurement (the pattern already used for focal point)
-
-### Pitfall 9: Over-Engineering the Stats Computation Layer
-
-**What goes wrong:**
-Building an abstraction layer ("StatsEngine" class, generic aggregation pipelines, pluggable metric definitions) before knowing which stats users actually check. The abstraction adds complexity without proven value. When requirements change (and they will -- "actually I want rolling 7-day average not 30-day"), the abstraction fights you.
+This doesn't include `/series` or `/series/[id]`. Pattern Dive is at `/charts` so it gets revalidated, but if series data is fetched separately or cached with tags, it could go stale.
 
 **Prevention:**
-- Start with one function per stat section: `getLifetimeStats()`, `getMonthlyActivity()`, `getPersonalBests()` -- simple, readable, independent
-- Share helpers for common patterns (timezone conversion, date range filtering) but don't build a framework
-- The existing project pattern is clear: `dashboard-actions.ts` has plain functions that call Prisma directly. Follow that pattern for stats.
-- If duplication emerges across 3+ stat functions, *then* extract a shared utility. Not before.
+1. Add `revalidatePath("/series")` to `createChart()`, `updateChart()`, and `deleteChart()`
+2. Add `revalidatePath(\`/series/${seriesId}\`)` when a chart's series assignment changes in `updateChart()`
+3. If the series management page has its own detail pages, add those paths too
+4. Consider whether stats cache needs `revalidateTag("stats")` when series changes (probably not in v1.8, but note for future stats-by-series)
 
-### Pitfall 10: Personal Bests Records Without Idempotent Detection
+---
 
-**What goes wrong:**
-"New record!" celebrations fire when logging a session that beats a previous best. But if the detection logic runs after every session mutation (create, edit, delete), edge cases emerge: editing a record-setting session to reduce its count should revoke the record. Deleting the record-holding session means a *different* session is now the record. Re-calculating on every mutation is expensive if scanning all sessions.
+### Pitfall 8: Series deletion orphans seriesId on charts
+
+**What goes wrong:** Deleting a series without clearing `seriesId` on associated charts leaves dangling foreign keys that crash the gallery filter and chart form.
+
+**Why it happens:** The designer deletion pattern in `designer-actions.ts` (lines 76-81) explicitly nulls out `designerId` on charts before deleting the designer in a `$transaction`:
+```typescript
+await prisma.$transaction([
+  prisma.chart.updateMany({
+    where: { designerId: id },
+    data: { designerId: null },
+  }),
+  prisma.designer.delete({ where: { id } }),
+]);
+```
+Series deletion MUST follow this exact pattern. If you rely on Prisma's `onDelete: SetNull` instead, it works at the DB level but you miss the `revalidatePath` calls and tests won't verify the behavior.
 
 **Prevention:**
-- Calculate personal bests *at display time* (in the stats page server action), not on session mutation
-- The "New record!" toast should compare the just-logged session against *current* bests calculated fresh, not against a stored record value
-- Never store "is_record" flags on sessions -- calculate dynamically (aligns with "calculated at query time" constraint)
-- For the toast: return `newRecords: string[]` from `createSession` action by doing a quick comparison query inline
+1. Follow the designer deletion pattern exactly: `$transaction` with `updateMany` + `delete`
+2. Include revalidation for affected paths inside the action
+3. Test: delete series -> verify charts previously in that series have `seriesId: null` -> verify gallery filter doesn't show the deleted series
+
+---
+
+### Pitfall 9: PatternDiveTabs exhaustive type check breaks on new tab
+
+**What goes wrong:** The `PatternDiveTabs` component uses a typed literal union `PATTERN_DIVE_TABS` and an explicit `contentMap` object. Adding "series" to the union without updating all references causes TypeScript errors -- but the nuqs URL state migration is the subtle part.
+
+**Why it happens:** Four linked type-level structures must be updated together:
+1. `PATTERN_DIVE_TABS = ["browse", "whats-next", "fabric", "storage"] as const` -- add `"series"`
+2. `TAB_CONFIG` array -- add `{ value: "series", label: "Series", icon: Library }`
+3. `PatternDiveTabsProps` interface -- add `seriesContent: React.ReactNode`
+4. `contentMap` object inside the component -- add `series: seriesContent`
+
+The nuqs `parseAsStringLiteral` on the tab state will also need the new value in its array.
+
+**Prevention:** TypeScript will catch most of this automatically because:
+- The `contentMap` type is `Record<PatternDiveTab, React.ReactNode>` -- adding to the union without adding the key is a compile error
+- The `TAB_CONFIG` has `as const` so missing entries are visually obvious
+
+But: decide on tab ordering. The DesignOS design suggests Series is a browsing-oriented tab. Place it after Browse (position 2) or after Storage View (position 5). Position 5 (last) is safest since it doesn't shift existing tab indices for bookmarked URLs.
+
+**Detection:** Build check (`npm run build`) will catch type errors. Manual test: navigate to Pattern Dive and verify all 5 tabs render.
+
+---
+
+### Pitfall 10: Series SearchableSelect placement in chart form
+
+**What goes wrong:** The chart form already has ~50 fields in scrolling sections. Adding a series selector in the wrong location creates visual clutter and breaks the logical grouping of fields.
+
+**Why it happens:** The form layout has logical sections (name/designer at top, stitch counts, genres, pattern type, project settings, files, notes). Series is logically related to designer (metadata about the chart) but could also be seen as project-level data. Placing it wrong confuses users.
+
+**Prevention:**
+- Place series selector directly below the designer field (same metadata section)
+- Use the same `SearchableSelect` component pattern with `onAddNew` for inline series creation
+- Do NOT add it to the project settings section (series is a chart property, not a project property -- it's in the `chart` Zod schema, not `project`)
+- The InlineNameDialog reusable component already exists for quick-add -- reuse it for inline series creation (exactly like storage locations and stitching apps use it)
+
+**Detection:** Load the chart form -- series selector should be visually grouped with designer, not buried below pattern type checkboxes.
+
+---
+
+### Pitfall 11: Series management page inconsistent with designer/genre patterns
+
+**What goes wrong:** Building the series management page without following the established designer/genre page patterns creates inconsistent navigation and CRUD UX.
+
+**Why it happens:** Designers and genres both have:
+- List page at `/designers` and `/genres`
+- Detail page at `/designers/[id]` and `/genres/[id]`
+- Sidebar navigation under "Reference" section
+- `InlineNameEdit` + `DeleteConfirmationDialog` reusable patterns
+- `getDesignersWithStats()` / `getGenresWithStats()` for list queries
+- Dedicated types in `types/designer.ts` / `types/genre.ts`
+- Full test coverage of CRUD actions
+
+Series pages must follow this exact structure or the app feels inconsistent.
+
+**Prevention:**
+1. Add `/series` and `/series/[id]` routes under `app/(dashboard)/series/`
+2. Add "Series" to `navigationSections` in `nav-items.ts` under "Reference" section (with `Library` icon from lucide)
+3. Create `types/series.ts` with `SeriesWithStats` and `SeriesDetail` types (parallel to genre types)
+4. Create `series-actions.ts` following `designer-actions.ts` structure exactly
+5. Create components in `components/features/series/` following the genre component structure
+6. Use `InlineNameEdit` for rename, `DeleteConfirmationDialog` for deletion with chart-count warning
+7. Series has extra fields vs. designer/genre: `totalCount` (optional int) and `designerId` (optional FK). The detail page is more complex (shows member charts with progress), but the list page follows the same card layout as the DesignOS mock.
 
 ---
 
 ## Minor Pitfalls
 
-### Pitfall 11: Chart Tooltip Z-Index Conflicts
+### Pitfall 12: getChartsForGallery query performance with series join
 
-**What goes wrong:**
-Recharts tooltips use absolute positioning. In a page with sticky headers, modals (sonner toasts), and the existing portal autocomplete pattern, tooltip z-index conflicts are likely.
+**What goes wrong:** Adding `series: { select: { name: true } }` to the already-complex `getChartsForGallery` query adds another join. With 500+ charts, this could increase query time.
 
-**Prevention:**
-- Set explicit `wrapperStyle={{ zIndex: 50 }}` on Recharts `<Tooltip>` component
-- Test tooltip visibility when page is scrolled (sticky TopBar at z-40)
-- Test with toasts active simultaneously
+**Prevention:** The join is simple (nullable FK lookup), and Prisma/PostgreSQL handles this efficiently. The existing query already joins designer, genres (many-to-many), project (with 3 supply sub-queries), and file count. One more nullable FK join is negligible. However, add a database index on `Chart.seriesId` in the schema:
+```prisma
+@@index([seriesId])
+```
 
-### Pitfall 12: Empty States for New Users vs Power Users
+---
 
-**What goes wrong:**
-Stats components assume data exists. A user with zero sessions sees broken charts (empty axes, "NaN%" labels, division by zero). The existing app handles empty states well elsewhere, but new chart components may not.
+### Pitfall 13: Series detail "Add Chart" modal excludes already-assigned charts
 
-**Prevention:**
-- Every chart wrapper checks `data.length === 0` and renders an encouraging empty state
-- Stats functions return explicit `null` or sentinel values when insufficient data
-- Test with: 0 sessions, 1 session, sessions only in current month (no historical data)
-
-### Pitfall 13: Presigned URL Expiration on Long-Idle Stats Page
-
-**What goes wrong:**
-If the stats page displays project cover images (linked from personal bests, top projects), presigned R2 URLs expire after their TTL. User leaves stats page open, returns hours later, images are broken.
+**What goes wrong:** The DesignOS SeriesDetail component shows an "Add Chart" modal that searches charts. If it shows charts already in the series, users get confused when selecting one that's already a member.
 
 **Prevention:**
-- This is an existing pattern in the app (all images use presigned URLs)
-- For stats page specifically, images are decorative context -- use `coverThumbnailUrl` (small) not full images
-- The existing page-level `getPresignedImageUrls()` pattern handles this -- just follow it consistently
+- The "Add Chart" modal query should filter by `seriesId: null` (charts not in any series) OR allow reassignment with confirmation
+- Since the data model is 1:many, adding a chart to this series implicitly removes it from any other series -- surface this to the user
+- Consider showing "Currently in: [Other Series]" next to charts that are already assigned elsewhere
+- The SearchableSelect in the chart form handles the normal case; the series detail "Add Chart" is for bulk management
+
+---
+
+### Pitfall 14: Stats dashboard series breakdown deferred
+
+**What goes wrong:** Adding series to the system creates an expectation that stats will show series-level insights (like designer/genre breakdowns). If the stats page doesn't acknowledge series at all, it feels incomplete.
+
+**Prevention:** For v1.8, do NOT add series to the stats dashboard. The existing stats queries (`designer-breakdown.ts`, `genre-breakdown.ts`) are complex cached computations. Adding series breakdown is a separate milestone concern. But DO add `revalidateTag("stats")` to series mutations so that when stats-by-series is eventually added, the cache invalidation is already wired.
+
+---
+
+### Pitfall 15: Series totalCount validation edge cases
+
+**What goes wrong:** A series with `totalCount: 5` but 7 assigned charts has confusing semantics. Is the totalCount wrong, or does the user own extras?
+
+**Prevention:**
+- `totalCount` represents the total number of charts in the series that exist (published by designer), not the number the user owns
+- Allow `memberCount > totalCount` -- the user might have more charts assigned than the series officially has (data entry flexibility)
+- Display: "7 of 5" looks wrong. Consider capping the progress bar at 100% while showing the real count, or showing "7 charts (series has 5 total)"
+- Validation: `totalCount` must be a positive integer when provided. Don't enforce `memberCount <= totalCount` at the database level.
+
+---
+
+### Pitfall 16: Series optional designer link
+
+**What goes wrong:** Some series are by a single designer (e.g., "Mini Bottles by Nora Corbett"), others span multiple designers (e.g., "Seasonal Samplers" collected across designers). Adding `designerId` to Series without clear semantics confuses users.
+
+**Prevention:**
+- Make `designerId` optional on Series (nullable FK, same pattern as Chart.designerId)
+- When set, display as "Series by [Designer]" with link to designer detail
+- When null, display just the series name
+- Do NOT auto-set from member charts (series with mixed designers should have null designerId)
+- The chart form already has a designer selector that's separate from series -- keep them independent
 
 ---
 
@@ -328,26 +319,92 @@ If the stats page displays project cover images (linked from personal bests, top
 
 | Phase Topic | Likely Pitfall | Mitigation |
 |-------------|---------------|------------|
-| Stats computation engine | Pitfall 4 (in-memory aggregation), Pitfall 9 (over-engineering) | Use SQL groupBy/aggregate, keep functions simple and independent |
-| Hero counters & lifetime stats | Pitfall 2 (cold start waterfall) | Bundle into single Promise.all() call |
-| Monthly bar chart | Pitfall 1 (hydration), Pitfall 5 (timezone), Pitfall 3 (bundle) | dynamic import, AT TIME ZONE, consider CSS-first or Visx |
-| Heatmap calendar | Pitfall 1 (hydration), Pitfall 5 (timezone) | Dedicated client component, explicit timezone handling |
-| Personal bests board | Pitfall 10 (idempotent detection), Pitfall 4 (scanning all sessions) | Calculate at display time with SQL MAX/aggregate |
-| "New record!" toast | Pitfall 10 (edge cases on edit/delete) | Fresh comparison in createSession, no stored flags |
-| Charting library integration | Pitfall 3 (bundle size), Pitfall 8 (ResponsiveContainer) | Dynamic import, explicit container dimensions |
-| Dashboard layout | Pitfall 6 (information overload), Pitfall 7 (Suspense strategy) | Progressive disclosure, 2-3 Suspense groups |
-| Collection breakdowns (designer/genre) | Pitfall 4 (scanning all projects+charts) | Prisma groupBy with count, not findMany + JS filter |
+| Schema migration (Series model + Chart.seriesId) | FK constraint prevents deletion without nulling references | Follow designer deletion pattern: `$transaction([updateMany, delete])` |
+| Series CRUD actions | Missing `revalidatePath` for downstream pages | Check all paths: `/charts`, `/charts/[id]`, `/series`, `/series/[id]` |
+| Chart form integration | SeriesId missing from Zod schema, create/update actions, draft persistence | Thread through all 4 layers: Zod -> actions -> form values -> draft |
+| Gallery series filter | Missing from `clearFilters` or `hasActiveFilters` | Add to both, plus FilterChips component |
+| Pattern Dive Series tab | Series query added to Promise.all but presigned URLs not updated | Include series member thumbnails in imageKeys collection |
+| Series management pages | Inconsistent with designer/genre page patterns | Mirror designer-actions.ts structure, use same reusable components |
+| Chart form new/edit page data loading | Series list not fetched in server component | Add `getSeries()` to the Promise.all in both `new/page.tsx` and `[id]/edit/page.tsx` |
+| InlineSeriesDialog | Building from scratch instead of reusing InlineNameDialog | InlineNameDialog already handles name-only creation -- reuse it |
+| Series detail page chart list | Not showing presigned image URLs for thumbnails | Use `getPresignedImageUrls()` for member chart thumbnails |
+| Existing tests | chart-actions tests don't include seriesId in mock data | Update test fixtures to include `seriesId: null` default |
+
+---
+
+## Integration Checklist
+
+Condensed "did you touch everything" checklist for adding seriesId to the existing codebase:
+
+### Schema Layer
+- [ ] `Series` model in `schema.prisma` (id, name, totalCount?, designerId?, userId, timestamps)
+- [ ] `seriesId` FK on `Chart` model (nullable, with `@@index([seriesId])`)
+- [ ] `onDelete: SetNull` on the Chart->Series relation (or handle explicitly in action code)
+- [ ] `prisma db push` + `prisma generate` on both dev and production Neon branches
+
+### Validation Layer
+- [ ] `seriesId: z.string().nullable().default(null)` in `chartFormSchema.chart`
+- [ ] Series create/update schemas (name required, totalCount optional positive int, designerId optional)
+
+### Action Layer
+- [ ] `series-actions.ts`: CRUD (create, update, delete, get, getSeriesWithStats, getSeriesDetail)
+- [ ] `chart-actions.ts`: `createChartAndProject()` includes `seriesId` in data object
+- [ ] `chart-actions.ts`: `updateChart()` includes `seriesId` in update data object
+- [ ] `chart-actions.ts`: `getChartsForGallery()` includes `series: { select: { id: true, name: true } }`
+- [ ] `chart-actions.ts`: `getChart()` includes series in query
+- [ ] `pattern-dive-actions.ts`: new `getSeriesWithProgress()` query for Pattern Dive tab
+
+### Type Layer
+- [ ] `types/series.ts`: SeriesWithStats, SeriesDetail, SeriesMember types
+- [ ] `types/chart.ts`: GalleryChartData updated to include optional series
+- [ ] `gallery-types.ts`: GalleryCardData includes `seriesId: string | null` and `seriesName: string | null`
+
+### Component Layer
+- [ ] Chart form: SearchableSelect for series + InlineNameDialog for inline create
+- [ ] Gallery: FilterBar, FilterChips, use-gallery-filters, gallery-utils all updated for series
+- [ ] Pattern Dive: PatternDiveTabs extended with 5th tab
+- [ ] Series management: list page, detail page, form/dialog components
+
+### Page Layer
+- [ ] `charts/new/page.tsx`: fetch series in Promise.all, pass to ChartMergedForm
+- [ ] `charts/[id]/edit/page.tsx`: fetch series in Promise.all, pass to ChartMergedForm
+- [ ] `charts/page.tsx`: fetch series progress in Promise.all, add series tab content
+- [ ] `app/(dashboard)/series/page.tsx` and `[id]/page.tsx`: new routes
+
+### Navigation
+- [ ] `nav-items.ts`: add Series to Reference section with Library icon
+
+### Cache Invalidation
+- [ ] Series mutations revalidate `/series`, `/charts`, affected `/charts/[id]`
+- [ ] Chart mutations that change seriesId revalidate `/series` and `/series/[id]`
+
+### Draft Persistence
+- [ ] `use-draft-persistence.ts`: handle `seriesId` in load/save, null stale IDs
+- [ ] Chart form: pass `validSeriesIds` to draft loading
+
+### Tests
+- [ ] Series CRUD action tests (create, update, delete, get) following designer-actions.test.ts patterns
+- [ ] Chart action tests updated with seriesId in test fixtures
+- [ ] Gallery filter tests for series dimension
+- [ ] Pattern Dive series tab rendering tests
+- [ ] Draft persistence with seriesId stale-ID handling
+- [ ] Series deletion cascading null-out test
+
+---
 
 ## Sources
 
-- [Neon latency benchmarks](https://neon.com/docs/guides/benchmarking-latency)
-- [Neon connection pooling docs](https://neon.com/docs/connect/connection-pooling)
-- [Neon performance tips](https://neon.com/blog/performance-tips-for-neon-postgres)
-- [Prisma query optimization](https://www.prisma.io/docs/orm/prisma-client/queries/advanced/query-optimization-performance)
-- [Prisma aggregation/groupBy docs](https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-summarizing)
-- [Next.js streaming and Suspense guide](https://nextjs.org/docs/app/guides/streaming)
-- [Next.js hydration error reference](https://nextjs.org/docs/messages/react-hydration-error)
-- [Recharts SSR issue #2918](https://github.com/recharts/recharts/issues/2918)
-- [Recharts bundle size issue #7018](https://github.com/recharts/recharts/issues/7018)
-- [PostgreSQL date_trunc timezone handling](https://neon.com/postgresql/postgresql-date-functions/postgresql-date_trunc)
-- [Recharts vs Visx comparison (PkgPulse)](https://www.pkgpulse.com/guides/recharts-vs-chartjs-vs-nivo-vs-visx-react-charting-2026)
+- Direct codebase analysis of:
+  - `prisma/schema.prisma` (current schema, ~20 entities)
+  - `src/lib/actions/chart-actions.ts` (create/update/delete/query patterns, 537 lines)
+  - `src/lib/actions/designer-actions.ts` (CRUD pattern to follow for series)
+  - `src/lib/validations/chart.ts` (Zod schema structure, chartFormSchema)
+  - `src/components/features/charts/chart-merged-form.tsx` (form integration points, 24 fields)
+  - `src/components/features/charts/pattern-dive-tabs.tsx` (tab architecture, nuqs state)
+  - `src/components/features/gallery/` (filter pipeline: 8 tightly coupled files)
+  - `src/components/features/charts/use-draft-persistence.ts` (V2 draft format, stale-ID handling)
+  - `src/app/(dashboard)/charts/` (page-level data loading, Promise.all patterns)
+  - `src/components/shell/nav-items.ts` (navigation structure, Reference section)
+  - `product-plan/sections/fabric-series-and-reference-data/` (DesignOS specs: SeriesList, SeriesDetail)
+  - `product-plan/sections/fabric-series-and-reference-data/series.png` (design screenshot)
+  - `product-plan/sections/fabric-series-and-reference-data/types.ts` (Series/SeriesMember interfaces)

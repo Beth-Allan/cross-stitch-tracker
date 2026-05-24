@@ -1,551 +1,392 @@
-# Architecture Patterns: Statistics Dashboard
+# Architecture Patterns: Series/Collection Integration
 
-**Domain:** Statistics dashboard & data aggregation for cross-stitch tracker
-**Researched:** 2026-05-17
-**Confidence:** HIGH (based on existing codebase patterns + official docs + Neon benchmarks)
+**Domain:** Cross-stitch chart series management added to existing tracker
+**Researched:** 2026-05-24
+**Confidence:** HIGH -- all patterns are established in the codebase; series follows identical conventions
 
 ## Recommended Architecture
 
-### Overview
+Series integrates as a **peer entity to Designer and Genre** -- a named entity with a 1:many relationship to Chart, managed via the same CRUD page + detail page + chart form assignment pattern already used for designers/genres/storage/apps. No new architectural patterns are needed; this is pure reuse of established conventions.
 
-The statistics dashboard integrates as a new page route (`/stats`) with a dedicated query layer that follows the established pattern: Server Component page fetches data via Promise.all, passes serialized results as props to Client Components that handle interactivity (tab switching, chart hover, popover drill-down).
-
-```
-src/app/(dashboard)/stats/page.tsx          <- Server Component (data fetching orchestrator)
-src/lib/queries/stats/                      <- Stats query layer (pure functions, no "use server")
-src/components/features/stats/              <- Client Components (charts, interactive tabs)
-src/types/stats.ts                          <- Type definitions
-```
-
-### Why a Query Layer, Not Server Actions
-
-The existing dashboard uses `"use server"` actions for data fetching, but stats queries are read-only and never called from Client Components via form submission. A dedicated query layer (`src/lib/queries/stats/`) provides:
-
-1. **No overhead** -- server actions add POST endpoint overhead for reads
-2. **Composability** -- queries can be combined with `Promise.all` in the Server Component
-3. **Testability** -- pure functions with injected prisma client, no auth coupling in unit tests
-4. **Cacheable** -- can wrap with `unstable_cache` without "use server" conflicts
-
-The auth guard moves to the page-level Server Component (call `requireAuth()` once, pass `userId` down to query functions).
-
----
-
-## Component Boundaries
-
-| Component | Type | Responsibility | Communicates With |
-|-----------|------|---------------|-------------------|
-| `stats/page.tsx` | Server Component | Auth, parallel data fetch, cache orchestration | Query layer, Client Components |
-| `StatsPageClient` | Client Component | Tab state, tab rendering | Individual stat components |
-| `HeroCounters` | Server Component | Render lifetime stat numbers | Receives props from page |
-| `MonthlyBarChart` | Client Component | Interactive bar chart with drill-down popover | Receives `monthlyTotals` prop |
-| `StitchingCalendar` | Client Component | Month navigation, day detail hover | Receives `calendarDays`, fetches on month change |
-| `PersonalBestsBoard` | Client/Server hybrid | Record cards with links | Receives `personalBests` prop |
-| `SessionHistoryTable` | Client Component | Sort, paginate session list | Receives initial data, lazy-loads pages |
-| `YearInReview` | Client Component | Year selector, all sub-sections | Receives data for selected year |
-| `CollectionInsights` | Server Component | Status/size/designer breakdowns | Receives pre-aggregated data |
-
-### Server vs Client Split Rationale
-
-**Server Components** (no interactivity needed):
-- `HeroCounters` -- static number display with JetBrains Mono
-- `CollectionInsights` -- pie/donut charts if CSS-only, or pass data to client
-- Page layout and section headings
-
-**Client Components** (require interactivity):
-- `MonthlyBarChart` -- click-to-drill-down popover, hover states
-- `StitchingCalendar` -- month navigation arrows, day cell hover
-- `PersonalBestsBoard` -- clickable project links (could be server if using `<Link>`)
-- `SessionHistoryTable` -- sort state, pagination
-- `YearInReview` -- year selector dropdown triggers data reload
-- `StatsPageClient` -- tab state management
-
----
-
-## Data Flow
-
-### Primary Flow (Page Load)
+### Data Model
 
 ```
-1. User navigates to /stats
-2. stats/page.tsx (Server Component):
-   a. requireAuth() -> userId
-   b. Promise.all([
-        getHeroStats(userId),
-        getMonthlyTotals(userId, currentYear),
-        getPersonalBests(userId),
-        getCalendarDays(userId, currentMonth),
-        getCollectionBreakdown(userId),
-      ])
-   c. Pass results as props to StatsPageClient
-3. StatsPageClient renders active tab with pre-fetched data
+Series
+  id         String    @id @default(cuid())
+  name       String    @unique
+  totalCount Int?      // null = open-ended, number = fixed count (e.g. 15)
+  designer   Designer? @relation(fields: [designerId], references: [id])
+  designerId String?
+  notes      String?
+  charts     Chart[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+Chart (modified)
+  + series    Series?  @relation(fields: [seriesId], references: [id])
+  + seriesId  String?
+
+Designer (modified)
+  + series    Series[]
 ```
 
-### Secondary Flow (Tab Interaction / Lazy Loading)
+Key design decisions:
 
+1. **`seriesId` on Chart, not on Project** -- a series is a collection of *designs*, not *work instances*. A chart belongs to "Mini Bottles" regardless of whether the user has started stitching it. Matches `designerId` placement on Chart.
+
+2. **Optional `totalCount`** -- `null` means open-ended ("I keep discovering new ones"), a number means fixed-count ("12 of 12 Mini Bottles"). `memberCount` and `finishedCount` are computed at query time, consistent with the "calculated fields at query time, never stored" convention.
+
+3. **Optional `designerId`** -- most series are by one designer (e.g. "Nora Corbett Fairies"), but cross-designer series exist. When set, the series detail page shows designer info. When null, it's inferred from the charts' designers or shown as "Multiple designers".
+
+4. **`@unique` on name** -- consistent with Designer and Genre. Prevents accidental duplicates.
+
+### Component Boundaries
+
+| Component | Responsibility | Communicates With |
+|-----------|---------------|-------------------|
+| `Series` Prisma model | Data storage, FK relationships | Chart, Designer |
+| `series-actions.ts` | Server actions: CRUD, queries | Prisma, auth-guard |
+| `seriesSchema` (validation) | Zod validation at boundary | series-actions |
+| `SeriesList` component | Management page: sortable card grid, search, CRUD modals | series-actions |
+| `SeriesDetail` component | Detail page: header, progress bar, member chart list | series-actions |
+| `SeriesFormModal` component | Create/edit series dialog | series-actions |
+| `InlineSeriesDialog` | Inline create from chart form (name + optional totalCount) | series-actions, chart form |
+| `SearchableSelect` (reused) | Series assignment in chart form | Chart form state |
+| `SeriesTab` (Pattern Dive) | Series progress cards in Pattern Dive | series-actions, PatternDiveTabs |
+| `MultiSelectDropdown` (reused) | Series filter on Browse tab | Gallery filters |
+| `GalleryCardData` (extended) | Add `seriesName` field for display/filtering | Gallery pipeline |
+
+### Data Flow
+
+**Series CRUD (management page):**
 ```
-Calendar month change:
-  1. Client Component calls server action getCalendarDays(month, year)
-  2. Server action validates auth, queries, returns data
-  3. Client Component updates state
-
-Year in Review year change:
-  1. Client Component calls server action getYearInReviewData(year)
-  2. Server action validates auth, queries, returns data
-  3. Client Component updates state
-
-Session History pagination:
-  1. Client Component calls server action getSessionPage(cursor)
-  2. Returns next page of sessions
-```
-
-### Data Flow Diagram
-
-```
-+-------------------------------------------------------------+
-| stats/page.tsx (Server Component)                           |
-|                                                             |
-|  requireAuth() --------------------------------------------|---> auth-guard
-|       |                                                     |
-|       v userId                                              |
-|  +----------------------------------------------------------+
-|  | Promise.all([                                        |   |
-|  |   getHeroStats(userId),          <- queries/stats/   |   |
-|  |   getMonthlyTotals(userId, yr),  <- queries/stats/   |   |
-|  |   getPersonalBests(userId),      <- queries/stats/   |   |
-|  |   getCalendarDays(userId, mo),   <- queries/stats/   |   |
-|  |   getCollectionBreakdown(userId) <- queries/stats/   |   |
-|  | ])                                                   |   |
-|  +----------------------+-------------------------------+   |
-|                         | serialized data                    |
-|                         v                                    |
-|  <StatsPageClient                                           |
-|     heroStats={...}                                         |
-|     monthlyTotals={...}                                     |
-|     personalBests={...}                                     |
-|     calendarDays={...}                                      |
-|     collectionBreakdown={...}                               |
-|  />                                                         |
-+-------------------------------------------------------------+
-         |
-         v
-+-------------------------------------------------------------+
-| StatsPageClient ("use client")                              |
-|                                                             |
-|  Tab state: overview | calendar | history | year-in-review  |
-|                                                             |
-|  +----------+  +--------------+  +----------------------+   |
-|  | Overview |  |  Calendar    |  |  Year in Review      |   |
-|  | -------- |  | ------------ |  | -------------------- |   |
-|  | HeroCntrs|  | StitchingCal |  | YearSelector ->      |   |
-|  | Personal |  | (month nav   |  | getYearInReviewData()|   |
-|  | Monthly  |  |  -> server   |  | (server action)      |   |
-|  | StatCards|  |  action)     |  |                      |   |
-|  +----------+  +--------------+  +----------------------+   |
-+-------------------------------------------------------------+
+/series page (Server Component)
+  -> getSeriesWithStats() server action
+  -> SeriesList (Client Component)
+    -> SeriesFormModal (create/edit)
+    -> DeleteConfirmationDialog (delete)
+    -> All mutations call series-actions, revalidatePath
 ```
 
----
-
-## Aggregation Strategy: Where Computation Happens
-
-### Decision: DB-level groupBy for time-series, in-memory for small collections
-
-| Query Type | Strategy | Rationale |
-|------------|----------|-----------|
-| Monthly totals (12 months) | Prisma `groupBy` | DB sums are O(n) on indexed column; avoids shipping all sessions to server |
-| Daily calendar (30 days) | Prisma `where` + in-memory group | Filter by date range at DB, group by day in JS (max ~60 sessions/month) |
-| Hero stats (today/week/month/year) | Prisma `aggregate` with `where` | 4 separate aggregate calls OR 1 call + in-memory bucketing |
-| Personal bests (all-time records) | Prisma `orderBy` + `take(1)` | "Max stitch day" = groupBy date, sum stitchCount, orderBy desc, take 1 |
-| Collection breakdown (status/size/designer) | In-memory from findMany | Already fetched for other dashboard sections; ~500 rows is trivial |
-| Streak calculation | Fetch all session dates, compute in JS | No SQL window function support in Prisma; date gap detection is cleaner in JS |
-| Year in Review | Mix of groupBy + in-memory | groupBy for monthly totals, in-memory for project timeline sorting |
-
-### Why Not Raw SQL?
-
-For this dataset scale (~500 projects, ~2000-5000 sessions over time), Prisma's groupBy/aggregate is sufficient. The overhead vs raw SQL is negligible at this volume. Benefits of staying with Prisma:
-
-1. Type safety on results
-2. No SQL injection surface
-3. Consistent with rest of codebase
-4. Prisma 7's query optimizer handles simple aggregates well
-
-**Exception:** If personal best streak calculation becomes complex (needing window functions like `LAG()`), use `prisma.$queryRaw` for that single query.
-
-### Query Layer File Structure
-
+**Series assignment (chart form):**
 ```
-src/lib/queries/stats/
-  index.ts                    <- Re-exports all query functions
-  hero-stats.ts               <- getHeroStats(userId): lifetime counters
-  monthly-totals.ts           <- getMonthlyTotals(userId, year): bar chart data
-  calendar-days.ts            <- getCalendarDays(userId, year, month): calendar grid
-  personal-bests.ts           <- getPersonalBests(userId): records board
-  collection-breakdown.ts     <- getCollectionBreakdown(userId): status/size/designer
-  year-in-review.ts           <- getYearInReviewData(userId, year): yearly summary
-  session-history.ts          <- getSessionHistory(userId, cursor, limit): paginated
-  streak-calculator.ts        <- computeCurrentStreak, computeLongestStreak
+Chart merged form receives series[] from page loader
+  -> SearchableSelect with series options
+  -> onAddNew triggers InlineSeriesDialog
+    -> createSeries() server action
+    -> Returns new series, auto-selects in form
+  -> seriesId stored in form state
+  -> Submitted with chart data via chartFormSchema
 ```
 
-Each file exports a single async function that takes `userId` and optional parameters, returns typed data. No auth logic inside -- caller is responsible.
-
----
-
-## Caching Strategy for Neon Free Tier
-
-### The Problem
-
-Neon free tier has:
-- 300-800ms cold starts after 5 min inactivity
-- ~770ms for aggregate queries (vs ~240ms on optimized DBs)
-- Promise.all mitigates waterfall but not individual query latency
-
-The stats page will fire 5+ queries in parallel. Without caching, worst case (cold start + 5 aggregates) = ~2-3 seconds total wall time.
-
-### Recommended Approach: `unstable_cache` with Tag-Based Invalidation
-
-**Why `unstable_cache` over `"use cache"` directive:**
-- The project does NOT have `dynamicIO` enabled in `next.config.ts`
-- Enabling `dynamicIO` is a global change affecting all routes -- too invasive for one feature
-- `unstable_cache` works without config changes and is battle-tested in this Next.js version
-- Can migrate to `"use cache"` later when/if `dynamicIO` is adopted project-wide
-
-**Implementation pattern:**
-
-```typescript
-// src/lib/queries/stats/hero-stats.ts
-import { unstable_cache } from "next/cache";
-import { prisma } from "@/lib/db";
-import type { StatsHeroData } from "@/types/stats";
-
-async function computeHeroStats(userId: string): Promise<StatsHeroData> {
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  // ... aggregate queries ...
-}
-
-export function getHeroStats(userId: string) {
-  return unstable_cache(
-    () => computeHeroStats(userId),
-    [`stats-hero-${userId}`],
-    {
-      tags: ["stats", `stats-${userId}`],
-      revalidate: 300, // 5 minutes
-    }
-  )();
-}
+**Series progress (Pattern Dive):**
+```
+/charts page (Server Component)
+  -> getSeriesWithProgress() in Promise.all alongside existing queries
+  -> PatternDiveTabs receives seriesContent prop (new tab)
+  -> SeriesTab renders progress cards
+    -> Each card: name, progress bar, "X of Y finished" or "X charts"
+    -> Click navigates to /series/[id] detail page
 ```
 
-### Cache Invalidation
-
-Stats change when sessions are created/edited/deleted. Add `revalidateTag("stats")` to session mutation actions:
-
-```typescript
-// In session-actions.ts createSession/updateSession/deleteSession:
-import { revalidateTag } from "next/cache";
-
-// After successful mutation:
-revalidateTag("stats");
+**Series filter (Browse tab):**
+```
+Gallery filters hook adds seriesFilter[] state (nuqs)
+  -> filterAndSort adds series matching
+  -> GalleryCardData includes seriesName/seriesId
+  -> FilterBar renders MultiSelectDropdown for series
 ```
 
-This invalidates ALL stats cache entries, which is correct because:
-- A new session affects hero stats, monthly totals, calendar, personal bests, streaks
-- Single-user app means no cross-user invalidation concerns
-- 5-minute revalidate means even without invalidation, data is reasonably fresh
+## Integration Points: New vs. Modified
 
-### Cache TTL Strategy
+### New Files (20-25 files)
 
-| Query | TTL | Rationale |
-|-------|-----|-----------|
-| Hero stats | 5 min (+ on-demand) | Changes with every session log |
-| Monthly totals | 1 hour (+ on-demand) | Only changes when sessions are logged |
-| Personal bests | 1 hour (+ on-demand) | Rarely changes; recomputed on session create |
-| Calendar days | 10 min (+ on-demand) | Active month changes with session logging |
-| Collection breakdown | 1 hour | Changes only when projects change status |
-| Year in Review | 1 hour | Historical data rarely changes |
-| Session history | 0 (no cache) | Paginated, cheap query on indexed column |
+| File | Pattern Source |
+|------|---------------|
+| `prisma/schema.prisma` (model Series + Chart.seriesId) | Designer model |
+| `src/types/series.ts` | `src/types/designer.ts` |
+| `src/lib/validations/series.ts` (or add to `chart.ts`) | `designerSchema` in `chart.ts` |
+| `src/lib/actions/series-actions.ts` | `designer-actions.ts` |
+| `src/app/(dashboard)/series/page.tsx` | `designers/page.tsx` |
+| `src/app/(dashboard)/series/[id]/page.tsx` | `designers/[id]/page.tsx` |
+| `src/app/(dashboard)/series/loading.tsx` | `designers/loading.tsx` |
+| `src/components/features/series/series-list.tsx` | `designers/designer-list.tsx` |
+| `src/components/features/series/series-detail.tsx` | `designers/designer-detail.tsx` |
+| `src/components/features/series/series-form-modal.tsx` | `designers/designer-form-modal.tsx` |
+| `src/components/features/charts/inline-series-dialog.tsx` | `inline-designer-dialog.tsx` (extended with totalCount) |
+| `src/components/features/charts/series-tab.tsx` | Pattern Dive tab pattern |
+| Test files for each of the above | Existing test patterns |
 
-The `+ on-demand` means `revalidateTag("stats")` from session mutations provides instant freshness when the user logs a session and navigates to stats.
+### Modified Files (10-15 files)
 
----
-
-## Charting Library Integration
-
-### Decision: Recharts 3.8.x
-
-Already specified in `docs/tech-stack.md`. Rationale confirmed:
-- React 19 compatible (v3.x has native support, no `react-is` override needed like v2.x)
-- Declarative component API aligns with React patterns
-- SVG-based (accessible, inspectable, print-friendly)
-- Tree-shakeable -- import only `BarChart`, `Bar`, `XAxis`, `YAxis` etc.
-- ~43M weekly npm downloads, actively maintained
-
-### Server/Client Split for Charts
-
-Charts **must** be Client Components (Recharts uses DOM measurement + D3 internally). Pattern:
-
-```typescript
-// Server Component (page.tsx)
-const monthlyTotals = await getMonthlyTotals(userId, currentYear);
-
-// Pass to Client Component
-<MonthlyBarChart data={monthlyTotals} />
-```
-
-```typescript
-// Client Component
-"use client";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-
-export function MonthlyBarChart({ data }: { data: MonthlyTotal[] }) {
-  return (
-    <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={data}>
-        <XAxis dataKey="month" />
-        <YAxis />
-        <Bar dataKey="totalStitches" fill="var(--color-primary)" radius={[4, 4, 0, 0]} />
-      </BarChart>
-    </ResponsiveContainer>
-  );
-}
-```
-
-### CSS-Only vs Recharts Decision Matrix
-
-| Chart Type | Approach | Rationale |
-|------------|----------|-----------|
-| Monthly bar chart | Recharts | Needs tooltips, click-to-drill, responsive sizing |
-| Calendar heatmap | CSS Grid | No library needed -- 7x5 grid with conditional bg colors |
-| Progress donut (collection) | CSS `conic-gradient` | Simple percentage, no library overhead |
-| Hero stat numbers | Plain text | No chart needed |
-| Streak display | Plain text + badge | No chart needed |
-| Year timeline | CSS or Recharts | If horizontal timeline bars, CSS flex; if complex, Recharts |
-
-### Bundle Impact
-
-Recharts 3.8.x (tree-shaken, only BarChart + deps): ~35-45kb gzipped. Acceptable for a stats page that is not the landing page. Consider dynamic import if first-load performance is a concern:
-
-```typescript
-import dynamic from "next/dynamic";
-const MonthlyBarChart = dynamic(
-  () => import("@/components/features/stats/monthly-bar-chart"),
-  { ssr: false, loading: () => <ChartSkeleton /> }
-);
-```
-
----
+| File | Change | Reason |
+|------|--------|--------|
+| `prisma/schema.prisma` | Add Series model, seriesId to Chart, series[] to Designer | Data model |
+| `src/types/chart.ts` | Add Series to ChartWithProject and GalleryChartData includes | Type flow |
+| `src/lib/validations/chart.ts` | Add `seriesId` to chartFormSchema + `seriesSchema` | Validation |
+| `src/lib/actions/chart-actions.ts` | Include series in getCharts/getChartsForGallery queries | Data fetching |
+| `src/components/features/charts/use-chart-form.ts` | Add `seriesId` to ChartFormValues, wire series data | Form state |
+| `src/components/features/charts/chart-merged-form.tsx` | Add series SearchableSelect + InlineSeriesDialog | Form UI |
+| `src/components/features/charts/pattern-dive-tabs.tsx` | Add "Series" tab to PATTERN_DIVE_TABS | Tab addition |
+| `src/app/(dashboard)/charts/page.tsx` | Add getSeriesWithProgress() to Promise.all, pass to SeriesTab | Data loading |
+| `src/components/features/gallery/gallery-types.ts` | Add `seriesName` to GalleryCardData | Filter/display |
+| `src/components/features/gallery/gallery-utils.ts` | Add `seriesName` to transformToGalleryCard, series filter to filterAndSort | Filter logic |
+| `src/components/features/gallery/use-gallery-filters.ts` | Add `seriesFilter` query state | URL state |
+| `src/components/features/gallery/filter-bar.tsx` | Add series MultiSelectDropdown | Filter UI |
+| `src/components/shell/nav-items.ts` | Add Series item to Reference section | Navigation |
+| `src/components/features/designers/designer-detail.tsx` | Show series list/count in detail | Enhancement |
+| `src/lib/actions/designer-actions.ts` | Include series count in getDesigner | Query enhancement |
 
 ## Patterns to Follow
 
-### Pattern 1: Parallel Query Orchestration (Established)
+### Pattern 1: Entity CRUD (Designer/Genre pattern)
 
-Matches the existing Main Dashboard pattern exactly:
+Series follows the exact same structure as Designer:
 
+**Server actions:** `createSeries`, `updateSeries`, `deleteSeries`, `getSeries`, `getSeriesWithStats`, `getSeriesList`
+
+**Deletion behavior:** `deleteSeries` nullifies `seriesId` on all Charts in the series (same as `deleteDesigner` nullifying `designerId`), then deletes the series. Uses `$transaction` for atomicity.
+
+**Revalidation:** `revalidatePath("/series")`, `revalidatePath("/charts")`, `revalidatePath("/stats")` on mutations.
+
+**Types pattern:**
 ```typescript
-// stats/page.tsx
-export default async function StatsPage() {
-  const user = await requireAuth();
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth();
+// src/types/series.ts
+export type SeriesWithStats = {
+  id: string;
+  name: string;
+  totalCount: number | null;
+  designerName: string | null;
+  notes: string | null;
+  memberCount: number;       // computed: charts.length
+  finishedCount: number;     // computed: charts with FINISHED/FFO status
+  completionPercent: number; // computed: finishedCount / (totalCount ?? memberCount) * 100
+};
 
-  const [heroStats, monthlyTotals, personalBests, calendarDays, breakdown] =
-    await Promise.all([
-      getHeroStats(user.id),
-      getMonthlyTotals(user.id, currentYear),
-      getPersonalBests(user.id),
-      getCalendarDays(user.id, currentYear, currentMonth),
-      getCollectionBreakdown(user.id),
-    ]);
+export type SeriesDetail = {
+  id: string;
+  name: string;
+  totalCount: number | null;
+  designerName: string | null;
+  designerId: string | null;
+  notes: string | null;
+  memberCount: number;
+  finishedCount: number;
+  completionPercent: number;
+  charts: SeriesChart[];
+};
 
-  return (
-    <StatsPageClient
-      heroStats={heroStats}
-      monthlyTotals={monthlyTotals}
-      personalBests={personalBests}
-      calendarDays={calendarDays}
-      collectionBreakdown={breakdown}
-    />
-  );
-}
+export type SeriesChart = OptionalFocalPoint & {
+  id: string;
+  name: string;
+  coverThumbnailUrl: string | null;
+  coverImageUrl: string | null;
+  stitchCount: number;
+  stitchesWide: number;
+  stitchesHigh: number;
+  designerName: string | null;
+  status: ProjectStatus | null;
+  stitchesCompleted: number;
+};
 ```
 
-### Pattern 2: Server Actions for Dynamic Tab Data
+### Pattern 2: Chart Form Assignment (Designer SearchableSelect pattern)
 
-Calendar month changes and Year in Review year changes need fresh data. Use server actions (not the query layer directly) because Client Components invoke them:
+Series assignment in the chart form follows the exact pattern of designer assignment:
 
-```typescript
-// src/lib/actions/stats-actions.ts
-"use server";
-
-import { requireAuth } from "@/lib/auth-guard";
-import { getCalendarDays } from "@/lib/queries/stats/calendar-days";
-
-export async function fetchCalendarMonth(year: number, month: number) {
-  const user = await requireAuth();
-  return getCalendarDays(user.id, year, month);
-}
+```
+1. Page loader fetches series list (alongside designers, genres, etc.)
+2. SearchableSelect renders series options
+3. "Add New" triggers InlineSeriesDialog (like InlineDesignerDialog)
+4. New series created via server action
+5. Return value auto-selects the new series
+6. seriesId stored in form values, submitted with chart data
 ```
 
-### Pattern 3: Type-Safe Query Results
+**InlineSeriesDialog** is slightly more complex than InlineNameDialog because it has:
+- Name field (required)
+- Total count field (optional number)
+- Designer field (optional SearchableSelect -- reuses the same options from the form)
 
-Follow the established `src/types/dashboard.ts` pattern -- define interfaces for all query return types:
+This makes it similar to InlineDesignerDialog (name + optional website) rather than InlineNameDialog (name only). Model after `InlineDesignerDialog` with additional fields.
+
+### Pattern 3: Pattern Dive Tab Addition
+
+Adding a Series tab to Pattern Dive follows the existing tab architecture:
 
 ```typescript
-// src/types/stats.ts
-export interface StatsHeroData {
-  stitchesToday: number;
-  stitchesThisWeek: number;
-  stitchesThisMonth: number;
-  stitchesThisYear: number;
-  totalLifetime: number;
-  totalSessions: number;
-  totalStitchingDays: number;
-  totalHoursStitched: number | null;
-}
+// pattern-dive-tabs.tsx
+export const PATTERN_DIVE_TABS = ["browse", "whats-next", "series", "fabric", "storage"] as const;
+
+// Tab position: after "What's Next", before "Fabric Requirements"
+// Rationale: series browsing is a "discovery" action like What's Next, not a
+// "planning" action like Fabric Requirements
 ```
 
----
+The tab receives pre-fetched data from the Server Component page:
+
+```typescript
+// charts/page.tsx -- add to existing Promise.all
+const [charts, whatsNextProjects, seriesProgress, fabricRequirements, storageGroups] =
+  await Promise.all([
+    getChartsForGallery(),
+    getWhatsNextProjects(),
+    getSeriesWithProgress(),  // NEW
+    getFabricRequirements(),
+    getStorageGroups(),
+  ]);
+```
+
+### Pattern 4: Gallery Filter Addition
+
+Series filter follows the same pattern as status and size filters:
+
+```typescript
+// use-gallery-filters.ts
+const [seriesFilter, setSeriesFilter] = useQueryState(
+  "series",
+  parseAsArrayOf(parseAsString, ",").withDefault([]),
+);
+```
+
+The filter options derive from card data (not a separate query):
+```typescript
+// Derive series options from existing gallery data
+const seriesOptions = useMemo(() => {
+  const names = new Set(cards.map(c => c.seriesName).filter(Boolean));
+  return [...names].sort().map(name => ({ value: name, label: name }));
+}, [cards]);
+```
+
+Extend search in filterAndSort to match series name:
+```typescript
+result = result.filter(
+  (c) => c.name.toLowerCase().includes(q)
+    || c.designerName.toLowerCase().includes(q)
+    || (c.seriesName && c.seriesName.toLowerCase().includes(q)),
+);
+```
+
+### Pattern 5: Management Page Layout (Card Grid vs Table)
+
+The DesignOS design shows a **card grid** for the series management page (not a table like designers/genres). This is appropriate because:
+- Series cards show progress bars (visual element not suited to table rows)
+- 30 series is a manageable number for a card grid
+- Matches the DesignOS screenshot exactly
+
+The SeriesList component uses a responsive grid:
+```
+sm: 1 column
+md: 2 columns
+lg: 3 columns
+```
+
+Sort controls use pill buttons (Name | Completion | Members) positioned above the grid, matching the DesignOS design.
+
+### Pattern 6: Delete Confirmation Dialog (Reuse)
+
+`DeleteConfirmationDialog` already accepts `entityType` as `"designer" | "genre" | "brand" | "supply"`. Add `"series"` to the union. The dialog message: "This will remove X charts from the series. The charts themselves won't be deleted."
 
 ## Anti-Patterns to Avoid
 
-### Anti-Pattern 1: Fetching All Sessions Then Computing Everything Client-Side
+### Anti-Pattern 1: Storing computed progress
 
-**What:** Sending raw session rows to the client and computing aggregates in React state.
-**Why bad:** Ships potentially thousands of rows over the wire. Increases TTFB. Makes the client do DB work.
-**Instead:** Aggregate in the query layer (DB or server-side JS), send only computed results.
+**What:** Adding `memberCount`, `finishedCount`, or `completionPercent` columns to the Series model.
+**Why bad:** Violates "calculated fields at query time" convention. Would go stale on chart status changes or series membership changes.
+**Instead:** Compute at query time in server actions, same as designer's `chartCount`, `projectsStarted`, `projectsFinished`.
 
-### Anti-Pattern 2: One Giant Query With All Stats
+### Anti-Pattern 2: Junction table for Chart-Series relationship
 
-**What:** Single Prisma query that tries to fetch everything for all tabs.
-**Why bad:** Blocks on the slowest sub-query. Neon cold start affects the entire page load.
-**Instead:** Multiple focused queries in `Promise.all` -- fastest queries resolve first.
+**What:** Creating a `ChartSeries` junction table (many-to-many).
+**Why bad:** A chart belongs to exactly zero or one series. This is 1:many (Series has many Charts), not many-to-many. A junction table adds complexity for no benefit.
+**Instead:** Simple nullable FK `seriesId` on Chart, matching the `designerId` pattern.
 
-### Anti-Pattern 3: Storing Computed Stats in the Database
+### Anti-Pattern 3: Series as a Pattern Dive-only feature
 
-**What:** Adding columns like `totalStitchesThisMonth` to the User or Project model.
-**Why bad:** Violates the project constraint ("calculated fields at query time, never stored in DB"). Creates stale data bugs.
-**Instead:** Always compute at request time, cache at the HTTP layer with `unstable_cache`.
+**What:** Building series only as a Pattern Dive tab without a dedicated management page.
+**Why bad:** Users need to create/edit/delete series independently of browsing. DesignOS shows a dedicated Series management page. Designers and genres have management + detail pages.
+**Instead:** Full management page at `/series`, detail page at `/series/[id]`, plus Pattern Dive tab.
 
-### Anti-Pattern 4: Client-Side Recharts Without Loading States
+### Anti-Pattern 4: Using InlineNameDialog for series inline creation
 
-**What:** Using `ssr: false` dynamic import without a skeleton fallback.
-**Why bad:** Flash of empty space, then chart pops in. Feels broken.
-**Instead:** Always provide a `loading` prop with `<ChartSkeleton />` that matches the chart dimensions.
+**What:** Using the generic name-only dialog for series creation from the chart form.
+**Why bad:** Series has `totalCount` and `designerId` fields that are useful to set at creation time. Name-only means navigating away to add these.
+**Instead:** InlineSeriesDialog with name (required), total count (optional), designer (optional).
 
-### Anti-Pattern 5: Cache Without Invalidation
+### Anti-Pattern 5: Confusing open-ended vs fixed progress display
 
-**What:** Setting `revalidate: 3600` but never calling `revalidateTag` on mutations.
-**Why bad:** User logs a session, navigates to stats, sees stale numbers. Confusing.
-**Instead:** Always pair `unstable_cache` with `revalidateTag` in the relevant mutation actions.
+**What:** Displaying "3 of 7 finished" for open-ended series with 7 charts.
+**Why bad:** "7" implies a known total, but open-ended series may grow. Denominator is unstable.
+**Instead:** Open-ended: "3 of 7 charts finished". Fixed-count (totalCount=15): "3 of 15 finished". Progress bar denominator: `totalCount ?? memberCount`. Label wording clarifies the difference.
 
----
+## Build Order Recommendation
+
+The build order minimizes rework by following the dependency chain:
+
+### Phase A: Data Model + Server Actions (foundation)
+1. Prisma schema: Series model + Chart.seriesId FK + Designer.series relation
+2. Types: `src/types/series.ts`
+3. Validation: `seriesSchema` in `src/lib/validations/chart.ts`
+4. Server actions: `series-actions.ts` (CRUD + queries)
+5. Tests for server actions
+
+**Rationale:** Everything else depends on data model and actions. No UI can proceed without these.
+
+### Phase B: Series Management Page
+1. `/series` page + SeriesList component (card grid with sort/search)
+2. SeriesFormModal (create/edit dialog)
+3. `/series/[id]` detail page + SeriesDetail component
+4. DeleteConfirmationDialog integration (extend entityType union)
+5. Navigation: Add "Series" to Reference section in nav-items
+6. Tests for components
+
+**Rationale:** Management page is standalone -- no dependency on chart form or Pattern Dive. Users need to create series before assigning charts.
+
+### Phase C: Chart Form Integration
+1. Add `seriesId` to ChartFormValues and chartFormSchema
+2. Add series to page loaders (getCharts, chart create/edit pages)
+3. InlineSeriesDialog component
+4. Wire SearchableSelect + InlineSeriesDialog in chart-merged-form
+5. Draft persistence: validate seriesId in stale ID check
+6. Tests
+
+**Rationale:** Depends on Phase A and B. This is where users assign charts to series.
+
+### Phase D: Pattern Dive + Browse Integration
+1. SeriesTab component for Pattern Dive
+2. getSeriesWithProgress() query
+3. Add Series tab to PatternDiveTabs
+4. Wire into charts/page.tsx Promise.all
+5. Extend GalleryCardData with seriesName
+6. Extend gallery-utils filterAndSort with series filter
+7. Add series filter to use-gallery-filters + filter-bar
+8. Tests
+
+**Rationale:** Depends on Phases A-C (data model + charts have series assigned). Browse features are last because they need populated data.
+
+### Phase E: Polish + Stats (optional for v1.8)
+1. Designer detail: show series count
+2. Series name on project detail overview tab
+3. Series insights in stats dashboard (optional, could defer)
+4. Polish pass
+
+**Rationale:** Enhancement layer that refines existing pages.
 
 ## Scalability Considerations
 
-| Concern | Current (~500 projects, ~2K sessions) | At 5K sessions | At 50K sessions |
-|---------|---------------------------------------|----------------|-----------------|
-| Query latency | <500ms per aggregate (warm) | Same (indexed) | Consider materialized views |
-| Cold start | 300-800ms one-time | Same | Same |
-| Cache hit ratio | High (single user, few updates/day) | Same | Same |
-| Bundle size | +45kb (Recharts) | Same | Same |
-| Memory (in-memory aggregation) | Trivial (<1MB) | Trivial (<5MB) | May need DB-level aggregation |
+| Concern | At 30 series | At 100+ series |
+|---------|--------------|----------------|
+| Management page | Card grid scrolls fine | Add search bar (designer list has one) |
+| Pattern Dive tab | 30 cards renders fast | Consider "show top 10" or pagination |
+| Browse filter | 30 items in dropdown fine | MultiSelectDropdown already handles long lists |
+| Series detail | Max ~50 charts per series | Sortable list handles this well |
 
-**Key insight:** This is a single-user app. The dataset will grow linearly with time, not exponentially with users. At typical stitching frequency (1-3 sessions/day), expect ~1000 sessions/year. Even at 10 years, 10K sessions is trivially handled by Prisma aggregate + groupBy on indexed columns.
-
----
-
-## File Structure (Complete)
-
-```
-src/
-  app/(dashboard)/stats/
-    page.tsx                           <- Server Component orchestrator
-    loading.tsx                        <- Suspense fallback (already exists)
-  lib/
-    queries/stats/
-      index.ts                         <- Barrel exports
-      hero-stats.ts                    <- Lifetime counters
-      monthly-totals.ts                <- Bar chart aggregation
-      calendar-days.ts                 <- Calendar grid data
-      personal-bests.ts                <- Records computation
-      collection-breakdown.ts          <- Status/size/designer distributions
-      year-in-review.ts                <- Yearly summary
-      session-history.ts               <- Paginated session list
-      streak-calculator.ts             <- Streak algorithms
-    actions/
-      stats-actions.ts                 <- Server actions for client-invoked fetches
-  components/features/stats/
-    stats-page-client.tsx              <- Tab container ("use client")
-    hero-counters.tsx                  <- Big number cards (server-safe)
-    monthly-bar-chart.tsx              <- Recharts bar chart ("use client")
-    stitching-calendar.tsx             <- Calendar grid ("use client")
-    personal-bests-board.tsx           <- Record cards
-    collection-insights.tsx            <- Breakdown charts
-    session-history-table.tsx          <- Sortable session table ("use client")
-    year-in-review/
-      year-in-review.tsx               <- Year in Review container
-      year-selector.tsx                <- Year dropdown
-      monthly-pace.tsx                 <- Pace chart
-      project-timeline.tsx             <- Timeline visualization
-      top-projects.tsx                 <- Top N ranking
-    chart-skeleton.tsx                 <- Loading placeholder for dynamic charts
-  types/
-    stats.ts                           <- All stats-related type definitions
-```
-
----
-
-## Build Order (Dependency-Driven)
-
-```
-Phase 1: Data Layer (no UI dependencies)
-  1. src/types/stats.ts -- type definitions
-  2. src/lib/queries/stats/ -- all query functions with tests
-  3. src/lib/actions/stats-actions.ts -- server actions wrapping queries
-  4. Cache integration (unstable_cache + revalidateTag in session-actions)
-
-Phase 2: Core UI (depends on Phase 1 types)
-  5. stats/page.tsx -- Server Component orchestrating queries
-  6. stats-page-client.tsx -- Tab structure
-  7. hero-counters.tsx -- Simplest visual component
-  8. personal-bests-board.tsx -- Record cards
-
-Phase 3: Charts (depends on Phase 1 data, Phase 2 structure)
-  9. Install recharts (npm install recharts@3.8.1)
-  10. monthly-bar-chart.tsx -- Primary chart with drill-down
-  11. stitching-calendar.tsx -- CSS grid calendar
-  12. collection-insights.tsx -- Breakdown visualization
-
-Phase 4: Advanced Features (depends on Phase 2-3)
-  13. session-history-table.tsx -- Paginated table
-  14. year-in-review/ -- Complete year summary
-  15. "New record!" toast on session logging
-```
-
----
-
-## Integration Points with Existing Code
-
-| Existing Code | Integration | Change Required |
-|---------------|-------------|-----------------|
-| `session-actions.ts` createSession | Add `revalidateTag("stats")` | 1 line addition |
-| `session-actions.ts` updateSession | Add `revalidateTag("stats")` | 1 line addition |
-| `session-actions.ts` deleteSession | Add `revalidateTag("stats")` | 1 line addition |
-| `stats/page.tsx` (placeholder) | Replace with real Server Component | Full rewrite |
-| `stats/loading.tsx` | Keep existing loading skeleton | No change needed |
-| `src/types/dashboard.ts` | Reference pattern for new `stats.ts` | No change |
-| `src/lib/db.ts` (Prisma singleton) | Used by query layer | No change |
-| `src/lib/auth-guard.ts` | Used in page.tsx and server actions | No change |
-| Navigation (MainNav) | Already has /stats link | No change |
-
----
+No scalability concerns at the user's scale (30+ series, 500+ charts). All patterns are proven at this scale.
 
 ## Sources
 
-- Existing codebase: `src/lib/actions/dashboard-actions.ts`, `project-dashboard-actions.ts`
-- [Next.js unstable_cache docs](https://nextjs.org/docs/app/api-reference/functions/unstable_cache)
-- [Next.js cacheTag docs](https://nextjs.org/docs/app/api-reference/functions/cacheTag)
-- [Next.js "use cache" directive docs](https://nextjs.org/docs/app/api-reference/directives/use-cache)
-- [Neon latency benchmarks](https://neon.com/docs/guides/benchmarking-latency)
-- [Recharts GitHub releases](https://github.com/recharts/recharts/releases)
-- [Prisma aggregation docs](https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-summarizing)
-- Design reference: `product-plan/sections/stitching-sessions-and-statistics/`
+- Codebase analysis: `prisma/schema.prisma`, Designer/Genre entity patterns, Pattern Dive tab architecture, gallery filter system
+- DesignOS: `product-plan/sections/fabric-series-and-reference-data/` (SeriesList.tsx, SeriesDetail.tsx, types.ts, series.png)
+- Established conventions: `CLAUDE.md`, `.claude/rules/`
+- Domain requirements: `CROSS_STITCH_TRACKER_PLAN.md` section 4.1 (Series Support)
+- Project context: `.planning/PROJECT.md` (v1.8 milestone definition)
