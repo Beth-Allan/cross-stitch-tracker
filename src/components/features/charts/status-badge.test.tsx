@@ -21,24 +21,23 @@ describe("StatusBadge", () => {
     expect(dot).toBeInTheDocument();
   });
 
-  it("renders UNSTARTED with slate background instead of bg-muted", () => {
+  it("renders UNSTARTED with status CSS variable classes", () => {
     const { container } = render(<StatusBadge status="UNSTARTED" />);
     const badge = container.firstChild as HTMLElement;
-    expect(badge.className).toContain("bg-slate-50");
+    expect(badge.className).toContain("bg-[var(--status-unstarted-bg)]");
     expect(badge.className).not.toContain("bg-muted");
   });
 
-  it("renders UNSTARTED with slate text classes", () => {
+  it("renders UNSTARTED with status text CSS variable", () => {
     const { container } = render(<StatusBadge status="UNSTARTED" />);
     const badge = container.firstChild as HTMLElement;
-    expect(badge.className).toContain("text-slate-700");
-    expect(badge.className).toContain("dark:bg-slate-900/40");
+    expect(badge.className).toContain("text-[var(--status-unstarted-text)]");
   });
 
-  it("renders KITTING with amber background (no regression)", () => {
+  it("renders KITTING with status CSS variable classes (no regression)", () => {
     const { container } = render(<StatusBadge status="KITTING" />);
     const badge = container.firstChild as HTMLElement;
-    expect(badge.className).toContain("bg-amber-50");
-    expect(badge.className).toContain("text-amber-700");
+    expect(badge.className).toContain("bg-[var(--status-kitting-bg)]");
+    expect(badge.className).toContain("text-[var(--status-kitting-text)]");
   });
 });
