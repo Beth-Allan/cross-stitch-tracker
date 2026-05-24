@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateSizeCategory, getEffectiveStitchCount } from "./size-category";
+import { calculateSizeCategory, getEffectiveStitchCount, SIZE_COLORS } from "./size-category";
 
 describe("calculateSizeCategory", () => {
   it("returns Mini for 0 stitches", () => expect(calculateSizeCategory(0)).toBe("Mini"));
@@ -38,5 +38,32 @@ describe("getEffectiveStitchCount", () => {
       count: 0,
       approximate: false,
     });
+  });
+});
+
+describe("SIZE_COLORS", () => {
+  it("uses -50 shade background for Mini", () => {
+    expect(SIZE_COLORS.Mini.bg).toContain("bg-blue-50");
+    expect(SIZE_COLORS.Mini.bg).not.toContain("bg-blue-100");
+  });
+
+  it("uses -50 shade background for Small", () => {
+    expect(SIZE_COLORS.Small.bg).toContain("bg-green-50");
+    expect(SIZE_COLORS.Small.bg).not.toContain("bg-green-100");
+  });
+
+  it("uses -50 shade background for Medium", () => {
+    expect(SIZE_COLORS.Medium.bg).toContain("bg-amber-50");
+    expect(SIZE_COLORS.Medium.bg).not.toContain("bg-amber-100");
+  });
+
+  it("uses -50 shade background for Large", () => {
+    expect(SIZE_COLORS.Large.bg).toContain("bg-orange-50");
+    expect(SIZE_COLORS.Large.bg).not.toContain("bg-orange-100");
+  });
+
+  it("uses -50 shade background for BAP", () => {
+    expect(SIZE_COLORS.BAP.bg).toContain("bg-red-50");
+    expect(SIZE_COLORS.BAP.bg).not.toContain("bg-red-100");
   });
 });

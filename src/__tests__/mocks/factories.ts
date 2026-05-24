@@ -399,6 +399,7 @@ export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): Gal
     specialtyItemCount: 0,
     finishDate: null,
     ffoDate: null,
+    hasDigitalCopy: false,
     dateAdded: new Date("2026-01-15"),
     ...overrides,
   };
