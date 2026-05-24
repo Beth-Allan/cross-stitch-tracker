@@ -28,7 +28,7 @@ export async function createSeries(formData: unknown) {
     ) {
       return { success: false as const, error: "A series with that name already exists" };
     }
-    console.error("createSeries error:", error);
+    console.error("createSeries error:", error instanceof Error ? error.message : String(error));
     return { success: false as const, error: "Failed to create series" };
   }
 }
@@ -57,7 +57,7 @@ export async function updateSeries(id: string, formData: unknown) {
     ) {
       return { success: false as const, error: "A series with that name already exists" };
     }
-    console.error("updateSeries error:", error);
+    console.error("updateSeries error:", error instanceof Error ? error.message : String(error));
     return { success: false as const, error: "Failed to update series" };
   }
 }
@@ -83,7 +83,7 @@ export async function deleteSeries(id: string) {
     revalidatePath("/charts");
     return { success: true as const };
   } catch (error) {
-    console.error("deleteSeries error:", error);
+    console.error("deleteSeries error:", error instanceof Error ? error.message : String(error));
     return { success: false as const, error: "Failed to delete series" };
   }
 }
