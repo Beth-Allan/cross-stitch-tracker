@@ -170,9 +170,15 @@ Plans:
   2. Gallery cards show a visual indicator when a chart has an uploaded digital working copy
   3. User can sort supplies by "Added" order and alphabetically (A-Z) on the project detail Supplies tab
   4. Project supplies card includes skein calculation adjustment controls (fabric count, over 1/2, waste percentage)
-  5. User can upload files up to 15MB, including .zip files as digital working copies
+  5. User can upload files up to 50MB, including .zip files as digital working copies
 
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+
+- [ ] 29-01-PLAN.md -- Gallery card visual polish: status/size badge colors and digital copy indicator
+- [ ] 29-02-PLAN.md -- Supply tab: CalculatorCard integration and sort fix
+- [ ] 29-03-PLAN.md -- File upload: 50MB limit and zip support
+
 **UI hint**: yes
 
 ### Phase 30: Code Quality
@@ -226,5 +232,5 @@ Phases execute in numeric order: 27 → 28 → 29 → 30
 | 26. UX Polish | v1.6 | 3/3 | Complete | 2026-05-20 |
 | 27. Chart Form Fixes | v1.7 | 2/2 | Complete    | 2026-05-23 |
 | 28. Stats Corrections | v1.7 | 3/3 | Complete    | 2026-05-24 |
-| 29. UI Polish | v1.7 | 0/0 | Not started | - |
+| 29. UI Polish | v1.7 | 0/3 | Not started | - |
 | 30. Code Quality | v1.7 | 0/0 | Not started | - |
