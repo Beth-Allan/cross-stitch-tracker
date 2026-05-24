@@ -123,9 +123,21 @@
   - Code review: 1 critical + 4 warnings fixed (mock type errors, sort mutation, dead scope param, error sanitization, semantic token)
   - Additional fixes: Prisma `projects` → `project` relation name, stale cache guard, thread insights show stitch count, color name removed from display
 
+### Done This Session (2026-05-24 cont.)
+
+- **Phase 28 shipped** — PR created via `/gsd-ship`
+
+- **Phase 29 executed & verified** — 3/3 plans complete, 2269 tests passing, all 5 requirements verified
+  - Plan 01: Colored status badges (UNSTARTED = slate), SIZE_COLORS lightened to -50, digital copy indicator (FileText + "Digital copy")
+  - Plan 02: CalculatorCard wired into project detail Supplies tab with optimistic persistence, fabric options threaded from page
+  - Plan 03: MAX_FILE_SIZE 10MB → 50MB, zip MIME types added to client + server validation, error messages updated
+  - Code review: 1 critical + 2 warnings fixed (CR-01 calcParams isPending bug, WR-01 getUnassignedFabrics catch, WR-02 FabricOption dedup)
+  - BUG-03 sort investigation confirmed working correctly (no bug)
+  - 3 human verification items blocked (R2 not configured on dev)
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-ship` — Create PR for Phase 28, run multi-agent review
+1. `/gsd-ship` — Create PR for Phase 29, run multi-agent review
 
 ### Backlog
 
