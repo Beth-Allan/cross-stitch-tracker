@@ -228,7 +228,7 @@ export async function updateChart(chartId: string, formData: unknown) {
   const user = await requireAuth();
 
   try {
-    // Verify ownership and fetch current cover image + project id for change detection
+    // Verify ownership and fetch current cover data for change detection and R2 cleanup
     const existing = await prisma.chart.findUnique({
       where: { id: chartId },
       select: {
@@ -329,19 +329,19 @@ export async function updateChart(chartId: string, formData: unknown) {
     if (chart.coverImageUrl && chart.coverImageUrl !== existing.coverImageUrl) {
       try {
         await generateThumbnail(chartId, chart.coverImageUrl);
-        if (existing.coverImageUrl) {
-          await deleteFile(existing.coverImageUrl).catch((err) =>
-            console.warn("[R2] old cover cleanup failed:", existing.coverImageUrl, err),
-          );
-        }
-        if (existing.coverThumbnailUrl) {
-          await deleteFile(existing.coverThumbnailUrl).catch((err) =>
-            console.warn("[R2] old thumbnail cleanup failed:", existing.coverThumbnailUrl, err),
-          );
-        }
       } catch (err) {
         console.error("Thumbnail generation failed (chart saved without thumbnail):", err);
         thumbnailWarning = "Thumbnail could not be generated";
+      }
+      if (existing.coverImageUrl) {
+        await deleteFile(existing.coverImageUrl).catch((err) =>
+          console.warn("[R2] old cover cleanup failed:", existing.coverImageUrl, err),
+        );
+      }
+      if (existing.coverThumbnailUrl) {
+        await deleteFile(existing.coverThumbnailUrl).catch((err) =>
+          console.warn("[R2] old thumbnail cleanup failed:", existing.coverThumbnailUrl, err),
+        );
       }
     }
 
