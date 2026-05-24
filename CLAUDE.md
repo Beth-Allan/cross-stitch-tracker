@@ -3,7 +3,7 @@
 ## Current Status
 
 **Milestone:** v1.7 Fix & Polish — IN PROGRESS
-**Last Updated:** 2026-05-21
+**Last Updated:** 2026-05-23
 **Roadmap:** 8 milestones / 30 phases — v1.0-v1.6 shipped
 
 ### Done
@@ -111,9 +111,21 @@
   - StatusFilterPills spec, insight relocation, chart axis fixes, hero stat, Collection Total rename, RankedList removal, days-in-library fix
   - All 14 CONTEXT.md decisions (D-01 through D-14) captured — zero user questions needed
 
+- **Phase 28 planned** — 3 plans in 2 waves: data layer + chart fixes (Wave 1 parallel), component restructuring (Wave 2)
+  - Plan 01 (W1): status-groups utility, insight query rewrites (session-gated → library-wide + status filter), collection total in hero stats
+  - Plan 02 (W2): StatusFilterPills, insights moved to Overview, Records simplified with session hero stat, COLLECTION TOTAL label
+  - Plan 03 (W1): allowDecimals={false} on 3 charts, formatAge number duplication fix
+
+- **Phase 28 executed & verified** — 3/3 plans complete, 2242 tests passing, all 5 requirements verified
+  - Plan 01 (W1): status-groups utility, 3 insight queries rewritten session-gated → library-wide, collectionTotalStitches in hero stats
+  - Plan 02 (W2): StatusFilterPills with shallow:false for server re-render, insights on Overview, Records simplified, STITCHES IN COLLECTION label
+  - Plan 03 (W1): allowDecimals={false} on 3 charts, formatAge/formatAgeNumber split fixes number duplication
+  - Code review: 1 critical + 4 warnings fixed (mock type errors, sort mutation, dead scope param, error sanitization, semantic token)
+  - Additional fixes: Prisma `projects` → `project` relation name, stale cache guard, thread insights show stitch count, color name removed from display
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-plan-phase 28` — Plan Stats Corrections phase
+1. `/gsd-ship` — Create PR for Phase 28, run multi-agent review
 
 ### Backlog
 
