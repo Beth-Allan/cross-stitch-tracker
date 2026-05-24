@@ -14,7 +14,9 @@ vi.mock("recharts", () => ({
     </div>
   ),
   XAxis: ({ dataKey }: { dataKey?: string }) => <div data-testid="x-axis" data-key={dataKey} />,
-  YAxis: () => <div data-testid="y-axis" />,
+  YAxis: ({ allowDecimals }: { allowDecimals?: boolean }) => (
+    <div data-testid="y-axis" data-allow-decimals={allowDecimals === false ? "false" : "true"} />
+  ),
   Cell: ({ fill }: { fill: string }) => <div data-testid="cell" data-fill={fill} />,
   ResponsiveContainer: ({ children }: { children: ReactNode }) => (
     <div data-testid="responsive-container">{children}</div>
@@ -87,6 +89,13 @@ describe("SizeCategoryChart", () => {
 
     expect(screen.getByText("No projects yet")).toBeInTheDocument();
     expect(screen.queryByTestId("chart-container")).not.toBeInTheDocument();
+  });
+
+  it("disallows decimal tick values on the numeric Y-axis", () => {
+    render(<SizeCategoryChart data={mockSizeData} />);
+
+    const yAxis = screen.getByTestId("y-axis");
+    expect(yAxis).toHaveAttribute("data-allow-decimals", "false");
   });
 
   it("renders cells with correct fill colors from data items", () => {
