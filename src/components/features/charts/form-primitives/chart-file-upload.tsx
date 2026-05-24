@@ -118,7 +118,8 @@ export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: Chart
           mimeType: file.type || "application/octet-stream",
           fileSize: file.size,
         } satisfies UploadedFile;
-      } catch {
+      } catch (error) {
+        console.error(`File upload failed for ${file.name}:`, error);
         setInProgress((prev) =>
           prev.map((f) =>
             f.id === localId

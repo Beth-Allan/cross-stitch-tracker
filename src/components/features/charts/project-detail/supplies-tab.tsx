@@ -99,7 +99,7 @@ export function SuppliesTab({ project, supplies, fabricOptions, chartId }: Suppl
     [project.id, stableRefresh],
   );
 
-  // CalculatorCard local state for calc params (optimistic updates)
+  // Server-authoritative calc params (source of truth for rollback)
   const serverCalcParams: CalcParams = useMemo(
     () => ({
       fabricCount: project.fabric?.count ?? 14,
@@ -110,10 +110,9 @@ export function SuppliesTab({ project, supplies, fabricOptions, chartId }: Suppl
     [project.fabric?.count, project.strandCount, project.overCount, project.wastePercent],
   );
 
-  const [localCalcParams, setLocalCalcParams] = useState<CalcParams>(serverCalcParams);
+  const [calcParams, setCalcParams] = useState<CalcParams>(serverCalcParams);
   const [localFabricId, setLocalFabricId] = useState<string | null>(project.fabric?.id ?? null);
 
-  // Keep ref to latest server params for rollback
   const serverParamsRef = useRef(serverCalcParams);
   useEffect(() => {
     serverParamsRef.current = serverCalcParams;
@@ -122,18 +121,16 @@ export function SuppliesTab({ project, supplies, fabricOptions, chartId }: Suppl
   // Sync local state from server when server data changes (after successful save)
   useEffect(() => {
     if (!isPending) {
-      setLocalCalcParams(serverCalcParams);
+      setCalcParams(serverCalcParams);
     }
   }, [serverCalcParams, isPending]);
-
-  const calcParams = localCalcParams;
 
   const handleCalcParamsChange = useCallback(
     (newParams: CalcParams) => {
       if (!chartId) return;
-      setLocalCalcParams(newParams);
+      setCalcParams(newParams);
 
-      // Only persist fields that exist as Project columns
+      // Only persist fields that actually changed
       const persistFields: Record<string, number> = {};
       if (newParams.strandCount !== serverParamsRef.current.strandCount) {
         persistFields.strandCount = newParams.strandCount;
@@ -150,15 +147,12 @@ export function SuppliesTab({ project, supplies, fabricOptions, chartId }: Suppl
       startTransition(async () => {
         try {
           const result = await updateProjectSettings(chartId, persistFields);
-          if (!result.success) {
-            setLocalCalcParams(serverParamsRef.current);
-            toast.error("Couldn't save settings. Please try again.");
-          }
+          if (result.success) return;
         } catch (error) {
           console.error("SuppliesTab calc param save failed:", error);
-          setLocalCalcParams(serverParamsRef.current);
-          toast.error("Couldn't save settings. Please try again.");
         }
+        setCalcParams(serverParamsRef.current);
+        toast.error("Couldn't save settings. Please try again.");
       });
     },
     [chartId],
@@ -167,7 +161,7 @@ export function SuppliesTab({ project, supplies, fabricOptions, chartId }: Suppl
   const handleFabricChange = useCallback((fabricId: string | null, fabricCount?: number) => {
     setLocalFabricId(fabricId);
     if (fabricCount != null) {
-      setLocalCalcParams((prev) => ({ ...prev, fabricCount }));
+      setCalcParams((prev) => ({ ...prev, fabricCount }));
     }
   }, []);
 
