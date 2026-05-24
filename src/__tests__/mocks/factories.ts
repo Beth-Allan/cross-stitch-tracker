@@ -151,6 +151,7 @@ export function createMockChart(overrides?: Partial<Chart>): Chart {
     kitColorCount: null,
     dateAdded: new Date(),
     notes: null,
+    seriesId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
