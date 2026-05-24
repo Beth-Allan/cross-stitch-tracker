@@ -163,7 +163,8 @@ export function LogSessionModal({
 
       setPhotoKey(result.key);
       setPhotoPreview(URL.createObjectURL(file));
-    } catch {
+    } catch (error) {
+      console.error("Photo upload failed:", error);
       toast.error("Photo upload failed. You can try again or save without a photo.");
     } finally {
       setIsUploading(false);
@@ -231,7 +232,8 @@ export function LogSessionModal({
             "Session could not be saved. Check that stitch count is a positive number and a project is selected.",
           );
         }
-      } catch {
+      } catch (error) {
+        console.error("Session save failed:", error);
         toast.error("Session could not be saved. Check your connection and try again.");
       }
     });
@@ -251,7 +253,8 @@ export function LogSessionModal({
           return;
         }
         toast.error("Session could not be deleted. Check your connection and try again.");
-      } catch {
+      } catch (error) {
+        console.error("Session delete failed:", error);
         toast.error("Session could not be deleted. Check your connection and try again.");
       }
     });
