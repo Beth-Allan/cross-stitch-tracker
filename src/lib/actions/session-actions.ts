@@ -202,6 +202,11 @@ export async function updateSession(sessionId: string, formData: unknown) {
           await deleteFile(session.photoKey).catch((err) =>
             console.warn("[R2] raw file cleanup failed:", session.photoKey, err),
           );
+          if (existing.photoKey) {
+            await deleteFile(existing.photoKey).catch((err) =>
+              console.warn("[R2] old photo cleanup failed:", existing.photoKey, err),
+            );
+          }
         }
       } catch (err) {
         console.warn("Session photo optimization failed:", err);

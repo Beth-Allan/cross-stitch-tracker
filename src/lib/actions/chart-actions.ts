@@ -5,7 +5,7 @@ import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
-import { generateThumbnail } from "@/lib/actions/upload-actions";
+import { deleteFile, generateThumbnail } from "@/lib/actions/upload-actions";
 import { chartFormSchema, batchSupplySchema } from "@/lib/validations/chart";
 import type { ChartFormInput } from "@/lib/validations/chart";
 import { updateProjectSettingsSchema } from "@/lib/validations/supply";
@@ -231,7 +231,11 @@ export async function updateChart(chartId: string, formData: unknown) {
     // Verify ownership and fetch current cover image + project id for change detection
     const existing = await prisma.chart.findUnique({
       where: { id: chartId },
-      select: { coverImageUrl: true, project: { select: { id: true, userId: true } } },
+      select: {
+        coverImageUrl: true,
+        coverThumbnailUrl: true,
+        project: { select: { id: true, userId: true } },
+      },
     });
     if (!existing?.project || existing.project.userId !== user.id) {
       return { success: false as const, error: "Chart not found" };
@@ -325,6 +329,16 @@ export async function updateChart(chartId: string, formData: unknown) {
     if (chart.coverImageUrl && chart.coverImageUrl !== existing.coverImageUrl) {
       try {
         await generateThumbnail(chartId, chart.coverImageUrl);
+        if (existing.coverImageUrl) {
+          await deleteFile(existing.coverImageUrl).catch((err) =>
+            console.warn("[R2] old cover cleanup failed:", existing.coverImageUrl, err),
+          );
+        }
+        if (existing.coverThumbnailUrl) {
+          await deleteFile(existing.coverThumbnailUrl).catch((err) =>
+            console.warn("[R2] old thumbnail cleanup failed:", existing.coverThumbnailUrl, err),
+          );
+        }
       } catch (err) {
         console.error("Thumbnail generation failed (chart saved without thumbnail):", err);
         thumbnailWarning = "Thumbnail could not be generated";
