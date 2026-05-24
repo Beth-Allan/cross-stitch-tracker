@@ -281,7 +281,7 @@
   --status-in-progress-text: oklch(0.828 0.111 230.318); /* sky-300 */
 
   --status-on-hold-bg: oklch(0.266 0.079 36.259 / 0.4); /* orange-950/40 */
-  --status-on-hold-dot: oklch(0.837 0.128 66.29); /* orange-300 */
+  --status-on-hold-dot: oklch(0.75 0.183 55.934); /* orange-400 */
   --status-on-hold-text: oklch(0.837 0.128 66.29); /* orange-300 */
 
   --status-finished-bg: oklch(0.283 0.141 291.089 / 0.4); /* violet-950/40 */
