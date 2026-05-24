@@ -108,7 +108,7 @@ Full details: `milestones/v1.6-ROADMAP.md`
 
 - [x] **Phase 27: Chart Form Fixes** - Fix designer quick-add, tab focus, thumbnails, stitch count calculation, and skeins display (completed 2026-05-21)
 - [x] **Phase 28: Stats Corrections** - Fix records tab population, chart axis values, inline entity names, total stitches stat, and days-in-library formatting (completed 2026-05-24)
-- [ ] **Phase 29: UI Polish** - Colored status/size pills, digital copy indicator, supply sort fix, skein calc controls on project supplies, file upload improvements
+- [x] **Phase 29: UI Polish** - Colored status/size pills, digital copy indicator, supply sort fix, skein calc controls on project supplies, file upload improvements (completed 2026-05-24)
 - [ ] **Phase 30: Code Quality** - Resolve TypeScript test errors, fix silent failures, clean up R2 photo orphans, centralize status colors, extract shared constants and hooks
 
 ## Phase Details
@@ -174,9 +174,9 @@ Plans:
 
 **Plans**: 3 plansPlans:
 
-- [ ] 29-01-PLAN.md -- Gallery card visual polish: status/size badge colors and digital copy indicator
-- [ ] 29-02-PLAN.md -- Supply tab: CalculatorCard integration and sort fix
-- [ ] 29-03-PLAN.md -- File upload: 50MB limit and zip support
+- [x] 29-01-PLAN.md -- Gallery card visual polish: status/size badge colors and digital copy indicator
+- [x] 29-02-PLAN.md -- Supply tab: CalculatorCard integration and sort fix
+- [x] 29-03-PLAN.md -- File upload: 50MB limit and zip support
 
 **UI hint**: yes
 
@@ -231,5 +231,5 @@ Phases execute in numeric order: 27 → 28 → 29 → 30
 | 26. UX Polish | v1.6 | 3/3 | Complete | 2026-05-20 |
 | 27. Chart Form Fixes | v1.7 | 2/2 | Complete    | 2026-05-23 |
 | 28. Stats Corrections | v1.7 | 3/3 | Complete    | 2026-05-24 |
-| 29. UI Polish | v1.7 | 0/3 | Not started | - |
+| 29. UI Polish | v1.7 | 3/3 | Complete   | 2026-05-24 |
 | 30. Code Quality | v1.7 | 0/0 | Not started | - |
