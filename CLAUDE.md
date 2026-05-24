@@ -160,9 +160,18 @@
   - Code review: 1 warning fixed (WR-01 dark mode on-hold-dot copy-paste), 1 advisory (WR-02 D-04 design decision)
   - Post-merge fix: 5 test assertions updated for CSS variable migration (status-badge, status-group, hero-status-badge)
 
+### Done This Session (2026-05-24 cont.)
+
+- **Branch created** — `feature/phase-31` off main
+- **Phase 31 discussed** — context gathered, 13 decisions locked (D-01 through D-13)
+  - Dual progress: FINISHED + FFO = finished, all assigned charts = owned, open-ended shows "8 charts, 3 finished"
+  - Series-designer: nullable FK to Designer, no enforcement, always manual
+  - Name constraints: @unique (like Designer), optional notes field
+  - FIX-01 + FIX-02: already resolved, verify and close only
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-ship` — Create PR for Phase 30 and run multi-agent review
+1. `/gsd-plan-phase 31` — Create detailed plan for Phase 31
 
 ### Backlog
 
