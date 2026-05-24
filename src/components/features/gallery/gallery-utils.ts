@@ -126,6 +126,7 @@ export function transformToGalleryCard(
     specialtyItemCount: chart.project?.projectSpecialty.length ?? 0,
     finishDate: chart.project?.finishDate ?? null,
     ffoDate: chart.project?.ffoDate ?? null,
+    hasDigitalCopy: (chart._count?.files ?? 0) > 0,
     dateAdded: chart.dateAdded,
   };
 }

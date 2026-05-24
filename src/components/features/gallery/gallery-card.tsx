@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
+import { FileText, Sparkles } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { CoverPlaceholder } from "./cover-placeholder";
 import { KittingDots } from "./kitting-dots";
 import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import { getCelebrationClasses } from "./gallery-utils";
+import { SIZE_COLORS } from "@/lib/utils/size-category";
 import { SIZE_TOOLTIP_TEXT } from "./gallery-format";
 import { formatNumber, formatDate } from "./gallery-format";
 import type { GalleryCardData } from "./gallery-types";
@@ -199,7 +200,7 @@ export function GalleryCard({ card }: GalleryCardProps) {
             <Tooltip>
               <TooltipTrigger
                 render={<span />}
-                className="bg-background/90 text-muted-foreground cursor-default rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-widest uppercase"
+                className={`${SIZE_COLORS[card.sizeCategory].bg} ${SIZE_COLORS[card.sizeCategory].text} cursor-default rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-widest uppercase`}
               >
                 {card.sizeCategory}
               </TooltipTrigger>
@@ -228,6 +229,13 @@ export function GalleryCard({ card }: GalleryCardProps) {
             {formatNumber(card.stitchCount)} stitches
             {card.stitchCountApproximate ? " (approx.)" : ""}
           </p>
+        )}
+
+        {card.hasDigitalCopy && (
+          <div className="flex items-center gap-1">
+            <FileText className="text-primary size-3.5" aria-hidden="true" />
+            <span className="text-muted-foreground text-xs">Digital copy</span>
+          </div>
         )}
 
         {/* Genre tags */}

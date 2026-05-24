@@ -486,6 +486,7 @@ export async function getChartsForGallery() {
       },
       designer: true,
       genres: true,
+      _count: { select: { files: true } },
     },
     orderBy: { dateAdded: "desc" },
   });

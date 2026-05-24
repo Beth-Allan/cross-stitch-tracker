@@ -53,4 +53,5 @@ export type GalleryChartData = Chart & {
   project: GalleryProjectData | null;
   designer: Designer | null;
   genres: Genre[];
+  _count?: { files: number };
 };

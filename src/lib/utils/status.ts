@@ -14,10 +14,10 @@ export const STATUS_CONFIG: Record<
   UNSTARTED: {
     label: "Unstarted",
     cssVar: "--status-unstarted",
-    bgClass: "bg-muted",
-    textClass: "text-muted-foreground",
-    dotClass: "bg-muted-foreground/60",
-    darkBgClass: "",
+    bgClass: "bg-slate-50",
+    textClass: "text-slate-700 dark:text-slate-300",
+    dotClass: "bg-slate-500",
+    darkBgClass: "dark:bg-slate-900/40",
   },
   KITTING: {
     label: "Kitting",
