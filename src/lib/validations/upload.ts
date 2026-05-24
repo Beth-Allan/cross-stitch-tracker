@@ -9,6 +9,8 @@ export const ALLOWED_FILE_TYPES = [
   "application/pdf",
   "application/octet-stream", // .saga, .oxs, .xsd (cross-stitch software formats)
   "text/css", // .css CrossStitch pattern files report as text/css in browsers
+  "application/zip",
+  "application/x-zip-compressed",
 ] as const;
 
 export const ALLOWED_CHART_FILE_TYPES = [
@@ -18,6 +20,8 @@ export const ALLOWED_CHART_FILE_TYPES = [
   "application/pdf",
   "application/octet-stream", // .pat, .xsd, .saga (binary pattern formats)
   "text/css", // .css CrossStitch files report as text/css in browsers
+  "application/zip",
+  "application/x-zip-compressed",
 ] as const;
 
 export const ALLOWED_CHART_FILE_EXTENSIONS = [
@@ -30,9 +34,10 @@ export const ALLOWED_CHART_FILE_EXTENSIONS = [
   ".xsd",
   ".css",
   ".saga",
+  ".zip",
 ] as const;
 
-export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 // Image optimization settings
 export const OPTIMIZED_MAX_WIDTH = 1200;
@@ -47,7 +52,7 @@ export const uploadRequestSchema = z.object({
     .number()
     .int()
     .positive()
-    .max(MAX_FILE_SIZE, "File is too large. Maximum size is 10MB."),
+    .max(MAX_FILE_SIZE, "File is too large. Maximum size is 50MB."),
   category: z.enum(["covers", "files", "sessions"]),
   projectId: z.string().trim().min(1),
 });

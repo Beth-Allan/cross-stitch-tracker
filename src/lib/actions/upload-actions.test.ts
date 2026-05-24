@@ -1,5 +1,13 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { createMockPrisma, assertSuccess, assertFailure } from "@/__tests__/mocks";
+import {
+  MAX_FILE_SIZE,
+  ALLOWED_FILE_TYPES,
+  ALLOWED_CHART_FILE_TYPES,
+  ALLOWED_CHART_FILE_EXTENSIONS,
+  ALLOWED_IMAGE_TYPES,
+  uploadRequestSchema,
+} from "@/lib/validations/upload";
 
 // Mock auth to return authenticated session
 vi.mock("@/lib/auth", () => ({
@@ -503,5 +511,111 @@ describe("upload-actions failure modes", () => {
       expect(result).toEqual({});
       consoleSpy.mockRestore();
     });
+  });
+});
+
+describe("upload validation constants", () => {
+  it("MAX_FILE_SIZE is 50MB", () => {
+    expect(MAX_FILE_SIZE).toBe(50 * 1024 * 1024);
+  });
+
+  it("accepts 50MB file in uploadRequestSchema", () => {
+    const result = uploadRequestSchema.safeParse({
+      fileName: "large-pattern.pdf",
+      contentType: "application/pdf",
+      fileSize: 50 * 1024 * 1024,
+      category: "files",
+      projectId: "p1",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects file over 50MB", () => {
+    const result = uploadRequestSchema.safeParse({
+      fileName: "huge-file.pdf",
+      contentType: "application/pdf",
+      fileSize: 50 * 1024 * 1024 + 1,
+      category: "files",
+      projectId: "p1",
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.errors[0].message).toContain("50MB");
+    }
+  });
+
+  it("ALLOWED_FILE_TYPES includes zip MIME types", () => {
+    expect(ALLOWED_FILE_TYPES).toContain("application/zip");
+    expect(ALLOWED_FILE_TYPES).toContain("application/x-zip-compressed");
+  });
+
+  it("ALLOWED_CHART_FILE_TYPES includes zip MIME types", () => {
+    expect(ALLOWED_CHART_FILE_TYPES).toContain("application/zip");
+    expect(ALLOWED_CHART_FILE_TYPES).toContain("application/x-zip-compressed");
+  });
+
+  it("ALLOWED_CHART_FILE_EXTENSIONS includes .zip", () => {
+    expect(ALLOWED_CHART_FILE_EXTENSIONS).toContain(".zip");
+  });
+
+  it("ALLOWED_IMAGE_TYPES does NOT include zip", () => {
+    expect(ALLOWED_IMAGE_TYPES).not.toContain("application/zip");
+    expect(ALLOWED_IMAGE_TYPES).not.toContain("application/x-zip-compressed");
+  });
+});
+
+describe("upload action zip type enforcement", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSend.mockReset();
+    mockGetR2Client.mockReturnValue({ send: mockSend });
+    mockSend.mockResolvedValue({});
+  });
+
+  it("accepts zip content type for files category", async () => {
+    const { getPresignedUploadUrl } = await import("./upload-actions");
+
+    const result = await getPresignedUploadUrl({
+      fileName: "patterns.zip",
+      contentType: "application/zip",
+      fileSize: 1024,
+      category: "files",
+      projectId: "p1",
+    });
+
+    assertSuccess(result);
+    expect(result.url).toBeDefined();
+  });
+
+  it("rejects zip content type for covers category", async () => {
+    const { getPresignedUploadUrl } = await import("./upload-actions");
+
+    const result = await getPresignedUploadUrl({
+      fileName: "patterns.zip",
+      contentType: "application/zip",
+      fileSize: 1024,
+      category: "covers",
+      projectId: "p1",
+    });
+
+    assertFailure(result);
+    expect(result.error).toContain("Invalid image type");
+  });
+
+  it("rejects zip content type for sessions category", async () => {
+    const { getPresignedUploadUrl } = await import("./upload-actions");
+
+    const result = await getPresignedUploadUrl({
+      fileName: "patterns.zip",
+      contentType: "application/zip",
+      fileSize: 1024,
+      category: "sessions",
+      projectId: "p1",
+    });
+
+    assertFailure(result);
+    expect(result.error).toContain("Invalid image type");
   });
 });

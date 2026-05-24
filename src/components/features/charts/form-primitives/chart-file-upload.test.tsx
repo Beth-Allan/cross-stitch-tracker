@@ -92,26 +92,28 @@ describe("ChartFileUpload", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("Unsupported file type. Accepted: PDF, images, .pat, .xsd, .css, .saga"),
+        screen.getByText(
+          "Unsupported file type. Accepted: PDF, images, .pat, .xsd, .css, .saga, .zip",
+        ),
       ).toBeInTheDocument();
     });
 
     expect(onFilesChange).not.toHaveBeenCalled();
   });
 
-  it("shows error message for file exceeding 10MB", async () => {
+  it("shows error message for file exceeding 50MB", async () => {
     const onFilesChange = vi.fn();
 
     render(<ChartFileUpload uploadedFiles={[]} onFilesChange={onFilesChange} />);
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(["content"], "huge.pdf", { type: "application/pdf" });
-    Object.defineProperty(file, "size", { value: 11 * 1024 * 1024 });
+    Object.defineProperty(file, "size", { value: 51 * 1024 * 1024 });
 
     fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(screen.getByText("File exceeds 10MB limit.")).toBeInTheDocument();
+      expect(screen.getByText("File exceeds 50MB limit.")).toBeInTheDocument();
     });
 
     expect(onFilesChange).not.toHaveBeenCalled();
