@@ -193,7 +193,12 @@ Plans:
   4. Status colors defined as CSS custom properties and consumed from a single source (not scattered Tailwind color scales)
   5. DEFAULT_SUPPLY_HEX extracted to a shared constant, and useRejectionFlash extracted to a shared hook
 
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+
+- [ ] 30-01-PLAN.md -- Status color CSS custom properties and STATUS_CONFIG migration
+- [ ] 30-02-PLAN.md -- Silent failure fixes, R2 photo orphan cleanup, and TS test error
+- [ ] 30-03-PLAN.md -- Shared constant and hook extractions
 
 ## Progress
 
@@ -232,4 +237,4 @@ Phases execute in numeric order: 27 → 28 → 29 → 30
 | 27. Chart Form Fixes | v1.7 | 2/2 | Complete    | 2026-05-23 |
 | 28. Stats Corrections | v1.7 | 3/3 | Complete    | 2026-05-24 |
 | 29. UI Polish | v1.7 | 3/3 | Complete    | 2026-05-24 |
-| 30. Code Quality | v1.7 | 0/0 | Not started | - |
+| 30. Code Quality | v1.7 | 0/3 | Not started | - |
