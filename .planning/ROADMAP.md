@@ -119,7 +119,7 @@ Full details: `milestones/v1.7-ROADMAP.md`
 
 **Milestone Goal:** Give stitchers a way to organize charts into series/collections, track completion progress, and browse their collection by series.
 
-- [ ] **Phase 31: Data Foundation & Fixes** - Series schema, CRUD actions, dual progress types, and independent bug fixes
+- [x] **Phase 31: Data Foundation & Fixes** - Series schema, CRUD actions, dual progress types, and independent bug fixes (completed 2026-05-24)
 - [ ] **Phase 32: Series Management Pages** - Series list page and series detail page with assigned charts and dual progress
 - [ ] **Phase 33: Chart Form Integration** - SearchableSelect for series assignment with inline create dialog
 - [ ] **Phase 34: Browse & Pattern Dive Integration** - Pattern Dive Series tab with progress cards and Browse tab series filter
@@ -147,7 +147,7 @@ Full details: `milestones/v1.7-ROADMAP.md`
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
+- [x] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
 
 ### Phase 32: Series Management Pages
 
@@ -184,8 +184,8 @@ Plans:
 **Plans**: 3 plans
 Plans:
 
-- [ ] 31-01-PLAN.md — Schema, types, validation, test factories
-- [ ] 31-02-PLAN.md — Series progress computation utility (TDD)
+- [x] 31-01-PLAN.md — Schema, types, validation, test factories
+- [x] 31-02-PLAN.md — Series progress computation utility (TDD)
 - [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
 
 **UI hint**: yes
@@ -249,7 +249,7 @@ Phases execute in numeric order: 31 -> 32 -> 33 -> 34
 | 28. Stats Corrections | v1.7 | 3/3 | Complete | 2026-05-24 |
 | 29. UI Polish | v1.7 | 3/3 | Complete | 2026-05-24 |
 | 30. Code Quality | v1.7 | 3/3 | Complete | 2026-05-24 |
-| 31. Data Foundation & Fixes | v1.8 | 2/3 | In Progress|  |
+| 31. Data Foundation & Fixes | v1.8 | 3/3 | Complete   | 2026-05-24 |
 | 32. Series Management Pages | v1.8 | 0/? | Not started | - |
 | 33. Chart Form Integration | v1.8 | 0/? | Not started | - |
 | 34. Browse & Pattern Dive Integration | v1.8 | 0/? | Not started | - |
