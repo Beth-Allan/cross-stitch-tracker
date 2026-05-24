@@ -150,8 +150,8 @@ Plans:
 **Plans**: 3 plansPlans:
 **Wave 1**
 
-- [ ] 28-01-PLAN.md -- Data layer: status groups utility, insight query rewrites, collection total
-- [ ] 28-03-PLAN.md -- Chart axis fixes and days-in-library formatAge fix
+- [x] 28-01-PLAN.md -- Data layer: status groups utility, insight query rewrites, collection total
+- [x] 28-03-PLAN.md -- Chart axis fixes and days-in-library formatAge fix
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -225,6 +225,6 @@ Phases execute in numeric order: 27 → 28 → 29 → 30
 | 25. Shopping Cart Scaling | v1.6 | 2/2 | Complete | 2026-05-20 |
 | 26. UX Polish | v1.6 | 3/3 | Complete | 2026-05-20 |
 | 27. Chart Form Fixes | v1.7 | 2/2 | Complete    | 2026-05-23 |
-| 28. Stats Corrections | v1.7 | 0/3 | Not started | - |
+| 28. Stats Corrections | v1.7 | 2/3 | In Progress|  |
 | 29. UI Polish | v1.7 | 0/0 | Not started | - |
 | 30. Code Quality | v1.7 | 0/0 | Not started | - |
