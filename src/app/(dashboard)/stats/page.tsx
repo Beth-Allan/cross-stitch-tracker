@@ -53,7 +53,7 @@ export default async function StatsPage({
 
   // Parse URL search params for session table state
   const parsedParams = await statsSearchParamsCache.parse(searchParams);
-  const { page, sort, dir, project, scope, status } = parsedParams;
+  const { page, sort, dir, project, status } = parsedParams;
 
   // Current date values for calendar/chart initial state
   const now = new Date();
@@ -72,12 +72,12 @@ export default async function StatsPage({
     getSessionHistory(user.id, page, sort, dir, project === "all" ? null : project),
     getPaceMetrics(user.id),
     getDayOfWeekPattern(user.id),
-    getPersonalBests(user.id, scope),
-    getFastestCompletions(user.id, scope),
+    getPersonalBests(user.id, "all"),
+    getFastestCompletions(user.id, "all"),
     getThreadInsights(user.id, status),
     getDesignerInsights(user.id, status),
     getGenreInsights(user.id, status),
-    getCompletionEstimates(user.id, scope),
+    getCompletionEstimates(user.id, "all"),
     getAvailableYears(user.id),
   ]);
 
@@ -97,7 +97,7 @@ export default async function StatsPage({
   const designerInsights = settled<DesignerInsight[]>(results[13], "designerInsights");
   const genreInsights = settled<GenreInsight[]>(results[14], "genreInsights");
   const completionEstimates = settled<CompletionEstimate[]>(results[15], "completionEstimates");
-  const availableYears = settled<number[]>(results[16], "availableYears");
+  const _availableYears = settled<number[]>(results[16], "availableYears");
 
   let projectList: { id: string; name: string }[] = [];
   try {
@@ -131,6 +131,9 @@ export default async function StatsPage({
           sizeBreakdown={sizeBreakdown}
           designerBreakdown={designerBreakdown}
           genreBreakdown={genreBreakdown}
+          threadInsights={threadInsights}
+          designerInsights={designerInsights}
+          genreInsights={genreInsights}
         />
       }
       activityContent={
@@ -150,11 +153,8 @@ export default async function StatsPage({
         <RecordsOverview
           personalBests={personalBests}
           fastestCompletions={fastestCompletions}
-          threadInsights={threadInsights}
-          designerInsights={designerInsights}
-          genreInsights={genreInsights}
           completionEstimates={completionEstimates}
-          availableYears={availableYears ?? null}
+          totalSessionStitches={heroStats?.totalLifetimeStitches ?? null}
           hasNoSessions={hasNoSessions}
         />
       }
