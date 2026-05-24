@@ -193,8 +193,7 @@ Plans:
   4. Status colors defined as CSS custom properties and consumed from a single source (not scattered Tailwind color scales)
   5. DEFAULT_SUPPLY_HEX extracted to a shared constant, and useRejectionFlash extracted to a shared hook
 
-**Plans**: 3 plans
-Plans:
+**Plans**: 3 plansPlans:
 
 - [ ] 30-01-PLAN.md -- Status color CSS custom properties and STATUS_CONFIG migration
 - [ ] 30-02-PLAN.md -- Silent failure fixes, R2 photo orphan cleanup, and TS test error
