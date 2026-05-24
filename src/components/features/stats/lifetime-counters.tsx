@@ -2,14 +2,14 @@ import { FolderOpen } from "lucide-react";
 import { formatTime } from "@/lib/utils/format-time";
 
 interface LifetimeCountersProps {
-  totalLifetimeStitches: number;
+  collectionTotalStitches: number;
   totalSessions: number;
   totalTimeMinutes: number;
   projectsCompleted: number;
 }
 
 const COUNTER_CARDS = [
-  { key: "totalLifetimeStitches" as const, label: "TOTAL STITCHES", format: "number" as const },
+  { key: "collectionTotalStitches" as const, label: "COLLECTION TOTAL", format: "number" as const },
   { key: "totalSessions" as const, label: "SESSIONS", format: "number" as const },
   { key: "totalTimeMinutes" as const, label: "TIME STITCHING", format: "time" as const },
   { key: "projectsCompleted" as const, label: "COMPLETED", format: "number" as const },

@@ -1,4 +1,4 @@
-import { render, screen } from "@/__tests__/test-utils";
+import { render, screen, fireEvent } from "@/__tests__/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockSetStatusFilter = vi.fn();
@@ -76,23 +76,23 @@ describe("StatusFilterPills", () => {
     );
   });
 
-  it("calls setStatusFilter when clicking a group pill", async () => {
-    const { user } = render(<StatusFilterPills />);
+  it("calls setStatusFilter when clicking a group pill", () => {
+    render(<StatusFilterPills />);
 
-    await user.click(screen.getByRole("button", { name: "Not Started" }));
+    fireEvent.click(screen.getByRole("button", { name: "Not Started" }));
 
     expect(mockSetStatusFilter).toHaveBeenCalled();
   });
 
-  it("calls setStatusFilter(null) when clicking All", async () => {
+  it("calls setStatusFilter(null) when clicking All", () => {
     mockedUseQueryState.mockReturnValue([
       ["not-started"] as string[],
       mockSetStatusFilter,
     ] as ReturnType<typeof useQueryState<string[]>>);
 
-    const { user } = render(<StatusFilterPills />);
+    render(<StatusFilterPills />);
 
-    await user.click(screen.getByRole("button", { name: "All" }));
+    fireEvent.click(screen.getByRole("button", { name: "All" }));
 
     expect(mockSetStatusFilter).toHaveBeenCalledWith(null);
   });
