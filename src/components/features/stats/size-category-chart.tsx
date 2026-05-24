@@ -24,7 +24,7 @@ export function SizeCategoryChart({ data }: SizeCategoryChartProps) {
     <ChartContainer config={sizeCategoryConfig} className="h-[250px] w-full">
       <BarChart data={data} accessibilityLayer>
         <XAxis dataKey="category" tickLine={false} axisLine={false} />
-        <YAxis type="number" tickLine={false} axisLine={false} />
+        <YAxis type="number" tickLine={false} axisLine={false} allowDecimals={false} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Bar dataKey="count" radius={4}>
           {data.map((entry) => (

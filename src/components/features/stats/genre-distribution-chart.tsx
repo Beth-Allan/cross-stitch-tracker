@@ -21,7 +21,7 @@ export function GenreDistributionChart({ data }: GenreDistributionChartProps) {
   return (
     <ChartContainer config={genreDistributionConfig} className="h-[300px] w-full">
       <BarChart layout="vertical" data={data} accessibilityLayer>
-        <XAxis type="number" tickLine={false} axisLine={false} />
+        <XAxis type="number" tickLine={false} axisLine={false} allowDecimals={false} />
         <YAxis
           type="category"
           dataKey="name"
