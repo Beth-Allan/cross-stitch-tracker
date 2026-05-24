@@ -56,24 +56,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SERIES-01 | — | Pending |
-| SERIES-02 | — | Pending |
-| SERIES-03 | — | Pending |
-| SERIES-04 | — | Pending |
-| SERIES-05 | — | Pending |
-| SERIES-06 | — | Pending |
-| SERIES-07 | — | Pending |
-| SERIES-08 | — | Pending |
-| SERIES-09 | — | Pending |
-| SERIES-10 | — | Pending |
-| FIX-01 | — | Pending |
-| FIX-02 | — | Pending |
+| SERIES-01 | Phase 31 | Pending |
+| SERIES-02 | Phase 32 | Pending |
+| SERIES-03 | Phase 31 | Pending |
+| SERIES-04 | Phase 31 | Pending |
+| SERIES-05 | Phase 32 | Pending |
+| SERIES-06 | Phase 33 | Pending |
+| SERIES-07 | Phase 33 | Pending |
+| SERIES-08 | Phase 34 | Pending |
+| SERIES-09 | Phase 34 | Pending |
+| SERIES-10 | Phase 31 | Pending |
+| FIX-01 | Phase 31 | Pending |
+| FIX-02 | Phase 31 | Pending |
 
 **Coverage:**
 - v1.8 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12
+- Mapped to phases: 12
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-24*
-*Last updated: 2026-05-24 after initial definition*
+*Last updated: 2026-05-24 after roadmap creation*

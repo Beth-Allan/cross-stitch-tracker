@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Series & Collections
 status: planning
-last_updated: "2026-05-24T21:57:53.862Z"
+last_updated: "2026-05-24T22:00:00.000Z"
 last_activity: 2026-05-24
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,17 +17,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-20)
+See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 30 — code quality (COMPLETE)
+**Current focus:** v1.8 Series & Collections -- roadmap created, ready to plan Phase 31
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-24 — Milestone v1.8 started
+Phase: 31 of 34 (Data Foundation & Fixes)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-05-24 -- Roadmap created for v1.8 (4 phases, 12 requirements)
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Milestone Structure
 
@@ -40,7 +42,8 @@ Last activity: 2026-05-24 — Milestone v1.8 started
 | v1.4 | Fixes & Polish | 15-17 | Shipped 2026-05-17 |
 | v1.5 | Statistics & Records | 18-21 | Shipped 2026-05-18 |
 | v1.6 | Cleanup & Hardening | 22-26 | Shipped 2026-05-20 |
-| v1.7 | Fix & Polish | 27-30 | In progress |
+| v1.7 | Fix & Polish | 27-30 | Shipped 2026-05-24 |
+| v1.8 | Series & Collections | 31-34 | In progress |
 
 ## Performance Metrics
 
@@ -51,15 +54,15 @@ Last activity: 2026-05-24 — Milestone v1.8 started
 **Velocity (v1.4):** 9 plans / 2 days (~4.5/day)
 **Velocity (v1.5):** 14 plans / 2 days (~7/day)
 **Velocity (v1.6):** 15 plans / 3 days (~5/day)
+**Velocity (v1.7):** 11 plans / 4 days (~2.75/day)
 
 ## Accumulated Context
 
 ### Key Architecture
 
-- `src/lib/queries/stats/` for query layer (pure functions, no "use server")
-- `unstable_cache` with `revalidateTag("stats")` on session mutations (5-min TTL + on-demand)
-- Recharts always Client Components (SSR incompatible)
-- `Promise.allSettled` for parallel data fetching (17 queries on stats page)
+- Series mirrors Designer/Genre pattern: dedicated management page + detail page + inline create from chart form
+- Dual progress: owned/total (collection completeness) + finished/owned (stitching progress)
+- Series is optional one-to-many from Chart (a chart belongs to at most one series)
 
 ### Decisions
 
@@ -75,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-24T21:00:00.000Z
-Stopped at: Phase 30 context gathered
-Resume file: .planning/phases/30-code-quality/30-CONTEXT.md
+Last session: 2026-05-24
+Stopped at: Roadmap created for v1.8 milestone
+Resume file: None -- ready for `/gsd-plan-phase 31`
