@@ -29,7 +29,7 @@ Requirements for v1.7 Fix & Polish. Each maps to roadmap phases.
 - [ ] **UI-01**: Status and size pills on gallery cards and pattern dive use colored styling instead of grey
 - [ ] **UI-02**: Gallery cards show indicator when a digital working copy has been uploaded
 - [ ] **UI-03**: Project supplies card includes skein calculation adjustment controls (count, over 1/2, waste)
-- [ ] **UI-04**: File upload limit increased to 15MB
+- [ ] **UI-04**: File upload limit increased to 50MB
 - [ ] **UI-05**: .zip files accepted as valid upload format for digital working copies
 
 ### Code Quality
