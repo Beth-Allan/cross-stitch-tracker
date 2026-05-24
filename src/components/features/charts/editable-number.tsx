@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { useRejectionFlash } from "@/components/hooks/use-rejection-flash";
 
 interface EditableNumberProps {
   value: number;
@@ -25,15 +26,8 @@ export function EditableNumber({
 }: EditableNumberProps) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(value));
-  const [showRejection, setShowRejection] = useState(false);
+  const { showRejection, triggerRejection } = useRejectionFlash();
   const inputRef = useRef<HTMLInputElement>(null);
-  const rejectionTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  useEffect(() => {
-    return () => {
-      if (rejectionTimerRef.current) clearTimeout(rejectionTimerRef.current);
-    };
-  }, []);
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -57,9 +51,7 @@ export function EditableNumber({
           if (!isNaN(num) && num >= min && (max === undefined || num <= max)) {
             onSave(num);
           } else {
-            setShowRejection(true);
-            if (rejectionTimerRef.current) clearTimeout(rejectionTimerRef.current);
-            rejectionTimerRef.current = setTimeout(() => setShowRejection(false), 600);
+            triggerRejection();
           }
           setEditing(false);
         }}

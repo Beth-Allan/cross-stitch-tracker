@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { useRejectionFlash } from "@/components/hooks/use-rejection-flash";
 
 /**
  * Click-to-edit number cell component for the supply table.
@@ -31,15 +32,8 @@ export function EditableNumber({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(value));
   const [optimistic, setOptimistic] = useState<number | null>(null);
-  const [showRejection, setShowRejection] = useState(false);
+  const { showRejection, triggerRejection } = useRejectionFlash();
   const inputRef = useRef<HTMLInputElement>(null);
-  const rejectionTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  useEffect(() => {
-    return () => {
-      if (rejectionTimerRef.current) clearTimeout(rejectionTimerRef.current);
-    };
-  }, []);
 
   // Clear optimistic value once the prop catches up
   useEffect(() => {
@@ -72,9 +66,7 @@ export function EditableNumber({
             onSave(num);
           } else {
             setDraft(String(displayValue));
-            setShowRejection(true);
-            if (rejectionTimerRef.current) clearTimeout(rejectionTimerRef.current);
-            rejectionTimerRef.current = setTimeout(() => setShowRejection(false), 600);
+            triggerRejection();
           }
           setEditing(false);
         }}
