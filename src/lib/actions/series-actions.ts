@@ -6,7 +6,7 @@ import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { seriesSchema } from "@/lib/validations/series";
 import { computeSeriesProgress } from "@/lib/utils/series-progress";
-import type { SeriesWithStats } from "@/types/series";
+import type { SeriesWithStats, SeriesChart, SeriesDetail } from "@/types/series";
 
 export async function createSeries(formData: unknown) {
   await requireAuth();
@@ -91,25 +91,90 @@ export async function deleteSeries(id: string) {
 export async function getSeriesWithStats(): Promise<SeriesWithStats[]> {
   await requireAuth();
 
-  const seriesList = await prisma.series.findMany({
-    include: {
-      charts: {
-        select: {
-          project: { select: { status: true } },
+  try {
+    const seriesList = await prisma.series.findMany({
+      include: {
+        charts: {
+          select: {
+            project: { select: { status: true } },
+          },
+        },
+        designer: { select: { name: true } },
+      },
+      orderBy: { name: "asc" },
+    });
+
+    return seriesList.map((s) => ({
+      id: s.id,
+      name: s.name,
+      totalCount: s.totalCount,
+      designerId: s.designerId,
+      designerName: s.designer?.name ?? null,
+      notes: s.notes,
+      progress: computeSeriesProgress(s.charts, s.totalCount),
+    }));
+  } catch (error) {
+    console.error(
+      "getSeriesWithStats error:",
+      error instanceof Error ? error.message : String(error),
+    );
+    throw error;
+  }
+}
+
+export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> {
+  await requireAuth();
+
+  try {
+    const series = await prisma.series.findUnique({
+      where: { id },
+      include: {
+        designer: { select: { id: true, name: true } },
+        charts: {
+          select: {
+            id: true,
+            name: true,
+            coverThumbnailUrl: true,
+            coverImageUrl: true,
+            focalPointX: true,
+            focalPointY: true,
+            stitchCount: true,
+            stitchesWide: true,
+            stitchesHigh: true,
+            project: { select: { status: true, stitchesCompleted: true } },
+          },
         },
       },
-      designer: { select: { name: true } },
-    },
-    orderBy: { name: "asc" },
-  });
+    });
 
-  return seriesList.map((s) => ({
-    id: s.id,
-    name: s.name,
-    totalCount: s.totalCount,
-    designerId: s.designerId,
-    designerName: s.designer?.name ?? null,
-    notes: s.notes,
-    progress: computeSeriesProgress(s.charts, s.totalCount),
-  }));
+    if (!series) return null;
+
+    const charts: SeriesChart[] = series.charts.map((c) => ({
+      id: c.id,
+      name: c.name,
+      coverThumbnailUrl: c.coverThumbnailUrl,
+      coverImageUrl: c.coverImageUrl,
+      focalPointX: c.focalPointX,
+      focalPointY: c.focalPointY,
+      stitchCount: c.stitchCount,
+      stitchesWide: c.stitchesWide,
+      stitchesHigh: c.stitchesHigh,
+      status: c.project?.status ?? null,
+      stitchesCompleted: c.project?.stitchesCompleted ?? 0,
+    }));
+
+    return {
+      id: series.id,
+      name: series.name,
+      totalCount: series.totalCount,
+      designerId: series.designerId,
+      designerName: series.designer?.name ?? null,
+      notes: series.notes,
+      progress: computeSeriesProgress(series.charts, series.totalCount),
+      charts,
+    };
+  } catch (error) {
+    console.error("getSeriesDetail error:", error instanceof Error ? error.message : String(error));
+    throw error;
+  }
 }

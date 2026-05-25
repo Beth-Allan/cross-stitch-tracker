@@ -21,6 +21,7 @@ import type { DesignerWithStats, DesignerChart } from "@/types/designer";
 import type { GenreWithStats, GenreChart } from "@/types/genre";
 import type { ChartWithProject, ProjectWithRelations } from "@/types/chart";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
+import type { SeriesWithStats, SeriesChart } from "@/types/series";
 import { vi } from "vitest";
 
 /**
@@ -50,6 +51,36 @@ export function createMockSeries(overrides?: Partial<Series>): Series {
     notes: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
+export function createMockSeriesWithStats(overrides?: Partial<SeriesWithStats>): SeriesWithStats {
+  return {
+    id: "series-1",
+    name: "Test Series",
+    totalCount: null,
+    designerId: null,
+    designerName: null,
+    notes: null,
+    progress: { ownedCount: 0, finishedCount: 0, totalCount: null },
+    ...overrides,
+  };
+}
+
+export function createMockSeriesChart(overrides?: Partial<SeriesChart>): SeriesChart {
+  return {
+    id: "chart-1",
+    name: "Test Chart",
+    coverThumbnailUrl: null,
+    coverImageUrl: null,
+    focalPointX: null,
+    focalPointY: null,
+    stitchCount: 5000,
+    stitchesWide: 100,
+    stitchesHigh: 50,
+    status: null,
+    stitchesCompleted: 0,
     ...overrides,
   };
 }

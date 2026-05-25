@@ -120,7 +120,7 @@ Full details: `milestones/v1.7-ROADMAP.md`
 **Milestone Goal:** Give stitchers a way to organize charts into series/collections, track completion progress, and browse their collection by series.
 
 - [x] **Phase 31: Data Foundation & Fixes** - Series schema, CRUD actions, dual progress types, and independent bug fixes (completed 2026-05-24)
-- [ ] **Phase 32: Series Management Pages** - Series list page and series detail page with assigned charts and dual progress
+- [x] **Phase 32: Series Management Pages** - Series list page and series detail page with assigned charts and dual progress (completed 2026-05-25)
 - [ ] **Phase 33: Chart Form Integration** - SearchableSelect for series assignment with inline create dialog
 - [ ] **Phase 34: Browse & Pattern Dive Integration** - Pattern Dive Series tab with progress cards and Browse tab series filter
 
@@ -139,7 +139,7 @@ Full details: `milestones/v1.7-ROADMAP.md`
   4. Dual progress values (owned/total + finished/owned) are computed correctly for any series configuration
   5. Pre-existing TypeScript test errors are resolved and stats page query groups are separated for resilience
 
-**Plans**: 3 plansPlans:
+**Plans**: 3 plans
 **Wave 1**
 
 - [x] 31-01-PLAN.md — Schema, types, validation, test factories
@@ -161,11 +161,14 @@ Full details: `milestones/v1.7-ROADMAP.md`
   3. User can inline-edit series name and delete series from the management pages
 
 **Plans**: 3 plans
-Plans:
+**Wave 1**
 
-- [x] 31-01-PLAN.md — Schema, types, validation, test factories
-- [x] 31-02-PLAN.md — Series progress computation utility (TDD)
-- [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
+- [x] 32-01-PLAN.md — Data layer: expanded types, getSeriesDetail, nav item, mock factories, loading skeleton
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 32-02-PLAN.md — Series list page with card grid, sorting, create modal, delete
+- [x] 32-03-PLAN.md — Series detail page with chart rows, inline editing, dual progress
 
 **UI hint**: yes
 
@@ -181,12 +184,7 @@ Plans:
   3. User can clear a chart's series assignment from the chart form
   4. Series assignment persists correctly on both chart creation and chart edit
 
-**Plans**: 3 plans
-Plans:
-
-- [x] 31-01-PLAN.md — Schema, types, validation, test factories
-- [x] 31-02-PLAN.md — Series progress computation utility (TDD)
-- [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
+**Plans**: [to be planned]
 
 **UI hint**: yes
 
@@ -201,12 +199,7 @@ Plans:
   2. User can click a series card to navigate to its detail page
   3. User can filter the Browse tab by series using the existing filter bar
 
-**Plans**: 3 plans
-Plans:
-
-- [ ] 31-01-PLAN.md — Schema, types, validation, test factories
-- [ ] 31-02-PLAN.md — Series progress computation utility (TDD)
-- [ ] 31-03-PLAN.md — Series CRUD actions + FIX verification (TDD)
+**Plans**: [to be planned]
 
 **UI hint**: yes
 
@@ -250,6 +243,6 @@ Phases execute in numeric order: 31 -> 32 -> 33 -> 34
 | 29. UI Polish | v1.7 | 3/3 | Complete | 2026-05-24 |
 | 30. Code Quality | v1.7 | 3/3 | Complete | 2026-05-24 |
 | 31. Data Foundation & Fixes | v1.8 | 3/3 | Complete   | 2026-05-24 |
-| 32. Series Management Pages | v1.8 | 0/? | Not started | - |
+| 32. Series Management Pages | v1.8 | 3/3 | Complete    | 2026-05-25 |
 | 33. Chart Form Integration | v1.8 | 0/? | Not started | - |
 | 34. Browse & Pattern Dive Integration | v1.8 | 0/? | Not started | - |

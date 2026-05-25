@@ -191,9 +191,20 @@
   - T-31-05: seriesSchema.parse() on create/update
   - T-31-03/06/07/SC: Accepted risks (pure function, single-user, no new packages)
 
+- **Phase 32 UI-SPEC approved** — 6/6 dimensions passed after 2 revision passes
+  - Typography: 2 weights (400, 600), 3 sizes (12, 14, 24px)
+  - Spacing: 8-point scale, 4 DesignOS exceptions documented (p-5, h-10, p-1.5, ml-0.5)
+  - Copywriting: 30 elements defined (modal labels, toasts, empty states, error states, delete confirmation)
+  - All 13 CONTEXT.md decisions (D-01 through D-13) captured — zero user questions needed
+
+- **Phase 32 planned** — 3 plans in 2 waves, verified (12/12 dimensions passed)
+  - Plan 01 (W1): Data layer — expanded SeriesChart type, getSeriesDetail, nav item, mock factories, loading skeleton
+  - Plan 02 (W2): Series list page — card grid, sort pills, create modal, delete (TDD)
+  - Plan 03 (W2): Series detail page — chart rows, inline editing, dual progress, designer select (TDD)
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-ship` — Create PR for Phase 31
+1. `/gsd-execute-phase 32` — Execute all plans for Series Management Pages
 
 ### Backlog
 

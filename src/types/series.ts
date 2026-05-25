@@ -1,4 +1,5 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
+import type { OptionalFocalPoint } from "@/types/focal-point";
 
 export type SeriesProgress = {
   ownedCount: number;
@@ -16,13 +17,16 @@ export type SeriesWithStats = {
   progress: SeriesProgress;
 };
 
-export type SeriesChart = {
+export type SeriesChart = OptionalFocalPoint & {
   id: string;
   name: string;
   coverThumbnailUrl: string | null;
+  coverImageUrl: string | null;
+  stitchCount: number;
+  stitchesWide: number;
+  stitchesHigh: number;
   status: ProjectStatus | null;
   stitchesCompleted: number;
-  stitchCount: number;
 };
 
 export type SeriesDetail = SeriesWithStats & {

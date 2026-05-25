@@ -10,10 +10,10 @@ Requirements for milestone v1.8 Series & Collections. Each maps to roadmap phase
 ### Series
 
 - [ ] **SERIES-01**: User can create a series with name, optional total count, and optional designer link
-- [ ] **SERIES-02**: User can view all series on a management page with progress indicators
+- [x] **SERIES-02**: User can view all series on a management page with progress indicators
 - [ ] **SERIES-03**: User can edit a series (name, total count, designer link)
 - [ ] **SERIES-04**: User can delete a series (charts become unassigned, not deleted)
-- [ ] **SERIES-05**: User can view a series detail page showing assigned charts with dual progress (owned/total + finished/owned)
+- [x] **SERIES-05**: User can view a series detail page showing assigned charts with dual progress (owned/total + finished/owned)
 - [ ] **SERIES-06**: User can assign a chart to a series from the chart form via SearchableSelect with inline "Add New"
 - [ ] **SERIES-07**: User can remove a chart's series assignment from the chart form
 - [ ] **SERIES-08**: User can browse series via a dedicated Series tab on Pattern Dive showing progress cards
@@ -57,10 +57,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SERIES-01 | Phase 31 | Pending |
-| SERIES-02 | Phase 32 | Pending |
+| SERIES-02 | Phase 32 | Complete |
 | SERIES-03 | Phase 31 | Pending |
 | SERIES-04 | Phase 31 | Pending |
-| SERIES-05 | Phase 32 | Pending |
+| SERIES-05 | Phase 32 | Complete |
 | SERIES-06 | Phase 33 | Pending |
 | SERIES-07 | Phase 33 | Pending |
 | SERIES-08 | Phase 34 | Pending |

@@ -279,4 +279,180 @@ describe("series-actions", () => {
       await expect(getSeriesWithStats()).rejects.toThrow("DB unavailable");
     });
   });
+
+  describe("getSeriesDetail", () => {
+    it("requires authentication", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { getSeriesDetail } = await import("./series-actions");
+
+      await expect(getSeriesDetail("s1")).rejects.toThrow("Unauthorized");
+    });
+
+    it("returns null for non-existent ID", async () => {
+      mockPrisma.series.findUnique.mockResolvedValueOnce(null);
+      const { getSeriesDetail } = await import("./series-actions");
+
+      const result = await getSeriesDetail("nonexistent");
+
+      expect(result).toBeNull();
+    });
+
+    it("returns enriched series with charts, progress, and designerName", async () => {
+      const dbSeries = {
+        id: "s1",
+        name: "Fairy Collection",
+        totalCount: 12,
+        designerId: "d1",
+        notes: "Beautiful series",
+        designer: { id: "d1", name: "Nora Corbett" },
+        charts: [
+          {
+            id: "c1",
+            name: "Spring Fairy",
+            coverThumbnailUrl: "/thumb.jpg",
+            coverImageUrl: "/full.jpg",
+            focalPointX: 50,
+            focalPointY: 30,
+            stitchCount: 15000,
+            stitchesWide: 150,
+            stitchesHigh: 200,
+            project: { status: "FINISHED", stitchesCompleted: 15000 },
+          },
+          {
+            id: "c2",
+            name: "Winter Fairy",
+            coverThumbnailUrl: null,
+            coverImageUrl: null,
+            focalPointX: null,
+            focalPointY: null,
+            stitchCount: 8000,
+            stitchesWide: 100,
+            stitchesHigh: 80,
+            project: null,
+          },
+        ],
+      };
+      mockPrisma.series.findUnique.mockResolvedValueOnce(dbSeries);
+      mockComputeSeriesProgress.mockReturnValueOnce({
+        ownedCount: 2,
+        finishedCount: 1,
+        totalCount: 12,
+      });
+
+      const { getSeriesDetail } = await import("./series-actions");
+      const result = await getSeriesDetail("s1");
+
+      expect(result).not.toBeNull();
+      expect(result!.id).toBe("s1");
+      expect(result!.name).toBe("Fairy Collection");
+      expect(result!.designerName).toBe("Nora Corbett");
+      expect(result!.designerId).toBe("d1");
+      expect(result!.notes).toBe("Beautiful series");
+      expect(result!.totalCount).toBe(12);
+      expect(result!.progress).toEqual({
+        ownedCount: 2,
+        finishedCount: 1,
+        totalCount: 12,
+      });
+      expect(result!.charts).toHaveLength(2);
+    });
+
+    it("charts include focalPoint, coverImageUrl, dimensions, and mapped status", async () => {
+      const dbSeries = {
+        id: "s1",
+        name: "Test Series",
+        totalCount: null,
+        designerId: null,
+        notes: null,
+        designer: null,
+        charts: [
+          {
+            id: "c1",
+            name: "Chart With Project",
+            coverThumbnailUrl: "/thumb.jpg",
+            coverImageUrl: "/cover.jpg",
+            focalPointX: 40,
+            focalPointY: 60,
+            stitchCount: 10000,
+            stitchesWide: 200,
+            stitchesHigh: 150,
+            project: { status: "IN_PROGRESS", stitchesCompleted: 3000 },
+          },
+          {
+            id: "c2",
+            name: "Chart Without Project",
+            coverThumbnailUrl: null,
+            coverImageUrl: null,
+            focalPointX: null,
+            focalPointY: null,
+            stitchCount: 5000,
+            stitchesWide: 100,
+            stitchesHigh: 50,
+            project: null,
+          },
+        ],
+      };
+      mockPrisma.series.findUnique.mockResolvedValueOnce(dbSeries);
+      mockComputeSeriesProgress.mockReturnValueOnce({
+        ownedCount: 2,
+        finishedCount: 0,
+        totalCount: null,
+      });
+
+      const { getSeriesDetail } = await import("./series-actions");
+      const result = await getSeriesDetail("s1");
+
+      const chart1 = result!.charts[0];
+      expect(chart1.focalPointX).toBe(40);
+      expect(chart1.focalPointY).toBe(60);
+      expect(chart1.coverImageUrl).toBe("/cover.jpg");
+      expect(chart1.stitchesWide).toBe(200);
+      expect(chart1.stitchesHigh).toBe(150);
+      expect(chart1.status).toBe("IN_PROGRESS");
+      expect(chart1.stitchesCompleted).toBe(3000);
+
+      const chart2 = result!.charts[1];
+      expect(chart2.focalPointX).toBeNull();
+      expect(chart2.focalPointY).toBeNull();
+      expect(chart2.coverImageUrl).toBeNull();
+      expect(chart2.status).toBeNull();
+      expect(chart2.stitchesCompleted).toBe(0);
+    });
+
+    it("computes progress via computeSeriesProgress", async () => {
+      const dbSeries = {
+        id: "s1",
+        name: "Test",
+        totalCount: 5,
+        designerId: null,
+        notes: null,
+        designer: null,
+        charts: [
+          {
+            id: "c1",
+            name: "A",
+            coverThumbnailUrl: null,
+            coverImageUrl: null,
+            focalPointX: null,
+            focalPointY: null,
+            stitchCount: 1000,
+            stitchesWide: 50,
+            stitchesHigh: 50,
+            project: { status: "FINISHED", stitchesCompleted: 1000 },
+          },
+        ],
+      };
+      mockPrisma.series.findUnique.mockResolvedValueOnce(dbSeries);
+      mockComputeSeriesProgress.mockReturnValueOnce({
+        ownedCount: 1,
+        finishedCount: 1,
+        totalCount: 5,
+      });
+
+      const { getSeriesDetail } = await import("./series-actions");
+      await getSeriesDetail("s1");
+
+      expect(mockComputeSeriesProgress).toHaveBeenCalledWith(dbSeries.charts, 5);
+    });
+  });
 });

@@ -66,6 +66,21 @@ describe("DeleteConfirmationDialog", () => {
     expect(screen.getByText(/will lose this genre tag/)).toBeInTheDocument();
   });
 
+  it("shows series-specific unassign message for series entity type", () => {
+    render(
+      <DeleteConfirmationDialog
+        {...defaultProps}
+        title="Delete Series?"
+        entityName="Fairy Collection"
+        chartCount={5}
+        entityType="series"
+      />,
+    );
+
+    expect(screen.getByText(/unassigned from this series/)).toBeInTheDocument();
+    expect(screen.getByText(/Charts will NOT be deleted/)).toBeInTheDocument();
+  });
+
   it("renders Cancel and Delete buttons", () => {
     render(<DeleteConfirmationDialog {...defaultProps} />);
 

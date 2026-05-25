@@ -17,7 +17,7 @@ interface DeleteConfirmationDialogProps {
   title: string;
   entityName: string;
   chartCount: number;
-  entityType: "designer" | "genre" | "brand" | "supply";
+  entityType: "designer" | "genre" | "brand" | "supply" | "series";
   onConfirm: () => Promise<void>;
 }
 
@@ -54,6 +54,8 @@ export function DeleteConfirmationDialog({
         return `This will remove "${entityName}" from your brands. ${chartCount} supply item(s) from this brand will also be deleted.`;
       case "supply":
         return `This will permanently delete "${entityName}" from your supply catalog.`;
+      case "series":
+        return `This will remove "${entityName}" from your collection. ${chartCount} chart(s) will be unassigned from this series. Charts will NOT be deleted.`;
     }
   }
 
