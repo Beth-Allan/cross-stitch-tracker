@@ -127,7 +127,7 @@ describe("SeriesDetail", () => {
 
   it("chart rows show StatusBadge for charts with status", () => {
     render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
-    expect(screen.getByText("In Progress")).toBeInTheDocument();
+    expect(screen.getByText("Stitching")).toBeInTheDocument();
     const finishedElements = screen.getAllByText("Finished");
     expect(finishedElements.length).toBeGreaterThanOrEqual(1);
   });
