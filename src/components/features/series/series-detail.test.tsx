@@ -66,51 +66,41 @@ function createSeriesDetail(overrides?: Partial<SeriesDetailType>): SeriesDetail
   };
 }
 
-const defaultDesigners = [
-  { id: "d1", name: "Nora Corbett" },
-  { id: "d2", name: "Lavender & Lace" },
-];
-
 describe("SeriesDetail", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("renders series name in heading", () => {
-    render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
+    render(<SeriesDetail series={createSeriesDetail()} />);
     const heading = screen.getByRole("heading", { level: 1 });
     expect(heading).toHaveTextContent("Mirabilia Fairies");
   });
 
   it('renders "Back to Series" link pointing to /series', () => {
-    render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
+    render(<SeriesDetail series={createSeriesDetail()} />);
     const backLink = screen.getByRole("link", { name: /back to series/i });
     expect(backLink).toHaveAttribute("href", "/series");
   });
 
   it("renders progress bar and completion text", () => {
-    render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
+    render(<SeriesDetail series={createSeriesDetail()} />);
     expect(screen.getByText(/1 of 3 finished/)).toBeInTheDocument();
   });
 
   it("renders designer name as link to /designers/{id} when designerId is set", () => {
-    render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
+    render(<SeriesDetail series={createSeriesDetail()} />);
     const designerLink = screen.getByRole("link", { name: /nora corbett/i });
     expect(designerLink).toHaveAttribute("href", "/designers/d1");
   });
 
   it("hides designer line when designerId is null", () => {
-    render(
-      <SeriesDetail
-        series={createSeriesDetail({ designerId: null, designerName: null })}
-        designers={defaultDesigners}
-      />,
-    );
+    render(<SeriesDetail series={createSeriesDetail({ designerId: null, designerName: null })} />);
     expect(screen.queryByText(/^by /)).not.toBeInTheDocument();
   });
 
   it("renders chart rows with chart name and stitch count", () => {
-    render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
+    render(<SeriesDetail series={createSeriesDetail()} />);
     expect(screen.getByText("Autumn Fairy")).toBeInTheDocument();
     expect(screen.getByText("Spring Garden")).toBeInTheDocument();
     expect(screen.getByText("Winter Cottage")).toBeInTheDocument();
@@ -118,7 +108,7 @@ describe("SeriesDetail", () => {
   });
 
   it("chart rows link to /charts/{chartId}", () => {
-    render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
+    render(<SeriesDetail series={createSeriesDetail()} />);
     const autumnLink = screen.getByRole("link", { name: /autumn fairy/i });
     expect(autumnLink).toHaveAttribute("href", "/charts/c1");
     const springLink = screen.getByRole("link", { name: /spring garden/i });
@@ -126,7 +116,7 @@ describe("SeriesDetail", () => {
   });
 
   it("chart rows show StatusBadge for charts with status", () => {
-    render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
+    render(<SeriesDetail series={createSeriesDetail()} />);
     expect(screen.getByText("Stitching")).toBeInTheDocument();
     const finishedElements = screen.getAllByText("Finished");
     expect(finishedElements.length).toBeGreaterThanOrEqual(1);
@@ -136,7 +126,7 @@ describe("SeriesDetail", () => {
     const user = userEvent.setup();
     mockUpdateSeries.mockResolvedValue({ success: true, series: {} });
 
-    render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
+    render(<SeriesDetail series={createSeriesDetail()} />);
 
     await user.click(screen.getByLabelText("Edit series name"));
 
@@ -155,7 +145,7 @@ describe("SeriesDetail", () => {
   it("inline name edit: Escape cancels without saving", async () => {
     const user = userEvent.setup();
 
-    render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
+    render(<SeriesDetail series={createSeriesDetail()} />);
 
     await user.click(screen.getByLabelText("Edit series name"));
 
@@ -168,7 +158,7 @@ describe("SeriesDetail", () => {
 
   it("sort pills (Name, Stitches, Status) reorder chart list", async () => {
     const user = userEvent.setup();
-    render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
+    render(<SeriesDetail series={createSeriesDetail()} />);
 
     await user.click(screen.getByRole("button", { name: /^stitches$/i }));
 
@@ -185,7 +175,7 @@ describe("SeriesDetail", () => {
     const user = userEvent.setup();
     mockDeleteSeries.mockResolvedValue({ success: true });
 
-    render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
+    render(<SeriesDetail series={createSeriesDetail()} />);
 
     await user.click(screen.getByLabelText("Delete series"));
 
@@ -204,14 +194,13 @@ describe("SeriesDetail", () => {
           charts: [],
           progress: { ownedCount: 0, finishedCount: 0, totalCount: 15 },
         })}
-        designers={defaultDesigners}
       />,
     );
     expect(screen.getByText("No charts in this series yet")).toBeInTheDocument();
   });
 
   it('renders "owned" line when totalCount is set', () => {
-    render(<SeriesDetail series={createSeriesDetail()} designers={defaultDesigners} />);
+    render(<SeriesDetail series={createSeriesDetail()} />);
     expect(screen.getByText(/3 of 15 owned/)).toBeInTheDocument();
   });
 });

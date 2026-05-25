@@ -42,10 +42,9 @@ function formatNumber(n: number): string {
 
 interface SeriesDetailProps {
   series: SeriesDetailType;
-  designers: Array<{ id: string; name: string }>;
 }
 
-export function SeriesDetail({ series, designers }: SeriesDetailProps) {
+export function SeriesDetail({ series }: SeriesDetailProps) {
   const router = useRouter();
 
   const [isEditingName, setIsEditingName] = useState(false);
@@ -56,6 +55,7 @@ export function SeriesDetail({ series, designers }: SeriesDetailProps) {
     dir: "asc",
   });
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const isSavingRef = useRef(false);
 
   useEffect(() => {
     if (isEditingName && nameInputRef.current) {
@@ -103,6 +103,7 @@ export function SeriesDetail({ series, designers }: SeriesDetailProps) {
   }, [series.charts, chartSort]);
 
   async function handleSaveName() {
+    if (isSavingRef.current) return;
     const trimmed = editName.trim();
     if (!trimmed || trimmed === series.name) {
       setIsEditingName(false);
@@ -110,6 +111,7 @@ export function SeriesDetail({ series, designers }: SeriesDetailProps) {
       return;
     }
 
+    isSavingRef.current = true;
     try {
       const result = await updateSeries(series.id, {
         name: trimmed,
@@ -127,6 +129,7 @@ export function SeriesDetail({ series, designers }: SeriesDetailProps) {
       toast.error("Couldn't update series. Please try again.");
     }
     setIsEditingName(false);
+    isSavingRef.current = false;
   }
 
   function handleCancelEdit() {
