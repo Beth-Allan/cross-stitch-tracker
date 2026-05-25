@@ -6,7 +6,7 @@ import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { seriesSchema } from "@/lib/validations/series";
 import { computeSeriesProgress } from "@/lib/utils/series-progress";
-import type { SeriesWithStats } from "@/types/series";
+import type { SeriesWithStats, SeriesChart, SeriesDetail } from "@/types/series";
 
 export async function createSeries(formData: unknown) {
   await requireAuth();
@@ -112,4 +112,56 @@ export async function getSeriesWithStats(): Promise<SeriesWithStats[]> {
     notes: s.notes,
     progress: computeSeriesProgress(s.charts, s.totalCount),
   }));
+}
+
+export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> {
+  await requireAuth();
+
+  const series = await prisma.series.findUnique({
+    where: { id },
+    include: {
+      designer: { select: { id: true, name: true } },
+      charts: {
+        select: {
+          id: true,
+          name: true,
+          coverThumbnailUrl: true,
+          coverImageUrl: true,
+          focalPointX: true,
+          focalPointY: true,
+          stitchCount: true,
+          stitchesWide: true,
+          stitchesHigh: true,
+          project: { select: { status: true, stitchesCompleted: true } },
+        },
+      },
+    },
+  });
+
+  if (!series) return null;
+
+  const charts: SeriesChart[] = series.charts.map((c) => ({
+    id: c.id,
+    name: c.name,
+    coverThumbnailUrl: c.coverThumbnailUrl,
+    coverImageUrl: c.coverImageUrl,
+    focalPointX: c.focalPointX,
+    focalPointY: c.focalPointY,
+    stitchCount: c.stitchCount,
+    stitchesWide: c.stitchesWide,
+    stitchesHigh: c.stitchesHigh,
+    status: c.project?.status ?? null,
+    stitchesCompleted: c.project?.stitchesCompleted ?? 0,
+  }));
+
+  return {
+    id: series.id,
+    name: series.name,
+    totalCount: series.totalCount,
+    designerId: series.designerId,
+    designerName: series.designer?.name ?? null,
+    notes: series.notes,
+    progress: computeSeriesProgress(series.charts, series.totalCount),
+    charts,
+  };
 }
