@@ -163,7 +163,7 @@ Full details: `milestones/v1.7-ROADMAP.md`
 **Plans**: 3 plans
 **Wave 1**
 
-- [ ] 32-01-PLAN.md — Data layer: expanded types, getSeriesDetail, nav item, mock factories, loading skeleton
+- [x] 32-01-PLAN.md — Data layer: expanded types, getSeriesDetail, nav item, mock factories, loading skeleton
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -243,6 +243,6 @@ Phases execute in numeric order: 31 -> 32 -> 33 -> 34
 | 29. UI Polish | v1.7 | 3/3 | Complete | 2026-05-24 |
 | 30. Code Quality | v1.7 | 3/3 | Complete | 2026-05-24 |
 | 31. Data Foundation & Fixes | v1.8 | 3/3 | Complete   | 2026-05-24 |
-| 32. Series Management Pages | v1.8 | 0/3 | Not started | - |
+| 32. Series Management Pages | v1.8 | 1/3 | In Progress|  |
 | 33. Chart Form Integration | v1.8 | 0/? | Not started | - |
 | 34. Browse & Pattern Dive Integration | v1.8 | 0/? | Not started | - |
