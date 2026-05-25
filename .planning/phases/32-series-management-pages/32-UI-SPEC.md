@@ -43,6 +43,8 @@ Exceptions:
 - Progress bar height: 8px (`h-2`) on cards, 10px (`h-2.5`) on detail header. Both match DesignOS design.
 - Chart row thumbnails: 40px (`h-10 w-10`) for consistency with existing designer detail chart rows.
 
+**Executor guidance:** These three exceptions are inherited from DesignOS. Do not introduce additional non-standard spacing values beyond this list.
+
 ---
 
 ## Typography
@@ -112,17 +114,17 @@ Accent reserved for: "Add Series" primary CTA button, progress bar fills on card
 | Property | Value |
 |----------|-------|
 | Back link | `<Link href="/series">` with ArrowLeft icon: "Back to Series". `text-muted-foreground hover:text-foreground text-sm` (matches designer detail back link) |
-| Series name (view mode) | `text-2xl font-semibold font-heading text-foreground` with Pencil icon button adjacent (D-07) |
+| Series name (view mode) | `text-2xl font-semibold font-heading text-foreground` with Pencil icon button adjacent (D-07). Icon button: `aria-label="Edit series name"` |
 | Series name (edit mode) | Inline `<input>` with `border-b-2 border-primary bg-transparent text-xl font-semibold font-heading focus:outline-none`. Check icon (save) + X icon (cancel). Enter saves, Escape cancels. (D-07, matches DesignOS inline edit) |
 | Designer display | `text-sm text-muted-foreground` "by {designerName}" as a link to `/designers/{designerId}`. (D-08) |
-| Designer edit | Small Pencil icon button opens SearchableSelect dropdown for designer reassignment. (D-08) |
+| Designer edit | Small Pencil icon button (`aria-label="Edit designer"`) opens SearchableSelect dropdown for designer reassignment. (D-08) |
 | Notes (view mode) | `text-sm text-muted-foreground mt-2` -- "Notes: {notes}". Only rendered when notes is non-null. |
 | Notes (edit mode) | `<textarea>` with standard input styling. Shown when user clicks edit icon next to notes. |
 | TotalCount display | `text-sm text-muted-foreground` -- "{ownedCount} of {totalCount} owned" when set, omitted when null. |
 | TotalCount edit | Inline number `<input>` adjacent to totalCount display. (D-07) |
 | Progress bar | `h-2.5 rounded-full bg-muted overflow-hidden` container, `h-full rounded-full bg-primary` fill. Same ratio as card. (D-01, D-03) |
 | Progress text | Right of bar: "{finishedCount} of {ownedCount} finished" in `text-sm text-muted-foreground`. |
-| Action buttons | Edit (Pencil) + Delete (Trash2) icons top-right, same styling as designer detail: `text-muted-foreground hover:text-foreground rounded-md p-1.5`, delete hover: `hover:text-destructive hover:bg-destructive/10` |
+| Action buttons | Edit (Pencil, `aria-label="Edit series name"`) + Delete (Trash2, `aria-label="Delete series"`) icons top-right, same styling as designer detail: `text-muted-foreground hover:text-foreground rounded-md p-1.5`, delete hover: `hover:text-destructive hover:bg-destructive/10` |
 
 ### CP-04: Chart Row (Detail Page)
 
@@ -146,10 +148,10 @@ Accent reserved for: "Add Series" primary CTA button, progress bar fills on card
 | Title | "Add Series" in `font-heading text-lg font-semibold` |
 | Fields | Name (required, text input, placeholder: "e.g. Mini Bottles"), Total Count (optional, number input, placeholder: "Total charts in series"), Designer (optional, SearchableSelect from existing designers), Notes (optional, textarea, placeholder: "Any notes about this series") |
 | Submit CTA | "Create Series" as primary `<Button>` |
-| Cancel | "Cancel" as outline `<Button>` |
+| Dismiss | "Never mind" as outline `<Button>` |
 | Validation | Name required, trimmed, min 1 char (matches seriesSchema). Duplicate name shows inline error from server response. |
 | On success | Toast "Series created", close modal, router.refresh() |
-| On error | Toast with error message from server action |
+| On error | Toast "Couldn't create series. Please try again." |
 
 ### CP-06: Delete Series Confirmation
 
@@ -158,8 +160,8 @@ Accent reserved for: "Add Series" primary CTA button, progress bar fills on card
 | Component | Extend existing `DeleteConfirmationDialog` -- add `"series"` to entityType union |
 | Title | "Delete Series?" |
 | Description | 'This will remove "{seriesName}" from your collection. {chartCount} chart(s) will be unassigned from this series. Charts will NOT be deleted.' |
-| Confirm button | "Delete" (destructive variant) / "Deleting..." when pending |
-| Cancel button | "Cancel" (outline variant) |
+| Confirm button | "Delete Series" (destructive variant) / "Deleting..." when pending |
+| Dismiss button | "Keep Series" (outline variant) |
 
 ### CP-07: Loading Skeleton (List Page)
 
@@ -183,6 +185,14 @@ Accent reserved for: "Add Series" primary CTA button, progress bar fills on card
 
 ---
 
+## Visual Hierarchy
+
+**List page primary focal point:** The series card grid is the primary visual anchor. The page title ("Series") and "Add Series" CTA button form the header bar, followed by the sort bar, then the card grid which occupies the majority of viewport. When no series exist, the empty state (centered icon + heading + CTA) is the sole focal point.
+
+**Detail page primary focal point:** The series name heading at `text-2xl` with the progress bar immediately below it. The chart list section is the secondary focal region.
+
+---
+
 ## Copywriting Contract
 
 | Element | Copy |
@@ -190,6 +200,7 @@ Accent reserved for: "Add Series" primary CTA button, progress bar fills on card
 | Page title | "Series" |
 | Primary CTA (list) | "Add Series" (button with Plus icon) |
 | Primary CTA (modal) | "Create Series" (submit button in add modal) |
+| Modal dismiss | "Never mind" (outline button in add modal) |
 | Empty state heading (list) | "No series created yet" |
 | Empty state description (list) | "Add your first series to start organizing your collection." |
 | Empty state icon | `Library` from lucide-react |
@@ -201,12 +212,15 @@ Accent reserved for: "Add Series" primary CTA button, progress bar fills on card
 | Error state (detail fetch) | "Series not found." (when ID doesn't exist) |
 | Delete confirmation title | "Delete Series?" |
 | Delete confirmation body | 'This will remove "{name}" from your collection. {N} chart(s) will be unassigned from this series. Charts will NOT be deleted.' |
+| Delete confirm button | "Delete Series" |
+| Delete dismiss button | "Keep Series" |
 | Delete success toast | "Series deleted" |
-| Delete error toast | "Something went wrong. Please try again." |
+| Delete error toast | "Couldn't delete series. Please try again." |
 | Create success toast | "Series created" |
+| Create error toast | "Couldn't create series. Please try again." |
 | Create error (duplicate) | "A series with that name already exists" (from server action) |
 | Update success toast | "Series updated" |
-| Update error toast | "Something went wrong. Please try again." |
+| Update error toast | "Couldn't update series. Please try again." |
 | Back link (detail) | "Back to Series" |
 | Section header (detail charts) | "Charts ({count})" |
 | Designer attribution (card) | "by {designerName}" |
@@ -223,6 +237,9 @@ Accent reserved for: "Add Series" primary CTA button, progress bar fills on card
 | Series card clickability | `<Link>` wrapping full card, inherits accessible name from series name heading inside | Verify card renders as `<a>` with href, contains series name |
 | Sort pills keyboard | `type="button"` on all sort buttons, `aria-label` not needed (visible label) | Tab to pills, Enter/Space toggles sort |
 | Inline name edit | Input receives focus on edit mode entry. `aria-label="Series name"` on input | Verify focus moves to input on Pencil click |
+| Edit series name icon button | `aria-label="Edit series name"` on Pencil icon button adjacent to series name | Verify accessible name present on icon-only button |
+| Edit designer icon button | `aria-label="Edit designer"` on Pencil icon button adjacent to designer display | Verify accessible name present on icon-only button |
+| Delete series icon button | `aria-label="Delete series"` on Trash2 icon button in detail header actions | Verify accessible name present on icon-only button |
 | Delete confirmation | Dialog uses `DialogTitle` + `DialogDescription` for screen reader context | Verify dialog has `role="dialog"`, title, description |
 | Chart rows | `<Link>` with chart name visible. `role="group"` not needed (Link is self-describing) | Navigate by Tab, Enter activates link |
 | Loading skeleton | `aria-hidden="true"` on skeleton container, `aria-label="Loading series"` on page wrapper | Verify skeleton is hidden from screen readers |
