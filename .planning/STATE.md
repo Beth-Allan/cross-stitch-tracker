@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Series & Collections
-status: "Phase 31 shipped — PR #56"
-last_updated: "2026-05-25T00:25:12.738Z"
-last_activity: "2026-05-24 -- Phase 31 shipped — PR #56"
+status: "Phase 32 planned — 3 plans in 2 waves"
+last_updated: "2026-05-24T22:00:00.000Z"
+last_activity: "2026-05-24 -- Phase 32 planned — 3 plans in 2 waves"
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 3
+  total_plans: 6
   completed_plans: 3
   percent: 25
 ---
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 31 — data-foundation-fixes (shipped)
+**Current focus:** Phase 32 — series-management-pages (planned, ready to execute)
 
 ## Current Position
 
-Phase: 31 (data-foundation-fixes) — SHIPPED (PR #56)
-Plan: 3 of 3
-Status: Phase 31 shipped — PR #56
-Last activity: 2026-05-24 -- Phase 31 shipped — PR #56
+Phase: 32 (series-management-pages) — PLANNED
+Plan: 0 of 3
+Status: Phase 32 planned — 3 plans in 2 waves
+Last activity: 2026-05-24 -- Phase 32 planned — 3 plans in 2 waves
 
 Progress: [██░░░░░░░░] 25%
 
@@ -78,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-25T00:25:12.732Z
-Stopped at: Phase 32 context gathered
-Resume file: .planning/phases/32-series-management-pages/32-CONTEXT.md
+Last session: 2026-05-24T22:00:00.000Z
+Stopped at: Phase 32 planned — ready for execution
+Resume file: .planning/phases/32-series-management-pages/32-01-PLAN.md
