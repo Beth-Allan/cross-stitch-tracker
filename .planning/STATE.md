@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Series & Collections
-status: ready_to_plan
-last_updated: 2026-05-25T02:11:26.017Z
-last_activity: 2026-05-25 -- Phase 32 execution started
+status: shipped
+last_updated: 2026-05-25T02:30:00.000Z
+last_activity: 2026-05-25 -- Phase 32 shipped — PR #57
 progress:
   total_phases: 4
   completed_phases: 1
