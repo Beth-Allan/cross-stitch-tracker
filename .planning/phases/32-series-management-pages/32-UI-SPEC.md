@@ -41,8 +41,10 @@ Declared values (must be multiples of 4):
 Exceptions:
 - Card padding: `p-5` (20px) matches DesignOS series card padding. This is a DesignOS-specified value, not a new token.
 - Chart row thumbnails: 40px (`h-10 w-10`) for consistency with existing designer detail chart rows.
+- Icon button padding: `p-1.5` (6px) on edit/delete action buttons — inherited from existing designer detail styling.
+- Chevron kerning: `ml-0.5` (2px) optical micro-adjustment on sort pill chevron icons — inherited from existing patterns.
 
-**Executor guidance:** These two exceptions are inherited from DesignOS. Do not introduce additional non-standard spacing values beyond this list.
+**Executor guidance:** These exceptions are inherited from DesignOS and existing patterns. Do not introduce additional non-standard spacing values beyond this list.
 
 ---
 
@@ -134,7 +136,7 @@ Accent reserved for: "Add Series" primary CTA button, progress bar fills on card
 | Chart name | `text-sm font-semibold text-foreground truncate` |
 | Chart meta | `text-xs text-muted-foreground`: stitch count formatted with locale separators + SizeBadge |
 | Status | `StatusBadge` component (existing). Fallback: `text-xs text-muted-foreground` "Not started" |
-| In-progress bar | When status is IN_PROGRESS and stitch count > 0: `h-1.5 w-16 bg-muted rounded-full` track, `bg-primary` fill, adjacent percentage in `text-xs text-muted-foreground`. (Matches designer detail exactly) |
+| In-progress bar | When status is IN_PROGRESS and stitch count > 0: `h-2 w-16 bg-muted rounded-full` track, `bg-primary` fill, adjacent percentage in `text-xs text-muted-foreground`. Consistent with main progress bar height. |
 | Sort | Sort pills above chart list: "Name", "Stitches", "Status" (matching designer detail sort pill pattern) |
 | Section header | `text-xs text-muted-foreground font-semibold uppercase tracking-widest`: "Charts ({count})" |
 
