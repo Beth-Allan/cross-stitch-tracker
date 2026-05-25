@@ -10,9 +10,9 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 ## Current State
 
-**Last shipped:** v1.6 Cleanup & Hardening (2026-05-20)
-**7 milestones shipped:** v1.0-v1.6 (26 phases, 122 plans)
-**Current:** v1.7 Fix & Polish (Phases 27-30) — Phase 29 complete (2026-05-24)
+**Last shipped:** v1.7 Fix & Polish (2026-05-24)
+**8 milestones shipped:** v1.0-v1.7 (30 phases, 133 plans)
+**Current:** v1.8 Series & Collections (Phases 31-34) — Phase 32 complete (2026-05-25)
 
 The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters) with colored status/size badges and digital copy indicators, project detail with tabbed layout, session logging, and inline skein calculator controls, unified supply table with keyboard-first entry and visible commit button, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project search, status grouping, supply search, smart selection, and squared pills, image optimization, multi-file working copies per chart (up to 50MB, including .zip), click-to-set focal point control for cover images with repositioned action bar, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights with stitch counts, status filter pills, and celebration confetti on record-breaking sessions. 2,269 tests, ~110k LOC TypeScript. Stats insights now populate from library data (not just session-tracked projects) with status group filtering. Integer-only chart axes. Collection total stitch counter. Days-in-library display fix.
 
@@ -92,6 +92,8 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - ✓ Stats corrections (records tab, integer axes, inline names, total stitches, days-in-library) — v1.7
 - ✓ UI polish (colored status/size pills, digital copy indicator, CalculatorCard on supplies tab, 50MB+zip upload) — v1.7
 - ✓ Code quality (TS test errors, silent failures, R2 orphan cleanup, status color CSS vars, shared constant + hook) — v1.7
+- ✓ Series data foundation (Prisma model, CRUD actions, progress computation, Zod validation) — v1.8
+- ✓ Series management pages (/series list with card grid, sort, create/delete; /series/[id] detail with inline edit, chart rows, progress) — v1.8
 
 ## Current Milestone: v1.8 Series & Collections
 
@@ -113,8 +115,8 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - [ ] Series progress display ("8 of 15" or "8 charts" for open-ended)
 - [ ] Pattern Dive Series tab with series cards and progress indicators
 - [ ] Series filter on Browse tab
-- [ ] Series detail page showing assigned charts
-- [ ] Series management page with CRUD
+- [x] Series detail page showing assigned charts — Phase 32
+- [x] Series management page with CRUD — Phase 32
 - [ ] Fix pre-existing TypeScript errors in test files (999.19)
 - [ ] Stats page query group separation for resilience (999.22)
 
@@ -151,8 +153,8 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 
 ## Context
 
-**Current state (v1.6 shipped):**
-- 2,176 tests, ~110k LOC TypeScript, deployed to Vercel
+**Current state (v1.8 in progress):**
+- 2,349 tests, ~115k LOC TypeScript, deployed to Vercel
 - Tech stack: Next.js 16, Prisma 7, Tailwind v4, Auth.js v5 beta, shadcn/ui v4 (Base UI)
 - Database: PostgreSQL on Neon (prod), Cloudflare R2 (file storage)
 - 70+ backlog items captured (see CLAUDE.md backlog section)
