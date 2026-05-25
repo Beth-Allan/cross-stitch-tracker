@@ -10,6 +10,7 @@ import {
   Clock,
   BarChart3,
   ShoppingCart,
+  Library,
   Settings,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -32,6 +33,7 @@ export const navigationSections: NavSection[] = [
       { label: "Dashboard", href: "/", icon: LayoutDashboard },
       { label: "Pattern Dive", href: "/charts", icon: Scissors },
       { label: "Shopping", href: "/shopping", icon: ShoppingCart },
+      { label: "Series", href: "/series", icon: Library },
     ],
   },
   {
