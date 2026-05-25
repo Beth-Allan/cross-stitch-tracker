@@ -40,10 +40,9 @@ Declared values (must be multiples of 4):
 
 Exceptions:
 - Card padding: `p-5` (20px) matches DesignOS series card padding. This is a DesignOS-specified value, not a new token.
-- Progress bar height: 8px (`h-2`) on cards, 10px (`h-2.5`) on detail header. Both match DesignOS design.
 - Chart row thumbnails: 40px (`h-10 w-10`) for consistency with existing designer detail chart rows.
 
-**Executor guidance:** These three exceptions are inherited from DesignOS. Do not introduce additional non-standard spacing values beyond this list.
+**Executor guidance:** These two exceptions are inherited from DesignOS. Do not introduce additional non-standard spacing values beyond this list.
 
 ---
 
@@ -122,7 +121,7 @@ Accent reserved for: "Add Series" primary CTA button, progress bar fills on card
 | Notes (edit mode) | `<textarea>` with standard input styling. Shown when user clicks edit icon next to notes. |
 | TotalCount display | `text-sm text-muted-foreground` -- "{ownedCount} of {totalCount} owned" when set, omitted when null. |
 | TotalCount edit | Inline number `<input>` adjacent to totalCount display. (D-07) |
-| Progress bar | `h-2.5 rounded-full bg-muted overflow-hidden` container, `h-full rounded-full bg-primary` fill. Same ratio as card. (D-01, D-03) |
+| Progress bar | `h-2 rounded-full bg-muted overflow-hidden` container, `h-full rounded-full bg-primary` fill. Same ratio as card. (D-01, D-03) |
 | Progress text | Right of bar: "{finishedCount} of {ownedCount} finished" in `text-sm text-muted-foreground`. |
 | Action buttons | Edit (Pencil, `aria-label="Edit series name"`) + Delete (Trash2, `aria-label="Delete series"`) icons top-right, same styling as designer detail: `text-muted-foreground hover:text-foreground rounded-md p-1.5`, delete hover: `hover:text-destructive hover:bg-destructive/10` |
 
