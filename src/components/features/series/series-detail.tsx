@@ -125,7 +125,8 @@ export function SeriesDetail({ series }: SeriesDetailProps) {
       } else {
         toast.error(result.error ?? "Couldn't update series. Please try again.");
       }
-    } catch {
+    } catch (error) {
+      console.error("SeriesDetail name update failed:", error);
       toast.error("Couldn't update series. Please try again.");
     }
     setIsEditingName(false);
@@ -156,7 +157,8 @@ export function SeriesDetail({ series }: SeriesDetailProps) {
       } else {
         toast.error(result.error ?? "Couldn't delete series. Please try again.");
       }
-    } catch {
+    } catch (error) {
+      console.error("SeriesDetail delete failed:", error);
       toast.error("Couldn't delete series. Please try again.");
     }
   }

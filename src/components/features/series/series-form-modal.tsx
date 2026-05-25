@@ -76,7 +76,8 @@ export function SeriesFormModal({ open, onOpenChange }: SeriesFormModalProps) {
             toast.error("Couldn't create series. Please try again.");
           }
         }
-      } catch {
+      } catch (error) {
+        console.error("SeriesFormModal create failed:", error);
         toast.error("Couldn't create series. Please try again.");
       }
     });

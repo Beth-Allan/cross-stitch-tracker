@@ -36,7 +36,8 @@ export function SeriesList({ series }: { series: SeriesWithStats[] }) {
       } else {
         toast.error(result.error ?? "Something went wrong. Please try again.");
       }
-    } catch {
+    } catch (error) {
+      console.error("SeriesList delete failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
   }

@@ -18,9 +18,7 @@ export function StatusDonut({ have, need }: { have: number; need: number }) {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="false" className="shrink-0">
       <title>{`${have} of ${need}`}</title>
-      {/* Background ring */}
       <circle cx="8" cy="8" r="6" fill="none" className="stroke-muted" strokeWidth="2" />
-      {/* Foreground arc */}
       {!isEmpty && (
         <circle
           cx="8"
