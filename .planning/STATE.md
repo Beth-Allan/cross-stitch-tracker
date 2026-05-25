@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Series & Collections
-status: executing
-last_updated: "2026-05-24T23:55:00.000Z"
-last_activity: 2026-05-24 -- Phase 31 shipped — PR #56
+status: "Phase 31 shipped — PR #56"
+last_updated: "2026-05-25T00:25:12.738Z"
+last_activity: "2026-05-24 -- Phase 31 shipped — PR #56"
 progress:
   total_phases: 4
   completed_phases: 1
@@ -78,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-24T22:38:04.712Z
-Stopped at: Phase 31 context gathered
-Resume file: .planning/phases/31-data-foundation-fixes/31-CONTEXT.md
+Last session: 2026-05-25T00:25:12.732Z
+Stopped at: Phase 32 context gathered
+Resume file: .planning/phases/32-series-management-pages/32-CONTEXT.md
