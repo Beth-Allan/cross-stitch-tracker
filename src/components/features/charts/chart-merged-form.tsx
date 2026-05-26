@@ -15,6 +15,7 @@ import type {
   ProjectStatus,
 } from "@/generated/prisma/client";
 import type { ChartWithProject } from "@/types/chart";
+import type { SeriesWithStats } from "@/types/series";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { PROJECT_STATUSES, STATUS_CONFIG } from "@/lib/utils/status";
 import { useChartForm, type ChartFormValues } from "./use-chart-form";
@@ -124,6 +125,7 @@ export function buildCreateFn() {
 interface ChartMergedFormProps {
   designers: Designer[];
   genres: Genre[];
+  series: SeriesWithStats[];
   storageLocations: StorageLocationWithStats[];
   stitchingApps: StitchingAppWithStats[];
   unassignedFabrics: (Fabric & { brand: FabricBrand })[];
@@ -135,6 +137,7 @@ interface ChartMergedFormProps {
 export function ChartMergedForm({
   designers,
   genres,
+  series,
   storageLocations,
   stitchingApps,
   unassignedFabrics,
@@ -173,6 +176,8 @@ export function ChartMergedForm({
   const [appDialogName, setAppDialogName] = useState("");
   const [designerDialogOpen, setDesignerDialogOpen] = useState(false);
   const [designerDialogName, setDesignerDialogName] = useState("");
+  const [seriesDialogOpen, setSeriesDialogOpen] = useState(false);
+  const [seriesDialogName, setSeriesDialogName] = useState("");
 
   // Instantiate adapter once via ref
   if (!adapterRef.current) {
@@ -234,6 +239,7 @@ export function ChartMergedForm({
     initialData: isEdit ? initialData : undefined,
     designers,
     genres,
+    series,
     storageLocations,
     stitchingApps,
     onSuccess,
@@ -294,6 +300,7 @@ export function ChartMergedForm({
     const defaultValues = {
       name: "",
       designerId: null,
+      seriesId: null,
       coverImageUrl: null,
       coverThumbnailUrl: null,
       uploadedFiles: [] as Array<{
@@ -408,6 +415,11 @@ export function ChartMergedForm({
     label: d.name,
   }));
 
+  const seriesOptions = form.seriesList.map((s) => ({
+    value: s.id,
+    label: s.name,
+  }));
+
   const fabricOptions = unassignedFabrics.map((f) => ({
     value: f.id,
     label: `${f.name} - ${f.count}ct ${f.type} (${f.brand.name})`,
@@ -501,6 +513,29 @@ export function ChartMergedForm({
                   form.setField("coverImageUrl", null);
                   form.setField("coverThumbnailUrl", null);
                 }}
+              />
+            </FormField>
+
+            <FormField label="Series" htmlFor="series">
+              <SearchableSelect
+                options={seriesOptions}
+                value={form.values.seriesId}
+                onChange={(v) => form.setField("seriesId", v)}
+                onAddNew={(searchTerm) => {
+                  setSeriesDialogName(searchTerm);
+                  setSeriesDialogOpen(true);
+                }}
+                placeholder="Select series..."
+              />
+              <InlineNameDialog
+                open={seriesDialogOpen}
+                onOpenChange={setSeriesDialogOpen}
+                title="Add New Series"
+                initialName={seriesDialogName}
+                placeholder="e.g. Mirabilia Collection"
+                submitLabel="Add Series"
+                requiredError="Series name is required"
+                onSubmit={form.handleAddSeries}
               />
             </FormField>
 
