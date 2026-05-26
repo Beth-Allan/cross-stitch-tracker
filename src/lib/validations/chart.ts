@@ -7,6 +7,7 @@ export const chartFormSchema = z.object({
     .object({
       name: z.string().trim().min(1, "Chart name is required").max(200, "Chart name too long"),
       designerId: z.string().nullable().default(null),
+      seriesId: z.string().nullable().default(null),
       coverImageUrl: z.string().min(1).nullable().default(null),
       coverThumbnailUrl: z.string().min(1).nullable().default(null),
       fileKeys: z

@@ -1,9 +1,10 @@
 import { renderHook, act } from "@/__tests__/test-utils";
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { useChartForm } from "./use-chart-form";
-import { createMockDesigner, createMockGenre } from "@/__tests__/mocks";
+import { createMockDesigner, createMockGenre, createMockSeriesWithStats } from "@/__tests__/mocks";
 import { createStorageLocation } from "@/lib/actions/storage-location-actions";
 import { createStitchingApp } from "@/lib/actions/stitching-app-actions";
+import { createSeries } from "@/lib/actions/series-actions";
 
 // Mock all server actions the hook imports
 vi.mock("@/lib/actions/chart-actions", () => ({
@@ -21,6 +22,9 @@ vi.mock("@/lib/actions/storage-location-actions", () => ({
 }));
 vi.mock("@/lib/actions/stitching-app-actions", () => ({
   createStitchingApp: vi.fn(),
+}));
+vi.mock("@/lib/actions/series-actions", () => ({
+  createSeries: vi.fn(),
 }));
 
 const defaultProps = {
@@ -146,6 +150,108 @@ describe("useChartForm inline entity creation", () => {
       });
 
       expect(createStitchingApp).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("handleAddSeries", () => {
+    it("creates series and selects it on success", async () => {
+      (createSeries as Mock).mockResolvedValue({
+        success: true,
+        series: {
+          id: "series-new",
+          name: "Test Series",
+          totalCount: null,
+          designerId: null,
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+
+      const { result } = renderHook(() => useChartForm(defaultProps));
+
+      await act(async () => {
+        await result.current.handleAddSeries("Test Series");
+      });
+
+      expect(createSeries).toHaveBeenCalledWith({ name: "Test Series", designerId: null });
+      expect(result.current.values.seriesId).toBe("series-new");
+      expect(result.current.seriesList).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: "series-new", name: "Test Series" }),
+        ]),
+      );
+    });
+
+    it("passes current designerId to createSeries (auto-populate)", async () => {
+      (createSeries as Mock).mockResolvedValue({
+        success: true,
+        series: {
+          id: "series-new",
+          name: "Designer Series",
+          totalCount: null,
+          designerId: "des-1",
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+
+      const { result } = renderHook(() => useChartForm(defaultProps));
+
+      await act(async () => {
+        result.current.setField("designerId", "des-1");
+      });
+
+      await act(async () => {
+        await result.current.handleAddSeries("Designer Series");
+      });
+
+      expect(createSeries).toHaveBeenCalledWith({
+        name: "Designer Series",
+        designerId: "des-1",
+      });
+    });
+
+    it("throws on server error", async () => {
+      (createSeries as Mock).mockResolvedValue({
+        success: false,
+        error: "Already exists",
+      });
+
+      const { result } = renderHook(() => useChartForm(defaultProps));
+
+      await expect(
+        act(async () => {
+          await result.current.handleAddSeries("Duplicate");
+        }),
+      ).rejects.toThrow("Already exists");
+    });
+
+    it("passes designerId: null when no designer selected", async () => {
+      (createSeries as Mock).mockResolvedValue({
+        success: true,
+        series: {
+          id: "series-new",
+          name: "No Designer Series",
+          totalCount: null,
+          designerId: null,
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+
+      const { result } = renderHook(() => useChartForm(defaultProps));
+
+      await act(async () => {
+        await result.current.handleAddSeries("No Designer Series");
+      });
+
+      expect(createSeries).toHaveBeenCalledWith({
+        name: "No Designer Series",
+        designerId: null,
+      });
     });
   });
 });

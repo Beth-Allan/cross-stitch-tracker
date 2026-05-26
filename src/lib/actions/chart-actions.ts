@@ -37,6 +37,7 @@ async function createChartAndProject(
     data: {
       name: chart.name,
       designerId: chart.designerId,
+      seriesId: chart.seriesId,
       coverImageUrl: chart.coverImageUrl,
       coverThumbnailUrl: chart.coverThumbnailUrl,
       stitchCount: effectiveStitchCount,
@@ -259,6 +260,7 @@ export async function updateChart(chartId: string, formData: unknown) {
         data: {
           name: chart.name,
           designerId: chart.designerId,
+          seriesId: chart.seriesId,
           coverImageUrl: chart.coverImageUrl,
           coverThumbnailUrl: chart.coverThumbnailUrl,
           stitchCount: effectiveStitchCount,
