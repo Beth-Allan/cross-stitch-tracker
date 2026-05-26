@@ -5,6 +5,7 @@ import { getGenres } from "@/lib/actions/genre-actions";
 import { getStorageLocationsWithStats } from "@/lib/actions/storage-location-actions";
 import { getStitchingAppsWithStats } from "@/lib/actions/stitching-app-actions";
 import { getUnassignedFabrics } from "@/lib/actions/fabric-actions";
+import { getSeriesWithStats } from "@/lib/actions/series-actions";
 import { prisma } from "@/lib/db";
 import { EditChartPageClient } from "./edit-client";
 
@@ -15,15 +16,15 @@ export default async function EditChartPage({ params }: { params: Promise<{ id: 
   const chart = await getChart(id);
   if (!chart) notFound();
 
-  const [designers, genres, storageLocations, stitchingApps, unassignedFabrics] = await Promise.all(
-    [
+  const [designers, genres, storageLocations, stitchingApps, unassignedFabrics, series] =
+    await Promise.all([
       getDesigners(),
       getGenres(),
       getStorageLocationsWithStats(),
       getStitchingAppsWithStats(),
       getUnassignedFabrics(chart.project?.id),
-    ],
-  );
+      getSeriesWithStats(),
+    ]);
 
   // Safe: getChart() above already verified userId ownership of this project.
   // The projectId used here comes from that verified chart, not from user input.
@@ -49,6 +50,7 @@ export default async function EditChartPage({ params }: { params: Promise<{ id: 
       stitchingApps={stitchingApps}
       unassignedFabrics={unassignedFabrics}
       supplyStitchTotal={supplyStitchTotal}
+      series={series}
     />
   );
 }
