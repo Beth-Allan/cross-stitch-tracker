@@ -187,7 +187,7 @@ Full details: `milestones/v1.7-ROADMAP.md`
 **Plans**: 2 plans
 **Wave 1**
 
-- [ ] 33-01-PLAN.md — Data plumbing: seriesId validation + chart actions + hook + InlineNameDialog props
+- [x] 33-01-PLAN.md — Data plumbing: seriesId validation + chart actions + hook + InlineNameDialog props
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -251,5 +251,5 @@ Phases execute in numeric order: 31 -> 32 -> 33 -> 34
 | 30. Code Quality | v1.7 | 3/3 | Complete | 2026-05-24 |
 | 31. Data Foundation & Fixes | v1.8 | 3/3 | Complete   | 2026-05-24 |
 | 32. Series Management Pages | v1.8 | 3/3 | Complete    | 2026-05-25 |
-| 33. Chart Form Integration | v1.8 | 0/2 | Not started | - |
+| 33. Chart Form Integration | v1.8 | 1/2 | In Progress|  |
 | 34. Browse & Pattern Dive Integration | v1.8 | 0/? | Not started | - |
