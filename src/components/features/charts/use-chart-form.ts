@@ -13,12 +13,15 @@ import { createDesigner } from "@/lib/actions/designer-actions";
 import { createGenre } from "@/lib/actions/genre-actions";
 import { createStorageLocation } from "@/lib/actions/storage-location-actions";
 import { createStitchingApp } from "@/lib/actions/stitching-app-actions";
+import { createSeries } from "@/lib/actions/series-actions";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
+import type { SeriesWithStats } from "@/types/series";
 import { z } from "zod";
 
 export interface ChartFormValues {
   name: string;
   designerId: string | null;
+  seriesId: string | null;
   coverImageUrl: string | null;
   coverThumbnailUrl: string | null;
   uploadedFiles: Array<{ key: string; filename: string; mimeType: string; fileSize: number }>;
@@ -52,6 +55,7 @@ interface UseChartFormOptions {
   genres: Genre[];
   storageLocations?: StorageLocationWithStats[];
   stitchingApps?: StitchingAppWithStats[];
+  series?: SeriesWithStats[];
   onSuccess: (chartId: string) => void;
   getSupplyRows?: () => SupplyRow[];
   onValidationError?: () => void;
@@ -81,6 +85,7 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
     return {
       name: "",
       designerId: null,
+      seriesId: null,
       coverImageUrl: null,
       coverThumbnailUrl: null,
       uploadedFiles: [],
@@ -112,6 +117,7 @@ function buildInitialValues(data?: ChartWithProject): ChartFormValues {
   return {
     name: data.name,
     designerId: data.designerId,
+    seriesId: data.seriesId,
     coverImageUrl: data.coverImageUrl,
     coverThumbnailUrl: data.coverThumbnailUrl,
     uploadedFiles: [],
@@ -151,6 +157,7 @@ export function useChartForm({
   genres: initialGenres,
   storageLocations: initialStorageLocations = [],
   stitchingApps: initialStitchingApps = [],
+  series: initialSeries = [],
   onSuccess,
   getSupplyRows,
   onValidationError,
@@ -167,6 +174,7 @@ export function useChartForm({
     useState<StorageLocationWithStats[]>(initialStorageLocations);
   const [stitchingAppsList, setStitchingAppsList] =
     useState<StitchingAppWithStats[]>(initialStitchingApps);
+  const [seriesList, setSeriesList] = useState<SeriesWithStats[]>(initialSeries);
 
   // Dirty tracking
   const isDirty = useMemo(() => {
@@ -207,6 +215,7 @@ export function useChartForm({
       chart: {
         name: values.name,
         designerId: values.designerId,
+        seriesId: values.seriesId,
         coverImageUrl: values.coverImageUrl,
         coverThumbnailUrl: values.coverThumbnailUrl,
         fileKeys: values.uploadedFiles,
@@ -403,6 +412,32 @@ export function useChartForm({
     [setField],
   );
 
+  const handleAddSeries = useCallback(
+    async (name: string) => {
+      suppressUnloadRef.current = true;
+      try {
+        const result = await createSeries({ name, designerId: values.designerId });
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+        const newItem: SeriesWithStats = {
+          id: result.series.id,
+          name: result.series.name,
+          totalCount: result.series.totalCount,
+          designerId: result.series.designerId,
+          designerName: null,
+          notes: result.series.notes,
+          progress: { ownedCount: 0, finishedCount: 0, totalCount: result.series.totalCount },
+        };
+        setSeriesList((prev) => [...prev, newItem]);
+        setField("seriesId", result.series.id);
+      } finally {
+        suppressUnloadRef.current = false;
+      }
+    },
+    [setField, values.designerId],
+  );
+
   // Suppress beforeunload during inline entity creation (server action revalidation can trigger it)
   const suppressUnloadRef = useRef(false);
 
@@ -436,7 +471,9 @@ export function useChartForm({
     handleAddGenre,
     storageLocationsList,
     stitchingAppsList,
+    seriesList,
     handleAddStorageLocation,
     handleAddStitchingApp,
+    handleAddSeries,
   };
 }

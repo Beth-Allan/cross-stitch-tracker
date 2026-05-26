@@ -18,6 +18,8 @@ interface InlineNameDialogProps {
   title: string;
   initialName?: string;
   placeholder?: string;
+  submitLabel?: string;
+  requiredError?: string;
   onSubmit: (name: string) => Promise<void>;
 }
 
@@ -27,6 +29,8 @@ export function InlineNameDialog({
   title,
   initialName = "",
   placeholder = "Enter name",
+  submitLabel = "Add",
+  requiredError = "Name is required",
   onSubmit,
 }: InlineNameDialogProps) {
   const [name, setName] = useState(initialName);
@@ -50,7 +54,7 @@ export function InlineNameDialog({
     e.stopPropagation();
     const trimmedName = name.trim();
     if (!trimmedName) {
-      setError("Name is required");
+      setError(requiredError);
       return;
     }
 
@@ -99,7 +103,7 @@ export function InlineNameDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Adding..." : "Add"}
+              {isPending ? "Adding..." : submitLabel}
             </Button>
           </DialogFooter>
         </form>
