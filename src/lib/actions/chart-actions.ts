@@ -136,6 +136,7 @@ export async function createChart(formData: unknown) {
     const thumbnailWarning = await handleThumbnail(created.id, validated.chart.coverImageUrl);
 
     revalidatePath("/charts");
+    revalidatePath("/series");
     revalidatePath("/fabric");
     return { success: true as const, chartId: created.id, warning: thumbnailWarning };
   } catch (error) {
@@ -214,6 +215,7 @@ export async function createChartWithSupplies(formData: unknown, supplyPayload: 
     const thumbnailWarning = await handleThumbnail(created.id, validated.chart.coverImageUrl);
 
     revalidatePath("/charts");
+    revalidatePath("/series");
     revalidatePath("/fabric");
     return { success: true as const, chartId: created.id, warning: thumbnailWarning };
   } catch (error) {
@@ -349,6 +351,7 @@ export async function updateChart(chartId: string, formData: unknown) {
 
     revalidatePath("/charts");
     revalidatePath(`/charts/${chartId}`);
+    revalidatePath("/series");
     revalidatePath("/fabric");
     return { success: true as const, warning: thumbnailWarning };
   } catch (error) {

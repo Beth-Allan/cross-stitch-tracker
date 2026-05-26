@@ -428,7 +428,6 @@ export function ChartMergedForm({
 
   return (
     <>
-      {/* === FORM MODE === */}
       <Activity mode={isEdit || mode === "form" ? "visible" : "hidden"}>
         <div className="mx-auto max-w-[720px] px-5 pt-12 pb-20 lg:px-8">
           {isEdit && initialData ? (
@@ -469,7 +468,6 @@ export function ChartMergedForm({
               lastFocusedRef.current = e.target as HTMLElement;
             }}
           >
-            {/* === IDENTITY GROUP === */}
             <FormField
               label="Chart Name"
               htmlFor="chart-name"
@@ -553,10 +551,8 @@ export function ChartMergedForm({
               />
             </FormField>
 
-            {/* === SECTION DIVIDER === */}
             <hr className="border-border/50 my-6 border-t border-none" />
 
-            {/* === PATTERN GROUP === */}
             <StitchCountFields
               stitchesWide={form.values.stitchesWide}
               stitchesHigh={form.values.stitchesHigh}
@@ -590,10 +586,8 @@ export function ChartMergedForm({
               label="Needs onion skinning"
             />
 
-            {/* === SECTION DIVIDER === */}
             <hr className="border-border/50 my-6 border-t border-none" />
 
-            {/* === WORKFLOW GROUP === */}
             <FormField
               label="Status"
               htmlFor="project-status"
@@ -665,10 +659,8 @@ export function ChartMergedForm({
               />
             </FormField>
 
-            {/* === SECTION DIVIDER === */}
             <hr className="border-border/50 my-6 border-t border-none" />
 
-            {/* === TIMELINE GROUP === */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <FormField label="Start Date" htmlFor="start-date">
                 <Input
@@ -722,10 +714,8 @@ export function ChartMergedForm({
               </FormField>
             )}
 
-            {/* === SECTION DIVIDER === */}
             <hr className="border-border/50 my-6 border-t border-none" />
 
-            {/* === MILESTONE MARKER / MANAGE SUPPLIES LINK === */}
             {isEdit ? (
               <ManageSuppliesLink chartId={initialData!.id} />
             ) : (
@@ -747,7 +737,6 @@ export function ChartMergedForm({
               </div>
             )}
 
-            {/* === FORM-LEVEL ERROR === */}
             {form.errors._form && (
               <p role="alert" className="text-destructive text-sm">
                 {form.errors._form}
@@ -757,7 +746,6 @@ export function ChartMergedForm({
         </div>
       </Activity>
 
-      {/* === SUPPLY MODE === */}
       {/* Conditional rendering (not Activity) so CalculatorCard's Base UI Popover
           initializes fresh when supply mode activates. Activity mode="hidden" defers
           FloatingRootContext init to OffscreenLane, leaving fabric dropdown broken
@@ -799,7 +787,6 @@ export function ChartMergedForm({
         </>
       )}
 
-      {/* === STICKY SAVE BAR === */}
       <StickySaveBar
         chartName={form.values.name}
         onSubmit={form.submitForm}

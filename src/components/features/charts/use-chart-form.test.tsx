@@ -1,7 +1,7 @@
 import { renderHook, act } from "@/__tests__/test-utils";
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { useChartForm } from "./use-chart-form";
-import { createMockDesigner, createMockGenre, createMockSeriesWithStats } from "@/__tests__/mocks";
+import { createMockDesigner, createMockGenre } from "@/__tests__/mocks";
 import { createStorageLocation } from "@/lib/actions/storage-location-actions";
 import { createStitchingApp } from "@/lib/actions/stitching-app-actions";
 import { createSeries } from "@/lib/actions/series-actions";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -37,12 +37,14 @@ export function InlineNameDialog({
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
-  // Sync initialName when dialog opens
-  const prevOpenRef = useState({ value: false })[0];
-  if (open && !prevOpenRef.value) {
-    setName(initialName);
-  }
-  prevOpenRef.value = open;
+  const prevOpenRef = useRef(false);
+
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      setName(initialName);
+    }
+    prevOpenRef.current = open;
+  }, [open, initialName]);
 
   const reset = () => {
     setName("");

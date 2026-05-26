@@ -207,9 +207,8 @@ export function useChartForm({
     [],
   );
 
-  // Core submission logic — callable without a DOM event.
-  // This bypasses requestSubmit() which fails inside React 19 <Activity mode="hidden">
-  // because React's event delegation blocks synthetic events from hidden Activity subtrees.
+  const suppressUnloadRef = useRef(false);
+
   const submitForm = useCallback(async () => {
     const formData = {
       chart: {
@@ -414,6 +413,7 @@ export function useChartForm({
 
   const handleAddSeries = useCallback(
     async (name: string) => {
+      if (!name.trim()) return;
       suppressUnloadRef.current = true;
       try {
         const result = await createSeries({ name, designerId: values.designerId });
@@ -437,9 +437,6 @@ export function useChartForm({
     },
     [setField, values.designerId],
   );
-
-  // Suppress beforeunload during inline entity creation (server action revalidation can trigger it)
-  const suppressUnloadRef = useRef(false);
 
   // Beforeunload warning
   useEffect(() => {
