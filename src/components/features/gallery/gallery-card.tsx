@@ -53,7 +53,6 @@ function GenreTags({ genres }: { genres: string[] }) {
 function WIPFooter({ card }: { card: GalleryCardData }) {
   return (
     <div className="flex flex-col gap-2">
-      {/* Progress bar */}
       <div className="flex items-center gap-2.5">
         <div
           className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full"
@@ -73,12 +72,10 @@ function WIPFooter({ card }: { card: GalleryCardData }) {
         </span>
       </div>
 
-      {/* Stitch fraction */}
       <p className="text-muted-foreground text-[11px]">
         {formatNumber(card.stitchesCompleted)} / {formatNumber(card.stitchCount)} stitches
       </p>
 
-      {/* Supply summary */}
       <p className="text-muted-foreground text-[11px]">{buildSupplySummary(card)}</p>
     </div>
   );
@@ -87,10 +84,8 @@ function WIPFooter({ card }: { card: GalleryCardData }) {
 function UnstartedFooter({ card }: { card: GalleryCardData }) {
   return (
     <div className="flex flex-col gap-2.5">
-      {/* Supply summary */}
       <p className="text-muted-foreground text-[11px]">{buildSupplySummary(card)}</p>
 
-      {/* Kitting dots */}
       <KittingDots
         fabricStatus={card.fabricStatus}
         threadStatus={card.threadStatus}
@@ -112,7 +107,6 @@ function FinishedFooter({ card }: { card: GalleryCardData }) {
 
   return (
     <div className="flex flex-col gap-2">
-      {/* 100% progress bar */}
       <div className="flex items-center gap-2.5">
         <div
           className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full"
@@ -131,7 +125,6 @@ function FinishedFooter({ card }: { card: GalleryCardData }) {
         </span>
       </div>
 
-      {/* Completion date */}
       {dateLabel && (
         <div className="text-muted-foreground flex items-center gap-1 text-[11px]">
           <Sparkles className="h-3 w-3" strokeWidth={1.5} />
@@ -139,7 +132,6 @@ function FinishedFooter({ card }: { card: GalleryCardData }) {
         </div>
       )}
 
-      {/* Supply summary */}
       <p className="text-muted-foreground text-[11px]">{buildSupplySummary(card)}</p>
     </div>
   );
@@ -163,7 +155,6 @@ export function GalleryCard({ card }: GalleryCardProps) {
         celebrationClasses ?? "border-border border"
       }`}
     >
-      {/* Cover image area — wrapped in supplementary Link for larger click target */}
       <Link href={`/charts/${card.chartId}`} className="block" tabIndex={-1} aria-hidden="true">
         <div className="relative aspect-[4/3] overflow-hidden">
           {hasRealImage ? (
@@ -180,17 +171,14 @@ export function GalleryCard({ card }: GalleryCardProps) {
             <CoverPlaceholder status={card.status} />
           )}
 
-          {/* Gradient overlay on real images */}
           {hasRealImage && (
             <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/20 to-transparent" />
           )}
 
-          {/* Status badge -- top left */}
           <div className="absolute top-3 left-3">
             <StatusBadge status={card.status} />
           </div>
 
-          {/* Size badge -- top right */}
           <div className="absolute top-3 right-3">
             <Tooltip>
               <TooltipTrigger
@@ -205,9 +193,7 @@ export function GalleryCard({ card }: GalleryCardProps) {
         </div>
       </Link>
 
-      {/* Card body */}
       <div className="bg-card flex flex-1 flex-col gap-1.5 p-4">
-        {/* Project name link */}
         <Link
           href={`/charts/${card.chartId}`}
           className="font-heading text-foreground decoration-border hover:text-selected-foreground hover:decoration-progress line-clamp-2 text-sm leading-snug font-semibold underline underline-offset-2 transition-colors"
@@ -215,10 +201,8 @@ export function GalleryCard({ card }: GalleryCardProps) {
           {card.name}
         </Link>
 
-        {/* Designer */}
         <p className="text-muted-foreground truncate text-sm">{card.designerName}</p>
 
-        {/* Stitch count (non-WIP only) */}
         {card.statusGroup !== "wip" && (
           <p className="text-muted-foreground text-xs">
             {formatNumber(card.stitchCount)} stitches
@@ -233,13 +217,10 @@ export function GalleryCard({ card }: GalleryCardProps) {
           </div>
         )}
 
-        {/* Genre tags */}
         <GenreTags genres={card.genres} />
 
-        {/* Spacer */}
         <div className="min-h-1 flex-1" />
 
-        {/* Status-specific footer */}
         {card.statusGroup === "wip" && <WIPFooter card={card} />}
         {card.statusGroup === "unstarted" && <UnstartedFooter card={card} />}
         {card.statusGroup === "finished" && <FinishedFooter card={card} />}

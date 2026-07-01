@@ -113,7 +113,6 @@ export function GenreDetail({ genre }: GenreDetailProps) {
 
   return (
     <div className="space-y-6">
-      {/* Back link */}
       <Link
         href="/genres"
         className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
@@ -122,13 +121,11 @@ export function GenreDetail({ genre }: GenreDetailProps) {
         Back to Genres
       </Link>
 
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1">
           <h1 className="font-heading text-2xl font-semibold">{genre.name}</h1>
         </div>
 
-        {/* Action buttons */}
         <div className="ml-4 flex shrink-0 items-center gap-1">
           <button
             type="button"
@@ -149,7 +146,6 @@ export function GenreDetail({ genre }: GenreDetailProps) {
         </div>
       </div>
 
-      {/* Stats row -- genre only has chart count */}
       <div className="flex flex-wrap gap-6">
         <div>
           <p className="text-muted-foreground text-xs tracking-wider uppercase">Charts</p>
@@ -157,9 +153,7 @@ export function GenreDetail({ genre }: GenreDetailProps) {
         </div>
       </div>
 
-      {/* Chart list section */}
       <div>
-        {/* Section header with sort pills */}
         <div className="mb-3 flex items-center justify-between">
           <span className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
             Charts ({genre.charts.length})
@@ -194,7 +188,6 @@ export function GenreDetail({ genre }: GenreDetailProps) {
           </div>
         </div>
 
-        {/* Chart rows */}
         {sortedCharts.length > 0 ? (
           <div className="space-y-2">
             {sortedCharts.map((chart) => (
@@ -206,7 +199,6 @@ export function GenreDetail({ genre }: GenreDetailProps) {
         )}
       </div>
 
-      {/* Edit modal */}
       <GenreFormModal
         open={editModalOpen}
         onOpenChange={setEditModalOpen}
@@ -217,7 +209,6 @@ export function GenreDetail({ genre }: GenreDetailProps) {
         }}
       />
 
-      {/* Delete confirmation dialog */}
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
@@ -250,7 +241,6 @@ function ChartRow({ chart }: { chart: GenreChart }) {
       href={`/charts/${chart.id}`}
       className="border-border hover:bg-muted/50 flex items-center gap-3 rounded-lg border p-3 transition-colors"
     >
-      {/* Thumbnail */}
       {chart.coverThumbnailUrl ? (
         <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -267,7 +257,6 @@ function ChartRow({ chart }: { chart: GenreChart }) {
         </div>
       )}
 
-      {/* Info */}
       <div className="min-w-0 flex-1">
         <p className="text-foreground truncate text-sm font-semibold">{chart.name}</p>
         <div className="text-muted-foreground flex items-center gap-2 text-xs">
@@ -282,7 +271,6 @@ function ChartRow({ chart }: { chart: GenreChart }) {
         </div>
       </div>
 
-      {/* Status + progress */}
       <div className="shrink-0 text-right">
         {chart.status ? (
           <StatusBadge status={chart.status} />

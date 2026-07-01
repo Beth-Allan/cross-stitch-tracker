@@ -222,7 +222,6 @@ export function FabricCatalog({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-semibold">Fabric</h1>
         <Button
@@ -239,7 +238,9 @@ export function FabricCatalog({
         </Button>
       </div>
 
-      {/* Tabs — plain buttons to avoid Base UI Tabs useId hydration mismatch */}
+      {
+        // Plain buttons to avoid Base UI Tabs useId hydration mismatch
+      }
       <div className="border-border flex items-center gap-1 border-b">
         {(
           [
@@ -265,10 +266,8 @@ export function FabricCatalog({
         })}
       </div>
 
-      {/* Tab content */}
       {activeTab === "fabrics" && (
         <div className="space-y-4">
-          {/* Search bar */}
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative max-w-xs min-w-[200px] flex-1">
               <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
@@ -292,7 +291,6 @@ export function FabricCatalog({
             )}
           </div>
 
-          {/* Table */}
           {fabrics.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <PackageOpen className="text-muted-foreground/40 mb-3 h-12 w-12" />
@@ -307,7 +305,6 @@ export function FabricCatalog({
             </div>
           ) : (
             <>
-              {/* Desktop table */}
               <div className="border-border bg-card hidden overflow-x-auto rounded-xl border md:block">
                 <table className="w-full text-sm">
                   <caption className="sr-only">Your fabric collection</caption>
@@ -382,7 +379,6 @@ export function FabricCatalog({
                 </table>
               </div>
 
-              {/* Mobile cards */}
               <div className="space-y-3 md:hidden">
                 {filteredFabrics.map((fabric) => (
                   <FabricCard
@@ -412,7 +408,6 @@ export function FabricCatalog({
         </div>
       )}
 
-      {/* Create fabric modal */}
       <FabricFormModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
@@ -421,7 +416,6 @@ export function FabricCatalog({
         projects={projects}
       />
 
-      {/* Edit fabric modal */}
       <FabricFormModal
         open={!!editingFabric}
         onOpenChange={(open) => {
@@ -432,7 +426,6 @@ export function FabricCatalog({
         projects={projects}
       />
 
-      {/* Delete fabric dialog */}
       <FabricDeleteDialog
         open={!!deletingFabric}
         onOpenChange={(open) => {

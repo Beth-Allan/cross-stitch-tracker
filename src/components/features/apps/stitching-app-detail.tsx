@@ -50,7 +50,6 @@ export function StitchingAppDetail({ app }: StitchingAppDetailProps) {
 
   return (
     <div className="px-6 pt-6 pb-4">
-      {/* Back link */}
       <Link
         href="/apps"
         className="text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1.5 text-sm transition-colors"
@@ -59,15 +58,12 @@ export function StitchingAppDetail({ app }: StitchingAppDetailProps) {
         All Apps
       </Link>
 
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          {/* Icon badge */}
           <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
             <Tablet className="text-muted-foreground h-5 w-5" />
           </div>
 
-          {/* Name + count */}
           <div>
             <InlineNameEdit name={app.name} onSave={handleRename} variant="heading" />
             <p className="text-muted-foreground text-sm">
@@ -76,7 +72,6 @@ export function StitchingAppDetail({ app }: StitchingAppDetailProps) {
           </div>
         </div>
 
-        {/* Action buttons */}
         <div className="flex shrink-0 items-center gap-1">
           <button
             type="button"
@@ -89,7 +84,6 @@ export function StitchingAppDetail({ app }: StitchingAppDetailProps) {
         </div>
       </div>
 
-      {/* Project list */}
       <div className="mt-6 space-y-2">
         {app.projects.map((project) => (
           <Link
@@ -114,7 +108,6 @@ export function StitchingAppDetail({ app }: StitchingAppDetailProps) {
           </Link>
         ))}
 
-        {/* Empty state */}
         {app.projects.length === 0 && (
           <div className="py-16 text-center">
             <p className="text-muted-foreground mb-1 text-sm">No projects using this app</p>
@@ -125,7 +118,6 @@ export function StitchingAppDetail({ app }: StitchingAppDetailProps) {
         )}
       </div>
 
-      {/* Delete dialog */}
       <DeleteEntityDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}

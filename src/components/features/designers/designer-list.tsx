@@ -162,7 +162,6 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-semibold">Designers</h1>
         <Button onClick={() => setCreateModalOpen(true)}>
@@ -171,7 +170,6 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
         </Button>
       </div>
 
-      {/* Search bar */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative max-w-xs min-w-[200px] flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
@@ -195,7 +193,6 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
         )}
       </div>
 
-      {/* Desktop table */}
       <div className="border-border bg-card hidden overflow-x-auto rounded-xl border md:block">
         <table className="w-full text-sm">
           <caption className="sr-only">Your designers and their chart counts</caption>
@@ -264,7 +261,6 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
         </table>
       </div>
 
-      {/* Mobile cards */}
       <div className="space-y-3 md:hidden">
         {filteredDesigners.map((designer) => (
           <DesignerCard
@@ -282,10 +278,8 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
         )}
       </div>
 
-      {/* Create modal */}
       <DesignerFormModal open={createModalOpen} onOpenChange={setCreateModalOpen} designer={null} />
 
-      {/* Edit modal */}
       <DesignerFormModal
         open={!!editingDesigner}
         onOpenChange={(open) => {
@@ -294,7 +288,6 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
         designer={editingDesigner}
       />
 
-      {/* Delete confirmation dialog */}
       <DeleteConfirmationDialog
         open={!!deletingDesigner}
         onOpenChange={(open) => {

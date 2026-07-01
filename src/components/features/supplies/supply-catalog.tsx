@@ -531,7 +531,6 @@ export function SupplyCatalog({
 
   return (
     <div className="space-y-6">
-      {/* Tabs */}
       <div
         className="border-border flex items-center gap-1 border-b"
         role="tablist"
@@ -561,9 +560,7 @@ export function SupplyCatalog({
         })}
       </div>
 
-      {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-3">
-        {/* Brand filter */}
         <select
           value={brandFilter}
           onChange={(e) => setBrandFilter(e.target.value)}
@@ -584,7 +581,6 @@ export function SupplyCatalog({
             ))}
         </select>
 
-        {/* Color family filter (threads only) */}
         {activeTab === "threads" && (
           <select
             value={colorFamilyFilter}
@@ -601,7 +597,6 @@ export function SupplyCatalog({
           </select>
         )}
 
-        {/* Search */}
         <div className="relative max-w-xs min-w-[200px] flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
           <Input
@@ -616,7 +611,6 @@ export function SupplyCatalog({
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          {/* View toggle */}
           <div className="border-border flex items-center rounded-lg border">
             <button
               type="button"
@@ -644,13 +638,11 @@ export function SupplyCatalog({
             </button>
           </div>
 
-          {/* Manage Brands */}
           <LinkButton href="/supplies/brands" variant="outline" size="sm">
             <Tags className="h-4 w-4" data-icon="inline-start" />
             Manage Brands
           </LinkButton>
 
-          {/* Add button */}
           <Button onClick={() => setCreateModalOpen(true)}>
             <Plus className="h-4 w-4" data-icon="inline-start" />
             {currentTabConfig.addLabel}
@@ -658,7 +650,6 @@ export function SupplyCatalog({
         </div>
       </div>
 
-      {/* Content */}
       {emptyState ? (
         emptyState
       ) : currentViewMode === "grid" ? (
@@ -672,7 +663,6 @@ export function SupplyCatalog({
         />
       )}
 
-      {/* Create modal */}
       <SupplyFormModal
         key={`create-${activeTab}`}
         open={createModalOpen}
@@ -682,7 +672,6 @@ export function SupplyCatalog({
         brands={brands}
       />
 
-      {/* Edit modal */}
       <SupplyFormModal
         key={editingItem?.data.id ?? "edit"}
         open={!!editingItem}
@@ -695,7 +684,6 @@ export function SupplyCatalog({
         initialData={editingItem?.data}
       />
 
-      {/* Delete confirmation */}
       <DeleteConfirmationDialog
         open={!!deletingItem}
         onOpenChange={(open) => {

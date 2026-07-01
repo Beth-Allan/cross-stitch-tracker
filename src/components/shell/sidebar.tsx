@@ -38,7 +38,6 @@ export function Sidebar() {
     >
       <TooltipProvider>
         <nav aria-label="Main" className="flex h-full flex-col">
-          {/* Logo */}
           <Link
             href="/"
             className="border-sidebar-border hover:bg-muted focus-visible:ring-ring flex h-14 items-center gap-3 border-b px-4 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset"
@@ -51,21 +50,17 @@ export function Sidebar() {
             )}
           </Link>
 
-          {/* Grouped nav sections */}
           <div className="flex-1 overflow-y-auto px-2 py-3">
             {navigationSections.map((section, sectionIndex) => (
               <div key={section.label}>
-                {/* Section divider (between sections, not before first) */}
                 {sectionIndex > 0 && <div className="border-sidebar-border mx-2 my-2 border-t" />}
 
-                {/* Section label (hidden when collapsed) */}
                 {!collapsed && (
                   <p className="text-muted-foreground/70 mb-1 px-3 pt-1 text-[0.65rem] font-semibold tracking-wider uppercase">
                     {section.label}
                   </p>
                 )}
 
-                {/* Section items */}
                 <div className="space-y-0.5">
                   {section.items.map((item) => {
                     if (collapsed) {
@@ -86,7 +81,6 @@ export function Sidebar() {
             ))}
           </div>
 
-          {/* Bottom section: settings + collapse toggle */}
           <div className="border-sidebar-border space-y-0.5 border-t px-2 py-3">
             {collapsed ? (
               <Tooltip>
@@ -99,7 +93,6 @@ export function Sidebar() {
               <NavItemLink item={settingsItem} />
             )}
 
-            {/* Theme toggle */}
             {collapsed ? (
               <Tooltip>
                 <TooltipTrigger render={<div />}>
@@ -111,7 +104,6 @@ export function Sidebar() {
               <ThemeToggle />
             )}
 
-            {/* Collapse toggle */}
             <button
               onClick={handleToggle}
               className={cn(

@@ -114,7 +114,6 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
 
   return (
     <div className="space-y-6">
-      {/* Back link */}
       <Link
         href="/designers"
         className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
@@ -123,12 +122,10 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
         Back to Designers
       </Link>
 
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1">
           <h1 className="font-heading text-2xl font-semibold">{designer.name}</h1>
 
-          {/* Website */}
           {designer.website && (
             <a
               href={designer.website}
@@ -142,7 +139,6 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
             </a>
           )}
 
-          {/* Notes */}
           {designer.notes && (
             <p className="text-muted-foreground mt-2 text-sm">
               <span className="font-semibold">Notes: </span>
@@ -151,7 +147,6 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
           )}
         </div>
 
-        {/* Action buttons */}
         <div className="ml-4 flex shrink-0 items-center gap-1">
           <button
             type="button"
@@ -172,7 +167,6 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
         </div>
       </div>
 
-      {/* Stats row */}
       <div className="flex flex-wrap gap-6">
         <StatItem label="Charts" value={designer.chartCount} />
         <StatItem label="Started" value={designer.projectsStarted} />
@@ -189,9 +183,7 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
         </div>
       </div>
 
-      {/* Chart list section */}
       <div>
-        {/* Section header with sort pills */}
         <div className="mb-3 flex items-center justify-between">
           <span className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
             Charts ({designer.charts.length})
@@ -226,7 +218,6 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
           </div>
         </div>
 
-        {/* Chart rows */}
         {sortedCharts.length > 0 ? (
           <div className="space-y-2">
             {sortedCharts.map((chart) => (
@@ -238,7 +229,6 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
         )}
       </div>
 
-      {/* Edit modal */}
       <DesignerFormModal
         open={editModalOpen}
         onOpenChange={setEditModalOpen}
@@ -251,7 +241,6 @@ export function DesignerDetail({ designer }: DesignerDetailProps) {
         }}
       />
 
-      {/* Delete confirmation dialog */}
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
@@ -315,7 +304,6 @@ function ChartRow({ chart }: { chart: DesignerChart }) {
         </div>
       )}
 
-      {/* Info */}
       <div className="min-w-0 flex-1">
         <p className="text-foreground truncate text-sm font-semibold">{chart.name}</p>
         <div className="text-muted-foreground flex items-center gap-2 text-xs">
@@ -330,7 +318,6 @@ function ChartRow({ chart }: { chart: DesignerChart }) {
         </div>
       </div>
 
-      {/* Status + progress */}
       <div className="shrink-0 text-right">
         {chart.status ? (
           <StatusBadge status={chart.status} />

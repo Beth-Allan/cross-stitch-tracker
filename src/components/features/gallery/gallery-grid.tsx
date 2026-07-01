@@ -250,13 +250,10 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
           role="listitem"
           className="group bg-card border-border hover:bg-muted/50 grid grid-cols-[40px_8px_1fr_auto_44px] items-center gap-x-4 border-b px-4 py-2 transition-colors sm:grid-cols-[40px_8px_minmax(180px,2fr)_minmax(120px,1fr)_minmax(100px,120px)_64px_56px_44px]"
         >
-          {/* 1. Thumbnail */}
           <SmallThumbnail card={card} />
 
-          {/* 2. Status dot */}
           <span className={`h-2 w-2 rounded-full ${STATUS_CONFIG[card.status].dotClass}`} />
 
-          {/* 3. Name + designer (+ compact stat line on mobile) */}
           <div className="min-w-0">
             <Link
               href={`/charts/${card.chartId}`}
@@ -268,7 +265,6 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
             <ListMobileStat card={card} />
           </div>
 
-          {/* 4. Status badge (always visible) / Context stats (desktop) */}
           <div className="sm:hidden">
             <StatusBadge status={card.status} />
           </div>
@@ -276,17 +272,14 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
             <ListContextStats card={card} />
           </div>
 
-          {/* 5. Progress / kitting / finish date */}
           <div className="hidden sm:block">
             <ListProgressCell card={card} />
           </div>
 
-          {/* 6. Status label */}
           <span className="text-muted-foreground hidden text-xs whitespace-nowrap sm:block">
             {STATUS_CONFIG[card.status].label}
           </span>
 
-          {/* 7. Size badge */}
           <div className="hidden sm:block">
             <Tooltip>
               <TooltipTrigger
@@ -299,7 +292,6 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
             </Tooltip>
           </div>
 
-          {/* 8. Kebab menu */}
           <div className="flex items-center justify-end transition-opacity group-focus-within:opacity-100 sm:opacity-40 sm:group-hover:opacity-100">
             <ListRowKebabMenu chartId={card.chartId} chartName={card.name} />
           </div>
@@ -403,7 +395,6 @@ function TableView({
               key={card.chartId}
               className="group bg-card hover:bg-muted/50 border-border border-b transition-colors"
             >
-              {/* Project */}
               <td className="px-4 py-2.5">
                 <div className="flex items-center gap-3">
                   <SmallThumbnail card={card} />
@@ -420,15 +411,12 @@ function TableView({
                   </div>
                 </div>
               </td>
-              {/* Status */}
               <td className="px-4 py-2.5">
                 <StatusBadge status={card.status} />
               </td>
-              {/* Designer */}
               <td className="px-4 py-2.5 max-md:hidden">
                 <span className="text-muted-foreground text-sm">{card.designerName}</span>
               </td>
-              {/* Size */}
               <td className="px-4 py-2.5 max-sm:hidden">
                 <Tooltip>
                   <TooltipTrigger
@@ -440,7 +428,6 @@ function TableView({
                   <TooltipContent>{SIZE_TOOLTIP_TEXT[card.sizeCategory]}</TooltipContent>
                 </Tooltip>
               </td>
-              {/* Progress */}
               <td className="px-4 py-2.5 max-sm:hidden">
                 {card.statusGroup === "wip" ? (
                   <div className="flex max-w-[100px] items-center gap-2">
@@ -466,7 +453,6 @@ function TableView({
                   </span>
                 )}
               </td>
-              {/* Stitches */}
               <td className="px-4 py-2.5 text-right max-lg:hidden">
                 <span className="text-muted-foreground text-xs tabular-nums">
                   {card.statusGroup === "wip"
@@ -474,13 +460,11 @@ function TableView({
                     : formatNumber(card.stitchCount)}
                 </span>
               </td>
-              {/* Colours */}
               <td className="px-4 py-2.5 text-right max-lg:hidden">
                 <span className="text-muted-foreground text-xs tabular-nums">
                   {card.threadColourCount}
                 </span>
               </td>
-              {/* Kebab menu */}
               <td className="px-2 py-2.5">
                 <div className="flex items-center justify-end opacity-40 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
                   <ListRowKebabMenu chartId={card.chartId} chartName={card.name} />

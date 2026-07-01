@@ -127,7 +127,6 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Sort bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-1.5">
           <p className="text-muted-foreground text-sm">{summaryLabel}</p>
@@ -161,7 +160,6 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
         </div>
       </div>
 
-      {/* Stacked bar chart */}
       <div className="border-border bg-card overflow-hidden rounded-xl border p-5">
         <div className="bg-muted flex h-6 overflow-hidden rounded-full">
           {buckets.map((bucket) => {
@@ -188,7 +186,6 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
           })}
         </div>
 
-        {/* Legend */}
         <div className="mt-3 flex flex-wrap gap-3">
           {buckets.map((bucket) => {
             const accent = BUCKET_ACCENTS[bucket.id];
@@ -204,7 +201,6 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
         </div>
       </div>
 
-      {/* Bucket accordion sections */}
       {sortedBuckets.map((bucket) => {
         const isExpanded = expandedBuckets.has(bucket.id);
         const accent = BUCKET_ACCENTS[bucket.id];
@@ -214,7 +210,6 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
 
         return (
           <div key={bucket.id} className="border-border overflow-hidden rounded-xl border">
-            {/* Bucket header */}
             <button
               type="button"
               onClick={() => toggleBucket(bucket.id)}
@@ -236,7 +231,6 @@ export function ProgressBreakdownTab({ buckets, imageUrls }: ProgressBreakdownTa
               </span>
             </button>
 
-            {/* Expanded content */}
             {isExpanded && (
               <div className="bg-card">
                 {bucket.projects.length === 0 ? (

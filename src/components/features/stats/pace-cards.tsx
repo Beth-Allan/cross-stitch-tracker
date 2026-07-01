@@ -37,7 +37,6 @@ export function PaceCards({ paceMetrics }: PaceCardsProps) {
 
   return (
     <div className="bg-success-muted border-success-border grid grid-cols-2 rounded-xl border sm:grid-cols-3 lg:flex lg:flex-row">
-      {/* 7-Day Average */}
       <div className="flex items-center lg:flex-1">
         <div className="flex w-full flex-col items-center gap-1 px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-1.5">
@@ -54,7 +53,6 @@ export function PaceCards({ paceMetrics }: PaceCardsProps) {
         <div className="bg-success-border my-2 hidden w-px self-stretch lg:block" />
       </div>
 
-      {/* 30-Day Average */}
       <div className="flex items-center lg:flex-1">
         <div className="flex w-full flex-col items-center gap-1 px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-1.5">
@@ -71,7 +69,6 @@ export function PaceCards({ paceMetrics }: PaceCardsProps) {
         <div className="bg-success-border my-2 hidden w-px self-stretch lg:block" />
       </div>
 
-      {/* 90-Day Average */}
       <div className="flex items-center lg:flex-1">
         <div className="flex w-full flex-col items-center gap-1 px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-1.5">
@@ -88,7 +85,6 @@ export function PaceCards({ paceMetrics }: PaceCardsProps) {
         <div className="bg-success-border my-2 hidden w-px self-stretch lg:block" />
       </div>
 
-      {/* VS Last Month */}
       <div className="flex items-center lg:flex-1">
         <div className="flex w-full flex-col items-center gap-1 px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-1.5">
@@ -107,7 +103,6 @@ export function PaceCards({ paceMetrics }: PaceCardsProps) {
         <div className="bg-success-border my-2 hidden w-px self-stretch lg:block" />
       </div>
 
-      {/* Stitch Rate */}
       <div className="flex items-center lg:flex-1">
         <div className="flex w-full flex-col items-center gap-1 px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-1.5">

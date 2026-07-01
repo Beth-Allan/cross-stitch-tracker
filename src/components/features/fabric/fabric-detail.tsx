@@ -50,7 +50,6 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb */}
       <nav className="text-muted-foreground flex items-center gap-1 text-sm">
         <Link href="/fabric" className="hover:text-foreground transition-colors">
           Fabric
@@ -59,7 +58,6 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
         <span className="text-foreground font-medium">{fabric.name}</span>
       </nav>
 
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-semibold">{fabric.name}</h1>
@@ -89,7 +87,6 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
         </div>
       </div>
 
-      {/* Metadata Grid */}
       <div className="border-border bg-card rounded-xl border p-6">
         <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
           <MetadataField label="Brand">{fabric.brand.name}</MetadataField>
@@ -131,7 +128,6 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
           </MetadataField>
         </div>
 
-        {/* Size Calculator */}
         {fabric.linkedProject && (
           <FabricSizeCalculator
             fabric={{
@@ -147,7 +143,6 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
         )}
       </div>
 
-      {/* Edit Modal */}
       <FabricFormModal
         open={editModalOpen}
         onOpenChange={setEditModalOpen}
@@ -156,7 +151,6 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
         projects={projects}
       />
 
-      {/* Delete Confirmation */}
       <FabricDeleteDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
