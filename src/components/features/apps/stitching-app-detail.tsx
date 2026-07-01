@@ -27,7 +27,8 @@ export function StitchingAppDetail({ app }: StitchingAppDetailProps) {
         return;
       }
       toast.error(result.error ?? "Failed to rename app");
-    } catch {
+    } catch (error) {
+      console.error("Rename stitching app failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
     throw new Error("Rename failed");
@@ -42,7 +43,8 @@ export function StitchingAppDetail({ app }: StitchingAppDetailProps) {
         return;
       }
       toast.error(result.error ?? "Failed to delete app");
-    } catch {
+    } catch (error) {
+      console.error("Delete stitching app failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
     throw new Error("Delete failed");

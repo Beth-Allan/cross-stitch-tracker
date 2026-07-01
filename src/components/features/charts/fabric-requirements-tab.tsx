@@ -145,7 +145,8 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
         } else {
           toast.error("Could not assign fabric. Please try again.");
         }
-      } catch {
+      } catch (error) {
+        console.error("Assign fabric to project failed:", error);
         toast.error("Something went wrong. Please try again.");
       }
     });

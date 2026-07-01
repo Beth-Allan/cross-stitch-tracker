@@ -201,8 +201,8 @@ export function SupplyCatalog({
             modes[tab.key] = stored;
           }
         }
-      } catch {
-        // localStorage unavailable (private browsing, CSP) — use defaults
+      } catch (error) {
+        console.error("Load supply view modes failed:", error);
       }
     }
     return modes;
@@ -236,8 +236,8 @@ export function SupplyCatalog({
       setViewModes((prev) => ({ ...prev, [tab]: mode }));
       try {
         localStorage.setItem(STORAGE_KEYS[tab], mode);
-      } catch {
-        // localStorage unavailable — view mode still works for this session via state
+      } catch (error) {
+        console.error("Save supply view mode failed:", error);
       }
       // Sync to URL for the active tab so refresh preserves it
       const params = new URLSearchParams(searchParams.toString());
@@ -448,7 +448,8 @@ export function SupplyCatalog({
       } else {
         toast.error(result.error ?? "Something went wrong. Please try again.");
       }
-    } catch {
+    } catch (error) {
+      console.error("Delete supply failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
   }

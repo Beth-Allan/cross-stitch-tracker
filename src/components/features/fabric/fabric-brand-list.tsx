@@ -143,7 +143,8 @@ function FabricBrandFormModal({
             toast.error(result.error ?? "Something went wrong. Please try again.");
           }
         }
-      } catch {
+      } catch (error) {
+        console.error("Save fabric brand failed:", error);
         toast.error("Something went wrong. Please try again.");
       }
     });
@@ -223,7 +224,8 @@ function FabricBrandDeleteDialog({
       try {
         await onConfirm();
         onOpenChange(false);
-      } catch {
+      } catch (error) {
+        console.error("Delete fabric brand confirmation failed:", error);
         // caller handles error via toast
       }
     });
@@ -282,7 +284,8 @@ export function FabricBrandList({
       } else {
         toast.error(result.error ?? "Something went wrong. Please try again.");
       }
-    } catch {
+    } catch (error) {
+      console.error("Delete fabric brand failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
   }

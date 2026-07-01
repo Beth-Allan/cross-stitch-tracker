@@ -259,7 +259,8 @@ export function GenreList({ genres }: GenreListProps) {
       } else {
         toast.error(result.error ?? "Something went wrong. Please try again.");
       }
-    } catch {
+    } catch (error) {
+      console.error("Delete genre failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
   }

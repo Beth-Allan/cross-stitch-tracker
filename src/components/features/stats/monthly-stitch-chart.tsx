@@ -60,7 +60,8 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
         setChartData(result.data);
         setActiveMonth(null);
         setDrillDownData([]);
-      } catch {
+      } catch (error) {
+        console.error("Load monthly chart data failed:", error);
         toast.error("Something went wrong loading chart data.");
       }
     });
@@ -79,7 +80,8 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
         setChartData(result.data);
         setActiveMonth(null);
         setDrillDownData([]);
-      } catch {
+      } catch (error) {
+        console.error("Load monthly chart data failed:", error);
         toast.error("Something went wrong loading chart data.");
       }
     });
@@ -104,7 +106,8 @@ export function MonthlyStitchChart({ data, initialYear }: MonthlyStitchChartProp
           return;
         }
         setDrillDownData(result.data);
-      } catch {
+      } catch (error) {
+        console.error("Load daily breakdown failed:", error);
         toast.error("Something went wrong loading breakdown.");
         setActiveMonth(null);
       }

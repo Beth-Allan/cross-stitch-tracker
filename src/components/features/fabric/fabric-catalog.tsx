@@ -92,7 +92,8 @@ function FabricDeleteDialog({
       try {
         await onConfirm();
         onOpenChange(false);
-      } catch {
+      } catch (error) {
+        console.error("Delete fabric confirmation failed:", error);
         // caller handles error via toast
       }
     });
@@ -173,7 +174,8 @@ export function FabricCatalog({
       } else {
         toast.error(result.error ?? "Something went wrong. Please try again.");
       }
-    } catch {
+    } catch (error) {
+      console.error("Delete fabric failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
   }
