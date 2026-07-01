@@ -132,7 +132,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 
 **Milestone Goal:** Systematically address accumulated backlog items -- silent failures, comment violations, type safety gaps, test coverage holes, UI polish, and series follow-ups -- to reduce PR review noise and improve code health.
 
-- [ ] **Phase 35: Error Handling & Comment Cleanup** - Fix silent failure patterns and remove comment convention violations
+- [x] **Phase 35: Error Handling & Comment Cleanup** - Fix silent failure patterns and remove comment convention violations (completed 2026-07-01)
 - [ ] **Phase 36: Type Safety** - Narrow types, discriminated unions, co-dependent props, controlled-only simplification
 - [ ] **Phase 37: Test Coverage -- Utilities & Stats** - Fill test gaps for skein calculator, stats actions, calendar, records, completion estimates
 - [ ] **Phase 38: Test Coverage -- Components** - Fill test gaps for shopping cart and chart form components
@@ -154,7 +154,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
   3. Zero WHAT-comments or section markers remain in test files and chart form files (beyond allowed conventions)
   4. `npm test` passes with no regressions
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 **Wave 1**
 
 - [x] 35-01-PLAN.md -- Error handling fixes (processAndStoreImage call sites + bare catch blocks)
@@ -165,7 +165,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 35-03-PLAN.md -- JSX comment cleanup (338 JSX comments + convention update)
+- [x] 35-03-PLAN.md -- JSX comment cleanup (338 JSX comments + convention update)
 
 ### Phase 36: Type Safety
 
@@ -293,7 +293,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 | 32. Series Management Pages | v1.8 | 3/3 | Complete | 2026-05-25 |
 | 33. Chart Form Integration | v1.8 | 2/2 | Complete | 2026-05-26 |
 | 34. Browse & Pattern Dive Integration | v1.8 | 3/3 | Complete | 2026-07-01 |
-| 35. Error Handling & Comment Cleanup | v1.9 | 2/3 | In Progress|  |
+| 35. Error Handling & Comment Cleanup | v1.9 | 3/3 | Complete   | 2026-07-01 |
 | 36. Type Safety | v1.9 | 0/0 | Not started | - |
 | 37. Test Coverage -- Utilities & Stats | v1.9 | 0/0 | Not started | - |
 | 38. Test Coverage -- Components | v1.9 | 0/0 | Not started | - |
