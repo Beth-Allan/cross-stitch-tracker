@@ -209,7 +209,7 @@ Full details: `milestones/v1.7-ROADMAP.md`
 **Plans**: 3 plans
 **Wave 1**
 
-- [ ] 34-01-PLAN.md — Data layer: SeriesCard extraction, gallery types, chart query extension
+- [x] 34-01-PLAN.md — Data layer: SeriesCard extraction, gallery types, chart query extension
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -260,4 +260,4 @@ Phases execute in numeric order: 31 -> 32 -> 33 -> 34
 | 31. Data Foundation & Fixes | v1.8 | 3/3 | Complete   | 2026-05-24 |
 | 32. Series Management Pages | v1.8 | 3/3 | Complete    | 2026-05-25 |
 | 33. Chart Form Integration | v1.8 | 2/2 | Complete    | 2026-05-26 |
-| 34. Browse & Pattern Dive Integration | v1.8 | 0/3 | Not started | - |
+| 34. Browse & Pattern Dive Integration | v1.8 | 1/3 | In Progress|  |
