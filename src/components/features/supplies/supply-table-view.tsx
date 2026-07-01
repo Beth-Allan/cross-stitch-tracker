@@ -124,7 +124,6 @@ export function SupplyTableView({ items, columns, onEdit, onDelete }: SupplyTabl
 
   return (
     <>
-      {/* Desktop table — hidden on mobile */}
       <div className="border-border bg-card hidden overflow-x-auto rounded-xl border md:block">
         <table className="w-full text-sm">
           <caption className="sr-only">Supply catalog items</caption>
@@ -192,7 +191,6 @@ export function SupplyTableView({ items, columns, onEdit, onDelete }: SupplyTabl
         </table>
       </div>
 
-      {/* Mobile cards — hidden on md+ */}
       <div className="flex flex-col gap-2 md:hidden">
         {sortedItems.length === 0 ? (
           <div className="py-12 text-center">

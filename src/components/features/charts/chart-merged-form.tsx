@@ -746,11 +746,13 @@ export function ChartMergedForm({
         </div>
       </Activity>
 
-      {/* Conditional rendering (not Activity) so CalculatorCard's Base UI Popover
-          initializes fresh when supply mode activates. Activity mode="hidden" defers
-          FloatingRootContext init to OffscreenLane, leaving fabric dropdown broken
-          on first click. CalcParams state lives in the parent, so remounting
-          CalculatorCard on mode switch is safe. */}
+      {
+        // Conditional rendering (not Activity) so CalculatorCard's Base UI Popover
+        // initializes fresh when supply mode activates. Activity mode="hidden" defers
+        // FloatingRootContext init to OffscreenLane, leaving fabric dropdown broken
+        // on first click. CalcParams state lives in the parent, so remounting
+        // CalculatorCard on mode switch is safe.
+      }
       {!isEdit && mode === "supply" && (
         <>
           <SummaryBar

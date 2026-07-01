@@ -91,7 +91,6 @@ export function FinishedTab({ projects, imageUrls }: FinishedTabProps) {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Aggregate stat cards */}
       {projects.length > 0 && (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
           <AggregateCard label="Projects Finished" value={String(projects.length)} />
@@ -101,7 +100,6 @@ export function FinishedTab({ projects, imageUrls }: FinishedTabProps) {
         </div>
       )}
 
-      {/* Search + sort */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="relative max-w-[320px] min-w-[200px] flex-1">
           <Search
@@ -137,7 +135,6 @@ export function FinishedTab({ projects, imageUrls }: FinishedTabProps) {
         </div>
       </div>
 
-      {/* Project list or empty state */}
       {filtered.length === 0 ? (
         <div className="text-muted-foreground py-16 text-center text-sm">
           {search

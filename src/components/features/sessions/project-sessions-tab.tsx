@@ -149,7 +149,6 @@ export function ProjectSessionsTab({
 
   return (
     <div>
-      {/* Mini-stat cards */}
       <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
         {summaryStats.map((stat) => (
           <MiniStatCard key={stat.label} {...stat} />
@@ -162,7 +161,6 @@ export function ProjectSessionsTab({
         </div>
       )}
 
-      {/* Session count + Log Session button */}
       <div className="mb-3 flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
           {sessions.length} session{sessions.length !== 1 ? "s" : ""} logged
@@ -173,10 +171,8 @@ export function ProjectSessionsTab({
         </Button>
       </div>
 
-      {/* Session table */}
       <SessionTable sessions={sessions} imageUrls={imageUrls} onEditSession={handleEditSession} />
 
-      {/* Log session modal — locked to this project */}
       <LogSessionModal
         isOpen={modalOpen}
         onOpenChange={setModalOpen}

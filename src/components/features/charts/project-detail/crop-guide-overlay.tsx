@@ -44,7 +44,6 @@ export function CropGuideOverlay({
         background: "transparent",
       }}
     >
-      {/* Label: 11px semibold uppercase tracking-wider, top-left inside guide */}
       <span className="absolute top-1 left-1 text-[11px] font-semibold tracking-wider text-white uppercase">
         Gallery preview
       </span>

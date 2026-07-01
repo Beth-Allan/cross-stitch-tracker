@@ -36,13 +36,11 @@ export function ChartFileRow({ file, onDelete, onDownload }: ChartFileRowProps) 
     >
       <FileTypeIcon mimeType={file.mimeType} filename={file.filename} />
 
-      {/* Filename + metadata: stacks on mobile, inline on desktop */}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2">
         <span className="min-w-0 flex-1 truncate text-sm">{file.label || file.filename}</span>
         <span className="text-muted-foreground text-xs">{formatFileSize(file.fileSize)}</span>
       </div>
 
-      {/* Action buttons */}
       <button
         type="button"
         aria-label={`Download ${file.filename}`}

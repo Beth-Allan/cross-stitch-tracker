@@ -127,7 +127,6 @@ export function SessionTable({
 
   return (
     <>
-      {/* Desktop table — hidden on mobile */}
       <div className="bg-card border-border hidden overflow-x-auto rounded-xl border md:block">
         <table className="w-full text-sm">
           <thead>
@@ -212,7 +211,6 @@ export function SessionTable({
         </table>
       </div>
 
-      {/* Mobile cards — hidden on md+ */}
       <div className="flex flex-col gap-2 md:hidden">
         {sortedSessions.map((session) => (
           <div

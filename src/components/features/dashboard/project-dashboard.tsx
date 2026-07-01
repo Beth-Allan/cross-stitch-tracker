@@ -28,7 +28,6 @@ export function ProjectDashboard({ data, imageUrls }: ProjectDashboardProps) {
 
       <HeroStats stats={data.heroStats} />
 
-      {/* Sub-tabs for Progress Breakdown and Finished */}
       <Tabs defaultValue="progress">
         <TabsList variant="line">
           <TabsTrigger value="progress" className="min-h-11">

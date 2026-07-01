@@ -131,13 +131,11 @@ export function StorageViewTab({ groups, imageUrls }: StorageViewTabProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Count summary */}
       <p className="text-muted-foreground text-sm">
         {groups.length} location{groups.length !== 1 ? "s" : ""} &middot; {totalItems} item
         {totalItems !== 1 ? "s" : ""}
       </p>
 
-      {/* Location groups */}
       {groups.map((group) => {
         const isCollapsed = collapsed.has(group.locationId);
         const projectCount = group.items.filter((i) => i.type === "project").length;
@@ -148,7 +146,6 @@ export function StorageViewTab({ groups, imageUrls }: StorageViewTabProps) {
             key={group.locationId ?? "__none__"}
             className="border-border overflow-hidden rounded-xl border"
           >
-            {/* Group header */}
             <button
               type="button"
               onClick={() => toggleGroup(group.locationId)}
@@ -178,7 +175,6 @@ export function StorageViewTab({ groups, imageUrls }: StorageViewTabProps) {
               />
             </button>
 
-            {/* Items */}
             {!isCollapsed && (
               <div className="bg-card">
                 {group.items.map((item) => (

@@ -46,7 +46,6 @@ export function ScrollableRow({ children, className }: ScrollableRowProps) {
 
   return (
     <div className={`relative ${className ?? ""}`}>
-      {/* Left arrow */}
       <button
         onClick={() => scroll("left")}
         aria-label="Scroll left"
@@ -59,7 +58,6 @@ export function ScrollableRow({ children, className }: ScrollableRowProps) {
         <ChevronLeft className="text-muted-foreground h-5 w-5" strokeWidth={2} />
       </button>
 
-      {/* Scrollable content */}
       <div
         ref={scrollRef}
         onScroll={updateScrollState}
@@ -72,7 +70,6 @@ export function ScrollableRow({ children, className }: ScrollableRowProps) {
         {children}
       </div>
 
-      {/* Right arrow */}
       <button
         onClick={() => scroll("right")}
         aria-label="Scroll right"
