@@ -127,6 +127,8 @@ export function transformToGalleryCard(
     finishDate: chart.project?.finishDate ?? null,
     ffoDate: chart.project?.ffoDate ?? null,
     hasDigitalCopy: (chart._count?.files ?? 0) > 0,
+    seriesId: chart.series?.id ?? null,
+    seriesName: chart.series?.name ?? null,
     dateAdded: chart.dateAdded,
   };
 }
