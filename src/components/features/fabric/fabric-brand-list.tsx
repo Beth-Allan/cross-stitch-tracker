@@ -350,7 +350,6 @@ export function FabricBrandList({
 
   return (
     <div className="space-y-4">
-      {/* Search */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative max-w-xs min-w-[200px] flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
@@ -364,7 +363,6 @@ export function FabricBrandList({
         </div>
       </div>
 
-      {/* Table */}
       <div className="border-border bg-card overflow-x-auto rounded-xl border">
         <table className="w-full text-sm">
           <caption className="sr-only">Your fabric brands</caption>
@@ -445,10 +443,8 @@ export function FabricBrandList({
         </table>
       </div>
 
-      {/* Create modal */}
       <FabricBrandFormModal open={createModalOpen} onOpenChange={setCreateModalOpen} brand={null} />
 
-      {/* Edit modal */}
       <FabricBrandFormModal
         open={!!editingBrand}
         onOpenChange={(open) => {
@@ -457,7 +453,6 @@ export function FabricBrandList({
         brand={editingBrand}
       />
 
-      {/* Delete confirmation */}
       <FabricBrandDeleteDialog
         open={!!deletingBrand}
         onOpenChange={(open) => {

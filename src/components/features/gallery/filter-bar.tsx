@@ -39,7 +39,6 @@ export function FilterBar({
 }: FilterBarProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {/* Search input */}
       <div className="relative w-full max-w-[280px] flex-shrink-0 sm:w-auto" data-search-wrapper>
         <Search
           className="text-muted-foreground/60 absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2"
@@ -65,7 +64,6 @@ export function FilterBar({
         )}
       </div>
 
-      {/* Status multi-select */}
       <MultiSelectDropdown
         label="Status"
         options={STATUS_OPTIONS}
@@ -73,7 +71,6 @@ export function FilterBar({
         onToggle={onStatusToggle}
       />
 
-      {/* Size multi-select */}
       <MultiSelectDropdown
         label="Size"
         options={SIZE_OPTIONS}

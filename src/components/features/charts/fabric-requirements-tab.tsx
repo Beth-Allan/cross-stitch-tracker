@@ -148,7 +148,6 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Info banner */}
       <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/40">
         <Info
           className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
@@ -164,7 +163,6 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
         </div>
       </div>
 
-      {/* Filter toggle */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           {(["needs", "all"] as const).map((f) => (
@@ -187,7 +185,6 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
         </p>
       </div>
 
-      {/* Project cards or empty state */}
       {filtered.length === 0 ? (
         <div className="text-muted-foreground py-12 text-center text-sm">
           All projects have fabric assigned. Nice work!
@@ -203,7 +200,6 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                 key={row.chartId}
                 className="border-border bg-card overflow-hidden rounded-xl border"
               >
-                {/* Header row */}
                 <button
                   type="button"
                   onClick={() => setExpandedId(isExpanded ? null : row.chartId)}
@@ -234,7 +230,6 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                     </p>
                   </div>
 
-                  {/* Quick size preview at common counts */}
                   <div className="hidden shrink-0 gap-4 md:flex">
                     {([14, 18, 25] as const).map((ct) => {
                       const w = calcFabricSize(row.stitchesWide, ct);
@@ -252,7 +247,6 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                     })}
                   </div>
 
-                  {/* Fabric assignment status */}
                   <div className="hidden shrink-0 sm:block">
                     {row.assignedFabric ? (
                       <span
@@ -279,10 +273,8 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                   />
                 </button>
 
-                {/* Expanded content */}
                 {isExpanded && (
                   <div className="border-border border-t p-5">
-                    {/* Matching fabrics */}
                     {row.matchingFabrics.length > 0 ? (
                       <div>
                         <h4 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
@@ -357,7 +349,6 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                       </div>
                     )}
 
-                    {/* Size Reference (collapsible) */}
                     <div className="mt-4">
                       <button
                         type="button"
@@ -386,7 +377,6 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                       )}
                     </div>
 
-                    {/* Link to project */}
                     <Link
                       href={`/charts/${row.chartId}`}
                       className="mt-4 inline-block text-sm text-emerald-700 underline decoration-emerald-300 underline-offset-2 transition-colors hover:text-emerald-800 dark:text-emerald-400 dark:decoration-emerald-700 dark:hover:text-emerald-300"

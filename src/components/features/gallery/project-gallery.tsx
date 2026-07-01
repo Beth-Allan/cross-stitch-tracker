@@ -57,7 +57,6 @@ export function ProjectGallery({ charts, imageUrls, hideHeader }: ProjectGallery
 
   return (
     <div className="space-y-6">
-      {/* Page header */}
       {!hideHeader && (
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -73,7 +72,6 @@ export function ProjectGallery({ charts, imageUrls, hideHeader }: ProjectGallery
         </div>
       )}
 
-      {/* Filter bar */}
       <FilterBar
         search={search}
         onSearchChange={setSearch}
@@ -86,7 +84,6 @@ export function ProjectGallery({ charts, imageUrls, hideHeader }: ProjectGallery
         seriesOptions={seriesOptions}
       />
 
-      {/* Filter chips */}
       <FilterChips
         search={search}
         statusFilter={statusFilter}
@@ -100,10 +97,8 @@ export function ProjectGallery({ charts, imageUrls, hideHeader }: ProjectGallery
         onClearAll={clearFilters}
       />
 
-      {/* Separator */}
       <div className="border-border border-b" />
 
-      {/* Toggle bar: count + sort + view */}
       <ViewToggleBar
         view={view}
         onViewChange={setView}
@@ -115,7 +110,6 @@ export function ProjectGallery({ charts, imageUrls, hideHeader }: ProjectGallery
         hasActiveFilters={hasActiveFilters}
       />
 
-      {/* Gallery grid */}
       <GalleryGrid
         cards={filteredAndSorted}
         view={view}

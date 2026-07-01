@@ -167,7 +167,6 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-lg font-semibold">Supply Brands</h1>
         <Button onClick={() => setCreateModalOpen(true)}>
@@ -176,7 +175,6 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
         </Button>
       </div>
 
-      {/* Search bar */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative max-w-xs min-w-[200px] flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
@@ -200,7 +198,6 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
         )}
       </div>
 
-      {/* Desktop table */}
       <div className="border-border bg-card hidden overflow-x-auto rounded-xl border md:block">
         <table className="w-full text-sm">
           <caption className="sr-only">Your supply brands</caption>
@@ -244,7 +241,6 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
         </table>
       </div>
 
-      {/* Mobile cards */}
       <div className="space-y-3 md:hidden">
         {filteredBrands.map((brand) => (
           <BrandCard
@@ -264,10 +260,8 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
         )}
       </div>
 
-      {/* Create modal */}
       <SupplyBrandFormModal open={createModalOpen} onOpenChange={setCreateModalOpen} brand={null} />
 
-      {/* Edit modal */}
       <SupplyBrandFormModal
         open={!!editingBrand}
         onOpenChange={(open) => {
@@ -276,7 +270,6 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
         brand={editingBrand}
       />
 
-      {/* Delete confirmation dialog */}
       <DeleteConfirmationDialog
         open={!!deletingBrand}
         onOpenChange={(open) => {

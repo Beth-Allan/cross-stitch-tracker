@@ -51,7 +51,6 @@ export function SessionsPageClient({
     <div>
       {hasSessions ? (
         <>
-          {/* Session count + Log Session button */}
           <div className="mb-3 flex items-center justify-between">
             <p className="text-muted-foreground text-sm">
               {sessions.length} session{sessions.length !== 1 ? "s" : ""} logged
@@ -62,7 +61,6 @@ export function SessionsPageClient({
             </Button>
           </div>
 
-          {/* Session table with project name column */}
           <SessionTable
             sessions={sessions}
             imageUrls={imageUrls}
@@ -85,7 +83,6 @@ export function SessionsPageClient({
         </div>
       )}
 
-      {/* Log session modal — no lockedProjectId so full picker shown */}
       <LogSessionModal
         isOpen={modalOpen}
         onOpenChange={setModalOpen}

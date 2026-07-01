@@ -59,7 +59,6 @@ export function SpotlightCard({
   return (
     <div className="border-border bg-card relative overflow-hidden rounded-2xl border shadow-sm">
       <div className="grid max-h-[300px] min-h-[260px] grid-cols-1 md:grid-cols-[320px_1fr]">
-        {/* Image half -- hidden on mobile */}
         <div className="bg-muted relative overflow-hidden max-md:hidden">
           {imageUrl ? (
             <img
@@ -74,9 +73,10 @@ export function SpotlightCard({
           )}
         </div>
 
-        {/* Content half */}
         <div className="flex flex-col justify-center gap-3 p-7 md:p-8">
-          {/* Section label — amber is an intentional decorative accent (no semantic token equivalent) */}
+          {
+            // amber is an intentional decorative accent (no semantic token equivalent)
+          }
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-amber-500 dark:text-amber-400" strokeWidth={2} />
             <span className="text-[11px] font-bold tracking-wider text-amber-600 uppercase dark:text-amber-400">
@@ -84,12 +84,10 @@ export function SpotlightCard({
             </span>
           </div>
 
-          {/* Project name */}
           <h3 className="font-heading text-foreground text-2xl leading-tight font-bold">
             {project.projectName}
           </h3>
 
-          {/* Designer + status */}
           <div className="flex flex-wrap items-center gap-3">
             {project.designerName && (
               <span className="text-muted-foreground text-sm">{project.designerName}</span>
@@ -97,12 +95,10 @@ export function SpotlightCard({
             <StatusBadge status={project.status} />
           </div>
 
-          {/* Stitch count */}
           <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-sm">
             <span>{project.totalStitches.toLocaleString()} stitches</span>
           </div>
 
-          {/* Genre tags */}
           {project.genres.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {project.genres.slice(0, 4).map((g) => (
@@ -116,7 +112,6 @@ export function SpotlightCard({
             </div>
           )}
 
-          {/* Progress bar for in-progress projects */}
           {isInProgress && project.progressPercent > 0 && (
             <div className="flex items-center gap-2.5">
               <div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
@@ -131,7 +126,6 @@ export function SpotlightCard({
             </div>
           )}
 
-          {/* Action buttons */}
           <div className="mt-1 flex flex-wrap gap-2.5">
             <LinkButton
               href={`/charts/${project.chartId}`}

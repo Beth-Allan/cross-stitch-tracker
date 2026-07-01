@@ -158,7 +158,6 @@ export function SupplyTableAddRow({
         data-testid="supply-table-add-row"
         className="bg-primary/[0.03] border-primary/20 border-b-2"
       >
-        {/* Cell 1: Type toggle + Search/Selected item (41%) */}
         <td className="px-2 py-1.5" style={{ width: "41%" }}>
           {selectedItem ? (
             <div className="flex items-center gap-2">
@@ -225,7 +224,6 @@ export function SupplyTableAddRow({
           />
         </td>
 
-        {/* Cell 2: Stitches/Qty (14%) */}
         <td className="px-2 py-1.5" style={{ width: "14%" }}>
           {selectedItem && supplyType !== "SPECIALTY" ? (
             <input
@@ -244,14 +242,12 @@ export function SupplyTableAddRow({
           ) : null}
         </td>
 
-        {/* Cell 3: Arrow (24px) */}
         <td className="px-1 py-1.5" style={{ width: "24px" }}>
           {selectedItem && supplyType !== "SPECIALTY" ? (
             <ArrowRight className="text-muted-foreground h-3 w-3" />
           ) : null}
         </td>
 
-        {/* Cell 4: Need (16%) */}
         <td className="px-2 py-1.5" style={{ width: "16%" }}>
           {selectedItem ? (
             <div className="flex items-center gap-1">
@@ -278,13 +274,10 @@ export function SupplyTableAddRow({
           ) : null}
         </td>
 
-        {/* Cell 5: Have (10%) - empty in add row */}
         <td className="px-2 py-1.5" style={{ width: "10%" }} />
 
-        {/* Cell 6: Status (6%) - empty in add row */}
         <td className="px-2 py-1.5" style={{ width: "6%" }} />
 
-        {/* Cell 7: Commit button (32px) - visible when supply selected */}
         <td className="px-1 py-1.5" style={{ width: "32px" }}>
           {selectedItem && (
             <button

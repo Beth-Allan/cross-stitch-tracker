@@ -35,7 +35,6 @@ export function MetricsBar(props: MetricsBarProps) {
               </span>
               <span className="text-muted-foreground text-xs">stitches</span>
             </div>
-            {/* Vertical divider between cells (desktop only, not after last) */}
             {index < METRIC_CELLS.length - 1 && (
               <div className="bg-success-border my-2 hidden w-px self-stretch sm:block" />
             )}

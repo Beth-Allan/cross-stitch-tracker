@@ -246,7 +246,6 @@ export function LogSessionModal({
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Project Picker */}
           {!lockedProjectId && (
             <div ref={dropdownRef} className="relative">
               <label
@@ -298,7 +297,6 @@ export function LogSessionModal({
                             : "text-foreground"
                         }`}
                       >
-                        {/* 28px thumbnail */}
                         <div className="bg-muted h-7 w-7 shrink-0 overflow-hidden rounded">
                           {project.coverThumbnailUrl && imageUrls[project.coverThumbnailUrl] ? (
                             <img
@@ -333,7 +331,6 @@ export function LogSessionModal({
             </div>
           )}
 
-          {/* Date Field */}
           <div>
             <label
               htmlFor="session-date"
@@ -353,7 +350,6 @@ export function LogSessionModal({
             </p>
           </div>
 
-          {/* Stitch Count */}
           <div>
             <label
               htmlFor="session-stitch-count"
@@ -374,7 +370,6 @@ export function LogSessionModal({
             </p>
           </div>
 
-          {/* Time Spent (optional) */}
           <div>
             <span className="text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase">
               Time Spent{" "}
@@ -407,7 +402,6 @@ export function LogSessionModal({
             </div>
           </div>
 
-          {/* Photo Upload (optional) */}
           <div>
             <span className="text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase">
               Progress Photo{" "}
@@ -465,9 +459,7 @@ export function LogSessionModal({
           </div>
         </div>
 
-        {/* Footer */}
         <DialogFooter className="sm:justify-between">
-          {/* Left side: delete link (edit mode only) */}
           <div className="flex items-center">
             {isEditing && !showDeleteConfirm && (
               <button
@@ -502,7 +494,6 @@ export function LogSessionModal({
             )}
           </div>
 
-          {/* Right side: dismiss + save */}
           <div className="flex items-center gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isPending}>
               {isEditing ? "Discard Changes" : "Discard"}

@@ -95,7 +95,6 @@ export function CalculatorSettingsBar({
       className="bg-muted flex flex-wrap gap-x-6 gap-y-3 rounded-lg px-4 py-3"
       data-testid="settings-bar"
     >
-      {/* Strands */}
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
           STRANDS
@@ -110,7 +109,6 @@ export function CalculatorSettingsBar({
         />
       </div>
 
-      {/* Over */}
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
           OVER
@@ -143,7 +141,6 @@ export function CalculatorSettingsBar({
         </div>
       </div>
 
-      {/* Fabric */}
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
           FABRIC
@@ -154,7 +151,6 @@ export function CalculatorSettingsBar({
         )}
       </div>
 
-      {/* Waste */}
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
           WASTE

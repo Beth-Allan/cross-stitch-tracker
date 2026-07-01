@@ -35,14 +35,12 @@ export function FinishedProjectCard({
 }: FinishedProjectCardProps) {
   return (
     <div className="border-border bg-card overflow-hidden rounded-xl border">
-      {/* Compact header row */}
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={isExpanded}
         className="hover:bg-muted/50 flex w-full cursor-pointer items-center gap-3 px-5 py-3.5 transition-colors"
       >
-        {/* Thumbnail */}
         <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg">
           {imageUrl ? (
             <img src={imageUrl} alt={project.projectName} className="h-full w-full object-cover" />
@@ -51,7 +49,6 @@ export function FinishedProjectCard({
           )}
         </div>
 
-        {/* Name + designer */}
         <div className="min-w-0 flex-1 text-left">
           <p className="font-heading truncate text-sm font-semibold">{project.projectName}</p>
           {project.designerName && (
@@ -59,7 +56,6 @@ export function FinishedProjectCard({
           )}
         </div>
 
-        {/* Key inline stats (hidden on mobile) */}
         <div className="hidden min-w-20 shrink-0 text-right md:block">
           <p className="text-foreground text-xs font-medium tabular-nums">
             {fmt(project.totalStitches)} stitches
@@ -69,7 +65,6 @@ export function FinishedProjectCard({
           </p>
         </div>
 
-        {/* Finish date (hidden on small mobile) */}
         <div className="hidden min-w-[90px] shrink-0 text-right sm:block">
           <p className="text-muted-foreground text-xs">Finished</p>
           <p className="text-foreground text-xs">{formatDate(project.finishDate)}</p>
@@ -83,10 +78,8 @@ export function FinishedProjectCard({
         />
       </button>
 
-      {/* Expanded stats panel */}
       {isExpanded && (
         <div className="border-border border-t p-5">
-          {/* Genre tags */}
           {project.genres.length > 0 && (
             <div className="mb-4 flex flex-wrap gap-1.5">
               {project.genres.map((g) => (
@@ -100,7 +93,6 @@ export function FinishedProjectCard({
             </div>
           )}
 
-          {/* Stats grid */}
           <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
             <StatCell
               label="Start to Finish"
@@ -118,7 +110,6 @@ export function FinishedProjectCard({
             <StatCell label="Specialty" value={String(project.specialtyCount)} />
           </div>
 
-          {/* View project details link */}
           <div className="mt-4">
             <Link
               href={`/charts/${project.chartId}`}

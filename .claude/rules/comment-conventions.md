@@ -15,6 +15,11 @@ Type-bundle files containing only interface/type declarations (e.g., `src/types/
 These files have no function or class symbols for IDE navigation, so section markers serve
 as the primary structural signal.
 
+## Exception: loading.tsx skeleton labels
+
+loading.tsx files are pure skeleton markup with no code logic. JSX comments serve as the
+only readable labels for skeleton sections. These are exempt from the JSX comment prohibition.
+
 ## Not allowed
 
 - JSX `{/* Section Label */}` markers inside render return blocks

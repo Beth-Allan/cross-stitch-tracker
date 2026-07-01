@@ -55,16 +55,13 @@ export function ViewToggleBar({
 }: ViewToggleBarProps) {
   return (
     <div className="flex items-center justify-between">
-      {/* Left side: project count */}
       <p className="text-muted-foreground text-xs">
         {hasActiveFilters ? `${filteredCount} of ${totalCount} projects` : `${totalCount} projects`}
       </p>
 
-      {/* Right side: sort + view toggle */}
       <div className="flex items-center gap-3">
         <SortDropdown sort={sort} dir={dir} onSortChange={onSortChange} />
 
-        {/* Segmented view toggle */}
         <TooltipProvider>
           <div className="bg-muted inline-flex items-center rounded-lg p-0.5">
             {VIEW_MODE_CONFIG.map(({ mode, icon: Icon, label, tooltip }) => (

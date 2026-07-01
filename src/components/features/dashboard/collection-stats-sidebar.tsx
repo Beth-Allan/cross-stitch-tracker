@@ -41,7 +41,6 @@ export function CollectionStatsSidebar({ stats }: CollectionStatsSidebarProps) {
 
   return (
     <Card className="gap-0 p-4">
-      {/* Mobile: collapsible header */}
       <button
         onClick={() => setExpanded(!expanded)}
         className="flex w-full items-center justify-between md:hidden"
@@ -56,12 +55,10 @@ export function CollectionStatsSidebar({ stats }: CollectionStatsSidebarProps) {
         />
       </button>
 
-      {/* Desktop: always-visible heading */}
       <h3 className="text-foreground mb-4 hidden text-[11px] font-bold tracking-wider uppercase md:block">
         Collection Stats
       </h3>
 
-      {/* Desktop stat rows */}
       <div className="hidden flex-col gap-3.5 md:flex">
         {STAT_ROWS.map((row) => (
           <div key={row.key} className="flex items-center gap-2.5">
@@ -73,10 +70,8 @@ export function CollectionStatsSidebar({ stats }: CollectionStatsSidebarProps) {
           </div>
         ))}
 
-        {/* Divider */}
         <div className="bg-border my-1 h-px" />
 
-        {/* Total Stitches */}
         <div className="flex flex-col gap-0.5">
           <span className="text-muted-foreground text-[11px] font-bold tracking-wider uppercase">
             Total Stitches
@@ -86,7 +81,6 @@ export function CollectionStatsSidebar({ stats }: CollectionStatsSidebarProps) {
           </span>
         </div>
 
-        {/* Most Recent Finish */}
         <div className="bg-border my-1 h-px" />
         <div className="flex flex-col gap-1">
           <span className="text-muted-foreground text-[11px] font-bold tracking-wider uppercase">
@@ -97,7 +91,6 @@ export function CollectionStatsSidebar({ stats }: CollectionStatsSidebarProps) {
           </span>
         </div>
 
-        {/* Largest Project */}
         <div className="bg-border my-1 h-px" />
         <div className="flex flex-col gap-1">
           <span className="text-muted-foreground text-[11px] font-bold tracking-wider uppercase">
@@ -114,7 +107,6 @@ export function CollectionStatsSidebar({ stats }: CollectionStatsSidebarProps) {
         </div>
       </div>
 
-      {/* Mobile: horizontal compact stat chips */}
       {expanded && (
         <div className="mt-3 flex flex-wrap gap-2 md:hidden">
           {STAT_ROWS.map((row) => (

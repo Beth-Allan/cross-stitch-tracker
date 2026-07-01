@@ -37,7 +37,6 @@ export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
 
   return (
     <header className="border-border bg-card flex h-14 shrink-0 items-center gap-3 border-b px-4 pt-[env(safe-area-inset-top)]">
-      {/* Mobile hamburger with Sheet drawer */}
       <div className="md:hidden">
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger
@@ -49,7 +48,6 @@ export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
           <SheetContent side="left" className="w-64 p-0" showCloseButton={false}>
             <SheetTitle className="sr-only">Navigation</SheetTitle>
             <nav aria-label="Main" className="flex h-full flex-col">
-              {/* Logo in drawer */}
               <Link
                 href="/"
                 onClick={() => setSheetOpen(false)}
@@ -61,7 +59,6 @@ export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
                 </span>
               </Link>
 
-              {/* Grouped nav sections */}
               <div className="flex-1 overflow-y-auto px-2 py-3">
                 {navigationSections.map((section, sectionIndex) => (
                   <div key={section.label}>
@@ -84,7 +81,6 @@ export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
                 ))}
               </div>
 
-              {/* Settings + theme at bottom */}
               <div className="border-sidebar-border space-y-0.5 border-t px-2 py-3">
                 <NavItemLink item={settingsItem} onClick={() => setSheetOpen(false)} />
                 <ThemeToggle />
@@ -94,10 +90,8 @@ export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
         </Sheet>
       </div>
 
-      {/* Spacer */}
       <div className="flex-1" />
 
-      {/* Quick actions */}
       <div className="ml-auto flex items-center gap-2">
         <Button
           size="sm"
@@ -121,7 +115,6 @@ export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
           </span>
         </LinkButton>
 
-        {/* User menu */}
         <div className="ml-1">
           <UserMenu user={user} />
         </div>

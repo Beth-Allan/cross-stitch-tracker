@@ -192,7 +192,6 @@ export function SupplyTable({
               onRowAdded={handleRowAdded}
             />
 
-            {/* Thread section */}
             <SupplyTableSectionDivider icon={CircleDot} label="Thread" count={threads.length} />
             {threads.map((row) => (
               <SupplyTableDataRow
@@ -204,7 +203,6 @@ export function SupplyTable({
               />
             ))}
 
-            {/* Beads section */}
             <SupplyTableSectionDivider icon={Gem} label="Beads" count={beads.length} />
             {beads.map((row) => (
               <SupplyTableDataRow
@@ -216,7 +214,6 @@ export function SupplyTable({
               />
             ))}
 
-            {/* Specialty section */}
             <SupplyTableSectionDivider icon={Sparkles} label="Specialty" count={specialty.length} />
             {specialty.map((row) => (
               <SupplyTableDataRow
@@ -228,7 +225,6 @@ export function SupplyTable({
               />
             ))}
 
-            {/* Empty state */}
             {totalCount === 0 && !isLoading && (
               <tr>
                 <td colSpan={7}>
@@ -241,7 +237,6 @@ export function SupplyTable({
               </tr>
             )}
 
-            {/* Loading skeleton */}
             {isLoading && (
               <>
                 {[1, 2, 3].map((i) => (

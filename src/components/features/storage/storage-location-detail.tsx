@@ -55,7 +55,6 @@ export function StorageLocationDetail({ location }: StorageLocationDetailProps) 
 
   return (
     <div className="px-6 pt-6 pb-4">
-      {/* Back link */}
       <Link
         href="/storage"
         className="text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1.5 text-sm transition-colors"
@@ -64,15 +63,12 @@ export function StorageLocationDetail({ location }: StorageLocationDetailProps) 
         All Locations
       </Link>
 
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          {/* Icon badge */}
           <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
             <MapPin className="text-muted-foreground h-5 w-5" />
           </div>
 
-          {/* Name + count */}
           <div>
             <InlineNameEdit name={location.name} onSave={handleRename} variant="heading" />
             <p className="text-muted-foreground text-sm">
@@ -81,7 +77,6 @@ export function StorageLocationDetail({ location }: StorageLocationDetailProps) 
           </div>
         </div>
 
-        {/* Action buttons */}
         <div className="flex shrink-0 items-center gap-1">
           <button
             type="button"
@@ -94,7 +89,6 @@ export function StorageLocationDetail({ location }: StorageLocationDetailProps) 
         </div>
       </div>
 
-      {/* Project list */}
       <div className="mt-6 space-y-2">
         {location.projects.map((project) => (
           <Link
@@ -119,7 +113,6 @@ export function StorageLocationDetail({ location }: StorageLocationDetailProps) 
           </Link>
         ))}
 
-        {/* Empty state */}
         {location.projects.length === 0 && (
           <div className="py-16 text-center">
             <p className="text-muted-foreground mb-1 text-sm">No projects in this location</p>
@@ -130,7 +123,6 @@ export function StorageLocationDetail({ location }: StorageLocationDetailProps) 
         )}
       </div>
 
-      {/* Delete dialog */}
       <DeleteEntityDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
