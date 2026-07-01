@@ -42,8 +42,8 @@ function usePersistedSelection(validProjectIds: string[]) {
       const validSet = new Set(validProjectIds);
       const filtered = parsed.filter((id) => validSet.has(id));
       if (filtered.length > 0) setSelectedIds(new Set(filtered));
-    } catch {
-      // localStorage may be unavailable
+    } catch (error) {
+      console.error("Load shopping cart selection failed:", error);
     }
   }, [validProjectIds]);
 
@@ -56,8 +56,8 @@ function usePersistedSelection(validProjectIds: string[]) {
     }
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(selectedIds)));
-    } catch {
-      // localStorage may be unavailable
+    } catch (error) {
+      console.error("Save shopping cart selection failed:", error);
     }
   }, [selectedIds]);
 
@@ -74,8 +74,8 @@ function usePersistedViewMode(): [ViewMode, (mode: ViewMode) => void] {
     try {
       const stored = localStorage.getItem(VIEW_KEY);
       if (stored === "by-supply") setViewMode("by-supply");
-    } catch {
-      // localStorage may be unavailable
+    } catch (error) {
+      console.error("Load shopping cart view mode failed:", error);
     }
   }, []);
 
@@ -83,8 +83,8 @@ function usePersistedViewMode(): [ViewMode, (mode: ViewMode) => void] {
     if (!hydratedRef.current) return;
     try {
       localStorage.setItem(VIEW_KEY, viewMode);
-    } catch {
-      // localStorage may be unavailable
+    } catch (error) {
+      console.error("Save shopping cart view mode failed:", error);
     }
   }, [viewMode]);
 

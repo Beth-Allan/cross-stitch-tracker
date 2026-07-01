@@ -37,7 +37,8 @@ export function StorageLocationList({ locations }: StorageLocationListProps) {
       } else {
         toast.error(result.error ?? "Failed to create location");
       }
-    } catch {
+    } catch (error) {
+      console.error("Create storage location failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
   }
@@ -51,7 +52,8 @@ export function StorageLocationList({ locations }: StorageLocationListProps) {
         return;
       }
       toast.error(result.error ?? "Failed to rename location");
-    } catch {
+    } catch (error) {
+      console.error("Rename storage location failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
     throw new Error("Rename failed");
@@ -67,7 +69,8 @@ export function StorageLocationList({ locations }: StorageLocationListProps) {
         return;
       }
       toast.error(result.error ?? "Failed to delete location");
-    } catch {
+    } catch (error) {
+      console.error("Delete storage location failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
     throw new Error("Delete failed");

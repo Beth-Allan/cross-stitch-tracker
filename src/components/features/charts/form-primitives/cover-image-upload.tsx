@@ -55,7 +55,8 @@ export function CoverImageUpload({
           setError("Could not load cover image");
           setState("idle");
         }
-      } catch {
+      } catch (error) {
+        console.error("Load cover image preview failed:", error);
         if (!cancelled) {
           setError("Could not load cover image");
           setState("idle");
@@ -127,7 +128,8 @@ export function CoverImageUpload({
         setImgError(false);
         setState("complete");
         onUploadComplete(result.key);
-      } catch {
+      } catch (error) {
+        console.error("Cover image upload failed:", error);
         setError("Upload failed. Please try again.");
         setState("error");
       }

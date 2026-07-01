@@ -114,7 +114,8 @@ export function ChartFileList({ chartId, files }: ChartFileListProps) {
           }
 
           toast.success(`Uploaded ${file.name}`);
-        } catch {
+        } catch (error) {
+          console.error("Chart file upload failed:", error);
           toast.error("Upload failed. Please try again.");
         }
       }
@@ -143,7 +144,8 @@ export function ChartFileList({ chartId, files }: ChartFileListProps) {
         a.click();
         document.body.removeChild(a);
       }
-    } catch {
+    } catch (error) {
+      console.error("Download chart file failed:", error);
       toast.error("Failed to download file.");
     }
   }

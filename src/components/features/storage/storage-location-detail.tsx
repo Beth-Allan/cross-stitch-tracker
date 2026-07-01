@@ -30,7 +30,8 @@ export function StorageLocationDetail({ location }: StorageLocationDetailProps) 
         return;
       }
       toast.error(result.error ?? "Failed to rename location");
-    } catch {
+    } catch (error) {
+      console.error("Rename storage location failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
     throw new Error("Rename failed");
@@ -45,7 +46,8 @@ export function StorageLocationDetail({ location }: StorageLocationDetailProps) 
         return;
       }
       toast.error(result.error ?? "Failed to delete location");
-    } catch {
+    } catch (error) {
+      console.error("Delete storage location failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
     throw new Error("Delete failed");

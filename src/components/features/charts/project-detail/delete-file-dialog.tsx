@@ -31,7 +31,8 @@ export function DeleteFileDialog({
       try {
         await onConfirm();
         onOpenChange(false);
-      } catch {
+      } catch (error) {
+        console.error("Delete file confirmation failed:", error);
         // Caller handles error reporting; dialog stays open for retry
       }
     });

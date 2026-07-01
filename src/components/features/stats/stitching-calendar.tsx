@@ -107,7 +107,8 @@ export function StitchingCalendar({ data, initialMonth, initialYear }: Stitching
         setMonth(newMonth);
         setYear(newYear);
         setCalendarData(result.data);
-      } catch {
+      } catch (error) {
+        console.error("Load calendar data failed:", error);
         toast.error("Something went wrong loading calendar.");
       }
     });

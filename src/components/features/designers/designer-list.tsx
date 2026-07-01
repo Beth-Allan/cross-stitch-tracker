@@ -92,7 +92,8 @@ export function DesignerList({ designers }: { designers: DesignerWithStats[] }) 
       } else {
         toast.error(result.error ?? "Something went wrong. Please try again.");
       }
-    } catch {
+    } catch (error) {
+      console.error("Delete designer failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
   }

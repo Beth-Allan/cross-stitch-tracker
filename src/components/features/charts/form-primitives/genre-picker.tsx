@@ -31,7 +31,8 @@ export function GenrePicker({ genres, selectedIds, onToggle, onAddGenre }: Genre
       await onAddGenre(trimmed);
       setNewName("");
       setIsAdding(false);
-    } catch {
+    } catch (error) {
+      console.error("Add genre failed:", error);
       // Keep input open on error so user can retry
       inputRef.current?.focus();
     } finally {

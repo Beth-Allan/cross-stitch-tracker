@@ -98,7 +98,8 @@ export function SupplyBrandList({ brands }: { brands: SupplyBrandWithCounts[] })
       } else {
         toast.error(result.error ?? "Something went wrong. Please try again.");
       }
-    } catch {
+    } catch (error) {
+      console.error("Delete supply brand failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
   }

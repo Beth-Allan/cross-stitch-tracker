@@ -130,7 +130,8 @@ export function SupplyTable({
           if (!result.success) {
             toast.error(result.error ?? "Couldn't update value. Try again.");
           }
-        } catch {
+        } catch (error) {
+          console.error("Update supply quantity failed:", error);
           toast.error("Couldn't update value. Try again.");
         }
       });
@@ -146,7 +147,8 @@ export function SupplyTable({
           if (!result.success) {
             toast.error(result.error ?? "Couldn't remove supply. Try again.");
           }
-        } catch {
+        } catch (error) {
+          console.error("Remove supply failed:", error);
           toast.error("Couldn't remove supply. Try again.");
         }
       });

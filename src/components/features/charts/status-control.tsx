@@ -37,7 +37,8 @@ export function StatusControl({ chartId, currentStatus }: StatusControlProps) {
         }
         setStatus(previousStatus);
         toast.error("Something went wrong. Please try again.");
-      } catch {
+      } catch (error) {
+        console.error("Update chart status failed:", error);
         setStatus(previousStatus);
         toast.error("Something went wrong. Please try again.");
       }

@@ -97,6 +97,8 @@ export async function createSession(formData: unknown) {
           await deleteFile(session.photoKey).catch((err) =>
             console.warn("[R2] raw file cleanup failed:", session.photoKey, err),
           );
+        } else {
+          console.warn("Image optimization skipped for session photo — using raw image");
         }
       } catch (err) {
         console.warn("Session photo optimization failed:", err);
@@ -207,6 +209,8 @@ export async function updateSession(sessionId: string, formData: unknown) {
               console.warn("[R2] old photo cleanup failed:", existing.photoKey, err),
             );
           }
+        } else {
+          console.warn("Image optimization skipped for session photo — using raw image");
         }
       } catch (err) {
         console.warn("Session photo optimization failed:", err);

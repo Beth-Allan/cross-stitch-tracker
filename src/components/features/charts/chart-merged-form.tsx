@@ -338,7 +338,8 @@ export function ChartMergedForm({
         const raw = localStorage.getItem("chart-draft");
         if (!raw) return null;
         return JSON.parse(raw);
-      } catch {
+      } catch (error) {
+        console.error("Load chart draft failed:", error);
         return null;
       }
     })();

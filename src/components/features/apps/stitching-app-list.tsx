@@ -37,7 +37,8 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
       } else {
         toast.error(result.error ?? "Failed to create app");
       }
-    } catch {
+    } catch (error) {
+      console.error("Create stitching app failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
   }
@@ -51,7 +52,8 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
         return;
       }
       toast.error(result.error ?? "Failed to rename app");
-    } catch {
+    } catch (error) {
+      console.error("Rename stitching app failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
     throw new Error("Rename failed");
@@ -67,7 +69,8 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
         return;
       }
       toast.error(result.error ?? "Failed to delete app");
-    } catch {
+    } catch (error) {
+      console.error("Delete stitching app failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
     throw new Error("Delete failed");
