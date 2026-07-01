@@ -32,8 +32,6 @@ describe("dashboard-actions", () => {
     });
   });
 
-  // ─── getMainDashboardData ─────────────────────────────────────────────────
-
   describe("getMainDashboardData", () => {
     // Test 1: Auth guard
     it("rejects unauthenticated calls", async () => {
@@ -592,8 +590,6 @@ describe("dashboard-actions", () => {
       }
     });
   });
-
-  // ─── getSpotlightProject ──────────────────────────────────────────────────
 
   describe("getSpotlightProject", () => {
     // Test 11: Auth guard

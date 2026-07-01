@@ -14,8 +14,6 @@ vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
-// ─── Test Data ──────────────────────────────────────────────────────────────
-
 const projectWithThreads: ShoppingListProject = {
   projectId: "proj-1",
   chartId: "chart-1",
@@ -96,8 +94,6 @@ const projectWithBeadsAndFabric: ShoppingListProject = {
     { label: "25", count: 25, widthInches: 14, heightInches: 12 },
   ],
 };
-
-// ─── Tests ──────────────────────────────────────────────────────────────────
 
 describe("ShoppingList", () => {
   beforeEach(() => {

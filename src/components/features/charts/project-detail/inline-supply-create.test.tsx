@@ -2,8 +2,6 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@/__tests__/test-utils";
 import { InlineSupplyCreate } from "./inline-supply-create";
 
-// ─── Mocks ─────────────────────────────────────────────────────────────────
-
 const mockCreateAndAddThread = vi.fn();
 const mockCreateAndAddBead = vi.fn();
 const mockCreateAndAddSpecialty = vi.fn();
@@ -21,8 +19,6 @@ vi.mock("sonner", () => ({
   },
 }));
 
-// ─── Test Data ──────────────────────────────────────────────────────────────
-
 const defaultProps = {
   open: true,
   onOpenChange: vi.fn(),
@@ -31,8 +27,6 @@ const defaultProps = {
   searchText: "Custom Red",
   onCreated: vi.fn(),
 };
-
-// ─── Tests ──────────────────────────────────────────────────────────────────
 
 describe("InlineSupplyCreate", () => {
   beforeEach(() => {

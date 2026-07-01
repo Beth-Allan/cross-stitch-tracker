@@ -2,8 +2,6 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@/__tests__/test-utils";
 import { CoverImageUpload } from "./cover-image-upload";
 
-// ─── Mocks ─────────────────────────────────────────────────────────────────
-
 vi.mock("@/lib/actions/upload-actions", () => ({
   getPresignedUploadUrl: vi.fn(),
   getPresignedDownloadUrl: vi.fn().mockResolvedValue({
@@ -16,8 +14,6 @@ vi.mock("@/lib/validations/upload", () => ({
   ALLOWED_IMAGE_TYPES: ["image/png", "image/jpeg", "image/webp"],
   MAX_FILE_SIZE: 10 * 1024 * 1024,
 }));
-
-// ─── Tests ──────────────────────────────────────────────────────────────────
 
 describe("CoverImageUpload - cover image display fixes", () => {
   const defaultProps = {

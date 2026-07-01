@@ -3,8 +3,6 @@ import { render, screen } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { StickySaveBar } from "./sticky-save-bar";
 
-// ─── Tests ──────────────────────────────────────────────────────────────────
-
 describe("StickySaveBar", () => {
   const defaultProps = {
     chartName: "",

@@ -82,8 +82,6 @@ vi.mock("@/components/features/charts/form-primitives/calculator-card", () => ({
   ),
 }));
 
-// ─── Test Data ────────────────────────────────────────────────────────────────
-
 const mockBrand = createMockSupplyBrand({ id: "brand-1", name: "DMC" });
 
 function makeThread(overrides?: Partial<ProjectThreadWithThread>): ProjectThreadWithThread {
@@ -168,8 +166,6 @@ const defaultProject: NonNullable<ProjectDetailProps["chart"]["project"]> = {
   stitchingApp: null,
   fabric: null,
 };
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe("SuppliesTab", () => {
   describe("renders SupplyTable with transformed data", () => {

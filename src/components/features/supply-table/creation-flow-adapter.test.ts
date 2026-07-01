@@ -2,8 +2,6 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { CreationFlowAdapter } from "./creation-flow-adapter";
 import type { SupplyRow, SupplySearchResult, SupplyType, CreateSupplyData } from "./types";
 
-// ─── Fixtures ──────────────────────────────────────────────────────────────
-
 function makeSearchResult(overrides: Partial<SupplySearchResult> = {}): SupplySearchResult {
   return {
     id: "sr-1",
@@ -17,8 +15,6 @@ function makeSearchResult(overrides: Partial<SupplySearchResult> = {}): SupplySe
   };
 }
 
-// ─── Tests ─────────────────────────────────────────────────────────────────
-
 describe("CreationFlowAdapter", () => {
   let onRowsChange: ReturnType<typeof vi.fn>;
   let searchFn: ReturnType<typeof vi.fn>;
@@ -31,8 +27,6 @@ describe("CreationFlowAdapter", () => {
     createFn = vi.fn();
     adapter = new CreationFlowAdapter(onRowsChange, searchFn, createFn);
   });
-
-  // ─── addThread ─────────────────────────────────────────────────────────
 
   describe("addThread", () => {
     it("stores row in buffer with client-generated UUID and calls onRowsChange", async () => {
@@ -64,8 +58,6 @@ describe("CreationFlowAdapter", () => {
     });
   });
 
-  // ─── addBead ───────────────────────────────────────────────────────────
-
   describe("addBead", () => {
     it("stores bead row in buffer and calls onRowsChange", async () => {
       const beadResult = makeSearchResult({
@@ -91,8 +83,6 @@ describe("CreationFlowAdapter", () => {
     });
   });
 
-  // ─── addSpecialty ──────────────────────────────────────────────────────
-
   describe("addSpecialty", () => {
     it("stores specialty row in buffer and calls onRowsChange", async () => {
       const specialtyResult = makeSearchResult({
@@ -116,8 +106,6 @@ describe("CreationFlowAdapter", () => {
       expect(rows[0].stitchCount).toBe(0);
     });
   });
-
-  // ─── updateQuantity ────────────────────────────────────────────────────
 
   describe("updateQuantity", () => {
     it("mutates buffered row's field and calls onRowsChange", async () => {
@@ -145,8 +133,6 @@ describe("CreationFlowAdapter", () => {
     });
   });
 
-  // ─── remove ────────────────────────────────────────────────────────────
-
   describe("remove", () => {
     it("deletes row from buffer and calls onRowsChange", async () => {
       const threadResult = makeSearchResult({ id: "t1", type: "THREAD" });
@@ -170,8 +156,6 @@ describe("CreationFlowAdapter", () => {
     });
   });
 
-  // ─── searchSupplies ────────────────────────────────────────────────────
-
   describe("searchSupplies", () => {
     it("delegates to provided searchFn", async () => {
       const results = [makeSearchResult()];
@@ -183,8 +167,6 @@ describe("CreationFlowAdapter", () => {
       expect(returned).toEqual(results);
     });
   });
-
-  // ─── createSupply ──────────────────────────────────────────────────────
 
   describe("createSupply", () => {
     it("delegates to provided createFn and returns SupplySearchResult", async () => {
@@ -222,23 +204,18 @@ describe("CreationFlowAdapter", () => {
     });
   });
 
-  // ─── getRows ───────────────────────────────────────────────────────────
-
   describe("getRows", () => {
     it("returns all buffered rows across all types", async () => {
-      // Add a thread
       const threadResult = makeSearchResult({ id: "t1", type: "THREAD" });
       searchFn.mockResolvedValueOnce([threadResult]);
       await adapter.searchSupplies("THREAD", "310");
       await adapter.addThread("t1", 500, 2);
 
-      // Add a bead
       const beadResult = makeSearchResult({ id: "b1", type: "BEAD", code: "00123", name: "Red" });
       searchFn.mockResolvedValueOnce([beadResult]);
       await adapter.searchSupplies("BEAD", "Red");
       await adapter.addBead("b1", 100, 1);
 
-      // Add a specialty
       const specialtyResult = makeSearchResult({
         id: "s1",
         type: "SPECIALTY",
@@ -258,8 +235,6 @@ describe("CreationFlowAdapter", () => {
       expect(types).toContain("SPECIALTY");
     });
   });
-
-  // ─── loadRows ──────────────────────────────────────────────────────────
 
   describe("loadRows", () => {
     it("populates buffer from serialized array (draft restore scenario)", () => {
@@ -302,7 +277,6 @@ describe("CreationFlowAdapter", () => {
     });
 
     it("clears existing rows before loading", async () => {
-      // Add a row first
       const threadResult = makeSearchResult({ id: "t1", type: "THREAD" });
       searchFn.mockResolvedValueOnce([threadResult]);
       await adapter.searchSupplies("THREAD", "310");
@@ -310,7 +284,6 @@ describe("CreationFlowAdapter", () => {
 
       expect(adapter.getRows()).toHaveLength(1);
 
-      // Load different rows
       const newRows: SupplyRow[] = [
         {
           id: "row-new",
@@ -334,8 +307,6 @@ describe("CreationFlowAdapter", () => {
       expect(rows[0].id).toBe("row-new");
     });
   });
-
-  // ─── Duplicate detection ───────────────────────────────────────────────
 
   describe("duplicate detection", () => {
     it("returns error when adding duplicate supplyId of same type", async () => {
@@ -369,8 +340,6 @@ describe("CreationFlowAdapter", () => {
       expect(adapter.getRows()).toHaveLength(2);
     });
   });
-
-  // ─── Skein recalculation on stitchCount edit ──────────────────────────
 
   describe("updateQuantity recalculation", () => {
     it("recalculates need via calculateSkeins when stitchCount changes on a non-overridden thread row", async () => {
@@ -458,8 +427,6 @@ describe("CreationFlowAdapter", () => {
       expect(rows2.find((r) => r.id === rowId)?.need).toBe(99);
     });
   });
-
-  // ─── Supply cache fallback ─────────────────────────────────────────────
 
   describe("supply cache fallback", () => {
     it("uses fallback metadata when supply not in cache", async () => {

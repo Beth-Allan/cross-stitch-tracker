@@ -49,8 +49,6 @@ describe("session-actions", () => {
     });
   });
 
-  // ─── Auth Guard ──────────────────────────────────────────────────────────
-
   describe("auth guard", () => {
     it("createSession rejects unauthenticated calls", async () => {
       mockAuth.mockResolvedValueOnce(null);
@@ -110,8 +108,6 @@ describe("session-actions", () => {
       await expect(getProjectSessionStats("proj-1")).rejects.toThrow("Unauthorized");
     });
   });
-
-  // ─── Ownership Validation ────────────────────────────────────────────────
 
   describe("ownership validation", () => {
     it("createSession rejects when project belongs to different user", async () => {
@@ -210,8 +206,6 @@ describe("session-actions", () => {
     });
   });
 
-  // ─── Validation ──────────────────────────────────────────────────────────
-
   describe("validation", () => {
     it("createSession rejects invalid date", async () => {
       const { createSession } = await import("./session-actions");
@@ -253,8 +247,6 @@ describe("session-actions", () => {
       expect(result.success).toBe(false);
     });
   });
-
-  // ─── createSession ──────────────────────────────────────────────────────
 
   describe("createSession", () => {
     it("creates session and recalculates progress atomically", async () => {
@@ -780,8 +772,6 @@ describe("session-actions", () => {
     });
   });
 
-  // ─── updateSession ─────────────────────────────────────────────────────
-
   describe("updateSession", () => {
     it("updates session and recalculates progress atomically", async () => {
       // Existing session with its project
@@ -1150,8 +1140,6 @@ describe("session-actions", () => {
     });
   });
 
-  // ─── deleteSession ─────────────────────────────────────────────────────
-
   describe("deleteSession", () => {
     it("deletes session and recalculates progress atomically", async () => {
       mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
@@ -1305,8 +1293,6 @@ describe("session-actions", () => {
     });
   });
 
-  // ─── getSessionsForProject ─────────────────────────────────────────────
-
   describe("getSessionsForProject", () => {
     it("returns sessions for owned project ordered by date desc", async () => {
       mockPrisma.project.findUnique.mockResolvedValueOnce({
@@ -1335,8 +1321,6 @@ describe("session-actions", () => {
     });
   });
 
-  // ─── getAllSessions ────────────────────────────────────────────────────
-
   describe("getAllSessions", () => {
     it("returns all sessions for the authenticated user", async () => {
       const sessions = [
@@ -1360,8 +1344,6 @@ describe("session-actions", () => {
       expect(result.sessions[1].projectName).toBe("Pattern B");
     });
   });
-
-  // ─── getActiveProjectsForPicker ────────────────────────────────────────
 
   describe("getActiveProjectsForPicker", () => {
     it("returns only projects with active statuses", async () => {
@@ -1414,8 +1396,6 @@ describe("session-actions", () => {
       );
     });
   });
-
-  // ─── getProjectSessionStats ────────────────────────────────────────────
 
   describe("getProjectSessionStats", () => {
     it("returns computed stats for a project with sessions", async () => {
