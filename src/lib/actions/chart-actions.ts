@@ -11,8 +11,6 @@ import type { ChartFormInput } from "@/lib/validations/chart";
 import { updateProjectSettingsSchema } from "@/lib/validations/supply";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
 
-// ─── Shared Helpers ──────────────────────────────────────────────────────────
-
 /**
  * Create a chart + project inside an existing transaction, then link fabric
  * if provided. Shared by createChart and createChartWithSupplies to avoid
@@ -120,8 +118,6 @@ async function handleThumbnail(
     return "Thumbnail could not be generated";
   }
 }
-
-// ─── Exported Actions ────────────────────────────────────────────────────────
 
 export async function createChart(formData: unknown) {
   const user = await requireAuth();

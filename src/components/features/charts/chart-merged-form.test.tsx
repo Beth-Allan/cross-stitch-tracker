@@ -50,6 +50,11 @@ vi.mock("@/lib/actions/stitching-app-actions", () => ({
   createStitchingApp: vi.fn(),
 }));
 
+vi.mock("@/lib/actions/series-actions", () => ({
+  createSeries: vi.fn(),
+  getSeriesWithStats: vi.fn().mockResolvedValue([]),
+}));
+
 vi.mock("@/lib/actions/upload-actions", () => ({
   getPresignedUploadUrl: vi.fn(),
 }));
@@ -178,6 +183,7 @@ const mockGenres = [
 const defaultFormProps = {
   designers: mockDesigners,
   genres: mockGenres,
+  series: [],
   storageLocations: [],
   stitchingApps: [],
   unassignedFabrics: [],

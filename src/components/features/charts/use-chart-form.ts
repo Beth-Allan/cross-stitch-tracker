@@ -416,7 +416,7 @@ export function useChartForm({
       if (!name.trim()) return;
       suppressUnloadRef.current = true;
       try {
-        const result = await createSeries({ name, designerId: values.designerId });
+        const result = await createSeries({ name: name.trim(), designerId: values.designerId });
         if (!result.success) {
           throw new Error(result.error);
         }

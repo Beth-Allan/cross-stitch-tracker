@@ -162,7 +162,7 @@ export function ChartMergedForm({
   const adapterRef = useRef<CreationFlowAdapter | null>(null);
 
   // Draft auto-save on unmount: track submission state and current values via refs
-  // to avoid stale closures in the cleanup function (GAP 10)
+  // to avoid stale closures in the cleanup function
   const submittedRef = useRef(false);
 
   // Draft state for save button feedback
@@ -749,7 +749,7 @@ export function ChartMergedForm({
       {/* Conditional rendering (not Activity) so CalculatorCard's Base UI Popover
           initializes fresh when supply mode activates. Activity mode="hidden" defers
           FloatingRootContext init to OffscreenLane, leaving fabric dropdown broken
-          on first click (GAP 5). CalcParams state lives in the parent, so remounting
+          on first click. CalcParams state lives in the parent, so remounting
           CalculatorCard on mode switch is safe. */}
       {!isEdit && mode === "supply" && (
         <>

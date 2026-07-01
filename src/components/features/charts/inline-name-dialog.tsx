@@ -67,6 +67,10 @@ export function InlineNameDialog({
       reset();
       onOpenChange(false);
     } catch (err) {
+      console.error(
+        "InlineNameDialog submit failed:",
+        err instanceof Error ? err.message : String(err),
+      );
       setError(err instanceof Error ? err.message : "Failed to create");
     } finally {
       setIsPending(false);
