@@ -10,11 +10,11 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 ## Current State
 
-**Last shipped:** v1.7 Fix & Polish (2026-05-24)
-**8 milestones shipped:** v1.0-v1.7 (30 phases, 133 plans)
-**Current:** v1.8 Series & Collections (Phases 31-34) — Phase 32 complete (2026-05-25)
+**Last shipped:** v1.8 Series & Collections (2026-07-01)
+**9 milestones shipped:** v1.0-v1.8 (34 phases, 144 plans)
+**Current:** Planning next milestone
 
-The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters) with colored status/size badges and digital copy indicators, project detail with tabbed layout, session logging, and inline skein calculator controls, unified supply table with keyboard-first entry and visible commit button, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive), shopping cart with project search, status grouping, supply search, smart selection, and squared pills, image optimization, multi-file working copies per chart (up to 50MB, including .zip), click-to-set focal point control for cover images with repositioned action bar, and a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights with stitch counts, status filter pills, and celebration confetti on record-breaking sessions. 2,269 tests, ~110k LOC TypeScript. Stats insights now populate from library data (not just session-tracked projects) with status group filtering. Integer-only chart axes. Collection total stitch counter. Days-in-library display fix.
+The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters) with colored status/size badges and digital copy indicators, project detail with tabbed layout, session logging, and inline skein calculator controls, unified supply table with keyboard-first entry and visible commit button, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive with Series tab), shopping cart with project search, status grouping, supply search, smart selection, and squared pills, image optimization, multi-file working copies per chart (up to 50MB, including .zip), click-to-set focal point control for cover images with repositioned action bar, a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights with stitch counts, status filter pills, and celebration confetti on record-breaking sessions, and series organization with CRUD, dual progress tracking (owned/total + finished/owned), management pages, chart form integration, and Browse tab filtering. 2,399 tests, ~117k LOC TypeScript.
 
 ## Requirements
 
@@ -94,31 +94,16 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - ✓ Code quality (TS test errors, silent failures, R2 orphan cleanup, status color CSS vars, shared constant + hook) — v1.7
 - ✓ Series data foundation (Prisma model, CRUD actions, progress computation, Zod validation) — v1.8
 - ✓ Series management pages (/series list with card grid, sort, create/delete; /series/[id] detail with inline edit, chart rows, progress) — v1.8
-
-## Current Milestone: v1.8 Series & Collections
-
-**Goal:** Give stitchers a way to organize charts into series/collections, track completion progress, and browse their collection by series.
-
-**Target features:**
-- Series CRUD (name, optional total count, optional designer link)
-- Chart-to-series assignment via chart form (SearchableSelect with inline "Add New")
-- Series progress tracking ("8 of 15" with optional total)
-- Pattern Dive Series tab with progress cards
-- Browse tab series filter
-- Series detail/management pages
-- Fix: TS test errors (999.19) and Stats Promise.all resilience (999.22)
+- ✓ Chart-to-series assignment from chart form with SearchableSelect + inline create — v1.8
+- ✓ Series progress display with dual progress (owned/total + finished/owned) — v1.8
+- ✓ Pattern Dive Series tab with sortable progress cards — v1.8
+- ✓ Browse tab series filter with "Unassigned" option — v1.8
+- ✓ Fix pre-existing TypeScript test errors (999.19) — v1.8
+- ✓ Stats page Promise.allSettled resilience (999.22) — v1.8
 
 ### Active
 
-- [ ] Series entity with name, optional total count, optional designer
-- [ ] Chart-to-series assignment from chart form with SearchableSelect + inline create
-- [ ] Series progress display ("8 of 15" or "8 charts" for open-ended)
-- [ ] Pattern Dive Series tab with series cards and progress indicators
-- [ ] Series filter on Browse tab
-- [x] Series detail page showing assigned charts — Phase 32
-- [x] Series management page with CRUD — Phase 32
-- [ ] Fix pre-existing TypeScript errors in test files (999.19)
-- [ ] Stats page query group separation for resilience (999.22)
+(No active requirements — start next milestone with `/gsd-new-milestone`)
 
 ### Deferred (no phase assigned)
 
@@ -153,8 +138,8 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 
 ## Context
 
-**Current state (v1.8 in progress):**
-- 2,349 tests, ~115k LOC TypeScript, deployed to Vercel
+**Current state (post v1.8):**
+- 2,399 tests, ~117k LOC TypeScript, deployed to Vercel
 - Tech stack: Next.js 16, Prisma 7, Tailwind v4, Auth.js v5 beta, shadcn/ui v4 (Base UI)
 - Database: PostgreSQL on Neon (prod), Cloudflare R2 (file storage)
 - 70+ backlog items captured (see CLAUDE.md backlog section)
@@ -240,6 +225,12 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 | FocalPointEditor split into overlay + action bar | Action bar in document flow below image; full image clickable for focal point placement | ✓ Good |
 | Synchronous localStorage in useState initializer | Eliminates view mode flash on first load; SSR-safe with typeof window guard | ✓ Good |
 | aria-labelledby without role override on tr | Preserves implicit row role for table semantics; role="group" only on mobile card divs | ✓ Good |
+| Series mirrors Designer/Genre pattern | Consistent UX: dedicated management page + detail page + inline create from chart form | ✓ Good |
+| Dual progress for series | Owned/total (collection completeness) + finished/owned (stitching progress) covers both use cases | ✓ Good |
+| Series nullable FK to Designer | Optional association; no enforcement required — always manual assignment | ✓ Good |
+| @unique constraint on Series name | Prevents duplicates, consistent with Designer uniqueness pattern | ✓ Good |
+| InlineNameDialog with customizable props | submitLabel/requiredError props allow reuse across genre-simple and series create flows | ✓ Good |
+| "Unassigned" option in series filter | Shows charts not belonging to any series — key for discovery/organization | ✓ Good |
 
 ## Evolution
 
@@ -258,4 +249,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 after v1.8 milestone started*
+*Last updated: 2026-07-01 after v1.8 milestone completed*

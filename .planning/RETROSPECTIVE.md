@@ -1,5 +1,50 @@
 # Retrospective
 
+## Milestone: v1.8 — Series & Collections
+
+**Shipped:** 2026-07-01
+**Phases:** 4 | **Plans:** 11
+**Timeline:** 38 days (2026-05-24 → 2026-07-01)
+**Tests:** 2,399 | **PRs:** #56, #57, #61, #62
+
+### What Was Built
+
+- Data Foundation: Series Prisma model with CRUD server actions, Zod validation (.trim/.min/.max), dual progress computation (owned/total + finished/owned), TS test error fixes, stats Promise.allSettled resilience
+- Series Management Pages: /series list page with card grid + sort pills + create modal + delete confirmation, /series/[id] detail page with chart rows + inline name editing + dual progress display
+- Chart Form Integration: Series SearchableSelect with InlineNameDialog (reused from genre), designer auto-populate from chart's selection, seriesId flow-through to chart create/update actions
+- Browse & Pattern Dive: SeriesTabContent as 5th Pattern Dive tab with sort pills + empty state, Browse tab series filter with "Unassigned" option via useGalleryFilters hook
+
+### What Worked
+
+- **Pattern reuse pays off** — Series mirrors Designer/Genre pattern exactly: dedicated management page + detail page + inline create from chart form. Each phase was faster because the patterns were established. InlineNameDialog reused across genre and series create flows.
+- **Wave-based execution** — Each phase had clean wave dependencies (data layer first, UI second). Plan 01 always laid foundation for parallel Plans 02-03 in Wave 2.
+- **Code review catching real bugs** — CR-01 in Phase 32 (CreationFlowAdapter isNeedOverridden data loss), CR-01 in Phase 34 (aggregated supply quantity bug). Multi-agent review continues to find genuine issues.
+- **UI-SPEC design contracts** — Phase 32 and 34 both had UI-SPECs with checker validation before planning. Design decisions locked before implementation.
+- **Dual progress design** — Separating "how many do you own" from "how many have you stitched" covers both collectors (acquisition tracking) and stitchers (completion tracking) without complexity.
+
+### What Was Inefficient
+
+- **SUMMARY.md one-liner quality (8th time)** — Auto-extracted accomplishments for MILESTONES.md were garbled again (deviation notes instead of accomplishments). Same root cause as every previous milestone. Manual rewrite required.
+- **REQUIREMENTS checkbox drift (8th time)** — 5 of 12 requirements unchecked despite being fully implemented in Phase 31. Had to fix manually before archiving.
+- **38-day timeline** — Longest milestone by calendar time despite only 11 plans. Reflects intermittent work sessions rather than continuous execution.
+- **Phase 32 verification gap** — Visual verification left in "human_needed" status, carried forward to milestone close. Same pattern as previous milestones.
+
+### Patterns Established
+
+- **InlineNameDialog with customizable props** — submitLabel/requiredError props allow reuse across different entity types (genre vs series). Future entities can use the same component.
+- **Dual progress computation** — computeSeriesProgress utility handles 4 combinations: open-ended/closed × has-finished/no-finished. Pure function with exhaustive test coverage.
+- **Series filter with "Unassigned"** — useGalleryFilters hook extended with seriesFilter URL state. FilterBar renders conditional "Unassigned" option. Pattern reusable for other nullable FK filters.
+- **SeriesCard standalone component** — Extracted to shared components for reuse across Pattern Dive Series tab and potential future contexts (dashboard, sidebar).
+
+### Key Lessons
+
+1. **Accept SUMMARY.md extraction as permanently broken** — 8 milestones, same issue. Write MILESTONES.md entries manually. Stop investing in fixing the extractor.
+2. **Pattern reuse is the velocity multiplier** — 4 phases, 11 plans, but each plan was faster than equivalent work in v1.0 because Designer/Genre patterns were established. New entities should always start by finding the closest existing analog.
+3. **Intermittent execution works** — 38 calendar days, but the actual execution time was much shorter. GSD's checkpoint/resume system made it possible to pick up exactly where left off.
+4. **Fix requirement checkboxes during verification** — The verify-work workflow should update REQUIREMENTS.md traceability status, not leave it for milestone close. This is the 8th time this drift has occurred.
+
+---
+
 ## Milestone: v1.6 — Cleanup & Hardening
 
 **Shipped:** 2026-05-20
@@ -333,13 +378,13 @@
 
 ## Cross-Milestone Trends
 
-| Metric | v1.0 | v1.1 | v1.2 | v1.3 | v1.4 | v1.5 |
-|--------|------|------|------|------|------|------|
-| Phases | 4 | 3 | 2 | 5 | 3 | 4 |
-| Plans | 23 | 20 | 20 | 19 | 9 | 14 |
-| Tests | 395 | 867 | 1,172 | 1,535 | 1,641 | 1,967 |
-| Days | 22 | 5 | 4 | 13 | 2 | 2 |
-| Plans/day | ~1 | ~4 | ~5 | ~1.5 | ~4.5 | ~7 |
-| Commits | 225+ | 225 | 153 | 190 | 153 | ~170 |
-| PRs | 6 | 3 | 2 | 1 | 2 | 2 |
-| LOC | 48k | ~65k | 82k | ~90k | ~95k | ~125k |
+| Metric | v1.0 | v1.1 | v1.2 | v1.3 | v1.4 | v1.5 | v1.6 | v1.7 | v1.8 |
+|--------|------|------|------|------|------|------|------|------|------|
+| Phases | 4 | 3 | 2 | 5 | 3 | 4 | 5 | 4 | 4 |
+| Plans | 23 | 20 | 20 | 19 | 9 | 14 | 15 | 11 | 11 |
+| Tests | 395 | 867 | 1,172 | 1,535 | 1,641 | 1,967 | 2,176 | 2,269 | 2,399 |
+| Days | 22 | 5 | 4 | 13 | 2 | 2 | 3 | 4 | 38 |
+| Plans/day | ~1 | ~4 | ~5 | ~1.5 | ~4.5 | ~7 | ~5 | ~2.75 | ~0.3 |
+| Commits | 225+ | 225 | 153 | 190 | 153 | ~170 | ~168 | ~120 | 124 |
+| PRs | 6 | 3 | 2 | 1 | 2 | 2 | 5 | 4 | 4 |
+| LOC | 48k | ~65k | 82k | ~90k | ~95k | ~125k | ~110k | ~113k | ~117k |

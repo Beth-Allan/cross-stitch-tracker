@@ -1,5 +1,23 @@
 # Milestones
 
+## v1.8 Series & Collections (Shipped: 2026-07-01)
+
+**Delivered:** Series organization for chart collections — full CRUD with dual progress tracking, dedicated management/detail pages, chart form integration with inline create, and Pattern Dive Series tab with Browse tab filtering.
+
+**Stats:** 4 phases, 11 plans | 124 commits | 2,399 tests | 38 days (2026-05-24 → 2026-07-01)
+
+**Key accomplishments:**
+
+1. **Data Foundation** — Series Prisma model with CRUD actions, Zod validation, dual progress computation (owned/total + finished/owned), TS test error fixes, stats Promise.allSettled resilience
+2. **Series Management Pages** — /series list page with card grid + sort pills + create modal + delete, /series/[id] detail page with chart rows + inline editing + dual progress display
+3. **Chart Form Integration** — Series SearchableSelect with inline create dialog (InlineNameDialog), designer auto-populate, seriesId flow-through to chart create/update actions
+4. **Browse & Pattern Dive** — SeriesTabContent with sortable progress cards as 5th Pattern Dive tab, Browse tab series filter with "Unassigned" option via useGalleryFilters hook
+
+**Known deferred items at close:** 16 (see STATE.md Deferred Items)
+**PRs:** #56 (Phase 31), #57 (Phase 32), #61 (Phase 33), #62 (Phase 34)
+
+---
+
 ## v1.6 Cleanup & Hardening (Shipped: 2026-05-20)
 
 **Delivered:** Comprehensive hardening pass — security gaps closed, test infrastructure modernized, 16 type quality improvements, shopping cart scaled to 75+ projects, and 14 UX polish items addressing ARIA compliance, visual consistency, and component affordances.
