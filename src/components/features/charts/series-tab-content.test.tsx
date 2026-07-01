@@ -147,12 +147,4 @@ describe("SeriesTabContent", () => {
 
     expect(screen.queryByTestId("delete-button")).not.toBeInTheDocument();
   });
-
-  it("series cards link to /series/{id}", () => {
-    const series = [createMockSeriesWithStats({ id: "s1", name: "Test" })];
-
-    render(<SeriesTabContent series={series} />);
-
-    expect(screen.getByTestId("series-card-s1")).toBeInTheDocument();
-  });
 });

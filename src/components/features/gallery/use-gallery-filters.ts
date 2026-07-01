@@ -150,15 +150,17 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
 
   const seriesOptions = useMemo(() => {
     const seen = new Map<string, string>();
+    let hasUnassigned = false;
     for (const card of cards) {
       if (card.seriesId && card.seriesName && !seen.has(card.seriesId)) {
         seen.set(card.seriesId, card.seriesName);
       }
+      if (card.seriesId === null) hasUnassigned = true;
     }
     const named = [...seen.entries()]
       .sort((a, b) => a[1].localeCompare(b[1]))
       .map(([value, label]) => ({ value, label }));
-    return [{ value: "__unassigned__", label: "Unassigned" }, ...named];
+    return hasUnassigned ? [{ value: "__unassigned__", label: "Unassigned" }, ...named] : named;
   }, [cards]);
 
   const hasActiveFilters =
