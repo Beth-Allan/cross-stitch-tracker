@@ -9,9 +9,12 @@ interface FilterChipsProps {
   search: string;
   statusFilter: string[];
   sizeFilter: string[];
+  seriesFilter: string[];
+  seriesNames: Record<string, string>;
   onRemoveSearch: () => void;
   onRemoveStatus: (value: string) => void;
   onRemoveSize: (value: string) => void;
+  onRemoveSeries: (value: string) => void;
   onClearAll: () => void;
 }
 
@@ -26,12 +29,19 @@ export function FilterChips({
   search,
   statusFilter,
   sizeFilter,
+  seriesFilter,
+  seriesNames,
   onRemoveSearch,
   onRemoveStatus,
   onRemoveSize,
+  onRemoveSeries,
   onClearAll,
 }: FilterChipsProps) {
-  const hasFilters = search.length > 0 || statusFilter.length > 0 || sizeFilter.length > 0;
+  const hasFilters =
+    search.length > 0 ||
+    statusFilter.length > 0 ||
+    sizeFilter.length > 0 ||
+    seriesFilter.length > 0;
 
   const chips = useMemo(() => {
     const result: Chip[] = [];
@@ -66,8 +76,28 @@ export function FilterChips({
       });
     }
 
+    for (const value of seriesFilter) {
+      const displayName = value === "__unassigned__" ? "Unassigned" : (seriesNames[value] ?? value);
+      result.push({
+        key: `series-${value}`,
+        label: `Series: ${displayName}`,
+        ariaLabel: `Remove Series: ${displayName} filter`,
+        onRemove: () => onRemoveSeries(value),
+      });
+    }
+
     return result;
-  }, [search, statusFilter, sizeFilter, onRemoveSearch, onRemoveStatus, onRemoveSize]);
+  }, [
+    search,
+    statusFilter,
+    sizeFilter,
+    seriesFilter,
+    seriesNames,
+    onRemoveSearch,
+    onRemoveStatus,
+    onRemoveSize,
+    onRemoveSeries,
+  ]);
 
   if (!hasFilters) return null;
 

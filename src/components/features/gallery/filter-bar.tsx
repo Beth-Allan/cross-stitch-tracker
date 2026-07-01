@@ -11,6 +11,9 @@ interface FilterBarProps {
   onStatusToggle: (value: string) => void;
   sizeFilter: string[];
   onSizeToggle: (value: string) => void;
+  seriesFilter: string[];
+  onSeriesToggle: (value: string) => void;
+  seriesOptions: { value: string; label: string }[];
 }
 
 const STATUS_OPTIONS = PROJECT_STATUSES.map((status) => ({
@@ -30,6 +33,9 @@ export function FilterBar({
   onStatusToggle,
   sizeFilter,
   onSizeToggle,
+  seriesFilter,
+  onSeriesToggle,
+  seriesOptions,
 }: FilterBarProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -73,6 +79,13 @@ export function FilterBar({
         options={SIZE_OPTIONS}
         selected={sizeFilter}
         onToggle={onSizeToggle}
+      />
+
+      <MultiSelectDropdown
+        label="Series"
+        options={seriesOptions}
+        selected={seriesFilter}
+        onToggle={onSeriesToggle}
       />
     </div>
   );
