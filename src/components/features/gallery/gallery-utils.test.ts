@@ -176,6 +176,7 @@ describe("transformToGalleryCard", () => {
     seriesId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    series: null,
     designer: {
       id: "d1",
       name: "Jane Doe",

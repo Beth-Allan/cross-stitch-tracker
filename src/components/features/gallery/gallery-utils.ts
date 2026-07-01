@@ -128,6 +128,8 @@ export function transformToGalleryCard(
     ffoDate: chart.project?.ffoDate ?? null,
     hasDigitalCopy: (chart._count?.files ?? 0) > 0,
     dateAdded: chart.dateAdded,
+    seriesId: chart.series?.id ?? null,
+    seriesName: chart.series?.name ?? null,
   };
 }
 
