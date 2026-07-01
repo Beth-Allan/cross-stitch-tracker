@@ -6,8 +6,6 @@ import type { ProgressBucket, BucketProject, ProgressBucketId } from "@/types/da
 import { BucketProjectRow } from "./bucket-project-row";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-// ─── Sort logic ─────────────────────────────────────────────────────────────
-
 type ProgressSortOption =
   | "closestToDone"
   | "furthestFromDone"
@@ -44,8 +42,6 @@ function sortBucketProjects(projects: BucketProject[], sort: ProgressSortOption)
   });
 }
 
-// ─── Bucket accent colors ───────────────────────────────────────────────────
-
 const BUCKET_ACCENTS: Record<ProgressBucketId, { bar: string; bg: string; dot: string }> = {
   unstarted: {
     bar: "bg-stone-300 dark:bg-stone-600",
@@ -74,11 +70,7 @@ const BUCKET_ACCENTS: Record<ProgressBucketId, { bar: string; bg: string; dot: s
   },
 };
 
-// ─── Constants ──────────────────────────────────────────────────────────────
-
 const ITEMS_PER_PAGE = 10;
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 interface ProgressBreakdownTabProps {
   buckets: ProgressBucket[];

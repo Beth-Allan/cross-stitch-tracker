@@ -21,7 +21,6 @@ const DEFAULT_DIR: Record<SortField, SortDir> = {
 };
 
 export function useGalleryFilters(cards: GalleryCardData[]) {
-  // ─── URL State ──────────────────────────────────────────────────────────
   const [view, setViewRaw] = useQueryState(
     "view",
     parseAsStringLiteral([...VIEW_MODES]).withDefault("gallery"),
@@ -81,7 +80,6 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
     parseAsArrayOf(parseAsString, ",").withDefault([]),
   );
 
-  // ─── Derived ────────────────────────────────────────────────────────────
   const deferredSearch = useDeferredValue(search);
 
   const setSort = useCallback(
@@ -134,7 +132,6 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
     void setSeriesFilter([]);
   }, [setSearch, setStatusFilter, setSizeFilter, setSeriesFilter]);
 
-  // ─── Computed ───────────────────────────────────────────────────────────
   const filteredAndSorted = useMemo(
     () =>
       filterAndSort(cards, {

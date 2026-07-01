@@ -11,8 +11,6 @@ import type {
   ActiveProjectForPicker,
 } from "@/types/session";
 
-// ─── Types ──────────────────────────────────────────────────────────────────
-
 import { ProjectCompletionEstimate } from "@/components/features/stats/project-completion-estimate";
 import type { CompletionEstimate } from "@/types/stats";
 
@@ -25,14 +23,10 @@ interface ProjectSessionsTabProps {
   completionEstimate?: CompletionEstimate | null;
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
 function formatActiveSince(date: Date | null): string {
   if (!date) return "\u2014";
   return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 }
-
-// ─── Mini-Stat Card ─────────────────────────────────────────────────────────
 
 interface MiniStatCardProps {
   label: string;
@@ -58,8 +52,6 @@ function MiniStatCard({ label, value, icon: Icon, mono }: MiniStatCardProps) {
     </div>
   );
 }
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 export function ProjectSessionsTab({
   sessions,

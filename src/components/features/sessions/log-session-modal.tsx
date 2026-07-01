@@ -17,8 +17,6 @@ import { getPresignedUploadUrl } from "@/lib/actions/upload-actions";
 import { fireCelebration } from "@/components/features/stats/record-celebration";
 import type { ActiveProjectForPicker } from "@/types/session";
 
-// ─── Types ──────────────────────────────────────────────────────────────────
-
 interface EditSessionData {
   id: string;
   projectId: string;
@@ -37,14 +35,10 @@ export interface LogSessionModalProps {
   lockedProjectId?: string;
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
 function todayString(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 export function LogSessionModal({
   isOpen,
@@ -57,8 +51,6 @@ export function LogSessionModal({
   const isEditing = !!editSession;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ─── Form State ─────────────────────────────────────────────────────────
-
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [date, setDate] = useState(todayString());
   const [stitchCount, setStitchCount] = useState("");
@@ -67,16 +59,12 @@ export function LogSessionModal({
   const [photoKey, setPhotoKey] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-  // ─── UI State ───────────────────────────────────────────────────────────
-
   const [showProjectDropdown, setShowProjectDropdown] = useState(false);
   const [projectSearch, setProjectSearch] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // ─── Close project dropdown on outside click ───────────────────────────
 
   useEffect(() => {
     if (!showProjectDropdown) return;
@@ -88,8 +76,6 @@ export function LogSessionModal({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showProjectDropdown]);
-
-  // ─── Reset form when modal opens/closes or editSession changes ──────────
 
   useEffect(() => {
     if (!isOpen) return;
@@ -120,8 +106,6 @@ export function LogSessionModal({
     setShowProjectDropdown(false);
   }, [isOpen, editSession, lockedProjectId]);
 
-  // ─── Derived State ──────────────────────────────────────────────────────
-
   const selectedProject = activeProjects.find((p) => p.projectId === selectedProjectId);
   const filteredProjects = activeProjects.filter((p) =>
     p.chartName.toLowerCase().includes(projectSearch.toLowerCase()),
@@ -131,8 +115,6 @@ export function LogSessionModal({
   const isValid = !!selectedProjectId && !isNaN(parsedStitchCount) && parsedStitchCount >= 1;
 
   const totalMinutes = (parseInt(hours, 10) || 0) * 60 + (parseInt(minutes, 10) || 0);
-
-  // ─── Photo Upload ───────────────────────────────────────────────────────
 
   async function handlePhotoUpload(file: File) {
     setIsUploading(true);
@@ -181,8 +163,6 @@ export function LogSessionModal({
       handlePhotoUpload(file);
     }
   }
-
-  // ─── Save ───────────────────────────────────────────────────────────────
 
   function handleSave() {
     if (!isValid || isUploading) return;
@@ -239,8 +219,6 @@ export function LogSessionModal({
     });
   }
 
-  // ─── Delete ─────────────────────────────────────────────────────────────
-
   function handleDelete() {
     if (!editSession) return;
 
@@ -259,8 +237,6 @@ export function LogSessionModal({
       }
     });
   }
-
-  // ─── Render ─────────────────────────────────────────────────────────────
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>

@@ -4,8 +4,6 @@ import { revalidatePath } from "next/cache";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
 export type ShoppingListProject = {
   projectId: string;
   chartId: string;
@@ -55,8 +53,6 @@ export type ShoppingListProject = {
   }> | null;
 };
 
-// ─── Fabric Count Reference ─────────────────────────────────────────────────
-
 const FABRIC_COUNT_OPTIONS = [
   { label: "14 / 28 over 2", count: 14 },
   { label: "16 / 32 over 2", count: 16 },
@@ -65,8 +61,6 @@ const FABRIC_COUNT_OPTIONS = [
   { label: "22", count: 22 },
   { label: "25", count: 25 },
 ] as const;
-
-// ─── Shopping List Query ─────────────────────────────────────────────────────
 
 export async function getShoppingList(): Promise<ShoppingListProject[]> {
   await requireAuth();
@@ -137,8 +131,6 @@ export async function getShoppingList(): Promise<ShoppingListProject[]> {
         p.needsFabric,
     );
 }
-
-// ─── Fulfillment ─────────────────────────────────────────────────────────────
 
 export async function markSupplyAcquired(
   type: "thread" | "bead" | "specialty",

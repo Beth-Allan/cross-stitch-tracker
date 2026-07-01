@@ -6,8 +6,6 @@ import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { fabricBrandSchema, fabricSchema } from "@/lib/validations/fabric";
 
-// ─── Fabric Brand CRUD ──────────────────────────────────────────────────────
-
 export async function createFabricBrand(formData: unknown) {
   await requireAuth();
 
@@ -83,7 +81,6 @@ export async function getFabricBrands() {
   });
 }
 
-// ─── Fabric CRUD ────────────────────────────────────────────────────────────
 // Fabric has no direct userId — ownership is inferred through linkedProject.userId.
 // Unlinked fabrics (linkedProjectId=null) are accessible to all authenticated users.
 // Mutations on linked fabrics verify the linked project belongs to the current user.

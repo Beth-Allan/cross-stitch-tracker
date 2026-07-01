@@ -176,12 +176,10 @@ export function useChartForm({
     useState<StitchingAppWithStats[]>(initialStitchingApps);
   const [seriesList, setSeriesList] = useState<SeriesWithStats[]>(initialSeries);
 
-  // Dirty tracking
   const isDirty = useMemo(() => {
     return JSON.stringify(values) !== JSON.stringify(initial);
   }, [values, initial]);
 
-  // Computed stitch count values
   const { count: effectiveStitchCount, approximate: isAutoCalculated } = useMemo(
     () => getEffectiveStitchCount(values.stitchCount, values.stitchesWide, values.stitchesHigh),
     [values.stitchCount, values.stitchesWide, values.stitchesHigh],
@@ -192,11 +190,10 @@ export function useChartForm({
     [effectiveStitchCount],
   );
 
-  // Clear field error when value changes
   const setField = useCallback(
     <K extends keyof ChartFormValues>(key: K, value: ChartFormValues[K]) => {
       setValues((prev) => ({ ...prev, [key]: value }));
-      // Clear errors for this field — check both chart.X and project.X paths
+      // Clear errors for this field -- check both chart.X and project.X paths
       setErrors((prev) => {
         const updated = { ...prev };
         delete updated[`chart.${key}`];
@@ -244,7 +241,6 @@ export function useChartForm({
       },
     };
 
-    // Client-side validation
     const result = chartFormSchema.safeParse(formData);
     if (!result.success) {
       const formatted = formatErrors(result.error);
@@ -320,7 +316,6 @@ export function useChartForm({
     }
   }, [values, mode, initialData, onSuccess, getSupplyRows, onValidationError]);
 
-  // Form onSubmit handler — wraps submitForm with preventDefault for native form events
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
@@ -329,7 +324,6 @@ export function useChartForm({
     [submitForm],
   );
 
-  // Inline entity creation
   const handleAddDesigner = useCallback(
     async (name: string, website?: string) => {
       suppressUnloadRef.current = true;
@@ -438,7 +432,6 @@ export function useChartForm({
     [setField, values.designerId],
   );
 
-  // Beforeunload warning
   useEffect(() => {
     if (!isDirty) return;
     const handler = (e: BeforeUnloadEvent) => {

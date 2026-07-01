@@ -7,8 +7,6 @@ import { toast } from "sonner";
 import type { FabricRequirementRow } from "@/types/session";
 import { assignFabricToProject } from "@/lib/actions/pattern-dive-actions";
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
 const MARGIN_PER_SIDE = 3; // inches
 const MARGIN_TOTAL = MARGIN_PER_SIDE * 2;
 
@@ -28,8 +26,6 @@ function fabricFits(row: FabricRequirementRow): boolean {
     longestEdgeInches >= row.requiredWidth && shortestEdgeInches >= row.requiredHeight;
   return fitsOption1 || fitsOption2;
 }
-
-// ─── Sub-components ─────────────────────────────────────────────────────────
 
 function StatusIcon({ row }: { row: FabricRequirementRow }) {
   if (row.assignedFabric) {
@@ -105,8 +101,6 @@ function SizeReferenceTable({
     </div>
   );
 }
-
-// ─── Main Component ─────────────────────────────────────────────────────────
 
 type FabricFilter = "needs" | "all";
 

@@ -7,15 +7,11 @@ import { SessionTable } from "./session-table";
 import { LogSessionModal } from "./log-session-modal";
 import type { StitchSessionRow, ActiveProjectForPicker } from "@/types/session";
 
-// ─── Types ──────────────────────────────────────────────────────────────────
-
 interface SessionsPageClientProps {
   sessions: StitchSessionRow[];
   activeProjects: ActiveProjectForPicker[];
   imageUrls: Record<string, string>;
 }
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 export function SessionsPageClient({
   sessions,
