@@ -4,14 +4,14 @@ milestone: v1.8
 milestone_name: Series & Collections
 status: ready_to_plan
 last_updated: 2026-05-26T02:27:09.567Z
-last_activity: 2026-05-26 -- Phase 33 execution started
+last_activity: 2026-07-01 -- Phase 33 shipped — PR #61
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 8
   completed_plans: 8
   percent: 50
-stopped_at: Phase 33 complete (2/2) — ready to discuss Phase 34
+stopped_at: Phase 33 shipped — PR #61 created, ready for review/merge
 ---
 
 # Project State
