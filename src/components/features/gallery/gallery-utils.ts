@@ -237,6 +237,7 @@ export function filterAndSort(
     search: string;
     statusFilter: string[];
     sizeFilter: string[];
+    seriesFilter?: string[];
     sort: SortField;
     dir: SortDir;
   },
@@ -259,6 +260,18 @@ export function filterAndSort(
   // Size filter
   if (options.sizeFilter.length > 0) {
     result = result.filter((c) => options.sizeFilter.includes(c.sizeCategory));
+  }
+
+  // Series filter
+  const seriesFilter = options.seriesFilter ?? [];
+  if (seriesFilter.length > 0) {
+    const hasUnassigned = seriesFilter.includes("__unassigned__");
+    const namedIds = seriesFilter.filter((v) => v !== "__unassigned__");
+    result = result.filter(
+      (c) =>
+        (hasUnassigned && c.seriesId === null) ||
+        (namedIds.length > 0 && c.seriesId !== null && namedIds.includes(c.seriesId)),
+    );
   }
 
   // Sort
