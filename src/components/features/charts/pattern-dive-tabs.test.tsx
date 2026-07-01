@@ -7,23 +7,25 @@ describe("PatternDiveTabs", () => {
   const defaultProps = {
     browseContent: <div data-testid="browse-content">Browse Content</div>,
     whatsNextContent: <div data-testid="whats-next-content">Whats Next Content</div>,
+    seriesContent: <div data-testid="series-content">Series Content</div>,
     fabricContent: <div data-testid="fabric-content">Fabric Content</div>,
     storageContent: <div data-testid="storage-content">Storage Content</div>,
   };
 
-  it("renders all 4 tab triggers with correct labels", () => {
+  it("renders all 5 tab triggers with correct labels", () => {
     render(<PatternDiveTabs {...defaultProps} />, {
       wrapper: withNuqsTestingAdapter(),
     });
 
     expect(screen.getByRole("tab", { name: /Browse/i })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /What's Next/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /^Series$/i })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /Fabric Requirements/i })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /Storage View/i })).toBeInTheDocument();
   });
 
-  it("has 4 tab values in PATTERN_DIVE_TABS", () => {
-    expect(PATTERN_DIVE_TABS).toEqual(["browse", "whats-next", "fabric", "storage"]);
+  it("has 5 tab values in PATTERN_DIVE_TABS with series at index 2", () => {
+    expect(PATTERN_DIVE_TABS).toEqual(["browse", "whats-next", "series", "fabric", "storage"]);
   });
 
   it("shows Browse tab as active by default", () => {
@@ -120,12 +122,48 @@ describe("PatternDiveTabs", () => {
     expect(labelSpan).toHaveClass("hidden", "sm:inline");
   });
 
-  it("renders exactly 4 tabs", () => {
+  it("renders exactly 5 tabs", () => {
     render(<PatternDiveTabs {...defaultProps} />, {
       wrapper: withNuqsTestingAdapter(),
     });
 
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(4);
+    expect(tabs).toHaveLength(5);
+  });
+
+  it("Series tab trigger has aria-label 'Series'", () => {
+    render(<PatternDiveTabs {...defaultProps} />, {
+      wrapper: withNuqsTestingAdapter(),
+    });
+
+    const seriesTab = screen.getByRole("tab", { name: "Series" });
+    expect(seriesTab).toHaveAttribute("aria-label", "Series");
+  });
+
+  it("clicking Series tab shows seriesContent", async () => {
+    const onUrlUpdate = vi.fn();
+    render(<PatternDiveTabs {...defaultProps} />, {
+      wrapper: withNuqsTestingAdapter({ onUrlUpdate }),
+    });
+
+    fireEvent.click(screen.getByRole("tab", { name: "Series" }));
+
+    await waitFor(() => {
+      expect(onUrlUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          queryString: expect.stringContaining("tab=series"),
+        }),
+      );
+    });
+  });
+
+  it("renders series content when series tab is active via URL", () => {
+    render(<PatternDiveTabs {...defaultProps} />, {
+      wrapper: withNuqsTestingAdapter({ searchParams: "?tab=series" }),
+    });
+
+    const seriesTab = screen.getByRole("tab", { name: "Series" });
+    expect(seriesTab).toHaveAttribute("data-active");
+    expect(screen.getByTestId("series-content")).toBeInTheDocument();
   });
 });

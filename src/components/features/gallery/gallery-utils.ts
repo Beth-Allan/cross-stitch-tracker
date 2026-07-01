@@ -130,6 +130,8 @@ export function transformToGalleryCard(
     seriesId: chart.series?.id ?? null,
     seriesName: chart.series?.name ?? null,
     dateAdded: chart.dateAdded,
+    seriesId: chart.series?.id ?? null,
+    seriesName: chart.series?.name ?? null,
   };
 }
 
