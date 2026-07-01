@@ -9,9 +9,9 @@ Requirements for milestone v1.9 Cleanup & Polish. Each maps to roadmap phases.
 
 ### Code Quality
 
-- [ ] **QUAL-01**: Fix all remaining silent failure patterns (bare catches, swallowed errors) across upload-actions, charts page, log-session-modal, deleteFile, processAndStoreImage (999.50, .51, .53, .54, .55)
-- [ ] **QUAL-02**: Remove JSX section markers from TSX files (~20 markers) (999.30)
-- [ ] **QUAL-03**: Remove WHAT-comments and section markers from test and form files (999.56, .57, .84)
+- [x] **QUAL-01**: Fix all remaining silent failure patterns (bare catches, swallowed errors) across upload-actions, charts page, log-session-modal, deleteFile, processAndStoreImage (999.50, .51, .53, .54, .55)
+- [x] **QUAL-02**: Remove JSX section markers from TSX files (~20 markers) (999.30)
+- [x] **QUAL-03**: Remove WHAT-comments and section markers from test and form files (999.56, .57, .84)
 - [ ] **QUAL-04**: Narrow strandCount to literal union (1-6) across all type definitions (999.0.23)
 - [ ] **QUAL-05**: Replace OptionalFocalPoint plain interface with discriminated union across dashboard types (999.70)
 - [ ] **QUAL-06**: Fix SuppliesTab type safety — co-dependent optional props pattern and persistFields narrowing (999.76, .77)
@@ -83,9 +83,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| QUAL-01 | Phase 35 | Pending |
-| QUAL-02 | Phase 35 | Pending |
-| QUAL-03 | Phase 35 | Pending |
+| QUAL-01 | Phase 35 | Complete |
+| QUAL-02 | Phase 35 | Complete |
+| QUAL-03 | Phase 35 | Complete |
 | QUAL-04 | Phase 36 | Pending |
 | QUAL-05 | Phase 36 | Pending |
 | QUAL-06 | Phase 36 | Pending |
