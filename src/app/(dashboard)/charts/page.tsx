@@ -5,21 +5,25 @@ import {
   getFabricRequirements,
   getStorageGroups,
 } from "@/lib/actions/pattern-dive-actions";
+import { getSeriesWithStats } from "@/lib/actions/series-actions";
 import { ProjectGallery } from "@/components/features/gallery/project-gallery";
 import { PatternDiveTabs } from "@/components/features/charts/pattern-dive-tabs";
 import { WhatsNextTab } from "@/components/features/charts/whats-next-tab";
+import { SeriesTabContent } from "@/components/features/charts/series-tab-content";
 import { FabricRequirementsTab } from "@/components/features/charts/fabric-requirements-tab";
 import { StorageViewTab } from "@/components/features/charts/storage-view-tab";
 
 export default async function ChartsPage() {
   // All four tab datasets fetched eagerly via Promise.all()
   // Avoids Neon cold start waterfall -- single parallel batch
-  const [charts, whatsNextProjects, fabricRequirements, storageGroups] = await Promise.all([
-    getChartsForGallery(),
-    getWhatsNextProjects(),
-    getFabricRequirements(),
-    getStorageGroups(),
-  ]);
+  const [charts, whatsNextProjects, fabricRequirements, storageGroups, seriesData] =
+    await Promise.all([
+      getChartsForGallery(),
+      getWhatsNextProjects(),
+      getFabricRequirements(),
+      getStorageGroups(),
+      getSeriesWithStats(),
+    ]);
 
   // Collect all image keys that need presigned URLs across all tabs
   const imageKeys = [
@@ -42,6 +46,7 @@ export default async function ChartsPage() {
       <PatternDiveTabs
         browseContent={<ProjectGallery charts={charts} imageUrls={imageUrls} hideHeader />}
         whatsNextContent={<WhatsNextTab projects={whatsNextProjects} imageUrls={imageUrls} />}
+        seriesContent={<SeriesTabContent series={seriesData} />}
         fabricContent={<FabricRequirementsTab rows={fabricRequirements} imageUrls={imageUrls} />}
         storageContent={<StorageViewTab groups={storageGroups} imageUrls={imageUrls} />}
       />
