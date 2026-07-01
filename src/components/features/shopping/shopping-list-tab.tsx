@@ -104,8 +104,8 @@ export function ShoppingListTab({ threads, beads, specialty, fabrics }: Shopping
           setCheckedItems(new Set(parsed));
         }
       }
-    } catch (error) {
-      console.error("Load shopping list checked items failed:", error);
+    } catch {
+      // localStorage may be unavailable (private browsing, SSR)
     }
     setHydrated(true);
   }, []);
@@ -114,8 +114,8 @@ export function ShoppingListTab({ threads, beads, specialty, fabrics }: Shopping
     if (!hydrated) return;
     try {
       localStorage.setItem("shopping-list-checked", JSON.stringify(Array.from(checkedItems)));
-    } catch (error) {
-      console.error("Save shopping list checked items failed:", error);
+    } catch {
+      // localStorage may be unavailable (private browsing, SSR)
     }
   }, [checkedItems, hydrated]);
 
