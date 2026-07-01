@@ -101,9 +101,28 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - ✓ Fix pre-existing TypeScript test errors (999.19) — v1.8
 - ✓ Stats page Promise.allSettled resilience (999.22) — v1.8
 
+## Current Milestone: v1.9 Cleanup & Polish
+
+**Goal:** Systematically address accumulated backlog items — silent failures, comment violations, type safety gaps, test coverage holes, UI polish, and series follow-ups — to reduce PR review noise and improve code health.
+
+**Target features:**
+- Fix all remaining silent failure patterns (5 bare catches)
+- Clean up comment convention violations (~40 markers/WHAT-comments)
+- Tighten type safety (strandCount, OptionalFocalPoint, SuppliesTab props)
+- Fill test coverage gaps (skein calc, stats, shopping cart, series)
+- UI/UX polish (ARIA, SSR hydration, What's Next, focal point, supply overview)
+- Series integration follow-ups (designerName bug, card styling, name display)
+- Fix bugs (fabric matching, stitch hint discoverability)
+
 ### Active
 
-(No active requirements — start next milestone with `/gsd-new-milestone`)
+- [ ] Fix silent failure patterns across 5 files (bare catches, swallowed errors)
+- [ ] Clean comment convention violations (~40 markers across TSX and test files)
+- [ ] Type safety improvements (strandCount, OptionalFocalPoint, SuppliesTab, AggregatedSupply)
+- [ ] Fill test coverage gaps (skein calc, stats actions, shopping cart, series, calc params)
+- [ ] UI/UX polish (ARIA, SSR hydration, What's Next, focal point, supply memoization)
+- [ ] Series follow-ups (designerName bug, card styling, name display on project/gallery)
+- [ ] Bug fixes (fabric matching, stitch hint, InlineNameDialog text)
 
 ### Deferred (no phase assigned)
 
@@ -249,4 +268,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-01 after v1.8 milestone completed*
+*Last updated: 2026-07-01 after v1.9 milestone started*
