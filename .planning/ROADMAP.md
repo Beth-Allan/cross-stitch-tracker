@@ -122,7 +122,7 @@ Full details: `milestones/v1.7-ROADMAP.md`
 - [x] **Phase 31: Data Foundation & Fixes** - Series schema, CRUD actions, dual progress types, and independent bug fixes (completed 2026-05-24)
 - [x] **Phase 32: Series Management Pages** - Series list page and series detail page with assigned charts and dual progress (completed 2026-05-25)
 - [x] **Phase 33: Chart Form Integration** - SearchableSelect for series assignment with inline create dialog (completed 2026-05-26)
-- [ ] **Phase 34: Browse & Pattern Dive Integration** - Pattern Dive Series tab with progress cards and Browse tab series filter
+- [x] **Phase 34: Browse & Pattern Dive Integration** - Pattern Dive Series tab with progress cards and Browse tab series filter (completed 2026-07-01)
 
 ## Phase Details
 
@@ -213,8 +213,8 @@ Full details: `milestones/v1.7-ROADMAP.md`
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 34-02-PLAN.md — Series tab: SeriesTabContent, PatternDiveTabs extension, charts page wiring
-- [ ] 34-03-PLAN.md — Browse filter: series filter predicate, hook, FilterBar, FilterChips
+- [x] 34-02-PLAN.md — Series tab: SeriesTabContent, PatternDiveTabs extension, charts page wiring
+- [x] 34-03-PLAN.md — Browse filter: series filter predicate, hook, FilterBar, FilterChips
 
 **UI hint**: yes
 
@@ -260,4 +260,4 @@ Phases execute in numeric order: 31 -> 32 -> 33 -> 34
 | 31. Data Foundation & Fixes | v1.8 | 3/3 | Complete   | 2026-05-24 |
 | 32. Series Management Pages | v1.8 | 3/3 | Complete    | 2026-05-25 |
 | 33. Chart Form Integration | v1.8 | 2/2 | Complete    | 2026-05-26 |
-| 34. Browse & Pattern Dive Integration | v1.8 | 1/3 | In Progress|  |
+| 34. Browse & Pattern Dive Integration | v1.8 | 3/3 | Complete   | 2026-07-01 |
