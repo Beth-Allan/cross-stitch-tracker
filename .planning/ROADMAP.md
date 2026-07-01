@@ -154,10 +154,10 @@ Full details: `milestones/v1.8-ROADMAP.md`
   3. Zero WHAT-comments or section markers remain in test files and chart form files (beyond allowed conventions)
   4. `npm test` passes with no regressions
 
-**Plans:** 3 plansPlans:
+**Plans:** 1/3 plans executed
 **Wave 1**
 
-- [ ] 35-01-PLAN.md -- Error handling fixes (processAndStoreImage call sites + bare catch blocks)
+- [x] 35-01-PLAN.md -- Error handling fixes (processAndStoreImage call sites + bare catch blocks)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -293,7 +293,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 | 32. Series Management Pages | v1.8 | 3/3 | Complete | 2026-05-25 |
 | 33. Chart Form Integration | v1.8 | 2/2 | Complete | 2026-05-26 |
 | 34. Browse & Pattern Dive Integration | v1.8 | 3/3 | Complete | 2026-07-01 |
-| 35. Error Handling & Comment Cleanup | v1.9 | 0/3 | In progress | - |
+| 35. Error Handling & Comment Cleanup | v1.9 | 1/3 | In Progress|  |
 | 36. Type Safety | v1.9 | 0/0 | Not started | - |
 | 37. Test Coverage -- Utilities & Stats | v1.9 | 0/0 | Not started | - |
 | 38. Test Coverage -- Components | v1.9 | 0/0 | Not started | - |
