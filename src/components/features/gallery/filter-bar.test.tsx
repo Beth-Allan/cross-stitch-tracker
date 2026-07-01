@@ -9,6 +9,9 @@ describe("FilterBar", () => {
     onStatusToggle: vi.fn(),
     sizeFilter: [] as string[],
     onSizeToggle: vi.fn(),
+    seriesFilter: [] as string[],
+    onSeriesToggle: vi.fn(),
+    seriesOptions: [] as { value: string; label: string }[],
   };
 
   it("renders search input with placeholder", () => {
@@ -43,5 +46,24 @@ describe("FilterBar", () => {
     render(<FilterBar {...defaultProps} search="dragon" />);
     const input = screen.getByPlaceholderText("Search projects...") as HTMLInputElement;
     expect(input.value).toBe("dragon");
+  });
+
+  it("renders Series dropdown trigger after Status and Size", () => {
+    const seriesOptions = [
+      { value: "__unassigned__", label: "Unassigned" },
+      { value: "s1", label: "Dragons" },
+    ];
+    render(<FilterBar {...defaultProps} seriesOptions={seriesOptions} />);
+    expect(screen.getByRole("button", { name: /series/i })).toBeInTheDocument();
+  });
+
+  it("passes seriesFilter and seriesOptions to Series dropdown", () => {
+    const seriesOptions = [
+      { value: "__unassigned__", label: "Unassigned" },
+      { value: "s1", label: "Dragons" },
+    ];
+    render(<FilterBar {...defaultProps} seriesFilter={["s1"]} seriesOptions={seriesOptions} />);
+    const seriesButton = screen.getByRole("button", { name: /series/i });
+    expect(seriesButton).toBeInTheDocument();
   });
 });

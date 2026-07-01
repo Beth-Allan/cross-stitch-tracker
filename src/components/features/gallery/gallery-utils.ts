@@ -2,12 +2,13 @@ import type { ProjectStatus } from "@/generated/prisma/client";
 import type { SizeCategory } from "@/lib/utils/size-category";
 import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
 import type { GalleryChartData } from "@/types/chart";
-import type {
-  GalleryCardData,
-  KittingItemStatus,
-  StatusGroup,
-  SortField,
-  SortDir,
+import {
+  UNASSIGNED_FILTER,
+  type GalleryCardData,
+  type KittingItemStatus,
+  type StatusGroup,
+  type SortField,
+  type SortDir,
 } from "./gallery-types";
 
 // ─── Status Group Mapping ───────────────────────────────────────────────────
@@ -127,6 +128,8 @@ export function transformToGalleryCard(
     finishDate: chart.project?.finishDate ?? null,
     ffoDate: chart.project?.ffoDate ?? null,
     hasDigitalCopy: (chart._count?.files ?? 0) > 0,
+    seriesId: chart.series?.id ?? null,
+    seriesName: chart.series?.name ?? null,
     dateAdded: chart.dateAdded,
   };
 }
@@ -235,6 +238,7 @@ export function filterAndSort(
     search: string;
     statusFilter: string[];
     sizeFilter: string[];
+    seriesFilter: string[];
     sort: SortField;
     dir: SortDir;
   },
@@ -257,6 +261,18 @@ export function filterAndSort(
   // Size filter
   if (options.sizeFilter.length > 0) {
     result = result.filter((c) => options.sizeFilter.includes(c.sizeCategory));
+  }
+
+  // Series filter
+  if (options.seriesFilter.length > 0) {
+    const seriesFilter = options.seriesFilter;
+    const hasUnassigned = seriesFilter.includes(UNASSIGNED_FILTER);
+    const namedIds = seriesFilter.filter((v) => v !== UNASSIGNED_FILTER);
+    result = result.filter(
+      (c) =>
+        (hasUnassigned && c.seriesId === null) ||
+        (namedIds.length > 0 && c.seriesId !== null && namedIds.includes(c.seriesId)),
+    );
   }
 
   // Sort

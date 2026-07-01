@@ -501,6 +501,7 @@ export async function getChartsForGallery() {
       },
       designer: true,
       genres: true,
+      series: { select: { id: true, name: true } },
       _count: { select: { files: true } },
     },
     orderBy: { dateAdded: "desc" },

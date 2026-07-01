@@ -3,7 +3,7 @@
 import { useQueryState, parseAsString, parseAsStringLiteral, parseAsArrayOf } from "nuqs";
 import React, { useMemo, useDeferredValue, useCallback, useEffect } from "react";
 import type { GalleryCardData, ViewMode, SortField, SortDir } from "./gallery-types";
-import { VIEW_MODES, SORT_FIELDS, SORT_DIRS } from "./gallery-types";
+import { VIEW_MODES, SORT_FIELDS, SORT_DIRS, UNASSIGNED_FILTER } from "./gallery-types";
 import { filterAndSort } from "./gallery-utils";
 
 const VIEW_STORAGE_KEY = "gallery-view-mode";
@@ -76,6 +76,10 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
     "size",
     parseAsArrayOf(parseAsString, ",").withDefault([]),
   );
+  const [seriesFilter, setSeriesFilter] = useQueryState(
+    "series",
+    parseAsArrayOf(parseAsString, ",").withDefault([]),
+  );
 
   // ─── Derived ────────────────────────────────────────────────────────────
   const deferredSearch = useDeferredValue(search);
@@ -113,11 +117,22 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
     [setSizeFilter],
   );
 
+  const toggleSeries = useCallback(
+    (s: string) => {
+      void setSeriesFilter((prev) => {
+        const current = prev ?? [];
+        return current.includes(s) ? current.filter((v) => v !== s) : [...current, s];
+      });
+    },
+    [setSeriesFilter],
+  );
+
   const clearFilters = useCallback(() => {
     void setSearch("");
     void setStatusFilter([]);
     void setSizeFilter([]);
-  }, [setSearch, setStatusFilter, setSizeFilter]);
+    void setSeriesFilter([]);
+  }, [setSearch, setStatusFilter, setSizeFilter, setSeriesFilter]);
 
   // ─── Computed ───────────────────────────────────────────────────────────
   const filteredAndSorted = useMemo(
@@ -126,14 +141,33 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
         search: deferredSearch,
         statusFilter: statusFilter ?? [],
         sizeFilter: sizeFilter ?? [],
+        seriesFilter: seriesFilter ?? [],
         sort,
         dir,
       }),
-    [cards, deferredSearch, statusFilter, sizeFilter, sort, dir],
+    [cards, deferredSearch, statusFilter, sizeFilter, seriesFilter, sort, dir],
   );
 
+  const seriesOptions = useMemo(() => {
+    const seen = new Map<string, string>();
+    let hasUnassigned = false;
+    for (const card of cards) {
+      if (card.seriesId && card.seriesName && !seen.has(card.seriesId)) {
+        seen.set(card.seriesId, card.seriesName);
+      }
+      if (card.seriesId === null) hasUnassigned = true;
+    }
+    const named = [...seen.entries()]
+      .sort((a, b) => a[1].localeCompare(b[1]))
+      .map(([value, label]) => ({ value, label }));
+    return hasUnassigned ? [{ value: UNASSIGNED_FILTER, label: "Unassigned" }, ...named] : named;
+  }, [cards]);
+
   const hasActiveFilters =
-    search !== "" || (statusFilter ?? []).length > 0 || (sizeFilter ?? []).length > 0;
+    search !== "" ||
+    (statusFilter ?? []).length > 0 ||
+    (sizeFilter ?? []).length > 0 ||
+    (seriesFilter ?? []).length > 0;
 
   return {
     // URL state
@@ -143,6 +177,7 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
     search,
     statusFilter: statusFilter ?? [],
     sizeFilter: sizeFilter ?? [],
+    seriesFilter: seriesFilter ?? [],
 
     // Setters
     setView,
@@ -151,10 +186,12 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
     setSearch: (s: string) => void setSearch(s),
     toggleStatus,
     toggleSize,
+    toggleSeries,
     clearFilters,
 
     // Computed
     filteredAndSorted,
+    seriesOptions,
     totalCount: cards.length,
     filteredCount: filteredAndSorted.length,
     hasActiveFilters,

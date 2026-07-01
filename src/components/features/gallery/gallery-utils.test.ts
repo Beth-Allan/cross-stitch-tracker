@@ -4,6 +4,7 @@ import {
   computeKittingDots,
   transformToGalleryCard,
   compareFn,
+  filterAndSort,
   STATUS_GRADIENT_CLASSES,
   getCelebrationClasses,
   STATUS_SORT_ORDER,
@@ -176,6 +177,7 @@ describe("transformToGalleryCard", () => {
     seriesId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    series: null,
     designer: {
       id: "d1",
       name: "Jane Doe",
@@ -350,6 +352,42 @@ describe("transformToGalleryCard", () => {
     const card = transformToGalleryCard(baseChart, imageUrls);
     expect(card.hasDigitalCopy).toBe(false);
   });
+
+  it("maps series.id to seriesId when chart has series", () => {
+    const chartWithSeries: GalleryChartData = {
+      ...baseChart,
+      series: { id: "s1", name: "Test Series" },
+    };
+    const card = transformToGalleryCard(chartWithSeries, imageUrls);
+    expect(card.seriesId).toBe("s1");
+  });
+
+  it("maps series.name to seriesName when chart has series", () => {
+    const chartWithSeries: GalleryChartData = {
+      ...baseChart,
+      series: { id: "s1", name: "Test Series" },
+    };
+    const card = transformToGalleryCard(chartWithSeries, imageUrls);
+    expect(card.seriesName).toBe("Test Series");
+  });
+
+  it("sets seriesId to null when chart has no series", () => {
+    const chartNoSeries: GalleryChartData = {
+      ...baseChart,
+      series: null,
+    };
+    const card = transformToGalleryCard(chartNoSeries, imageUrls);
+    expect(card.seriesId).toBeNull();
+  });
+
+  it("sets seriesName to null when chart has no series", () => {
+    const chartNoSeries: GalleryChartData = {
+      ...baseChart,
+      series: null,
+    };
+    const card = transformToGalleryCard(chartNoSeries, imageUrls);
+    expect(card.seriesName).toBeNull();
+  });
 });
 
 // ─── compareFn ──────────────────────────────────────────────────────────────
@@ -495,5 +533,74 @@ describe("SIZE_SORT_ORDER", () => {
 
   it("has 5 entries", () => {
     expect(Object.keys(SIZE_SORT_ORDER)).toHaveLength(5);
+  });
+});
+
+describe("filterAndSort series filter", () => {
+  const defaultOpts = {
+    search: "",
+    statusFilter: [] as string[],
+    sizeFilter: [] as string[],
+    seriesFilter: [] as string[],
+    sort: "name" as const,
+    dir: "asc" as const,
+  };
+
+  const cards = [
+    createMockGalleryCard({ chartId: "c1", name: "Alpha", seriesId: "s1", seriesName: "Dragons" }),
+    createMockGalleryCard({ chartId: "c2", name: "Beta", seriesId: "s2", seriesName: "Florals" }),
+    createMockGalleryCard({ chartId: "c3", name: "Gamma", seriesId: "s1", seriesName: "Dragons" }),
+    createMockGalleryCard({ chartId: "c4", name: "Delta", seriesId: null, seriesName: null }),
+  ];
+
+  it("returns all cards when seriesFilter is empty", () => {
+    const result = filterAndSort(cards, { ...defaultOpts, seriesFilter: [] });
+    expect(result).toHaveLength(4);
+  });
+
+  it("filters to cards with matching seriesId", () => {
+    const result = filterAndSort(cards, { ...defaultOpts, seriesFilter: ["s1"] });
+    expect(result).toHaveLength(2);
+    expect(result.map((c) => c.name)).toEqual(["Alpha", "Gamma"]);
+  });
+
+  it("filters to cards matching any of multiple series", () => {
+    const result = filterAndSort(cards, { ...defaultOpts, seriesFilter: ["s1", "s2"] });
+    expect(result).toHaveLength(3);
+    expect(result.map((c) => c.name)).toEqual(["Alpha", "Beta", "Gamma"]);
+  });
+
+  it("filters to unassigned cards with __unassigned__ value", () => {
+    const result = filterAndSort(cards, { ...defaultOpts, seriesFilter: ["__unassigned__"] });
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("Delta");
+  });
+
+  it("unions __unassigned__ with named series", () => {
+    const result = filterAndSort(cards, {
+      ...defaultOpts,
+      seriesFilter: ["__unassigned__", "s1"],
+    });
+    expect(result).toHaveLength(3);
+    expect(result.map((c) => c.name)).toEqual(["Alpha", "Delta", "Gamma"]);
+  });
+
+  it("returns empty array when no cards match nonexistent series", () => {
+    const result = filterAndSort(cards, { ...defaultOpts, seriesFilter: ["nonexistent"] });
+    expect(result).toHaveLength(0);
+  });
+});
+
+describe("createMockGalleryCard series defaults", () => {
+  it("includes seriesId and seriesName with null defaults", () => {
+    const card = createMockGalleryCard();
+    expect(card.seriesId).toBeNull();
+    expect(card.seriesName).toBeNull();
+  });
+
+  it("accepts seriesId and seriesName overrides", () => {
+    const card = createMockGalleryCard({ seriesId: "s1", seriesName: "My Series" });
+    expect(card.seriesId).toBe("s1");
+    expect(card.seriesName).toBe("My Series");
   });
 });

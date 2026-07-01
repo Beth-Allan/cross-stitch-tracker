@@ -1,15 +1,16 @@
 "use client";
 
 import { useQueryState, parseAsStringLiteral } from "nuqs";
-import { Search, Star, Layers, MapPin } from "lucide-react";
+import { Search, Star, Library, Layers, MapPin } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-export const PATTERN_DIVE_TABS = ["browse", "whats-next", "fabric", "storage"] as const;
+export const PATTERN_DIVE_TABS = ["browse", "whats-next", "series", "fabric", "storage"] as const;
 export type PatternDiveTab = (typeof PATTERN_DIVE_TABS)[number];
 
 const TAB_CONFIG = [
   { value: "browse" as const, label: "Browse", icon: Search },
   { value: "whats-next" as const, label: "What's Next", icon: Star },
+  { value: "series" as const, label: "Series", icon: Library },
   { value: "fabric" as const, label: "Fabric Requirements", icon: Layers },
   { value: "storage" as const, label: "Storage View", icon: MapPin },
 ] as const;
@@ -17,6 +18,7 @@ const TAB_CONFIG = [
 interface PatternDiveTabsProps {
   browseContent: React.ReactNode;
   whatsNextContent: React.ReactNode;
+  seriesContent: React.ReactNode;
   fabricContent: React.ReactNode;
   storageContent: React.ReactNode;
 }
@@ -24,6 +26,7 @@ interface PatternDiveTabsProps {
 export function PatternDiveTabs({
   browseContent,
   whatsNextContent,
+  seriesContent,
   fabricContent,
   storageContent,
 }: PatternDiveTabsProps) {
@@ -35,6 +38,7 @@ export function PatternDiveTabs({
   const contentMap: Record<PatternDiveTab, React.ReactNode> = {
     browse: browseContent,
     "whats-next": whatsNextContent,
+    series: seriesContent,
     fabric: fabricContent,
     storage: storageContent,
   };

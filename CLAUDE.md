@@ -3,7 +3,7 @@
 ## Current Status
 
 **Milestone:** v1.8 Series & Collections — IN PROGRESS
-**Last Updated:** 2026-05-25
+**Last Updated:** 2026-07-01
 **Roadmap:** 8 milestones / 34 phases — v1.0-v1.7 shipped
 
 ### Done
@@ -221,10 +221,22 @@
   - CI fix: missing vi.mock for series-actions in chart-merged-form.test.tsx caused ESM module resolution failure
   - Backlogged: 5 items (999.81-999.85) for seriesId flow-through test, empty guard tests, designerName null, WHAT-comments, Adding... text
 
+- **Phase 34 planned** — 3 plans in 2 waves: data layer (Wave 1), Series tab + Browse filter (Wave 2 parallel)
+  - Plan 01 (W1): SeriesCard extraction, GalleryCardData series fields, chart query extension, mock factory
+  - Plan 02 (W2): SeriesTabContent, PatternDiveTabs 5th tab with Library icon, charts page getSeriesWithStats wiring
+  - Plan 03 (W2): filterAndSort series predicate with Unassigned, useGalleryFilters hook, FilterBar/FilterChips/ProjectGallery
+
+- **Phase 34 executed & verified** — 3/3 plans complete, 2399 tests passing, 10/10 must-haves verified (human UAT approved)
+  - Plan 01 (W1): SeriesCard extracted to standalone component, GalleryCardData extended with seriesId/seriesName, Prisma query updated
+  - Plan 02 (W2): SeriesTabContent with sort pills + empty state, PatternDiveTabs extended to 5 tabs, charts page wired
+  - Plan 03 (W2): filterAndSort series predicate with **unassigned**, useGalleryFilters seriesFilter URL state, FilterBar/FilterChips/ProjectGallery
+  - Code review: 3 warnings fixed (WR-01 vacuous test removed, WR-02 sort logic extracted to useSeriesSort+SeriesSortPills, WR-03 conditional Unassigned option)
+  - Post-merge fix: duplicate seriesId/seriesName from parallel worktree merge
+  - Backlogged: 4 items (999.86-999.89) for series detail card style, series name on project detail, series on gallery cards, series tab photos
+
 ### Next Up — RESUME HERE
 
-1. Merge PR #61 when CI passes
-2. `/gsd-discuss-phase 34` — Start browse & pattern dive integration
+1. `/gsd-ship 34` — Create PR for phase 34, run multi-agent review
 
 ### Backlog
 
@@ -326,6 +338,10 @@
 - 999.83: Constructed SeriesWithStats designerName: null — when designer is selected, local list item has null designerName despite having a designerId; look up from designers list or expand createSeries return
 - 999.84: Chart form WHAT-comments cleanup — 17 pre-existing label/WHAT-comments in chart-merged-form.tsx and use-chart-form.ts (extends 999.29/999.30 scope)
 - 999.85: InlineNameDialog "Adding..." hardcoded — pending text says "Adding..." regardless of customized submitLabel prop value
+- 999.86: Series detail page chart list style — /series/[id] should use card-style rows (like gallery cards) instead of current list-style display
+- 999.87: Series name on project detail page — show series name under pattern details section on /charts/[id]
+- 999.88: Series name on gallery/project cards — display series association on gallery card and project detail cards
+- 999.89: Series tab photo previews — show chart cover images (grid or carousel) for items in each series on the Pattern Dive Series tab
 
 ### Blockers
 

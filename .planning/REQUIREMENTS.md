@@ -16,8 +16,8 @@ Requirements for milestone v1.8 Series & Collections. Each maps to roadmap phase
 - [x] **SERIES-05**: User can view a series detail page showing assigned charts with dual progress (owned/total + finished/owned)
 - [x] **SERIES-06**: User can assign a chart to a series from the chart form via SearchableSelect with inline "Add New"
 - [x] **SERIES-07**: User can remove a chart's series assignment from the chart form
-- [ ] **SERIES-08**: User can browse series via a dedicated Series tab on Pattern Dive showing progress cards
-- [ ] **SERIES-09**: User can filter the Browse tab by series
+- [x] **SERIES-08**: User can browse series via a dedicated Series tab on Pattern Dive showing progress cards
+- [x] **SERIES-09**: User can filter the Browse tab by series
 - [ ] **SERIES-10**: User can see dual progress for each series — owned count vs total, and finished count vs owned
 
 ### Fixes
@@ -63,8 +63,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SERIES-05 | Phase 32 | Complete |
 | SERIES-06 | Phase 33 | Complete |
 | SERIES-07 | Phase 33 | Complete |
-| SERIES-08 | Phase 34 | Pending |
-| SERIES-09 | Phase 34 | Pending |
+| SERIES-08 | Phase 34 | Complete |
+| SERIES-09 | Phase 34 | Complete |
 | SERIES-10 | Phase 31 | Pending |
 | FIX-01 | Phase 31 | Pending |
 | FIX-02 | Phase 31 | Pending |

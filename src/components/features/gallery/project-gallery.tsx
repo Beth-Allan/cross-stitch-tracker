@@ -32,17 +32,28 @@ export function ProjectGallery({ charts, imageUrls, hideHeader }: ProjectGallery
     search,
     statusFilter,
     sizeFilter,
+    seriesFilter,
     setView,
     setSort,
     setSearch,
     toggleStatus,
     toggleSize,
+    toggleSeries,
     clearFilters,
     filteredAndSorted,
+    seriesOptions,
     totalCount,
     filteredCount,
     hasActiveFilters,
   } = useGalleryFilters(cards);
+
+  const seriesNames = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const opt of seriesOptions) {
+      map[opt.value] = opt.label;
+    }
+    return map;
+  }, [seriesOptions]);
 
   return (
     <div className="space-y-6">
@@ -70,6 +81,9 @@ export function ProjectGallery({ charts, imageUrls, hideHeader }: ProjectGallery
         onStatusToggle={toggleStatus}
         sizeFilter={sizeFilter}
         onSizeToggle={toggleSize}
+        seriesFilter={seriesFilter}
+        onSeriesToggle={toggleSeries}
+        seriesOptions={seriesOptions}
       />
 
       {/* Filter chips */}
@@ -77,9 +91,12 @@ export function ProjectGallery({ charts, imageUrls, hideHeader }: ProjectGallery
         search={search}
         statusFilter={statusFilter}
         sizeFilter={sizeFilter}
+        seriesFilter={seriesFilter}
+        seriesNames={seriesNames}
         onRemoveSearch={() => setSearch("")}
         onRemoveStatus={toggleStatus}
         onRemoveSize={toggleSize}
+        onRemoveSeries={toggleSeries}
         onClearAll={clearFilters}
       />
 

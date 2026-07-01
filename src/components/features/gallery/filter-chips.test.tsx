@@ -6,9 +6,12 @@ describe("FilterChips", () => {
     search: "",
     statusFilter: [] as string[],
     sizeFilter: [] as string[],
+    seriesFilter: [] as string[],
+    seriesNames: {} as Record<string, string>,
     onRemoveSearch: vi.fn(),
     onRemoveStatus: vi.fn(),
     onRemoveSize: vi.fn(),
+    onRemoveSeries: vi.fn(),
     onClearAll: vi.fn(),
   };
 
@@ -63,5 +66,35 @@ describe("FilterChips", () => {
     const clearAll = screen.getByText("Clear all");
     fireEvent.click(clearAll);
     expect(onClearAll).toHaveBeenCalled();
+  });
+
+  it("renders 'Series: {name}' chip for named series filter", () => {
+    render(<FilterChips {...defaultProps} seriesFilter={["s1"]} seriesNames={{ s1: "Dragons" }} />);
+    expect(screen.getByText("Series: Dragons")).toBeInTheDocument();
+  });
+
+  it("renders 'Series: Unassigned' chip for __unassigned__ filter", () => {
+    render(
+      <FilterChips
+        {...defaultProps}
+        seriesFilter={["__unassigned__"]}
+        seriesNames={{ __unassigned__: "Unassigned" }}
+      />,
+    );
+    expect(screen.getByText("Series: Unassigned")).toBeInTheDocument();
+  });
+
+  it("hasFilters includes seriesFilter check", () => {
+    const { container } = render(
+      <FilterChips {...defaultProps} seriesFilter={["s1"]} seriesNames={{ s1: "Dragons" }} />,
+    );
+    expect(container.firstChild).not.toBeNull();
+  });
+
+  it("chip aria-label follows 'Remove Series: {name} filter' pattern", () => {
+    render(<FilterChips {...defaultProps} seriesFilter={["s1"]} seriesNames={{ s1: "Dragons" }} />);
+    expect(
+      screen.getByRole("button", { name: "Remove Series: Dragons filter" }),
+    ).toBeInTheDocument();
   });
 });
