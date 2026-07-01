@@ -128,7 +128,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 
 </details>
 
-### 🚧 v1.9 Cleanup & Polish (In Progress)
+### v1.9 Cleanup & Polish (In Progress)
 
 **Milestone Goal:** Systematically address accumulated backlog items -- silent failures, comment violations, type safety gaps, test coverage holes, UI polish, and series follow-ups -- to reduce PR review noise and improve code health.
 
@@ -151,7 +151,11 @@ Full details: `milestones/v1.8-ROADMAP.md`
   2. Zero JSX section markers (`{/* ... */}`) remain in TSX render blocks
   3. Zero WHAT-comments or section markers remain in test files and chart form files (beyond allowed conventions)
   4. `npm test` passes with no regressions
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 35-01-PLAN.md -- Error handling fixes (processAndStoreImage call sites + bare catch blocks)
+- [ ] 35-02-PLAN.md -- Section markers & WHAT-comments (production files + test files)
+- [ ] 35-03-PLAN.md -- JSX comment cleanup (338 JSX comments + convention update)
 
 ### Phase 36: Type Safety
 **Goal**: Type definitions enforce domain invariants at compile time, eliminating runtime null checks and invalid state combinations
@@ -261,7 +265,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 | 32. Series Management Pages | v1.8 | 3/3 | Complete | 2026-05-25 |
 | 33. Chart Form Integration | v1.8 | 2/2 | Complete | 2026-05-26 |
 | 34. Browse & Pattern Dive Integration | v1.8 | 3/3 | Complete | 2026-07-01 |
-| 35. Error Handling & Comment Cleanup | v1.9 | 0/0 | Not started | - |
+| 35. Error Handling & Comment Cleanup | v1.9 | 0/3 | In progress | - |
 | 36. Type Safety | v1.9 | 0/0 | Not started | - |
 | 37. Test Coverage -- Utilities & Stats | v1.9 | 0/0 | Not started | - |
 | 38. Test Coverage -- Components | v1.9 | 0/0 | Not started | - |
