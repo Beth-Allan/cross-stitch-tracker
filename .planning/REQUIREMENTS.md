@@ -83,34 +83,34 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| QUAL-01 | TBD | Pending |
-| QUAL-02 | TBD | Pending |
-| QUAL-03 | TBD | Pending |
-| QUAL-04 | TBD | Pending |
-| QUAL-05 | TBD | Pending |
-| QUAL-06 | TBD | Pending |
-| QUAL-07 | TBD | Pending |
-| QUAL-08 | TBD | Pending |
-| TEST-01 | TBD | Pending |
-| TEST-02 | TBD | Pending |
-| TEST-03 | TBD | Pending |
-| TEST-04 | TBD | Pending |
-| POLISH-01 | TBD | Pending |
-| POLISH-02 | TBD | Pending |
-| POLISH-03 | TBD | Pending |
-| POLISH-04 | TBD | Pending |
-| POLISH-05 | TBD | Pending |
-| SERIES-01 | TBD | Pending |
-| SERIES-02 | TBD | Pending |
-| SERIES-03 | TBD | Pending |
-| FIX-01 | TBD | Pending |
-| FIX-02 | TBD | Pending |
+| QUAL-01 | Phase 35 | Pending |
+| QUAL-02 | Phase 35 | Pending |
+| QUAL-03 | Phase 35 | Pending |
+| QUAL-04 | Phase 36 | Pending |
+| QUAL-05 | Phase 36 | Pending |
+| QUAL-06 | Phase 36 | Pending |
+| QUAL-07 | Phase 36 | Pending |
+| QUAL-08 | Phase 36 | Pending |
+| TEST-01 | Phase 37 | Pending |
+| TEST-02 | Phase 37 | Pending |
+| TEST-03 | Phase 38 | Pending |
+| TEST-04 | Phase 38 | Pending |
+| POLISH-01 | Phase 39 | Pending |
+| POLISH-04 | Phase 39 | Pending |
+| POLISH-02 | Phase 40 | Pending |
+| POLISH-03 | Phase 40 | Pending |
+| POLISH-05 | Phase 40 | Pending |
+| SERIES-01 | Phase 41 | Pending |
+| SERIES-02 | Phase 41 | Pending |
+| SERIES-03 | Phase 41 | Pending |
+| FIX-01 | Phase 41 | Pending |
+| FIX-02 | Phase 41 | Pending |
 
 **Coverage:**
 - v1.9 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22
+- Mapped to phases: 22
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-07-01*
-*Last updated: 2026-07-01 after initial definition*
+*Last updated: 2026-07-01 after roadmap creation*
