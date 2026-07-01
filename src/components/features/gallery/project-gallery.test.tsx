@@ -99,6 +99,7 @@ function createMockGalleryChartData(overrides?: Partial<GalleryChartData>): Gall
       updatedAt: new Date(),
     },
     genres: [],
+    series: null,
     ...overrides,
   };
 }

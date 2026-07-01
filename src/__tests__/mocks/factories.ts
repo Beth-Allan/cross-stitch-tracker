@@ -447,6 +447,8 @@ export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): Gal
     ffoDate: null,
     hasDigitalCopy: false,
     dateAdded: new Date("2026-01-15"),
+    seriesId: null,
+    seriesName: null,
     ...overrides,
   };
 }

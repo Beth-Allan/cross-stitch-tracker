@@ -1,24 +1,19 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronUp, ChevronDown, Library, Plus, Trash2 } from "lucide-react";
+import { ChevronUp, ChevronDown, Library, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SeriesFormModal } from "./series-form-modal";
+import { SeriesCard } from "./series-card";
 import { DeleteConfirmationDialog } from "../designers/delete-confirmation-dialog";
 import { deleteSeries } from "@/lib/actions/series-actions";
 import type { SeriesWithStats } from "@/types/series";
 
 type SortKey = "name" | "completion" | "charts";
 type SortDir = "asc" | "desc";
-
-function getCompletionPercent(series: SeriesWithStats): number {
-  if (series.progress.ownedCount === 0) return 0;
-  return Math.round((series.progress.finishedCount / series.progress.ownedCount) * 100);
-}
 
 export function SeriesList({ series }: { series: SeriesWithStats[] }) {
   const router = useRouter();
@@ -159,59 +154,5 @@ export function SeriesList({ series }: { series: SeriesWithStats[] }) {
         onConfirm={handleDelete}
       />
     </div>
-  );
-}
-
-function SeriesCard({ series, onDelete }: { series: SeriesWithStats; onDelete: () => void }) {
-  const percent = getCompletionPercent(series);
-  const { ownedCount, finishedCount, totalCount } = series.progress;
-
-  return (
-    <Link
-      href={`/series/${series.id}`}
-      className="border-border bg-card hover:border-border/80 block rounded-xl border p-5 transition-all hover:shadow-md"
-    >
-      <div className="flex items-start justify-between">
-        <div className="min-w-0 flex-1">
-          <p className="font-heading text-foreground text-sm font-semibold">{series.name}</p>
-          {series.designerName && (
-            <p className="text-muted-foreground mt-0.5 text-xs">by {series.designerName}</p>
-          )}
-        </div>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onDelete();
-          }}
-          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md p-1.5 transition-colors"
-          aria-label={`Delete ${series.name}`}
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
-      </div>
-
-      <div className="bg-muted mt-3 h-2 overflow-hidden rounded-full">
-        {ownedCount > 0 && (
-          <div className="bg-primary h-full rounded-full" style={{ width: `${percent}%` }} />
-        )}
-      </div>
-
-      <div className="mt-2 flex items-center justify-between">
-        <div className="text-muted-foreground text-xs">
-          {totalCount !== null ? (
-            <span>
-              {finishedCount} of {ownedCount} finished
-            </span>
-          ) : (
-            <span>
-              {finishedCount} finished <span aria-hidden="true">&middot;</span> {ownedCount} charts
-            </span>
-          )}
-        </div>
-        <span className="text-primary text-sm font-semibold">{percent}%</span>
-      </div>
-    </Link>
   );
 }

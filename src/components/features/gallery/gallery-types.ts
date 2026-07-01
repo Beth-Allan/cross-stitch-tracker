@@ -63,4 +63,6 @@ export interface GalleryCardData extends OptionalFocalPoint {
   ffoDate: Date | null;
   hasDigitalCopy: boolean;
   dateAdded: Date;
+  seriesId: string | null;
+  seriesName: string | null;
 }
