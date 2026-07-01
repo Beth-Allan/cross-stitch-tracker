@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { X } from "lucide-react";
 import { STATUS_CONFIG } from "@/lib/utils/status";
 import type { ProjectStatus } from "@/generated/prisma/client";
+import { UNASSIGNED_FILTER } from "./gallery-types";
 
 interface FilterChipsProps {
   search: string;
@@ -77,7 +78,8 @@ export function FilterChips({
     }
 
     for (const value of seriesFilter) {
-      const displayName = value === "__unassigned__" ? "Unassigned" : (seriesNames[value] ?? value);
+      const displayName =
+        value === UNASSIGNED_FILTER ? "Unassigned" : (seriesNames[value] ?? value);
       result.push({
         key: `series-${value}`,
         label: `Series: ${displayName}`,

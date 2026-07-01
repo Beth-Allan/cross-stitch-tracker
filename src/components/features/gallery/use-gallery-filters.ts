@@ -3,7 +3,7 @@
 import { useQueryState, parseAsString, parseAsStringLiteral, parseAsArrayOf } from "nuqs";
 import React, { useMemo, useDeferredValue, useCallback, useEffect } from "react";
 import type { GalleryCardData, ViewMode, SortField, SortDir } from "./gallery-types";
-import { VIEW_MODES, SORT_FIELDS, SORT_DIRS } from "./gallery-types";
+import { VIEW_MODES, SORT_FIELDS, SORT_DIRS, UNASSIGNED_FILTER } from "./gallery-types";
 import { filterAndSort } from "./gallery-utils";
 
 const VIEW_STORAGE_KEY = "gallery-view-mode";
@@ -160,7 +160,7 @@ export function useGalleryFilters(cards: GalleryCardData[]) {
     const named = [...seen.entries()]
       .sort((a, b) => a[1].localeCompare(b[1]))
       .map(([value, label]) => ({ value, label }));
-    return hasUnassigned ? [{ value: "__unassigned__", label: "Unassigned" }, ...named] : named;
+    return hasUnassigned ? [{ value: UNASSIGNED_FILTER, label: "Unassigned" }, ...named] : named;
   }, [cards]);
 
   const hasActiveFilters =

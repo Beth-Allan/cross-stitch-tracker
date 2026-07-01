@@ -35,6 +35,10 @@ export type SortField = (typeof SORT_FIELDS)[number];
 export const SORT_DIRS = ["asc", "desc"] as const;
 export type SortDir = (typeof SORT_DIRS)[number];
 
+// ─── Filter Sentinels ───────────────────────────────────────────────────────
+
+export const UNASSIGNED_FILTER = "__unassigned__" as const;
+
 // ─── Gallery Card Data ──────────────────────────────────────────────────────
 
 export interface GalleryCardData extends OptionalFocalPoint {

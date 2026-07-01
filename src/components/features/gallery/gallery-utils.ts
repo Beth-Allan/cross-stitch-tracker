@@ -2,12 +2,13 @@ import type { ProjectStatus } from "@/generated/prisma/client";
 import type { SizeCategory } from "@/lib/utils/size-category";
 import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
 import type { GalleryChartData } from "@/types/chart";
-import type {
-  GalleryCardData,
-  KittingItemStatus,
-  StatusGroup,
-  SortField,
-  SortDir,
+import {
+  UNASSIGNED_FILTER,
+  type GalleryCardData,
+  type KittingItemStatus,
+  type StatusGroup,
+  type SortField,
+  type SortDir,
 } from "./gallery-types";
 
 // ─── Status Group Mapping ───────────────────────────────────────────────────
@@ -237,7 +238,7 @@ export function filterAndSort(
     search: string;
     statusFilter: string[];
     sizeFilter: string[];
-    seriesFilter?: string[];
+    seriesFilter: string[];
     sort: SortField;
     dir: SortDir;
   },
@@ -263,10 +264,10 @@ export function filterAndSort(
   }
 
   // Series filter
-  const seriesFilter = options.seriesFilter ?? [];
-  if (seriesFilter.length > 0) {
-    const hasUnassigned = seriesFilter.includes("__unassigned__");
-    const namedIds = seriesFilter.filter((v) => v !== "__unassigned__");
+  if (options.seriesFilter.length > 0) {
+    const seriesFilter = options.seriesFilter;
+    const hasUnassigned = seriesFilter.includes(UNASSIGNED_FILTER);
+    const namedIds = seriesFilter.filter((v) => v !== UNASSIGNED_FILTER);
     result = result.filter(
       (c) =>
         (hasUnassigned && c.seriesId === null) ||

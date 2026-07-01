@@ -44,6 +44,7 @@ describe("filterAndSort", () => {
       search: "",
       statusFilter: [],
       sizeFilter: [],
+      seriesFilter: [],
       sort: "dateAdded",
       dir: "desc",
     });
@@ -55,6 +56,7 @@ describe("filterAndSort", () => {
       search: "stitch",
       statusFilter: [],
       sizeFilter: [],
+      seriesFilter: [],
       sort: "dateAdded",
       dir: "desc",
     });
@@ -84,6 +86,7 @@ describe("filterAndSort", () => {
       search: "mirabilia",
       statusFilter: [],
       sizeFilter: [],
+      seriesFilter: [],
       sort: "dateAdded",
       dir: "desc",
     });
@@ -96,6 +99,7 @@ describe("filterAndSort", () => {
       search: "",
       statusFilter: ["IN_PROGRESS"],
       sizeFilter: [],
+      seriesFilter: [],
       sort: "dateAdded",
       dir: "desc",
     });
@@ -108,6 +112,7 @@ describe("filterAndSort", () => {
       search: "",
       statusFilter: [],
       sizeFilter: ["BAP"],
+      seriesFilter: [],
       sort: "dateAdded",
       dir: "desc",
     });
@@ -120,6 +125,7 @@ describe("filterAndSort", () => {
       search: "pattern",
       statusFilter: ["IN_PROGRESS"],
       sizeFilter: ["Medium"],
+      seriesFilter: [],
       sort: "dateAdded",
       dir: "desc",
     });
@@ -132,6 +138,7 @@ describe("filterAndSort", () => {
       search: "",
       statusFilter: ["IN_PROGRESS"],
       sizeFilter: [],
+      seriesFilter: [],
       sort: "name",
       dir: "asc",
     });
@@ -145,6 +152,7 @@ describe("filterAndSort", () => {
       search: "",
       statusFilter: [],
       sizeFilter: [],
+      seriesFilter: [],
       sort: "dateAdded",
       dir: "desc",
     });
@@ -157,6 +165,7 @@ describe("filterAndSort", () => {
       search: "nonexistent",
       statusFilter: [],
       sizeFilter: [],
+      seriesFilter: [],
       sort: "name",
       dir: "asc",
     });

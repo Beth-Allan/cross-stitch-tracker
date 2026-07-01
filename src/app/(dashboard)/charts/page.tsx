@@ -6,6 +6,7 @@ import {
   getStorageGroups,
 } from "@/lib/actions/pattern-dive-actions";
 import { getSeriesWithStats } from "@/lib/actions/series-actions";
+import type { SeriesWithStats } from "@/types/series";
 import { ProjectGallery } from "@/components/features/gallery/project-gallery";
 import { PatternDiveTabs } from "@/components/features/charts/pattern-dive-tabs";
 import { WhatsNextTab } from "@/components/features/charts/whats-next-tab";
@@ -22,7 +23,10 @@ export default async function ChartsPage() {
       getWhatsNextProjects(),
       getFabricRequirements(),
       getStorageGroups(),
-      getSeriesWithStats(),
+      getSeriesWithStats().catch((err) => {
+        console.error("Failed to load series data:", err instanceof Error ? err.message : err);
+        return [] as SeriesWithStats[];
+      }),
     ]);
 
   // Collect all image keys that need presigned URLs across all tabs
