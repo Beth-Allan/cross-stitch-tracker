@@ -15,6 +15,7 @@ import type {
   ProjectStatus,
 } from "@/generated/prisma/client";
 import type { ChartWithProject } from "@/types/chart";
+import type { SeriesWithStats } from "@/types/series";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import { PROJECT_STATUSES, STATUS_CONFIG } from "@/lib/utils/status";
 import { useChartForm, type ChartFormValues } from "./use-chart-form";
@@ -124,6 +125,7 @@ export function buildCreateFn() {
 interface ChartMergedFormProps {
   designers: Designer[];
   genres: Genre[];
+  series: SeriesWithStats[];
   storageLocations: StorageLocationWithStats[];
   stitchingApps: StitchingAppWithStats[];
   unassignedFabrics: (Fabric & { brand: FabricBrand })[];
@@ -135,6 +137,7 @@ interface ChartMergedFormProps {
 export function ChartMergedForm({
   designers,
   genres,
+  series,
   storageLocations,
   stitchingApps,
   unassignedFabrics,
@@ -159,7 +162,7 @@ export function ChartMergedForm({
   const adapterRef = useRef<CreationFlowAdapter | null>(null);
 
   // Draft auto-save on unmount: track submission state and current values via refs
-  // to avoid stale closures in the cleanup function (GAP 10)
+  // to avoid stale closures in the cleanup function
   const submittedRef = useRef(false);
 
   // Draft state for save button feedback
@@ -173,6 +176,8 @@ export function ChartMergedForm({
   const [appDialogName, setAppDialogName] = useState("");
   const [designerDialogOpen, setDesignerDialogOpen] = useState(false);
   const [designerDialogName, setDesignerDialogName] = useState("");
+  const [seriesDialogOpen, setSeriesDialogOpen] = useState(false);
+  const [seriesDialogName, setSeriesDialogName] = useState("");
 
   // Instantiate adapter once via ref
   if (!adapterRef.current) {
@@ -234,6 +239,7 @@ export function ChartMergedForm({
     initialData: isEdit ? initialData : undefined,
     designers,
     genres,
+    series,
     storageLocations,
     stitchingApps,
     onSuccess,
@@ -294,6 +300,7 @@ export function ChartMergedForm({
     const defaultValues = {
       name: "",
       designerId: null,
+      seriesId: null,
       coverImageUrl: null,
       coverThumbnailUrl: null,
       uploadedFiles: [] as Array<{
@@ -408,6 +415,11 @@ export function ChartMergedForm({
     label: d.name,
   }));
 
+  const seriesOptions = form.seriesList.map((s) => ({
+    value: s.id,
+    label: s.name,
+  }));
+
   const fabricOptions = unassignedFabrics.map((f) => ({
     value: f.id,
     label: `${f.name} - ${f.count}ct ${f.type} (${f.brand.name})`,
@@ -416,7 +428,6 @@ export function ChartMergedForm({
 
   return (
     <>
-      {/* === FORM MODE === */}
       <Activity mode={isEdit || mode === "form" ? "visible" : "hidden"}>
         <div className="mx-auto max-w-[720px] px-5 pt-12 pb-20 lg:px-8">
           {isEdit && initialData ? (
@@ -457,7 +468,6 @@ export function ChartMergedForm({
               lastFocusedRef.current = e.target as HTMLElement;
             }}
           >
-            {/* === IDENTITY GROUP === */}
             <FormField
               label="Chart Name"
               htmlFor="chart-name"
@@ -504,6 +514,29 @@ export function ChartMergedForm({
               />
             </FormField>
 
+            <FormField label="Series" htmlFor="series">
+              <SearchableSelect
+                options={seriesOptions}
+                value={form.values.seriesId}
+                onChange={(v) => form.setField("seriesId", v)}
+                onAddNew={(searchTerm) => {
+                  setSeriesDialogName(searchTerm);
+                  setSeriesDialogOpen(true);
+                }}
+                placeholder="Select series..."
+              />
+              <InlineNameDialog
+                open={seriesDialogOpen}
+                onOpenChange={setSeriesDialogOpen}
+                title="Add New Series"
+                initialName={seriesDialogName}
+                placeholder="e.g. Mirabilia Collection"
+                submitLabel="Add Series"
+                requiredError="Series name is required"
+                onSubmit={form.handleAddSeries}
+              />
+            </FormField>
+
             <FormField label="Genres" htmlFor="genres">
               <GenrePicker
                 genres={form.genres}
@@ -518,10 +551,8 @@ export function ChartMergedForm({
               />
             </FormField>
 
-            {/* === SECTION DIVIDER === */}
             <hr className="border-border/50 my-6 border-t border-none" />
 
-            {/* === PATTERN GROUP === */}
             <StitchCountFields
               stitchesWide={form.values.stitchesWide}
               stitchesHigh={form.values.stitchesHigh}
@@ -555,10 +586,8 @@ export function ChartMergedForm({
               label="Needs onion skinning"
             />
 
-            {/* === SECTION DIVIDER === */}
             <hr className="border-border/50 my-6 border-t border-none" />
 
-            {/* === WORKFLOW GROUP === */}
             <FormField
               label="Status"
               htmlFor="project-status"
@@ -630,10 +659,8 @@ export function ChartMergedForm({
               />
             </FormField>
 
-            {/* === SECTION DIVIDER === */}
             <hr className="border-border/50 my-6 border-t border-none" />
 
-            {/* === TIMELINE GROUP === */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <FormField label="Start Date" htmlFor="start-date">
                 <Input
@@ -687,10 +714,8 @@ export function ChartMergedForm({
               </FormField>
             )}
 
-            {/* === SECTION DIVIDER === */}
             <hr className="border-border/50 my-6 border-t border-none" />
 
-            {/* === MILESTONE MARKER / MANAGE SUPPLIES LINK === */}
             {isEdit ? (
               <ManageSuppliesLink chartId={initialData!.id} />
             ) : (
@@ -712,7 +737,6 @@ export function ChartMergedForm({
               </div>
             )}
 
-            {/* === FORM-LEVEL ERROR === */}
             {form.errors._form && (
               <p role="alert" className="text-destructive text-sm">
                 {form.errors._form}
@@ -722,11 +746,10 @@ export function ChartMergedForm({
         </div>
       </Activity>
 
-      {/* === SUPPLY MODE === */}
       {/* Conditional rendering (not Activity) so CalculatorCard's Base UI Popover
           initializes fresh when supply mode activates. Activity mode="hidden" defers
           FloatingRootContext init to OffscreenLane, leaving fabric dropdown broken
-          on first click (GAP 5). CalcParams state lives in the parent, so remounting
+          on first click. CalcParams state lives in the parent, so remounting
           CalculatorCard on mode switch is safe. */}
       {!isEdit && mode === "supply" && (
         <>
@@ -764,7 +787,6 @@ export function ChartMergedForm({
         </>
       )}
 
-      {/* === STICKY SAVE BAR === */}
       <StickySaveBar
         chartName={form.values.name}
         onSubmit={form.submitForm}

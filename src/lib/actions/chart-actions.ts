@@ -11,8 +11,6 @@ import type { ChartFormInput } from "@/lib/validations/chart";
 import { updateProjectSettingsSchema } from "@/lib/validations/supply";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
 
-// ─── Shared Helpers ──────────────────────────────────────────────────────────
-
 /**
  * Create a chart + project inside an existing transaction, then link fabric
  * if provided. Shared by createChart and createChartWithSupplies to avoid
@@ -37,6 +35,7 @@ async function createChartAndProject(
     data: {
       name: chart.name,
       designerId: chart.designerId,
+      seriesId: chart.seriesId,
       coverImageUrl: chart.coverImageUrl,
       coverThumbnailUrl: chart.coverThumbnailUrl,
       stitchCount: effectiveStitchCount,
@@ -120,8 +119,6 @@ async function handleThumbnail(
   }
 }
 
-// ─── Exported Actions ────────────────────────────────────────────────────────
-
 export async function createChart(formData: unknown) {
   const user = await requireAuth();
 
@@ -135,6 +132,7 @@ export async function createChart(formData: unknown) {
     const thumbnailWarning = await handleThumbnail(created.id, validated.chart.coverImageUrl);
 
     revalidatePath("/charts");
+    revalidatePath("/series");
     revalidatePath("/fabric");
     return { success: true as const, chartId: created.id, warning: thumbnailWarning };
   } catch (error) {
@@ -213,6 +211,7 @@ export async function createChartWithSupplies(formData: unknown, supplyPayload: 
     const thumbnailWarning = await handleThumbnail(created.id, validated.chart.coverImageUrl);
 
     revalidatePath("/charts");
+    revalidatePath("/series");
     revalidatePath("/fabric");
     return { success: true as const, chartId: created.id, warning: thumbnailWarning };
   } catch (error) {
@@ -259,6 +258,7 @@ export async function updateChart(chartId: string, formData: unknown) {
         data: {
           name: chart.name,
           designerId: chart.designerId,
+          seriesId: chart.seriesId,
           coverImageUrl: chart.coverImageUrl,
           coverThumbnailUrl: chart.coverThumbnailUrl,
           stitchCount: effectiveStitchCount,
@@ -347,6 +347,7 @@ export async function updateChart(chartId: string, formData: unknown) {
 
     revalidatePath("/charts");
     revalidatePath(`/charts/${chartId}`);
+    revalidatePath("/series");
     revalidatePath("/fabric");
     return { success: true as const, warning: thumbnailWarning };
   } catch (error) {

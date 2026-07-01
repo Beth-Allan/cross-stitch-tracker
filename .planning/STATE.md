@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Series & Collections
-status: shipped
-last_updated: 2026-05-25T02:30:00.000Z
-last_activity: 2026-05-25 -- Phase 32 shipped — PR #57
+status: ready_to_plan
+last_updated: 2026-05-26T02:27:09.567Z
+last_activity: 2026-07-01 -- Phase 33 shipped — PR #61
 progress:
   total_phases: 4
-  completed_phases: 1
-  total_plans: 6
-  completed_plans: 6
-  percent: 25
-stopped_at: Phase 32 complete (3/3) — ready to discuss Phase 33
+  completed_phases: 2
+  total_plans: 8
+  completed_plans: 8
+  percent: 50
+stopped_at: Phase 33 shipped — PR #61 created, ready for review/merge
 ---
 
 # Project State
@@ -21,14 +21,14 @@ stopped_at: Phase 32 complete (3/3) — ready to discuss Phase 33
 See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Phase 33 — chart form integration
+**Current focus:** Phase 34 — browse & pattern dive integration
 
 ## Current Position
 
-Phase: 33
+Phase: 34
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-05-25
+Last activity: 2026-05-26
 
 Progress: [██░░░░░░░░] 25%
 

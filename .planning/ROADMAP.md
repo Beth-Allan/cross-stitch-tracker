@@ -115,13 +115,13 @@ Full details: `milestones/v1.7-ROADMAP.md`
 
 </details>
 
-### 🚧 v1.8 Series & Collections (In Progress)
+### v1.8 Series & Collections (In Progress)
 
 **Milestone Goal:** Give stitchers a way to organize charts into series/collections, track completion progress, and browse their collection by series.
 
 - [x] **Phase 31: Data Foundation & Fixes** - Series schema, CRUD actions, dual progress types, and independent bug fixes (completed 2026-05-24)
 - [x] **Phase 32: Series Management Pages** - Series list page and series detail page with assigned charts and dual progress (completed 2026-05-25)
-- [ ] **Phase 33: Chart Form Integration** - SearchableSelect for series assignment with inline create dialog
+- [x] **Phase 33: Chart Form Integration** - SearchableSelect for series assignment with inline create dialog (completed 2026-05-26)
 - [ ] **Phase 34: Browse & Pattern Dive Integration** - Pattern Dive Series tab with progress cards and Browse tab series filter
 
 ## Phase Details
@@ -184,7 +184,14 @@ Full details: `milestones/v1.7-ROADMAP.md`
   3. User can clear a chart's series assignment from the chart form
   4. Series assignment persists correctly on both chart creation and chart edit
 
-**Plans**: [to be planned]
+**Plans**: 2 plans
+**Wave 1**
+
+- [x] 33-01-PLAN.md — Data plumbing: seriesId validation + chart actions + hook + InlineNameDialog props
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 33-02-PLAN.md — Form UI: series SearchableSelect + dialog wiring + page data fetching
 
 **UI hint**: yes
 
@@ -244,5 +251,5 @@ Phases execute in numeric order: 31 -> 32 -> 33 -> 34
 | 30. Code Quality | v1.7 | 3/3 | Complete | 2026-05-24 |
 | 31. Data Foundation & Fixes | v1.8 | 3/3 | Complete   | 2026-05-24 |
 | 32. Series Management Pages | v1.8 | 3/3 | Complete    | 2026-05-25 |
-| 33. Chart Form Integration | v1.8 | 0/? | Not started | - |
+| 33. Chart Form Integration | v1.8 | 2/2 | Complete    | 2026-05-26 |
 | 34. Browse & Pattern Dive Integration | v1.8 | 0/? | Not started | - |

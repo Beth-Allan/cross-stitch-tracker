@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Milestone:** v1.7 Fix & Polish — IN PROGRESS
-**Last Updated:** 2026-05-24
-**Roadmap:** 8 milestones / 30 phases — v1.0-v1.6 shipped
+**Milestone:** v1.8 Series & Collections — IN PROGRESS
+**Last Updated:** 2026-05-25
+**Roadmap:** 8 milestones / 34 phases — v1.0-v1.7 shipped
 
 ### Done
 
@@ -202,9 +202,29 @@
   - Plan 02 (W2): Series list page — card grid, sort pills, create modal, delete (TDD)
   - Plan 03 (W2): Series detail page — chart rows, inline editing, dual progress, designer select (TDD)
 
+- **Phase 33 discussed** — context gathered, 7 decisions locked (D-01 through D-07)
+  - Form placement: Series between Cover Image and Genres
+  - Inline dialog: name only (genre-simple), auto-populate designer from chart's selection
+  - Pattern: exact mirror of designer SearchableSelect + InlineDialog flow
+
+- **Phase 33 planned** — 2 plans in 2 waves: data plumbing (Wave 1), form UI wiring (Wave 2)
+  - Plan 01 (W1): seriesId in validation + chart-actions, handleAddSeries in hook, InlineNameDialog custom props
+  - Plan 02 (W2): Series SearchableSelect + InlineNameDialog in chart form, page data fetching
+
+- **Phase 33 executed & verified** — 2/2 plans complete, 2304 tests passing, 9/9 must-haves verified (5 human items pending)
+  - Plan 01: seriesId in chartFormSchema + chart-actions (create + update), handleAddSeries with designer auto-populate, InlineNameDialog submitLabel/requiredError props, 6 TDD tests
+  - Plan 02: Series SearchableSelect + InlineNameDialog between Cover Image and Genres, both chart pages fetch series data via getSeriesWithStats
+  - Code review: 4 warnings + 2 info fixed (WR-01 revalidatePath("/series") added to 3 actions, WR-02 render-phase side effect → useEffect+useRef, WR-03 removed 13 JSX section markers, WR-04 suppressUnloadRef declaration order, IN-01 unused import, IN-02 empty-name guard)
+
+- **Phase 33 shipped** — PR #61 created, 6-agent review completed, all findings fixed, 2304 tests passing
+  - Fixed: WR-01 handleAddSeries name.trim() consistency, WR-02 InlineNameDialog console.error, WR-03 GAP planning doc refs removed, WR-04 chart-actions section markers removed, WR-05 test fixtures (series mock + props)
+  - CI fix: missing vi.mock for series-actions in chart-merged-form.test.tsx caused ESM module resolution failure
+  - Backlogged: 5 items (999.81-999.85) for seriesId flow-through test, empty guard tests, designerName null, WHAT-comments, Adding... text
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-execute-phase 32` — Execute all plans for Series Management Pages
+1. Merge PR #61 when CI passes
+2. `/gsd-discuss-phase 34` — Start browse & pattern dive integration
 
 ### Backlog
 
@@ -301,6 +321,11 @@
 - 999.78: handleCalcParamsChange error/rollback test coverage — test `!result.success` rollback, catch rollback, and missing `chartId` no-op paths
 - 999.79: updateProjectSettings server action test coverage — auth rejection, ownership validation, Zod boundary, and Prisma error handling
 - 999.80: Client-side zip validation test — verify `.zip` file passes `validateFile` in chart-file-upload component
+- 999.81: Chart-actions test gap: seriesId flow-through — no test verifying seriesId appears in prisma.chart.create/update data payload when provided
+- 999.82: handleAddSeries empty/whitespace guard tests — missing mirror of handleAddStorageLocation's "does not call when empty/whitespace" test pair
+- 999.83: Constructed SeriesWithStats designerName: null — when designer is selected, local list item has null designerName despite having a designerId; look up from designers list or expand createSeries return
+- 999.84: Chart form WHAT-comments cleanup — 17 pre-existing label/WHAT-comments in chart-merged-form.tsx and use-chart-form.ts (extends 999.29/999.30 scope)
+- 999.85: InlineNameDialog "Adding..." hardcoded — pending text says "Adding..." regardless of customized submitLabel prop value
 
 ### Blockers
 

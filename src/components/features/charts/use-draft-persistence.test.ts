@@ -10,6 +10,7 @@ function createDefaultValues(): ChartFormValues {
   return {
     name: "",
     designerId: null,
+    seriesId: null,
     coverImageUrl: null,
     coverThumbnailUrl: null,
     uploadedFiles: [],

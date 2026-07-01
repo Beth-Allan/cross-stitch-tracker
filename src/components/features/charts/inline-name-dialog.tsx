@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,8 @@ interface InlineNameDialogProps {
   title: string;
   initialName?: string;
   placeholder?: string;
+  submitLabel?: string;
+  requiredError?: string;
   onSubmit: (name: string) => Promise<void>;
 }
 
@@ -27,18 +29,22 @@ export function InlineNameDialog({
   title,
   initialName = "",
   placeholder = "Enter name",
+  submitLabel = "Add",
+  requiredError = "Name is required",
   onSubmit,
 }: InlineNameDialogProps) {
   const [name, setName] = useState(initialName);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
-  // Sync initialName when dialog opens
-  const prevOpenRef = useState({ value: false })[0];
-  if (open && !prevOpenRef.value) {
-    setName(initialName);
-  }
-  prevOpenRef.value = open;
+  const prevOpenRef = useRef(false);
+
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      setName(initialName);
+    }
+    prevOpenRef.current = open;
+  }, [open, initialName]);
 
   const reset = () => {
     setName("");
@@ -50,7 +56,7 @@ export function InlineNameDialog({
     e.stopPropagation();
     const trimmedName = name.trim();
     if (!trimmedName) {
-      setError("Name is required");
+      setError(requiredError);
       return;
     }
 
@@ -61,6 +67,10 @@ export function InlineNameDialog({
       reset();
       onOpenChange(false);
     } catch (err) {
+      console.error(
+        "InlineNameDialog submit failed:",
+        err instanceof Error ? err.message : String(err),
+      );
       setError(err instanceof Error ? err.message : "Failed to create");
     } finally {
       setIsPending(false);
@@ -99,7 +109,7 @@ export function InlineNameDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Adding..." : "Add"}
+              {isPending ? "Adding..." : submitLabel}
             </Button>
           </DialogFooter>
         </form>

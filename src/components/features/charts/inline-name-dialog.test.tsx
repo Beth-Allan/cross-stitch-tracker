@@ -144,4 +144,36 @@ describe("InlineNameDialog", () => {
 
     expect(screen.getByPlaceholderText("e.g. Pattern Keeper")).toBeInTheDocument();
   });
+
+  it("renders custom submit button label when submitLabel provided", () => {
+    render(
+      <InlineNameDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        title="Add New Series"
+        submitLabel="Add Series"
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Add Series" })).toBeInTheDocument();
+  });
+
+  it("shows custom required error when requiredError provided", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <InlineNameDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        title="Add New Series"
+        requiredError="Series name is required"
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Add" }));
+
+    expect(screen.getByText("Series name is required")).toBeInTheDocument();
+  });
 });
