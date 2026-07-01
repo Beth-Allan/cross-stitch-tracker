@@ -311,6 +311,86 @@ describe("useGalleryFilters", () => {
     expect(result.current.filteredCount).toBe(1);
     expect(result.current.filteredAndSorted[0].name).toBe("Gamma");
   });
+
+  it("returns seriesFilter as empty array by default and toggleSeries callback", () => {
+    const { result } = renderHook(() => useGalleryFilters(cards), {
+      wrapper: withNuqsTestingAdapter({ hasMemory: true }),
+    });
+
+    expect(result.current.seriesFilter).toEqual([]);
+    expect(typeof result.current.toggleSeries).toBe("function");
+  });
+
+  it("clearFilters resets seriesFilter to empty array", async () => {
+    const { result } = renderHook(() => useGalleryFilters(cards), {
+      wrapper: withNuqsTestingAdapter({ hasMemory: true }),
+    });
+
+    await act(() => result.current.toggleSeries("s1"));
+    expect(result.current.seriesFilter).toEqual(["s1"]);
+
+    await act(() => result.current.clearFilters());
+    expect(result.current.seriesFilter).toEqual([]);
+  });
+
+  it("hasActiveFilters is true when seriesFilter is non-empty", async () => {
+    const { result } = renderHook(() => useGalleryFilters(cards), {
+      wrapper: withNuqsTestingAdapter({ hasMemory: true }),
+    });
+
+    expect(result.current.hasActiveFilters).toBe(false);
+
+    await act(() => result.current.toggleSeries("s1"));
+    expect(result.current.hasActiveFilters).toBe(true);
+  });
+
+  it("seriesFilter is passed to filterAndSort options", async () => {
+    const cardsWithSeries = [
+      createMockGalleryCard({
+        chartId: "cs1",
+        name: "SeriesA",
+        seriesId: "s1",
+        seriesName: "Dragons",
+        dateAdded: new Date("2026-01-01"),
+      }),
+      createMockGalleryCard({
+        chartId: "cs2",
+        name: "NoSeries",
+        seriesId: null,
+        seriesName: null,
+        dateAdded: new Date("2026-02-01"),
+      }),
+    ];
+
+    const { result } = renderHook(() => useGalleryFilters(cardsWithSeries), {
+      wrapper: withNuqsTestingAdapter({ hasMemory: true }),
+    });
+
+    await act(() => result.current.toggleSeries("s1"));
+    expect(result.current.filteredCount).toBe(1);
+    expect(result.current.filteredAndSorted[0].name).toBe("SeriesA");
+  });
+
+  it("returns seriesOptions derived from cards", () => {
+    const cardsWithSeries = [
+      createMockGalleryCard({ chartId: "cs1", seriesId: "s1", seriesName: "Zodiac" }),
+      createMockGalleryCard({ chartId: "cs2", seriesId: "s2", seriesName: "Alpine" }),
+      createMockGalleryCard({ chartId: "cs3", seriesId: "s1", seriesName: "Zodiac" }),
+      createMockGalleryCard({ chartId: "cs4", seriesId: null, seriesName: null }),
+    ];
+
+    const { result } = renderHook(() => useGalleryFilters(cardsWithSeries), {
+      wrapper: withNuqsTestingAdapter({ hasMemory: true }),
+    });
+
+    expect(result.current.seriesOptions[0]).toEqual({
+      value: "__unassigned__",
+      label: "Unassigned",
+    });
+    expect(result.current.seriesOptions[1]).toEqual({ value: "s2", label: "Alpine" });
+    expect(result.current.seriesOptions[2]).toEqual({ value: "s1", label: "Zodiac" });
+    expect(result.current.seriesOptions).toHaveLength(3);
+  });
 });
 
 // ─── View mode persistence ────────────────────────────────────────────────────
