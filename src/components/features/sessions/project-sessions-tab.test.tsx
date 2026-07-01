@@ -7,8 +7,6 @@ import type {
   ActiveProjectForPicker,
 } from "@/types/session";
 
-// ─── Mocks ──────────────────────────────────────────────────────────────────
-
 vi.mock("@/lib/actions/session-actions", () => ({
   createSession: vi.fn(),
   updateSession: vi.fn(),
@@ -25,8 +23,6 @@ vi.mock("sonner", () => ({
     error: vi.fn(),
   }),
 }));
-
-// ─── Test Data ──────────────────────────────────────────────────────────────
 
 const mockStats: ProjectSessionStats = {
   totalStitches: 6801,

@@ -24,8 +24,6 @@ describe("shopping-cart-actions", () => {
     });
   });
 
-  // ─── getShoppingCartData ────────────────────────────────────────────────────
-
   describe("getShoppingCartData", () => {
     it("rejects unauthenticated calls", async () => {
       mockAuth.mockResolvedValueOnce(null);
@@ -420,8 +418,6 @@ describe("shopping-cart-actions", () => {
       );
     });
   });
-
-  // ─── updateSupplyAcquired ─────────────────────────────────────────────────
 
   describe("updateSupplyAcquired", () => {
     it("rejects unauthenticated calls", async () => {

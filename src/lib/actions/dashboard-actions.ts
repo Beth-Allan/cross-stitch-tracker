@@ -11,8 +11,6 @@ import type {
   MainDashboardData,
 } from "@/types/dashboard";
 
-// ─── Internal Helpers ──────────────────────────────────────────────────────
-
 /**
  * Currently Stitching: IN_PROGRESS and ON_HOLD projects sorted by most recent session.
  */
@@ -268,8 +266,6 @@ async function getRandomSpotlightProject(userId: string): Promise<SpotlightProje
     progressPercent,
   };
 }
-
-// ─── Exported Actions ──────────────────────────────────────────────────────
 
 /**
  * Main Dashboard: Fetches all data sections in parallel.

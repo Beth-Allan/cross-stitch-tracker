@@ -4,8 +4,6 @@ import { useState, useMemo } from "react";
 import { Camera, ChevronUp, ChevronDown, Pencil } from "lucide-react";
 import type { StitchSessionRow } from "@/types/session";
 
-// ─── Types ──────────────────────────────────────────────────────────────────
-
 type SortField = "date" | "stitches" | "time";
 type SortDir = "asc" | "desc";
 
@@ -15,8 +13,6 @@ interface SessionTableProps {
   showProjectName?: boolean;
   onEditSession?: (session: StitchSessionRow) => void;
 }
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString("en-US", {
@@ -33,8 +29,6 @@ function formatTime(minutes: number): string {
   if (m === 0) return `${h}h`;
   return `${h}h ${m}m`;
 }
-
-// ─── SortHeader ─────────────────────────────────────────────────────────────
 
 function SortHeader({
   field,
@@ -77,8 +71,6 @@ function SortHeader({
     </th>
   );
 }
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 export function SessionTable({
   sessions,

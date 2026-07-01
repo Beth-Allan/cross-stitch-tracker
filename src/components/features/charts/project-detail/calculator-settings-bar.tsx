@@ -6,8 +6,6 @@ import { EditableNumber } from "@/components/features/charts/editable-number";
 import { updateProjectSettings } from "@/lib/actions/chart-actions";
 import type { CalculatorSettings } from "./types";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface CalculatorSettingsBarProps {
   chartId: string;
   settings: CalculatorSettings;
@@ -16,8 +14,6 @@ interface CalculatorSettingsBarProps {
   hasStitchCounts: boolean;
   onSettingsChange: (newSettings: CalculatorSettings) => void;
 }
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export function CalculatorSettingsBar({
   chartId,
@@ -45,7 +41,6 @@ export function CalculatorSettingsBar({
     settingsRef.current = currentSettings;
   }, [currentSettings]);
 
-  // ─── Handlers ─────────────────────────────────────────────────────────────
   // All hooks must be declared before any conditional returns (React rules of hooks)
 
   const handleSettingChange = useCallback(
@@ -88,11 +83,7 @@ export function CalculatorSettingsBar({
     [handleSettingChange],
   );
 
-  // ─── Conditional render ────────────────────────────────────────────────────
-
   if (!everShown) return null;
-
-  // ─── Fabric Display ──────────────────────────────────────────────────────
 
   const fabricDisplay =
     fabricSource === "linked" && fabricName

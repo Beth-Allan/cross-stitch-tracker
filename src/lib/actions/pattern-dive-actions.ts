@@ -84,8 +84,6 @@ export async function getWhatsNextProjects(): Promise<WhatsNextProject[]> {
   return projects;
 }
 
-// ─── Fabric Requirements ──────────────────────────────────────────────────
-
 const MARGIN_PER_SIDE = 3; // inches
 const MARGIN_TOTAL = MARGIN_PER_SIDE * 2; // 6 inches
 
@@ -209,8 +207,6 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
     });
 }
 
-// ─── Storage Groups ───────────────────────────────────────────────────────
-
 /**
  * Groups projects by storage location and fabrics into "No Location".
  * Named locations sorted alphabetically, "No Location" always last.
@@ -294,8 +290,6 @@ export async function getStorageGroups(): Promise<StorageGroup[]> {
     return a.locationName.localeCompare(b.locationName);
   });
 }
-
-// ─── Assign Fabric to Project ─────────────────────────────────────────────
 
 /**
  * Links a fabric to a project, unlinking any previously linked fabric.

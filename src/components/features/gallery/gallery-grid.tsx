@@ -21,8 +21,6 @@ import type {
   KittingItemStatus,
 } from "./gallery-types";
 
-// ─── Props ──────────────────────────────────────────────────────────────────
-
 interface GalleryGridProps {
   cards: GalleryCardData[];
   view: ViewMode;
@@ -32,8 +30,6 @@ interface GalleryGridProps {
   hasProjects: boolean;
   onClearFilters?: () => void;
 }
-
-// ─── Small Thumbnail ────────────────────────────────────────────────────────
 
 function SmallThumbnail({ card }: { card: GalleryCardData }) {
   const [imgFailed, setImgFailed] = useState(false);
@@ -60,8 +56,6 @@ function SmallThumbnail({ card }: { card: GalleryCardData }) {
     </div>
   );
 }
-
-// ─── Empty States ───────────────────────────────────────────────────────────
 
 function EmptyFilterState({ onClearFilters }: { onClearFilters?: () => void }) {
   return (
@@ -97,8 +91,6 @@ function EmptyProjectState() {
   );
 }
 
-// ─── Gallery View ───────────────────────────────────────────────────────────
-
 function GalleryView({ cards }: { cards: GalleryCardData[] }) {
   return (
     <div
@@ -116,8 +108,6 @@ function GalleryView({ cards }: { cards: GalleryCardData[] }) {
     </div>
   );
 }
-
-// ─── List View ──────────────────────────────────────────────────────────────
 
 function ListContextStats({ card }: { card: GalleryCardData }) {
   if (card.statusGroup === "wip") {
@@ -309,8 +299,6 @@ function ListView({ cards }: { cards: GalleryCardData[] }) {
   );
 }
 
-// ─── Table View ─────────────────────────────────────────────────────────────
-
 interface TableColumn {
   label: string;
   sortField: SortField | null;
@@ -493,8 +481,6 @@ function TableView({
     </div>
   );
 }
-
-// ─── Main GalleryGrid ───────────────────────────────────────────────────────
 
 export function GalleryGrid({
   cards,

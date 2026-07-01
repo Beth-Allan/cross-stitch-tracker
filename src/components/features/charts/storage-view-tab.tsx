@@ -8,8 +8,6 @@ import type { ProjectStatus } from "@/generated/prisma/client";
 import { StatusBadge } from "@/components/features/charts/status-badge";
 import { STATUS_GRADIENT_CLASSES } from "@/components/features/gallery/gallery-utils";
 
-// ─── Status gradient placeholders ───────────────────────────────────────────
-
 function CoverPlaceholder({ status }: { status: ProjectStatus }) {
   return (
     <div
@@ -19,8 +17,6 @@ function CoverPlaceholder({ status }: { status: ProjectStatus }) {
     </div>
   );
 }
-
-// ─── Sub-components ─────────────────────────────────────────────────────────
 
 function StorageThumbnail({
   item,
@@ -96,8 +92,6 @@ function StorageItem({
     </div>
   );
 }
-
-// ─── Main Component ─────────────────────────────────────────────────────────
 
 interface StorageViewTabProps {
   groups: StorageGroup[];

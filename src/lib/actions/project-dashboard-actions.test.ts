@@ -17,8 +17,6 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
 /** Build a mock project with chart + sessions + junction tables for findMany results */
 function mockProject(overrides: {
   id?: string;
@@ -89,16 +87,12 @@ describe("project-dashboard-actions", () => {
     });
   });
 
-  // ─── Auth ───────────────────────────────────────────────────────────────────
-
   describe("getProjectDashboardData", () => {
     it("rejects unauthenticated calls", async () => {
       mockAuth.mockResolvedValueOnce(null);
       const { getProjectDashboardData } = await import("./project-dashboard-actions");
       await expect(getProjectDashboardData()).rejects.toThrow("Unauthorized");
     });
-
-    // ─── Hero Stats ─────────────────────────────────────────────────────────
 
     describe("heroStats", () => {
       it("totalWIPs counts only IN_PROGRESS projects", async () => {
@@ -251,8 +245,6 @@ describe("project-dashboard-actions", () => {
       });
     });
 
-    // ─── Progress Buckets ───────────────────────────────────────────────────
-
     describe("progressBuckets", () => {
       it("assigns UNSTARTED project to 'unstarted' bucket", async () => {
         mockPrisma.project.findMany.mockResolvedValue([
@@ -365,8 +357,6 @@ describe("project-dashboard-actions", () => {
         expect(totalInBuckets).toBe(0);
       });
     });
-
-    // ─── Finished Projects ──────────────────────────────────────────────────
 
     describe("finishedProjects", () => {
       it("includes startToFinishDays calculated as days between startDate and finishDate", async () => {
@@ -560,8 +550,6 @@ describe("project-dashboard-actions", () => {
         expect(result.finishedProjects[2].projectName).toBe("Older Finish");
       });
     });
-
-    // ─── Query Security ─────────────────────────────────────────────────────
 
     describe("security", () => {
       it("all queries filter by userId", async () => {

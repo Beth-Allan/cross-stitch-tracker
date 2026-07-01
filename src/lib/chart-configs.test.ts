@@ -44,8 +44,6 @@ describe("collectionStatusConfig", () => {
   });
 });
 
-// ─── Size Category Config ─────────────────────────────────────────────────
-
 const EXPECTED_SIZE_KEYS = ["Mini", "Small", "Medium", "Large", "BAP"] as const;
 
 describe("sizeCategoryConfig", () => {
@@ -69,8 +67,6 @@ describe("sizeCategoryConfig", () => {
   });
 });
 
-// ─── Designer Bar Config ──────────────────────────────────────────────────
-
 describe("designerBarConfig", () => {
   it("has exactly 1 key 'count' with label 'Charts' and color 'var(--chart-1)'", () => {
     const keys = Object.keys(designerBarConfig);
@@ -85,8 +81,6 @@ describe("designerBarConfig", () => {
     expect(_config).toBeDefined();
   });
 });
-
-// ─── Genre Distribution Config ────────────────────────────────────────────
 
 describe("genreDistributionConfig", () => {
   it("has exactly 1 key 'count' with label 'Charts' and color 'var(--chart-3)'", () => {
@@ -103,8 +97,6 @@ describe("genreDistributionConfig", () => {
   });
 });
 
-// ─── Monthly Bar Config ─────────────────────────────────────────────────
-
 describe("monthlyBarConfig", () => {
   it("has exactly 1 key 'totalStitches' with label 'Stitches' and color 'var(--chart-1)'", () => {
     const keys = Object.keys(monthlyBarConfig);
@@ -119,8 +111,6 @@ describe("monthlyBarConfig", () => {
     expect(_config).toBeDefined();
   });
 });
-
-// ─── Day of Week Config ──────────────────────────────────────────────────
 
 describe("dayOfWeekConfig", () => {
   it("has exactly 1 key 'avgStitches' with label 'Avg Stitches' and color 'var(--chart-1)'", () => {

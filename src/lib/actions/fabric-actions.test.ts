@@ -29,8 +29,6 @@ describe("fabric-actions", () => {
     mockAuth.mockResolvedValue({ user: { id: "user-1", name: "Test", email: "test@test.com" } });
   });
 
-  // ─── Fabric Brand Auth Guard ──────────────────────────────────────────────
-
   describe("fabric brand auth guard", () => {
     it("rejects unauthenticated calls to createFabricBrand", async () => {
       mockAuth.mockResolvedValueOnce(null);
@@ -60,8 +58,6 @@ describe("fabric-actions", () => {
       await expect(getFabricBrands()).rejects.toThrow("Unauthorized");
     });
   });
-
-  // ─── createFabricBrand ────────────────────────────────────────────────────
 
   describe("createFabricBrand", () => {
     it("creates a brand with valid data and returns success", async () => {
@@ -125,8 +121,6 @@ describe("fabric-actions", () => {
     });
   });
 
-  // ─── updateFabricBrand ────────────────────────────────────────────────────
-
   describe("updateFabricBrand", () => {
     it("updates name and website", async () => {
       const updatedBrand = createMockFabricBrand({
@@ -170,8 +164,6 @@ describe("fabric-actions", () => {
     });
   });
 
-  // ─── deleteFabricBrand ────────────────────────────────────────────────────
-
   describe("deleteFabricBrand", () => {
     it("deletes the brand and returns success", async () => {
       mockPrisma.fabricBrand.delete.mockResolvedValueOnce(createMockFabricBrand({ id: "fb-1" }));
@@ -195,8 +187,6 @@ describe("fabric-actions", () => {
       consoleSpy.mockRestore();
     });
   });
-
-  // ─── getFabricBrands ──────────────────────────────────────────────────────
 
   describe("getFabricBrands", () => {
     it("returns brands with fabric counts ordered by name", async () => {
@@ -224,8 +214,6 @@ describe("fabric-actions", () => {
       await expect(getFabricBrands()).rejects.toThrow("DB error");
     });
   });
-
-  // ─── Fabric Auth Guard ────────────────────────────────────────────────────
 
   describe("fabric auth guard", () => {
     it("rejects unauthenticated calls to createFabric", async () => {
@@ -288,8 +276,6 @@ describe("fabric-actions", () => {
       await expect(getUnassignedFabrics()).rejects.toThrow("Unauthorized");
     });
   });
-
-  // ─── createFabric ─────────────────────────────────────────────────────────
 
   describe("createFabric", () => {
     const validFabricData = {
@@ -421,8 +407,6 @@ describe("fabric-actions", () => {
     });
   });
 
-  // ─── updateFabric ─────────────────────────────────────────────────────────
-
   describe("updateFabric", () => {
     const validUpdateData = {
       name: "Updated Fabric",
@@ -507,8 +491,6 @@ describe("fabric-actions", () => {
     });
   });
 
-  // ─── deleteFabric ─────────────────────────────────────────────────────────
-
   describe("deleteFabric", () => {
     it("deletes the fabric and returns success", async () => {
       mockPrisma.fabric.delete.mockResolvedValueOnce(createMockFabric({ id: "fabric-1" }));
@@ -556,8 +538,6 @@ describe("fabric-actions", () => {
       expect(mockPrisma.fabric.delete).not.toHaveBeenCalled();
     });
   });
-
-  // ─── getFabric ────────────────────────────────────────────────────────────
 
   describe("getFabric", () => {
     it("returns fabric with brand and linked project details", async () => {
@@ -627,8 +607,6 @@ describe("fabric-actions", () => {
     });
   });
 
-  // ─── getFabrics ───────────────────────────────────────────────────────────
-
   describe("getFabrics", () => {
     it("returns all fabrics with brand included, ordered by name", async () => {
       mockPrisma.fabric.findMany.mockResolvedValueOnce([
@@ -668,8 +646,6 @@ describe("fabric-actions", () => {
       await expect(getFabrics()).rejects.toThrow("DB error");
     });
   });
-
-  // ─── getUnassignedFabrics ────────────────────────────────────────────────
 
   describe("getUnassignedFabrics", () => {
     it("returns unassigned fabrics with brand included", async () => {

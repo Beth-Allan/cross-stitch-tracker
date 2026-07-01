@@ -4,8 +4,6 @@ import userEvent from "@testing-library/user-event";
 import { LogSessionModal } from "./log-session-modal";
 import type { ActiveProjectForPicker } from "@/types/session";
 
-// ─── Mocks ──────────────────────────────────────────────────────────────────
-
 const mockCreateSession = vi.fn();
 const mockUpdateSession = vi.fn();
 const mockDeleteSession = vi.fn();
@@ -33,8 +31,6 @@ const mockFireCelebration = vi.fn();
 vi.mock("@/components/features/stats/record-celebration", () => ({
   fireCelebration: (...args: unknown[]) => mockFireCelebration(...args),
 }));
-
-// ─── Test Data ──────────────────────────────────────────────────────────────
 
 const mockProjects: ActiveProjectForPicker[] = [
   {
@@ -70,8 +66,6 @@ const editSession = {
   photoKey: null,
 };
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
 function renderModal(overrides?: Partial<React.ComponentProps<typeof LogSessionModal>>) {
   const defaultProps = {
     isOpen: true,
@@ -87,8 +81,6 @@ function renderModal(overrides?: Partial<React.ComponentProps<typeof LogSessionM
 function getSaveButton(name: RegExp = /log stitches/i) {
   return screen.getByRole("button", { name });
 }
-
-// ─── Tests ──────────────────────────────────────────────────────────────────
 
 describe("LogSessionModal", () => {
   beforeEach(() => {

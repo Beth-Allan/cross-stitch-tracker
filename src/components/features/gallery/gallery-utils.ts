@@ -11,8 +11,6 @@ import {
   type SortDir,
 } from "./gallery-types";
 
-// ─── Status Group Mapping ───────────────────────────────────────────────────
-
 export function getStatusGroup(status: ProjectStatus): StatusGroup {
   switch (status) {
     case "IN_PROGRESS":
@@ -27,8 +25,6 @@ export function getStatusGroup(status: ProjectStatus): StatusGroup {
       return "finished";
   }
 }
-
-// ─── Kitting Dot Computation ────────────────────────────────────────────────
 
 type SupplyItem = { quantityRequired: number; quantityAcquired: number };
 
@@ -59,8 +55,6 @@ export function computeKittingDots(project: {
     specialtyStatus: computeSupplyStatus(project.projectSpecialty),
   };
 }
-
-// ─── Data Transformation ────────────────────────────────────────────────────
 
 export function transformToGalleryCard(
   chart: GalleryChartData,
@@ -134,8 +128,6 @@ export function transformToGalleryCard(
   };
 }
 
-// ─── Status Gradient Classes (dark-mode aware) ─────────────────────────────
-
 export const STATUS_GRADIENT_CLASSES: Record<ProjectStatus, string> = {
   UNSTARTED: "bg-gradient-to-br from-stone-200 to-stone-300 dark:from-stone-800 dark:to-stone-700",
   KITTING: "bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900 dark:to-amber-800",
@@ -149,8 +141,6 @@ export const STATUS_GRADIENT_CLASSES: Record<ProjectStatus, string> = {
   FFO: "bg-gradient-to-br from-rose-100 to-rose-200 dark:from-rose-900 dark:to-rose-800",
 };
 
-// ─── Celebration Classes (dark-mode aware) ──────────────────────────────────
-
 export function getCelebrationClasses(status: ProjectStatus): string | null {
   if (status === "FINISHED") {
     return "border-2 border-violet-500 shadow-[0_0_0_1px_rgb(139_92_246/0.15),0_0_12px_rgb(139_92_246/0.08)] dark:shadow-[0_0_0_1px_rgb(139_92_246/0.25),0_0_12px_rgb(139_92_246/0.2)]";
@@ -160,8 +150,6 @@ export function getCelebrationClasses(status: ProjectStatus): string | null {
   }
   return null;
 }
-
-// ─── Sort Order Constants ───────────────────────────────────────────────────
 
 export const STATUS_SORT_ORDER: Record<ProjectStatus, number> = {
   UNSTARTED: 0,
@@ -180,8 +168,6 @@ export const SIZE_SORT_ORDER: Record<SizeCategory, number> = {
   Large: 3,
   BAP: 4,
 };
-
-// ─── Sort Comparator ────────────────────────────────────────────────────────
 
 export function compareFn(
   field: SortField,
@@ -229,8 +215,6 @@ export function compareFn(
     return result * multiplier;
   };
 }
-
-// ─── Filter & Sort (pure function for testability) ──────────────────────────
 
 export function filterAndSort(
   cards: GalleryCardData[],

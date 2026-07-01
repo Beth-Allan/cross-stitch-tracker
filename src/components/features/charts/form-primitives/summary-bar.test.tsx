@@ -3,8 +3,6 @@ import { render, screen } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { SummaryBar } from "./summary-bar";
 
-// ─── Tests ──────────────────────────────────────────────────────────────────
-
 describe("SummaryBar", () => {
   const defaultProps = {
     name: "Woodland Sampler",

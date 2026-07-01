@@ -11,8 +11,6 @@ import type {
   FinishedProjectData,
 } from "@/types/dashboard";
 
-// ─── Bucket Definitions ────────────────────────────────────────────────────
-
 const BUCKET_DEFINITIONS: ReadonlyArray<{
   id: ProgressBucketId;
   label: string;
@@ -28,8 +26,6 @@ const BUCKET_DEFINITIONS: ReadonlyArray<{
 const UNSTARTED_STATUSES = new Set(["UNSTARTED", "KITTING", "KITTED"]);
 const FINISHED_STATUSES = new Set(["FINISHED", "FFO"]);
 const WIP_STATUS = "IN_PROGRESS";
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
 
 function computeProgressPercent(stitchesCompleted: number, stitchCount: number): number {
   return stitchCount > 0 ? Math.min(100, Math.round((stitchesCompleted / stitchCount) * 100)) : 0;
@@ -50,8 +46,6 @@ function assignBucketId(status: string, progressPercent: number): ProgressBucket
   if (progressPercent <= 75) return "50-75";
   return "75-100";
 }
-
-// ─── Main Action ────────────────────────────────────────────────────────────
 
 /**
  * Fetches all data for the Project Dashboard tab: hero stats, progress buckets,
@@ -96,8 +90,6 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
       },
     },
   });
-
-  // ─── Hero Stats ─────────────────────────────────────────────────────────
 
   const wips = projects.filter((p) => p.status === WIP_STATUS);
   const currentYear = new Date().getFullYear();
@@ -144,8 +136,6 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
     totalStitchesAllProjects: projects.reduce((sum, p) => sum + p.stitchesCompleted, 0),
   };
 
-  // ─── Progress Buckets ───────────────────────────────────────────────────
-
   const bucketProjectsMap = new Map<ProgressBucketId, BucketProject[]>();
   for (const def of BUCKET_DEFINITIONS) {
     bucketProjectsMap.set(def.id, []);
@@ -186,8 +176,6 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
       projects: bucketProjects,
     };
   });
-
-  // ─── Finished Projects ──────────────────────────────────────────────────
 
   const finishedProjectData: FinishedProjectData[] = finishedProjects
     .map((p) => {

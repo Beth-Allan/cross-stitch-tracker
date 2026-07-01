@@ -5,8 +5,6 @@ import { useGalleryFilters } from "./use-gallery-filters";
 import { filterAndSort } from "./gallery-utils";
 import { createMockGalleryCard } from "@/__tests__/mocks/factories";
 
-// ─── filterAndSort (pure function) ─────────────────────────────────────────
-
 describe("filterAndSort", () => {
   const cards = [
     createMockGalleryCard({
@@ -172,8 +170,6 @@ describe("filterAndSort", () => {
     expect(result).toHaveLength(0);
   });
 });
-
-// ─── useGalleryFilters (hook integration) ───────────────────────────────────
 
 describe("useGalleryFilters", () => {
   const cards = [
@@ -401,8 +397,6 @@ describe("useGalleryFilters", () => {
     expect(result.current.seriesOptions).toHaveLength(3);
   });
 });
-
-// ─── View mode persistence ────────────────────────────────────────────────────
 
 describe("view mode persistence", () => {
   const cards = [

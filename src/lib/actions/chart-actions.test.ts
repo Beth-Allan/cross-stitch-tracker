@@ -50,8 +50,6 @@ describe("chart-actions auth guard", () => {
   });
 });
 
-// ─── createChartWithSupplies (authenticated) ─────────────────────────────
-
 describe("createChartWithSupplies", () => {
   const validChartInput = {
     chart: {

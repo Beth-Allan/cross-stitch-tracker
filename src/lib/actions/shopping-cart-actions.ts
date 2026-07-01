@@ -6,15 +6,11 @@ import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import type { ShoppingCartData } from "@/types/dashboard";
 
-// ─── Validation ─────────────────────────────────────────────────────────────
-
 const updateSupplyAcquiredSchema = z.object({
   type: z.enum(["thread", "bead", "specialty"]),
   junctionId: z.string().min(1),
   acquiredQuantity: z.number().int().min(0),
 });
-
-// ─── Shopping Cart Data ─────────────────────────────────────────────────────
 
 export async function getShoppingCartData(): Promise<ShoppingCartData> {
   const user = await requireAuth();
@@ -125,8 +121,6 @@ export async function getShoppingCartData(): Promise<ShoppingCartData> {
 
   return { projects: cartProjects, threads, beads, specialty, fabrics };
 }
-
-// ─── Update Supply Acquired ─────────────────────────────────────────────────
 
 export async function updateSupplyAcquired(
   type: "thread" | "bead" | "specialty",

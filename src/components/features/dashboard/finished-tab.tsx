@@ -5,8 +5,6 @@ import { ArrowUpDown, Search } from "lucide-react";
 import type { FinishedProjectData } from "@/types/dashboard";
 import { FinishedProjectCard } from "./finished-project-card";
 
-// ─── Sort logic ─────────────────────────────────────────────────────────────
-
 type FinishedSortOption = "finishDate" | "startToFinish" | "stitchCount" | "stitchingDays";
 
 const SORT_OPTIONS: { value: FinishedSortOption; label: string }[] = [
@@ -42,11 +40,7 @@ function sortFinishedProjects(
   });
 }
 
-// ─── Constants ──────────────────────────────────────────────────────────────
-
 const ITEMS_PER_PAGE = 10;
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 interface FinishedTabProps {
   projects: FinishedProjectData[];
@@ -178,8 +172,6 @@ export function FinishedTab({ projects, imageUrls }: FinishedTabProps) {
     </div>
   );
 }
-
-// ─── Aggregate stat card ────────────────────────────────────────────────────
 
 function AggregateCard({ label, value }: { label: string; value: string }) {
   return (

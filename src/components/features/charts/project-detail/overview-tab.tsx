@@ -231,8 +231,6 @@ export function OverviewTab({ chart, supplies, sessionCount }: OverviewTabProps)
   );
 }
 
-// ─── Helper Components ─────────────────────────────────────────────────────
-
 function KittingItem({ label, ready, detail }: { label: string; ready: boolean; detail: string }) {
   return (
     <div className="flex items-center gap-2">
