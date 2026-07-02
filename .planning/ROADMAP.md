@@ -133,7 +133,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 **Milestone Goal:** Systematically address accumulated backlog items -- silent failures, comment violations, type safety gaps, test coverage holes, UI polish, and series follow-ups -- to reduce PR review noise and improve code health.
 
 - [x] **Phase 35: Error Handling & Comment Cleanup** - Fix silent failure patterns and remove comment convention violations (completed 2026-07-01)
-- [ ] **Phase 36: Type Safety** - Narrow types, discriminated unions, co-dependent props, controlled-only simplification
+- [x] **Phase 36: Type Safety** - Narrow types, discriminated unions, co-dependent props, controlled-only simplification (completed 2026-07-02)
 - [ ] **Phase 37: Test Coverage -- Utilities & Stats** - Fill test gaps for skein calculator, stats actions, calendar, records, completion estimates
 - [ ] **Phase 38: Test Coverage -- Components** - Fill test gaps for shopping cart and chart form components
 - [ ] **Phase 39: Accessibility & Performance** - ARIA nested interactive refactor, useMemo optimization, SSR hydration fix
@@ -183,9 +183,9 @@ Full details: `milestones/v1.8-ROADMAP.md`
 **Plans**: 3 plans
 **Wave 1** (all parallel)
 
-- [ ] 36-01-PLAN.md -- StrandCount literal union + SuppliesTab co-dependent props (QUAL-04, QUAL-06)
-- [ ] 36-02-PLAN.md -- OptionalFocalPoint discriminated union + mapFocalPoint (QUAL-05)
-- [ ] 36-03-PLAN.md -- Collection types + controlled-only simplification (QUAL-07, QUAL-08)
+- [x] 36-01-PLAN.md -- StrandCount literal union + SuppliesTab co-dependent props (QUAL-04, QUAL-06)
+- [x] 36-02-PLAN.md -- OptionalFocalPoint discriminated union + mapFocalPoint (QUAL-05)
+- [x] 36-03-PLAN.md -- Collection types + controlled-only simplification (QUAL-07, QUAL-08)
 
 ### Phase 37: Test Coverage -- Utilities & Stats
 
@@ -299,7 +299,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 | 33. Chart Form Integration | v1.8 | 2/2 | Complete | 2026-05-26 |
 | 34. Browse & Pattern Dive Integration | v1.8 | 3/3 | Complete | 2026-07-01 |
 | 35. Error Handling & Comment Cleanup | v1.9 | 3/3 | Complete    | 2026-07-01 |
-| 36. Type Safety | v1.9 | 0/3 | Planned | - |
+| 36. Type Safety | v1.9 | 3/3 | Complete   | 2026-07-02 |
 | 37. Test Coverage -- Utilities & Stats | v1.9 | 0/0 | Not started | - |
 | 38. Test Coverage -- Components | v1.9 | 0/0 | Not started | - |
 | 39. Accessibility & Performance | v1.9 | 0/0 | Not started | - |
