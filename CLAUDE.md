@@ -263,9 +263,15 @@
   - SC-5: completion-estimates equals + exceeds totalStitches exclusion (lines 171, 196)
   - Backlog closed: 999.0.24, 999.24, 999.27, 999.38, 999.39
 
+### Done This Session (2026-07-02)
+
+- **Phase 39 UAT approved** — 4/4 human verification items passed (storage cards, apps cards, SSR hydration, shopping cart)
+- **Phase 39 shipped** — PR #65 created and merged, 6-agent review completed, all findings fixed, 2448 tests passing
+  - Fixed: WR-01 unnecessary onClick arrow wrappers in storage/app lists, WR-02 unsafe StrandCount cast → isStrandCount guard in calculator-card, WR-03 redundant overCount WHAT-comments removed
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-discuss-phase 38` — Gather context for Phase 38
+1. `/gsd-discuss-phase 40` — Gather context for Phase 40 (Visual & Layout Polish)
 
 ### Backlog
 
