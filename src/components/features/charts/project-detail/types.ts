@@ -25,32 +25,6 @@ export interface CalculatorSettings {
   wastePercent: number; // 0-50
 }
 
-// ─── Supply Row Data ───────────────────────────────────────────────────────
-
-export interface SupplyRowData {
-  id: string;
-  type: "thread" | "bead" | "specialty";
-  name: string;
-  code: string;
-  hexColor?: string | null;
-  brandName?: string;
-  stitchCount: number;
-  quantityRequired: number;
-  quantityAcquired: number;
-  isNeedOverridden: boolean;
-  calculatedNeed?: number; // from calculateSkeins, undefined for non-thread or no stitch count
-}
-
-// ─── Supply Section Data ───────────────────────────────────────────────────
-
-export interface SupplySectionData {
-  type: "thread" | "bead" | "specialty";
-  label: string; // "Threads", "Beads", "Specialty Items"
-  unitLabel: string; // "skeins", "packages", "quantity"
-  items: SupplyRowData[];
-  totalStitchCount: number;
-}
-
 // ─── Project Detail Props ──────────────────────────────────────────────────
 
 export interface ProjectDetailProps {

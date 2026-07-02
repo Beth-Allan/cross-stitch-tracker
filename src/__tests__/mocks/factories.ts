@@ -22,6 +22,7 @@ import type { GenreWithStats, GenreChart } from "@/types/genre";
 import type { ChartWithProject, ProjectWithRelations } from "@/types/chart";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import type { SeriesWithStats, SeriesChart } from "@/types/series";
+import type { GalleryCardData } from "@/components/features/gallery/gallery-types";
 import { vi } from "vitest";
 
 /**
@@ -407,8 +408,6 @@ export function createMockStitchingAppWithStats(
     ...overrides,
   };
 }
-
-import type { GalleryCardData } from "@/components/features/gallery/gallery-types";
 
 export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): GalleryCardData {
   return {
