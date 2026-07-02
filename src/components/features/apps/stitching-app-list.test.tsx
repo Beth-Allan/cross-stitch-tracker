@@ -88,25 +88,77 @@ describe("StitchingAppList", () => {
     ).toBeInTheDocument();
   });
 
-  it("clicking a row navigates to /apps/[id]", async () => {
-    const user = userEvent.setup();
+  it("clicking a row navigates to /apps/[id]", () => {
     render(<StitchingAppList apps={mockApps} />);
 
-    const rows = screen.getAllByRole("button", { name: /navigate to/i });
-    await user.click(rows[0]);
-
-    expect(mockPush).toHaveBeenCalledWith("/apps/app-1");
+    const link = screen.getByRole("link", { name: /view markup r-xp/i });
+    expect(link).toHaveAttribute("href", "/apps/app-1");
   });
 
-  it("pencil click calls e.stopPropagation (doesn't navigate)", async () => {
+  it("pencil click enters edit mode without navigating", async () => {
     const user = userEvent.setup();
     render(<StitchingAppList apps={mockApps} />);
 
     const renameButton = screen.getByRole("button", { name: /rename markup r-xp/i });
     await user.click(renameButton);
 
-    // Should enter edit mode, not navigate
     expect(mockPush).not.toHaveBeenCalled();
     expect(screen.getByRole("textbox")).toBeInTheDocument();
+  });
+
+  describe("ARIA compliance", () => {
+    it("does not render role='button' on the card container", () => {
+      render(<StitchingAppList apps={mockApps} />);
+
+      const buttonRoles = screen.queryAllByRole("button");
+      const cardButtons = buttonRoles.filter((el) =>
+        el.getAttribute("aria-label")?.startsWith("Navigate to"),
+      );
+      expect(cardButtons).toHaveLength(0);
+    });
+
+    it("contains a Link with href='/apps/{id}' and visually hidden 'View {name}' text", () => {
+      render(<StitchingAppList apps={mockApps} />);
+
+      const link = screen.getByRole("link", { name: /view markup r-xp/i });
+      expect(link).toHaveAttribute("href", "/apps/app-1");
+
+      const srText = link.querySelector(".sr-only");
+      expect(srText).toHaveTextContent("View Markup R-XP");
+    });
+
+    it("contains no nested interactive elements (no button inside a link)", () => {
+      render(<StitchingAppList apps={mockApps} />);
+
+      const links = screen.getAllByRole("link");
+      const buttons = screen.getAllByRole("button");
+
+      for (const link of links) {
+        for (const button of buttons) {
+          expect(link.contains(button)).toBe(false);
+        }
+      }
+    });
+
+    it("edit button click does not trigger navigation", async () => {
+      const user = userEvent.setup();
+      render(<StitchingAppList apps={mockApps} />);
+
+      const renameButton = screen.getByRole("button", { name: /rename markup r-xp/i });
+      await user.click(renameButton);
+
+      expect(mockPush).not.toHaveBeenCalled();
+    });
+
+    it("delete button click opens dialog without navigation", async () => {
+      const user = userEvent.setup();
+      render(<StitchingAppList apps={mockApps} />);
+
+      const deleteButton = screen.getByRole("button", { name: /delete markup r-xp/i });
+      await user.click(deleteButton);
+
+      expect(mockPush).not.toHaveBeenCalled();
+      expect(screen.getByText("Delete Stitching App")).toBeInTheDocument();
+    });
   });
 });
