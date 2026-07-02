@@ -34,7 +34,7 @@ function makeProject(overrides?: Partial<ShoppingCartProject>): ShoppingCartProj
     specialtyCount: 0,
     fabricNeeded: false,
     ...overrides,
-  };
+  } as ShoppingCartProject;
 }
 
 const defaultProps = {

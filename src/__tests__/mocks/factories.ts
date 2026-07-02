@@ -82,7 +82,7 @@ export function createMockSeriesChart(overrides?: Partial<SeriesChart>): SeriesC
     status: null,
     stitchesCompleted: 0,
     ...overrides,
-  };
+  } as SeriesChart;
 }
 
 export function createMockDesignerWithStats(
@@ -113,7 +113,7 @@ export function createMockDesignerChart(overrides?: Partial<DesignerChart>): Des
     stitchesCompleted: 0,
     genres: [],
     ...overrides,
-  };
+  } as DesignerChart;
 }
 
 export function createMockGenre(overrides?: Partial<Genre>): Genre {
@@ -148,7 +148,7 @@ export function createMockGenreChart(overrides?: Partial<GenreChart>): GenreChar
     status: null,
     stitchesCompleted: 0,
     ...overrides,
-  };
+  } as GenreChart;
 }
 
 export function createMockProject(overrides?: Partial<Project>): Project {
@@ -442,7 +442,7 @@ export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): Gal
     seriesName: null,
     dateAdded: new Date("2026-01-15"),
     ...overrides,
-  };
+  } as GalleryCardData;
 }
 
 export function createMockStitchSession(overrides?: Partial<StitchSession>): StitchSession {

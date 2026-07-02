@@ -41,7 +41,7 @@ export const UNASSIGNED_FILTER = "__unassigned__" as const;
 
 // ─── Gallery Card Data ──────────────────────────────────────────────────────
 
-export interface GalleryCardData extends OptionalFocalPoint {
+export type GalleryCardData = OptionalFocalPoint & {
   chartId: string;
   projectId: string | null;
   name: string;
@@ -69,4 +69,4 @@ export interface GalleryCardData extends OptionalFocalPoint {
   seriesId: string | null;
   seriesName: string | null;
   dateAdded: Date;
-}
+};

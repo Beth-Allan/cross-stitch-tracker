@@ -86,7 +86,7 @@ function createMockSpotlight(overrides?: Partial<SpotlightProject>): SpotlightPr
     totalStitches: 34000,
     progressPercent: 42,
     ...overrides,
-  };
+  } as SpotlightProject;
 }
 
 describe("SpotlightCard", () => {

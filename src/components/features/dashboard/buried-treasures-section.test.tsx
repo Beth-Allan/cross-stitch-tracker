@@ -54,7 +54,7 @@ function createTreasure(overrides: Partial<BuriedTreasure> = {}): BuriedTreasure
     focalPointX: null,
     focalPointY: null,
     ...overrides,
-  };
+  } as BuriedTreasure;
 }
 
 const { BuriedTreasuresSection } = await import("./buried-treasures-section");
