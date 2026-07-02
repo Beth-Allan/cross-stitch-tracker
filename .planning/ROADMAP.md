@@ -135,7 +135,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 - [x] **Phase 35: Error Handling & Comment Cleanup** - Fix silent failure patterns and remove comment convention violations (completed 2026-07-01)
 - [x] **Phase 36: Type Safety** - Narrow types, discriminated unions, co-dependent props, controlled-only simplification (completed 2026-07-02)
 - [x] **Phase 37: Test Coverage -- Utilities & Stats** - Fill test gaps for skein calculator, stats actions, calendar, records, completion estimates (completed 2026-07-02)
-- [ ] **Phase 38: Test Coverage -- Components** - Fill test gaps for shopping cart and chart form components
+- [x] **Phase 38: Test Coverage -- Components** - Fill test gaps for shopping cart and chart form components (completed 2026-07-02)
 - [ ] **Phase 39: Accessibility & Performance** - ARIA nested interactive refactor, useMemo optimization, SSR hydration fix
 - [ ] **Phase 40: Visual & Layout Polish** - What's Next styling, focal point gaps, layout/label issues, shopping pill styling
 - [ ] **Phase 41: Series Polish & Bug Fixes** - Series display improvements, designerName bug, fabric matching, stitch hint
@@ -215,11 +215,11 @@ Full details: `milestones/v1.8-ROADMAP.md`
   1. Shopping cart tests cover aggregated quantity distribution across multi-item rows, project accordion expand/collapse, updateSupplyAcquired integration flow, and QuantityControl on-blur commit
   2. Chart form tests cover seriesId appearing in prisma create/update payloads, handleAddSeries empty/whitespace guards, calcParams error rollback paths, updateProjectSettings auth and validation, and .zip file validation
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 **Wave 1** (all parallel)
 
-- [ ] 38-01-PLAN.md — Shopping cart test gaps (aggregated quantity, project accordion, QuantityControl blur, updateSupplyAcquired wiring)
-- [ ] 38-02-PLAN.md — Chart form test gaps (seriesId flow-through, zip validation, calcParams rollback, verify-and-close)
+- [x] 38-01-PLAN.md — Shopping cart test gaps (aggregated quantity, project accordion, QuantityControl blur, updateSupplyAcquired wiring)
+- [x] 38-02-PLAN.md — Chart form test gaps (seriesId flow-through, zip validation, calcParams rollback, verify-and-close)
 
 ### Phase 39: Accessibility & Performance
 
@@ -317,7 +317,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 | 35. Error Handling & Comment Cleanup | v1.9 | 3/3 | Complete    | 2026-07-01 |
 | 36. Type Safety | v1.9 | 3/3 | Complete    | 2026-07-02 |
 | 37. Test Coverage -- Utilities & Stats | v1.9 | 1/1 | Complete    | 2026-07-02 |
-| 38. Test Coverage -- Components | v1.9 | 0/2 | Not started | - |
+| 38. Test Coverage -- Components | v1.9 | 2/2 | Complete   | 2026-07-02 |
 | 39. Accessibility & Performance | v1.9 | 0/0 | Not started | - |
 | 40. Visual & Layout Polish | v1.9 | 0/0 | Not started | - |
 | 41. Series Polish & Bug Fixes | v1.9 | 0/0 | Not started | - |
