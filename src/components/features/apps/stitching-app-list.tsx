@@ -248,7 +248,7 @@ function AppRow({
       <div className="relative z-10 flex shrink-0 items-center gap-1 transition-opacity group-focus-within:opacity-100 md:opacity-0 md:group-hover:opacity-100">
         <button
           type="button"
-          onClick={() => onStartEdit()}
+          onClick={onStartEdit}
           className="text-muted-foreground hover:text-foreground hover:bg-muted flex min-h-11 min-w-11 items-center justify-center rounded-md p-1.5 transition-colors"
           aria-label={`Rename ${app.name}`}
         >
@@ -256,7 +256,7 @@ function AppRow({
         </button>
         <button
           type="button"
-          onClick={() => onDelete()}
+          onClick={onDelete}
           className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex min-h-11 min-w-11 items-center justify-center rounded-md p-1.5 transition-colors"
           aria-label={`Delete ${app.name}`}
         >
