@@ -119,12 +119,12 @@ export function SuppliesTab({ project, supplies, calculator }: SuppliesTabProps)
     }
   }, [serverCalcParams, isPending]);
 
+  const chartId = calculator?.chartId;
   const handleCalcParamsChange = useCallback(
     (newParams: CalcParams) => {
-      if (!calculator) return;
+      if (!chartId) return;
       setCalcParams(newParams);
 
-      // Only persist fields that actually changed
       const persistFields: Partial<Pick<CalcParams, "strandCount" | "overCount" | "wastePercent">> =
         {};
       if (newParams.strandCount !== serverParamsRef.current.strandCount) {
@@ -141,7 +141,7 @@ export function SuppliesTab({ project, supplies, calculator }: SuppliesTabProps)
 
       startTransition(async () => {
         try {
-          const result = await updateProjectSettings(calculator.chartId, persistFields);
+          const result = await updateProjectSettings(chartId, persistFields);
           if (result.success) return;
         } catch (error) {
           console.error("SuppliesTab calc param save failed:", error);
@@ -150,7 +150,7 @@ export function SuppliesTab({ project, supplies, calculator }: SuppliesTabProps)
         toast.error("Couldn't save settings. Please try again.");
       });
     },
-    [calculator],
+    [chartId],
   );
 
   const handleFabricChange = useCallback((fabricId: string | null, fabricCount?: number) => {
