@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, within } from "@/__tests__/test-utils";
+import { render, screen } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { StorageLocationList } from "./storage-location-list";
 import type { StorageLocationWithStats } from "@/types/storage";
@@ -90,14 +90,11 @@ describe("StorageLocationList", () => {
     expect(screen.getByText("Delete Storage Location")).toBeInTheDocument();
   });
 
-  it("clicking a row navigates to /storage/[id]", async () => {
-    const user = userEvent.setup();
+  it("clicking a row navigates to /storage/[id]", () => {
     render(<StorageLocationList locations={mockLocations} />);
 
-    const rows = screen.getAllByRole("button", { name: /navigate to/i });
-    await user.click(rows[0]);
-
-    expect(mockPush).toHaveBeenCalledWith("/storage/loc-1");
+    const link = screen.getByRole("link", { name: /view bin a/i });
+    expect(link).toHaveAttribute("href", "/storage/loc-1");
   });
 
   it("shows empty state when no locations exist", () => {
@@ -109,15 +106,70 @@ describe("StorageLocationList", () => {
     ).toBeInTheDocument();
   });
 
-  it("pencil click calls e.stopPropagation (doesn't navigate)", async () => {
+  it("pencil click enters edit mode without navigating", async () => {
     const user = userEvent.setup();
     render(<StorageLocationList locations={mockLocations} />);
 
     const renameButton = screen.getByRole("button", { name: /rename bin a/i });
     await user.click(renameButton);
 
-    // Should enter edit mode, not navigate
     expect(mockPush).not.toHaveBeenCalled();
     expect(screen.getByRole("textbox")).toBeInTheDocument();
+  });
+
+  describe("ARIA compliance", () => {
+    it("does not render role='button' on the card container", () => {
+      render(<StorageLocationList locations={mockLocations} />);
+
+      const buttonRoles = screen.queryAllByRole("button");
+      const cardButtons = buttonRoles.filter((el) =>
+        el.getAttribute("aria-label")?.startsWith("Navigate to"),
+      );
+      expect(cardButtons).toHaveLength(0);
+    });
+
+    it("contains a Link with href='/storage/{id}' and visually hidden 'View {name}' text", () => {
+      render(<StorageLocationList locations={mockLocations} />);
+
+      const link = screen.getByRole("link", { name: /view bin a/i });
+      expect(link).toHaveAttribute("href", "/storage/loc-1");
+
+      const srText = link.querySelector(".sr-only");
+      expect(srText).toHaveTextContent("View Bin A");
+    });
+
+    it("contains no nested interactive elements (no button inside a link)", () => {
+      render(<StorageLocationList locations={mockLocations} />);
+
+      const links = screen.getAllByRole("link");
+      const buttons = screen.getAllByRole("button");
+
+      for (const link of links) {
+        for (const button of buttons) {
+          expect(link.contains(button)).toBe(false);
+        }
+      }
+    });
+
+    it("edit button click does not trigger navigation", async () => {
+      const user = userEvent.setup();
+      render(<StorageLocationList locations={mockLocations} />);
+
+      const renameButton = screen.getByRole("button", { name: /rename bin a/i });
+      await user.click(renameButton);
+
+      expect(mockPush).not.toHaveBeenCalled();
+    });
+
+    it("delete button click opens dialog without navigation", async () => {
+      const user = userEvent.setup();
+      render(<StorageLocationList locations={mockLocations} />);
+
+      const deleteButton = screen.getByRole("button", { name: /delete bin a/i });
+      await user.click(deleteButton);
+
+      expect(mockPush).not.toHaveBeenCalled();
+      expect(screen.getByText("Delete Storage Location")).toBeInTheDocument();
+    });
   });
 });

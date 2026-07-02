@@ -1,11 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@/__tests__/test-utils";
+import { render, screen, waitFor } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { ShoppingCart } from "./shopping-cart";
+import { updateSupplyAcquired } from "@/lib/actions/shopping-cart-actions";
+import { toast } from "sonner";
 import type { ShoppingCartData } from "@/types/dashboard";
 
 vi.mock("@/lib/actions/shopping-cart-actions", () => ({
   updateSupplyAcquired: vi.fn().mockResolvedValue({ success: true }),
+}));
+
+vi.mock("sonner", () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
 }));
 
 let localStore: Record<string, string> = {};
@@ -401,6 +407,65 @@ describe("ShoppingCart", () => {
       expect(pill).toBeTruthy();
       expect(pill?.className).toContain("border");
       expect(pill?.className).toContain("border-selected-border");
+    });
+  });
+
+  describe("updateSupplyAcquired integration", () => {
+    beforeEach(() => {
+      vi.mocked(updateSupplyAcquired).mockClear();
+      vi.mocked(toast.success).mockClear();
+      vi.mocked(toast.error).mockClear();
+    });
+
+    it("increment in By Supply Type view calls updateSupplyAcquired", async () => {
+      localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
+      vi.mocked(updateSupplyAcquired).mockResolvedValue({ success: true });
+      const user = userEvent.setup();
+      render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+      await user.click(screen.getByText("By Supply Type"));
+
+      const incrementButtons = screen.getAllByRole("button", { name: "Increment quantity" });
+      await user.click(incrementButtons[0]);
+
+      await waitFor(() => {
+        expect(updateSupplyAcquired).toHaveBeenCalledWith("thread", "jt1", 2);
+      });
+    });
+
+    it("successful update shows toast.success", async () => {
+      localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
+      vi.mocked(updateSupplyAcquired).mockResolvedValue({ success: true });
+      const user = userEvent.setup();
+      render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+      await user.click(screen.getByText("By Supply Type"));
+
+      const incrementButtons = screen.getAllByRole("button", { name: "Increment quantity" });
+      await user.click(incrementButtons[0]);
+
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith("Supply quantity updated");
+      });
+    });
+
+    it("failed update shows toast.error", async () => {
+      localStore["shopping-cart-selected-projects"] = JSON.stringify(["p1"]);
+      vi.mocked(updateSupplyAcquired).mockResolvedValue({
+        success: false,
+        error: "DB error",
+      });
+      const user = userEvent.setup();
+      render(<ShoppingCart data={mockData} imageUrls={{}} />);
+
+      await user.click(screen.getByText("By Supply Type"));
+
+      const incrementButtons = screen.getAllByRole("button", { name: "Increment quantity" });
+      await user.click(incrementButtons[0]);
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith("DB error");
+      });
     });
   });
 });

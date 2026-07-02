@@ -20,7 +20,7 @@ export type SupplySortOption = (typeof SUPPLY_SORT_OPTIONS)[number];
 
 export interface CalculatorSettings {
   strandCount: StrandCount;
-  overCount: 1 | 2; // over 1 or over 2
+  overCount: 1 | 2;
   fabricCount: number; // from linked fabric or default 14
   wastePercent: number; // 0-50
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search, Grid3X3, List, Plus, CircleDot, Gem, Sparkles, Tags } from "lucide-react";
 import { toast } from "sonner";
@@ -186,27 +186,32 @@ export function SupplyCatalog({
   const searchParams = useSearchParams();
   const [activeTab, setActiveTabRaw] = useState<SupplyTab>("threads");
 
-  // Initialize view modes synchronously from localStorage to prevent flash
   const [viewModes, setViewModes] = useState<Record<SupplyTab, ViewMode>>(() => {
     const modes = { ...DEFAULT_VIEWS };
     if (initialView) {
       modes.threads = initialView;
     }
-    if (typeof window !== "undefined") {
-      try {
-        for (const tab of TAB_CONFIG) {
-          if (tab.key === "threads" && initialView) continue;
-          const stored = localStorage.getItem(STORAGE_KEYS[tab.key]);
-          if (stored === "grid" || stored === "table") {
-            modes[tab.key] = stored;
-          }
-        }
-      } catch (error) {
-        console.error("Load supply view modes failed:", error);
-      }
-    }
     return modes;
   });
+
+  useEffect(() => {
+    try {
+      const updates: Partial<Record<SupplyTab, ViewMode>> = {};
+      for (const tab of TAB_CONFIG) {
+        if (tab.key === "threads" && initialView) continue;
+        const stored = localStorage.getItem(STORAGE_KEYS[tab.key]);
+        if (stored === "grid" || stored === "table") {
+          updates[tab.key] = stored;
+        }
+      }
+      if (Object.keys(updates).length > 0) {
+        setViewModes((prev) => ({ ...prev, ...updates }));
+      }
+    } catch (error) {
+      console.error("Load supply view modes failed:", error);
+    }
+  }, [initialView]);
+
   const [search, setSearch] = useState("");
   const [colorFamilyFilter, setColorFamilyFilter] = useState<ColorFamily | "">("");
   const [brandFilter, setBrandFilter] = useState<string>("");

@@ -119,6 +119,34 @@ describe("ChartFileUpload", () => {
     expect(onFilesChange).not.toHaveBeenCalled();
   });
 
+  it("accepts .zip file and triggers upload", async () => {
+    const onFilesChange = vi.fn();
+    mockGetPresignedUploadUrl.mockResolvedValue({
+      success: true as const,
+      url: "https://r2.example.com/presigned",
+      key: "files/unsaved/abc-patterns.zip",
+    });
+
+    render(<ChartFileUpload uploadedFiles={[]} onFilesChange={onFilesChange} />);
+
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(["zip-content"], "patterns.zip", { type: "application/zip" });
+    Object.defineProperty(file, "size", { value: 5000 });
+
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(onFilesChange).toHaveBeenCalledWith([
+        {
+          key: "files/unsaved/abc-patterns.zip",
+          filename: "patterns.zip",
+          mimeType: "application/zip",
+          fileSize: 5000,
+        },
+      ]);
+    });
+  });
+
   it("allows removing an uploaded file from the list", () => {
     const onFilesChange = vi.fn();
     const files = [

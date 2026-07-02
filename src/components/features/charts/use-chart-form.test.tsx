@@ -228,6 +228,26 @@ describe("useChartForm inline entity creation", () => {
       ).rejects.toThrow("Already exists");
     });
 
+    it("does not call server action when name is empty", async () => {
+      const { result } = renderHook(() => useChartForm(defaultProps));
+
+      await act(async () => {
+        await result.current.handleAddSeries("");
+      });
+
+      expect(createSeries).not.toHaveBeenCalled();
+    });
+
+    it("does not call server action when name is whitespace only", async () => {
+      const { result } = renderHook(() => useChartForm(defaultProps));
+
+      await act(async () => {
+        await result.current.handleAddSeries("   ");
+      });
+
+      expect(createSeries).not.toHaveBeenCalled();
+    });
+
     it("passes designerId: null when no designer selected", async () => {
       (createSeries as Mock).mockResolvedValue({
         success: true,

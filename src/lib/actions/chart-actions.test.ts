@@ -218,6 +218,135 @@ describe("createChartWithSupplies", () => {
   });
 });
 
+describe("seriesId flow-through", () => {
+  const validChartInput = {
+    chart: {
+      name: "Test Chart",
+      designerId: null,
+      coverImageUrl: null,
+      coverThumbnailUrl: null,
+      stitchCount: 5000,
+      stitchCountApproximate: false,
+      stitchesWide: 100,
+      stitchesHigh: 50,
+      genreIds: [],
+      isPaperChart: false,
+      isFormalKit: false,
+      isSAL: false,
+      kitColorCount: null,
+      notes: null,
+    },
+    project: {
+      status: "UNSTARTED" as const,
+      storageLocationId: null,
+      stitchingAppId: null,
+      fabricId: null,
+      needsOnionSkinning: false,
+      startDate: null,
+      finishDate: null,
+      ffoDate: null,
+      wantToStartNext: false,
+      preferredStartSeason: null,
+      startingStitches: 0,
+    },
+  };
+
+  beforeEach(async () => {
+    vi.resetAllMocks();
+    const auth = await import("@/lib/auth");
+    (auth.auth as ReturnType<typeof vi.fn>).mockResolvedValue({
+      user: { id: "user-1", email: "test@test.com" },
+    });
+  });
+
+  it("includes seriesId in create payload when provided", async () => {
+    const inputWithSeries = {
+      ...validChartInput,
+      chart: { ...validChartInput.chart, seriesId: "series-1" },
+    };
+    const createdChart = {
+      id: "chart-new",
+      project: { id: "proj-new" },
+      designer: null,
+      genres: [],
+    };
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: unknown) => Promise<unknown>) => {
+        mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
+        return fn(mockPrisma);
+      },
+    );
+
+    const { createChartWithSupplies } = await import("./chart-actions");
+    const result = await createChartWithSupplies(inputWithSeries, {});
+
+    assertSuccess(result);
+    expect(mockPrisma.chart.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ seriesId: "series-1" }),
+      }),
+    );
+  });
+
+  it("includes null seriesId in create payload when not provided", async () => {
+    const createdChart = {
+      id: "chart-new",
+      project: { id: "proj-new" },
+      designer: null,
+      genres: [],
+    };
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: unknown) => Promise<unknown>) => {
+        mockPrisma.chart.create.mockResolvedValueOnce(createdChart);
+        return fn(mockPrisma);
+      },
+    );
+
+    const { createChartWithSupplies } = await import("./chart-actions");
+    const result = await createChartWithSupplies(validChartInput, {});
+
+    assertSuccess(result);
+    expect(mockPrisma.chart.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ seriesId: null }),
+      }),
+    );
+  });
+
+  it("includes seriesId in update payload when provided", async () => {
+    const inputWithSeries = {
+      ...validChartInput,
+      chart: { ...validChartInput.chart, seriesId: "series-1" },
+    };
+
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({
+      coverImageUrl: null,
+      coverThumbnailUrl: null,
+      project: { id: "proj-1", userId: "user-1" },
+    });
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: unknown) => Promise<unknown>) => {
+        mockPrisma.chart.update.mockResolvedValueOnce({
+          id: "chart-1",
+          project: { id: "proj-1" },
+        });
+        mockPrisma.fabric.findUnique.mockResolvedValueOnce(null);
+        return fn(mockPrisma);
+      },
+    );
+
+    const { updateChart } = await import("./chart-actions");
+    const result = await updateChart("chart-1", inputWithSeries);
+
+    assertSuccess(result);
+    expect(mockPrisma.chart.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ seriesId: "series-1" }),
+      }),
+    );
+  });
+});
+
 describe("updateChartStatus cache invalidation", () => {
   beforeEach(async () => {
     vi.resetAllMocks();

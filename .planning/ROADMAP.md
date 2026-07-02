@@ -134,9 +134,9 @@ Full details: `milestones/v1.8-ROADMAP.md`
 
 - [x] **Phase 35: Error Handling & Comment Cleanup** - Fix silent failure patterns and remove comment convention violations (completed 2026-07-01)
 - [x] **Phase 36: Type Safety** - Narrow types, discriminated unions, co-dependent props, controlled-only simplification (completed 2026-07-02)
-- [ ] **Phase 37: Test Coverage -- Utilities & Stats** - Fill test gaps for skein calculator, stats actions, calendar, records, completion estimates
-- [ ] **Phase 38: Test Coverage -- Components** - Fill test gaps for shopping cart and chart form components
-- [ ] **Phase 39: Accessibility & Performance** - ARIA nested interactive refactor, useMemo optimization, SSR hydration fix
+- [x] **Phase 37: Test Coverage -- Utilities & Stats** - Fill test gaps for skein calculator, stats actions, calendar, records, completion estimates (completed 2026-07-02)
+- [x] **Phase 38: Test Coverage -- Components** - Fill test gaps for shopping cart and chart form components (completed 2026-07-02)
+- [x] **Phase 39: Accessibility & Performance** - ARIA nested interactive refactor, useMemo optimization, SSR hydration fix (completed 2026-07-02)
 - [ ] **Phase 40: Visual & Layout Polish** - What's Next styling, focal point gaps, layout/label issues, shopping pill styling
 - [ ] **Phase 41: Series Polish & Bug Fixes** - Series display improvements, designerName bug, fabric matching, stitch hint
 
@@ -200,7 +200,10 @@ Full details: `milestones/v1.8-ROADMAP.md`
   4. Record-detection tests cover two sessions on the same day with identical stitch counts
   5. Completion-estimate tests verify projects with stitchesCompleted >= totalStitches are excluded
 
-**Plans**: TBD
+**Plans**: 1 plan
+**Wave 1**
+
+- [x] 37-01-PLAN.md — Verify existing test coverage and close backlog items
 
 ### Phase 38: Test Coverage -- Components
 
@@ -212,7 +215,11 @@ Full details: `milestones/v1.8-ROADMAP.md`
   1. Shopping cart tests cover aggregated quantity distribution across multi-item rows, project accordion expand/collapse, updateSupplyAcquired integration flow, and QuantityControl on-blur commit
   2. Chart form tests cover seriesId appearing in prisma create/update payloads, handleAddSeries empty/whitespace guards, calcParams error rollback paths, updateProjectSettings auth and validation, and .zip file validation
 
-**Plans**: TBD
+**Plans:** 2/2 plans complete
+**Wave 1** (all parallel)
+
+- [x] 38-01-PLAN.md — Shopping cart test gaps (aggregated quantity, project accordion, QuantityControl blur, updateSupplyAcquired wiring)
+- [x] 38-02-PLAN.md — Chart form test gaps (seriesId flow-through, zip validation, calcParams rollback, verify-and-close)
 
 ### Phase 39: Accessibility & Performance
 
@@ -225,7 +232,12 @@ Full details: `milestones/v1.8-ROADMAP.md`
   2. SupplyOverview aggregation and filtering results are memoized via useMemo, recomputing only when source data changes
   3. Supply catalog initial load produces no React hydration mismatch warnings in the browser console
 
-**Plans**: TBD
+**Plans**: 2 plans
+**Wave 1** (all parallel)
+
+- [x] 39-01-PLAN.md — Card row ARIA refactor (stretched link pattern for storage/app rows)
+- [x] 39-02-PLAN.md — Performance & SSR fixes (useMemo aggregation, hydration-safe view modes)
+
 **UI hint**: yes
 
 ### Phase 40: Visual & Layout Polish
@@ -240,7 +252,10 @@ Full details: `milestones/v1.8-ROADMAP.md`
   3. Shopping-for pills use squared-off chip styling with borders (matching mockup), not full-round pills
   4. Chart form has no unexplained gap above breadcrumb/SummaryBar, InlineCreateDialog labels are contextualized per supply type, and supplies page has no first-load view flash
 
-**Plans**: TBD
+**Plans**: 1 plan
+**Wave 1**
+
+- [ ] 37-01-PLAN.md — Verify existing test coverage and close backlog items
 **UI hint**: yes
 
 ### Phase 41: Series Polish & Bug Fixes
@@ -256,7 +271,10 @@ Full details: `milestones/v1.8-ROADMAP.md`
   4. Fabric Requirements tab matches projects without assigned fabric (null fabricCount no longer short-circuits matching)
   5. Supply stitch total hint is visible outside Details mode -- shown in SummaryBar or supply mode footer
 
-**Plans**: TBD
+**Plans**: 1 plan
+**Wave 1**
+
+- [ ] 37-01-PLAN.md — Verify existing test coverage and close backlog items
 **UI hint**: yes
 
 ## Progress
@@ -300,8 +318,8 @@ Full details: `milestones/v1.8-ROADMAP.md`
 | 34. Browse & Pattern Dive Integration | v1.8 | 3/3 | Complete | 2026-07-01 |
 | 35. Error Handling & Comment Cleanup | v1.9 | 3/3 | Complete    | 2026-07-01 |
 | 36. Type Safety | v1.9 | 3/3 | Complete    | 2026-07-02 |
-| 37. Test Coverage -- Utilities & Stats | v1.9 | 0/0 | Not started | - |
-| 38. Test Coverage -- Components | v1.9 | 0/0 | Not started | - |
-| 39. Accessibility & Performance | v1.9 | 0/0 | Not started | - |
+| 37. Test Coverage -- Utilities & Stats | v1.9 | 1/1 | Complete    | 2026-07-02 |
+| 38. Test Coverage -- Components | v1.9 | 2/2 | Complete    | 2026-07-02 |
+| 39. Accessibility & Performance | v1.9 | 2/2 | Complete   | 2026-07-02 |
 | 40. Visual & Layout Polish | v1.9 | 0/0 | Not started | - |
 | 41. Series Polish & Bug Fixes | v1.9 | 0/0 | Not started | - |

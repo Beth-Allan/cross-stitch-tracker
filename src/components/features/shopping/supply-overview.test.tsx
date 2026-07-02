@@ -338,4 +338,174 @@ describe("SupplyOverview", () => {
       expect(screen.getByText(/Project A, Project B/)).toBeInTheDocument();
     });
   });
+
+  describe("Aggregated quantity distribution", () => {
+    const defaultSupplyProps = {
+      beads: [] as ShoppingSupplyNeed[],
+      specialty: [] as ShoppingSupplyNeed[],
+      fabrics: [],
+      pendingIds: new Set<string>(),
+      failedIds: new Set<string>(),
+      supplySearchQuery: "",
+      onSupplySearchChange: vi.fn(),
+    };
+
+    it("increment on multi-item supply allocates to first item with capacity", async () => {
+      const onUpdateAcquired = vi.fn();
+      const user = userEvent.setup();
+      const threads = [
+        createMockSupplyNeed({
+          supplyId: "shared-1",
+          junctionId: "j-a",
+          projectId: "p1",
+          projectName: "Project A",
+          quantityRequired: 3,
+          quantityAcquired: 1,
+        }),
+        createMockSupplyNeed({
+          supplyId: "shared-1",
+          junctionId: "j-b",
+          projectId: "p2",
+          projectName: "Project B",
+          quantityRequired: 2,
+          quantityAcquired: 0,
+        }),
+      ];
+
+      render(
+        <SupplyOverview
+          {...defaultSupplyProps}
+          threads={threads}
+          onUpdateAcquired={onUpdateAcquired}
+        />,
+      );
+
+      const incrementBtn = screen.getByRole("button", { name: "Increment quantity" });
+      await user.click(incrementBtn);
+
+      expect(onUpdateAcquired).toHaveBeenCalledTimes(1);
+      expect(onUpdateAcquired).toHaveBeenCalledWith("thread", "j-a", 2);
+    });
+
+    it("decrement on multi-item supply deducts from first item with acquired > 0", async () => {
+      const onUpdateAcquired = vi.fn();
+      const user = userEvent.setup();
+      const threads = [
+        createMockSupplyNeed({
+          supplyId: "shared-1",
+          junctionId: "j-a",
+          projectId: "p1",
+          projectName: "Project A",
+          quantityRequired: 3,
+          quantityAcquired: 2,
+        }),
+        createMockSupplyNeed({
+          supplyId: "shared-1",
+          junctionId: "j-b",
+          projectId: "p2",
+          projectName: "Project B",
+          quantityRequired: 2,
+          quantityAcquired: 1,
+        }),
+      ];
+
+      render(
+        <SupplyOverview
+          {...defaultSupplyProps}
+          threads={threads}
+          onUpdateAcquired={onUpdateAcquired}
+        />,
+      );
+
+      const decrementBtn = screen.getByRole("button", { name: "Decrement quantity" });
+      await user.click(decrementBtn);
+
+      expect(onUpdateAcquired).toHaveBeenCalledTimes(1);
+      expect(onUpdateAcquired).toHaveBeenCalledWith("thread", "j-a", 1);
+    });
+
+    it("single-item supply calls onUpdateAcquired directly with junction ID", async () => {
+      const onUpdateAcquired = vi.fn();
+      const user = userEvent.setup();
+      const threads = [
+        createMockSupplyNeed({
+          supplyId: "solo-1",
+          junctionId: "j-single",
+          quantityRequired: 3,
+          quantityAcquired: 1,
+        }),
+      ];
+
+      render(
+        <SupplyOverview
+          {...defaultSupplyProps}
+          threads={threads}
+          onUpdateAcquired={onUpdateAcquired}
+        />,
+      );
+
+      const incrementBtn = screen.getByRole("button", { name: "Increment quantity" });
+      await user.click(incrementBtn);
+
+      expect(onUpdateAcquired).toHaveBeenCalledTimes(1);
+      expect(onUpdateAcquired).toHaveBeenCalledWith("thread", "j-single", 2);
+    });
+  });
+
+  describe("Memoization", () => {
+    const baseProps = {
+      beads: [] as ShoppingSupplyNeed[],
+      specialty: [] as ShoppingSupplyNeed[],
+      fabrics: [],
+      onUpdateAcquired: vi.fn(),
+      pendingIds: new Set<string>(),
+      failedIds: new Set<string>(),
+      supplySearchQuery: "",
+      onSupplySearchChange: vi.fn(),
+    };
+
+    it("re-render with changed pendingIds does not recompute aggregation", () => {
+      const threads = [
+        createMockSupplyNeed({ supplyId: "s-1", junctionId: "j-1", code: "310" }),
+        createMockSupplyNeed({
+          supplyId: "s-2",
+          junctionId: "j-2",
+          code: "321",
+          colorName: "Red",
+          hexColor: "#cc0000",
+        }),
+      ];
+
+      const { rerender } = render(<SupplyOverview {...baseProps} threads={threads} />);
+
+      expect(screen.getByText("Threads")).toBeInTheDocument();
+      expect(screen.getByText(/2 types/)).toBeInTheDocument();
+
+      rerender(<SupplyOverview {...baseProps} threads={threads} pendingIds={new Set(["j-1"])} />);
+
+      expect(screen.getByText(/2 types/)).toBeInTheDocument();
+    });
+
+    it("re-render with changed threads array updates aggregation", () => {
+      const oneThread = [createMockSupplyNeed({ supplyId: "s-1", junctionId: "j-1", code: "310" })];
+      const twoThreads = [
+        ...oneThread,
+        createMockSupplyNeed({
+          supplyId: "s-2",
+          junctionId: "j-2",
+          code: "321",
+          colorName: "Red",
+          hexColor: "#cc0000",
+        }),
+      ];
+
+      const { rerender } = render(<SupplyOverview {...baseProps} threads={oneThread} />);
+
+      expect(screen.getByText(/1 type[^s]/)).toBeInTheDocument();
+
+      rerender(<SupplyOverview {...baseProps} threads={twoThreads} />);
+
+      expect(screen.getByText(/2 types/)).toBeInTheDocument();
+    });
+  });
 });

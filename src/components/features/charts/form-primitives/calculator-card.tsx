@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { SearchableSelect } from "./searchable-select";
 import { EditableNumber } from "@/components/features/charts/editable-number";
 import type { CalcParams, FabricOption } from "@/components/features/supply-table/types";
+import { isStrandCount } from "@/types/supply";
 
 interface CalculatorCardProps {
   calcParams: CalcParams;
@@ -38,7 +39,9 @@ export function CalculatorCard({
 
   const handleStrandsChange = useCallback(
     (value: number) => {
-      onCalcParamsChange({ ...calcParams, strandCount: value as CalcParams["strandCount"] });
+      if (isStrandCount(value)) {
+        onCalcParamsChange({ ...calcParams, strandCount: value });
+      }
     },
     [calcParams, onCalcParamsChange],
   );

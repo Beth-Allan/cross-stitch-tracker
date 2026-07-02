@@ -25,7 +25,7 @@ export function calculateSkeins(params: {
   stitchCount: number;
   strandCount: StrandCount;
   fabricCount: number; // stitches per inch (e.g., 14, 16, 18)
-  overCount: 1 | 2; // over 1 or over 2
+  overCount: 1 | 2;
   wastePercent: number; // 0-50, default 20
 }): number {
   const { stitchCount, strandCount, fabricCount, overCount, wastePercent } = params;
