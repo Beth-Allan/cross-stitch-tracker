@@ -3,6 +3,7 @@ import type {
   ProjectThreadWithThread,
   ProjectBeadWithBead,
   ProjectSpecialtyWithItem,
+  StrandCount,
 } from "@/types/supply";
 
 // ─── Tab Navigation ────────────────────────────────────────────────────────
@@ -18,7 +19,7 @@ export type SupplySortOption = (typeof SUPPLY_SORT_OPTIONS)[number];
 // ─── Calculator Settings ───────────────────────────────────────────────────
 
 export interface CalculatorSettings {
-  strandCount: number; // 1-6
+  strandCount: StrandCount;
   overCount: 1 | 2; // over 1 or over 2
   fabricCount: number; // from linked fabric or default 14
   wastePercent: number; // 0-50

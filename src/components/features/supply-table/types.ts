@@ -6,11 +6,13 @@
  * creation-flow adapters).
  */
 
+import type { StrandCount } from "@/types/supply";
+
 export type SupplyType = "THREAD" | "BEAD" | "SPECIALTY";
 
 export interface CalcParams {
   fabricCount: number; // default 14
-  strandCount: 1 | 2 | 3 | 4 | 5 | 6; // default 2
+  strandCount: StrandCount; // default 2
   overCount: 1 | 2; // default 1
   wastePercent: number; // default 20
 }

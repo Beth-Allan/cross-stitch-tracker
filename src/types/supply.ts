@@ -36,6 +36,14 @@ export type ProjectSpecialtyWithItem = ProjectSpecialty & {
   specialtyItem: SpecialtyItemWithBrand;
 };
 
+/** Valid strand counts for cross-stitch (1-6 strands of floss). */
+export type StrandCount = 1 | 2 | 3 | 4 | 5 | 6;
+
+/** Type guard that validates a number is a valid StrandCount (integer 1-6). */
+export function isStrandCount(value: number): value is StrandCount {
+  return Number.isInteger(value) && value >= 1 && value <= 6;
+}
+
 export const COLOR_FAMILIES: ColorFamily[] = [
   "BLACK",
   "WHITE",
