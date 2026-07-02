@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Plus, Tablet, Pencil, Trash2, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -104,7 +105,7 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
                 projectCount: app.projectCount,
               })
             }
-            onNavigate={() => router.push(`/apps/${app.id}`)}
+            href={`/apps/${app.id}`}
           />
         ))}
 
@@ -205,7 +206,7 @@ function AppRow({
   onRename,
   onCancelEdit,
   onDelete,
-  onNavigate,
+  href,
 }: {
   app: StitchingAppWithStats;
   isEditing: boolean;
@@ -213,7 +214,7 @@ function AppRow({
   onRename: (newName: string) => Promise<void>;
   onCancelEdit: () => void;
   onDelete: () => void;
-  onNavigate: () => void;
+  href: string;
 }) {
   const projectCount = app.projectCount;
 
@@ -226,20 +227,11 @@ function AppRow({
   }
 
   return (
-    <div
-      role="button"
-      aria-label={`Navigate to ${app.name}`}
-      tabIndex={0}
-      onClick={onNavigate}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          if (e.target instanceof HTMLElement && e.target.closest("button")) return;
-          e.preventDefault();
-          onNavigate();
-        }
-      }}
-      className="group border-border bg-card hover:border-border/80 flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 shadow-sm transition-[box-shadow,border-color] hover:shadow-md"
-    >
+    <div className="group border-border bg-card hover:border-border/80 relative flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 shadow-sm transition-[box-shadow,border-color] hover:shadow-md">
+      <Link href={href} className="absolute inset-0 z-0">
+        <span className="sr-only">View {app.name}</span>
+      </Link>
+
       <div className="bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
         <Tablet className="text-muted-foreground h-4 w-4" />
       </div>
@@ -253,13 +245,10 @@ function AppRow({
         </p>
       </div>
 
-      <div className="flex shrink-0 items-center gap-1 transition-opacity group-focus-within:opacity-100 md:opacity-0 md:group-hover:opacity-100">
+      <div className="relative z-10 flex shrink-0 items-center gap-1 transition-opacity group-focus-within:opacity-100 md:opacity-0 md:group-hover:opacity-100">
         <button
           type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onStartEdit();
-          }}
+          onClick={() => onStartEdit()}
           className="text-muted-foreground hover:text-foreground hover:bg-muted flex min-h-11 min-w-11 items-center justify-center rounded-md p-1.5 transition-colors"
           aria-label={`Rename ${app.name}`}
         >
@@ -267,10 +256,7 @@ function AppRow({
         </button>
         <button
           type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
+          onClick={() => onDelete()}
           className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex min-h-11 min-w-11 items-center justify-center rounded-md p-1.5 transition-colors"
           aria-label={`Delete ${app.name}`}
         >
