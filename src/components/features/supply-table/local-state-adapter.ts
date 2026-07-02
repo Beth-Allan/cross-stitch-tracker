@@ -118,7 +118,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
   async updateQuantity(
     type: SupplyType,
     junctionId: string,
-    field: string,
+    field: "stitchCount" | "need" | "have",
     value: number,
   ): Promise<Result> {
     const map = this.getMap(type);
@@ -126,9 +126,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
     if (!row) {
       return { success: false, error: "Supply not found" };
     }
-    if (field in row) {
-      (row as unknown as Record<string, unknown>)[field] = value;
-    }
+    row[field] = value;
     return { success: true };
   }
 
