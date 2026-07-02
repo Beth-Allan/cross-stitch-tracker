@@ -136,7 +136,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 - [x] **Phase 36: Type Safety** - Narrow types, discriminated unions, co-dependent props, controlled-only simplification (completed 2026-07-02)
 - [x] **Phase 37: Test Coverage -- Utilities & Stats** - Fill test gaps for skein calculator, stats actions, calendar, records, completion estimates (completed 2026-07-02)
 - [x] **Phase 38: Test Coverage -- Components** - Fill test gaps for shopping cart and chart form components (completed 2026-07-02)
-- [ ] **Phase 39: Accessibility & Performance** - ARIA nested interactive refactor, useMemo optimization, SSR hydration fix
+- [x] **Phase 39: Accessibility & Performance** - ARIA nested interactive refactor, useMemo optimization, SSR hydration fix (completed 2026-07-02)
 - [ ] **Phase 40: Visual & Layout Polish** - What's Next styling, focal point gaps, layout/label issues, shopping pill styling
 - [ ] **Phase 41: Series Polish & Bug Fixes** - Series display improvements, designerName bug, fabric matching, stitch hint
 
@@ -235,8 +235,8 @@ Full details: `milestones/v1.8-ROADMAP.md`
 **Plans**: 2 plans
 **Wave 1** (all parallel)
 
-- [ ] 39-01-PLAN.md — Card row ARIA refactor (stretched link pattern for storage/app rows)
-- [ ] 39-02-PLAN.md — Performance & SSR fixes (useMemo aggregation, hydration-safe view modes)
+- [x] 39-01-PLAN.md — Card row ARIA refactor (stretched link pattern for storage/app rows)
+- [x] 39-02-PLAN.md — Performance & SSR fixes (useMemo aggregation, hydration-safe view modes)
 
 **UI hint**: yes
 
@@ -320,6 +320,6 @@ Full details: `milestones/v1.8-ROADMAP.md`
 | 36. Type Safety | v1.9 | 3/3 | Complete    | 2026-07-02 |
 | 37. Test Coverage -- Utilities & Stats | v1.9 | 1/1 | Complete    | 2026-07-02 |
 | 38. Test Coverage -- Components | v1.9 | 2/2 | Complete    | 2026-07-02 |
-| 39. Accessibility & Performance | v1.9 | 0/2 | In progress | - |
+| 39. Accessibility & Performance | v1.9 | 2/2 | Complete   | 2026-07-02 |
 | 40. Visual & Layout Polish | v1.9 | 0/0 | Not started | - |
 | 41. Series Polish & Bug Fixes | v1.9 | 0/0 | Not started | - |
