@@ -427,20 +427,19 @@ describe("SuppliesTab", () => {
   });
 
   describe("CalculatorCard integration", () => {
-    it("renders CalculatorCard when fabricOptions and chartId are provided", () => {
+    it("renders CalculatorCard when calculator prop is provided", () => {
       render(
         <SuppliesTab
           project={defaultProject}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
-          fabricOptions={[]}
-          chartId="test-chart-id"
+          calculator={{ fabricOptions: [], chartId: "test-chart-id" }}
         />,
       );
       expect(screen.getByTestId("calculator-card")).toBeInTheDocument();
       expect(screen.getByText("Skein Calculator")).toBeInTheDocument();
     });
 
-    it("does not render CalculatorCard when fabricOptions is not provided", () => {
+    it("does not render CalculatorCard when calculator prop is not provided", () => {
       render(
         <SuppliesTab
           project={defaultProject}
@@ -462,8 +461,10 @@ describe("SuppliesTab", () => {
         <SuppliesTab
           project={customProject}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
-          fabricOptions={[{ value: "fab-1", label: "Zweigart Aida (18ct)", count: 18 }]}
-          chartId="test-chart-id"
+          calculator={{
+            fabricOptions: [{ value: "fab-1", label: "Zweigart Aida (18ct)", count: 18 }],
+            chartId: "test-chart-id",
+          }}
         />,
       );
       expect(screen.getByTestId("calc-strands")).toHaveTextContent("3");
@@ -481,8 +482,7 @@ describe("SuppliesTab", () => {
         <SuppliesTab
           project={defaultProject}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
-          fabricOptions={fabricOptions}
-          chartId="test-chart-id"
+          calculator={{ fabricOptions, chartId: "test-chart-id" }}
         />,
       );
       expect(screen.getByTestId("calc-fabric-options")).toHaveTextContent("2");
