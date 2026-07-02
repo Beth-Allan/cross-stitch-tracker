@@ -255,10 +255,17 @@
   - Code review: WR-02 dead types removed, IN-01 import placement fixed, CR-01 accepted as backlog 999.90
   - Backlogged: 999.90 (test factory OptionalFocalPoint enforcement)
 
+- **Phase 37 verified & closed** — 150 tests across 6 files, all 5 success criteria confirmed, 5 backlog items closed
+  - SC-1: skein-calculator fabricCount=0 (line 157) + resolveDefaultBrandId (3 tests, line 1359)
+  - SC-2: stats-actions auth rejection (3 functions) + Zod boundaries (year 2019/2101, month 0/13)
+  - SC-3: calendar year-rollover Jan-to-Dec (line 174) + Dec-to-Jan (line 189)
+  - SC-4: record-detection duplicate stitch counts (line 218)
+  - SC-5: completion-estimates equals + exceeds totalStitches exclusion (lines 171, 196)
+  - Backlog closed: 999.0.24, 999.24, 999.27, 999.38, 999.39
+
 ### Next Up — RESUME HERE
 
-1. Review/merge PR #64, then switch back to `main`
-2. `/gsd-discuss-phase 37` — Gather context for Phase 37 (Test Coverage — Utilities & Stats)
+1. `/gsd-discuss-phase 38` — Gather context for Phase 38
 
 ### Backlog
 
@@ -275,7 +282,7 @@
 - ~~999.0.21: EditableNumber invalid input feedback — visual indication when entry is rejected~~ — **Shipped in Phase 26**
 - 999.0.22: Clean up planning doc references in code comments
 - 999.0.23: Narrow strandCount type to literal union (1-6)
-- 999.0.24: Add skein calculator edge case tests (fabricCount=0, resolveDefaultBrandId)
+- ~~**999.0.24: Add skein calculator edge case tests (fabricCount=0, resolveDefaultBrandId)**~~ -- **Shipped in Phase 37**
 - 999.1: Supply detail modal (read-only view with "used in projects" list)
 - 999.2: Bulk supply editor
 - 999.3: Fabric type hierarchy (replace flat dropdown)
@@ -298,10 +305,10 @@
 - 999.21: Fabric matching excludes valid candidates — Pattern Dive Fabric Requirements tab shows zero matches for projects without assigned fabric (null fabricCount short-circuits matching logic)
 - **999.22: Stats page Promise.all resilience (HIGH PRIORITY)** — 17 parallel queries in single Promise.all; one failure crashes entire page. Consider Promise.allSettled or separating query groups with Suspense boundaries.
 - 999.23: Deduplicate SORT_FIELDS/SORT_DIRS constants — duplicated between search-params.ts and session-history-table.tsx; export from search-params and import in component to prevent drift
-- 999.24: Stats action auth/validation test coverage — add tests for requireAuth rejection and Zod boundary violations in stats-actions
+- ~~**999.24: Stats action auth/validation test coverage**~~ -- **Shipped in Phase 37**
 - 999.25: Stats types: use literal unions for MonthLabel and DayLabel — MonthlyTotal.month and DayOfWeekData.dayOfWeek are string but constrained to finite values
 - 999.26: Stats types: consistent date representation — SessionHistoryItem.date is Date while CalendarDayData.date and DailyBreakdownEntry.date are string
-- 999.27: Calendar year-rollover navigation tests — add tests for Jan→Dec and Dec→Jan boundary cases in StitchingCalendar
+- ~~**999.27: Calendar year-rollover navigation tests**~~ -- **Shipped in Phase 37**
 - 999.28: DailyBreakdownEntry could extend CalendarSession — structural overlap; making relationship explicit reduces duplication
 - 999.29: Remove WHAT-comments from Phase 20/21 code — 13 from Phase 20 + 14 from Phase 21 (record-detection.ts, personal-bests.ts). 2 comments in record-detection.ts to rewrite (JSDoc caller reference, skip-self explanation)
 - 999.30: Remove low-harm JSX section markers (~20) — technically against no-comments convention but low priority
@@ -312,8 +319,8 @@
 - 999.35: CompletionEstimate presentational leak — move `~` prefix from `estimatedDate` data to component-side rendering
 - 999.36: Remove AvailableYearsData wrapper — return `number[]` directly from query, remove unnecessary indirection
 - 999.37: Extract shared `buildDateFilter` and `Scope` type — duplicated across 6 stats query modules
-- 999.38: Record-detection duplicate-stitch-count edge case test — two sessions today with same stitch count
-- 999.39: Completion-estimates already-completed project filter test — project with stitchesCompleted >= totalStitches should be excluded
+- ~~**999.38: Record-detection duplicate-stitch-count edge case test**~~ -- **Shipped in Phase 37**
+- ~~**999.39: Completion-estimates already-completed project filter test**~~ -- **Shipped in Phase 37**
 - 999.40: Pre-existing silent failures in session-actions — `deleteFile().catch(() => {})` orphans files silently; photo upload catch discards error context
 - 999.41: Stats cache staleness on chart status change — `updateChartStatus` missing `revalidateTag("stats")`, stale until TTL (300s hero, 3600s breakdowns)
 - 999.42: Stats cache staleness on supply mutations — supply-actions missing `revalidateTag("stats")`, thread insights stale until TTL
