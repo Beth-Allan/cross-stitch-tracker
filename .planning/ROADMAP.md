@@ -218,7 +218,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 **Plans**: 1 plan
 **Wave 1**
 
-- [ ] 37-01-PLAN.md — Verify existing test coverage and close backlog items
+- [x] 37-01-PLAN.md — Verify existing test coverage and close backlog items
 
 ### Phase 39: Accessibility & Performance
 
@@ -315,7 +315,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 | 34. Browse & Pattern Dive Integration | v1.8 | 3/3 | Complete | 2026-07-01 |
 | 35. Error Handling & Comment Cleanup | v1.9 | 3/3 | Complete    | 2026-07-01 |
 | 36. Type Safety | v1.9 | 3/3 | Complete    | 2026-07-02 |
-| 37. Test Coverage -- Utilities & Stats | v1.9 | 1/1 | Complete   | 2026-07-02 |
+| 37. Test Coverage -- Utilities & Stats | v1.9 | 1/1 | Complete    | 2026-07-02 |
 | 38. Test Coverage -- Components | v1.9 | 0/0 | Not started | - |
 | 39. Accessibility & Performance | v1.9 | 0/0 | Not started | - |
 | 40. Visual & Layout Polish | v1.9 | 0/0 | Not started | - |

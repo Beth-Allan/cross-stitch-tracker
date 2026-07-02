@@ -20,8 +20,8 @@ Requirements for milestone v1.9 Cleanup & Polish. Each maps to roadmap phases.
 
 ### Test Coverage
 
-- [ ] **TEST-01**: Add skein calculator edge case tests (fabricCount=0, resolveDefaultBrandId) and stats action auth/validation tests (999.0.24, .24)
-- [ ] **TEST-02**: Add calendar year-rollover, record-detection duplicate-stitch-count, and completion-estimates already-completed filter tests (999.27, .38, .39)
+- [x] **TEST-01**: Add skein calculator edge case tests (fabricCount=0, resolveDefaultBrandId) and stats action auth/validation tests (999.0.24, .24)
+- [x] **TEST-02**: Add calendar year-rollover, record-detection duplicate-stitch-count, and completion-estimates already-completed filter tests (999.27, .38, .39)
 - [ ] **TEST-03**: Fill shopping cart test gaps — aggregated quantity distribution, project expand/collapse, updateSupplyAcquired integration, QuantityControl blur (999.62, .63, .64, .65)
 - [ ] **TEST-04**: Add chart form test gaps — seriesId flow-through, handleAddSeries guards, calcParams error/rollback, updateProjectSettings, zip validation (999.78, .79, .80, .81, .82)
 
@@ -91,8 +91,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-06 | Phase 36 | Complete |
 | QUAL-07 | Phase 36 | Complete |
 | QUAL-08 | Phase 36 | Complete |
-| TEST-01 | Phase 37 | Pending |
-| TEST-02 | Phase 37 | Pending |
+| TEST-01 | Phase 37 | Complete |
+| TEST-02 | Phase 37 | Complete |
 | TEST-03 | Phase 38 | Pending |
 | TEST-04 | Phase 38 | Pending |
 | POLISH-01 | Phase 39 | Pending |
