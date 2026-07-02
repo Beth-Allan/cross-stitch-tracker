@@ -103,4 +103,28 @@ describe("QuantityControl", () => {
     await user.keyboard("{Enter}");
     expect(onChange).toHaveBeenCalledWith(3);
   });
+
+  it("commits edited value on blur (mobile commit path)", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<QuantityControl {...defaultProps} onChange={onChange} />);
+    await user.click(screen.getByText("2/3"));
+    const input = screen.getByRole("spinbutton");
+    await user.clear(input);
+    await user.type(input, "1");
+    await user.tab();
+    expect(onChange).toHaveBeenCalledWith(1);
+    expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
+  });
+
+  it("blur after Escape does not re-commit value", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<QuantityControl {...defaultProps} onChange={onChange} />);
+    await user.click(screen.getByText("2/3"));
+    expect(screen.getByRole("spinbutton")).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
+  });
 });
