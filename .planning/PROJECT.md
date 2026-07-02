@@ -12,7 +12,7 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 **Last shipped:** v1.8 Series & Collections (2026-07-01)
 **9 milestones shipped:** v1.0-v1.8 (34 phases, 144 plans)
-**Current:** v1.9 Cleanup & Polish — Phase 36 complete, Phase 37 next
+**Current:** v1.9 Cleanup & Polish — Phase 37 complete, Phase 38 next
 
 The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters) with colored status/size badges and digital copy indicators, project detail with tabbed layout, session logging, and inline skein calculator controls, unified supply table with keyboard-first entry and visible commit button, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive with Series tab), shopping cart with project search, status grouping, supply search, smart selection, and squared pills, image optimization, multi-file working copies per chart (up to 50MB, including .zip), click-to-set focal point control for cover images with repositioned action bar, a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights with stitch counts, status filter pills, and celebration confetti on record-breaking sessions, and series organization with CRUD, dual progress tracking (owned/total + finished/owned), management pages, chart form integration, and Browse tab filtering. 2,417 tests, ~117k LOC TypeScript.
 
