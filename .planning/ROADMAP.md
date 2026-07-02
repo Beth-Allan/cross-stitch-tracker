@@ -134,7 +134,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 
 - [x] **Phase 35: Error Handling & Comment Cleanup** - Fix silent failure patterns and remove comment convention violations (completed 2026-07-01)
 - [x] **Phase 36: Type Safety** - Narrow types, discriminated unions, co-dependent props, controlled-only simplification (completed 2026-07-02)
-- [ ] **Phase 37: Test Coverage -- Utilities & Stats** - Fill test gaps for skein calculator, stats actions, calendar, records, completion estimates
+- [x] **Phase 37: Test Coverage -- Utilities & Stats** - Fill test gaps for skein calculator, stats actions, calendar, records, completion estimates (completed 2026-07-02)
 - [ ] **Phase 38: Test Coverage -- Components** - Fill test gaps for shopping cart and chart form components
 - [ ] **Phase 39: Accessibility & Performance** - ARIA nested interactive refactor, useMemo optimization, SSR hydration fix
 - [ ] **Phase 40: Visual & Layout Polish** - What's Next styling, focal point gaps, layout/label issues, shopping pill styling
@@ -203,7 +203,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 **Plans**: 1 plan
 **Wave 1**
 
-- [ ] 37-01-PLAN.md — Verify existing test coverage and close backlog items
+- [x] 37-01-PLAN.md — Verify existing test coverage and close backlog items
 
 ### Phase 38: Test Coverage -- Components
 
@@ -315,7 +315,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 | 34. Browse & Pattern Dive Integration | v1.8 | 3/3 | Complete | 2026-07-01 |
 | 35. Error Handling & Comment Cleanup | v1.9 | 3/3 | Complete    | 2026-07-01 |
 | 36. Type Safety | v1.9 | 3/3 | Complete    | 2026-07-02 |
-| 37. Test Coverage -- Utilities & Stats | v1.9 | 0/1 | Not started | - |
+| 37. Test Coverage -- Utilities & Stats | v1.9 | 1/1 | Complete   | 2026-07-02 |
 | 38. Test Coverage -- Components | v1.9 | 0/0 | Not started | - |
 | 39. Accessibility & Performance | v1.9 | 0/0 | Not started | - |
 | 40. Visual & Layout Polish | v1.9 | 0/0 | Not started | - |
