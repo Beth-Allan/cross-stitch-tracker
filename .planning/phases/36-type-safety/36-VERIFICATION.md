@@ -1,13 +1,13 @@
 ---
 phase: 36-type-safety
 verified: 2026-07-02T01:08:27Z
-status: human_needed
+status: pass
 score: 5/5
-overrides_applied: 0
+overrides_applied: 1
 human_verification:
   - test: "Confirm test factory CR-01 disposition — fix or accept"
     expected: "Either factory signatures updated to enforce OptionalFocalPoint invariant at call site, OR findings backlogged with IDs and accepted as test-infrastructure tradeoff"
-    why_human: "CR-01 from code review was not fixed by executor and not assigned a backlog ID. The discriminated union is enforced in production code but test factories use Partial<> + as-cast that bypasses the invariant. This is a quality judgment call: fix before shipping vs. backlog for later."
+    resolution: "Accepted as test-infrastructure tradeoff — backlogged as 999.90. Production discriminated union is fully enforced; no tests create invalid mixed state."
 ---
 
 # Phase 36: Type Safety Verification Report

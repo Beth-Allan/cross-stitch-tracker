@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Milestone:** v1.8 Series & Collections — IN PROGRESS
+**Milestone:** v1.9 Cleanup & Polish — IN PROGRESS
 **Last Updated:** 2026-07-01
-**Roadmap:** 8 milestones / 34 phases — v1.0-v1.7 shipped
+**Roadmap:** 9 milestones / 34 phases shipped — v1.9 Phases 35-41 planned
 
 ### Done
 
@@ -15,6 +15,9 @@
 - **v1.3 Form & Supply Overhaul shipped** (2026-05-16): 5 phases, 19 plans, 1535 tests, tagged `v1.3`
 - **v1.4 Fixes & Polish shipped** (2026-05-17): 3 phases, 9 plans, 1641 tests, tagged `v1.4`
 - **v1.5 Statistics & Records shipped** (2026-05-18): 4 phases, 14 plans, 1967 tests, tagged `v1.5`
+- **v1.6 Cleanup & Hardening shipped** (2026-05-20): 5 phases, 15 plans, 2176 tests, tagged `v1.6`
+- **v1.7 Fix & Polish shipped** (2026-05-24): 4 phases, 11 plans, 2269 tests, tagged `v1.7`
+- **v1.8 Series & Collections shipped** (2026-07-01): 4 phases, 11 plans, 2399 tests, tagged `v1.8`
   - All milestones archived to `.planning/milestones/`
   - Full details: `.planning/MILESTONES.md` and `.planning/RETROSPECTIVE.md`
 
@@ -234,9 +237,22 @@
   - Post-merge fix: duplicate seriesId/seriesName from parallel worktree merge
   - Backlogged: 4 items (999.86-999.89) for series detail card style, series name on project detail, series on gallery cards, series tab photos
 
+### Done This Session (2026-07-01 cont.)
+
+- **Phase 35 executed & verified** — 3/3 plans complete, 2399 tests passing, 4/4 must-haves verified
+  - Plan 01 (W1): 53 bare catches → `console.error`, 3 `processAndStoreImage` sites → `console.warn`, backlog 999.50-999.55 verified closed
+  - Plan 02 (W2): 190+ section markers removed from 48 files, 19 WHAT-comments removed from chart form
+  - Plan 03 (W3): 334 JSX markers removed from 59 TSX files, `comment-conventions.md` updated with loading.tsx exception
+  - Code review: 0 critical, 4 warnings, 2 info
+
+- **Phase 35 shipped** — PR #63 created, 4-agent review completed, findings fixed, 2399 tests passing
+  - Fixed: WR-01 localStorage catches in shopping-cart/shopping-list-tab reverted to silent per D-03 (6 catches)
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-ship 34` — Create PR for phase 34, run multi-agent review
+1. Merge PR #63, then switch back to `main`
+2. `/gsd-code-review 35 --fix` — optionally fix remaining 3 warnings (WR-02 empty-name guards, WR-03 setTimeout cleanup, WR-04 ownership gap)
+3. `/gsd-discuss-phase 36` — Gather context for Phase 36 (Type Safety)
 
 ### Backlog
 
@@ -342,6 +358,7 @@
 - 999.87: Series name on project detail page — show series name under pattern details section on /charts/[id]
 - 999.88: Series name on gallery/project cards — display series association on gallery card and project detail cards
 - 999.89: Series tab photo previews — show chart cover images (grid or carousel) for items in each series on the Pattern Dive Series tab
+- 999.90: Test factory OptionalFocalPoint enforcement — factory `as Type` casts in `factories.ts` (lines 86, 117, 152, 444) bypass discriminated union safety. Update signatures to enforce both-or-neither focal point coordinates at compile time
 
 ### Blockers
 
