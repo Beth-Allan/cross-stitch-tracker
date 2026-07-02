@@ -8,17 +8,14 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { SearchInput } from "./search-input";
 import { QuantityControl } from "./quantity-control";
 import type { ShoppingSupplyNeed, ShoppingFabricNeed } from "@/types/dashboard";
+import type { OnUpdateAcquired } from "@/types/shopping";
 
 interface SupplyOverviewProps {
   threads: ShoppingSupplyNeed[];
   beads: ShoppingSupplyNeed[];
   specialty: ShoppingSupplyNeed[];
   fabrics: ShoppingFabricNeed[];
-  onUpdateAcquired: (
-    type: "thread" | "bead" | "specialty",
-    junctionId: string,
-    quantity: number,
-  ) => void;
+  onUpdateAcquired: OnUpdateAcquired;
   pendingIds: Set<string>;
   failedIds: Set<string>;
   supplySearchQuery: string;
@@ -34,7 +31,7 @@ interface AggregatedSupply {
   unit: string;
   totalRequired: number;
   totalAcquired: number;
-  items: ShoppingSupplyNeed[];
+  items: [ShoppingSupplyNeed, ...ShoppingSupplyNeed[]];
 }
 
 function aggregateSupplies(supplies: ShoppingSupplyNeed[]): AggregatedSupply[] {
@@ -183,11 +180,7 @@ function SupplySection({
   label: string;
   aggregated: AggregatedSupply[];
   type: "thread" | "bead" | "specialty";
-  onUpdateAcquired: (
-    type: "thread" | "bead" | "specialty",
-    junctionId: string,
-    quantity: number,
-  ) => void;
+  onUpdateAcquired: OnUpdateAcquired;
   pendingIds: Set<string>;
   failedIds: Set<string>;
 }) {
@@ -238,11 +231,7 @@ function AggregatedSupplyRow({
 }: {
   supply: AggregatedSupply;
   type: "thread" | "bead" | "specialty";
-  onUpdateAcquired: (
-    type: "thread" | "bead" | "specialty",
-    junctionId: string,
-    quantity: number,
-  ) => void;
+  onUpdateAcquired: OnUpdateAcquired;
   pendingIds: Set<string>;
   failedIds: Set<string>;
 }) {
