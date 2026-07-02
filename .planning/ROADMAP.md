@@ -232,10 +232,12 @@ Full details: `milestones/v1.8-ROADMAP.md`
   2. SupplyOverview aggregation and filtering results are memoized via useMemo, recomputing only when source data changes
   3. Supply catalog initial load produces no React hydration mismatch warnings in the browser console
 
-**Plans**: 1 plan
-**Wave 1**
+**Plans**: 2 plans
+**Wave 1** (all parallel)
 
-- [ ] 37-01-PLAN.md — Verify existing test coverage and close backlog items
+- [ ] 39-01-PLAN.md — Card row ARIA refactor (stretched link pattern for storage/app rows)
+- [ ] 39-02-PLAN.md — Performance & SSR fixes (useMemo aggregation, hydration-safe view modes)
+
 **UI hint**: yes
 
 ### Phase 40: Visual & Layout Polish
@@ -318,6 +320,6 @@ Full details: `milestones/v1.8-ROADMAP.md`
 | 36. Type Safety | v1.9 | 3/3 | Complete    | 2026-07-02 |
 | 37. Test Coverage -- Utilities & Stats | v1.9 | 1/1 | Complete    | 2026-07-02 |
 | 38. Test Coverage -- Components | v1.9 | 2/2 | Complete    | 2026-07-02 |
-| 39. Accessibility & Performance | v1.9 | 0/0 | Not started | - |
+| 39. Accessibility & Performance | v1.9 | 0/2 | In progress | - |
 | 40. Visual & Layout Polish | v1.9 | 0/0 | Not started | - |
 | 41. Series Polish & Bug Fixes | v1.9 | 0/0 | Not started | - |
