@@ -24,8 +24,6 @@ describe("pattern-dive-actions", () => {
     });
   });
 
-  // ─── getWhatsNextProjects ──────────────────────────────────────────────────
-
   describe("getWhatsNextProjects", () => {
     it("rejects unauthenticated calls", async () => {
       mockAuth.mockResolvedValueOnce(null);
@@ -422,8 +420,6 @@ describe("pattern-dive-actions", () => {
       });
     });
   });
-
-  // ─── getFabricRequirements ────────────────────────────────────────────────
 
   describe("getFabricRequirements", () => {
     it("rejects unauthenticated calls", async () => {
@@ -971,8 +967,6 @@ describe("pattern-dive-actions", () => {
     });
   });
 
-  // ─── getStorageGroups ─────────────────────────────────────────────────────
-
   describe("getStorageGroups", () => {
     it("rejects unauthenticated calls", async () => {
       mockAuth.mockResolvedValueOnce(null);
@@ -1105,8 +1099,6 @@ describe("pattern-dive-actions", () => {
       expect(result[1].items).toHaveLength(2);
     });
   });
-
-  // ─── assignFabricToProject ────────────────────────────────────────────────
 
   describe("assignFabricToProject", () => {
     it("rejects unauthenticated calls", async () => {

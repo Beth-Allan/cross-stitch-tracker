@@ -152,24 +152,18 @@ export function ChartMergedForm({
   const formMode = modeProp ?? "create";
   const isEdit = formMode === "edit";
 
-  // Mode toggle: "form" shows the creation form, "supply" shows summary bar + supply table
   const [mode, setMode] = useState<"form" | "supply">("form");
 
-  // Supply state
   const [supplyRows, setSupplyRows] = useState<SupplyRow[]>([]);
   const [calcParams, setCalcParams] = useState<CalcParams>(DEFAULT_CALC_PARAMS);
   const lastFocusedRef = useRef<HTMLElement | null>(null);
   const adapterRef = useRef<CreationFlowAdapter | null>(null);
 
-  // Draft auto-save on unmount: track submission state and current values via refs
-  // to avoid stale closures in the cleanup function
   const submittedRef = useRef(false);
 
-  // Draft state for save button feedback
   const [saveDraftLabel, setSaveDraftLabel] = useState("Save Draft");
   const [isSavingDraft, setIsSavingDraft] = useState(false);
 
-  // Inline add dialogs
   const [storageDialogOpen, setStorageDialogOpen] = useState(false);
   const [storageDialogName, setStorageDialogName] = useState("");
   const [appDialogOpen, setAppDialogOpen] = useState(false);
@@ -179,7 +173,6 @@ export function ChartMergedForm({
   const [seriesDialogOpen, setSeriesDialogOpen] = useState(false);
   const [seriesDialogName, setSeriesDialogName] = useState("");
 
-  // Instantiate adapter once via ref
   if (!adapterRef.current) {
     const searchFn = async (type: SupplyType, query: string): Promise<SupplySearchResult[]> => {
       if (type === "THREAD") {
@@ -247,8 +240,7 @@ export function ChartMergedForm({
     onValidationError: isEdit ? undefined : () => setMode("form"),
   });
 
-  // Keep refs in sync with latest values for unmount auto-save (GAP 10).
-  // Using refs avoids stale closures in the cleanup function.
+  // Using refs avoids stale closures in the unmount auto-save cleanup function.
   const formValuesRef = useRef(form.values);
   const supplyRowsRef = useRef(supplyRows);
   const calcParamsRef = useRef(calcParams);
@@ -266,7 +258,6 @@ export function ChartMergedForm({
     };
   }, [formMode]);
 
-  // Derived values for SummaryBar
   const resolvedDesignerName = useMemo(() => {
     if (!form.values.designerId) return null;
     return form.designers.find((d) => d.id === form.values.designerId)?.name ?? null;
@@ -338,7 +329,8 @@ export function ChartMergedForm({
         const raw = localStorage.getItem("chart-draft");
         if (!raw) return null;
         return JSON.parse(raw);
-      } catch {
+      } catch (error) {
+        console.error("Load chart draft failed:", error);
         return null;
       }
     })();
@@ -386,7 +378,6 @@ export function ChartMergedForm({
     }, 1000);
   }, [form.values, supplyRows, calcParams]);
 
-  // Mode toggle handlers
   const handleAddSuppliesClick = useCallback(() => {
     setMode("supply");
   }, []);
@@ -399,7 +390,6 @@ export function ChartMergedForm({
     }, 0);
   }, []);
 
-  // Storage and stitching app options
   const storageOptions = form.storageLocationsList.map((sl) => ({
     value: sl.id,
     label: sl.name,
@@ -746,11 +736,13 @@ export function ChartMergedForm({
         </div>
       </Activity>
 
-      {/* Conditional rendering (not Activity) so CalculatorCard's Base UI Popover
-          initializes fresh when supply mode activates. Activity mode="hidden" defers
-          FloatingRootContext init to OffscreenLane, leaving fabric dropdown broken
-          on first click. CalcParams state lives in the parent, so remounting
-          CalculatorCard on mode switch is safe. */}
+      {
+        // Conditional rendering (not Activity) so CalculatorCard's Base UI Popover
+        // initializes fresh when supply mode activates. Activity mode="hidden" defers
+        // FloatingRootContext init to OffscreenLane, leaving fabric dropdown broken
+        // on first click. CalcParams state lives in the parent, so remounting
+        // CalculatorCard on mode switch is safe.
+      }
       {!isEdit && mode === "supply" && (
         <>
           <SummaryBar

@@ -34,9 +34,7 @@ export function HeroCoverBanner({
 
   return (
     <div className="bg-muted group relative w-full rounded-lg">
-      {/* Inner image wrapper with overflow-hidden for zoom effect */}
       <div className="max-h-64 overflow-hidden rounded-lg max-[767px]:max-h-40 md:max-h-48">
-        {/* Blurred background fill */}
         <Image
           src={imageUrl}
           alt=""
@@ -45,7 +43,6 @@ export function HeroCoverBanner({
           className="scale-110 object-cover opacity-60 blur-[20px]"
           unoptimized
         />
-        {/* Foreground image with object-contain */}
         <Image
           src={imageUrl}
           alt={`Cover for ${chartName}`}
@@ -57,7 +54,6 @@ export function HeroCoverBanner({
           unoptimized
         />
       </div>
-      {/* Focal point editor: edit button (absolute), click area (absolute inset-0), action bar (normal flow below) */}
       <FocalPointEditor
         chartId={chartId}
         initialFocalPoint={

@@ -3,8 +3,6 @@ import { render, screen, within } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { PatternTypeCards } from "./pattern-type-cards";
 
-// ─── Tests ──────────────────────────────────────────────────────────────────
-
 describe("PatternTypeCards", () => {
   const defaultProps = {
     isPaperChart: false,

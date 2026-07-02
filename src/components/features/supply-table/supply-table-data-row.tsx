@@ -36,7 +36,6 @@ export function SupplyTableDataRow({
 
   return (
     <tr className={`group ${isNew ? "animate-slide-in" : ""}`}>
-      {/* Column 1 - Colour (41%) */}
       <td className="border-muted border-b px-3 py-[5px]">
         <div className="flex items-center gap-2">
           <ColorSwatch hexColor={row.hexColor} size="sm" />
@@ -48,7 +47,6 @@ export function SupplyTableDataRow({
         </div>
       </td>
 
-      {/* Column 2 - Stitches/Qty (14%) */}
       <td className="border-muted border-b px-3 py-[5px] [font-variant-numeric:tabular-nums]">
         {row.type === "THREAD" && (
           <EditableNumber
@@ -67,14 +65,12 @@ export function SupplyTableDataRow({
         {row.type === "SPECIALTY" && <span className="text-muted-foreground">--</span>}
       </td>
 
-      {/* Column 3 - Arrow (24px fixed) */}
       <td className="border-muted w-6 border-b py-[5px]">
         {showStitches && (
           <ArrowRight className="text-muted-foreground h-3 w-3" data-testid="arrow-icon" />
         )}
       </td>
 
-      {/* Column 4 - Need (16%) */}
       <td className="border-muted border-b px-3 py-[5px] [font-variant-numeric:tabular-nums]">
         <div className="flex items-center gap-1">
           <EditableNumber
@@ -89,7 +85,6 @@ export function SupplyTableDataRow({
         </div>
       </td>
 
-      {/* Column 5 - Have (10%) */}
       <td className="border-muted border-b px-3 py-[5px] [font-variant-numeric:tabular-nums]">
         <EditableNumber
           value={row.have}
@@ -98,7 +93,6 @@ export function SupplyTableDataRow({
         />
       </td>
 
-      {/* Column 6 - Status (6%) */}
       <td className="border-muted border-b px-3 py-[5px]">
         <TooltipProvider>
           <Tooltip>
@@ -114,7 +108,6 @@ export function SupplyTableDataRow({
         </TooltipProvider>
       </td>
 
-      {/* Column 7 - Delete (32px fixed) */}
       <td className="border-muted w-8 border-b py-[5px]">
         <button
           onClick={() => onDelete(row.type, row.id)}

@@ -13,8 +13,6 @@ import {
 import type { GalleryChartData } from "@/types/chart";
 import { createMockGalleryCard } from "@/__tests__/mocks/factories";
 
-// ─── getStatusGroup ─────────────────────────────────────────────────────────
-
 describe("getStatusGroup", () => {
   it("maps IN_PROGRESS to wip", () => {
     expect(getStatusGroup("IN_PROGRESS")).toBe("wip");
@@ -44,8 +42,6 @@ describe("getStatusGroup", () => {
     expect(getStatusGroup("FFO")).toBe("finished");
   });
 });
-
-// ─── computeKittingDots ─────────────────────────────────────────────────────
 
 describe("computeKittingDots", () => {
   const noSupplies = { projectThreads: [], projectBeads: [], projectSpecialty: [] };
@@ -152,8 +148,6 @@ describe("computeKittingDots", () => {
     expect(result.specialtyStatus).toBe("fulfilled");
   });
 });
-
-// ─── transformToGalleryCard ─────────────────────────────────────────────────
 
 describe("transformToGalleryCard", () => {
   const baseChart: GalleryChartData = {
@@ -390,8 +384,6 @@ describe("transformToGalleryCard", () => {
   });
 });
 
-// ─── compareFn ──────────────────────────────────────────────────────────────
-
 describe("compareFn", () => {
   it("sorts by name ascending (A-Z)", () => {
     const a = createMockGalleryCard({ name: "Alpha" });
@@ -464,8 +456,6 @@ describe("compareFn", () => {
   });
 });
 
-// ─── getCelebrationClasses ──────────────────────────────────────────────────
-
 describe("getCelebrationClasses", () => {
   it("returns violet classes for FINISHED", () => {
     const classes = getCelebrationClasses("FINISHED");
@@ -487,8 +477,6 @@ describe("getCelebrationClasses", () => {
     expect(getCelebrationClasses("UNSTARTED")).toBeNull();
   });
 });
-
-// ─── STATUS_GRADIENT_CLASSES ────────────────────────────────────────────────
 
 describe("STATUS_GRADIENT_CLASSES", () => {
   it("has 7 entries, one per ProjectStatus", () => {
@@ -513,8 +501,6 @@ describe("STATUS_GRADIENT_CLASSES", () => {
     }
   });
 });
-
-// ─── Sort Order Constants ───────────────────────────────────────────────────
 
 describe("STATUS_SORT_ORDER", () => {
   it("orders UNSTARTED before FFO", () => {

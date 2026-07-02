@@ -16,8 +16,6 @@ import type {
 } from "@/types/session";
 import type { BrokenRecord } from "@/types/stats";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
 // startingStitches fetched inside transaction to stay atomic with the sum
 async function recalculateProgress(tx: Prisma.TransactionClient, projectId: string): Promise<void> {
   const [aggregation, project] = await Promise.all([
@@ -40,11 +38,7 @@ async function recalculateProgress(tx: Prisma.TransactionClient, projectId: stri
   });
 }
 
-// ─── Active Project Statuses ────────────────────────────────────────────────
-
 const ACTIVE_STATUSES = ["IN_PROGRESS", "ON_HOLD", "KITTING", "KITTED"] as const;
-
-// ─── createSession ──────────────────────────────────────────────────────────
 
 export async function createSession(formData: unknown) {
   const user = await requireAuth();
@@ -97,6 +91,8 @@ export async function createSession(formData: unknown) {
           await deleteFile(session.photoKey).catch((err) =>
             console.warn("[R2] raw file cleanup failed:", session.photoKey, err),
           );
+        } else {
+          console.warn("Image optimization skipped for session photo — using raw image");
         }
       } catch (err) {
         console.warn("Session photo optimization failed:", err);
@@ -134,8 +130,6 @@ export async function createSession(formData: unknown) {
     return { success: false as const, error: "Failed to create session" };
   }
 }
-
-// ─── updateSession ──────────────────────────────────────────────────────────
 
 export async function updateSession(sessionId: string, formData: unknown) {
   const user = await requireAuth();
@@ -207,6 +201,8 @@ export async function updateSession(sessionId: string, formData: unknown) {
               console.warn("[R2] old photo cleanup failed:", existing.photoKey, err),
             );
           }
+        } else {
+          console.warn("Image optimization skipped for session photo — using raw image");
         }
       } catch (err) {
         console.warn("Session photo optimization failed:", err);
@@ -234,8 +230,6 @@ export async function updateSession(sessionId: string, formData: unknown) {
     return { success: false as const, error: "Failed to update session" };
   }
 }
-
-// ─── deleteSession ──────────────────────────────────────────────────────────
 
 export async function deleteSession(sessionId: string) {
   const user = await requireAuth();
@@ -280,8 +274,6 @@ export async function deleteSession(sessionId: string) {
   }
 }
 
-// ─── getSessionsForProject ──────────────────────────────────────────────────
-
 export async function getSessionsForProject(projectId: string) {
   const user = await requireAuth();
 
@@ -325,8 +317,6 @@ export async function getSessionsForProject(projectId: string) {
   }
 }
 
-// ─── getAllSessions ─────────────────────────────────────────────────────────
-
 export async function getAllSessions() {
   const user = await requireAuth();
 
@@ -363,7 +353,6 @@ export async function getAllSessions() {
   }
 }
 
-// ─── getActiveProjectsForPicker ─────────────────────────────────────────────
 // Wrapped with React cache() to deduplicate within a single request
 // (layout.tsx + page.tsx both call this — cache ensures only one DB query)
 
@@ -400,8 +389,6 @@ export const getActiveProjectsForPicker = cache(async function getActiveProjects
     return { success: false as const, error: "Failed to load projects" };
   }
 });
-
-// ─── getProjectSessionStats ─────────────────────────────────────────────────
 
 export async function getProjectSessionStats(projectId: string) {
   const user = await requireAuth();

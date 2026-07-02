@@ -159,7 +159,8 @@ export function FabricFormModal({
             toast.error(result.error ?? "Something went wrong. Please try again.");
           }
         }
-      } catch {
+      } catch (error) {
+        console.error("Save fabric failed:", error);
         toast.error("Something went wrong. Please try again.");
       }
     });

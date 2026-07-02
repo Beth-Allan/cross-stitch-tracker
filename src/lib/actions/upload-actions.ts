@@ -155,8 +155,9 @@ export async function confirmUpload(input: { chartId: string; field: string; key
           await deleteFile(input.key).catch((err) =>
             console.warn("[R2] raw file cleanup failed:", input.key, err),
           );
+        } else {
+          console.warn("Image optimization skipped for chart cover — using raw image");
         }
-        // If processing failed, the raw key is already saved from the first update above
       } catch (err) {
         console.warn("Image optimization failed (raw image preserved):", err);
       }

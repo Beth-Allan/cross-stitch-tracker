@@ -42,7 +42,8 @@ function SupplyRow({
         } else {
           toast.error(result.error ?? "Something went wrong.");
         }
-      } catch {
+      } catch (error) {
+        console.error("Mark supply acquired failed:", error);
         toast.error("Something went wrong.");
       }
     });

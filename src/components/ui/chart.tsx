@@ -90,9 +90,11 @@ function ChartContainer({
         )}
         {...props}
       >
-        {/* ChartStyle injects CSS custom properties for chart colors from config.
-            Content is derived from the ChartConfig type (developer-defined labels/colors),
-            not from user input, so dangerouslySetInnerHTML is safe here. */}
+        {
+          // ChartStyle injects CSS custom properties for chart colors from config.
+          // Content is derived from ChartConfig (developer-defined labels/colors),
+          // not from user input, so the inner HTML is safe here.
+        }
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer initialDimension={initialDimension}>
           {children}

@@ -59,8 +59,6 @@ vi.mock("@/components/features/charts/editable-number", () => ({
   ),
 }));
 
-// ─── Tests ──────────────────────────────────────────────────────────────────
-
 describe("CalculatorCard", () => {
   const defaultCalcParams: CalcParams = {
     fabricCount: 14,

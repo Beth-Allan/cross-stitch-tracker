@@ -6,8 +6,6 @@ import { EditableNumber } from "@/components/features/charts/editable-number";
 import { updateProjectSettings } from "@/lib/actions/chart-actions";
 import type { CalculatorSettings } from "./types";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface CalculatorSettingsBarProps {
   chartId: string;
   settings: CalculatorSettings;
@@ -16,8 +14,6 @@ interface CalculatorSettingsBarProps {
   hasStitchCounts: boolean;
   onSettingsChange: (newSettings: CalculatorSettings) => void;
 }
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export function CalculatorSettingsBar({
   chartId,
@@ -45,7 +41,6 @@ export function CalculatorSettingsBar({
     settingsRef.current = currentSettings;
   }, [currentSettings]);
 
-  // ─── Handlers ─────────────────────────────────────────────────────────────
   // All hooks must be declared before any conditional returns (React rules of hooks)
 
   const handleSettingChange = useCallback(
@@ -88,11 +83,7 @@ export function CalculatorSettingsBar({
     [handleSettingChange],
   );
 
-  // ─── Conditional render ────────────────────────────────────────────────────
-
   if (!everShown) return null;
-
-  // ─── Fabric Display ──────────────────────────────────────────────────────
 
   const fabricDisplay =
     fabricSource === "linked" && fabricName
@@ -104,7 +95,6 @@ export function CalculatorSettingsBar({
       className="bg-muted flex flex-wrap gap-x-6 gap-y-3 rounded-lg px-4 py-3"
       data-testid="settings-bar"
     >
-      {/* Strands */}
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
           STRANDS
@@ -119,7 +109,6 @@ export function CalculatorSettingsBar({
         />
       </div>
 
-      {/* Over */}
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
           OVER
@@ -152,7 +141,6 @@ export function CalculatorSettingsBar({
         </div>
       </div>
 
-      {/* Fabric */}
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
           FABRIC
@@ -163,7 +151,6 @@ export function CalculatorSettingsBar({
         )}
       </div>
 
-      {/* Waste */}
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
           WASTE

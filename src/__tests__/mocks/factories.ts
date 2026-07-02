@@ -232,8 +232,6 @@ export function createMockChartWithRelations(
   };
 }
 
-// ─── Supply Factories ───────────────────────────────────────────────────────
-
 export function createMockSupplyBrand(overrides?: Partial<SupplyBrand>): SupplyBrand {
   return {
     id: "brand-1",
@@ -331,8 +329,6 @@ export function createMockProjectSpecialty(
   };
 }
 
-// ─── Fabric Factories ───────────────────────────────────────────────────────
-
 export function createMockFabricBrand(overrides?: Partial<FabricBrand>): FabricBrand {
   return {
     id: "fb-1",
@@ -363,8 +359,6 @@ export function createMockFabric(overrides?: Partial<Fabric>): Fabric {
     ...overrides,
   };
 }
-
-// ─── Storage & App Factories ────────────────────────────────────────────────
 
 export function createMockStorageLocation(overrides?: Partial<StorageLocation>): StorageLocation {
   return {
@@ -414,8 +408,6 @@ export function createMockStitchingAppWithStats(
   };
 }
 
-// ─── Gallery Card Factory ───────────────────────────────────────────────────
-
 import type { GalleryCardData } from "@/components/features/gallery/gallery-types";
 
 export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): GalleryCardData {
@@ -453,8 +445,6 @@ export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): Gal
   };
 }
 
-// ─── Session Factory ──────────────────────────────────────────────────────
-
 export function createMockStitchSession(overrides?: Partial<StitchSession>): StitchSession {
   return {
     id: "session-1",
@@ -468,8 +458,6 @@ export function createMockStitchSession(overrides?: Partial<StitchSession>): Sti
     ...overrides,
   };
 }
-
-// ─── Mock Prisma Client ─────────────────────────────────────────────────────
 
 /**
  * Creates a mock Prisma client object for use inside vi.mock("@/lib/db") factories.
@@ -669,8 +657,6 @@ export function createMockRouter() {
     refresh: vi.fn(),
   };
 }
-
-// ─── Server Action Result Assertion Helpers ─────────────────────────────────
 
 /**
  * Narrows a server action result to the success branch.

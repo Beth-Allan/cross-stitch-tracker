@@ -34,8 +34,6 @@ describe("shopping-actions", () => {
     });
   });
 
-  // ─── Auth Guard ────────────────────────────────────────────────────────────
-
   describe("auth guard", () => {
     it("rejects unauthenticated calls to getShoppingList", async () => {
       mockAuth.mockResolvedValueOnce(null);
@@ -49,8 +47,6 @@ describe("shopping-actions", () => {
       await expect(markSupplyAcquired("thread", "pt-1")).rejects.toThrow("Unauthorized");
     });
   });
-
-  // ─── getShoppingList ───────────────────────────────────────────────────────
 
   describe("getShoppingList", () => {
     const brand = createMockSupplyBrand();
@@ -242,8 +238,6 @@ describe("shopping-actions", () => {
       expect(result[0].fabricNeeds).toBeNull();
     });
   });
-
-  // ─── markSupplyAcquired ────────────────────────────────────────────────────
 
   describe("markSupplyAcquired", () => {
     it("updates quantityAcquired to match quantityRequired for thread", async () => {

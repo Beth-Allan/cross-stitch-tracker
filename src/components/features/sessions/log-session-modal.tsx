@@ -17,8 +17,6 @@ import { getPresignedUploadUrl } from "@/lib/actions/upload-actions";
 import { fireCelebration } from "@/components/features/stats/record-celebration";
 import type { ActiveProjectForPicker } from "@/types/session";
 
-// ─── Types ──────────────────────────────────────────────────────────────────
-
 interface EditSessionData {
   id: string;
   projectId: string;
@@ -37,14 +35,10 @@ export interface LogSessionModalProps {
   lockedProjectId?: string;
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
 function todayString(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 export function LogSessionModal({
   isOpen,
@@ -57,8 +51,6 @@ export function LogSessionModal({
   const isEditing = !!editSession;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ─── Form State ─────────────────────────────────────────────────────────
-
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [date, setDate] = useState(todayString());
   const [stitchCount, setStitchCount] = useState("");
@@ -67,16 +59,12 @@ export function LogSessionModal({
   const [photoKey, setPhotoKey] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-  // ─── UI State ───────────────────────────────────────────────────────────
-
   const [showProjectDropdown, setShowProjectDropdown] = useState(false);
   const [projectSearch, setProjectSearch] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // ─── Close project dropdown on outside click ───────────────────────────
 
   useEffect(() => {
     if (!showProjectDropdown) return;
@@ -88,8 +76,6 @@ export function LogSessionModal({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showProjectDropdown]);
-
-  // ─── Reset form when modal opens/closes or editSession changes ──────────
 
   useEffect(() => {
     if (!isOpen) return;
@@ -120,8 +106,6 @@ export function LogSessionModal({
     setShowProjectDropdown(false);
   }, [isOpen, editSession, lockedProjectId]);
 
-  // ─── Derived State ──────────────────────────────────────────────────────
-
   const selectedProject = activeProjects.find((p) => p.projectId === selectedProjectId);
   const filteredProjects = activeProjects.filter((p) =>
     p.chartName.toLowerCase().includes(projectSearch.toLowerCase()),
@@ -131,8 +115,6 @@ export function LogSessionModal({
   const isValid = !!selectedProjectId && !isNaN(parsedStitchCount) && parsedStitchCount >= 1;
 
   const totalMinutes = (parseInt(hours, 10) || 0) * 60 + (parseInt(minutes, 10) || 0);
-
-  // ─── Photo Upload ───────────────────────────────────────────────────────
 
   async function handlePhotoUpload(file: File) {
     setIsUploading(true);
@@ -181,8 +163,6 @@ export function LogSessionModal({
       handlePhotoUpload(file);
     }
   }
-
-  // ─── Save ───────────────────────────────────────────────────────────────
 
   function handleSave() {
     if (!isValid || isUploading) return;
@@ -239,8 +219,6 @@ export function LogSessionModal({
     });
   }
 
-  // ─── Delete ─────────────────────────────────────────────────────────────
-
   function handleDelete() {
     if (!editSession) return;
 
@@ -260,8 +238,6 @@ export function LogSessionModal({
     });
   }
 
-  // ─── Render ─────────────────────────────────────────────────────────────
-
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md" showCloseButton={false}>
@@ -270,7 +246,6 @@ export function LogSessionModal({
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Project Picker */}
           {!lockedProjectId && (
             <div ref={dropdownRef} className="relative">
               <label
@@ -322,7 +297,6 @@ export function LogSessionModal({
                             : "text-foreground"
                         }`}
                       >
-                        {/* 28px thumbnail */}
                         <div className="bg-muted h-7 w-7 shrink-0 overflow-hidden rounded">
                           {project.coverThumbnailUrl && imageUrls[project.coverThumbnailUrl] ? (
                             <img
@@ -357,7 +331,6 @@ export function LogSessionModal({
             </div>
           )}
 
-          {/* Date Field */}
           <div>
             <label
               htmlFor="session-date"
@@ -377,7 +350,6 @@ export function LogSessionModal({
             </p>
           </div>
 
-          {/* Stitch Count */}
           <div>
             <label
               htmlFor="session-stitch-count"
@@ -398,7 +370,6 @@ export function LogSessionModal({
             </p>
           </div>
 
-          {/* Time Spent (optional) */}
           <div>
             <span className="text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase">
               Time Spent{" "}
@@ -431,7 +402,6 @@ export function LogSessionModal({
             </div>
           </div>
 
-          {/* Photo Upload (optional) */}
           <div>
             <span className="text-muted-foreground mb-1.5 block text-xs font-semibold tracking-wider uppercase">
               Progress Photo{" "}
@@ -489,9 +459,7 @@ export function LogSessionModal({
           </div>
         </div>
 
-        {/* Footer */}
         <DialogFooter className="sm:justify-between">
-          {/* Left side: delete link (edit mode only) */}
           <div className="flex items-center">
             {isEditing && !showDeleteConfirm && (
               <button
@@ -526,7 +494,6 @@ export function LogSessionModal({
             )}
           </div>
 
-          {/* Right side: dismiss + save */}
           <div className="flex items-center gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isPending}>
               {isEditing ? "Discard Changes" : "Discard"}

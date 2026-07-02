@@ -105,7 +105,7 @@ export function ShoppingListTab({ threads, beads, specialty, fabrics }: Shopping
         }
       }
     } catch {
-      // localStorage may be unavailable
+      // localStorage may be unavailable (private browsing, SSR)
     }
     setHydrated(true);
   }, []);
@@ -115,7 +115,7 @@ export function ShoppingListTab({ threads, beads, specialty, fabrics }: Shopping
     try {
       localStorage.setItem("shopping-list-checked", JSON.stringify(Array.from(checkedItems)));
     } catch {
-      // localStorage may be unavailable
+      // localStorage may be unavailable (private browsing, SSR)
     }
   }, [checkedItems, hydrated]);
 
@@ -171,7 +171,6 @@ export function ShoppingListTab({ threads, beads, specialty, fabrics }: Shopping
 
   return (
     <div>
-      {/* Header */}
       <div className="mb-5 flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
           {items.length} item{items.length !== 1 ? "s" : ""} to buy
@@ -194,7 +193,6 @@ export function ShoppingListTab({ threads, beads, specialty, fabrics }: Shopping
         )}
       </div>
 
-      {/* Grouped list */}
       <div className="flex flex-col gap-6">
         {Array.from(grouped.entries()).map(([type, groupItems]) => (
           <div key={type}>

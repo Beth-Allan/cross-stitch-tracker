@@ -4,8 +4,6 @@ import type { ChartFormValues } from "./use-chart-form";
 // Will import from implementation file once created
 // import { saveDraft, loadDraft, clearDraft, DRAFT_KEY } from "./use-draft-persistence";
 
-// ─── Fixture ────────────────────────────────────────────────────────────────
-
 function createDefaultValues(): ChartFormValues {
   return {
     name: "",
@@ -57,14 +55,10 @@ function createDraftValues(overrides: Partial<ChartFormValues> = {}): ChartFormV
 
 const DRAFT_KEY = "chart-draft";
 
-// ─── Tests ──────────────────────────────────────────────────────────────────
-
 describe("use-draft-persistence", () => {
   beforeEach(() => {
     localStorage.clear();
   });
-
-  // ─── saveDraft ──────────────────────────────────────────────────────────
 
   describe("saveDraft", () => {
     it("stores JSON string at key 'chart-draft' in localStorage", async () => {
@@ -87,8 +81,6 @@ describe("use-draft-persistence", () => {
       setItemSpy.mockRestore();
     });
   });
-
-  // ─── loadDraft ──────────────────────────────────────────────────────────
 
   describe("loadDraft", () => {
     it("returns null when no draft exists in localStorage", async () => {
@@ -236,8 +228,6 @@ describe("use-draft-persistence", () => {
     });
   });
 
-  // ─── clearDraft ─────────────────────────────────────────────────────────
-
   describe("clearDraft", () => {
     it("removes 'chart-draft' key from localStorage", async () => {
       const { clearDraft } = await import("./use-draft-persistence");
@@ -259,16 +249,12 @@ describe("use-draft-persistence", () => {
     });
   });
 
-  // ─── DRAFT_KEY export ───────────────────────────────────────────────────
-
   describe("DRAFT_KEY", () => {
     it("exports DRAFT_KEY as 'chart-draft'", async () => {
       const { DRAFT_KEY: key } = await import("./use-draft-persistence");
       expect(key).toBe("chart-draft");
     });
   });
-
-  // ─── saveDraftV2 ──────────────────────────────────────────────────────
 
   describe("saveDraftV2", () => {
     it("stores version 2 format with form + supplies + calcParams", async () => {
@@ -307,8 +293,6 @@ describe("use-draft-persistence", () => {
       expect(parsed.calcParams).toEqual(calcParams);
     });
   });
-
-  // ─── loadDraftV2 ──────────────────────────────────────────────────────
 
   describe("loadDraftV2", () => {
     it("returns null when no draft exists", async () => {
@@ -396,8 +380,6 @@ describe("use-draft-persistence", () => {
       expect(result).toBeNull();
     });
   });
-
-  // ─── clearDraft also clears v2 ────────────────────────────────────────
 
   describe("clearDraft with v2", () => {
     it("removes storage item regardless of format", async () => {

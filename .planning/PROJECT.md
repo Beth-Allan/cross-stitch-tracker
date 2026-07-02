@@ -12,7 +12,7 @@ A stitcher can manage their entire chart collection and supplies faster and more
 
 **Last shipped:** v1.8 Series & Collections (2026-07-01)
 **9 milestones shipped:** v1.0-v1.8 (34 phases, 144 plans)
-**Current:** Planning next milestone
+**Current:** v1.9 Cleanup & Polish — Phase 35 complete, Phase 36 next
 
 The app is a fully functional cross-stitch management PWA with: browsable gallery (3 view modes + filters) with colored status/size badges and digital copy indicators, project detail with tabbed layout, session logging, and inline skein calculator controls, unified supply table with keyboard-first entry and visible commit button, single-page chart creation/edit form with supply takeover mode, dashboards (Main + Project + Pattern Dive with Series tab), shopping cart with project search, status grouping, supply search, smart selection, and squared pills, image optimization, multi-file working copies per chart (up to 50MB, including .zip), click-to-set focal point control for cover images with repositioned action bar, a 3-tab statistics dashboard with lifetime counters, activity charts, stitching calendar, personal records, designer/genre/thread insights with stitch counts, status filter pills, and celebration confetti on record-breaking sessions, and series organization with CRUD, dual progress tracking (owned/total + finished/owned), management pages, chart form integration, and Browse tab filtering. 2,399 tests, ~117k LOC TypeScript.
 
@@ -101,9 +101,28 @@ The app is a fully functional cross-stitch management PWA with: browsable galler
 - ✓ Fix pre-existing TypeScript test errors (999.19) — v1.8
 - ✓ Stats page Promise.allSettled resilience (999.22) — v1.8
 
+## Current Milestone: v1.9 Cleanup & Polish
+
+**Goal:** Systematically address accumulated backlog items — silent failures, comment violations, type safety gaps, test coverage holes, UI polish, and series follow-ups — to reduce PR review noise and improve code health.
+
+**Target features:**
+- Fix all remaining silent failure patterns (5 bare catches)
+- Clean up comment convention violations (~40 markers/WHAT-comments)
+- Tighten type safety (strandCount, OptionalFocalPoint, SuppliesTab props)
+- Fill test coverage gaps (skein calc, stats, shopping cart, series)
+- UI/UX polish (ARIA, SSR hydration, What's Next, focal point, supply overview)
+- Series integration follow-ups (designerName bug, card styling, name display)
+- Fix bugs (fabric matching, stitch hint discoverability)
+
 ### Active
 
-(No active requirements — start next milestone with `/gsd-new-milestone`)
+- [x] Fix silent failure patterns across 5 files (bare catches, swallowed errors) — Phase 35
+- [x] Clean comment convention violations (~40 markers across TSX and test files) — Phase 35
+- [ ] Type safety improvements (strandCount, OptionalFocalPoint, SuppliesTab, AggregatedSupply)
+- [ ] Fill test coverage gaps (skein calc, stats actions, shopping cart, series, calc params)
+- [ ] UI/UX polish (ARIA, SSR hydration, What's Next, focal point, supply memoization)
+- [ ] Series follow-ups (designerName bug, card styling, name display on project/gallery)
+- [ ] Bug fixes (fabric matching, stitch hint, InlineNameDialog text)
 
 ### Deferred (no phase assigned)
 
@@ -249,4 +268,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-01 after v1.8 milestone completed*
+*Last updated: 2026-07-01 after v1.9 milestone started*

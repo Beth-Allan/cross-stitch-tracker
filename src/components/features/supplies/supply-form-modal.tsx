@@ -236,7 +236,8 @@ export function SupplyFormModal({
             toast.error(result.error ?? "Something went wrong. Please try again.");
           }
         }
-      } catch {
+      } catch (error) {
+        console.error("Save supply failed:", error);
         toast.error("Something went wrong. Please try again.");
       }
     });
@@ -254,7 +255,6 @@ export function SupplyFormModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Color preview */}
           <div className="bg-muted/50 flex items-center gap-4 rounded-lg p-3">
             <ColorSwatch hexColor={hexColor} size="lg" />
             <div>
@@ -268,7 +268,6 @@ export function SupplyFormModal({
             </div>
           </div>
 
-          {/* Brand */}
           <FormField label="Brand" htmlFor="supply-brand" required error={errors.brandId}>
             <SearchableSelect
               options={filteredBrandOptions}
@@ -288,7 +287,6 @@ export function SupplyFormModal({
             />
           </FormField>
 
-          {/* Code */}
           <FormField label={codeLabel} htmlFor="supply-code" required error={errors.code}>
             <Input
               id="supply-code"
@@ -300,7 +298,6 @@ export function SupplyFormModal({
             />
           </FormField>
 
-          {/* Color Name */}
           <FormField
             label="Color Name"
             htmlFor="supply-color-name"
@@ -316,7 +313,6 @@ export function SupplyFormModal({
             />
           </FormField>
 
-          {/* Hex Color and Color Family row */}
           <div className="grid grid-cols-2 gap-3">
             <FormField
               label="Hex Color"
@@ -361,7 +357,6 @@ export function SupplyFormModal({
             )}
           </div>
 
-          {/* Description (specialty only) */}
           {supplyType === "specialty" && (
             <FormField
               label="Description"

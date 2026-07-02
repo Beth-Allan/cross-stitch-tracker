@@ -259,14 +259,14 @@ export function GenreList({ genres }: GenreListProps) {
       } else {
         toast.error(result.error ?? "Something went wrong. Please try again.");
       }
-    } catch {
+    } catch (error) {
+      console.error("Delete genre failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h1 className="font-heading text-2xl font-semibold">Genres</h1>
@@ -276,7 +276,6 @@ export function GenreList({ genres }: GenreListProps) {
           </Button>
         </div>
 
-        {/* Search bar */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative max-w-xs min-w-[200px] flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
@@ -301,7 +300,6 @@ export function GenreList({ genres }: GenreListProps) {
         </div>
       </div>
 
-      {/* Desktop table */}
       <div className="hidden md:block">
         {filteredGenres.length > 0 ? (
           <div className="border-border bg-card overflow-hidden rounded-xl border">
@@ -347,7 +345,6 @@ export function GenreList({ genres }: GenreListProps) {
         )}
       </div>
 
-      {/* Mobile cards */}
       <div className="space-y-3 md:hidden">
         {filteredGenres.length > 0 ? (
           filteredGenres.map((genre) => (
@@ -367,10 +364,8 @@ export function GenreList({ genres }: GenreListProps) {
         )}
       </div>
 
-      {/* Create modal */}
       <GenreFormModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
 
-      {/* Edit modal */}
       <GenreFormModal
         open={!!editingGenre}
         onOpenChange={(open) => {
@@ -379,7 +374,6 @@ export function GenreList({ genres }: GenreListProps) {
         genre={editingGenre}
       />
 
-      {/* Delete confirmation dialog */}
       <DeleteConfirmationDialog
         open={!!deletingGenre}
         onOpenChange={(open) => {

@@ -28,7 +28,6 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
       href={`/charts/${project.chartId}`}
       className="group border-border hover:bg-muted/50 flex items-center gap-3 border-t px-5 py-3 transition-colors"
     >
-      {/* Thumbnail */}
       <div className="h-8 w-8 shrink-0 overflow-hidden rounded-lg">
         {imageUrl ? (
           <img
@@ -43,7 +42,6 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
         )}
       </div>
 
-      {/* Name + designer */}
       <div className="min-w-0 flex-1">
         <p className="font-heading group-hover:text-primary truncate text-sm font-semibold transition-colors">
           {project.projectName}
@@ -53,7 +51,6 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
         )}
       </div>
 
-      {/* Progress bar (hidden on mobile, hidden for unstarted bucket) */}
       {bucketId !== "unstarted" && (
         <div className="hidden w-[100px] shrink-0 md:block">
           <div className="flex items-center gap-2">
@@ -70,7 +67,6 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
         </div>
       )}
 
-      {/* Stitch count */}
       <div className="hidden min-w-20 shrink-0 text-right sm:block">
         <p className="text-foreground text-xs tabular-nums">
           {project.stitchesCompleted.toLocaleString()}/{project.totalStitches.toLocaleString()}
@@ -78,7 +74,6 @@ export function BucketProjectRow({ project, imageUrl, bucketId }: BucketProjectR
         <p className="text-muted-foreground text-[10px]">stitches</p>
       </div>
 
-      {/* Last stitched (hidden on mobile) */}
       <div className="hidden min-w-[90px] shrink-0 text-right md:block">
         {project.lastSessionDate ? (
           <p className="text-muted-foreground text-xs">{project.stitchingDays} stitching days</p>

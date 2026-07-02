@@ -18,8 +18,6 @@ import {
   createAndAddSpecialty,
 } from "@/lib/actions/supply-actions";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface InlineSupplyCreateProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -28,8 +26,6 @@ interface InlineSupplyCreateProps {
   searchText: string;
   onCreated: () => void;
 }
-
-// ─── Constants ────────────────────────────────────────────────────────────────
 
 const TITLE_MAP: Record<InlineSupplyCreateProps["type"], string> = {
   thread: "Add New Thread",
@@ -42,8 +38,6 @@ const ACTION_MAP = {
   bead: createAndAddBead,
   specialty: createAndAddSpecialty,
 } as const;
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export function InlineSupplyCreate({
   open,

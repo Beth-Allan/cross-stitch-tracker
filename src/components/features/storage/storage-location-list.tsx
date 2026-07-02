@@ -37,7 +37,8 @@ export function StorageLocationList({ locations }: StorageLocationListProps) {
       } else {
         toast.error(result.error ?? "Failed to create location");
       }
-    } catch {
+    } catch (error) {
+      console.error("Create storage location failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
   }
@@ -51,7 +52,8 @@ export function StorageLocationList({ locations }: StorageLocationListProps) {
         return;
       }
       toast.error(result.error ?? "Failed to rename location");
-    } catch {
+    } catch (error) {
+      console.error("Rename storage location failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
     throw new Error("Rename failed");
@@ -67,7 +69,8 @@ export function StorageLocationList({ locations }: StorageLocationListProps) {
         return;
       }
       toast.error(result.error ?? "Failed to delete location");
-    } catch {
+    } catch (error) {
+      console.error("Delete storage location failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
     throw new Error("Delete failed");
@@ -75,7 +78,6 @@ export function StorageLocationList({ locations }: StorageLocationListProps) {
 
   return (
     <div className="px-6 pt-6 pb-4">
-      {/* Header */}
       <div className="mb-5 flex items-center justify-between">
         <h1 className="font-heading text-2xl font-semibold">Storage Locations</h1>
         <Button onClick={() => setIsAdding(true)}>
@@ -84,12 +86,9 @@ export function StorageLocationList({ locations }: StorageLocationListProps) {
         </Button>
       </div>
 
-      {/* List */}
       <div className="space-y-2">
-        {/* Inline add row */}
         {isAdding && <InlineAddRow onAdd={handleCreate} onCancel={() => setIsAdding(false)} />}
 
-        {/* Location rows */}
         {locations.map((location) => (
           <LocationRow
             key={location.id}
@@ -109,7 +108,6 @@ export function StorageLocationList({ locations }: StorageLocationListProps) {
           />
         ))}
 
-        {/* Empty state */}
         {locations.length === 0 && !isAdding && (
           <div className="py-16 text-center">
             <MapPin className="text-muted-foreground/50 mx-auto mb-3 h-8 w-8" />
@@ -121,7 +119,6 @@ export function StorageLocationList({ locations }: StorageLocationListProps) {
         )}
       </div>
 
-      {/* Delete dialog */}
       <DeleteEntityDialog
         open={deleteTarget !== null}
         onOpenChange={(open) => {
@@ -248,12 +245,10 @@ function LocationRow({
       }}
       className="group border-border bg-card hover:border-border/80 flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 shadow-sm transition-[box-shadow,border-color] hover:shadow-md"
     >
-      {/* Icon badge */}
       <div className="bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
         <MapPin className="text-muted-foreground h-4 w-4" />
       </div>
 
-      {/* Name + count */}
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{location.name}</p>
         <p className="text-muted-foreground text-xs">
@@ -263,7 +258,6 @@ function LocationRow({
         </p>
       </div>
 
-      {/* Hover actions */}
       <div className="flex shrink-0 items-center gap-1 transition-opacity group-focus-within:opacity-100 md:opacity-0 md:group-hover:opacity-100">
         <button
           type="button"

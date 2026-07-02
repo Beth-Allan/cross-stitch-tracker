@@ -130,7 +130,8 @@ export function SupplyTable({
           if (!result.success) {
             toast.error(result.error ?? "Couldn't update value. Try again.");
           }
-        } catch {
+        } catch (error) {
+          console.error("Update supply quantity failed:", error);
           toast.error("Couldn't update value. Try again.");
         }
       });
@@ -146,7 +147,8 @@ export function SupplyTable({
           if (!result.success) {
             toast.error(result.error ?? "Couldn't remove supply. Try again.");
           }
-        } catch {
+        } catch (error) {
+          console.error("Remove supply failed:", error);
           toast.error("Couldn't remove supply. Try again.");
         }
       });
@@ -190,7 +192,6 @@ export function SupplyTable({
               onRowAdded={handleRowAdded}
             />
 
-            {/* Thread section */}
             <SupplyTableSectionDivider icon={CircleDot} label="Thread" count={threads.length} />
             {threads.map((row) => (
               <SupplyTableDataRow
@@ -202,7 +203,6 @@ export function SupplyTable({
               />
             ))}
 
-            {/* Beads section */}
             <SupplyTableSectionDivider icon={Gem} label="Beads" count={beads.length} />
             {beads.map((row) => (
               <SupplyTableDataRow
@@ -214,7 +214,6 @@ export function SupplyTable({
               />
             ))}
 
-            {/* Specialty section */}
             <SupplyTableSectionDivider icon={Sparkles} label="Specialty" count={specialty.length} />
             {specialty.map((row) => (
               <SupplyTableDataRow
@@ -226,7 +225,6 @@ export function SupplyTable({
               />
             ))}
 
-            {/* Empty state */}
             {totalCount === 0 && !isLoading && (
               <tr>
                 <td colSpan={7}>
@@ -239,7 +237,6 @@ export function SupplyTable({
               </tr>
             )}
 
-            {/* Loading skeleton */}
             {isLoading && (
               <>
                 {[1, 2, 3].map((i) => (

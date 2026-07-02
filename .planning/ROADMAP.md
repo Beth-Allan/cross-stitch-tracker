@@ -17,6 +17,7 @@ Design components from `product-plan/sections/` are imported and adapted as each
 - ✅ **v1.6 Cleanup & Hardening** -- Phases 22-26 (shipped 2026-05-20)
 - ✅ **v1.7 Fix & Polish** -- Phases 27-30 (shipped 2026-05-24)
 - ✅ **v1.8 Series & Collections** -- Phases 31-34 (shipped 2026-07-01)
+- 🚧 **v1.9 Cleanup & Polish** -- Phases 35-41 (in progress)
 
 ## Phases
 
@@ -127,6 +128,132 @@ Full details: `milestones/v1.8-ROADMAP.md`
 
 </details>
 
+### v1.9 Cleanup & Polish (In Progress)
+
+**Milestone Goal:** Systematically address accumulated backlog items -- silent failures, comment violations, type safety gaps, test coverage holes, UI polish, and series follow-ups -- to reduce PR review noise and improve code health.
+
+- [x] **Phase 35: Error Handling & Comment Cleanup** - Fix silent failure patterns and remove comment convention violations (completed 2026-07-01)
+- [ ] **Phase 36: Type Safety** - Narrow types, discriminated unions, co-dependent props, controlled-only simplification
+- [ ] **Phase 37: Test Coverage -- Utilities & Stats** - Fill test gaps for skein calculator, stats actions, calendar, records, completion estimates
+- [ ] **Phase 38: Test Coverage -- Components** - Fill test gaps for shopping cart and chart form components
+- [ ] **Phase 39: Accessibility & Performance** - ARIA nested interactive refactor, useMemo optimization, SSR hydration fix
+- [ ] **Phase 40: Visual & Layout Polish** - What's Next styling, focal point gaps, layout/label issues, shopping pill styling
+- [ ] **Phase 41: Series Polish & Bug Fixes** - Series display improvements, designerName bug, fabric matching, stitch hint
+
+## Phase Details
+
+### Phase 35: Error Handling & Comment Cleanup
+
+**Goal**: All error paths surface diagnostic information and codebase follows comment conventions consistently
+**Depends on**: Nothing (first phase of v1.9)
+**Requirements**: QUAL-01, QUAL-02, QUAL-03
+**Success Criteria** (what must be TRUE):
+
+  1. Every catch block in upload-actions, charts page, log-session-modal, deleteFile, and processAndStoreImage either logs with console.error or surfaces a user-facing toast -- no silent swallowing
+  2. Zero JSX section markers (`{/* ... */}`) remain in TSX render blocks
+  3. Zero WHAT-comments or section markers remain in test files and chart form files (beyond allowed conventions)
+  4. `npm test` passes with no regressions
+
+**Plans:** 3/3 plans complete
+**Wave 1**
+
+- [x] 35-01-PLAN.md -- Error handling fixes (processAndStoreImage call sites + bare catch blocks)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 35-02-PLAN.md -- Section markers & WHAT-comments (production files + test files)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [x] 35-03-PLAN.md -- JSX comment cleanup (338 JSX comments + convention update)
+
+### Phase 36: Type Safety
+
+**Goal**: Type definitions enforce domain invariants at compile time, eliminating runtime null checks and invalid state combinations
+**Depends on**: Nothing (independent of Phase 35)
+**Requirements**: QUAL-04, QUAL-05, QUAL-06, QUAL-07, QUAL-08
+**Success Criteria** (what must be TRUE):
+
+  1. `strandCount` accepts only values 1-6 as a literal union type -- passing 0 or 7 is a type error
+  2. `OptionalFocalPoint` is a discriminated union where `focalPointX` and `focalPointY` are either both numbers or both null -- mixed states are type errors
+  3. `SuppliesTab` requires `fabricOptions` and `chartId` together or neither -- passing one without the other is a type error
+  4. `AggregatedSupply.items` uses a non-empty tuple type, and `onUpdateAcquired` callback type is defined once and shared across 4 component interfaces
+  5. `InlineDesignerDialog` has no uncontrolled code path, and `LocalStateAdapter.updateQuantity` indexes without `as unknown as` cast
+
+**Plans**: TBD
+
+### Phase 37: Test Coverage -- Utilities & Stats
+
+**Goal**: Utility functions and stats actions have test coverage for edge cases, boundary conditions, and auth rejection
+**Depends on**: Nothing (independent, test-only changes)
+**Requirements**: TEST-01, TEST-02
+**Success Criteria** (what must be TRUE):
+
+  1. Skein calculator tests cover fabricCount=0 and resolveDefaultBrandId edge cases
+  2. Stats action tests verify requireAuth rejection and Zod boundary violations
+  3. Calendar year-rollover tests cover Jan-to-Dec and Dec-to-Jan navigation boundaries
+  4. Record-detection tests cover two sessions on the same day with identical stitch counts
+  5. Completion-estimate tests verify projects with stitchesCompleted >= totalStitches are excluded
+
+**Plans**: TBD
+
+### Phase 38: Test Coverage -- Components
+
+**Goal**: Shopping cart and chart form components have test coverage for interaction paths currently untested
+**Depends on**: Nothing (independent, test-only changes)
+**Requirements**: TEST-03, TEST-04
+**Success Criteria** (what must be TRUE):
+
+  1. Shopping cart tests cover aggregated quantity distribution across multi-item rows, project accordion expand/collapse, updateSupplyAcquired integration flow, and QuantityControl on-blur commit
+  2. Chart form tests cover seriesId appearing in prisma create/update payloads, handleAddSeries empty/whitespace guards, calcParams error rollback paths, updateProjectSettings auth and validation, and .zip file validation
+
+**Plans**: TBD
+
+### Phase 39: Accessibility & Performance
+
+**Goal**: Interactive card rows use valid ARIA patterns and supply aggregation is memoized for render performance
+**Depends on**: Nothing (independent)
+**Requirements**: POLISH-01, POLISH-04
+**Success Criteria** (what must be TRUE):
+
+  1. Clickable card rows do not contain nested interactive elements (buttons inside links or links inside buttons) -- DOM validates with no ARIA violations
+  2. SupplyOverview aggregation and filtering results are memoized via useMemo, recomputing only when source data changes
+  3. Supply catalog initial load produces no React hydration mismatch warnings in the browser console
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 40: Visual & Layout Polish
+
+**Goal**: Visual inconsistencies in What's Next, focal point, shopping pills, and form layout are resolved
+**Depends on**: Nothing (independent)
+**Requirements**: POLISH-02, POLISH-03, POLISH-05
+**Success Criteria** (what must be TRUE):
+
+  1. What's Next tab uses gallery-card-style presentation matching Browse tab, and kitting label at 0% progress shows an appropriate label (not "Kitting")
+  2. BucketProject cards apply focal point styling to cover images, and focal point action bar does not overlap the bottom ~25% of the image
+  3. Shopping-for pills use squared-off chip styling with borders (matching mockup), not full-round pills
+  4. Chart form has no unexplained gap above breadcrumb/SummaryBar, InlineCreateDialog labels are contextualized per supply type, and supplies page has no first-load view flash
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 41: Series Polish & Bug Fixes
+
+**Goal**: Series display is polished across all surfaces and remaining functional bugs are fixed
+**Depends on**: Nothing (independent)
+**Requirements**: SERIES-01, SERIES-02, SERIES-03, FIX-01, FIX-02
+**Success Criteria** (what must be TRUE):
+
+  1. Creating a series with a designer selection shows the correct designerName in the list (not null), and InlineNameDialog pending text respects the customized submitLabel
+  2. Series detail page (/series/[id]) uses card-style rows for charts instead of list-style, and series name appears on project detail and gallery cards
+  3. Pattern Dive Series tab shows chart cover image previews for each series
+  4. Fabric Requirements tab matches projects without assigned fabric (null fabricCount no longer short-circuits matching)
+  5. Supply stitch total hint is visible outside Details mode -- shown in SummaryBar or supply mode footer
+
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -166,3 +293,10 @@ Full details: `milestones/v1.8-ROADMAP.md`
 | 32. Series Management Pages | v1.8 | 3/3 | Complete | 2026-05-25 |
 | 33. Chart Form Integration | v1.8 | 2/2 | Complete | 2026-05-26 |
 | 34. Browse & Pattern Dive Integration | v1.8 | 3/3 | Complete | 2026-07-01 |
+| 35. Error Handling & Comment Cleanup | v1.9 | 3/3 | Complete    | 2026-07-01 |
+| 36. Type Safety | v1.9 | 0/0 | Not started | - |
+| 37. Test Coverage -- Utilities & Stats | v1.9 | 0/0 | Not started | - |
+| 38. Test Coverage -- Components | v1.9 | 0/0 | Not started | - |
+| 39. Accessibility & Performance | v1.9 | 0/0 | Not started | - |
+| 40. Visual & Layout Polish | v1.9 | 0/0 | Not started | - |
+| 41. Series Polish & Bug Fixes | v1.9 | 0/0 | Not started | - |

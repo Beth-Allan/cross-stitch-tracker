@@ -62,7 +62,8 @@ export function GenreFormModal({ open, onOpenChange, genre, onSuccess }: GenreFo
         } else {
           setError(result.error);
         }
-      } catch {
+      } catch (error) {
+        console.error("Save genre failed:", error);
         toast.error("Something went wrong. Please try again.");
       }
     });

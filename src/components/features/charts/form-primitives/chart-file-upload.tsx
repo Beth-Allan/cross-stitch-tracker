@@ -203,7 +203,6 @@ export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: Chart
         aria-label="Upload working copy files"
       />
 
-      {/* Upload button */}
       <Button
         type="button"
         variant="outline"
@@ -223,7 +222,6 @@ export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: Chart
         )}
       </Button>
 
-      {/* Validation errors */}
       {validationErrors.length > 0 && (
         <div aria-live="polite">
           {validationErrors.map((error, i) => (
@@ -234,7 +232,6 @@ export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: Chart
         </div>
       )}
 
-      {/* In-progress uploads */}
       {inProgress.map((file) => (
         <div
           key={file.id}
@@ -250,7 +247,6 @@ export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: Chart
         </div>
       ))}
 
-      {/* Completed files */}
       {uploadedFiles.map((file) => (
         <div
           key={file.key}

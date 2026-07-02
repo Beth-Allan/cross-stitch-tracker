@@ -20,8 +20,6 @@ import {
   createAndAddSpecialtySchema,
 } from "@/lib/validations/supply";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
 function isP2002(error: unknown): boolean {
   return (
     error !== null &&
@@ -52,8 +50,6 @@ async function resolveDefaultBrandId(
   });
   return brand.id;
 }
-
-// ─── Thread CRUD ─────────────────────────────────────────────────────────────
 
 export async function createThread(formData: unknown) {
   await requireAuth();
@@ -143,8 +139,6 @@ export async function getThreads(brandId?: string, colorFamily?: string, search?
   return threads.sort((a, b) => naturalSortByCode(a.colorCode, b.colorCode));
 }
 
-// ─── Bead CRUD ───────────────────────────────────────────────────────────────
-
 export async function createBead(formData: unknown) {
   await requireAuth();
 
@@ -230,8 +224,6 @@ export async function getBeads(search?: string) {
     orderBy: { productCode: "asc" },
   });
 }
-
-// ─── Specialty Item CRUD ─────────────────────────────────────────────────────
 
 export async function createSpecialtyItem(formData: unknown) {
   await requireAuth();
@@ -328,8 +320,6 @@ export async function getSpecialtyItems(search?: string) {
   });
 }
 
-// ─── Supply Brand CRUD ───────────────────────────────────────────────────────
-
 export async function createSupplyBrand(formData: unknown) {
   await requireAuth();
 
@@ -408,8 +398,6 @@ export async function getSupplyBrands() {
     orderBy: { name: "asc" },
   });
 }
-
-// ─── Junction Operations ─────────────────────────────────────────────────────
 
 export async function addThreadToProject(formData: unknown) {
   const user = await requireAuth();

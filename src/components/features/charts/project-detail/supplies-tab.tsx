@@ -15,16 +15,12 @@ import type {
   ProjectSpecialtyWithItem,
 } from "@/types/supply";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface SuppliesTabProps {
   project: NonNullable<ProjectDetailProps["chart"]["project"]>;
   supplies: NonNullable<ProjectDetailProps["supplies"]>;
   fabricOptions?: FabricOption[];
   chartId?: string;
 }
-
-// ─── Data Transform Helpers ───────────────────────────────────────────────────
 
 function threadToSupplyRow(pt: ProjectThreadWithThread): SupplyRow {
   return {
@@ -82,8 +78,6 @@ function sortSupplyRows(items: SupplyRow[], sortOption: SupplySortOption): Suppl
   }
   return items; // "added" = insertion order (already from server)
 }
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export function SuppliesTab({ project, supplies, fabricOptions, chartId }: SuppliesTabProps) {
   const router = useRouter();

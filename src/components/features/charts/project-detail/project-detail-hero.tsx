@@ -59,7 +59,6 @@ export function ProjectDetailHero({ chart, imageUrls, onStatusChange }: ProjectD
 
   return (
     <div className={cn("space-y-4 rounded-lg", getCelebrationClasses(status))}>
-      {/* Cover image banner */}
       <HeroCoverBanner
         imageUrl={coverImageUrl}
         chartName={chart.name}
@@ -68,7 +67,6 @@ export function ProjectDetailHero({ chart, imageUrls, onStatusChange }: ProjectD
         focalPointY={chart.focalPointY}
       />
 
-      {/* Navigation bar: Back to Gallery + Edit + Kebab */}
       <div className="flex items-center justify-between">
         <BackToGalleryLink />
         <div className="flex items-center gap-2">
@@ -80,17 +78,14 @@ export function ProjectDetailHero({ chart, imageUrls, onStatusChange }: ProjectD
         </div>
       </div>
 
-      {/* Chart name */}
       <h1 className="font-heading text-foreground text-2xl font-semibold lg:text-3xl">
         {chart.name}
       </h1>
 
-      {/* Designer name */}
       {chart.designer && (
         <p className="text-muted-foreground text-base">Designer: {chart.designer.name}</p>
       )}
 
-      {/* Metadata row: status badge | stitch count | size badge | progress % */}
       <div className="flex flex-wrap items-center gap-3">
         {project && (
           <HeroStatusBadge

@@ -7,15 +7,11 @@ import { SessionTable } from "./session-table";
 import { LogSessionModal } from "./log-session-modal";
 import type { StitchSessionRow, ActiveProjectForPicker } from "@/types/session";
 
-// ─── Types ──────────────────────────────────────────────────────────────────
-
 interface SessionsPageClientProps {
   sessions: StitchSessionRow[];
   activeProjects: ActiveProjectForPicker[];
   imageUrls: Record<string, string>;
 }
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 export function SessionsPageClient({
   sessions,
@@ -55,7 +51,6 @@ export function SessionsPageClient({
     <div>
       {hasSessions ? (
         <>
-          {/* Session count + Log Session button */}
           <div className="mb-3 flex items-center justify-between">
             <p className="text-muted-foreground text-sm">
               {sessions.length} session{sessions.length !== 1 ? "s" : ""} logged
@@ -66,7 +61,6 @@ export function SessionsPageClient({
             </Button>
           </div>
 
-          {/* Session table with project name column */}
           <SessionTable
             sessions={sessions}
             imageUrls={imageUrls}
@@ -89,7 +83,6 @@ export function SessionsPageClient({
         </div>
       )}
 
-      {/* Log session modal — no lockedProjectId so full picker shown */}
       <LogSessionModal
         isOpen={modalOpen}
         onOpenChange={setModalOpen}

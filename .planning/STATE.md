@@ -1,33 +1,35 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.8
-milestone_name: Series & Collections
-status: Awaiting next milestone
-last_updated: "2026-07-01T21:20:49.261Z"
-last_activity: 2026-07-01 — Milestone v1.8 completed and archived
+milestone: v1.9
+milestone_name: Cleanup & Polish
+status: "Phase 35 shipped — PR #63"
+last_updated: "2026-07-01T23:59:08.713Z"
+last_activity: 2026-07-01
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 11
-  completed_plans: 11
-  percent: 100
+  total_phases: 7
+  completed_phases: 0
+  total_plans: 3
+  completed_plans: 3
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-24)
+See: .planning/PROJECT.md (updated 2026-07-01)
 
 **Core value:** A stitcher can manage their entire chart collection and supplies faster and more pleasantly than Notion, with comprehensive statistics that make tracking feel rewarding.
-**Current focus:** Milestone complete
+**Current focus:** Phase 36 — type safety
 
 ## Current Position
 
-Phase: Milestone v1.8 complete
-Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-07-01 — Milestone v1.8 completed and archived
+Phase: 36
+Plan: Not started
+Status: Phase 35 shipped — PR #63
+Last activity: 2026-07-01
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Milestone Structure
 
@@ -42,6 +44,7 @@ Last activity: 2026-07-01 — Milestone v1.8 completed and archived
 | v1.6 | Cleanup & Hardening | 22-26 | Shipped 2026-05-20 |
 | v1.7 | Fix & Polish | 27-30 | Shipped 2026-05-24 |
 | v1.8 | Series & Collections | 31-34 | Shipped 2026-07-01 |
+| v1.9 | Cleanup & Polish | 35-41 | In progress |
 
 ## Performance Metrics
 
@@ -57,12 +60,6 @@ Last activity: 2026-07-01 — Milestone v1.8 completed and archived
 
 ## Accumulated Context
 
-### Key Architecture
-
-- Series mirrors Designer/Genre pattern: dedicated management page + detail page + inline create from chart form
-- Dual progress: owned/total (collection completeness) + finished/owned (stitching progress)
-- Series is optional one-to-many from Chart (a chart belongs to at most one series)
-
 ### Decisions
 
 Decisions logged in PROJECT.md Key Decisions table.
@@ -75,35 +72,17 @@ None.
 
 - `.env.local` bcrypt hashes must escape `$` as `\$`
 
-## Session Continuity
-
-Last session: 2026-07-01T19:06:24.956Z
-Stopped at: Phase 34 UI-SPEC approved
-Resume file: .planning/phases/34-browse-pattern-dive-integration/34-UI-SPEC.md
-
 ## Deferred Items
 
 Items acknowledged and deferred at milestone close on 2026-07-01:
 
 | Category | Item | Status |
 |----------|------|--------|
-| debug | fabric-matching-excludes-valid | converted_to_backlog |
 | verification | Phase 32 32-VERIFICATION.md | human_needed |
-| quick_task | 260328-igi-fix-critical-and-high-auth-security-issu | missing |
-| quick_task | 260328-im6-fix-shell-navigation-issues-and-dry-clea | missing |
-| quick_task | 260328-iv3-add-csp-header-and-commit-github-actions | missing |
-| quick_task | 260329-oj1-centralize-test-mocks-and-create-test-fa | missing |
-| quick_task | 260329-ora-add-failure-mode-tests-for-existing-code | missing |
-| quick_task | 260329-p5l-fix-the-issues-identified-in-pr-2-pr-2-r | missing |
-| quick_task | 260407-ozt-migrate-docs-conventions-to-claude-rules | missing |
-| quick_task | 260411-iwm-fix-thread-sort-to-use-numeric-ordering | missing |
-| quick_task | 260411-j3i-form-submit-idempotency-disable-submit-b | missing |
-| quick_task | 260411-j8v-show-already-added-indicator-for-project | missing |
-| quick_task | 260411-jhw-chart-list-edit-delete-actions-matching | missing |
-| quick_task | 260411-js1-chart-images-not-displaying-generate-pre | missing |
-| quick_task | 260411-kip-wire-generatethumbnail-into-cover-upload | missing |
-| quick_task | 260414-s7s-fix-gallery-view-mode-persistence-back-l | missing |
+| quick_task | 14 orphaned GSD artifacts | missing |
 
-## Operator Next Steps
+## Session Continuity
 
-- Start the next milestone with /gsd-new-milestone
+Last session: 2026-07-01T22:29:03.481Z
+Stopped at: Phase 35 context gathered
+Resume file: .planning/phases/35-error-handling-comment-cleanup/35-CONTEXT.md

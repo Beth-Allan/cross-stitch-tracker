@@ -3,8 +3,6 @@ import { render, screen, fireEvent } from "@/__tests__/test-utils";
 import { SessionTable } from "./session-table";
 import type { StitchSessionRow } from "@/types/session";
 
-// ─── Test Data ──────────────────────────────────────────────────────────────
-
 function createSession(overrides: Partial<StitchSessionRow> = {}): StitchSessionRow {
   return {
     id: "session-1",

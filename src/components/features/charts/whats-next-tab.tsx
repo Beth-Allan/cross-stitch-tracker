@@ -64,7 +64,6 @@ export function WhatsNextTab({ projects, imageUrls }: WhatsNextTabProps) {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Sort bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-muted-foreground text-sm">
           {projects.length} project{projects.length !== 1 ? "s" : ""} ready or getting ready to

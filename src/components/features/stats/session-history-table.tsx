@@ -53,7 +53,6 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
 
   return (
     <div className="space-y-4">
-      {/* Header with project filter */}
       <div className="flex items-center justify-between">
         <h3 className="font-heading text-sm font-semibold">Session History</h3>
         <div className="flex items-center gap-2">
@@ -74,7 +73,6 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
         </div>
       </div>
 
-      {/* Table */}
       <div className="border-border bg-card rounded-xl border">
         <Table>
           <TableHeader>
@@ -142,7 +140,6 @@ export function SessionHistoryTable({ data, projects }: SessionHistoryTableProps
         </Table>
       </div>
 
-      {/* Pagination */}
       {data.totalPages > 0 && (
         <div className="flex items-center justify-between">
           <span className="text-muted-foreground text-sm">

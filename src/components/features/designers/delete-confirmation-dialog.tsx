@@ -37,7 +37,8 @@ export function DeleteConfirmationDialog({
       try {
         await onConfirm();
         onOpenChange(false);
-      } catch {
+      } catch (error) {
+        console.error("Delete confirmation action failed:", error);
         // onConfirm caller handles error reporting (toast);
         // dialog stays open so user can retry
       }

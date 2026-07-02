@@ -37,7 +37,8 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
       } else {
         toast.error(result.error ?? "Failed to create app");
       }
-    } catch {
+    } catch (error) {
+      console.error("Create stitching app failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
   }
@@ -51,7 +52,8 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
         return;
       }
       toast.error(result.error ?? "Failed to rename app");
-    } catch {
+    } catch (error) {
+      console.error("Rename stitching app failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
     throw new Error("Rename failed");
@@ -67,7 +69,8 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
         return;
       }
       toast.error(result.error ?? "Failed to delete app");
-    } catch {
+    } catch (error) {
+      console.error("Delete stitching app failed:", error);
       toast.error("Something went wrong. Please try again.");
     }
     throw new Error("Delete failed");
@@ -75,7 +78,6 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
 
   return (
     <div className="px-6 pt-6 pb-4">
-      {/* Header */}
       <div className="mb-5 flex items-center justify-between">
         <h1 className="font-heading text-2xl font-semibold">Stitching Apps</h1>
         <Button onClick={() => setIsAdding(true)}>
@@ -84,12 +86,9 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
         </Button>
       </div>
 
-      {/* List */}
       <div className="space-y-2">
-        {/* Inline add row */}
         {isAdding && <InlineAddRow onAdd={handleCreate} onCancel={() => setIsAdding(false)} />}
 
-        {/* App rows */}
         {apps.map((app) => (
           <AppRow
             key={app.id}
@@ -109,7 +108,6 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
           />
         ))}
 
-        {/* Empty state */}
         {apps.length === 0 && !isAdding && (
           <div className="py-16 text-center">
             <Tablet className="text-muted-foreground/50 mx-auto mb-3 h-8 w-8" />
@@ -121,7 +119,6 @@ export function StitchingAppList({ apps }: StitchingAppListProps) {
         )}
       </div>
 
-      {/* Delete dialog */}
       <DeleteEntityDialog
         open={deleteTarget !== null}
         onOpenChange={(open) => {
@@ -243,12 +240,10 @@ function AppRow({
       }}
       className="group border-border bg-card hover:border-border/80 flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 shadow-sm transition-[box-shadow,border-color] hover:shadow-md"
     >
-      {/* Icon badge */}
       <div className="bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
         <Tablet className="text-muted-foreground h-4 w-4" />
       </div>
 
-      {/* Name + count */}
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{app.name}</p>
         <p className="text-muted-foreground text-xs">
@@ -258,7 +253,6 @@ function AppRow({
         </p>
       </div>
 
-      {/* Hover actions */}
       <div className="flex shrink-0 items-center gap-1 transition-opacity group-focus-within:opacity-100 md:opacity-0 md:group-hover:opacity-100">
         <button
           type="button"

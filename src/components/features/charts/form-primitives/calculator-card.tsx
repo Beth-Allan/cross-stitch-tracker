@@ -65,7 +65,6 @@ export function CalculatorCard({
     >
       <h3 className="text-foreground mb-3 text-sm font-semibold">Skein Calculator</h3>
 
-      {/* Fabric row */}
       <div className="mb-3">
         <SearchableSelect
           options={fabricOptions.map((f) => ({
@@ -78,9 +77,7 @@ export function CalculatorCard({
         />
       </div>
 
-      {/* Controls row */}
       <div className="flex flex-wrap gap-x-6 gap-y-3">
-        {/* Strands */}
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
             STRANDS
@@ -95,7 +92,6 @@ export function CalculatorCard({
           />
         </div>
 
-        {/* Over */}
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
             OVER
@@ -130,7 +126,6 @@ export function CalculatorCard({
           </div>
         </div>
 
-        {/* Fabric Count */}
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
             COUNT
@@ -145,7 +140,6 @@ export function CalculatorCard({
           />
         </div>
 
-        {/* Waste */}
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
             WASTE

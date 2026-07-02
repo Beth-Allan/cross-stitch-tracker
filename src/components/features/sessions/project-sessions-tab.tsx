@@ -11,8 +11,6 @@ import type {
   ActiveProjectForPicker,
 } from "@/types/session";
 
-// ─── Types ──────────────────────────────────────────────────────────────────
-
 import { ProjectCompletionEstimate } from "@/components/features/stats/project-completion-estimate";
 import type { CompletionEstimate } from "@/types/stats";
 
@@ -25,14 +23,10 @@ interface ProjectSessionsTabProps {
   completionEstimate?: CompletionEstimate | null;
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
 function formatActiveSince(date: Date | null): string {
   if (!date) return "\u2014";
   return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 }
-
-// ─── Mini-Stat Card ─────────────────────────────────────────────────────────
 
 interface MiniStatCardProps {
   label: string;
@@ -58,8 +52,6 @@ function MiniStatCard({ label, value, icon: Icon, mono }: MiniStatCardProps) {
     </div>
   );
 }
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 export function ProjectSessionsTab({
   sessions,
@@ -149,7 +141,6 @@ export function ProjectSessionsTab({
 
   return (
     <div>
-      {/* Mini-stat cards */}
       <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
         {summaryStats.map((stat) => (
           <MiniStatCard key={stat.label} {...stat} />
@@ -162,7 +153,6 @@ export function ProjectSessionsTab({
         </div>
       )}
 
-      {/* Session count + Log Session button */}
       <div className="mb-3 flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
           {sessions.length} session{sessions.length !== 1 ? "s" : ""} logged
@@ -173,10 +163,8 @@ export function ProjectSessionsTab({
         </Button>
       </div>
 
-      {/* Session table */}
       <SessionTable sessions={sessions} imageUrls={imageUrls} onEditSession={handleEditSession} />
 
-      {/* Log session modal — locked to this project */}
       <LogSessionModal
         isOpen={modalOpen}
         onOpenChange={setModalOpen}
