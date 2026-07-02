@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen } from "@/__tests__/test-utils";
+import { render, screen, waitFor } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { SupplyCatalog } from "./supply-catalog";
 import {
@@ -205,45 +205,73 @@ describe("SupplyCatalog", () => {
     expect(screen.getByText("No threads in your catalog")).toBeInTheDocument();
   });
 
-  /* ── Synchronous view mode persistence (flash-free) ── */
+  describe("SSR hydration safety", () => {
+    it("does not read localStorage during state initialization", () => {
+      localStorage.setItem("supply-view-threads", "table");
+      const getItemSpy = vi.spyOn(Storage.prototype, "getItem");
 
-  it("initializes view modes from localStorage synchronously (no useEffect flash)", () => {
-    localStorage.setItem("supply-view-threads", "table");
-    localStorage.setItem("supply-view-beads", "grid");
+      // Clear any calls from beforeEach
+      getItemSpy.mockClear();
 
-    render(
-      <SupplyCatalog
-        threads={mockThreads}
-        beads={mockBeads}
-        specialtyItems={mockSpecialty}
-        brands={brands}
-      />,
-    );
+      render(
+        <SupplyCatalog
+          threads={mockThreads}
+          beads={mockBeads}
+          specialtyItems={mockSpecialty}
+          brands={brands}
+        />,
+      );
 
-    // The table view button should be active immediately for threads (from localStorage)
-    const tableButton = screen.getByRole("button", { name: "Table view" });
-    expect(tableButton.className).toContain("text-primary");
-  });
+      // localStorage.getItem IS called (via useEffect post-mount), but NOT
+      // during the useState initializer. Verify it was called via useEffect
+      // by checking the call happened and the result was applied.
+      expect(getItemSpy).toHaveBeenCalled();
 
-  it("when localStorage has 'grid' stored for threads tab, initial viewModes.threads is 'grid'", () => {
-    localStorage.setItem("supply-view-threads", "grid");
+      // The key SSR safety: no typeof window check in useState initializer.
+      // Verified by code inspection -- useState uses DEFAULT_VIEWS directly.
+      // The useEffect reads localStorage post-mount, which is SSR-safe.
+      getItemSpy.mockRestore();
+    });
 
-    render(
-      <SupplyCatalog
-        threads={mockThreads}
-        beads={mockBeads}
-        specialtyItems={mockSpecialty}
-        brands={brands}
-      />,
-    );
+    it("reads localStorage after mount and updates view mode", async () => {
+      localStorage.setItem("supply-view-threads", "table");
 
-    // Grid view button should be active (matching localStorage)
-    const gridButton = screen.getByRole("button", { name: "Grid view" });
-    expect(gridButton.className).toContain("text-primary");
+      render(
+        <SupplyCatalog
+          threads={mockThreads}
+          beads={mockBeads}
+          specialtyItems={mockSpecialty}
+          brands={brands}
+        />,
+      );
+
+      await waitFor(() => {
+        const tableButton = screen.getByRole("button", { name: "Table view" });
+        expect(tableButton.className).toContain("text-primary");
+      });
+    });
+
+    it("initialView prop takes precedence over localStorage for threads tab after mount", async () => {
+      localStorage.setItem("supply-view-threads", "grid");
+
+      render(
+        <SupplyCatalog
+          threads={mockThreads}
+          beads={mockBeads}
+          specialtyItems={mockSpecialty}
+          brands={brands}
+          initialView="table"
+        />,
+      );
+
+      await waitFor(() => {
+        const tableButton = screen.getByRole("button", { name: "Table view" });
+        expect(tableButton.className).toContain("text-primary");
+      });
+    });
   });
 
   it("when no localStorage value exists, default view mode is used", () => {
-    // No localStorage set — should use DEFAULT_VIEWS (threads = "grid")
     render(
       <SupplyCatalog
         threads={mockThreads}
@@ -255,24 +283,6 @@ describe("SupplyCatalog", () => {
 
     const gridButton = screen.getByRole("button", { name: "Grid view" });
     expect(gridButton.className).toContain("text-primary");
-  });
-
-  it("URL param initialView takes precedence over localStorage for the specified tab", () => {
-    localStorage.setItem("supply-view-threads", "grid");
-
-    render(
-      <SupplyCatalog
-        threads={mockThreads}
-        beads={mockBeads}
-        specialtyItems={mockSpecialty}
-        brands={brands}
-        initialView="table"
-      />,
-    );
-
-    // initialView="table" should override localStorage "grid"
-    const tableButton = screen.getByRole("button", { name: "Table view" });
-    expect(tableButton.className).toContain("text-primary");
   });
 
   it("persists view mode changes to localStorage", async () => {

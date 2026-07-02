@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue } from "react";
+import { useDeferredValue, useMemo } from "react";
 import { Search, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
@@ -88,6 +88,23 @@ export function SupplyOverview({
 }: SupplyOverviewProps) {
   const deferredSearch = useDeferredValue(supplySearchQuery);
 
+  const aggregatedThreads = useMemo(() => aggregateSupplies(threads), [threads]);
+  const aggregatedBeads = useMemo(() => aggregateSupplies(beads), [beads]);
+  const aggregatedSpecialty = useMemo(() => aggregateSupplies(specialty), [specialty]);
+
+  const filteredAggThreads = useMemo(
+    () => filterAggregatedSupplies(aggregatedThreads, deferredSearch),
+    [aggregatedThreads, deferredSearch],
+  );
+  const filteredAggBeads = useMemo(
+    () => filterAggregatedSupplies(aggregatedBeads, deferredSearch),
+    [aggregatedBeads, deferredSearch],
+  );
+  const filteredAggSpecialty = useMemo(
+    () => filterAggregatedSupplies(aggregatedSpecialty, deferredSearch),
+    [aggregatedSpecialty, deferredSearch],
+  );
+
   const hasAny =
     threads.length > 0 || beads.length > 0 || specialty.length > 0 || fabrics.length > 0;
 
@@ -99,14 +116,6 @@ export function SupplyOverview({
       </div>
     );
   }
-
-  const aggregatedThreads = aggregateSupplies(threads);
-  const aggregatedBeads = aggregateSupplies(beads);
-  const aggregatedSpecialty = aggregateSupplies(specialty);
-
-  const filteredAggThreads = filterAggregatedSupplies(aggregatedThreads, deferredSearch);
-  const filteredAggBeads = filterAggregatedSupplies(aggregatedBeads, deferredSearch);
-  const filteredAggSpecialty = filterAggregatedSupplies(aggregatedSpecialty, deferredSearch);
 
   const isSupplySearchActive = deferredSearch.length > 0;
   const hasFilteredResults =
