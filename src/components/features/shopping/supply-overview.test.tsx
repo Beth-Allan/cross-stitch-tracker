@@ -451,4 +451,61 @@ describe("SupplyOverview", () => {
       expect(onUpdateAcquired).toHaveBeenCalledWith("thread", "j-single", 2);
     });
   });
+
+  describe("Memoization", () => {
+    const baseProps = {
+      beads: [] as ShoppingSupplyNeed[],
+      specialty: [] as ShoppingSupplyNeed[],
+      fabrics: [],
+      onUpdateAcquired: vi.fn(),
+      pendingIds: new Set<string>(),
+      failedIds: new Set<string>(),
+      supplySearchQuery: "",
+      onSupplySearchChange: vi.fn(),
+    };
+
+    it("re-render with changed pendingIds does not recompute aggregation", () => {
+      const threads = [
+        createMockSupplyNeed({ supplyId: "s-1", junctionId: "j-1", code: "310" }),
+        createMockSupplyNeed({
+          supplyId: "s-2",
+          junctionId: "j-2",
+          code: "321",
+          colorName: "Red",
+          hexColor: "#cc0000",
+        }),
+      ];
+
+      const { rerender } = render(<SupplyOverview {...baseProps} threads={threads} />);
+
+      expect(screen.getByText("Threads")).toBeInTheDocument();
+      expect(screen.getByText(/2 types/)).toBeInTheDocument();
+
+      rerender(<SupplyOverview {...baseProps} threads={threads} pendingIds={new Set(["j-1"])} />);
+
+      expect(screen.getByText(/2 types/)).toBeInTheDocument();
+    });
+
+    it("re-render with changed threads array updates aggregation", () => {
+      const oneThread = [createMockSupplyNeed({ supplyId: "s-1", junctionId: "j-1", code: "310" })];
+      const twoThreads = [
+        ...oneThread,
+        createMockSupplyNeed({
+          supplyId: "s-2",
+          junctionId: "j-2",
+          code: "321",
+          colorName: "Red",
+          hexColor: "#cc0000",
+        }),
+      ];
+
+      const { rerender } = render(<SupplyOverview {...baseProps} threads={oneThread} />);
+
+      expect(screen.getByText(/1 type[^s]/)).toBeInTheDocument();
+
+      rerender(<SupplyOverview {...baseProps} threads={twoThreads} />);
+
+      expect(screen.getByText(/2 types/)).toBeInTheDocument();
+    });
+  });
 });
