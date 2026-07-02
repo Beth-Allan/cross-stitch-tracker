@@ -248,11 +248,17 @@
 - **Phase 35 shipped** — PR #63 created, 4-agent review completed, findings fixed, 2399 tests passing
   - Fixed: WR-01 localStorage catches in shopping-cart/shopping-list-tab reverted to silent per D-03 (6 catches)
 
+- **Phase 36 shipped** — PR #64 created, 2399 tests passing, 5/5 requirements verified
+  - Plan 01: StrandCount literal union (1-6) + isStrandCount guard, co-dependent calculator? prop, narrowed persistFields
+  - Plan 02: OptionalFocalPoint discriminated union + mapFocalPoint wired into all 10 query sites
+  - Plan 03: OnUpdateAcquired shared type, non-empty tuple, controlled-only InlineDesignerDialog, type-safe LocalStateAdapter
+  - Code review: WR-02 dead types removed, IN-01 import placement fixed, CR-01 accepted as backlog 999.90
+  - Backlogged: 999.90 (test factory OptionalFocalPoint enforcement)
+
 ### Next Up — RESUME HERE
 
-1. Merge PR #63, then switch back to `main`
-2. `/gsd-code-review 35 --fix` — optionally fix remaining 3 warnings (WR-02 empty-name guards, WR-03 setTimeout cleanup, WR-04 ownership gap)
-3. `/gsd-discuss-phase 36` — Gather context for Phase 36 (Type Safety)
+1. Review/merge PR #64, then switch back to `main`
+2. `/gsd-discuss-phase 37` — Gather context for Phase 37 (Test Coverage — Utilities & Stats)
 
 ### Backlog
 
