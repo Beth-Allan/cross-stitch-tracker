@@ -2,6 +2,7 @@
 
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { mapFocalPoint } from "@/types/focal-point";
 import type {
   ProjectDashboardData,
   HeroStatsData,
@@ -155,8 +156,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
       projectName: p.chart.name,
       designerName: p.chart.designer?.name ?? null,
       coverThumbnailUrl: p.chart.coverThumbnailUrl,
-      focalPointX: p.chart.focalPointX ?? null,
-      focalPointY: p.chart.focalPointY ?? null,
+      ...mapFocalPoint(p.chart.focalPointX, p.chart.focalPointY),
       status: p.status,
       progressPercent,
       totalStitches: p.chart.stitchCount,

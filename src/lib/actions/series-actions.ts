@@ -6,6 +6,7 @@ import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { seriesSchema } from "@/lib/validations/series";
 import { computeSeriesProgress } from "@/lib/utils/series-progress";
+import { mapFocalPoint } from "@/types/focal-point";
 import type { SeriesWithStats, SeriesChart, SeriesDetail } from "@/types/series";
 
 export async function createSeries(formData: unknown) {
@@ -154,8 +155,7 @@ export async function getSeriesDetail(id: string): Promise<SeriesDetail | null> 
       name: c.name,
       coverThumbnailUrl: c.coverThumbnailUrl,
       coverImageUrl: c.coverImageUrl,
-      focalPointX: c.focalPointX,
-      focalPointY: c.focalPointY,
+      ...mapFocalPoint(c.focalPointX, c.focalPointY),
       stitchCount: c.stitchCount,
       stitchesWide: c.stitchesWide,
       stitchesHigh: c.stitchesHigh,

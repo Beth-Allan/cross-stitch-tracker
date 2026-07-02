@@ -1,6 +1,7 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
 import type { SizeCategory } from "@/lib/utils/size-category";
 import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
+import { mapFocalPoint } from "@/types/focal-point";
 import type { GalleryChartData } from "@/types/chart";
 import {
   UNASSIGNED_FILTER,
@@ -102,8 +103,7 @@ export function transformToGalleryCard(
     coverThumbnailUrl: chart.coverThumbnailUrl
       ? (imageUrls[chart.coverThumbnailUrl] ?? null)
       : null,
-    focalPointX: chart.focalPointX ?? null,
-    focalPointY: chart.focalPointY ?? null,
+    ...mapFocalPoint(chart.focalPointX, chart.focalPointY),
     status,
     statusGroup,
     genres: chart.genres.map((g) => g.name),

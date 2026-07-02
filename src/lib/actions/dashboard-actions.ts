@@ -2,6 +2,7 @@
 
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { mapFocalPoint } from "@/types/focal-point";
 import type {
   CurrentlyStitchingProject,
   StartNextProject,
@@ -55,8 +56,7 @@ async function getCurrentlyStitchingProjects(userId: string): Promise<CurrentlyS
         projectName: p.chart.name,
         designerName: p.chart.designer?.name ?? null,
         coverThumbnailUrl: p.chart.coverThumbnailUrl,
-        focalPointX: p.chart.focalPointX,
-        focalPointY: p.chart.focalPointY,
+        ...mapFocalPoint(p.chart.focalPointX, p.chart.focalPointY),
         status: p.status,
         stitchesCompleted: p.stitchesCompleted,
         totalStitches: p.chart.stitchCount,
@@ -105,8 +105,7 @@ async function getStartNextProjects(userId: string): Promise<StartNextProject[]>
       designerName: c.designer?.name ?? null,
       coverThumbnailUrl: c.coverThumbnailUrl,
       coverImageUrl: c.coverImageUrl,
-      focalPointX: c.focalPointX,
-      focalPointY: c.focalPointY,
+      ...mapFocalPoint(c.focalPointX, c.focalPointY),
       status: c.project!.status,
       totalStitches: c.stitchCount,
       genres: c.genres.map((g) => g.name),
@@ -146,8 +145,7 @@ async function getBuriedTreasures(userId: string): Promise<BuriedTreasure[]> {
     chartName: c.name,
     designerName: c.designer?.name ?? null,
     coverThumbnailUrl: c.coverThumbnailUrl,
-    focalPointX: c.focalPointX,
-    focalPointY: c.focalPointY,
+    ...mapFocalPoint(c.focalPointX, c.focalPointY),
     dateAdded: c.dateAdded,
     daysInLibrary: Math.floor((Date.now() - c.dateAdded.getTime()) / (1000 * 60 * 60 * 24)),
     genres: c.genres.map((g) => g.name),
@@ -258,8 +256,7 @@ async function getRandomSpotlightProject(userId: string): Promise<SpotlightProje
     designerName: project.chart.designer?.name ?? null,
     coverThumbnailUrl: project.chart.coverThumbnailUrl,
     coverImageUrl: project.chart.coverImageUrl,
-    focalPointX: project.chart.focalPointX,
-    focalPointY: project.chart.focalPointY,
+    ...mapFocalPoint(project.chart.focalPointX, project.chart.focalPointY),
     status: project.status,
     genres: project.chart.genres.map((g) => g.name),
     totalStitches: project.chart.stitchCount,

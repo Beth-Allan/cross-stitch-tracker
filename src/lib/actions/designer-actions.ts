@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { mapFocalPoint } from "@/types/focal-point";
 import { designerSchema } from "@/lib/validations/chart";
 import type { DesignerWithStats, DesignerDetail } from "@/types/designer";
 
@@ -121,8 +122,7 @@ export async function getDesigner(id: string): Promise<DesignerDetail | null> {
     name: c.name,
     coverThumbnailUrl: c.coverThumbnailUrl,
     coverImageUrl: c.coverImageUrl,
-    focalPointX: c.focalPointX,
-    focalPointY: c.focalPointY,
+    ...mapFocalPoint(c.focalPointX, c.focalPointY),
     stitchCount: c.stitchCount,
     stitchesWide: c.stitchesWide,
     stitchesHigh: c.stitchesHigh,
