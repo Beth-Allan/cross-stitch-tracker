@@ -215,10 +215,11 @@ Full details: `milestones/v1.8-ROADMAP.md`
   1. Shopping cart tests cover aggregated quantity distribution across multi-item rows, project accordion expand/collapse, updateSupplyAcquired integration flow, and QuantityControl on-blur commit
   2. Chart form tests cover seriesId appearing in prisma create/update payloads, handleAddSeries empty/whitespace guards, calcParams error rollback paths, updateProjectSettings auth and validation, and .zip file validation
 
-**Plans**: 1 plan
-**Wave 1**
+**Plans:** 2 plans
+**Wave 1** (all parallel)
 
-- [x] 37-01-PLAN.md — Verify existing test coverage and close backlog items
+- [ ] 38-01-PLAN.md — Shopping cart test gaps (aggregated quantity, project accordion, QuantityControl blur, updateSupplyAcquired wiring)
+- [ ] 38-02-PLAN.md — Chart form test gaps (seriesId flow-through, zip validation, calcParams rollback, verify-and-close)
 
 ### Phase 39: Accessibility & Performance
 
@@ -316,7 +317,7 @@ Full details: `milestones/v1.8-ROADMAP.md`
 | 35. Error Handling & Comment Cleanup | v1.9 | 3/3 | Complete    | 2026-07-01 |
 | 36. Type Safety | v1.9 | 3/3 | Complete    | 2026-07-02 |
 | 37. Test Coverage -- Utilities & Stats | v1.9 | 1/1 | Complete    | 2026-07-02 |
-| 38. Test Coverage -- Components | v1.9 | 0/0 | Not started | - |
+| 38. Test Coverage -- Components | v1.9 | 0/2 | Not started | - |
 | 39. Accessibility & Performance | v1.9 | 0/0 | Not started | - |
 | 40. Visual & Layout Polish | v1.9 | 0/0 | Not started | - |
 | 41. Series Polish & Bug Fixes | v1.9 | 0/0 | Not started | - |
