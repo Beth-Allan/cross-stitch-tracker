@@ -19,7 +19,7 @@
  * Implementation files are READ-ONLY per Nyquist protocol.
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, act } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { SuppliesTab } from "./supplies-tab";
@@ -134,6 +134,84 @@ const defaultProject: NonNullable<ProjectDetailProps["chart"]["project"]> = {
   stitchingApp: null,
   fabric: null,
 };
+
+describe("SuppliesTab — calcParams error rollback", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("rolls back calcParams and shows toast.error when updateProjectSettings returns failure", async () => {
+    const user = userEvent.setup();
+    const { updateProjectSettings } = await import("@/lib/actions/chart-actions");
+    const { toast } = await import("sonner");
+
+    vi.mocked(updateProjectSettings).mockResolvedValueOnce({
+      success: false as const,
+      error: "DB error",
+    });
+
+    render(
+      <SuppliesTab
+        project={defaultProject}
+        supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
+        calculator={{ chartId: "chart-1", fabricOptions: [] }}
+      />,
+    );
+
+    const over1Button = screen.getByRole("button", { name: "Stitch over 1 thread" });
+    const over2Button = screen.getByRole("button", { name: "Stitch over 2 threads" });
+    expect(over2Button).toHaveAttribute("aria-pressed", "true");
+    expect(over1Button).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(over1Button);
+
+    await vi.waitFor(() => {
+      expect(vi.mocked(toast.error)).toHaveBeenCalledWith(
+        "Couldn't save settings. Please try again.",
+      );
+    });
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole("button", { name: "Stitch over 2 threads" })).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      );
+    });
+  });
+
+  it("rolls back calcParams and shows toast.error when updateProjectSettings throws", async () => {
+    const user = userEvent.setup();
+    const { updateProjectSettings } = await import("@/lib/actions/chart-actions");
+    const { toast } = await import("sonner");
+
+    vi.mocked(updateProjectSettings).mockRejectedValueOnce(new Error("Network failure"));
+
+    render(
+      <SuppliesTab
+        project={defaultProject}
+        supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
+        calculator={{ chartId: "chart-1", fabricOptions: [] }}
+      />,
+    );
+
+    const over1Button = screen.getByRole("button", { name: "Stitch over 1 thread" });
+
+    await user.click(over1Button);
+
+    await vi.waitFor(() => {
+      expect(vi.mocked(toast.error)).toHaveBeenCalledWith(
+        "Couldn't save settings. Please try again.",
+      );
+    });
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole("button", { name: "Stitch over 2 threads" })).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      );
+    });
+  });
+});
 
 describe("SuppliesTab — Nyquist gap tests", () => {
   // ──────────────────────────────────────────────────────────────────────────────
