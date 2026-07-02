@@ -82,8 +82,7 @@ export function ProjectDetailPage({
             <SuppliesTab
               project={project}
               supplies={supplies}
-              fabricOptions={fabricOptions}
-              chartId={chart.id}
+              calculator={fabricOptions ? { fabricOptions, chartId: chart.id } : undefined}
             />
           ) : (
             <div className="text-muted-foreground py-12 text-center">

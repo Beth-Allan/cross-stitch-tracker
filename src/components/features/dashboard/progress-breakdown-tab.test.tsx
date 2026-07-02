@@ -20,7 +20,7 @@ function createMockProject(overrides?: Partial<BucketProject>): BucketProject {
     focalPointX: null,
     focalPointY: null,
     ...overrides,
-  };
+  } as BucketProject;
 }
 
 function createMockBuckets(): ProgressBucket[] {

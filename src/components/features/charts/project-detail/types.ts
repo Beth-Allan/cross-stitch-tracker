@@ -3,6 +3,7 @@ import type {
   ProjectThreadWithThread,
   ProjectBeadWithBead,
   ProjectSpecialtyWithItem,
+  StrandCount,
 } from "@/types/supply";
 
 // ─── Tab Navigation ────────────────────────────────────────────────────────
@@ -18,36 +19,10 @@ export type SupplySortOption = (typeof SUPPLY_SORT_OPTIONS)[number];
 // ─── Calculator Settings ───────────────────────────────────────────────────
 
 export interface CalculatorSettings {
-  strandCount: number; // 1-6
+  strandCount: StrandCount;
   overCount: 1 | 2; // over 1 or over 2
   fabricCount: number; // from linked fabric or default 14
   wastePercent: number; // 0-50
-}
-
-// ─── Supply Row Data ───────────────────────────────────────────────────────
-
-export interface SupplyRowData {
-  id: string;
-  type: "thread" | "bead" | "specialty";
-  name: string;
-  code: string;
-  hexColor?: string | null;
-  brandName?: string;
-  stitchCount: number;
-  quantityRequired: number;
-  quantityAcquired: number;
-  isNeedOverridden: boolean;
-  calculatedNeed?: number; // from calculateSkeins, undefined for non-thread or no stitch count
-}
-
-// ─── Supply Section Data ───────────────────────────────────────────────────
-
-export interface SupplySectionData {
-  type: "thread" | "bead" | "specialty";
-  label: string; // "Threads", "Beads", "Specialty Items"
-  unitLabel: string; // "skeins", "packages", "quantity"
-  items: SupplyRowData[];
-  totalStitchCount: number;
 }
 
 // ─── Project Detail Props ──────────────────────────────────────────────────

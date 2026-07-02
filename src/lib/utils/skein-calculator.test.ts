@@ -179,10 +179,12 @@ describe("calculateSkeins", () => {
   });
 
   it("returns 0 for strandCount of 0", () => {
+    // Runtime guard test: StrandCount type prevents 0 at compile time,
+    // but the runtime check still handles it for defense-in-depth
     expect(
       calculateSkeins({
         stitchCount: 1000,
-        strandCount: 0,
+        strandCount: 0 as unknown as 1,
         fabricCount: 14,
         overCount: 1,
         wastePercent: 20,

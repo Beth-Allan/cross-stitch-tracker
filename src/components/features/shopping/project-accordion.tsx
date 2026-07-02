@@ -16,6 +16,7 @@ import type {
   ShoppingSupplyNeed,
   ShoppingFabricNeed,
 } from "@/types/dashboard";
+import type { OnUpdateAcquired } from "@/types/shopping";
 import type { ProjectStatus } from "@/generated/prisma/client";
 
 function buildIndex<T extends { projectId: string }>(items: T[]): Map<string, T[]> {
@@ -40,11 +41,7 @@ interface ProjectAccordionProps {
   onSelectAll: () => void;
   selectAllLabel: string;
   onSelectGroup: (projectIds: string[]) => void;
-  onUpdateAcquired: (
-    type: "thread" | "bead" | "specialty",
-    junctionId: string,
-    quantity: number,
-  ) => void;
+  onUpdateAcquired: OnUpdateAcquired;
   pendingIds: Set<string>;
   failedIds: Set<string>;
   collapsedGroups: Set<ProjectStatus>;
@@ -353,11 +350,7 @@ function SupplyGroup({
   type: "thread" | "bead" | "specialty";
   allSelectedProjectIds: Set<string>;
   allSupplies: ShoppingSupplyNeed[];
-  onUpdateAcquired: (
-    type: "thread" | "bead" | "specialty",
-    junctionId: string,
-    quantity: number,
-  ) => void;
+  onUpdateAcquired: OnUpdateAcquired;
   pendingIds: Set<string>;
   failedIds: Set<string>;
 }) {

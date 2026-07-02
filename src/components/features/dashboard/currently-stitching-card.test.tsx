@@ -51,7 +51,7 @@ function createMockProject(
     totalTimeMinutes: 120,
     stitchingDays: 5,
     ...overrides,
-  };
+  } as CurrentlyStitchingProject;
 }
 
 describe("CurrentlyStitchingCard", () => {

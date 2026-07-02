@@ -3,7 +3,7 @@ import type { OptionalFocalPoint } from "@/types/focal-point";
 
 // ─── Currently Stitching ───────────────────────────────────────────────────
 
-export interface CurrentlyStitchingProject extends OptionalFocalPoint {
+export type CurrentlyStitchingProject = OptionalFocalPoint & {
   projectId: string;
   chartId: string;
   projectName: string;
@@ -16,11 +16,11 @@ export interface CurrentlyStitchingProject extends OptionalFocalPoint {
   lastSessionDate: Date | null;
   totalTimeMinutes: number;
   stitchingDays: number;
-}
+};
 
 // ─── Start Next ────────────────────────────────────────────────────────────
 
-export interface StartNextProject extends OptionalFocalPoint {
+export type StartNextProject = OptionalFocalPoint & {
   projectId: string;
   chartId: string;
   projectName: string;
@@ -30,11 +30,11 @@ export interface StartNextProject extends OptionalFocalPoint {
   status: ProjectStatus;
   totalStitches: number;
   genres: string[];
-}
+};
 
 // ─── Buried Treasures ──────────────────────────────────────────────────────
 
-export interface BuriedTreasure extends OptionalFocalPoint {
+export type BuriedTreasure = OptionalFocalPoint & {
   chartId: string;
   projectId: string | null;
   chartName: string;
@@ -43,11 +43,11 @@ export interface BuriedTreasure extends OptionalFocalPoint {
   dateAdded: Date;
   daysInLibrary: number;
   genres: string[];
-}
+};
 
 // ─── Spotlight ─────────────────────────────────────────────────────────────
 
-export interface SpotlightProject extends OptionalFocalPoint {
+export type SpotlightProject = OptionalFocalPoint & {
   projectId: string;
   chartId: string;
   projectName: string;
@@ -58,7 +58,7 @@ export interface SpotlightProject extends OptionalFocalPoint {
   genres: string[];
   totalStitches: number;
   progressPercent: number;
-}
+};
 
 // ─── Collection Stats ──────────────────────────────────────────────────────
 
@@ -98,7 +98,7 @@ export interface HeroStatsData {
 
 export type ProgressBucketId = "unstarted" | "0-25" | "25-50" | "50-75" | "75-100";
 
-export interface BucketProject extends OptionalFocalPoint {
+export type BucketProject = OptionalFocalPoint & {
   projectId: string;
   chartId: string;
   projectName: string;
@@ -110,7 +110,7 @@ export interface BucketProject extends OptionalFocalPoint {
   stitchesCompleted: number;
   lastSessionDate: Date | null;
   stitchingDays: number;
-}
+};
 
 export interface ProgressBucket {
   id: ProgressBucketId;
@@ -151,7 +151,7 @@ export interface ProjectDashboardData {
 
 // ─── Shopping Cart Types ───────────────────────────────────────────────────
 
-export interface ShoppingCartProject extends OptionalFocalPoint {
+export type ShoppingCartProject = OptionalFocalPoint & {
   projectId: string;
   chartId: string;
   projectName: string;
@@ -162,7 +162,7 @@ export interface ShoppingCartProject extends OptionalFocalPoint {
   beadCount: number;
   specialtyCount: number;
   fabricNeeded: boolean;
-}
+};
 
 export interface ShoppingSupplyNeed {
   junctionId: string;

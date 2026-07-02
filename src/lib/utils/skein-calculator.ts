@@ -17,11 +17,13 @@
  * - wasteFactor covers movement between areas and mistakes (user-configurable)
  */
 
+import type { StrandCount } from "@/types/supply";
+
 const USABLE_INCHES_PER_SKEIN = 255; // 17 segments * 15 inches usable
 
 export function calculateSkeins(params: {
   stitchCount: number;
-  strandCount: number; // default 2, range 1-6
+  strandCount: StrandCount;
   fabricCount: number; // stitches per inch (e.g., 14, 16, 18)
   overCount: 1 | 2; // over 1 or over 2
   wastePercent: number; // 0-50, default 20

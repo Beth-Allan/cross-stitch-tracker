@@ -67,8 +67,8 @@ vi.mock("./inline-designer-dialog", () => ({
     initialName,
     onSubmit,
   }: {
-    open?: boolean;
-    onOpenChange?: (open: boolean) => void;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
     initialName?: string;
     onSubmit: (name: string, website?: string) => Promise<void>;
   }) =>

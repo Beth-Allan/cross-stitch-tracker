@@ -22,6 +22,7 @@ import type { GenreWithStats, GenreChart } from "@/types/genre";
 import type { ChartWithProject, ProjectWithRelations } from "@/types/chart";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import type { SeriesWithStats, SeriesChart } from "@/types/series";
+import type { GalleryCardData } from "@/components/features/gallery/gallery-types";
 import { vi } from "vitest";
 
 /**
@@ -82,7 +83,7 @@ export function createMockSeriesChart(overrides?: Partial<SeriesChart>): SeriesC
     status: null,
     stitchesCompleted: 0,
     ...overrides,
-  };
+  } as SeriesChart;
 }
 
 export function createMockDesignerWithStats(
@@ -113,7 +114,7 @@ export function createMockDesignerChart(overrides?: Partial<DesignerChart>): Des
     stitchesCompleted: 0,
     genres: [],
     ...overrides,
-  };
+  } as DesignerChart;
 }
 
 export function createMockGenre(overrides?: Partial<Genre>): Genre {
@@ -148,7 +149,7 @@ export function createMockGenreChart(overrides?: Partial<GenreChart>): GenreChar
     status: null,
     stitchesCompleted: 0,
     ...overrides,
-  };
+  } as GenreChart;
 }
 
 export function createMockProject(overrides?: Partial<Project>): Project {
@@ -408,8 +409,6 @@ export function createMockStitchingAppWithStats(
   };
 }
 
-import type { GalleryCardData } from "@/components/features/gallery/gallery-types";
-
 export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): GalleryCardData {
   return {
     chartId: "chart-1",
@@ -442,7 +441,7 @@ export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): Gal
     seriesName: null,
     dateAdded: new Date("2026-01-15"),
     ...overrides,
-  };
+  } as GalleryCardData;
 }
 
 export function createMockStitchSession(overrides?: Partial<StitchSession>): StitchSession {

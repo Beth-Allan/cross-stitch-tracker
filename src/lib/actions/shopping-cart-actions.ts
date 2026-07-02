@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { mapFocalPoint } from "@/types/focal-point";
 import type { ShoppingCartData } from "@/types/dashboard";
 
 const updateSupplyAcquiredSchema = z.object({
@@ -51,8 +52,7 @@ export async function getShoppingCartData(): Promise<ShoppingCartData> {
     projectName: p.chart.name,
     designerName: p.chart.designer?.name ?? null,
     coverThumbnailUrl: p.chart.coverThumbnailUrl,
-    focalPointX: p.chart.focalPointX,
-    focalPointY: p.chart.focalPointY,
+    ...mapFocalPoint(p.chart.focalPointX, p.chart.focalPointY),
     status: p.status,
     threadCount: p.projectThreads.length,
     beadCount: p.projectBeads.length,

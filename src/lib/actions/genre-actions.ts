@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { mapFocalPoint } from "@/types/focal-point";
 import { genreSchema } from "@/lib/validations/chart";
 import type { GenreWithStats, GenreDetail } from "@/types/genre";
 
@@ -123,8 +124,7 @@ export async function getGenre(id: string): Promise<GenreDetail | null> {
       id: c.id,
       name: c.name,
       coverThumbnailUrl: c.coverThumbnailUrl,
-      focalPointX: c.focalPointX,
-      focalPointY: c.focalPointY,
+      ...mapFocalPoint(c.focalPointX, c.focalPointY),
       stitchCount: c.stitchCount,
       stitchesWide: c.stitchesWide,
       stitchesHigh: c.stitchesHigh,

@@ -3,7 +3,7 @@ import { render, screen } from "@/__tests__/test-utils";
 import { BucketProjectRow } from "./bucket-project-row";
 import type { BucketProject } from "@/types/dashboard";
 
-const baseBucketProject: BucketProject = {
+const baseBucketProject = {
   projectId: "proj-1",
   chartId: "chart-1",
   projectName: "Summer Garden",
@@ -17,7 +17,7 @@ const baseBucketProject: BucketProject = {
   stitchingDays: 12,
   focalPointX: null,
   focalPointY: null,
-};
+} as BucketProject;
 
 describe("BucketProjectRow", () => {
   describe("focal point styling (UX-09)", () => {
