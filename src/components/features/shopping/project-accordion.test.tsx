@@ -260,4 +260,100 @@ describe("ProjectAccordion", () => {
       expect(screen.getByText("No projects match your search")).toBeInTheDocument();
     });
   });
+
+  describe("Expand/collapse detail rendering", () => {
+    it("shows not-selected message when expanded but not selected", async () => {
+      const user = userEvent.setup();
+      const project = makeProject({ status: "IN_PROGRESS" });
+      render(
+        <ProjectAccordion
+          {...defaultProps}
+          projects={[project]}
+          imageUrls={{}}
+          selectedIds={new Set()}
+          totalCount={1}
+          visibleCount={1}
+        />,
+      );
+
+      const expandBtn = screen.getByRole("button", {
+        name: /Expand Test Project supplies/,
+      });
+      await user.click(expandBtn);
+
+      expect(screen.getByText("Select this project to see supply details")).toBeInTheDocument();
+    });
+
+    it("shows supply details when expanded and selected with thread data", async () => {
+      const user = userEvent.setup();
+      const project = makeProject({ projectId: "p1", status: "IN_PROGRESS" });
+      const threads = [
+        {
+          junctionId: "jt1",
+          supplyId: "s1",
+          brandName: "DMC",
+          code: "310",
+          colorName: "Black",
+          hexColor: "#000000",
+          quantityRequired: 3,
+          quantityAcquired: 1,
+          unit: "skeins",
+          projectId: "p1",
+          projectName: "Test Project",
+        },
+      ];
+      render(
+        <ProjectAccordion
+          {...defaultProps}
+          projects={[project]}
+          imageUrls={{}}
+          selectedIds={new Set(["p1"])}
+          threads={threads}
+          totalCount={1}
+          visibleCount={1}
+          selectedCount={1}
+          visibleSelectedCount={1}
+        />,
+      );
+
+      const expandBtn = screen.getByRole("button", {
+        name: /Expand Test Project supplies/,
+      });
+      await user.click(expandBtn);
+
+      expect(screen.getByText(/Threads/)).toBeInTheDocument();
+      expect(screen.getByText("DMC 310")).toBeInTheDocument();
+    });
+
+    it("shows empty supply message when expanded and selected with no supplies", async () => {
+      const user = userEvent.setup();
+      const project = makeProject({
+        projectId: "p1",
+        status: "IN_PROGRESS",
+        threadCount: 0,
+        beadCount: 0,
+        specialtyCount: 0,
+        fabricNeeded: false,
+      });
+      render(
+        <ProjectAccordion
+          {...defaultProps}
+          projects={[project]}
+          imageUrls={{}}
+          selectedIds={new Set(["p1"])}
+          totalCount={1}
+          visibleCount={1}
+          selectedCount={1}
+          visibleSelectedCount={1}
+        />,
+      );
+
+      const expandBtn = screen.getByRole("button", {
+        name: /Expand Test Project supplies/,
+      });
+      await user.click(expandBtn);
+
+      expect(screen.getByText("No supply data for this project")).toBeInTheDocument();
+    });
+  });
 });
