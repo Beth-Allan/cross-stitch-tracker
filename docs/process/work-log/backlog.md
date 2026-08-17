@@ -77,7 +77,7 @@ half of Phase 41 into this list, on the reasoning that **polishing UI that is ab
 redesigned is work done twice**: every item below sits on a surface the D-07 redesign order
 reaches. Nothing was dropped.
 
-**These move to `docs/design/screens.md`** when that manifest is scaffolded at overhaul step 8,
+**These move to `docs/design/screens.md` (the manifest **file** — not `docs/design/screens/`, the directory canon lands in)** when that manifest is scaffolded at overhaul step 8,
 filed against the screen each belongs to. Until then this is their only home — do not let step 8
 leave them behind.
 

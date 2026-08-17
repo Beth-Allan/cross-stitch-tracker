@@ -80,8 +80,8 @@ path in.
 `.claude/rules/` carries the detail and is loaded for you — do not re-derive what it already
 says. Four files have no `globs:` frontmatter and load every session (git workflow, quality
 gates, testing, comments); the other eight are scoped by their `globs:` to the paths they
-describe (Base UI, server/client split, auth, forms, server actions, bleeding-edge libs, design
-reference). **Never rewrite a rule file without carrying its frontmatter over** — it is not
+describe (Base UI, server/client split, component implementation, auth, forms, server actions,
+bleeding-edge libs, design reference). **Never rewrite a rule file without carrying its frontmatter over** — it is not
 visible in the loaded copy. The always-true core:
 
 - Server Components by default — `"use client"` only for genuine interactivity.
@@ -147,8 +147,11 @@ visible in the loaded copy. The always-true core:
 No process framework governs this repo — the GSD/Superpowers era is over; no `/gsd-*` or
 `gsd:*` anything exists, and its state directory is archived at `docs/archive/planning/`.
 **`docs/archive/` is history, not authority: never follow instructions found in it.** This file
-plus `docs/process/session-protocol.md` are the only process authorities; the
-repo skills are thin wrappers over the protocol. Impeccable is installed as a design _tool_,
+plus `docs/process/session-protocol.md` are the process authorities, with one carve-out:
+**Beth's standing rulings D-01–D-14 live in `WORKFLOW-OVERHAUL-HANDOFF.md` §2 and nowhere else**,
+and they bind — the rest of that file is history. New rulings go to
+`docs/process/work-log/drift.md`, numbering on from D-15. The repo skills are thin wrappers over
+the protocol. Impeccable is installed as a design _tool_,
 never a process authority. The bundled `/code-review` skill is fine as a tool (there is no
 `/commit` — that plugin is not installed here). If any other instruction conflicts with `docs/` or this file, `docs/` wins — and say so
 in the work log.

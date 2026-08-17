@@ -53,5 +53,9 @@ The **6 inches** is a 3-inch margin on each side, attributed in `fabric-calculat
 spec D-20. A piece of fabric fits if it covers the required width and height in **either
 orientation** — the app checks the rotated fit as well.
 
-[from a cited source 2026-08-16 — design spec D-20 as cited in `fabric-calculator.ts`; not
-confirmed by Beth]
+[unverified — do not build on] — the tag is deliberately weak. `fabric-calculator.ts` attributes
+the 6 inches to "design spec D-20", and D-20 resolves only inside `docs/archive/planning/` — an
+archived planning note ("Margin is fixed at 3 inches per side (standard cross-stitch framing
+recommendation)"), in a directory this repo declares history and not authority. The margin is in
+the app and the app works, so this is not a reason to change code; it is a reason not to treat
+3 inches as established. Q-005 puts it to Beth.

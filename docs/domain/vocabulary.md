@@ -36,16 +36,18 @@ states separately.
 ### VOC-004 — SAL
 
 **S**titch-**A**long — a single design released in parts over time, typically monthly. One
-project, multiple chart parts arriving progressively. **Stitch count and supply needs evolve as
-new parts are released**, which is why a SAL's totals cannot be treated as fixed at kitting time.
+project, multiple chart parts arriving progressively. The plan's wording: stitch count and supply
+needs **may** evolve as new parts are released — so a SAL's totals are not necessarily fixed at
+the point of kitting. Whether they always move, and what that should mean for a SAL already
+kitted, is Beth's to say and is not recorded here.
 
 [from the project plan 2026-08-16 — CROSS_STITCH_TRACKER_PLAN.md §3, not re-confirmed]
 
 ### VOC-005 — Series
 
 A collection of **independent but related** patterns — "Mini Bottles", "Celtic Santas". Each
-chart is its own project; they belong to a named group. Closer to a book series than to a SAL:
-nothing about a series makes its members one piece of work.
+chart is its own project; they belong to a named group. The plan likens it to a book-series
+tracker.
 
 [from the project plan 2026-08-16 — CROSS_STITCH_TRACKER_PLAN.md §3, not re-confirmed]
 

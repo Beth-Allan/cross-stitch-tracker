@@ -142,7 +142,9 @@ deliberately absent.
 - Dependabot (`.github/dependabot.yml`): weekly, Mondays, for both npm and github-actions. npm
   minor and patch bumps are grouped into one PR and major bumps are ignored for `next`, `prisma`,
   `@prisma/client`, and `next-auth` — those are upgraded deliberately, not by bot. Limit 5 open
-  PRs; github-actions updates are grouped together
+  PRs; github-actions updates are grouped together. **There is a fifth ignore rule and it is
+  broken:** it names `@base-ui-components/*`, but the installed package is `@base-ui/react`, so
+  the guard on the UI primitives matches nothing (maintenance-ledger row, 2026-08-16)
 
 **Git hooks (Husky):**
 
@@ -178,6 +180,11 @@ deliberately absent.
 - `R2_BUCKET_NAME` - defaults to `cross-stitch-tracker` (`src/lib/r2.ts`)
 - `STATS_TIMEZONE` - IANA timezone for stats day boundaries; defaults to `America/Edmonton`
   (`src/lib/queries/stats/timezone.ts`). An invalid value throws rather than falling back
+
+**Declared but dead:**
+
+- `NEXT_PUBLIC_APP_URL` is in `.env.example` and is read nowhere — not in `src/`, `next.config.ts`
+  or `proxy.ts`. Setting it does nothing (maintenance-ledger row, 2026-08-16)
 
 **Secrets location:**
 

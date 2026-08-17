@@ -146,8 +146,10 @@ Three tiers, no global store:
 
 ## Imports and exports
 
-- Every internal path uses the `@/` alias; `import type` for type-only imports. **There is no
-  enforced import order** — do not invent one in review.
+- The `@/` alias is the intended form for internal paths and is what new code should use — but
+  it is a preference, not a rule: ~230 relative imports survive across ~94 files, including
+  cross-directory ones, and nothing enforces either form. `import type` for type-only imports.
+  **There is no enforced import order** — do not invent one in review.
 - Tests import from `@/__tests__/test-utils`, never `@testing-library/react`
   (`.claude/rules/testing-requirements.md`).
 - **Named exports** for server actions, queries, types, and components. **Default exports only

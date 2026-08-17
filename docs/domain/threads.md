@@ -17,8 +17,9 @@ The embroidery thread used for stitching. Tracked by brand, colour code and colo
 
 ### THR-002 — Skein
 
-The standard unit in which embroidery thread is sold. Charts specify how many skeins of each
-colour a design needs.
+The standard unit in which embroidery thread is sold. The plan's wording is that **projects**
+specify how many skeins of each colour are needed — which matters, because VOC-001 makes chart and
+project different things and this is the project's number, not the design's.
 
 [from the project plan 2026-08-16 — CROSS_STITCH_TRACKER_PLAN.md §3, not re-confirmed]
 

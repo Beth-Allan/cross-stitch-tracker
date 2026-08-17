@@ -29,16 +29,23 @@ typecheck, test, and ship. Reviewing an action means checking the first line, ev
 
 ### What the schema scopes, and what it does not
 
-Of eighteen models, **three carry a `userId`**: `Project`, `StorageLocation`, `StitchingApp`. All
-other ownership is transitive through `Project` — sessions via `projectId`, supplies via the three
-junction tables, fabric via `linkedProjectId`.
+Of eighteen models, **three carry a `userId`**: `Project`, `StorageLocation`, `StitchingApp`.
+Ownership everywhere else is **transitive through `Project`** — sessions via `projectId`, chart
+files via `chart.project`, supplies via the three junction tables — and the action layer does walk
+those relations (`chart-actions.ts` selects `{ project: { select: { userId: true } } }` before a
+destructive chart mutation; `chart-file-actions.ts` checks `file.chart.project?.userId`).
 
-**`Chart`, `Designer`, `Series`, `Genre`, and the whole supply and fabric catalogue
-(`SupplyBrand`, `Thread`, `Bead`, `SpecialtyItem`, `FabricBrand`) have no owner at all.** They are
-a global catalogue. This is coherent for one user and is not an oversight to correct on sight —
-but it means an ownership check on a chart-shaped query has nothing to check against, and any
-query reaching a chart without going through its project is unscoped by construction. Treat
-"add a `userId` filter" as a schema change with a migration, not a one-line fix.
+**Two relations are optional, and that is where the scoping actually stops.** `Chart.project` is
+`Project?` and `Fabric.linkedProjectId` is nullable, so an unattached chart or an unlinked fabric
+has **no ownership path at all** — which is why `fabric-actions.ts` queries
+`OR: [{ linkedProjectId: null }, { linkedProject: { userId } }]`, deliberately returning the
+ownerless arm. **`Designer`, `Series`, `Genre` and the supply and fabric catalogues
+(`SupplyBrand`, `Thread`, `Bead`, `SpecialtyItem`, `FabricBrand`) carry no owner by design**, and
+`ChartFile` is owned only through the chain above.
+
+This is coherent for one user and is not an oversight to correct on sight — but it means a
+chart-shaped or fabric-shaped query that does not traverse a project is unscoped by construction.
+Treat "add a `userId` filter" as a schema change with a migration, not a one-line fix.
 
 Multi-tenancy would not be an incremental change. It would touch the schema, every query, and
 every ownership assertion in the action layer.
@@ -65,7 +72,9 @@ should not be cited as if it were.** It ships:
 The file carries its own TODO to move to nonces and drop `unsafe-eval` in production. Until that
 lands, the CSP restricts origins but does not meaningfully constrain injected script. Anyone
 adding a header or relaxing a directive should know they are editing a policy that is already at
-its loosest defensible setting.
+its loosest defensible setting. **Whether it stays this way is a live question, not a settled
+property** — `maintenance-ledger.md` carries it as an open row for the A-1 audit's
+security-checklist sweep.
 
 ## No pagination anywhere in the browse path
 
@@ -75,8 +84,10 @@ what's-next, series, fabric requirements, storage groups — then resolves presi
 every image key across all five. The eager batch is deliberate: it avoids a Neon cold-start
 waterfall between tabs.
 
-**The absence of pagination is not.** It is an omission that has never needed addressing, not a
-decision that was taken. The collection only grows, and the page cost grows linearly with it —
+**The absence of pagination is not.** It is an omission rather than a decision — recorded as such
+in `maintenance-ledger.md`, which is where the question of doing something about it lives; this
+section exists so that the shape is known before anything else is built onto this path. The
+collection only grows, and the page cost grows linearly with it —
 including the presigned-URL round trip, which scales with image count rather than visible rows.
 Adding pagination later means changing the query, the eager-batch strategy, and the URL-state
 filters together, so it is worth knowing the constraint exists before building anything else onto
@@ -90,10 +101,12 @@ instead of taking the page down, and a `settled()` helper turns each rejection i
 absent section.
 
 What it does not do is bound concurrency. Each of those queries sits behind `unstable_cache`, so a
-warm cache costs almost nothing — but a cold cache, a redeploy, or a `revalidateTag("stats")` from
+warm cache costs almost nothing — but a cold cache, a redeploy, or a `revalidateTag("stats", { expire: 0 })` from
 any mutation puts sixteen concurrent queries onto **one Neon connection pool**. Under exhaustion
 the failure mode is not an error page; it is several panels quietly missing. Adding a seventeenth
-query to that array is a bigger decision than it looks.
+query to that array is a bigger decision than it looks. Whether the current width is already too
+wide is an open `maintenance-ledger.md` row for A-1 to measure; the shape is here because it
+constrains anything built on this page either way.
 
 ## The stack is bleeding-edge on purpose
 

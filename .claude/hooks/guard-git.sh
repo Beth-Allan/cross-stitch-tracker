@@ -2,7 +2,8 @@
 # Claude Code PreToolUse guard (workflow overhaul 2026-08-16; ported from
 # ffh-horse-database). Refuses any Bash tool call that would bypass the gates or rewrite
 # protected history (CLAUDE.md hard rules 1 + 6; session-protocol §1):
-#   - git commit with --no-verify / -n
+#   - ANY git command carrying the hook-bypass long flag (commit and push both run hooks)
+#   - git commit with the -n short form of it
 #   - git push with --force / -f / --force-with-lease
 #   - git push naming main as the target ref — main moves only by squash-merged PR
 #   - any git push while checked out on main (sessions branch first, always)
@@ -29,10 +30,16 @@ deny() {
 }
 
 if echo "$cmd" | grep -qE '(^|[[:space:]])git([[:space:]]|$)'; then
+  # The hook-bypass long flag is checked for ANY git command, not just commit: pre-push
+  # runs the whole gate, so push carries it too, and that is the expensive hook a session
+  # is most tempted to skip. The -n short form stays scoped to commit, where it means the
+  # same thing; on push it means --dry-run and is harmless.
+  if echo "$cmd" | grep -qE '(^|[[:space:]])--no-verify([[:space:]]|$)'; then
+    deny "a git command carrying the hook-bypass flag — the commit and push hooks are the gate"
+  fi
   if echo "$cmd" | grep -qE 'git[[:space:]]+commit'; then
-    if echo "$cmd" | grep -qE '(^|[[:space:]])--no-verify([[:space:]]|$)' \
-      || echo "$cmd" | grep -qE '(^|[[:space:]])-[a-zA-Z]*n[a-zA-Z]*([[:space:]]|$)'; then
-      deny "git commit --no-verify / -n"
+    if echo "$cmd" | grep -qE '(^|[[:space:]])-[a-zA-Z]*n[a-zA-Z]*([[:space:]]|$)'; then
+      deny "git commit -n (the short form of the hook-bypass flag)"
     fi
   fi
   if echo "$cmd" | grep -qE 'git[[:space:]]+push'; then

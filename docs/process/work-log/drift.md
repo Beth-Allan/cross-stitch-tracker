@@ -33,7 +33,7 @@ words where possible. Rows are never deleted.
 ### 2026-08-16 · gate-config change, applied out of necessity at overhaul step 5
 
 **What happened.** `.planning/` was excluded from both `format:check` and `lint`. Step 5 moved it
-to `docs/archive/planning/` — 654 archived markdown files — and `docs/` **is** inside the
+to `docs/archive/planning/` — 663 files renamed, 660 of them markdown — and `docs/` **is** inside the
 formatter's scope, so the move would have pulled every one of them into `npm run gate` and turned
 the gate red on history nobody is going to reformat. The exclusion was carried across the rename:
 `.prettierignore` now ignores `docs/archive/`, and `eslint.config.mjs` ignores `docs/archive/**`
@@ -41,8 +41,11 @@ where it ignored `.planning/**` (its `// GSD tooling` comment went with it).
 
 **Why it needs Beth.** Hard rule 6 makes any gate-config change drift, and this one was made
 inside the migration rather than brought to her first — so it is recorded here for her yes or no
-rather than filed as done. **Coverage of live code and live docs is unchanged**; the same content
-that was exempt before is exempt now, at its new path.
+rather than filed as done. **No live code and no live doc lost coverage.** Precisely: 647 of the
+archived files genuinely fail `prettier --check` today, which is what would have turned the gate
+red. Five files moved _out_ of the formatter's scope that were in it on main — the four
+`docs/superpowers/` plan/spec pairs and `docs/tech-stack.md`, all now archived; all five pass
+`prettier --check` as they stand, so nothing is being hidden.
 
 **Her options.** (a) Confirm the carry-over — recommended; archived history is preserved
 byte-for-byte, and reformatting it would rewrite the record. (b) Reverse it and let the gate
@@ -51,6 +54,43 @@ verbatim. (c) Move the archive out of `docs/` entirely so the question does not 
 
 **What happens after she chooses.** (a) changes nothing and this row moves to Ruled. (b) or (c)
 is a small `chore/` branch.
+
+### 2026-08-16 · two gate questions raised by the layer-1 review of PR #72
+
+**What happened.** The independent pre-merge review of the overhaul branch found two things that
+are Beth's to rule on rather than a session's to decide.
+
+**① `gh pr merge` is now auto-approved.** Step 1 added a `permissions.allow` entry for it in
+`.claude/settings.json`. Before that, running the merge command surfaced a permission prompt — a
+mechanical stop before a production deploy. What replaces it is convention: her word (protocol §5
+layer 2, §8). It was in the plan and is not smuggled, but it was never raised as a gate-config
+change the way the formatter exclusion was. **Options:** (a) confirm it — recommended, since the
+merge already requires her word and the prompt was answered by the same session that would be
+merging, so it stopped nothing a rule doesn't; (b) remove the entry and keep the prompt as a
+second, mechanical pause. Either way the `--admin` bypass stays blocked by the guard.
+
+**② Should the `revalidateTag("stats")` callers be review-gated?** The stats _cache_ is gated by
+its query directory, but the mutations that invalidate it — `chart-actions.ts`,
+`supply-actions.ts`, `session-actions.ts` — are not. That trap caused two of the bugs the ledger
+was seeded from. **Options:** (a) leave as is — most items touch one of those three files, so
+gating them makes almost every build item need a fresh `/review` session, which is a real tax on
+a one-item-per-session process; (b) gate them and accept the tax on the ground that the cache
+layer is where bugs have actually hidden; (c) let A-1 look first and decide with evidence —
+recommended. Recorded in `.claude/hooks/review-gated-paths.txt` as an open question so it cannot
+be quietly forgotten.
+
+**③ Four paths were added to the review-gated list during this same review, and she should know.**
+The list is the whole of hard rule 3's enforcement (no `guard-merge` exists, D-03), and the review
+found it missing files that protocol §5 already names in prose: **`proxy.ts`** — the matcher
+deciding which routes are protected at all, so a one-line edit there can silently unprotect the
+app — plus `src/lib/r2.ts` (the module that builds the R2 client from the credentials, where the
+two gated upload actions only _use_ it), and the `src/app/(auth)/` and `src/app/api/auth/`
+directories, where the only `checkRateLimit` caller lives. These were added rather than parked,
+because each closes a gap against policy she has already ruled on rather than extending it — but
+adding to that list is a gate-config change either way, so **it is hers to confirm or reverse**.
+Recommended: confirm. `session-protocol.md` §5 was updated to match.
+
+**What happens after she chooses.** All three are one-line edits to a config file, no code.
 
 ## Also open — the questions known to be coming
 

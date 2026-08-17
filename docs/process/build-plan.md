@@ -214,5 +214,5 @@ written against the canon it now has. Hard rule 4 is the whole reason for the or
 | **D-6** | reference data (fabric, designers, series, storage) — carries the series detail/preview wishes (old 999.86, 999.89)                                                                                                                                                                                                                                                                             | DS-6              |
 
 The design-track inputs each stage inherits are listed in `docs/process/work-log/backlog.md`
-under "Design-track inputs"; they move to `docs/design/screens.md` when that manifest is
+under "Design-track inputs"; they move to `docs/design/screens.md` (the manifest **file** — not `docs/design/screens/`, the directory canon lands in) when that manifest is
 scaffolded at overhaul step 8.

@@ -13,10 +13,16 @@
 ^prisma/schema\.prisma$
 ^prisma/migrations/
 
-# Auth, session, and rate limiting
+# Auth, session, and rate limiting — the mechanisms AND the routes that apply them.
+# The route group and the API segment are gated as directories, per the lesson above:
+# login/actions.ts is the only checkRateLimit caller, and a sibling added beside it
+# would otherwise arrive ungated.
+^proxy\.ts$
 ^src/lib/auth\.ts$
 ^src/lib/auth-guard\.ts$
 ^src/lib/rate-limit\.ts$
+^src/app/\(auth\)/
+^src/app/api/auth/
 
 # The math (skein + fabric calculators)
 ^src/lib/utils/skein-calculator\.ts$
@@ -26,6 +32,16 @@
 # (history: backlog 999.41 and 999.42)
 ^src/lib/queries/stats/
 
-# R2 upload paths — orphan-leak history (999.50, 999.52)
+# R2 — the upload actions (orphan-leak history) and the client module they both
+# call, which builds the S3 client from the R2 credentials and resolves the bucket.
 ^src/lib/actions/upload-actions\.ts$
 ^src/lib/actions/chart-file-actions\.ts$
+^src/lib/r2\.ts$
+
+# OPEN QUESTION for Beth, raised by the layer-1 review of PR #72 (2026-08-16) and
+# carried as a drift row: the stats *cache* is gated above by its query directory,
+# but revalidateTag("stats") is called from chart-actions.ts, supply-actions.ts and
+# session-actions.ts, which are not gated. Gating them would pull most of the app's
+# mutation surface into fresh-/review territory; leaving them means the trap that
+# caused 999.41/999.42 can be re-introduced from an ungated file. Her ruling decides;
+# nothing is added here until she gives it.

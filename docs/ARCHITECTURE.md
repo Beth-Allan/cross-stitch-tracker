@@ -90,7 +90,7 @@ Shadcn/Base UI component wrappers. No business logic. Key files:
 
 ### Layer 5: Server Actions (`src/lib/actions/`)
 
-Eighteen files, each starting with `"use server"`, one per domain. Pattern: `requireAuth()` → Zod validation → Prisma mutation → `revalidatePath()` / `revalidateTag()`.
+Eighteen files, each starting with `"use server"`, one per domain. Pattern: `requireAuth()` → Zod validation → Prisma mutation → `revalidatePath()` / `revalidateTag("stats", { expire: 0 })` — the Next 16 two-argument form.
 
 Key files:
 
@@ -106,11 +106,11 @@ Key files:
 
 ### Layer 6: Stats Query Layer (`src/lib/queries/stats/`)
 
-Nineteen query files plus a barrel and a shared helper module. Pure async functions querying Prisma — not server actions, called from pages and actions. Most export a single function; `timezone.ts` exports two.
+Nineteen query files plus a barrel and a shared helper module. Pure async functions querying Prisma — not server actions, called from pages and actions. Most export a single function; `timezone.ts` and `completion-estimates.ts` export two.
 
-Caching: `unstable_cache` keyed per user, tagged `"stats"`, invalidated by `revalidateTag("stats")` on session and status mutations. TTL varies by volatility — **300s** for activity-derived queries, **3600s** for collection-shape queries (`collection-breakdown`, `size-breakdown`, `designer-breakdown`, `genre-breakdown`); several take a scope-derived `revalidate`. `timezone.ts` and `record-detection.ts` are uncached.
+Caching: `unstable_cache` keyed per user, tagged `"stats"`, invalidated by `revalidateTag("stats", { expire: 0 })` from any mutation that moves a statistic. TTL varies by volatility — **300s** for activity-derived queries, **3600s** for collection-shape queries (`collection-breakdown`, `size-breakdown`, `designer-breakdown`, `genre-breakdown`); several take a scope-derived `revalidate`. `timezone.ts` and `record-detection.ts` are uncached.
 
-- `index.ts` — Barrel re-exporting 20 functions. Not exhaustive by design: `record-detection.ts` stays off the barrel and is imported by path from `session-actions.ts`.
+- `index.ts` — Barrel re-exporting 20 functions. Not exhaustive by design: `record-detection.ts` stays off it entirely and `completion-estimates.ts` puts only one of its two exports on it; both are imported by path instead — from `session-actions.ts` and `charts/[id]/page.tsx` respectively.
 - `hero-stats.ts` — Today/week/month/year/lifetime aggregates
 - `timezone.ts` — IANA timezone resolution + day boundary computation
 - Plus: `completion-estimates.ts`, `pace-metrics.ts`, `personal-bests.ts`, `record-detection.ts`, `calendar-days.ts`, `session-history.ts`, `monthly-totals.ts`, `daily-breakdown.ts`, `day-of-week.ts`, `fastest-completions.ts`, `thread-insights.ts`, `designer-insights.ts`, `genre-insights.ts`, `collection-breakdown.ts`, `size-breakdown.ts`, `designer-breakdown.ts`, `genre-breakdown.ts`, `available-years.ts`
@@ -164,9 +164,9 @@ Pure functions, no side effects: `skein-calculator.ts`, `fabric-calculator.ts`, 
 
 1. `requireAuth()` — throws if no session
 2. `schema.parse(input)` — Zod validation
-3. Ownership check — **only for user-scoped models.** Three models carry a `userId`: `Project`, `StitchingApp`, `StorageLocation`. Those get `prisma.X.findUnique({ where: { id }, select: { userId: true } })` before the write. Everything else — charts, series, designers, genres, threads, beads, specialty items, brands, fabric — is globally scoped, because this is a single-user app with one collection.
+3. Ownership check — **direct where the model carries a `userId`, transitive where it does not.** Three models carry one: `Project`, `StitchingApp`, `StorageLocation`; those get `prisma.X.findUnique({ where: { id }, select: { userId: true } })` before the write. Models that hang off a project are checked **through** it — `chart-actions.ts` selects `{ project: { select: { userId: true } } }` before deleting a chart or changing its status, `chart-file-actions.ts` checks `file.chart.project?.userId` on every mutation, and `fabric-actions.ts` verifies a linked fabric's project. Genuinely global, because this is a single-user app with one collection: designers, genres, series, threads, beads, specialty items and brands. **Fabric is the boundary case** — `linkedProjectId` is nullable, so an unlinked fabric has no ownership path at all and is queried as `OR: [{ linkedProjectId: null }, { linkedProject: { userId } }]`.
 4. Prisma write (often inside `$transaction`)
-5. `revalidatePath()` / `revalidateTag()`
+5. `revalidatePath()` / `revalidateTag("stats", { expire: 0 })` — the Next 16 two-argument form
 6. Return `{ success: true, ... }` or `{ success: false, error: string }`
 
 ### File Uploads (R2 Three-Step Presigned URL)
@@ -180,32 +180,32 @@ R2 key pattern: `{category}/{projectId}/{nanoid()}-{filename}` (categories: `cov
 ### Stats Queries
 
 - Each query accepts `userId`, uses `unstable_cache()` with a user-scoped key and the `"stats"` tag
-- Invalidated by `revalidateTag("stats")` on session/status mutations
+- Invalidated by `revalidateTag("stats", { expire: 0 })` from any mutation that moves a statistic
 - The stats page calls sixteen of them in one `Promise.allSettled()` for graceful degradation, then fetches its project picker list separately in its own try/catch
 - `settled<T>()` unwraps each result to `T | null`
 
 ## Key Abstractions
 
-| Abstraction                 | Location                         | Purpose                                                                        |
-| --------------------------- | -------------------------------- | ------------------------------------------------------------------------------ |
-| Lazy Singleton              | `db.ts`, `r2.ts`                 | Deferred init via Proxy/getter to avoid build-time env failures                |
-| Auth Edge                   | `proxy.ts`                       | Session gate ahead of routing; layout redirect is the second line              |
-| Auth Guard                  | `auth-guard.ts`                  | Single chokepoint for auth enforcement inside actions                          |
-| Discriminated Union Results | All actions                      | `{ success: true } \| { success: false; error }` — never throw to client       |
-| Gallery Transform           | `gallery-utils.ts`               | Pure DB→UI type transformation with computed fields, including series identity |
-| Status Config               | `utils/status.ts`                | `Record<ProjectStatus, {...}>` — single source for labels/colors               |
-| Factory Pattern             | `__tests__/mocks/factories.ts`   | Typed factories for every Prisma model + mock client                           |
-| nuqs URL State              | Gallery, stats                   | URL-persisted search/filter/sort state, series filter included                 |
-| Stats Barrel                | `queries/stats/index.ts`         | Aggregated import path for the stats page's query set                          |
-| Component Public API        | `features/supply-table/index.ts` | Exports the table, adapters and types; sub-components stay internal            |
+| Abstraction                 | Location                         | Purpose                                                                             |
+| --------------------------- | -------------------------------- | ----------------------------------------------------------------------------------- |
+| Lazy Singleton              | `db.ts`, `r2.ts`                 | Deferred init via Proxy/getter to avoid build-time env failures                     |
+| Auth Edge                   | `proxy.ts`                       | Session gate ahead of routing; layout redirect is the second line                   |
+| Auth Guard                  | `auth-guard.ts`                  | Single chokepoint for auth enforcement inside actions                               |
+| Discriminated Union Results | All actions                      | `{ success: true } \| { success: false; error }` — never throw to client            |
+| Gallery Transform           | `gallery-utils.ts`               | Pure DB→UI type transformation with computed fields, including series identity      |
+| Status Config               | `utils/status.ts`                | `Record<ProjectStatus, {...}>` — single source for labels/colors                    |
+| Factory Pattern             | `__tests__/mocks/factories.ts`   | Typed factories for 17 of the 18 Prisma models (`ChartFile` has none) + mock client |
+| nuqs URL State              | Gallery, stats                   | URL-persisted search/filter/sort state, series filter included                      |
+| Stats Barrel                | `queries/stats/index.ts`         | Aggregated import path for the stats page's query set                               |
+| Component Public API        | `features/supply-table/index.ts` | Exports the table, adapters and types; sub-components stay internal                 |
 
 ## Architectural Constraints
 
 - Requests pass `proxy.ts` before routing; nothing in `(dashboard)` renders for an unauthenticated session
 - Server Components fetch data; Client Components receive props (split at top-level feature component)
-- All page-level fetching uses `Promise.all()` or `Promise.allSettled()` — no sequential awaits
+- Pages that fetch more than one dataset parallelize with `Promise.all()` / `Promise.allSettled()`. It is a habit, not an invariant — around a dozen of the simpler dashboard pages still await sequentially (e.g. `shopping/page.tsx`), which is worth fixing when you are already in the file and is not a review finding on its own
 - R2 keys stored in DB, presigned URLs generated per-render (1-hour expiry); image processing (sharp) is server-side only
-- Stats queries share the `"stats"` cache tag; a mutation that changes stitch counts or status must invalidate it
-- Ownership checks apply to the three user-scoped models; reference data is global
+- Stats queries share the `"stats"` cache tag; any mutation that moves a statistic must invalidate it with `revalidateTag("stats", { expire: 0 })` — `supply-actions.ts` alone does so at 26 sites, most of which change neither stitch count nor status
+- Ownership is checked directly on the three `userId`-carrying models and transitively on everything that hangs off a project; only true reference data is global (see the mutation sequence above)
 - Security headers set globally in `next.config.ts` (CSP whitelists R2 origins)
 - Component, form, action and testing conventions are in `.claude/rules/` — follow them there rather than duplicating them here

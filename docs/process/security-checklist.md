@@ -28,11 +28,19 @@ gate-config change (drift, session-protocol §6).
 
 ## 2. Access control
 
+- [ ] **`proxy.ts` still gates the routes it should.** It is the app's outer fence — Next.js 16's
+      middleware rename, re-exporting Auth.js's `auth` with a matcher that excludes `api/auth`,
+      `_next/*`, icons and the manifest. Anything added to that exclusion list is unauthenticated
+      from then on, and nothing else in the app will say so. Review-gated.
 - [ ] Every server action and API route calls `requireAuth()` from `@/lib/auth-guard` and
       checks `user.id` exists. Fallback IDs (`user.id ?? "1"`) are banned. No local copies of
       the guard.
-- [ ] Every query and mutation touching user data filters by ownership (`userId` in the
-      `where`). Single-user today; nothing may assume it (the 999.0.17 hardening direction).
+- [ ] Every query and mutation touching user data filters by ownership — directly via `userId`
+      where the model carries one (`Project`, `StorageLocation`, `StitchingApp`), or by
+      traversing the project relation where it does not. **`Chart.project` and
+      `Fabric.linkedProjectId` are both optional**, so those two have rows with no ownership
+      path at all; a query over either that does not traverse a project is unscoped by
+      construction (`docs/CONCERNS.md`). Single-user today; nothing may assume it.
 - [ ] The Auth.js v5 JWT/session callbacks in `src/lib/auth.ts` stay intact —
       `session.user.id` threading is load-bearing (`.claude/rules/auth-patterns.md`); without
       it `requireAuth()` rejects everything. The file is review-gated.

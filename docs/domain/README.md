@@ -81,5 +81,10 @@ Two different things, kept apart:
 `CROSS_STITCH_TRACKER_PLAN.md` remains the **product** spec — what the app must do, and the
 source most of this directory was seeded from. **This directory is authoritative for domain
 truth**: where the two disagree about how cross-stitch works, a fact here wins and the
-contradiction is a drift row. The calculators in `src/lib/utils/` cite fact IDs for the constants
-they encode.
+contradiction is a drift row.
+
+**The calculators do not cite fact IDs yet.** `skein-calculator.ts` cites two URLs and
+`fabric-calculator.ts` cites "design spec D-20"; neither names a `THR-` or `FAB-` id, so the trail
+currently runs one way only — from a fact here to the code, not back. The next item that touches
+either file should add the citation while it is in there. Both are review-gated cores, so it is
+not a drive-by edit.

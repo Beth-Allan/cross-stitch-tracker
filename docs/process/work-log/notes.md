@@ -198,6 +198,25 @@ directory exists and holds the DesignOS map, but canon still has nowhere to land
 creates `docs/design/screens/`, and the note's own instruction was to delete it only then.
 **Consumed when** step 8 has built the canon home.
 
+## `D-NN` means three different things — check the shape before you follow one
+
+**Tags:** drift · build-plan · design track · any session citing a `D-` id
+
+Three namespaces share the prefix and only the punctuation tells them apart:
+
+- **`D-01`–`D-14`, zero-padded** — Beth's standing rulings, in `WORKFLOW-OVERHAUL-HANDOFF.md` §2.
+  New ones number on from `D-15` in `drift.md`.
+- **`D-1`–`D-6`, unpadded** — the redesign build items in `build-plan.md` / the work log's Stage D.
+- **`D-20` and friends, in code comments** — DesignOS-era design specs. `fabric-calculator.ts`
+  cites "design spec D-20" for the 6-inch margin; it resolves only inside
+  `docs/archive/planning/`, which is history, not authority.
+
+The padding convention is applied consistently today, which is the only thing keeping them apart —
+and `backlog.md` already has a sentence containing a ruling, a design session and a build item in
+three different `D` shapes. **Ruling D-20 will one day collide with design spec D-20.** Cheapest
+fix if it ever bites: rename the ruling namespace, not the other two. **Not consumed** — this is a
+standing fact until someone renames something. Raised by the layer-1 review of PR #72.
+
 ## `.claude/` is prettier-ignored — the doors are not gate-formatted
 
 **Tags:** `.claude/skills/` · `.claude/rules/` · gate · formatting

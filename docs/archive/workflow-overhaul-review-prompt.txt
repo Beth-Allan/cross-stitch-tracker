@@ -1,11 +1,14 @@
+[Archived 2026-08-16 at workflow-overhaul step 5. Local filesystem paths were replaced with
+descriptions on archiving, because this repository is public; nothing else is changed.]
+
 I'm the owner of two personal projects and I'm about to replace the entire development process in one of them. I'm not a full-time coder — I'll be living with whatever this produces for the next year of work, and I can't easily judge process design myself, which is why I'm asking you.
 
 The plan is written up here, self-contained:
-/Users/isleofskye/dev/bethallan/cross-stitch-tracker/WORKFLOW-OVERHAUL-HANDOFF.md
+WORKFLOW-OVERHAUL-HANDOFF.md (in this repo)
 
 Both repos are on disk, read whatever you need:
-- /Users/isleofskye/dev/bethallan/cross-stitch-tracker — the target. Next.js 16, 2448 tests, mid-milestone.
-- /Users/isleofskye/dev/bethallan/ffh-horse-database — the source model. Laravel, same owner, already made this transition. docs/process/session-protocol.md is its authority, .claude/skills/ its doors, .claude/hooks/ its fences.
+- this repo — the target. Next.js 16, 2448 tests, mid-milestone.
+- a second private repo of the owner's — the source model. Laravel, same owner, already made this transition. docs/process/session-protocol.md is its authority, .claude/skills/ its doors, .claude/hooks/ its fences.
 
 This is the second review. The first one is already in the document at §4, and its findings have been folded into §3 — so §3 is the revised plan, not the draft that was reviewed. That changes what's useful from you: I don't need the first review repeated back. I need to know where it was wrong, where folding it in made something worse, and what a plan that has now survived one careful reading still gets wrong. Reviewers agreeing with each other is not evidence.
 
