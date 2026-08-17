@@ -236,6 +236,19 @@ with no obvious cause. **Auto-delete must be Never.** Her other choices were alr
 branch `production`, "Branch data and schema", TTL Forever. The branch is refreshed later with Neon's
 _reset from parent_, which keeps the same connection strings.
 
+**Discovered mid-pass, and it matters: the R2 credentials were _already_ shared with Preview.**
+`R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` have been scoped **Production and Preview** since
+April, so Preview inherits the production pair — which is read-**write** on the real bucket. Left
+that way, key A is pointless: the code would still route writes to scratch, but a preview would be
+holding a credential capable of altering real files, and the Cloudflare-enforced half of the
+guarantee would not exist. **Vercel models per-environment values as separate entries**, so the fix
+is ordered: un-tick Preview on the existing entry (leaving Production), _then_ add a same-named
+Preview-only entry with key A's value — adding first is rejected as a duplicate. Same pattern for
+`DATABASE_URL`/`DIRECT_URL`, except those are Production-only today so they need no un-tick.
+`STATS_TIMEZONE` does not exist in Vercel at all (the code default, `America/Edmonton`, is what
+production has always used), and `NEXT_PUBLIC_APP_URL` is the dead variable from its own ledger row —
+neither needs a Preview copy.
+
 **Known limitation of the preview branch:** its schema is a point-in-time copy, and neither the Vercel
 build nor CI runs `prisma migrate deploy`. A PR that adds a migration will therefore run new code
 against the older preview schema until someone resets the branch from parent. Not a blocker for
