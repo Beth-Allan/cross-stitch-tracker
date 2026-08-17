@@ -158,6 +158,10 @@ the skill appearing in the session's skills listing — rather than by the gate 
 **Consumed when** a preview URL can be logged into and shows a real chart cover, and the three
 ledger rows R-1 owns are Resolved.
 
+**Beth's copy of this list** is a private artifact — a five-step checklist in her language, with
+the two hazards flagged: <https://claude.ai/code/artifact/b6538c58-ce8c-4d54-bdb8-31515242ac6b>
+(published 2026-08-17; republishing the same file path from that session updates it in place).
+
 **Why this note exists.** R-1 is two halves and only the code half can be done from a session:
 this machine has no Vercel or Cloudflare access — no CLI, no stored login, no `.env.local` at all
 (checked 2026-08-17). Beth ruled (D-16) that the keys stay with her and Claude writes the steps, so
