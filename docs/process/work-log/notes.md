@@ -148,3 +148,136 @@ broken frontmatter block in a door or a rule file. `WORKFLOW-REFERENCE.md`, bein
 root, **is** formatted. Practical upshot: after writing a door, confirm it by its own evidence —
 the skill appearing in the session's skills listing — rather than by the gate going green.
 **Not consumed** — this is a standing fact about where the gate's eyes are.
+
+---
+
+## R-1's settings half — the exact list, and the one check that must happen before the code merges
+
+**Tags:** R-1 · preview deployments · Vercel · Cloudflare R2 · Neon · D-15 · D-16 · layer 2
+
+**CONSUMED 2026-08-17** — the settings pass is done and the shape is verified on PR #85's preview
+(signed in, real covers rendered, a new cover uploaded to scratch, production's copy untouched).
+`/cleanup` may retire this note: everything durable in it now lives in `docs/INTEGRATIONS.md`
+(topology, the CORS requirement, the credential split) and the work-log row. It is kept until then
+because it is the only place the _ordering_ of the dashboard steps is written down, which is what a
+rebuild of the Preview environment would need.
+
+**Beth's copy of this list** is a private artifact — a five-step checklist in her language, with
+the two hazards flagged: <https://claude.ai/code/artifact/b6538c58-ce8c-4d54-bdb8-31515242ac6b>
+(published 2026-08-17; republishing the same file path from that session updates it in place).
+
+**Why this note exists.** R-1 is two halves and only the code half can be done from a session:
+this machine has no Vercel or Cloudflare access — no CLI, no stored login, no `.env.local` at all
+(checked 2026-08-17). Beth ruled (D-16) that the keys stay with her and Claude writes the steps, so
+this is that list, written down so the next session does not re-derive it or re-ask her.
+
+**① The pre-merge check — `R2_BUCKET_NAME` in Vercel Production. CLEARED 2026-08-17 — do not
+re-ask Beth.** She checked the dashboard in-session and it is set, scoped to **Production and
+Preview** both (added Apr 11, marked Sensitive). Production is therefore not running on the removed
+default, and the merge is safe on this axis. The rest of this item is kept for the record and for
+anyone who wonders why the check existed.
+
+**Why it existed.** R-1 made that variable
+**required**: it used to default to `"cross-stitch-tracker"` with a warning, which meant a typo
+silently redirected every presigned URL to the wrong bucket. **`.env.example` suggests the real
+bucket is named exactly that, so Production may be running on the fallback right now with the
+variable unset.**
+
+If it is, merging does more than break uploads — **it blanks every image on the live site, quietly.**
+`getPresignedImageUrls` catches per-key failures with `Promise.allSettled` and returns an empty map,
+so every cover, thumbnail and session photo disappears from every page with nothing but a
+`console.warn` (the layer-1 review of PR #85 traced this; the first draft of this note understated
+it as an upload-only failure). **So before R-1 merges, Production must be confirmed to have
+`R2_BUCKET_NAME` set to the real bucket's name.** That is a dashboard read, not a code question — it
+belongs to the `/review` session's checklist, and the PR says so.
+
+**② Cloudflare — one bucket, two tokens, one CORS policy** (dash.cloudflare.com → R2):
+
+- **The CORS policy is not optional and was missed on the first pass.** A new bucket refuses browser
+  uploads until it has one; the real bucket has carried one since April and a new bucket inherits
+  nothing. On the scratch bucket → Settings → CORS Policy: `AllowedOrigins: ["*"]`,
+  `AllowedMethods: ["GET","PUT"]`, `AllowedHeaders: ["*"]`. Takes effect immediately, no redeploy.
+  Reasoning for the wildcard is in `INTEGRATIONS.md`. **Symptom if forgotten:** the upload UI says
+  "Upload failed. Please try again." — which is reachable only _after_ the presign succeeds, so a
+  presign-side cause (missing variable, bad key) would have produced a different message.
+
+- Create a bucket in the same account as the real one, e.g. `cross-stitch-tracker-preview`.
+- Token A — **Object Read only**, scoped to the _real_ bucket. This becomes Preview's main
+  credential pair, which is what makes a preview physically unable to write to production storage
+  rather than merely coded not to.
+- Token B — **Object Read & Write**, scoped to the _scratch_ bucket only.
+- Both tokens are optional in the sense that one read-write pair covering **both** buckets also
+  works — the code enforces the split either way (`getWriteTarget` / `getReadTarget` in
+  `src/lib/r2.ts`). Two tokens move the guarantee from our code to Cloudflare, which is why they are
+  the recommendation.
+- **The two configurations do not mix.** A read-only main pair with no token B is the one broken
+  combination: writes are denied and the scratch probe fails, so a preview shows broken images. It is
+  token A **plus** token B, or one read-write pair for both buckets — never half. Half a scratch
+  credential pair now throws outright rather than falling back to the production credentials.
+
+**③ Neon — a branch, per D-15** (console.neon.tech): branch the production branch (call it
+`preview`), then take its **pooled** connection string for `DATABASE_URL` and its **direct** string
+for `DIRECT_URL`. Previews then show real charts while writing only to the copy.
+
+**④ Vercel — Project → Settings → Environment Variables**, all scoped to **Preview**:
+
+| variable                                                    | value                                               |
+| ----------------------------------------------------------- | --------------------------------------------------- |
+| `AUTH_SECRET`, `AUTH_USER_EMAIL`, `AUTH_USER_PASSWORD_HASH` | tick **Preview** on the existing Production entries |
+| `STATS_TIMEZONE`                                            | tick **Preview** on the existing entry              |
+| `DATABASE_URL`, `DIRECT_URL`                                | the Neon _preview_ branch strings from ③            |
+| `R2_ACCOUNT_ID`                                             | same as Production                                  |
+| `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`                  | token A (read-only on the real bucket)              |
+| `R2_BUCKET_NAME`                                            | the real bucket — previews read it                  |
+| `R2_SCRATCH_BUCKET_NAME`                                    | the scratch bucket from ②                           |
+| `R2_SCRATCH_ACCESS_KEY_ID`, `R2_SCRATCH_SECRET_ACCESS_KEY`  | token B (read-write on scratch)                     |
+
+**Two traps.** ① Ticking the existing entry's **Preview** box is deliberate for the auth variables:
+it reuses the identical value, so Beth logs into a preview with her normal password and nobody has
+to think about the `.env.local` `\$`-escaping rule (which is a dotenv-parsing artefact and does not
+apply to values typed into Vercel). ② `R2_SCRATCH_BUCKET_NAME` must **never** be set on Production
+— and if it is ever set equal to `R2_BUCKET_NAME`, the app throws rather than quietly writing to
+the real bucket, by design.
+
+**Beth's pass COMPLETED 2026-08-17** — every variable verified from her dashboard screenshots. Final
+Preview state: the seven new Preview-only entries (`DATABASE_URL`, `DIRECT_URL`, `R2_ACCESS_KEY_ID`,
+`R2_SECRET_ACCESS_KEY`, `R2_SCRATCH_BUCKET_NAME`, `R2_SCRATCH_ACCESS_KEY_ID`,
+`R2_SCRATCH_SECRET_ACCESS_KEY`), plus five shared with Production (`AUTH_SECRET`,
+`AUTH_USER_EMAIL`, `AUTH_USER_PASSWORD_HASH`, `R2_ACCOUNT_ID`, `R2_BUCKET_NAME`). The two R2
+credential names each appear **twice with no overlap** — Production holds the live read-write pair,
+Preview holds key A. Cloudflare: scratch bucket created, two tokens scoped to specific buckets. Neon:
+`preview` branch off `production`, data and schema, auto-delete Never. **A deployment built before
+the variables existed cannot see them** — a preview must be rebuilt after this point to pick them up.
+
+**Beth's pass, as originally briefed 2026-08-17.** Her screenshots corrected two things in this list, both now
+fixed in the artifact: ① the Cloudflare token dialog defaults to **"Apply to all buckets in this
+account"** — both tokens want **"Apply to specific buckets only"** (key A → the real bucket, key B →
+the scratch bucket); ② Neon's new-branch dialog defaults **Auto-delete to "After 1 day"**, which
+would have deleted the preview branch and its connection strings overnight and re-broken previews
+with no obvious cause. **Auto-delete must be Never.** Her other choices were already right: parent
+branch `production`, "Branch data and schema", TTL Forever. The branch is refreshed later with Neon's
+_reset from parent_, which keeps the same connection strings.
+
+**Discovered mid-pass, and it matters: the R2 credentials were _already_ shared with Preview.**
+`R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` have been scoped **Production and Preview** since
+April, so Preview inherits the production pair — which is read-**write** on the real bucket. Left
+that way, key A is pointless: the code would still route writes to scratch, but a preview would be
+holding a credential capable of altering real files, and the Cloudflare-enforced half of the
+guarantee would not exist. **Vercel models per-environment values as separate entries**, so the fix
+is ordered: un-tick Preview on the existing entry (leaving Production), _then_ add a same-named
+Preview-only entry with key A's value — adding first is rejected as a duplicate. Same pattern for
+`DATABASE_URL`/`DIRECT_URL`, except those are Production-only today so they need no un-tick.
+`STATS_TIMEZONE` does not exist in Vercel at all (the code default, `America/Edmonton`, is what
+production has always used), and `NEXT_PUBLIC_APP_URL` is the dead variable from its own ledger row —
+neither needs a Preview copy.
+
+**Known limitation of the preview branch:** its schema is a point-in-time copy, and neither the Vercel
+build nor CI runs `prisma migrate deploy`. A PR that adds a migration will therefore run new code
+against the older preview schema until someone resets the branch from parent. Not a blocker for
+design review (the surfaces D-13 cares about are read paths), but it is the first thing to suspect if
+a preview errors on a PR that touched `prisma/`.
+
+**Verification, once ④ is done** (this is R-1's remaining done-when): open the PR's preview URL,
+log in, confirm a chart cover renders, upload a new cover, and confirm the new object appears in the
+scratch bucket while the real bucket is unchanged. State the PR number and which image in the work
+log.

@@ -34,10 +34,25 @@ deliberately absent.
 
 - Cloudflare R2 (S3-compatible object storage)
   - SDK: `@aws-sdk/client-s3` 3.1033.0 + `@aws-sdk/s3-request-presigner` 3.1033.0
-  - Client: `src/lib/r2.ts` — lazy singleton `getR2Client()` using `S3Client` with
-    `region: "auto"` pointed at the R2 endpoint
-  - Bucket: `R2_BUCKET_NAME`, falling back to `"cross-stitch-tracker"` with a `console.warn`
+  - Client: `src/lib/r2.ts` — every caller asks for a **target** (`{ client, bucket }`) rather
+    than a client and a bucket name separately, because on preview deployments reads and writes
+    land in different buckets:
+    - `getWriteTarget()` — where every `PutObject` and `DeleteObject` goes. Synchronous
+    - `getReadTarget(key)` — where that key is read from. Async: in scratch mode it costs one
+      `HeadObject` against the scratch bucket, and nothing at all otherwise
+    - Clients are lazy singletons (`S3Client`, `region: "auto"`, pointed at the R2 endpoint), so
+      module evaluation during a build touches no credentials and prints nothing
+  - Bucket: `R2_BUCKET_NAME` — **required**; a missing value throws rather than defaulting
   - Credentials: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`
+  - **Read real, write scratch** (Beth's ruling, 2026-08-17; item R-1): setting
+    `R2_SCRATCH_BUCKET_NAME` puts the app in scratch mode — it still reads `R2_BUCKET_NAME`, so
+    a preview shows the real images, but every object it creates or deletes goes to the scratch
+    bucket instead. A delete aimed at a real key is issued against the scratch bucket, where it
+    is a no-op, which is what makes a preview unable to remove a real file. Optional
+    `R2_SCRATCH_ACCESS_KEY_ID` / `R2_SCRATCH_SECRET_ACCESS_KEY` let the main credential pair be
+    read-only, so Cloudflare rather than this code enforces the split; without them one pair
+    covers both buckets. A scratch name equal to `R2_BUCKET_NAME` throws — a deployment that
+    believes it is isolated and is not is worse than one that fails loudly
   - Endpoint pattern: `https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com`
   - Upload flow: client → presigned PUT URL (10-minute expiry) → R2 directly; the server then
     confirms the upload and processes it
@@ -128,6 +143,63 @@ deliberately absent.
 - Production URL: `https://cross-stitch-tracker-adolwyn.vercel.app`
 - Pull requests get a Vercel preview deployment
 
+**Deployment topology** (2026-08-17, item R-1 — the 2026-08-16 ledger row asked for this to be
+written down rather than assumed). All three rows are current fact as of 2026-08-17,
+when the Preview environment was populated and verified.
+
+| surface        | code            | database                    | R2 reads         | R2 writes                |
+| -------------- | --------------- | --------------------------- | ---------------- | ------------------------ |
+| local dev      | working tree    | whatever `.env.local` names | `R2_BUCKET_NAME` | same bucket              |
+| Vercel Preview | the PR's branch | a Neon branch — a copy      | `R2_BUCKET_NAME` | `R2_SCRATCH_BUCKET_NAME` |
+| Vercel Prod    | `main`          | the Neon production branch  | `R2_BUCKET_NAME` | same bucket              |
+
+- **Two Vercel environments are in play:** Production (built from `main`) and Preview (one per
+  pull request). There is no staging environment and no third Vercel environment.
+- **Preview's shape is Beth's ruling, twice over** (2026-08-17): the database is a _copy_ — a Neon
+  branch, so a click in a preview cannot edit or delete a real chart — and R2 is **read real,
+  write scratch**, so a preview shows the real photos but its uploads and deletes land in the
+  scratch bucket. Both decisions exist because a preview is a working app, not a screenshot.
+- **Verified working end to end on 2026-08-17** (PR #85's preview): signed in with the production
+  credentials, real chart covers rendered from the real bucket, a new cover uploaded into the scratch
+  bucket, and the same chart in production still showed its original photo. Before that day no preview
+  had ever been loggable-into.
+- **Preview needs its own copy of every variable.** Vercel scopes environment variables per
+  environment; a value set for Production only is simply absent on a preview. Until 2026-08-17 the
+  Preview environment held **none** of them, and preview deployments returned HTTP 500 on
+  `/api/auth/*` and could not be logged into at all. Beth populated it that day (twelve entries —
+  the auth trio, the Neon branch pair, and the R2 real/scratch sets), which is what makes the table
+  above fact rather than intent. **A new variable added to Production is still absent from Preview
+  until it is ticked there too** — that is the standing trap, not a one-off.
+- **A new bucket refuses browser uploads until it has a CORS policy.** Uploads are the only R2
+  traffic the _browser_ makes — a presigned PUT via `fetch` — so they are the only path CORS governs;
+  covers render through `<img src>` and chart files open through `window.open`/an anchor, neither of
+  which is CORS-bound. The real bucket has carried a policy since April and a new bucket inherits
+  nothing, so the scratch bucket needs its own: `AllowedOrigins: ["*"]`, `AllowedMethods:
+["GET","PUT"]`, `AllowedHeaders: ["*"]`. **The wildcard origin is deliberate**, and it grants no
+  access: authorization is the 10-minute presigned URL signed with the scratch credentials, and CORS
+  only decides whether the browser is willing to send the request. An exact-origin list is not
+  workable because every pull request gets its own preview hostname. It belongs on the **scratch
+  bucket only** — the real bucket's policy is untouched by any of this. Found by testing the real
+  preview on 2026-08-17, not by any gate; R2 bucket configuration is not inspectable from the repo
+  (audit report §, 2026-08-17), so this is the record of it.
+- **The scratch bucket needs no CSP change — but not for the reason it looks like.** The AWS SDK
+  addresses R2 **virtual-hosted style** (no `forcePathStyle` is set), so the bucket is the first
+  label of the hostname: a presigned URL for the scratch bucket points at
+  `https://<bucket>.<R2_ACCOUNT_ID>.r2.cloudflarestorage.com`, a different host from the real
+  bucket's. What covers both is that `next.config.ts` allows the **wildcard**
+  `https://*.r2.cloudflarestorage.com`, which suffix-matches the extra label. **Tightening that
+  wildcard to the bare account host would break images in production, not just preview** —
+  verified empirically against this repo's SDK version, 2026-08-17.
+- **"Write scratch" protects objects, not rows.** The split is storage-only: a preview's
+  `deleteChartFile` still deletes the `ChartFile` row from whatever database it is pointed at, while
+  the R2 delete lands harmlessly in scratch. With the Preview Neon branch in place that only touches
+  the copy — but if Preview were ever pointed at the production database, the result would be a real
+  row deleted and its real object left behind: exactly the orphan class item P8 owns. The database
+  half of the guarantee is D-15, not this code.
+- **Nothing cleans up the scratch bucket.** Preview uploads accumulate there with no lifecycle
+  rule and no orphan sweep — deliberate (a preview's leftovers are worthless), recorded so it is
+  not discovered as a surprise (maintenance-ledger row, 2026-08-17).
+
 **CI Pipeline:**
 
 - GitHub Actions — `.github/workflows/ci.yml`
@@ -175,9 +247,20 @@ deliberately absent.
 - `R2_ACCESS_KEY_ID` - R2 API token access key
 - `R2_SECRET_ACCESS_KEY` - R2 API token secret
 
+- `R2_BUCKET_NAME` - the bucket every read comes from; required since item R-1 (it previously
+  defaulted to `cross-stitch-tracker` with a warning, which meant a typo silently redirected
+  every presign to the wrong bucket)
+
+**Optional — Vercel Preview only (scratch writes):**
+
+- `R2_SCRATCH_BUCKET_NAME` - when set, all writes and deletes go here instead of
+  `R2_BUCKET_NAME`. Unset in Production and locally
+- `R2_SCRATCH_ACCESS_KEY_ID`, `R2_SCRATCH_SECRET_ACCESS_KEY` - credentials for the scratch
+  bucket. **Both or neither — half a pair throws**; without them the main pair is used for both
+  buckets, which then has to be able to write to the scratch bucket
+
 **Optional, with a code-level default:**
 
-- `R2_BUCKET_NAME` - defaults to `cross-stitch-tracker` (`src/lib/r2.ts`)
 - `STATS_TIMEZONE` - IANA timezone for stats day boundaries; defaults to `America/Edmonton`
   (`src/lib/queries/stats/timezone.ts`). An invalid value throws rather than falling back
 
@@ -190,7 +273,8 @@ deliberately absent.
 
 - `.env.local` (development) — gitignored
 - `.env.production.local` — gitignored
-- Vercel environment variable dashboard (production secrets)
+- Vercel environment variable dashboard — **scoped per environment**: Production and Preview each
+  hold their own copy, and the scratch-bucket variables belong to Preview alone
 - Reference template: `.env.example` (committed, no real values)
 
 ## Webhooks & Callbacks

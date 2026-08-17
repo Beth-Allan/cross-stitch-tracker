@@ -30,38 +30,6 @@ words where possible. Rows are never deleted.
 
 ## Open — awaiting Beth's ruling
 
-### 2026-08-17 · review layer 2 asks Beth to check a preview she cannot log into — found during P10
-
-**What contradicts what.** `session-protocol.md` §5 layer 2 (and CLAUDE.md's summary of it) says a
-UI-touching PR is confirmed by Beth on its Vercel preview before merge — that is the stated safety
-valve on D-01, because merge deploys production instantly. **Preview deployments cannot
-authenticate.** Every preview returns HTTP 500 on `/api/auth/csrf`, `/api/auth/session` and
-`/api/auth/providers` (Auth.js's "problem with the server configuration"), while production returns
-200 on all three: the Vercel **Preview** environment is missing `AUTH_SECRET` and probably the rest
-of the auth vars. So the only page Beth can actually see on a preview is `/login`.
-
-**Pre-existing, not caused by P10** — verified two ways this session: previews built from code
-without the P10 diff fail identically, and the same endpoints return 200 locally the instant a
-secret is present. P10 only surfaced it, by being the first item that needed the preview for its
-own done-when.
-
-**Why it needs Beth.** Layer 2 is written into the process as a merge precondition. Either the
-preview environment gains the auth vars so layer 2 works as written, or layer 2 needs a different
-answer for anything behind the login (confirm in production after merge, with `git revert` as the
-undo, is the honest alternative — the recovery protocol already covers it).
-
-**Owner if it becomes work:** R-1, which already owns preview-deployment environment topology
-(bucket ruled read-real/write-scratch); setting the Preview auth vars belongs beside that.
-Maintenance-ledger row carries the evidence.
-
-**Ruling:** _open on the standing question._ **Interim precedent set 2026-08-17:** asked whether P10
-should merge with its "app demonstrated working" clause unmet, Beth ruled **merge now** — the
-advisories were live in production, every automated check was green, and `git revert` of the squash
-commit is a one-minute undo. So the working answer today is _signed-in surfaces are confirmed in
-production after merge, with revert as the safety valve_. That is a precedent for one low-risk case
-(no source change, dependencies only), **not** a general replacement for layer 2: a real UI change
-still has nowhere for Beth to preview it, which is why this row stays open.
-
 ### 2026-08-17 · P1 made `src/lib/validations/auth.ts` load-bearing for auth, and it is not review-gated
 
 **What contradicts what.** The review-gated list (`.claude/hooks/review-gated-paths.txt`, mirrored
@@ -113,6 +81,74 @@ allow** at the same `/cleanup`; see Ruled below.)_
 
 _(Beth's rulings D-01–D-14, which set the process itself up, are in
 `WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
+
+### 2026-08-17 · review layer 2 asked Beth to check a preview she could not log into — CLOSED by R-1
+
+**What contradicts what.** `session-protocol.md` §5 layer 2 (and CLAUDE.md's summary of it) says a
+UI-touching PR is confirmed by Beth on its Vercel preview before merge — that is the stated safety
+valve on D-01, because merge deploys production instantly. **Preview deployments cannot
+authenticate.** Every preview returns HTTP 500 on `/api/auth/csrf`, `/api/auth/session` and
+`/api/auth/providers` (Auth.js's "problem with the server configuration"), while production returns
+200 on all three: the Vercel **Preview** environment is missing `AUTH_SECRET` and probably the rest
+of the auth vars. So the only page Beth can actually see on a preview is `/login`.
+
+**Pre-existing, not caused by P10** — verified two ways this session: previews built from code
+without the P10 diff fail identically, and the same endpoints return 200 locally the instant a
+secret is present. P10 only surfaced it, by being the first item that needed the preview for its
+own done-when.
+
+**Why it needs Beth.** Layer 2 is written into the process as a merge precondition. Either the
+preview environment gains the auth vars so layer 2 works as written, or layer 2 needs a different
+answer for anything behind the login (confirm in production after merge, with `git revert` as the
+undo, is the honest alternative — the recovery protocol already covers it).
+
+**Owner if it becomes work:** R-1, which already owns preview-deployment environment topology
+(bucket ruled read-real/write-scratch); setting the Preview auth vars belongs beside that.
+Maintenance-ledger row carries the evidence.
+
+**CLOSED 2026-08-17 by R-1.** Previews now authenticate and show real data: Beth signed into PR
+#85's preview with her production credentials, saw her real chart covers, and uploaded a new one that
+landed in the scratch bucket while production's copy stayed put. **Layer 2 works as written for the
+first time** — a UI-touching PR can now be shown to Beth on its own preview before merge, which is
+what D-01's safety valve always assumed. The interim precedent below (confirm in production after
+merge, revert as the undo) is therefore spent, and stands only as the record of how one low-risk
+dependency PR shipped while the preview was blind.
+
+**Ruling:** _closed; the standing question is answered by D-15 and D-16._ **Interim precedent set 2026-08-17:** asked whether P10
+should merge with its "app demonstrated working" clause unmet, Beth ruled **merge now** — the
+advisories were live in production, every automated check was green, and `git revert` of the squash
+commit is a one-minute undo. So the working answer today is _signed-in surfaces are confirmed in
+production after merge, with revert as the safety valve_. That is a precedent for one low-risk case
+(no source change, dependencies only), **not** a general replacement for layer 2: a real UI change
+still has nowhere for Beth to preview it, which is why this row stays open.
+
+### 2026-08-17 · D-15 and D-16 · what a preview deployment is allowed to touch — ruled during R-1
+
+**What happened.** R-1 opened on a ruled bucket question (read real, write scratch) and hit two
+things the ruling did not cover. First, a preview needs a _database_ before it can show any image
+at all, and nothing had ever said which one. Second, the settings a preview needs live in Beth's
+Cloudflare and Vercel accounts, and no session can reach them from this machine — no CLI, no
+stored credentials, no `.env.local` (checked). Both were put to her in-session.
+
+**D-15 — a preview reads a copy of the database, not the real one.** Previews get their own Neon
+branch: real charts, real numbers, honest review, and a click that edits or deletes something
+changes only the copy. Rejected: pointing Preview at the production database, because a preview is
+a working app — the same hazard the R2 ruling already refused for files, and there is no undo for a
+deleted chart. This is the database half of _read real, write scratch_, and the two together are
+now the documented shape of a preview (`docs/INTEGRATIONS.md`, Deployment topology).
+
+**D-16 — the keys stay with Beth; Claude writes the steps.** Asked whether to do the settings
+herself with an exact list, or hand over a Cloudflare token and a Vercel token so Claude could do
+all of it, Beth chose to do it herself. So the standing shape for infrastructure settings is:
+**Claude never holds credentials to the live site; it produces the numbered steps and verifies the
+result afterwards.** The cost is accepted — a session that needs a new environment variable stops
+and asks rather than setting it. Note this is not the same as the file/command contract (protocol
+§8): Beth is still never asked to edit a repo file or run a command, and dashboards are not that.
+
+**What happens after.** R-1's code half merges through `/review`; the settings list lives in
+`notes.md` tagged R-1; the preview clauses of R-1's done-when are demonstrated once Beth has done
+the dashboard pass. The open row above — _review layer 2 asks Beth to check a preview she cannot
+log into_ — stays open until then, and D-15/D-16 are what will close it.
 
 ### 2026-08-17 · Next.js may not co-author CLAUDE.md — ruled during P10
 

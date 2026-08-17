@@ -204,7 +204,9 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
   with the display clamp unification.
 - **Folded in:** ledger rows — comment sweep, recharts named imports, `shadcn`→devDependencies,
   dead `NEXT_PUBLIC_APP_URL`, dependabot package-name fix, `.gitignore` settings.local.json,
-  the two placement oddities, the `R2_BUCKET_NAME` fallback throw (coordinate with R-1).
+  the two placement oddities. ~~the `R2_BUCKET_NAME` fallback throw~~ — **done in R-1
+  (2026-08-17)**: making the bucket lazy and required was the same edit as the read/write split, so
+  P11 inherits only the `/charts` dynamic-server half of the build-noise row.
 - **Traps:** honestly too big for one session if each fix sprouts discussion — apply the
   protocol §2 size check and split rather than marathon.
 - **Done-when:** each fix demonstrated (behavior fixes test-first; pure copy/config by
@@ -366,9 +368,19 @@ not a promise that the diagnosis below is right.
   Trap ① is answered; build to this shape. Also in scope now: document the actual deployment
   topology (Neon branches, R2 buckets, Vercel environments) — the 2026-08-16 ledger row — in
   `docs/INTEGRATIONS.md` as part of this item.
-- **Done-when:** the read-real/write-scratch shape demonstrated on a real preview URL; preview deployments serve and accept R2 images;
-  a real preview URL demonstrated with a working image (state which PR and which image); no
-  secret in the repo; the build-time R2 fallback warning is gone or explained; work log updated.
+- **Two passes, not one** (added 2026-08-17 after the first pass; rulings D-15/D-16 in `drift.md`):
+  the item splits at the line no session can cross. **Pass 1 — the code** (done, PR #85): the
+  read/write split, the required-and-lazy `R2_BUCKET_NAME`, the topology written down. **Pass 2 — the
+  settings**: the Cloudflare scratch bucket, the Neon preview branch and the Vercel Preview variables
+  are Beth's to create (D-16 — the keys stay with her), so pass 2 begins after her dashboard pass and
+  ends with the preview demonstration. The exact settings list is in `notes.md` tagged R-1, including
+  **the pre-merge check that Production has `R2_BUCKET_NAME` set** — without it, merging pass 1
+  blanks every image on the live site.
+- **Done-when, pass 1:** the read-real/write-scratch shape built and tested; no secret in the repo;
+  the build-time R2 fallback warning gone or explained; deployment topology documented in
+  `docs/INTEGRATIONS.md`; work log updated. **Done-when, pass 2:** preview deployments serve and
+  accept R2 images, demonstrated on a real preview URL with a working image (state which PR and which
+  image), with the preview's writes confirmed to land in scratch and the real bucket unchanged.
 
 ---
 

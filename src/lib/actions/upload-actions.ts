@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
-import { getR2Client, R2_BUCKET_NAME } from "@/lib/r2";
+import { getReadTarget, getWriteTarget } from "@/lib/r2";
 import {
   uploadRequestSchema,
   ALLOWED_IMAGE_TYPES,
@@ -24,12 +24,12 @@ const VALID_CHART_FIELDS = ["coverImageUrl", "coverThumbnailUrl"] as const;
 async function fetchImageBuffer(
   key: string,
 ): Promise<{ success: true; buffer: Buffer } | { success: false; error: string }> {
-  const r2 = getR2Client();
+  const { client, bucket } = await getReadTarget(key);
   const getCommand = new GetObjectCommand({
-    Bucket: R2_BUCKET_NAME,
+    Bucket: bucket,
     Key: key,
   });
-  const response = await r2.send(getCommand);
+  const response = await client.send(getCommand);
 
   if (!response.Body) {
     return { success: false, error: "Original image not found in storage" };
@@ -90,13 +90,14 @@ export async function getPresignedUploadUrl(input: unknown) {
     const sanitizedName = validated.fileName.replace(/[/\\]/g, "-").slice(0, 100);
     const key = `${validated.category}/${validated.projectId}/${nanoid()}-${sanitizedName}`;
 
+    const { client, bucket } = getWriteTarget();
     const command = new PutObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: bucket,
       Key: key,
       ContentType: validated.contentType,
     });
 
-    const url = await getSignedUrl(getR2Client(), command, {
+    const url = await getSignedUrl(client, command, {
       expiresIn: 600,
     });
 
@@ -175,12 +176,13 @@ export async function getPresignedDownloadUrl(key: string) {
   await requireAuth();
 
   try {
+    const { client, bucket } = await getReadTarget(key);
     const command = new GetObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: bucket,
       Key: key,
     });
 
-    const url = await getSignedUrl(getR2Client(), command, {
+    const url = await getSignedUrl(client, command, {
       expiresIn: 3600,
     });
 
@@ -212,11 +214,12 @@ export async function getPresignedImageUrls(
   try {
     const results = await Promise.allSettled(
       validKeys.map(async (key) => {
+        const { client, bucket } = await getReadTarget(key);
         const command = new GetObjectCommand({
-          Bucket: R2_BUCKET_NAME,
+          Bucket: bucket,
           Key: key,
         });
-        const url = await getSignedUrl(getR2Client(), command, { expiresIn: 3600 });
+        const url = await getSignedUrl(client, command, { expiresIn: 3600 });
         return { key, url };
       }),
     );
@@ -241,12 +244,15 @@ export async function deleteFile(key: string) {
   await requireAuth();
 
   try {
+    // Write target, not read: on a preview deployment this is the scratch bucket, so
+    // a delete aimed at a real key is a no-op there instead of removing the file.
+    const { client, bucket } = getWriteTarget();
     const command = new DeleteObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: bucket,
       Key: key,
     });
 
-    await getR2Client().send(command);
+    await client.send(command);
     return { success: true as const };
   } catch (error) {
     console.error("deleteFile error:", error);
@@ -263,7 +269,6 @@ export async function processAndStoreImage(
   { success: true; optimizedKey: string; thumbnailKey: string } | { success: false; error: string }
 > {
   await requireAuth();
-  const r2 = getR2Client();
 
   try {
     const fetchResult = await fetchImageBuffer(rawKey);
@@ -286,18 +291,19 @@ export async function processAndStoreImage(
     const optimizedKey = `${category}/${entityId}/opt-${nanoid()}.webp`;
     const thumbnailKey = `${category}/${entityId}/thumb-${nanoid()}.webp`;
 
+    const { client, bucket } = getWriteTarget();
     await Promise.all([
-      r2.send(
+      client.send(
         new PutObjectCommand({
-          Bucket: R2_BUCKET_NAME,
+          Bucket: bucket,
           Key: optimizedKey,
           Body: optimizedBuffer,
           ContentType: "image/webp",
         }),
       ),
-      r2.send(
+      client.send(
         new PutObjectCommand({
-          Bucket: R2_BUCKET_NAME,
+          Bucket: bucket,
           Key: thumbnailKey,
           Body: thumbnailBuffer,
           ContentType: "image/webp",
@@ -320,8 +326,6 @@ export async function generateThumbnail(chartId: string, coverKey: string) {
   await requireAuth();
 
   try {
-    const r2 = getR2Client();
-
     const fetchResult = await fetchImageBuffer(coverKey);
     if (!fetchResult.success) {
       return { success: false as const, error: fetchResult.error };
@@ -334,13 +338,14 @@ export async function generateThumbnail(chartId: string, coverKey: string) {
       .toBuffer();
 
     const thumbnailKey = `covers/${chartId}/thumb-${nanoid()}.webp`;
+    const { client, bucket } = getWriteTarget();
     const putCommand = new PutObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: bucket,
       Key: thumbnailKey,
       Body: thumbnailBuffer,
       ContentType: "image/webp",
     });
-    await r2.send(putCommand);
+    await client.send(putCommand);
 
     await prisma.chart.update({
       where: { id: chartId },

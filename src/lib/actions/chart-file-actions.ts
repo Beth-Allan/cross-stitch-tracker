@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
-import { getR2Client, R2_BUCKET_NAME } from "@/lib/r2";
+import { getReadTarget, getWriteTarget } from "@/lib/r2";
 
 const addChartFileSchema = z.object({
   chartId: z.string().min(1),
@@ -73,12 +73,14 @@ export async function deleteChartFile(fileId: string) {
     return { success: false as const, error: "File not found" };
   }
 
-  // Delete R2 object — if it fails, log but proceed with DB deletion
+  // Delete R2 object — if it fails, log but proceed with DB deletion. The write
+  // target is the scratch bucket on a preview deployment, so a preview cannot
+  // remove the real file behind this record.
   try {
-    const r2 = getR2Client();
-    await r2.send(
+    const { client, bucket } = getWriteTarget();
+    await client.send(
       new DeleteObjectCommand({
-        Bucket: R2_BUCKET_NAME,
+        Bucket: bucket,
         Key: file.url,
       }),
     );
@@ -109,10 +111,11 @@ export async function getChartFileDownloadUrl(fileId: string) {
   }
 
   try {
+    const { client, bucket } = await getReadTarget(file.url);
     const url = await getSignedUrl(
-      getR2Client(),
+      client,
       new GetObjectCommand({
-        Bucket: R2_BUCKET_NAME,
+        Bucket: bucket,
         Key: file.url,
       }),
       { expiresIn: 3600 },
