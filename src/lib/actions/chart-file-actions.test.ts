@@ -18,8 +18,8 @@ vi.mock("next/cache", () => ({
 const mockSend = vi.fn();
 const mockGetR2Client = vi.fn();
 vi.mock("@/lib/r2", () => ({
-  getR2Client: (...args: unknown[]) => mockGetR2Client(...args),
-  R2_BUCKET_NAME: "test-bucket",
+  getReadTarget: async () => ({ client: mockGetR2Client(), bucket: "test-bucket" }),
+  getWriteTarget: () => ({ client: mockGetR2Client(), bucket: "test-bucket" }),
 }));
 
 vi.mock("@aws-sdk/s3-request-presigner", () => ({
