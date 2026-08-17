@@ -148,3 +148,37 @@ old location and go stale the moment it moves:
   mid-item.
 
 **Consumed when** step 5 has landed the promotion and repointed all three.
+
+## The two doors that open onto nothing yet — what step 5 owes them
+
+**Tags:** step 4 · step 5 · `.claude/skills/` · `docs/domain/` · `docs/design/` · `/stitch-fact` · `/design-session`
+
+Step 4 installed all eleven doors, but two of them name homes that do not exist until step 5.
+Both handle it the same way — say so plainly and offer the scaffold, never improvise a home —
+which is safe but is **not** the end state. Step 5 owes each of them something concrete:
+
+- **`/stitch-fact` reads `docs/domain/README.md` for the ID scheme, the provenance vocabulary,
+  and the domain manifest** before writing any fact. That README is a step-5 deliverable and the
+  door is already written against it: scaffold it with all three, or the door's step 1 and step 3
+  have nothing to follow. Then delete the door's "if `docs/domain/` does not exist yet" paragraph.
+- **`/design-session` has the same paragraph** for `docs/design/`. Step 5 creates the directory
+  and promotes the DesignOS map into it; step 8 adds `screens.md` and the canon home. Delete the
+  paragraph only once canon actually has somewhere to land (`docs/design/screens/`), not merely
+  because the directory exists.
+
+Both doors also assume `docs/process/work-log/backlog.md`'s "Design-track inputs" section stays
+where it is until step 8 moves it — that is the same D-10 routing the steps 4–5 note protects.
+
+**Consumed when** both paragraphs are gone and `docs/domain/README.md` carries the three things
+`/stitch-fact` cites.
+
+## `.claude/` is prettier-ignored — the doors are not gate-formatted
+
+**Tags:** `.claude/skills/` · `.claude/rules/` · gate · formatting
+
+`.prettierignore` excludes `.claude/` wholesale, so nothing in `.claude/skills/` or
+`.claude/rules/` is touched by `format:check` — the gate will not catch a malformed table or a
+broken frontmatter block in a door or a rule file. `WORKFLOW-REFERENCE.md`, being in the repo
+root, **is** formatted. Practical upshot: after writing a door, confirm it by its own evidence —
+the skill appearing in the session's skills listing — rather than by the gate going green.
+**Not consumed** — this is a standing fact about where the gate's eyes are.

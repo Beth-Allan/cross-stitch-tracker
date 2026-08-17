@@ -3,12 +3,14 @@
 **Status:** Authoritative from the workflow overhaul (2026-08-16; `WORKFLOW-OVERHAUL-HANDOFF.md`, Beth's rulings D-01–D-14).
 **What this is:** the per-session playbook for every Claude Code session in this repo. CLAUDE.md
 carries the always-loaded summary; this file is the full authority — where they seem to disagree,
-this file wins and the disagreement is a bug (fix CLAUDE.md). The repo skills (`.claude/skills/`,
-installed at overhaul step 4) — the build doors `/work-item`, `/review`, `/stage-review`, and
-Beth's doors `/progress`, `/broken`, `/tweak`, `/cleanup`, `/stitch-fact`, `/design-session`,
-`/plan-feature`, `/walkthrough` (§8) — are thin wrappers that point here. There is no `/deploy`
-door: **merging to main IS the deploy** (Vercel auto-deploys production on merge), which is why
-§5's before-merge discipline exists. Every session, whichever door opened it, obeys §8's
+this file wins and the disagreement is a bug (fix CLAUDE.md). The repo skills
+(`.claude/skills/`, installed at overhaul step 4, 2026-08-16) — the build doors `/work-item`,
+`/review`, `/stage-review`, and Beth's doors `/progress`, `/broken`, `/tweak`, `/cleanup`,
+`/stitch-fact`, `/design-session`, `/plan-feature`, `/walkthrough` (§8) — are thin wrappers that
+point here. `WORKFLOW-REFERENCE.md` is Beth's one-page card of the same list, in her language; a
+session that changes a door updates the card in the same PR. There is no `/deploy` door:
+**merging to main IS the deploy** (Vercel auto-deploys production on merge), which is why §5's
+before-merge discipline exists. Every session, whichever door opened it, obeys §8's
 communication contract and §9's session-wide rules.
 
 ---

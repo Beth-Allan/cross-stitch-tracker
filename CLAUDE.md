@@ -6,13 +6,16 @@ shopping lists. Single user — Beth. Live at https://cross-stitch-tracker-adolw
 **merging to main deploys production instantly** (Vercel), which shapes the whole merge
 discipline below.
 
-> **Overhaul in progress (2026-08-16):** steps 4–5 of `WORKFLOW-OVERHAUL-HANDOFF.md` §3.7 are
-> still landing on `chore/workflow-overhaul`. **The work log is live as of step 2** — it, not the
-> handoff, is now the session-to-session memory, and its Up-next queue is the running order.
-> **`.claude/rules/` is reconciled as of step 3** — it describes this process, not the dead GSD
-> one. Still to come: `docs/domain/`, `docs/design/` and the `.claude/skills/` doors (so the door
-> names below are not yet typeable), plus the promoted codebase docs. `.planning/` stays
-> unmigrated history until step 5. Delete this note when the overhaul branch merges.
+> **Overhaul in progress (2026-08-16):** step 5 of `WORKFLOW-OVERHAUL-HANDOFF.md` §3.7 is the
+> last one still to land on `chore/workflow-overhaul`. **The work log is live as of step 2** —
+> it, not the handoff, is now the session-to-session memory, and its Up-next queue is the running
+> order. **`.claude/rules/` is reconciled as of step 3** — it describes this process, not the
+> dead GSD one. **The doors are installed as of step 4** — every door name below is typeable,
+> and `WORKFLOW-REFERENCE.md` is Beth's one-page card of them. Still to come: `docs/domain/` and
+> `docs/design/` — so `/stitch-fact` and `/design-session` currently open onto a home that does
+> not exist yet and say so rather than improvising one — plus the promoted codebase docs.
+> `.planning/` stays unmigrated history until step 5. Delete this note when the overhaul branch
+> merges.
 
 ## Working with Beth
 
@@ -24,7 +27,9 @@ command, or open GitHub** — Claude performs every file operation, and her expl
 approval IS her ruling (Claude merges on her word; merge deploys production, so UI changes show
 her the Vercel preview first). Her doors: `/progress`, `/broken`, `/tweak`, `/cleanup`,
 `/stitch-fact`, `/design-session`, `/plan-feature`, `/walkthrough` (protocol §8; installed as
-repo skills — she types the word, the skill opens the door). There is no `/deploy`: merging is
+repo skills — she types the word, the skill opens the door), and the queue also hands her the
+build doors `/work-item`, `/review`, `/stage-review`. Her one-page card of all of them is
+`WORKFLOW-REFERENCE.md` — keep it in step when a door changes. There is no `/deploy`: merging is
 deploying.
 
 ## Never assume domain facts
