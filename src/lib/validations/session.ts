@@ -1,11 +1,22 @@
 import { z } from "zod";
+import { parseCalendarDate } from "@/lib/utils/calendar-date";
 
 export const sessionFormSchema = z.object({
   projectId: z.string().trim().min(1, "Project is required"),
-  date: z
-    .string()
-    .refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date" })
-    .refine((val) => new Date(val) <= new Date(), { message: "Date cannot be in the future" }),
+  // A session date is a calendar date, never an instant (docs/ARCHITECTURE.md).
+  // "Not in the future" is a per-user judgement and lives in the action, which
+  // knows whose timezone decides what "today" means.
+  date: z.string().refine(
+    (val) => {
+      try {
+        parseCalendarDate(val);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    { message: "Invalid date" },
+  ),
   stitchCount: z
     .number()
     .int("Stitch count must be a whole number")

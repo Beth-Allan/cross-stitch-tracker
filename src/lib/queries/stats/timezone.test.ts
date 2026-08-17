@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { TZDate } from "@date-fns/tz";
 
 const originalEnv = process.env;
 
@@ -41,63 +40,81 @@ describe("timezone utilities", () => {
   describe("getLocalDayBoundaries", () => {
     const TIMEZONE = "America/Denver";
 
-    // 2026-05-17 16:30 MDT = 2026-05-17T22:30:00.000Z
-    // Construct an explicit TZDate so tests don't depend on host timezone or fake timers
-    const NOW_MDT = new TZDate(2026, 4, 17, 16, 30, 0, 0, TIMEZONE);
+    // 2026-05-17 16:30 MDT — the local calendar date is 2026-05-17
+    const NOW_MDT = new Date("2026-05-17T22:30:00.000Z");
 
-    it("returns todayStart at midnight local time (06:00 UTC for MDT)", async () => {
+    it("returns todayStart at UTC midnight of the local calendar date", async () => {
       const { getLocalDayBoundaries } = await import("./timezone");
       const boundaries = getLocalDayBoundaries(TIMEZONE, NOW_MDT);
 
-      expect(toUTC(boundaries.todayStart)).toBe("2026-05-17T06:00:00.000Z");
+      expect(toUTC(boundaries.todayStart)).toBe("2026-05-17T00:00:00.000Z");
     });
 
-    it("returns todayEnd at 23:59:59.999 local time", async () => {
+    it("returns todayEnd at the last millisecond of that UTC day", async () => {
       const { getLocalDayBoundaries } = await import("./timezone");
       const boundaries = getLocalDayBoundaries(TIMEZONE, NOW_MDT);
 
-      expect(toUTC(boundaries.todayEnd)).toBe("2026-05-18T05:59:59.999Z");
+      expect(toUTC(boundaries.todayEnd)).toBe("2026-05-17T23:59:59.999Z");
     });
 
-    it("returns weekStart on Sunday midnight local time", async () => {
+    it("returns weekStart on the Sunday that starts the local week", async () => {
       const { getLocalDayBoundaries } = await import("./timezone");
       const boundaries = getLocalDayBoundaries(TIMEZONE, NOW_MDT);
 
-      // 2026-05-17 is a Sunday, so weekStart is same day midnight
-      expect(toUTC(boundaries.weekStart)).toBe("2026-05-17T06:00:00.000Z");
+      // 2026-05-17 is a Sunday, so weekStart is that same day
+      expect(toUTC(boundaries.weekStart)).toBe("2026-05-17T00:00:00.000Z");
     });
 
-    it("returns monthStart on 1st of current month midnight local time", async () => {
+    it("returns monthStart on the 1st of the local current month", async () => {
       const { getLocalDayBoundaries } = await import("./timezone");
       const boundaries = getLocalDayBoundaries(TIMEZONE, NOW_MDT);
 
-      expect(toUTC(boundaries.monthStart)).toBe("2026-05-01T06:00:00.000Z");
+      expect(toUTC(boundaries.monthStart)).toBe("2026-05-01T00:00:00.000Z");
     });
 
-    it("returns yearStart on Jan 1 midnight local time (MST in January)", async () => {
+    it("returns yearStart on Jan 1 of the local current year", async () => {
       const { getLocalDayBoundaries } = await import("./timezone");
       const boundaries = getLocalDayBoundaries(TIMEZONE, NOW_MDT);
 
-      // Jan 1 midnight MST (UTC-7 in winter)
-      expect(toUTC(boundaries.yearStart)).toBe("2026-01-01T07:00:00.000Z");
+      expect(toUTC(boundaries.yearStart)).toBe("2026-01-01T00:00:00.000Z");
     });
 
-    it("a session at 11:30pm Mountain Time falls within todayStart..todayEnd", async () => {
-      // 2026-05-16 23:30 MDT = 2026-05-17T05:30:00.000Z
-      const lateNight = new TZDate(2026, 4, 16, 23, 30, 0, 0, TIMEZONE);
-
+    it("uses the local calendar date, not the UTC one, when they disagree", async () => {
+      // 2026-05-18T04:00Z is still 22:00 on 2026-05-17 in Denver
       vi.resetModules();
       const { getLocalDayBoundaries } = await import("./timezone");
-      const boundaries = getLocalDayBoundaries(TIMEZONE, lateNight);
+      const boundaries = getLocalDayBoundaries(TIMEZONE, new Date("2026-05-18T04:00:00.000Z"));
 
-      // todayStart is May 16 midnight MDT
-      expect(toUTC(boundaries.todayStart)).toBe("2026-05-16T06:00:00.000Z");
-      expect(toUTC(boundaries.todayEnd)).toBe("2026-05-17T05:59:59.999Z");
+      expect(toUTC(boundaries.todayStart)).toBe("2026-05-17T00:00:00.000Z");
+    });
 
-      // The session at 05:30 UTC (23:30 MDT on May 16) falls within boundaries
-      const sessionTime = new Date("2026-05-17T05:30:00.000Z");
-      expect(sessionTime.getTime() >= boundaries.todayStart.getTime()).toBe(true);
-      expect(sessionTime.getTime() <= boundaries.todayEnd.getTime()).toBe(true);
+    it("a session dated today falls inside todayStart..todayEnd", async () => {
+      vi.resetModules();
+      const { getLocalDayBoundaries } = await import("./timezone");
+      const boundaries = getLocalDayBoundaries(TIMEZONE, NOW_MDT);
+
+      // A session logged for 2026-05-17 is stored as that date's UTC midnight
+      const session = new Date("2026-05-17T00:00:00.000Z");
+      expect(session.getTime() >= boundaries.todayStart.getTime()).toBe(true);
+      expect(session.getTime() <= boundaries.todayEnd.getTime()).toBe(true);
+    });
+
+    it("the first of the month counts in that month, not the previous one", async () => {
+      vi.resetModules();
+      const { getLocalDayBoundaries } = await import("./timezone");
+      const boundaries = getLocalDayBoundaries(TIMEZONE, new Date("2026-05-17T22:30:00.000Z"));
+
+      const firstOfMonth = new Date("2026-05-01T00:00:00.000Z");
+      expect(firstOfMonth.getTime() >= boundaries.monthStart.getTime()).toBe(true);
+    });
+
+    it("January 1st counts in that year, not the previous one", async () => {
+      vi.resetModules();
+      const { getLocalDayBoundaries } = await import("./timezone");
+      const boundaries = getLocalDayBoundaries(TIMEZONE, new Date("2026-05-17T22:30:00.000Z"));
+
+      const newYearsDay = new Date("2026-01-01T00:00:00.000Z");
+      expect(newYearsDay.getTime() >= boundaries.yearStart.getTime()).toBe(true);
     });
 
     it("all returned dates are valid Date objects (not NaN)", async () => {
@@ -117,6 +134,36 @@ describe("timezone utilities", () => {
       const { getLocalDayBoundaries } = await import("./timezone");
 
       expect(() => getLocalDayBoundaries("Invalid/Timezone")).toThrow(
+        'Invalid timezone "Invalid/Timezone"',
+      );
+    });
+  });
+
+  describe("getCurrentPeriod", () => {
+    it("reports the month and year of the user's local today", async () => {
+      const { getCurrentPeriod } = await import("./timezone");
+
+      // 2026-01-01T04:00Z is still 21:00 on 2025-12-31 in Denver
+      expect(getCurrentPeriod("America/Denver", new Date("2026-01-01T04:00:00.000Z"))).toEqual({
+        year: 2025,
+        month: 12,
+      });
+    });
+
+    it("returns a 1-based month", async () => {
+      const { getCurrentPeriod } = await import("./timezone");
+
+      expect(getCurrentPeriod("UTC", new Date("2026-08-17T12:00:00.000Z"))).toEqual({
+        year: 2026,
+        month: 8,
+      });
+    });
+
+    it("throws an error for an invalid timezone string", async () => {
+      vi.resetModules();
+      const { getCurrentPeriod } = await import("./timezone");
+
+      expect(() => getCurrentPeriod("Invalid/Timezone")).toThrow(
         'Invalid timezone "Invalid/Timezone"',
       );
     });

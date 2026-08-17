@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Camera, ChevronUp, ChevronDown, Pencil } from "lucide-react";
+import { formatCalendarDate } from "@/lib/utils/calendar-date";
 import type { StitchSessionRow } from "@/types/session";
 
 type SortField = "date" | "stitches" | "time";
@@ -12,14 +13,6 @@ interface SessionTableProps {
   imageUrls: Record<string, string>;
   showProjectName?: boolean;
   onEditSession?: (session: StitchSessionRow) => void;
-}
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
 }
 
 function formatTime(minutes: number): string {
@@ -169,7 +162,7 @@ export function SessionTable({
                 className="group border-border/50 hover:bg-muted/50 border-b transition-colors last:border-b-0"
               >
                 <td className="text-foreground px-4 py-3 whitespace-nowrap tabular-nums">
-                  {formatDate(session.date)}
+                  {formatCalendarDate(session.date)}
                 </td>
                 {showProjectName && (
                   <td className="text-foreground px-4 py-3">{session.projectName}</td>
@@ -212,7 +205,7 @@ export function SessionTable({
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <span className="text-foreground text-sm font-medium tabular-nums">
-                  {formatDate(session.date)}
+                  {formatCalendarDate(session.date)}
                 </span>
                 {session.photoKey && (
                   <Camera className="size-3 text-emerald-500" strokeWidth={1.5} />

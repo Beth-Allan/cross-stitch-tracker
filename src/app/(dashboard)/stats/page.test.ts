@@ -52,6 +52,8 @@ vi.mock("@/lib/queries/stats", () => ({
   getDesignerInsights: (...args: unknown[]) => mockGetDesignerInsights(...args),
   getGenreInsights: (...args: unknown[]) => mockGetGenreInsights(...args),
   getCompletionEstimates: (...args: unknown[]) => mockGetCompletionEstimates(...args),
+  getUserTimezone: () => "America/Edmonton",
+  getCurrentPeriod: () => ({ year: 2026, month: 5 }),
 }));
 
 // Mock search params cache
@@ -328,5 +330,28 @@ describe("StatsPage server component", () => {
     const { default: StatsPage } = await import("./page");
     await expect(StatsPage({ searchParams: Promise.resolve({}) })).resolves.not.toThrow();
     spy.mockRestore();
+  });
+});
+
+describe("StatsPage — calendar-date convention", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRequireAuth.mockResolvedValue({ id: "user-123", name: "Test User" });
+    mockParse.mockResolvedValue({
+      page: 1,
+      sort: "date",
+      dir: "desc",
+      project: "all",
+      status: "all",
+    });
+    mockFindMany.mockResolvedValue([]);
+  });
+
+  it("asks for the calendar and yearly totals of the user's current period", async () => {
+    const { default: StatsPage } = await import("./page");
+    await StatsPage({ searchParams: Promise.resolve({}) });
+
+    expect(mockGetCalendarDays).toHaveBeenCalledWith("user-123", 5, 2026);
+    expect(mockGetMonthlyTotals).toHaveBeenCalledWith("user-123", 2026);
   });
 });

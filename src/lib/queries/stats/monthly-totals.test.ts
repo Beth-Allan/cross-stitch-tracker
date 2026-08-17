@@ -5,20 +5,25 @@ const mockPrisma = createMockPrisma();
 vi.mock("@/lib/db", () => ({ prisma: mockPrisma }));
 
 // Bypass unstable_cache -- make it transparent
+const { cacheOptions } = vi.hoisted(() => ({
+  cacheOptions: [] as Array<{ tags?: string[]; revalidate?: number }>,
+}));
+
 vi.mock("next/cache", () => ({
-  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
+  unstable_cache: (
+    fn: (...args: unknown[]) => unknown,
+    _keys: string[],
+    options: { tags?: string[]; revalidate?: number },
+  ) => {
+    cacheOptions.push(options);
+    return fn;
+  },
 }));
 
 // Mock timezone to return fixed timezone
 vi.mock("./timezone", () => ({
   getUserTimezone: () => "America/Denver",
-  getLocalDayBoundaries: () => ({
-    todayStart: new Date("2026-05-17T06:00:00.000Z"),
-    todayEnd: new Date("2026-05-18T05:59:59.999Z"),
-    weekStart: new Date("2026-05-11T06:00:00.000Z"),
-    monthStart: new Date("2026-05-01T06:00:00.000Z"),
-    yearStart: new Date("2026-01-01T07:00:00.000Z"),
-  }),
+  getCurrentPeriod: () => ({ year: 2026, month: 5 }),
 }));
 
 describe("getMonthlyTotals", () => {
@@ -85,14 +90,75 @@ describe("getMonthlyTotals", () => {
     );
   });
 
-  it("uses 300s revalidate for current year, 3600s for past years", async () => {
-    // This test verifies the function signature includes year parameter
-    // which the conditional TTL logic uses
+  it("uses 300s revalidate for the current year and 3600s for a past year", async () => {
+    mockPrisma.stitchSession.groupBy.mockResolvedValue([]);
+    cacheOptions.length = 0;
+
+    const { getMonthlyTotals } = await import("./monthly-totals");
+    await getMonthlyTotals("user-1", 2026);
+    await getMonthlyTotals("user-1", 2025);
+
+    expect(cacheOptions[0]).toEqual({ tags: ["stats"], revalidate: 300 });
+    expect(cacheOptions[1]).toEqual({ tags: ["stats"], revalidate: 3600 });
+  });
+
+  it("decides the current year in the user's timezone, not the server's", async () => {
+    // getCurrentPeriod is mocked to 2026 -- a server clock already in 2027 must not
+    // demote 2026 to a closed year while it is still 2026 for Beth
+    mockPrisma.stitchSession.groupBy.mockResolvedValue([]);
+    cacheOptions.length = 0;
+
+    const { getMonthlyTotals } = await import("./monthly-totals");
+    await getMonthlyTotals("user-1", 2026);
+
+    expect(cacheOptions[0].revalidate).toBe(300);
+  });
+});
+
+describe("getMonthlyTotals — calendar-date convention", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("counts a session dated the 1st in that month, not the previous one", async () => {
+    mockPrisma.stitchSession.groupBy.mockResolvedValue([
+      { date: new Date("2026-05-01T00:00:00.000Z"), _sum: { stitchCount: 500 } },
+    ]);
+
+    const { getMonthlyTotals } = await import("./monthly-totals");
+    const result = await getMonthlyTotals("user-1", 2026);
+
+    expect(result.find((m) => m.month === "May")!.totalStitches).toBe(500);
+    expect(result.find((m) => m.month === "Apr")!.totalStitches).toBe(0);
+  });
+
+  it("queries the year with UTC-midnight bounds so January 1st is inside it", async () => {
     mockPrisma.stitchSession.groupBy.mockResolvedValue([]);
 
     const { getMonthlyTotals } = await import("./monthly-totals");
-    // Should not throw for past year
-    const result = await getMonthlyTotals("user-1", 2025);
-    expect(result).toHaveLength(12);
+    await getMonthlyTotals("user-1", 2026);
+
+    expect(mockPrisma.stitchSession.groupBy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          date: {
+            gte: new Date("2026-01-01T00:00:00.000Z"),
+            lt: new Date("2027-01-01T00:00:00.000Z"),
+          },
+        }),
+      }),
+    );
+  });
+
+  it("counts a session dated January 1st in January", async () => {
+    mockPrisma.stitchSession.groupBy.mockResolvedValue([
+      { date: new Date("2026-01-01T00:00:00.000Z"), _sum: { stitchCount: 300 } },
+    ]);
+
+    const { getMonthlyTotals } = await import("./monthly-totals");
+    const result = await getMonthlyTotals("user-1", 2026);
+
+    expect(result.find((m) => m.month === "Jan")!.totalStitches).toBe(300);
+    expect(result.find((m) => m.month === "Dec")!.totalStitches).toBe(0);
   });
 });

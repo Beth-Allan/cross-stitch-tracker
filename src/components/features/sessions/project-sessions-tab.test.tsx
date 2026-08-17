@@ -147,3 +147,19 @@ describe("ProjectSessionsTab", () => {
     expect(screen.getByText("\u2014")).toBeInTheDocument();
   });
 });
+
+describe("ProjectSessionsTab — calendar-date convention", () => {
+  it("shows the month the project became active from the stored date", () => {
+    render(
+      <ProjectSessionsTab
+        sessions={mockSessions}
+        stats={{ ...mockStats, activeSince: new Date("2025-11-01T00:00:00.000Z") }}
+        imageUrls={{}}
+        activeProjects={mockActiveProjects}
+        projectId="proj-1"
+      />,
+    );
+
+    expect(screen.getByText("Nov 2025")).toBeInTheDocument();
+  });
+});

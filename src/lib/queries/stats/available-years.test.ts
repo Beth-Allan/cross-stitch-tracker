@@ -54,3 +54,32 @@ describe("getAvailableYears", () => {
     expect(result).toEqual([2026]);
   });
 });
+
+describe("getAvailableYears — calendar-date convention", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("counts a session dated January 1st in that year, not the previous one", async () => {
+    mockPrisma.stitchSession.findMany.mockResolvedValue([
+      { date: new Date("2026-01-01T00:00:00.000Z") },
+    ]);
+
+    const { getAvailableYears } = await import("./available-years");
+    const result = await getAvailableYears("user-1");
+
+    expect(result).toEqual([2026]);
+  });
+
+  it("is unaffected by daylight-saving transitions", async () => {
+    mockPrisma.stitchSession.findMany.mockResolvedValue([
+      { date: new Date("2026-03-08T00:00:00.000Z") },
+      { date: new Date("2026-11-01T00:00:00.000Z") },
+    ]);
+
+    const { getAvailableYears } = await import("./available-years");
+    const result = await getAvailableYears("user-1");
+
+    expect(result).toEqual([2026]);
+  });
+});

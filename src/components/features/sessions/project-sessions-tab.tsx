@@ -12,6 +12,7 @@ import type {
 } from "@/types/session";
 
 import { ProjectCompletionEstimate } from "@/components/features/stats/project-completion-estimate";
+import { formatCalendarDate } from "@/lib/utils/calendar-date";
 import type { CompletionEstimate } from "@/types/stats";
 
 interface ProjectSessionsTabProps {
@@ -25,7 +26,7 @@ interface ProjectSessionsTabProps {
 
 function formatActiveSince(date: Date | null): string {
   if (!date) return "\u2014";
-  return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  return formatCalendarDate(date, { month: "short", year: "numeric" });
 }
 
 interface MiniStatCardProps {

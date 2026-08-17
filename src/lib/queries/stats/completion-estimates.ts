@@ -1,12 +1,21 @@
 import { unstable_cache } from "next/cache";
-import { TZDate } from "@date-fns/tz";
-import { differenceInCalendarDays, format, addDays } from "date-fns";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
+import {
+  toCalendarDate,
+  addCalendarDays,
+  daysBetweenCalendarDates,
+  formatCalendarDate,
+} from "@/lib/utils/calendar-date";
+import { getUserTimezone, getTodayCalendarDate, getCurrentPeriod } from "./timezone";
 import { buildDateFilter, type Scope } from "./utils";
 import type { CompletionEstimate } from "@/types/stats";
 
 const MIN_SESSIONS = 3;
+
+// A project stitched slowly enough can project a finish date past the representable calendar.
+// Anything beyond this horizon already reads as "never", and clamping the *label* keeps one
+// glacial project from throwing the whole estimates panel away.
+const MAX_PROJECTION_DAYS = 365_000;
 
 async function computeCompletionEstimates(
   userId: string,
@@ -14,7 +23,7 @@ async function computeCompletionEstimates(
 ): Promise<CompletionEstimate[]> {
   try {
     const tz = getUserTimezone(userId);
-    const dateFilter = buildDateFilter(scope, tz);
+    const dateFilter = buildDateFilter(scope);
 
     const projects = await prisma.project.findMany({
       where: {
@@ -34,7 +43,7 @@ async function computeCompletionEstimates(
       },
     });
 
-    const now = TZDate.tz(tz);
+    const today = getTodayCalendarDate(tz);
     const estimates: (CompletionEstimate & { _daysRemaining: number })[] = [];
 
     for (const project of projects) {
@@ -44,7 +53,7 @@ async function computeCompletionEstimates(
       if (totalStitches <= 0) continue;
 
       const firstSession = project.sessions[0];
-      const daysSinceFirst = differenceInCalendarDays(now, firstSession.date);
+      const daysSinceFirst = daysBetweenCalendarDates(today, toCalendarDate(firstSession.date));
       if (daysSinceFirst <= 0) continue;
 
       const totalSessionStitches = project.sessions.reduce((sum, s) => sum + s.stitchCount, 0);
@@ -55,7 +64,7 @@ async function computeCompletionEstimates(
       if (remaining <= 0) continue;
 
       const daysRemaining = Math.ceil(remaining / avgPerDay);
-      const estimatedDate = addDays(now, daysRemaining);
+      const estimatedDate = addCalendarDays(today, Math.min(daysRemaining, MAX_PROJECTION_DAYS));
       const percentComplete = Math.round((project.stitchesCompleted / totalStitches) * 100);
 
       estimates.push({
@@ -65,7 +74,7 @@ async function computeCompletionEstimates(
         stitchesCompleted: project.stitchesCompleted,
         totalStitches,
         percentComplete,
-        estimatedDate: format(estimatedDate, "MMM yyyy"),
+        estimatedDate: formatCalendarDate(estimatedDate, { month: "short", year: "numeric" }),
         avgPerDay: Math.round(avgPerDay * 10) / 10,
         _daysRemaining: daysRemaining,
       });
@@ -81,7 +90,7 @@ async function computeCompletionEstimates(
 }
 
 export function getCompletionEstimates(userId: string, scope: Scope) {
-  const currentYear = new Date().getFullYear();
+  const { year: currentYear } = getCurrentPeriod(getUserTimezone(userId));
   const year = parseInt(scope, 10);
   const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;
 
@@ -118,9 +127,9 @@ export async function getProjectCompletionEstimate(
     if (totalStitches <= 0) return null;
     if (project.sessions.length < MIN_SESSIONS) return null;
 
-    const now = TZDate.tz(tz);
+    const today = getTodayCalendarDate(tz);
     const firstSession = project.sessions[0];
-    const daysSinceFirst = differenceInCalendarDays(now, firstSession.date);
+    const daysSinceFirst = daysBetweenCalendarDates(today, toCalendarDate(firstSession.date));
     if (daysSinceFirst <= 0) return null;
 
     const totalSessionStitches = project.sessions.reduce((sum, s) => sum + s.stitchCount, 0);
@@ -131,7 +140,7 @@ export async function getProjectCompletionEstimate(
     if (remaining <= 0) return null;
 
     const daysRemaining = Math.ceil(remaining / avgPerDay);
-    const estimatedDate = addDays(now, daysRemaining);
+    const estimatedDate = addCalendarDays(today, Math.min(daysRemaining, MAX_PROJECTION_DAYS));
     const percentComplete = Math.round((project.stitchesCompleted / totalStitches) * 100);
 
     return {
@@ -141,7 +150,7 @@ export async function getProjectCompletionEstimate(
       stitchesCompleted: project.stitchesCompleted,
       totalStitches,
       percentComplete,
-      estimatedDate: format(estimatedDate, "MMM yyyy"),
+      estimatedDate: formatCalendarDate(estimatedDate, { month: "short", year: "numeric" }),
       avgPerDay: Math.round(avgPerDay * 10) / 10,
     };
   } catch (error) {

@@ -1,8 +1,7 @@
 import { unstable_cache } from "next/cache";
-import { TZDate } from "@date-fns/tz";
-import { format, differenceInCalendarDays } from "date-fns";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
+import { toCalendarDate, daysBetweenCalendarDates } from "@/lib/utils/calendar-date";
+import { getUserTimezone, getTodayCalendarDate, getCurrentPeriod } from "./timezone";
 import { buildDateFilter, type Scope } from "./utils";
 import type { PersonalBestRecord, ProjectLinkedRecord, AggregateRecord } from "@/types/stats";
 
@@ -18,8 +17,7 @@ interface SessionRow {
 
 async function computePersonalBests(userId: string, scope: Scope): Promise<PersonalBestRecord[]> {
   try {
-    const tz = getUserTimezone(userId);
-    const dateFilter = buildDateFilter(scope, tz);
+    const dateFilter = buildDateFilter(scope);
 
     const sessions: SessionRow[] = await prisma.stitchSession.findMany({
       where: {
@@ -59,7 +57,7 @@ async function computePersonalBests(userId: string, scope: Scope): Promise<Perso
 
     const dayMap = new Map<string, { total: number; topSession: SessionRow }>();
     for (const s of sessions) {
-      const localDate = format(new TZDate(s.date, tz), "yyyy-MM-dd");
+      const localDate = toCalendarDate(s.date);
       const existing = dayMap.get(localDate);
       if (existing) {
         existing.total += s.stitchCount;
@@ -99,7 +97,7 @@ async function computePersonalBests(userId: string, scope: Scope): Promise<Perso
           label: "Best Session",
           value: s.stitchCount,
           unit: "stitches",
-          date: format(new TZDate(s.date, tz), "yyyy-MM-dd"),
+          date: toCalendarDate(s.date),
           projectId: s.projectId,
           chartId: s.project.chart.id,
           projectName: s.project.chart.name,
@@ -107,16 +105,12 @@ async function computePersonalBests(userId: string, scope: Scope): Promise<Perso
       }
     }
 
-    const uniqueDates = [
-      ...new Set(sessions.map((s) => format(new TZDate(s.date, tz), "yyyy-MM-dd"))),
-    ].sort();
+    const uniqueDates = [...new Set(sessions.map((s) => toCalendarDate(s.date)))].sort();
 
     let longestStreak = 1;
     let currentRun = 1;
     for (let i = 1; i < uniqueDates.length; i++) {
-      const prev = new Date(uniqueDates[i - 1]);
-      const curr = new Date(uniqueDates[i]);
-      const diff = differenceInCalendarDays(curr, prev);
+      const diff = daysBetweenCalendarDates(uniqueDates[i], uniqueDates[i - 1]);
       if (diff === 1) {
         currentRun++;
         if (currentRun > longestStreak) {
@@ -140,17 +134,15 @@ async function computePersonalBests(userId: string, scope: Scope): Promise<Perso
 
     let currentStreakValue = 0;
     if (scope === "all" && uniqueDates.length > 0) {
-      const today = format(TZDate.tz(tz), "yyyy-MM-dd");
+      const today = getTodayCalendarDate(getUserTimezone(userId));
       const sortedDesc = [...uniqueDates].sort().reverse();
       const mostRecent = sortedDesc[0];
-      const daysSinceLast = differenceInCalendarDays(new Date(today), new Date(mostRecent));
+      const daysSinceLast = daysBetweenCalendarDates(today, mostRecent);
 
       if (daysSinceLast <= 1) {
         currentStreakValue = 1;
         for (let i = 1; i < sortedDesc.length; i++) {
-          const curr = new Date(sortedDesc[i - 1]);
-          const prev = new Date(sortedDesc[i]);
-          const diff = differenceInCalendarDays(curr, prev);
+          const diff = daysBetweenCalendarDates(sortedDesc[i - 1], sortedDesc[i]);
           if (diff === 1) {
             currentStreakValue++;
           } else {
@@ -175,7 +167,7 @@ async function computePersonalBests(userId: string, scope: Scope): Promise<Perso
 }
 
 export function getPersonalBests(userId: string, scope: Scope) {
-  const currentYear = new Date().getFullYear();
+  const { year: currentYear } = getCurrentPeriod(getUserTimezone(userId));
   const year = parseInt(scope, 10);
   const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;
 

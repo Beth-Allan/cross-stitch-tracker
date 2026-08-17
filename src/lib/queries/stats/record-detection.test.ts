@@ -265,3 +265,65 @@ describe("detectBrokenRecords", () => {
     );
   });
 });
+
+describe("detectBrokenRecords — calendar-date convention", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetModules();
+  });
+
+  it("aggregates the session's own calendar day, not the previous one", async () => {
+    mockPrisma.stitchSession.aggregate.mockResolvedValue({ _sum: { stitchCount: 100 } });
+    mockPrisma.stitchSession.findMany.mockResolvedValue([]);
+
+    const { detectBrokenRecords } = await import("./record-detection");
+    await detectBrokenRecords("user-1", {
+      date: new Date("2026-05-01T00:00:00.000Z"),
+      stitchCount: 100,
+      projectId: "p1",
+    });
+
+    const where = mockPrisma.stitchSession.aggregate.mock.calls[0][0].where;
+    expect(where.date.gte).toEqual(new Date("2026-05-01T00:00:00.000Z"));
+    expect(where.date.lt).toEqual(new Date("2026-05-02T00:00:00.000Z"));
+  });
+
+  it("does not compare the new session's day against itself", async () => {
+    // Today's total is 100, and the only stored session IS today's -- no previous best
+    mockPrisma.stitchSession.aggregate.mockResolvedValue({ _sum: { stitchCount: 100 } });
+    mockPrisma.stitchSession.findMany.mockResolvedValue([
+      { date: new Date("2026-05-01T00:00:00.000Z"), stitchCount: 100 },
+    ]);
+
+    const { detectBrokenRecords } = await import("./record-detection");
+    const records = await detectBrokenRecords("user-1", {
+      date: new Date("2026-05-01T00:00:00.000Z"),
+      stitchCount: 100,
+      projectId: "p1",
+    });
+
+    expect(records.find((r) => r.type === "bestDay")).toBeDefined();
+    expect(records.find((r) => r.type === "bestDay")!.oldValue).toBe(0);
+  });
+
+  it("counts a streak across a DST transition as consecutive days", async () => {
+    mockPrisma.stitchSession.aggregate.mockResolvedValue({ _sum: { stitchCount: 10 } });
+    mockPrisma.stitchSession.findMany.mockResolvedValue([
+      { date: new Date("2026-03-07T00:00:00.000Z"), stitchCount: 500 },
+      { date: new Date("2026-03-08T00:00:00.000Z"), stitchCount: 500 },
+      { date: new Date("2026-03-09T00:00:00.000Z"), stitchCount: 10 },
+    ]);
+
+    const { detectBrokenRecords } = await import("./record-detection");
+    const records = await detectBrokenRecords("user-1", {
+      date: new Date("2026-03-09T00:00:00.000Z"),
+      stitchCount: 10,
+      projectId: "p1",
+    });
+
+    const streak = records.find((r) => r.type === "longestStreak");
+    expect(streak).toBeDefined();
+    expect(streak!.newValue).toBe(3);
+    expect(streak!.oldValue).toBe(2);
+  });
+});

@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
-import { TZDate } from "@date-fns/tz";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
+import { parseCalendarDate } from "@/lib/utils/calendar-date";
+import { getUserTimezone, getCurrentPeriod } from "./timezone";
 import type { MonthlyTotal } from "@/types/stats";
 
 const MONTH_LABELS = [
@@ -21,10 +21,8 @@ const MONTH_LABELS = [
 
 async function computeMonthlyTotals(userId: string, year: number): Promise<MonthlyTotal[]> {
   try {
-    const tz = getUserTimezone(userId);
-
-    const yearStart = new TZDate(year, 0, 1, 0, 0, 0, tz);
-    const nextYearStart = new TZDate(year + 1, 0, 1, 0, 0, 0, tz);
+    const yearStart = parseCalendarDate(`${year}-01-01`);
+    const nextYearStart = parseCalendarDate(`${year + 1}-01-01`);
 
     const results = await prisma.stitchSession.groupBy({
       by: ["date"],
@@ -40,8 +38,7 @@ async function computeMonthlyTotals(userId: string, year: number): Promise<Month
 
     // Bucket each session into its month (timezone-aware)
     for (const row of results) {
-      const sessionDate = new TZDate(row.date, tz);
-      const month = sessionDate.getMonth(); // 0-11
+      const month = row.date.getUTCMonth(); // 0-11
       monthBuckets[month] += row._sum.stitchCount ?? 0;
     }
 
@@ -57,7 +54,7 @@ async function computeMonthlyTotals(userId: string, year: number): Promise<Month
 }
 
 export function getMonthlyTotals(userId: string, year: number) {
-  const currentYear = new Date().getFullYear();
+  const { year: currentYear } = getCurrentPeriod(getUserTimezone(userId));
   const revalidate = year < currentYear ? 3600 : 300;
 
   return unstable_cache(

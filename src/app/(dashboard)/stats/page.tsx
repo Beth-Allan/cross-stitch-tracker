@@ -17,6 +17,8 @@ import {
   getDesignerInsights,
   getGenreInsights,
   getCompletionEstimates,
+  getUserTimezone,
+  getCurrentPeriod,
 } from "@/lib/queries/stats";
 import { settled } from "@/lib/utils/settled";
 import { StatsPageShell } from "@/components/features/stats/stats-page-shell";
@@ -53,9 +55,8 @@ export default async function StatsPage({
   const parsedParams = await statsSearchParamsCache.parse(searchParams);
   const { page, sort, dir, project, status } = parsedParams;
 
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // 1-based for calendar
+  // The calendar and year defaults follow Beth's calendar, not the server's clock
+  const { year: currentYear, month: currentMonth } = getCurrentPeriod(getUserTimezone(user.id));
 
   const results = await Promise.allSettled([
     getHeroStats(user.id),

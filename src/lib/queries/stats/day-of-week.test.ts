@@ -61,3 +61,40 @@ describe("getDayOfWeekPattern", () => {
     expect(wednesday!.avgStitches).toBe(0);
   });
 });
+
+describe("getDayOfWeekPattern — calendar-date convention", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("puts a session dated Monday on Monday, not the Sunday before", async () => {
+    // 2026-05-11 is a Monday, stored as that date's UTC midnight
+    mockPrisma.stitchSession.findMany.mockResolvedValue([
+      { date: new Date("2026-05-11T00:00:00.000Z"), stitchCount: 100 },
+    ]);
+
+    const { getDayOfWeekPattern } = await import("./day-of-week");
+    const result = await getDayOfWeekPattern("user-1");
+
+    expect(result.find((d) => d.dayOfWeek === "Mon")!.avgStitches).toBe(100);
+    expect(result.find((d) => d.dayOfWeek === "Sun")!.avgStitches).toBe(0);
+  });
+
+  it("places every weekday correctly across a full week", async () => {
+    // 2026-05-10 is a Sunday
+    mockPrisma.stitchSession.findMany.mockResolvedValue([
+      { date: new Date("2026-05-10T00:00:00.000Z"), stitchCount: 70 },
+      { date: new Date("2026-05-11T00:00:00.000Z"), stitchCount: 10 },
+      { date: new Date("2026-05-12T00:00:00.000Z"), stitchCount: 20 },
+      { date: new Date("2026-05-13T00:00:00.000Z"), stitchCount: 30 },
+      { date: new Date("2026-05-14T00:00:00.000Z"), stitchCount: 40 },
+      { date: new Date("2026-05-15T00:00:00.000Z"), stitchCount: 50 },
+      { date: new Date("2026-05-16T00:00:00.000Z"), stitchCount: 60 },
+    ]);
+
+    const { getDayOfWeekPattern } = await import("./day-of-week");
+    const result = await getDayOfWeekPattern("user-1");
+
+    expect(result.map((d) => d.avgStitches)).toEqual([10, 20, 30, 40, 50, 60, 70]);
+  });
+});

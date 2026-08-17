@@ -8,6 +8,8 @@ import { prisma } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
 import { processAndStoreImage, deleteFile } from "@/lib/actions/upload-actions";
 import { detectBrokenRecords } from "@/lib/queries/stats/record-detection";
+import { getUserTimezone, getTodayCalendarDate } from "@/lib/queries/stats/timezone";
+import { parseCalendarDate } from "@/lib/utils/calendar-date";
 import { sessionFormSchema } from "@/lib/validations/session";
 import type {
   StitchSessionRow,
@@ -40,11 +42,21 @@ async function recalculateProgress(tx: Prisma.TransactionClient, projectId: stri
 
 const ACTIVE_STATUSES = ["IN_PROGRESS", "ON_HOLD", "KITTING", "KITTED"] as const;
 
+// "Today" is whatever day it is where the user is -- comparing calendar dates rather
+// than instants is what stops the last hours of an evening accepting tomorrow
+function isFutureDate(date: string, userId: string): boolean {
+  return date > getTodayCalendarDate(getUserTimezone(userId));
+}
+
 export async function createSession(formData: unknown) {
   const user = await requireAuth();
 
   try {
     const validated = sessionFormSchema.parse(formData);
+
+    if (isFutureDate(validated.date, user.id)) {
+      return { success: false as const, error: "Date cannot be in the future" };
+    }
 
     // Verify project ownership
     const project = await prisma.project.findUnique({
@@ -66,7 +78,7 @@ export async function createSession(formData: unknown) {
       const created = await tx.stitchSession.create({
         data: {
           projectId: validated.projectId,
-          date: new Date(validated.date),
+          date: parseCalendarDate(validated.date),
           stitchCount: validated.stitchCount,
           timeSpentMinutes: validated.timeSpentMinutes,
           photoKey: validated.photoKey,
@@ -102,7 +114,7 @@ export async function createSession(formData: unknown) {
     let brokenRecords: BrokenRecord[] = [];
     try {
       brokenRecords = await detectBrokenRecords(user.id, {
-        date: new Date(validated.date),
+        date: parseCalendarDate(validated.date),
         stitchCount: validated.stitchCount,
         projectId: validated.projectId,
       });
@@ -137,6 +149,10 @@ export async function updateSession(sessionId: string, formData: unknown) {
   try {
     const validated = sessionFormSchema.parse(formData);
 
+    if (isFutureDate(validated.date, user.id)) {
+      return { success: false as const, error: "Date cannot be in the future" };
+    }
+
     const existing = await prisma.stitchSession.findUnique({
       where: { id: sessionId },
       include: {
@@ -170,7 +186,7 @@ export async function updateSession(sessionId: string, formData: unknown) {
       const updated = await tx.stitchSession.update({
         where: { id: sessionId },
         data: {
-          date: new Date(validated.date),
+          date: parseCalendarDate(validated.date),
           stitchCount: validated.stitchCount,
           timeSpentMinutes: validated.timeSpentMinutes,
           photoKey: validated.photoKey,

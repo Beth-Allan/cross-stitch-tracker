@@ -1,16 +1,11 @@
 import { unstable_cache } from "next/cache";
-import { TZDate } from "@date-fns/tz";
-import { getDay } from "date-fns";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
 import type { DayOfWeekData } from "@/types/stats";
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
 async function computeDayOfWeekPattern(userId: string): Promise<DayOfWeekData[]> {
   try {
-    const tz = getUserTimezone(userId);
-
     const sessions = await prisma.stitchSession.findMany({
       where: { project: { userId } },
       select: { date: true, stitchCount: true },
@@ -21,9 +16,8 @@ async function computeDayOfWeekPattern(userId: string): Promise<DayOfWeekData[]>
     const counts = new Array<number>(7).fill(0);
 
     for (const session of sessions) {
-      const tzDate = new TZDate(session.date, tz);
-      // getDay: 0=Sun, 1=Mon, 2=Tue, ..., 6=Sat
-      const dayIndex = getDay(tzDate);
+      // getUTCDay: 0=Sun, 1=Mon, 2=Tue, ..., 6=Sat
+      const dayIndex = session.date.getUTCDay();
       // Reorder to Mon-Sun: Mon=0, Tue=1, ..., Sun=6
       const reordered = dayIndex === 0 ? 6 : dayIndex - 1;
       totals[reordered] += session.stitchCount;

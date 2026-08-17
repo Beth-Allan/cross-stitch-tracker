@@ -340,3 +340,27 @@ describe("GalleryCard", () => {
     });
   });
 });
+
+describe("GalleryCard — calendar-date convention", () => {
+  it("shows the stored finish date, not the previous local day", () => {
+    const card = createMockGalleryCard({
+      status: "FINISHED",
+      statusGroup: "finished",
+      finishDate: new Date("2026-03-01T00:00:00.000Z"),
+    });
+    render(<GalleryCard card={card} />);
+
+    expect(screen.getByText(/Finished Mar 1, 2026/)).toBeInTheDocument();
+  });
+
+  it("shows the stored FFO date, not the previous local day", () => {
+    const card = createMockGalleryCard({
+      status: "FFO",
+      statusGroup: "finished",
+      ffoDate: new Date("2026-04-01T00:00:00.000Z"),
+    });
+    render(<GalleryCard card={card} />);
+
+    expect(screen.getByText(/FFO Apr 1, 2026/)).toBeInTheDocument();
+  });
+});

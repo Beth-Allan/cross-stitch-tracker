@@ -11,7 +11,7 @@ async function computeHeroStats(userId: string): Promise<StatsHeroData> {
     const [today, week, month, year, lifetime, completedCount, collectionTotal] = await Promise.all(
       [
         prisma.stitchSession.aggregate({
-          where: { project: { userId }, date: { gte: todayStart, lt: todayEnd } },
+          where: { project: { userId }, date: { gte: todayStart, lte: todayEnd } },
           _sum: { stitchCount: true },
         }),
         prisma.stitchSession.aggregate({

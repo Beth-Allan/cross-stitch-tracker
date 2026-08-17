@@ -14,7 +14,11 @@ export function formatNumber(n: number): string {
   return numberFormatter.format(n);
 }
 
-export function formatDate(date: Date | string): string {
+/**
+ * Formats a real timestamp (a moment, e.g. `dateAdded`) in the viewer's own timezone.
+ * Calendar dates -- finish, FFO, session dates -- use `formatCalendarDate` instead.
+ */
+export function formatTimestamp(date: Date | string): string {
   const d = date instanceof Date ? date : new Date(date);
   return d.toLocaleDateString("en-US", {
     month: "short",

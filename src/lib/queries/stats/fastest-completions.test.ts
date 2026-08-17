@@ -10,6 +10,7 @@ vi.mock("next/cache", () => ({
 
 vi.mock("./timezone", () => ({
   getUserTimezone: () => "America/Edmonton",
+  getCurrentPeriod: () => ({ year: 2026, month: 5 }),
 }));
 
 describe("getFastestCompletions", () => {
@@ -154,5 +155,62 @@ describe("getFastestCompletions", () => {
     const result = await getFastestCompletions("user-1", "all");
 
     expect(result).toEqual([]);
+  });
+});
+
+describe("getFastestCompletions — calendar-date convention", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetModules();
+  });
+
+  it("reports start and finish by their stored calendar dates", async () => {
+    mockPrisma.project.findMany.mockResolvedValue([
+      {
+        id: "p1",
+        startDate: new Date("2026-05-01T00:00:00.000Z"),
+        finishDate: new Date("2026-05-11T00:00:00.000Z"),
+        stitchesCompleted: 1000,
+        chart: {
+          id: "c1",
+          name: "Small One",
+          stitchCount: 2000,
+          stitchesWide: 50,
+          stitchesHigh: 40,
+        },
+        sessions: [],
+      },
+    ]);
+
+    const { getFastestCompletions } = await import("./fastest-completions");
+    const result = await getFastestCompletions("user-1", "all");
+
+    expect(result[0].startDate).toBe("2026-05-01");
+    expect(result[0].finishDate).toBe("2026-05-11");
+    expect(result[0].daysToComplete).toBe(10);
+  });
+
+  it("counts days across a DST transition exactly", async () => {
+    mockPrisma.project.findMany.mockResolvedValue([
+      {
+        id: "p1",
+        startDate: new Date("2026-03-07T00:00:00.000Z"),
+        finishDate: new Date("2026-03-09T00:00:00.000Z"),
+        stitchesCompleted: 1000,
+        chart: {
+          id: "c1",
+          name: "Small One",
+          stitchCount: 2000,
+          stitchesWide: 50,
+          stitchesHigh: 40,
+        },
+        sessions: [],
+      },
+    ]);
+
+    const { getFastestCompletions } = await import("./fastest-completions");
+    const result = await getFastestCompletions("user-1", "all");
+
+    expect(result[0].daysToComplete).toBe(2);
   });
 });

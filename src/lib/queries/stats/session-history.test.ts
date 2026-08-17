@@ -140,3 +140,47 @@ describe("getSessionHistory", () => {
     );
   });
 });
+
+describe("getSessionHistory — calendar-date convention", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("reports the stored calendar date, not the previous local day", async () => {
+    mockPrisma.stitchSession.findMany.mockResolvedValue([
+      {
+        id: "s1",
+        date: new Date("2026-08-17T00:00:00.000Z"),
+        stitchCount: 100,
+        timeSpentMinutes: 60,
+        photoKey: null,
+        project: { id: "p1", chartId: "c1", chart: { name: "Project A" } },
+      },
+    ]);
+    mockPrisma.stitchSession.count.mockResolvedValue(1);
+
+    const { getSessionHistory } = await import("./session-history");
+    const result = await getSessionHistory("user-1", 1, "date", "desc", null);
+
+    expect(result.sessions[0].date).toBe("2026-08-17");
+  });
+
+  it("is unaffected by daylight-saving transitions", async () => {
+    mockPrisma.stitchSession.findMany.mockResolvedValue([
+      {
+        id: "s1",
+        date: new Date("2026-03-08T00:00:00.000Z"),
+        stitchCount: 100,
+        timeSpentMinutes: 60,
+        photoKey: null,
+        project: { id: "p1", chartId: "c1", chart: { name: "Project A" } },
+      },
+    ]);
+    mockPrisma.stitchSession.count.mockResolvedValue(1);
+
+    const { getSessionHistory } = await import("./session-history");
+    const result = await getSessionHistory("user-1", 1, "date", "desc", null);
+
+    expect(result.sessions[0].date).toBe("2026-03-08");
+  });
+});

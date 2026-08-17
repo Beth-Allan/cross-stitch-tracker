@@ -13,21 +13,15 @@ import { InfoCard } from "@/components/features/charts/info-card";
 import { DetailRow } from "@/components/features/charts/detail-row";
 import { ProgressBar } from "@/components/features/charts/progress-bar";
 import { getEffectiveStitchCount } from "@/lib/utils/size-category";
-import { formatNumber, formatDate } from "@/components/features/gallery/gallery-format";
+import { formatNumber, formatTimestamp } from "@/components/features/gallery/gallery-format";
+import { formatCalendarDate } from "@/lib/utils/calendar-date";
 import { SECTION_ORDER, type OverviewSection } from "./types";
 import type { ProjectDetailProps } from "./types";
 import { ChartFileList } from "./chart-file-list";
 
-/** Format a date-only value (YYYY-MM-DD stored as midnight UTC) without timezone shift. */
 function formatDateOnly(date: Date | null | undefined): string {
   if (!date) return "-";
-  const d = date instanceof Date ? date : new Date(date);
-  return d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+  return formatCalendarDate(date);
 }
 
 interface OverviewTabProps {
@@ -189,7 +183,7 @@ export function OverviewTab({ chart, supplies, sessionCount }: OverviewTabProps)
     dates: () => (
       <InfoCard key="dates" icon={Calendar} title="Dates">
         <div>
-          <DetailRow label="Added" value={formatDate(chart.dateAdded)} />
+          <DetailRow label="Added" value={formatTimestamp(chart.dateAdded)} />
           {project.startDate && (
             <DetailRow label="Started" value={formatDateOnly(project.startDate)} />
           )}
