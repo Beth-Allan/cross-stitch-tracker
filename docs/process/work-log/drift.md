@@ -92,6 +92,32 @@ Recommended: confirm. `session-protocol.md` §5 was updated to match.
 
 **What happens after she chooses.** All three are one-line edits to a config file, no code.
 
+### 2026-08-17 · kitting % for a project with no supplies — the rule was decided inside a test file
+
+**What happened.** The A-1 audit found `pattern-dive-actions.test.ts` carrying a test titled
+_"returns 100% kitting for project with no supplies needed"_ whose assertion is **0%**, with the
+reasoning for the flip written as a comment inside the test rather than surfaced anywhere; a
+sibling test hardens _"fabric alone doesn't make a project kittable."_ Both encode product/domain
+rules — what the kitting figure should say when a chart has no supplies attached, and whether
+fabric counts toward kitted — that trace to no `docs/domain/` fact (KIT-001's nine conditions
+are themselves still unconfirmed with Beth, and say nothing about the empty case). The code
+ships the 0% reading today.
+
+**Why it needs Beth.** "Kitted" is her practice, not an inference (hard rule 5). Today the
+What's Next tab shows a supply-less chart at 0% kitted; the test's title believed it should read
+100% ("nothing to gather = ready to start"). Either reading is defensible; only she knows which
+matches how she decides a project is ready.
+
+**Her options.** (a) 0% as built — "no supplies recorded" means "not ready; kit list unknown".
+(b) 100% — "nothing left to gather" means ready. (c) Neither — show "no kit list" as its own
+state instead of a percentage; the only option that never overstates in either direction, at
+the cost of a slightly bigger change.
+
+**What happens after she chooses.** The ruling is recorded via `/stitch-fact` (it is a domain
+fact about what kitting % means), the test is retitled or reshaped to match, and the What's
+Next surface follows — small work, foldable into the audit's P12 or the design track's
+DS-3/DS-4.
+
 ## Also open — the questions known to be coming
 
 _(Two questions are **known to be coming** but are not drift rows yet, because nothing
