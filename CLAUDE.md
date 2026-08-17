@@ -6,11 +6,13 @@ shopping lists. Single user — Beth. Live at https://cross-stitch-tracker-adolw
 **merging to main deploys production instantly** (Vercel), which shapes the whole merge
 discipline below.
 
-> **Overhaul in progress (2026-08-16):** steps 2–5 of `WORKFLOW-OVERHAUL-HANDOFF.md` §3.7 are
-> still landing on `chore/workflow-overhaul`. Some files this guide references — the work log,
-> `docs/domain/`, the `.claude/skills/` doors, the promoted codebase docs — arrive in those
-> steps; until then the handoff's §7 is the session-to-session memory and `.planning/` is
-> unmigrated history. Delete this note when the overhaul branch merges.
+> **Overhaul in progress (2026-08-16):** steps 3–5 of `WORKFLOW-OVERHAUL-HANDOFF.md` §3.7 are
+> still landing on `chore/workflow-overhaul`. **The work log is live as of step 2** — it, not the
+> handoff, is now the session-to-session memory, and its Up-next queue is the running order. Still
+> to come: `docs/domain/` and the `.claude/skills/` doors (so the door names below are not yet
+> typeable), the promoted codebase docs, and the four `.claude/rules/` files that still describe
+> the dead GSD process. `.planning/` stays unmigrated history until step 5. Delete this note when
+> the overhaul branch merges.
 
 ## Working with Beth
 

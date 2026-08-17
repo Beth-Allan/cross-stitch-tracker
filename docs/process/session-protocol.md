@@ -121,8 +121,9 @@ sessions), `backlog.md` (feature wishes + design backlog). Statuses: `queued` �
 `built` → (`built, awaiting review` → `reviewed`, where §5 requires) → `accepted` (stage sealed
 after Beth's walkthrough). Notes append — the next session reads your last line. Every session
 updates the log before finishing; a session that can't finish honestly finishes by documenting
-(§9 handoff). _(The log is created at overhaul step 2; until it exists,
-`WORKFLOW-OVERHAUL-HANDOFF.md` §7 is the interim memory.)_
+(§9 handoff). _(Created at overhaul step 2, 2026-08-16 — it is live, and it supersedes
+`WORKFLOW-OVERHAUL-HANDOFF.md` §7 as the session-to-session memory. The handoff remains the spec
+for overhaul steps 3–5 only.)_
 
 ## 5. Review policy — four layers + sensitive cores
 
