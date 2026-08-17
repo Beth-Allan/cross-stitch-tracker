@@ -14,7 +14,7 @@ ledger and the docs before landing here; everything already known is cited, not 
 **Where findings live (one home each):**
 
 - **Proposed items** (§3) — the list `/cleanup` triages with Beth.
-- **New maintenance-ledger rows** (7) and **dated A-1 annotations** on 11 existing rows —
+- **New maintenance-ledger rows** (7) and **dated A-1 annotations** on 12 existing rows —
   in `docs/process/maintenance-ledger.md`.
 - **One new drift row** (kitting percentage) — in `docs/process/work-log/drift.md`.
 - **Report-only notes** (§4) — assessments and context that need no separate tracking.
@@ -31,7 +31,7 @@ placeholder-quality corners. But the audit found real problems, and five matter 
 1. **The front door's outer lock doesn't lock.** The security layer every doc describes as the
    app's outer fence (`proxy.ts`) checks nothing — a one-line configuration piece was never
    added, so it waves every request through. You're currently protected by the _inner_ checks
-   (which do hold, everywhere but two spots on a dead screen). Related: the "five wrong
+   (which do hold, everywhere but three spots — two on an old shopping screen nothing links to any more, and one image-thumbnail helper). Related: the "five wrong
    password attempts and you wait" limit only guards the login form — the underlying login
    endpoint can be hammered without limit.
 2. **Your stitching dates are recorded one day early in statistics.** A session you log as
@@ -45,7 +45,7 @@ placeholder-quality corners. But the audit found real problems, and five matter 
 4. **When loading fails, screens say "you have none" instead of "couldn't load."** A database
    hiccup on the stats page tells you you've never stitched; the sessions page goes blank; a
    failed save in the supply table keeps showing the number that never saved.
-5. **The security patches waiting: 2 critical and 13 high** in the libraries the live app
+5. **The security patches waiting: 2 critical and 13 high** (the two most serious severity ratings) in the libraries the live app
    ships — including the login library itself. Versions are pinned (by design), so nothing
    updates until a session goes and gets it. That session shouldn't wait for the monthly
    routine.
@@ -76,10 +76,10 @@ and the `/cleanup` session decides the order together with you.
 Most fixes are plain `npm audit fix` (non-breaking); the criticals in the auth stack need the
 bleeding-edge care rule (hard rule 8). → Proposed item **P10**.
 
-**Deep lint** — reproduces ledger row ② exactly: 55 warnings in 38 files — 39
+**Deep lint** — reproduces the 55-eslint-warnings ledger row exactly: 55 warnings in 38 files — 39
 `@typescript-eslint/no-unused-vars`, 13 `@next/next/no-img-element`, 2
 `jsx-a11y/role-supports-aria-props` (the _two separately-maintained copies_ of
-`editable-number.tsx` — see P11/L1), 1 `jsx-a11y/alt-text`. The three a11y warnings are small
+`editable-number.tsx` — see P11 and the new component-duplication ledger row), 1 `jsx-a11y/alt-text`. The three a11y warnings are small
 real defects, not just hygiene. Also: **zero** `.skip`/`.only`/`.todo` tests anywhere.
 
 ---
@@ -196,7 +196,7 @@ reintroduce 999.41/999.42). The defects are all on the **writer** side:
   → zeros, unassigned fabrics → "none"), `/sessions` (blank page), the dashboard layout's
   project picker (failure = "no active projects" = **Beth cannot log stitches, with no error
   shown**). `(dashboard)/error.tsx` exists and is honest — these guards are strictly worse
-  than not guarding. Ledger row ㉓ (the 1-of-5 guarded `/charts` fetch) folds into this item.
+  than not guarding. The 1-of-5-guarded-`/charts` ledger row folds into this item.
 - `supply-table.tsx` + its `editable-number`: on save failure the optimistic value is never
   rolled back — the table shows the unsaved number until a hard reload (the sibling
   `shopping-cart.tsx` does this correctly with `failedIds`). Contradicts
@@ -235,7 +235,7 @@ Phase 30 hardened replace paths; delete-the-parent and the failure arms were nev
   thumbnail, success toast.
 - Pre-save uploads land under literal `covers/unsaved/`/`files/unsaved/` prefixes; abandoning
   a form leaks them, and nothing can enumerate orphans (no reconciliation job, and any
-  bucket-side lifecycle rule is unknown — deployment topology, ledger row ⑳). Decide the
+  bucket-side lifecycle rule is unknown — deployment topology, per its ledger row). Decide the
   reconciliation story here.
 
 ### P9 · Query scale: the unbounded-read batch — **medium (pays off as the collection grows); index half gated (schema)**
@@ -279,7 +279,7 @@ need hard rule 8 care and a real verification pass.
   `form-action 'self'`, `object-src 'none'` (~15 min). Nonce work deferred — see §4.
 - Progress-% display: 11 hand-written copies, 7 unclamped — the same project reads 100% on the
   gallery card and 137% on the chart hero. Unify the _display_ clamp now; whether logging past
-  100% should be blocked stays Beth's open domain question (ledger row ⑤).
+  100% should be blocked stays Beth's open domain question (the over-logging ledger row).
 - Quick-added supplies hardcode `colorFamily: "NEUTRAL"`, making them invisible to the
   catalogue's colour-family filter — **needs Beth's word on what quick-add should do** (ask at
   `/cleanup`; may be a `/stitch-fact`).
@@ -315,17 +315,17 @@ they exist) — but the sweep found tests that cannot fail where it matters:
 
 ## 4. Report-only notes (no separate tracking needed)
 
-- **Stats-page width (closes the open half of ledger row ⑭):** the "16 queries" is really
+- **Stats-page width (closes the open half of the stats-fan-out ledger row):** the "16 queries" is really
   16 _functions_ ≈ **45–50 queries** per cold render — but `@prisma/adapter-neon` passes only
   `connectionString`, and `@neondatabase/serverless` defaults **`max: 10`**, so the fan-out is
   a 10-wide pool with a queue. Pool exhaustion as described in `docs/CONCERNS.md` is not
   reachable at this width; the live cost is cold-render latency (and `revalidateTag` on every
   session write makes cold the common case). The thing to bound is rows per query (P9), not
   query count.
-- **`/charts` eager batch measured (annotates row ⑮):** ~33 queries + a presign per image key;
+- **`/charts` eager batch measured (annotates the pagination ledger row):** ~33 queries + a presign per image key;
   rows ≈ 3N + 2T + 2F where T (junction rows) ≈ 30N dominates; ~0.5MB of presigned URLs in
   the payload at N=500, four of five tabs unopened.
-- **CSP assessment (row ⑬):** Next 16 supports nonces only when the CSP header is generated
+- **CSP assessment (the CSP ledger row):** Next 16 supports nonces only when the CSP header is generated
   per-request in middleware — a static `next.config.ts` header can never carry one, which is
   why the current setup is stuck with `unsafe-inline`. A per-request nonce also forces dynamic
   rendering (this app statically generates routes) — that trade is Beth's, and deferring it is
@@ -342,11 +342,11 @@ they exist) — but the sweep found tests that cannot fail where it matters:
   the compiled middleware chunk exists — most likely a truncated local build. Moot while P1 is
   open (the middleware checks nothing anyway); worth a glance at deployed headers when P1
   lands.
-- **Factory `as` casts (row ⑥) checked:** none currently hides a real shape mismatch — the
+- **Factory `as` casts (the factory-casts ledger row) checked:** none currently hides a real shape mismatch — the
   discriminated-union invariant they bypass is fully covered by `focal-point.test.ts`, and no
   test passes a half-set pair. The row stays valid as a latent hazard.
 - **Neon backup/restore posture remains unknown** — not answerable from the repo; already
-  owned by the deployment-topology ledger row ⑳, which the queued `/cleanup` covers.
+  owned by the deployment-topology ledger row, which the queued `/cleanup` covers.
 - **Briefing correction for future audits:** `src/lib/actions/` holds **18** action files
   (105 exported actions), not 21 — the higher count was inflated by test files.
 
@@ -388,7 +388,7 @@ The positive assurance, so the next session doesn't re-audit it:
   `requireAuth()` before any data access (scripted enumeration, not sampling); zero local
   guard copies; zero fallback IDs; `auth-guard.ts` checks `user.id` specifically and throws
   (fails closed). Ownership scoping verified on every owned-model query/mutation — the only
-  gaps are the three on the dead shopping path (P3) and `generateThumbnail` (P2). The
+  gaps are the two on the dead shopping path (P3) plus `generateThumbnail` (P2). The
   documented ownerless arms (unattached charts/fabrics, catalogues) match `docs/CONCERNS.md`
   exactly. All 24 pages checked against the middleware matcher's exclusions — the exclusion
   list itself is correct (the callback behind it is P1).
