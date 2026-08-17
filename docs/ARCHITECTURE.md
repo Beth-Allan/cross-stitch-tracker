@@ -106,7 +106,7 @@ Key files:
 - `dashboard-actions.ts` — Dashboard data aggregation
 - `stats-actions.ts` — Delegating wrapper for calendar/session stats
 - `shopping-cart-actions.ts` — Shopping list mutations
-- Plus: `designer-actions.ts`, `genre-actions.ts`, `fabric-actions.ts`, `chart-file-actions.ts`, `storage-location-actions.ts`, `stitching-app-actions.ts`, `focal-point-actions.ts`, `pattern-dive-actions.ts`, `shopping-actions.ts`, `project-dashboard-actions.ts`
+- Plus: `designer-actions.ts`, `genre-actions.ts`, `fabric-actions.ts`, `chart-file-actions.ts`, `storage-location-actions.ts`, `stitching-app-actions.ts`, `focal-point-actions.ts`, `pattern-dive-actions.ts`, `project-dashboard-actions.ts`
 
 ### Layer 6: Stats Query Layer (`src/lib/queries/stats/`)
 

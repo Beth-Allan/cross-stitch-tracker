@@ -3,7 +3,6 @@ import type {
   ProjectThreadWithThread,
   ProjectBeadWithBead,
   ProjectSpecialtyWithItem,
-  StrandCount,
 } from "@/types/supply";
 
 // ─── Tab Navigation ────────────────────────────────────────────────────────
@@ -15,15 +14,6 @@ export type TabValue = (typeof TAB_VALUES)[number];
 
 export const SUPPLY_SORT_OPTIONS = ["added", "alpha"] as const;
 export type SupplySortOption = (typeof SUPPLY_SORT_OPTIONS)[number];
-
-// ─── Calculator Settings ───────────────────────────────────────────────────
-
-export interface CalculatorSettings {
-  strandCount: StrandCount;
-  overCount: 1 | 2;
-  fabricCount: number; // from linked fabric or default 14
-  wastePercent: number; // 0-50
-}
 
 // ─── Project Detail Props ──────────────────────────────────────────────────
 

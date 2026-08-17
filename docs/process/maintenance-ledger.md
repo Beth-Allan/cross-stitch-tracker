@@ -148,7 +148,7 @@ that item merges. Stage P items are in `docs/process/build-plan.md`.
 - **P12** — factory-`as`-casts row.
 - **P13** — `src/lib` boundary/validation duplication row · unknown-typed-actions row.
 - **P14** — 55-eslint-warnings row (**ruled: fix all, then `--max-warnings 0`**) ·
-  CI-re-implements-the-gate row (**ruled: CI runs `npm run gate`**).
+  CI-re-implements-the-gate row (**ruled: CI runs `npm run gate`**). **Baseline moved 2026-08-17:** P3 deleted two warnings with their dead files, so the row's 55 is now **53** — the row text stays verbatim (append-only), and P14 starts from 53.
 - **R-1** — deployment-topology row (documents it; the bucket question is **ruled: read real,
   write scratch**).
 - **Design track (D-1/DS-4)** — the `--status-*` dark-values row, as the row itself says.
