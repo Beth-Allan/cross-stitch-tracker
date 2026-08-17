@@ -47,7 +47,8 @@ Path list: `.claude/hooks/review-gated-paths.txt`.
   `unstable_cache` / `revalidateTag("stats")` layer · **test honesty** (tests that assert
   nothing, mock the thing under test, or pass regardless of the code) · a full
   `docs/process/security-checklist.md` sweep · plus the mechanical runs: `npm audit`, deep lint
-  (including the 55 warnings the gate currently lets through — ledger row 2026-08-16 ①).
+  (including the 53 warnings the gate currently lets through — ledger row 2026-08-16 ①, logged
+  at 55 before P3 deleted two with their files).
 - **Prime suspects going in** (both already carry 999.x trails, both are protocol §5 cores):
   the **R2 upload / orphan-cleanup paths** (`upload-actions.ts`, `chart-file-actions.ts`,
   `session-actions.ts`) and the **stats cache layer** (`src/lib/queries/stats/**` — the
@@ -234,7 +235,7 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
 
 ### P14 Gate alignment — **gate-config changes pre-approved 2026-08-17**
 
-- **Objective:** burn down the standing eslint warnings (55 minus whatever P11's a11y fixes
+- **Objective:** burn down the standing eslint warnings (53 as of P3, minus whatever P11's a11y fixes
   already took), then flip lint to `--max-warnings 0`; change CI to literally run
   `npm run gate`. Both approved on the record (drift 2026-08-17).
 - **Cited specs:** the two ledger rows (55-warnings; CI re-implements the gate) ·

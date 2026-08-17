@@ -204,7 +204,7 @@ describe("StatsOverview", () => {
     expect(screen.getByTestId("genre-distribution-chart")).toBeInTheDocument();
   });
 
-  it("does NOT render RankedList", () => {
+  it("does NOT render a ranked list", () => {
     renderOverview();
     expect(screen.queryByTestId("ranked-list")).not.toBeInTheDocument();
   });

@@ -10,7 +10,6 @@ type SortDir = "asc" | "desc";
 
 interface SessionTableProps {
   sessions: StitchSessionRow[];
-  imageUrls: Record<string, string>;
   showProjectName?: boolean;
   onEditSession?: (session: StitchSessionRow) => void;
 }
@@ -67,7 +66,6 @@ function SortHeader({
 
 export function SessionTable({
   sessions,
-  imageUrls: _imageUrls,
   showProjectName = false,
   onEditSession,
 }: SessionTableProps) {

@@ -164,7 +164,7 @@ export function ProjectSessionsTab({
         </Button>
       </div>
 
-      <SessionTable sessions={sessions} imageUrls={imageUrls} onEditSession={handleEditSession} />
+      <SessionTable sessions={sessions} onEditSession={handleEditSession} />
 
       <LogSessionModal
         isOpen={modalOpen}

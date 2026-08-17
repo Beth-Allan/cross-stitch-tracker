@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { navigationSections, navigationItems } from "./nav-items";
+import { navigationSections } from "./nav-items";
 
 describe("navigationSections", () => {
   describe("PDIV-01: Pattern Dive nav label", () => {
@@ -22,14 +22,6 @@ describe("navigationSections", () => {
       const allItems = navigationSections.flatMap((s) => s.items);
       const patternDiveItem = allItems.find((item) => item.label === "Pattern Dive");
 
-      expect(patternDiveItem).toBeDefined();
-      expect(patternDiveItem?.href).toBe("/charts");
-    });
-  });
-
-  describe("flat navigationItems list", () => {
-    it("includes Pattern Dive item in flat list", () => {
-      const patternDiveItem = navigationItems.find((item) => item.label === "Pattern Dive");
       expect(patternDiveItem).toBeDefined();
       expect(patternDiveItem?.href).toBe("/charts");
     });

@@ -410,16 +410,15 @@ describe("SuppliesTab", () => {
     });
   });
 
-  describe("CalculatorSettingsBar exclusion", () => {
-    it("does NOT render CalculatorSettingsBar (per D-02/D-03)", () => {
+  describe("calculator settings exclusion", () => {
+    it("does NOT render fabric-count, strand-count or over-count controls", () => {
       render(
         <SuppliesTab
           project={defaultProject}
           supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
         />,
       );
-      // CalculatorSettingsBar renders fabric count, strand count labels
-      // None of those should be present
+      // Those settings belong to the chart form, never to this tab
       expect(screen.queryByText(/fabric count/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/strand count/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/over \d/i)).not.toBeInTheDocument();

@@ -108,7 +108,7 @@ describe("RecordsOverview", () => {
     );
   });
 
-  it("does NOT render YearScopeToggle", () => {
+  it("does NOT render a time-scope toggle", () => {
     renderRecords();
 
     expect(screen.queryByText("All-time")).not.toBeInTheDocument();

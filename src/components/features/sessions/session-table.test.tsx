@@ -42,7 +42,6 @@ const baseSessions: StitchSessionRow[] = [
 describe("SessionTable", () => {
   const defaultProps = {
     sessions: baseSessions,
-    imageUrls: {},
     onEditSession: vi.fn(),
   };
 
@@ -133,7 +132,7 @@ describe("SessionTable", () => {
   });
 
   it("renders empty state message when no sessions", () => {
-    render(<SessionTable sessions={[]} imageUrls={{}} />);
+    render(<SessionTable sessions={[]} />);
 
     expect(screen.getByText(/no sessions logged/i)).toBeInTheDocument();
   });
@@ -155,7 +154,7 @@ describe("SessionTable", () => {
 
   it("displays time as dash when timeSpentMinutes is null", () => {
     const sessions = [createSession({ id: "s-null", timeSpentMinutes: null })];
-    render(<SessionTable sessions={sessions} imageUrls={{}} />);
+    render(<SessionTable sessions={sessions} />);
 
     // em-dash for null time — appears in both table and mobile card
     expect(screen.getAllByText("\u2014")).toHaveLength(2);
@@ -167,7 +166,6 @@ describe("SessionTable — calendar-date convention", () => {
     render(
       <SessionTable
         sessions={[createSession({ id: "s1", date: new Date("2026-08-17T00:00:00.000Z") })]}
-        imageUrls={{}}
       />,
     );
 
@@ -179,7 +177,6 @@ describe("SessionTable — calendar-date convention", () => {
     render(
       <SessionTable
         sessions={[createSession({ id: "s1", date: new Date("2026-11-01T00:00:00.000Z") })]}
-        imageUrls={{}}
       />,
     );
 

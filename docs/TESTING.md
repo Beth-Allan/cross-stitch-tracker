@@ -32,15 +32,15 @@ excuse for pushing red.
 
 ## What exists
 
-**218 test files · 2609 tests · no E2E** (no Playwright, no Cypress). The numbers go stale; the
+**212 test files · 2560 tests · no E2E** (no Playwright, no Cypress). The numbers go stale; the
 suite footer does not. Run `npm test` and read the last line rather than trusting this paragraph.
 
 | Area                       | Files   |
 | -------------------------- | ------- |
-| `src/components/features/` | 138     |
-| `src/lib/actions/`         | 24      |
-| `src/lib/queries/stats/`   | 20      |
-| `src/lib/utils/`           | 11      |
+| `src/components/features/` | 133     |
+| `src/lib/actions/`         | 23      |
+| `src/lib/queries/stats/`   | 21      |
+| `src/lib/utils/`           | 12      |
 | `src/lib/validations/`     | 5       |
 | `src/types/`               | 3       |
 | `src/lib/` (root)          | 5       |
@@ -50,11 +50,11 @@ suite footer does not. Run `npm test` and read the last line rather than trustin
 | `src/components/hooks/`    | 1       |
 | `src/components/` (root)   | 1       |
 | `src/app/`                 | 2       |
-| **Total**                  | **216** |
+| **Total**                  | **212** |
 
-Inside `src/components/features/`, the weight sits in `stats/` (26), `supply-table/` (15),
-`charts/project-detail/` (15), `charts/` (15), `gallery/` (12), `dashboard/` (11),
-`charts/form-primitives/` (9) and `shopping/` (8). The stats feature directory is the single
+Inside `src/components/features/`, the weight sits in `stats/` (24), `supply-table/` (15),
+`charts/` (15), `charts/project-detail/` (13), `gallery/` (12), `dashboard/` (11),
+`charts/form-primitives/` (9) and `shopping/` (7). The stats feature directory is the single
 largest test surface in the repo — larger than every server action put together.
 
 `src/lib/queries/` contains only `stats/`; there is no general query layer.
