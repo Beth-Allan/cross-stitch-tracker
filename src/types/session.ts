@@ -13,16 +13,6 @@ export interface StitchSessionRow {
   createdAt: Date;
 }
 
-// ─── Session Form Data ──────────────────────────────────────────────────────
-
-export interface SessionFormData {
-  projectId: string;
-  date: string; // ISO date string
-  stitchCount: number;
-  timeSpentMinutes: number | null;
-  photoKey: string | null;
-}
-
 // ─── Active Project for Picker ──────────────────────────────────────────────
 
 export interface ActiveProjectForPicker {

@@ -61,9 +61,3 @@ export const settingsItem: NavItem = {
   href: "/settings",
   icon: Settings,
 };
-
-/** Flat list for backward compatibility (e.g. mobile nav) */
-export const navigationItems: NavItem[] = [
-  ...navigationSections.flatMap((s) => s.items),
-  settingsItem,
-];

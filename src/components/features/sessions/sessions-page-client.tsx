@@ -63,7 +63,6 @@ export function SessionsPageClient({
 
           <SessionTable
             sessions={sessions}
-            imageUrls={imageUrls}
             showProjectName={true}
             onEditSession={handleEditSession}
           />

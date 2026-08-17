@@ -59,7 +59,7 @@ Twelve routes carry their own `loading.tsx` skeleton alongside the group-level o
 
 - `app-shell.tsx` — Sidebar + topbar wrapper
 - `sidebar.tsx`, `top-bar.tsx`, `nav-item-link.tsx` — Navigation chrome
-- `nav-items.ts` — Three sections plus a pinned settings item: **Projects** (Dashboard, Pattern Dive, Shopping, Series) · **Track** (Sessions, Statistics) · **Reference** (Designers, Genres, Supplies, Fabric, Storage, Apps). `navigationItems` is a flattened list kept for mobile nav.
+- `nav-items.ts` — Three sections plus a pinned settings item: **Projects** (Dashboard, Pattern Dive, Shopping, Series) · **Track** (Sessions, Statistics) · **Reference** (Designers, Genres, Supplies, Fabric, Storage, Apps).
 - `logo.tsx`, `theme-toggle.tsx`, `user-menu.tsx`
 - `logout-action.ts` — Logout server action
 

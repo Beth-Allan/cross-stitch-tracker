@@ -67,7 +67,6 @@ export interface ProjectDetailProps {
       fabric: { id: string; name: string; count: number; brand: { name: string } } | null;
     } | null;
   };
-  imageUrls: Record<string, string>;
   supplies: {
     threads: ProjectThreadWithThread[];
     beads: ProjectBeadWithBead[];
