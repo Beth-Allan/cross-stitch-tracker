@@ -108,8 +108,9 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
 
 - **Objective:** report §3 P2 — real server-side size/type enforcement, ownership-scoped key
   primitives (copy `chart-file-actions.ts`'s model), Zod on every input, and resolve
-  `confirmUpload` (dead code today; deleting it takes its tests with it — same-shape approval as
-  P3's is on the record in drift, cite it in the PR).
+  `confirmUpload` (dead code today; deleting it takes its tests with it — **not** covered by the
+  2026-08-17 approvals, which name only P3 and P12: if deletion is the choice, ask Beth for her
+  word on the record when P2 runs; wiring it instead needs no approval).
 - **Folded in:** the write-path integrity gaps ledger row (2026-08-17) that touch this file —
   delete-order and client-trusted metadata.
 - **Done-when:** P2's list closed test-first; gate green; fresh `/review` before merge.
@@ -142,8 +143,11 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
   test rule** (Beth's ruling, drift 2026-08-17 ②: every stats-visible mutation carries a test
   asserting its `revalidateTag("stats", { expire: 0 })` call) becomes the standing pattern,
   recorded in `.claude/rules/testing-requirements.md` (carry the frontmatter rule).
+- **Folded in:** the cache-TTL ledger row's legibility half — the 300s/3600s TTLs move to
+  shared named constants with a one-line written rule for which a new query picks (P4 owns the
+  same row's timezone half).
 - **Done-when:** chart 6/6, designer + genre covered, supply 23/23, session 3/3 asserted; the
-  rule file states the pattern; gate green.
+  rule file states the pattern; TTL constants + the choosing rule in place; gate green.
 
 ### P6 Honest failure states: stop rendering errors as zeros
 

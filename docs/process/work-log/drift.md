@@ -32,17 +32,15 @@ words where possible. Rows are never deleted.
 
 _(Empty — every drift row to date was ruled at the 2026-08-17 `/cleanup`.)_
 
-## Also open — the questions known to be coming
+## Also open — the question known to be coming
 
-_(Two questions are **known to be coming** but are not drift rows yet, because nothing
-contradicts anything until someone tries to build them — they are recorded where they will be
-asked, which is the point of writing them down now:_
-
-- _Fabric matching for a project with no assigned fabric — what should it match against? Build
-  item **F-2**, trap ②. It is a domain fact, so it goes through `/stitch-fact`, not through here,
-  unless her answer contradicts something already written._
-- _(the second — block/warn/allow on over-logging — was ruled **warn but allow** at the
-  2026-08-17 `/cleanup`; see Ruled below.)_
+_(One question is **known to be coming** but is not a drift row yet, because nothing contradicts
+anything until someone builds it: fabric matching for a project with no assigned fabric — what
+should it match against? Asked inside **P7**, which absorbed F-2 at the 2026-08-17 `/cleanup`
+(the question is F-2's trap ②, and P7 inherits it). It is a domain fact, so it goes through
+`/stitch-fact`, not through here, unless her answer contradicts something already written. The
+second question that used to sit here — block/warn/allow on over-logging — was ruled **warn but
+allow** at the same `/cleanup`; see Ruled below.)_
 
 ## Ruled
 

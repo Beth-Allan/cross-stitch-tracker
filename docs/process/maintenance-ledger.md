@@ -120,7 +120,7 @@ that item merges. Stage P items are in `docs/process/build-plan.md`.
 
 - **P1** — auth-misconfig-diagnoses-as-"Invalid credentials" row.
 - **P3** — dead-code-slivers row.
-- **P4/P5** — cache-TTL/current-period-predicate row (P4 the timezone half, P5 the pattern).
+- **P4/P5** — cache-TTL/current-period-predicate row (P4 the timezone half, P5 the shared TTL constants + written choosing rule).
 - **P5** — supply-actions revalidate test-gap row.
 - **P6** — the 1-of-5-guarded `/charts` row (already folded by the audit).
 - **P2/P8** — file/fabric write-path integrity row (split by file: upload actions → P2,
