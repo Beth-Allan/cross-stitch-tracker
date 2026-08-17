@@ -1,0 +1,31 @@
+# Review-gated cores (session-protocol §5) — the sensitive paths that merge only
+# from a fresh /review session, never by their builder (CLAUDE.md hard rule 3).
+# One POSIX extended regex per line, matched against a PR's changed file paths.
+# No guard-merge hook reads this file yet (Beth's ruling D-03) — enforcement is
+# by convention; a maintenance-ledger row tracks the optional wiring. Keep this
+# list in step with session-protocol §5; changing either is a gate-config
+# change (drift, Beth's ruling on the record).
+# Lesson inherited from horse-db (its drifts D21/D26/D48): gate growing
+# families by directory, not filename — a per-filename line goes stale the day
+# a sibling is added.
+
+# Schema and migrations
+^prisma/schema\.prisma$
+^prisma/migrations/
+
+# Auth, session, and rate limiting
+^src/lib/auth\.ts$
+^src/lib/auth-guard\.ts$
+^src/lib/rate-limit\.ts$
+
+# The math (skein + fabric calculators)
+^src/lib/utils/skein-calculator\.ts$
+^src/lib/utils/fabric-calculator\.ts$
+
+# Stats query layer — the unstable_cache + revalidateTag("stats") trap
+# (history: backlog 999.41 and 999.42)
+^src/lib/queries/stats/
+
+# R2 upload paths — orphan-leak history (999.50, 999.52)
+^src/lib/actions/upload-actions\.ts$
+^src/lib/actions/chart-file-actions\.ts$
