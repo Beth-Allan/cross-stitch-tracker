@@ -71,7 +71,7 @@ into every session.
 - @vitejs/plugin-react 4.4.1 - Vite React plugin for Vitest
 - ESLint 9.39.4 + eslint-config-next 16.3.1 - Flat config
 - Prettier 3.8.3 + prettier-plugin-tailwindcss 0.7.2 - Formatting and Tailwind class ordering
-- tsx 4.21.0 - TypeScript execution, used by the Prisma seed script
+- tsx 4.23.12 - TypeScript execution, used by the Prisma seed script
 - Husky 9.1.7 - Git hooks (`pre-commit`: `lint-staged`; `pre-push`: `npm run gate`)
 - lint-staged 16.4.0 - Prettier on staged `ts,tsx,js,mjs,json,css,md`; `eslint --fix` on staged
   `ts,tsx`
@@ -83,6 +83,7 @@ into every session.
 **Critical:**
 
 - Prisma 7.9.1 (`prisma` CLI + `@prisma/client`) - ORM; schema at `prisma/schema.prisma`,
+- **One dependency override lives in `package.json`:** `@prisma/config` → `deepmerge-ts` `8.0.1`. `@prisma/config` pins `7.1.5`, which carries a high advisory, and npm's only alternative was a backwards major on `prisma`. Scoped so it cannot leak; remove it once `@prisma/config` declares `>=8` itself (maintenance-ledger row carries the condition).
   generated client output to `src/generated/prisma/`
 - `@prisma/adapter-neon` 7.9.1 - Neon serverless PostgreSQL driver adapter, constructed by
   `PrismaClient` in `src/lib/db.ts`. The adapter has been GA since Prisma 6.16.0; under Prisma 7

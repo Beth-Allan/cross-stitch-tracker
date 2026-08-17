@@ -73,7 +73,9 @@
     "vitest": "3.2.7"
   },
   "overrides": {
-    "deepmerge-ts": "8.0.1"
+    "@prisma/config": {
+      "deepmerge-ts": "8.0.1"
+    }
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs,json,css,md}": "prettier --write",
