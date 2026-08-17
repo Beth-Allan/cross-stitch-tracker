@@ -38,10 +38,9 @@
 ^src/lib/actions/chart-file-actions\.ts$
 ^src/lib/r2\.ts$
 
-# OPEN QUESTION for Beth, raised by the layer-1 review of PR #72 (2026-08-16) and
-# carried as a drift row: the stats *cache* is gated above by its query directory,
-# but revalidateTag("stats") is called from chart-actions.ts, supply-actions.ts and
-# session-actions.ts, which are not gated. Gating them would pull most of the app's
-# mutation surface into fresh-/review territory; leaving them means the trap that
-# caused 999.41/999.42 can be re-introduced from an ungated file. Her ruling decides;
-# nothing is added here until she gives it.
+# RULED by Beth (2026-08-17, /cleanup; drift.md Ruled): the revalidateTag("stats")
+# caller files (chart-actions.ts, supply-actions.ts, session-actions.ts) are NOT
+# gated. The adopted protection is the per-mutation test rule — every stats-visible
+# mutation carries a test asserting its revalidateTag("stats", { expire: 0 }) call
+# (audit item P5 completes the pattern). Rationale: A-1 report §5 — every cache
+# defect found was writer-side, in files a path gate could not have watched.

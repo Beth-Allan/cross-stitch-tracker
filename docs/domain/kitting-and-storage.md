@@ -26,6 +26,17 @@ at query time).
 
 [from the project plan 2026-08-16 — CROSS_STITCH_TRACKER_PLAN.md §3, not re-confirmed]
 
+### KIT-004 — Kitting % for a project with no supplies recorded is 0%
+
+A project with **no supplies recorded against it** shows **0% kitted**, not 100%: "no kit list
+recorded" means _not ready — kit list unknown_, never _nothing left to gather_. Related, ruled in
+the same breath: having the right **fabric alone does not make a project kittable** — supplies
+decide it (fabric is one of KIT-001's conditions, not a substitute for the list). Chosen over the
+alternatives (100%, or a "no kit list" label instead of a percentage) at the 2026-08-17
+`/cleanup`, resolving the drift row of the same date.
+
+[stated by Beth 2026-08-17]
+
 ### KIT-002 — Project bag
 
 A physical bag or pouch holding all the supplies for a single project.

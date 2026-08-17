@@ -47,11 +47,30 @@ The queue is **Beth's to reorder anytime** — say the word in any session, or a
 `/progress` reads this queue and never changes it. Model lanes are not a column: **Opus is the
 default**, and a row says otherwise only when it is otherwise (protocol §1).
 
-| #   | Beth types                | what it is                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| --- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | `/cleanup`                | triage the A-1 audit with Beth — the report at `docs/process/state-of-the-code-2026-08-17.md` proposes **12 items (P1–P12)**, the ledger gained 7 rows plus dated annotations (one row moved to Resolved), and `drift.md` gained the kitting-% question — together with the three Stage F briefs (note: **F-2's brief needs rewriting first**, report P7), the gate questions already in `drift.md` (the audit's evidence for the `revalidateTag` question is report §5), and the deployment-topology ledger row. One decision at a time, rulings recorded as made (D-09: the queue is managed before new work). |
-| 2   | _(set at the `/cleanup`)_ | **the wart burn-down** — fix items until the ledger reaches a baseline Beth accepts. Includes `/work-item F-1`, `F-2`, `F-3` and `R-1` unless her triage reorders them. R-1 (R2 on preview deployments) wants to land early: the design track's whole verification loop runs on preview links, and previews cannot currently show images.                                                                                                                                                                                                                                                                        |
-| 3   | `/design-session`         | **DS-1, the foundation session** — the palette, type and token direction for the whole app (her ruling D-06). Its output becomes build item **D-1**, and when D-1 lands, the no-hardcoded-colour check joins the gate. **Lane: Fable.**                                                                                                                                                                                                                                                                                                                                                                          |
+| #   | Beth types        | what it is                                                                                                        |
+| --- | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
+| 1   | `/work-item P10`  | **security patch session** — 2 critical + 13 high advisories cleared now, auth stack included (hard-rule-8 care)  |
+| 2   | `/work-item P1`   | outer auth fence + login rate limit — **gated**, a fresh `/review` follows                                        |
+| 3   | `/work-item P4`   | session dates land one day early in stats — **partly gated**, `/review` follows                                   |
+| 4   | `/work-item P3`   | delete the superseded shopping feature + orphans (test removals approved 2026-08-17)                              |
+| 5   | `/work-item R-1`  | R2 on preview deployments — bucket ruled: read real, write scratch; documents deployment topology                 |
+| 6   | `/work-item P6`   | honest failure states — errors stop rendering as zeros                                                            |
+| 7   | `/work-item P5`   | stats cache invalidation, writer side + the per-mutation test rule                                                |
+| 8   | `/work-item P2`   | R2 upload-action hardening — **gated**, `/review` follows                                                         |
+| 9   | `/work-item P8`   | R2 orphan lifecycle — **gated**, `/review` follows                                                                |
+| 10  | `/work-item P7`   | one fabric calculator — absorbs F-2 (its domain question asked in-session) — **gated**, `/review` follows         |
+| 11  | `/work-item F-1`  | series designerName + dialog pending text                                                                         |
+| 12  | `/work-item P12`  | test-honesty repairs (phantom removals approved 2026-08-17; kitting test retitled to KIT-004)                     |
+| 13  | `/work-item P11`  | small honest fixes, one batch — includes the quick-add colour picker and over-log confirm (ruled 2026-08-17)      |
+| 14  | `/work-item P13`  | one validation boundary — unify the duplicated `src/lib` rules                                                    |
+| 15  | `/work-item P9`   | query scale + data integrity batch — **schema half gated**, `/review` follows                                     |
+| 16  | `/work-item P14`  | gate alignment — warnings burn-down + `--max-warnings 0` + CI runs the gate (approved 2026-08-17)                 |
+| 17  | `/design-session` | **DS-1, the foundation session** — palette, type and token direction (D-06); output becomes D-1. **Lane: Fable.** |
+
+Order approved by Beth at the 2026-08-17 `/cleanup`; hers to reorder anytime. Gated items each
+add a `/review` row when they finish — the builder stops at `built, awaiting review` and the
+review session merges. If P11 outgrows one session it splits rather than marathons (its brief
+says so).
 
 **Standing recurrence — dependency maintenance (~monthly, next due 2026-09).** `npm audit` plus a
 dependency review, in **its own session, never as a side effect of other work** (protocol §9).
@@ -70,26 +89,48 @@ Full record: `docs/process/work-log-archive.md`.
 
 ## Stage A — the audit
 
-| item                                        | status | date       | model   | note                                                                                                                                                                                                                   |
-| ------------------------------------------- | ------ | ---------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A-1 whole-codebase quality + security audit | built  | 2026-08-17 | Fable 5 | report at `docs/process/state-of-the-code-2026-08-17.md` — 12 proposed items, 7 new ledger rows + annotations, 1 new drift row, kitting-% drift filed; 8 parallel Opus sweeps + mechanical runs; zero app-code changes |
+| item                                        | status | date       | model   | note                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------- | ------ | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A-1 whole-codebase quality + security audit | built  | 2026-08-17 | Fable 5 | report at `docs/process/state-of-the-code-2026-08-17.md` — 12 proposed items, 7 new ledger rows + annotations, 1 new drift row, kitting-% drift filed; 8 parallel Opus sweeps + mechanical runs; zero app-code changes · **triaged at the 2026-08-17 `/cleanup`** — 14 rulings in `drift.md`, Stage P adopted (P1–P14), ledger down to folds + accepts |
+
+## Stage P — the A-1 burn-down (adopted 2026-08-17)
+
+Briefs in `docs/process/build-plan.md` §Stage P; P1–P12's full specs are the audit report's §3.
+Running order: the queue above (interleaved with F-1 and R-1).
+
+| item                                            | status | date | model | note                                                            |
+| ----------------------------------------------- | ------ | ---- | ----- | --------------------------------------------------------------- |
+| P1 outer fence + login rate limit               | queued |      |       | gated (auth)                                                    |
+| P2 R2 upload-action hardening                   | queued |      |       | gated (R2)                                                      |
+| P3 delete superseded shopping feature + orphans | queued |      |       | test removals approved 2026-08-17                               |
+| P4 session dates off-by-one in stats            | queued |      |       | partly gated (stats queries)                                    |
+| P5 writer-side invalidation + test rule         | queued |      |       | per-mutation rule is Beth's ruling 2026-08-17                   |
+| P6 honest failure states                        | queued |      |       |                                                                 |
+| P7 one fabric calculator                        | queued |      |       | absorbs F-2; gated (fabric calculator)                          |
+| P8 R2 orphan lifecycle                          | queued |      |       | gated (R2)                                                      |
+| P9 query scale + data integrity batch           | queued |      |       | schema half gated                                               |
+| P10 dependency patch session                    | queued |      |       | first in queue — 2 critical + 13 high                           |
+| P11 small honest fixes batch                    | queued |      |       | includes quick-add picker + over-log confirm (ruled 2026-08-17) |
+| P12 test-honesty repairs                        | queued |      |       | phantom removals approved 2026-08-17; KIT-004 retitle           |
+| P13 one validation boundary                     | queued |      |       | created at `/cleanup`                                           |
+| P14 gate alignment                              | queued |      |       | gate changes approved 2026-08-17                                |
 
 ## Stage F — post-audit fixes (seeded from the dissolved Phase 41)
 
 Seeded, not scheduled — they run after A-1 so both get triaged at one `/cleanup` (D-09). If the
 audit finds a deeper cause under any of them, the brief is rewritten before it is built.
 
-| item                                          | status | date | model | note                                                                                                                                                                                                                                                                                 |
-| --------------------------------------------- | ------ | ---- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| F-1 series designerName + dialog pending text | queued |      |       | old 999.83, 999.85 (SERIES-01)                                                                                                                                                                                                                                                       |
-| F-2 fabric matching with no fabric assigned   | queued |      |       | old 999.21 (FIX-01); **domain fact needed first**; may be `/review`-gated depending on where the fix lands; A-1 found the deeper cause: the fabric formula is implemented 3× with drifted rounding and the gated copy is unused (report P7) — **rewrite this brief before building** |
-| F-3 supply stitch-total hint visibility       | queued |      |       | old 999.73 (FIX-02); **overlaps the chart-form redesign** — Beth routes it at the Stage F `/cleanup`                                                                                                                                                                                 |
+| item                                          | status          | date | model | note                                                                                                                                                      |
+| --------------------------------------------- | --------------- | ---- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F-1 series designerName + dialog pending text | queued          |      |       | old 999.83, 999.85 (SERIES-01)                                                                                                                            |
+| F-2 fabric matching with no fabric assigned   | absorbed → P7   |      |       | **absorbed into P7** (2026-08-17 `/cleanup`) — built inside the unified calculator after its domain question is asked in-session; not run as its own item |
+| F-3 supply stitch-total hint visibility       | rerouted → DS-2 |      |       | **rerouted to the design track** (Beth, 2026-08-17) — now a DS-2/D-2 input in `backlog.md`; not built in Stage F                                          |
 
 ## Stage R — process-enabling fixes
 
-| item                          | status | date | model | note                                                                                                                      |
-| ----------------------------- | ------ | ---- | ----- | ------------------------------------------------------------------------------------------------------------------------- |
-| R-1 R2 on preview deployments | queued |      |       | blocked human verification in phases 26, 27 and 29; D-13's preview ritual depends on it; needs Beth's bucket ruling first |
+| item                          | status | date | model | note                                                                                                                                           |
+| ----------------------------- | ------ | ---- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| R-1 R2 on preview deployments | queued |      |       | blocked human verification in phases 26, 27 and 29; D-13's preview ritual depends on it; **bucket ruled 2026-08-17: read real, write scratch** |
 
 ## Stage D — the redesigns
 
