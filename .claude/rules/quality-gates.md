@@ -1,42 +1,57 @@
 # Quality Gates
 
-Mandatory checkpoints during the development workflow.
+> Policy lives in `docs/process/session-protocol.md` §5 (the four review layers) and §9. This
+> file is the mechanical detail — what runs, in what order, and what it does not catch.
 
-## After UI-Heavy Plans
-
-Run `/impeccable:polish` in the main conversation after any plan that produces visible UI components. This catches spacing, alignment, and visual consistency issues while the work is fresh.
-
-## At Phase Boundaries
-
-Run `/impeccable:audit` before `/gsd:verify-work` for any phase that includes UI output. The audit produces a scored report with P0-P3 severity ratings. Fix P0-P1 issues before verification.
-
-## Sequence
+## `npm run gate` — exactly what CI runs
 
 ```
-Execute plan (GSD executor)
-  → /impeccable:polish (if UI was built)
-  → Fix polish issues
-  → ... next plan ...
-  → All plans complete
-  → /impeccable:audit (phase-level)
-  → Fix P0-P1 issues
-  → /gsd:verify-work
-  → /gsd:ship (create PR)
-  → pr-review-toolkit:review-pr (multi-agent PR review)
-  → Fix review findings before merge
+prisma generate → format:check → lint → tsc --noEmit → test → build
 ```
 
-## Security Review
+~2.5 min end to end; the 2448-test suite itself is ~16s. **`prisma generate` runs first, always**
+— without it `tsc` validates against a stale client after any schema change.
 
-For phases that touch auth, user data, or server actions, run a security review before verification:
+Green locally before you push. **Nothing merges red**, and CI is a required check on main,
+enforced for admins too.
 
-```
-All plans complete
-  → /gsd:secure-phase (verify threat mitigations)
-  → /impeccable:audit (if UI)
-  → /gsd:verify-work
-```
+## Git hooks are live
 
-Applies to: Phase 2 (CRUD), Phase 3 (designers), Phase 4 (supplies), any phase with new server actions.
+- **pre-commit** — `lint-staged`
+- **pre-push** — the full `npm run gate`
 
-Do NOT delegate impeccable reviews to subagents. Run them in the main conversation where visual judgment applies.
+A failing hook is a problem to fix, never to bypass. Bypass flags and force-pushes are refused by
+`.claude/hooks/guard-git.sh` (see `git-workflow.md`), and weakening a gate to get green converts a
+visible failure into an invisible one.
+
+## What lint mechanically enforces
+
+- `Button render={<Link>}` is banned — use `LinkButton` (`no-restricted-syntax`)
+- importing `@/lib/auth` inside action files is banned — use `@/lib/auth-guard`
+  (`no-restricted-imports`)
+
+**Known gap:** eslint exits 0 on warnings, so **55 pre-existing warnings pass the gate**
+(maintenance-ledger row, 2026-08-16). They are logged, not accepted — do not add to them.
+
+## What the gate does not check
+
+Design fidelity, seam-level coherence, test *honesty*, and security posture. Those are the review
+layers (protocol §5), not the gate:
+
+1. **Every PR** — delegated auto-review against `docs/process/security-checklist.md` and the
+   quality bar (DRY/SOLID/YAGNI/KISS, repo conventions, test honesty).
+2. **UI-touching PRs** — Beth sees the Vercel preview before merge.
+3. **Review-gated cores** — a fresh `/review` session, never the builder (hard rule 3).
+4. **Stage boundaries** — `/stage-review`, which includes an Impeccable critique on UI stages.
+
+**Impeccable is the design tool, never a process authority.** It belongs inside
+`/design-session` and the UI half of `/stage-review` — not as a ritual after every plan. It has
+no slash commands: invoke the `impeccable` skill with the mode as its argument (`audit`,
+`critique`, `polish`), never `/impeccable:audit`.
+
+## Changing the gate is drift
+
+Adding, removing, or loosening a gate step is a gate-config change: it gets a drift row and
+Beth's ruling, never a quiet edit (hard rule 6). One addition is already planned — a grep banning
+raw Tailwind colour scales outside an allowlist, which joins the gate when the design track's
+token swap (item D-1) lands.

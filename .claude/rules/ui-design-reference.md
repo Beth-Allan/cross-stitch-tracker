@@ -1,30 +1,56 @@
 ---
 globs:
   - "src/components/features/**/*.tsx"
+  - "docs/design/**/*"
   - "product-plan/**/*"
 ---
 
-# UI Design Reference Rules
+# UI Design Reference
 
-The entire UI has been designed in DesignOS. **The design is the spec.**
+**Hard rule 4: never build UI from scratch.** Building a screen from imagination is the banned
+move — there is always a reference, and this file says which one.
 
-Before building ANY feature component:
+## Which reference wins
 
-1. Find the design reference in `product-plan/sections/` (see `.planning/DESIGN-REFERENCE.md`)
-2. Read the component .tsx file — layout, fields, sub-components, interaction patterns
-3. Read the screenshot .png — intended visual result
-4. Read shared sub-components in the same section's `components/` directory
-5. Adapt to Next.js — server/client split, server actions, Zod validation
-6. If no design reference exists, flag it before building
+1. **Design canon — `docs/design/screens/<slug>.md`.** Produced by a `/design-session`: Beth
+   reacts to variants, her approval makes canon, and the canon landing queues the fidelity
+   rebuild item. Canon is the spec for the screen it covers and supersedes everything below.
+2. **DesignOS — `product-plan/sections/`.** The original whole-app design, mapped by
+   `DESIGN-REFERENCE.md`. **Historical input, not the spec** (Beth's ruling D-05): it is what
+   you follow for screens canon has not reached yet, and new canon supersedes it screen by
+   screen.
+3. **Nothing?** Flag it before building — a screen with no reference is a stop-and-ask, not a
+   licence to invent.
 
-Design section to phase mapping (updated 2026-04-07 after MVP restructure):
+> **Transition, 2026-08-16 → overhaul step 5:** `docs/design/` does not exist yet. Until step 5
+> creates it, the DesignOS map is at **`.planning/DESIGN-REFERENCE.md`** and there is no canon
+> for any screen. Step 5 promotes the map to `docs/design/DESIGN-REFERENCE.md` — **promote, never
+> archive; D-05 needs it live.** Delete this note when step 5 lands.
 
-| Section | Path | Phase(s) |
-|---------|------|----------|
-| project-management | `product-plan/sections/project-management/` | 2, 3 |
-| supply-tracking-and-shopping | `product-plan/sections/supply-tracking-and-shopping/` | 4 |
-| fabric-series-and-reference-data | `product-plan/sections/fabric-series-and-reference-data/` | 4 (fabric), 3 (designers), 6 (series/storage) |
-| stitching-sessions-and-statistics | `product-plan/sections/stitching-sessions-and-statistics/` | 8, 9 |
-| gallery-cards-and-advanced-filtering | `product-plan/sections/gallery-cards-and-advanced-filtering/` | 5 |
-| dashboards-and-views | `product-plan/sections/dashboards-and-views/` | 7 |
-| goals-and-plans | `product-plan/sections/goals-and-plans/` | 10 |
+## Reading a DesignOS reference
+
+`DESIGN-REFERENCE.md` maps each of the seven sections to its component and screenshot paths.
+Inside a section directory (e.g. `product-plan/sections/project-management/`):
+
+- **`components/*.tsx`** — layout, fields, sub-components, interaction patterns. Read the
+  component you are building *and* the shared sub-components it pulls from the same directory.
+- **`*.png`** — the intended visual result. Read it, do not skim the filename.
+- **`README.md`, `types.ts`** — the section's own notes and data shapes.
+
+Then **adapt to this stack** rather than copying: Server Components by default, server actions
+for mutations, Zod at the boundary, and this repo's own primitives (`LinkButton`, semantic
+tokens). The DesignOS files are React sketches, not production code.
+
+## The live design system
+
+The implemented direction — not a proposal:
+
+- **`src/app/globals.css`** — the token set. Semantic tokens only in components (`bg-card`,
+  `text-muted-foreground`), never raw colour scales.
+- **`DESIGN.md`** + **`.impeccable/design.json`** — the written direction and its machine
+  sidecar. A session that changes one refreshes the other before it ends.
+- `product-plan/design-system/` (`tokens.css`, `fonts.md`, `tailwind-colors.md`) is the
+  DesignOS-era source these were derived from — historical, same status as the rest of DesignOS.
+
+**Impeccable is the design tool, never a process authority.** It produces variants and critiques;
+`docs/process/session-protocol.md` §8 (`/design-session`) owns the process.

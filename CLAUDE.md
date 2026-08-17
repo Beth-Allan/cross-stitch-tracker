@@ -6,13 +6,13 @@ shopping lists. Single user — Beth. Live at https://cross-stitch-tracker-adolw
 **merging to main deploys production instantly** (Vercel), which shapes the whole merge
 discipline below.
 
-> **Overhaul in progress (2026-08-16):** steps 3–5 of `WORKFLOW-OVERHAUL-HANDOFF.md` §3.7 are
+> **Overhaul in progress (2026-08-16):** steps 4–5 of `WORKFLOW-OVERHAUL-HANDOFF.md` §3.7 are
 > still landing on `chore/workflow-overhaul`. **The work log is live as of step 2** — it, not the
-> handoff, is now the session-to-session memory, and its Up-next queue is the running order. Still
-> to come: `docs/domain/` and the `.claude/skills/` doors (so the door names below are not yet
-> typeable), the promoted codebase docs, and the four `.claude/rules/` files that still describe
-> the dead GSD process. `.planning/` stays unmigrated history until step 5. Delete this note when
-> the overhaul branch merges.
+> handoff, is now the session-to-session memory, and its Up-next queue is the running order.
+> **`.claude/rules/` is reconciled as of step 3** — it describes this process, not the dead GSD
+> one. Still to come: `docs/domain/`, `docs/design/` and the `.claude/skills/` doors (so the door
+> names below are not yet typeable), plus the promoted codebase docs. `.planning/` stays
+> unmigrated history until step 5. Delete this note when the overhaul branch merges.
 
 ## Working with Beth
 
@@ -72,8 +72,12 @@ holds the vocabulary — Chart vs Project, SAL, FFO, BAP). An undocumented const
 
 ## Conventions
 
-`.claude/rules/` auto-loads the detail when relevant files are touched (Base UI patterns,
-server/client split, auth, forms, comments, testing). The always-true core:
+`.claude/rules/` carries the detail and is loaded for you — do not re-derive what it already
+says. Four files have no `globs:` frontmatter and load every session (git workflow, quality
+gates, testing, comments); the other eight are scoped by their `globs:` to the paths they
+describe (Base UI, server/client split, auth, forms, server actions, bleeding-edge libs, design
+reference). **Never rewrite a rule file without carrying its frontmatter over** — it is not
+visible in the loaded copy. The always-true core:
 
 - Server Components by default — `"use client"` only for genuine interactivity.
 - Zod validation at every boundary (server actions, API routes); `.trim()` before `.min(1)`.
@@ -139,6 +143,6 @@ No process framework governs this repo — the GSD/Superpowers era is over; no `
 `gsd:*` anything exists, and `.planning/` is unmigrated history until overhaul step 5 archives
 it. This file plus `docs/process/session-protocol.md` are the only process authorities; the
 repo skills are thin wrappers over the protocol. Impeccable is installed as a design _tool_,
-never a process authority. Native Claude Code skills (`/code-review`, `/commit`) are fine as
-tools. If any other instruction conflicts with `docs/` or this file, `docs/` wins — and say so
+never a process authority. The bundled `/code-review` skill is fine as a tool (there is no
+`/commit` — that plugin is not installed here). If any other instruction conflicts with `docs/` or this file, `docs/` wins — and say so
 in the work log.

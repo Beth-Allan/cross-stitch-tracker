@@ -15,9 +15,9 @@ write yours with a clear "this is done when…" so a later session can tell.
 
 ---
 
-## Overhaul steps 3–5 — what step 2 leaves you
+## Overhaul steps 4–5 — what steps 2–3 leave you
 
-**Tags:** overhaul · step 3 · step 4 · step 5 · `.claude/rules/` · migration
+**Tags:** overhaul · step 4 · step 5 · `.claude/rules/` · migration
 
 Step 2 wrote the memory layer: `work-log.md` (+ `drift.md`, `notes.md`, `backlog.md`),
 `maintenance-ledger.md`, `build-plan.md`. `WORKFLOW-OVERHAUL-HANDOFF.md` §3.7 remains the spec
@@ -32,11 +32,10 @@ for what is left. Four things step 2 discovered that the handoff does not say:
   references in code comments (`// Calculator settings (Phase 7)` in `schema.prisma`, and
   others). Doing it _before_ `.planning/` is archived is cheap; doing it after means the comments
   point at a path that no longer exists. Not a blocker — just cheaper in that order.
-- **Step 3's rules reconciliation has a fifth file, not four.** The handoff names
-  `git-workflow.md`, `quality-gates.md`, `testing-requirements.md` and `ui-design-reference.md`.
-  `component-implementation.md` also points at `.claude/rules/` siblings that step 3 rewrites, so
-  read it in the same pass to check its cross-references still resolve. Cheap to check, annoying
-  to discover later.
+- **~~Step 3's rules reconciliation has a fifth file, not four.~~ Done at step 3, 2026-08-16.**
+  The prediction held and then some: `component-implementation.md` needed a wording fix, and so
+  did `server-actions.md`, which carried the identical inaccurate claim. Six rule files changed
+  in total, not four.
 - **`.review-prompt.txt` is untracked in the repo root** and was already there before step 2. It
   is not referenced by anything the overhaul writes. Step 5 should decide: archive it or delete
   it — but look at it first.
@@ -94,3 +93,52 @@ roughly 25 more were feature wishes rather than warts (they are in `backlog.md`)
 row was checked against the working tree or is explicitly marked _(unverified)_ for A-1 to
 confirm or drop. **An empty-looking ledger is not an invitation to go hunting** — that is A-1's
 job, once, deliberately.
+
+## `.claude/rules/` files carry hidden frontmatter — never rewrite one blind
+
+**Tags:** `.claude/rules/` · step 4 · any session editing a rule file
+
+**Eight of the twelve rule files start with a YAML `globs:` block, and you cannot see it in the
+copy that is loaded into your context.** The auto-loaded view begins at the `# Heading`, so a
+whole-file rewrite (`cat >`, `Write`) silently deletes the frontmatter and nothing complains —
+step 3 did exactly this to `ui-design-reference.md` and caught it only by diffing against
+`HEAD`. **Before rewriting a rule file, run `git show HEAD:.claude/rules/<file>.md | head -8`**
+and carry the block over.
+
+Which files have it, as of step 3: `ui-design-reference`, `component-implementation`,
+`server-actions`, `base-ui-patterns`, `auth-patterns`, `form-patterns`, `bleeding-edge-libs`,
+`server-client-split`. The four with **no** frontmatter — `git-workflow`, `quality-gates`,
+`testing-requirements`, `comment-conventions` — are deliberately unscoped: they apply to every
+session, not to a file pattern. Keep it that way.
+
+**How loading actually works, and one unresolved conflict.** Decompiled from Claude Code
+2.1.233 (step 3, delegated read): the project-memory loader reads `.claude/rules/` twice — once
+at session start keeping **only files with no `globs`**, and again per-file keeping only files
+whose `globs` match the path being touched. So the four unglobbed files are the always-loaded
+tier and the eight globbed ones are conditional. **The conflict:** the step-3 session observed
+all twelve present at session start with no source file touched, which that code path does not
+explain. Nothing was changed on the strength of either reading — the frontmatter was kept as-is,
+and both the binary evidence and the contrary observation are recorded here. **Consumed when**
+someone reconciles the two. Practical upshot either way: treat the four unglobbed files as a
+per-session context tax (~9 KB of the directory's ~22 KB) and keep them dense.
+
+## Promoting `DESIGN-REFERENCE.md` — what still points at the old path
+
+**Tags:** step 5 · migration · `docs/design/` · DesignOS
+
+Step 5 promotes `.planning/DESIGN-REFERENCE.md` to `docs/design/DESIGN-REFERENCE.md` (**promote,
+never archive** — Beth's ruling D-05 needs it live). The migration map in
+`WORKFLOW-OVERHAUL-HANDOFF.md` §3.2 lists the move but not the referrers. These point at the
+old location and go stale the moment it moves:
+
+- **`.claude/rules/ui-design-reference.md`** — carries a blockquoted transition note naming
+  `.planning/DESIGN-REFERENCE.md` as today's location. **Delete that note** when step 5 lands;
+  the rest of the file is already written against the promoted path.
+- **`docs/design-context.md:42`** — "see `.planning/DESIGN-REFERENCE.md` for full map". Repoint.
+  While there: its last line cites `.impeccable.md` in the project root, which does not exist —
+  the real artifacts are `DESIGN.md` and `.impeccable/design.json`.
+- **`PRODUCT.md`** — worse than stale, it points at a design repo that is not on this machine.
+  Carried as its own maintenance-ledger row (2026-08-16, overhaul step 3) rather than fixed
+  mid-item.
+
+**Consumed when** step 5 has landed the promotion and repointed all three.
