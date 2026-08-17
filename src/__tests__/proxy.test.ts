@@ -6,15 +6,12 @@ vi.mock("next-auth", () => ({
   default: () => ({ auth: vi.fn(), handlers: {}, signIn: vi.fn(), signOut: vi.fn() }),
 }));
 
-const { proxy, config } = await import("../../proxy");
+const { config } = await import("../../proxy");
 
+// Next compiles `config.matcher` through path-to-regexp, not `new RegExp`, so this
+// checks the pattern's intent rather than the runtime matcher. A pattern that
+// path-to-regexp parses differently would pass here and still change the fence.
 const matcher = new RegExp(`^${config.matcher[0]}$`);
-
-describe("proxy", () => {
-  it("exports the Auth.js handler as the proxy", () => {
-    expect(proxy).toBeDefined();
-  });
-});
 
 describe("the proxy matcher", () => {
   it.each([

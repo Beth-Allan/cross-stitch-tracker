@@ -39,12 +39,17 @@ route passes while looking exactly like a working fence:
 ```ts
 authorized({ request, auth }) {
   if (PUBLIC_PATHS.has(request.nextUrl.pathname)) return true;
-  return Boolean(auth?.user);
+  return Boolean(auth?.user?.id);
 }
 ```
 
+`user.id`, not `user` — the same predicate `requireAuth()` enforces, so the fence and the guard
+cannot disagree about who is signed in if the `jwt`/`session` callbacks ever regress.
+
 Adding a path to `PUBLIC_PATHS` makes it unauthenticated, exactly like adding one to the
-matcher's exclusion list. `docs/process/security-checklist.md` §2 covers both.
+matcher's exclusion list. `docs/process/security-checklist.md` §2 covers both. **The fence
+protects pages, never server actions** — action ids are global, so a POST to the public `/login`
+can invoke any action; `requireAuth()` is what stops it.
 
 ## Rate limiting belongs inside `authorize()`, not at a caller
 
@@ -53,6 +58,11 @@ direct `POST /api/auth/callback/credentials`, which the matcher necessarily excl
 applied in the form action alone leaves bcrypt guessing unthrottled on the second. So
 `recordAttempt()` is called only from `authorizeCredentials`, before `bcrypt.compare`;
 `peekRateLimit()` is the read-only companion the form action uses to name the wait.
+
+That also makes `authorizeCredentials` an **unauthenticated boundary**, so it parses with
+`loginSchema` before anything else touches the input — the limiter keys on the parsed,
+normalized email, never on raw request text. `rate-limit.ts` caps how many keys it will track
+for the same reason.
 
 ## requireAuth pattern
 

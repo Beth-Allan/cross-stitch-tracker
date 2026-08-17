@@ -2,8 +2,16 @@ import NextAuth, { type NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { recordAttempt } from "@/lib/rate-limit";
+import { loginSchema } from "@/lib/validations/auth";
 
-/** Paths the outer fence lets through unauthenticated. Everything else the matcher covers needs a session. */
+/**
+ * Paths the outer fence lets through unauthenticated. Everything else the
+ * matcher covers needs a session.
+ *
+ * `/login` is also the configured `pages.signIn`, which Auth.js already refuses
+ * to redirect to itself, so listing it changes nothing today — it states the
+ * intent and is where a second public path would go.
+ */
 const PUBLIC_PATHS = new Set(["/login"]);
 
 /** A whole, unmangled bcrypt hash — the shape `.env`'s `$` interpolation destroys when it is not escaped. */
@@ -21,8 +29,10 @@ const BCRYPT_HASH = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/;
 export async function authorizeCredentials(
   credentials: Partial<Record<"email" | "password", unknown>>,
 ): Promise<{ id: string; name: string; email: string } | null> {
-  const expectedEmail = process.env.AUTH_USER_EMAIL;
-  const expectedHash = process.env.AUTH_USER_PASSWORD_HASH;
+  const expectedEmail = process.env.AUTH_USER_EMAIL?.trim().toLowerCase();
+  // Trimmed because an env var pasted into a dashboard often arrives with a
+  // trailing newline, and bcrypt would reject the hash without saying why.
+  const expectedHash = process.env.AUTH_USER_PASSWORD_HASH?.trim();
 
   // Checked before the rate limit so a broken deploy cannot lock the real user
   // out, and thrown rather than returned so a misconfigured server does not
@@ -35,8 +45,12 @@ export async function authorizeCredentials(
     );
   }
 
-  const email = typeof credentials.email === "string" ? credentials.email : "";
-  const password = typeof credentials.password === "string" ? credentials.password : "";
+  // The same Zod boundary the form action uses. This function is also reachable
+  // unauthenticated at POST /api/auth/callback/credentials, so nothing past here
+  // — the rate-limiter key above all — may be raw request input.
+  const parsed = loginSchema.safeParse(credentials);
+  if (!parsed.success) return null;
+  const { email, password } = parsed.data;
 
   // Before bcrypt, so a guessing run costs the attacker nothing to reject.
   if (!recordAttempt(email).allowed) return null;
@@ -64,7 +78,9 @@ export const authConfig = {
     // authorized, and `proxy.ts` fetches the session only to discard it.
     authorized({ request, auth }) {
       if (PUBLIC_PATHS.has(request.nextUrl.pathname)) return true;
-      return Boolean(auth?.user);
+      // `user.id`, not `user`: the same predicate `requireAuth()` enforces, so
+      // the fence and the guard never disagree about who is signed in.
+      return Boolean(auth?.user?.id);
     },
     jwt({ token, user }) {
       if (user?.id) {

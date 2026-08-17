@@ -9,7 +9,7 @@
 prisma generate → format:check → lint → tsc --noEmit → test → build
 ```
 
-~2.5 min end to end; the 2504-test suite itself is ~16s. **`prisma generate` runs first, always**
+~2.5 min end to end; the 2511-test suite itself is ~16s. **`prisma generate` runs first, always**
 — without it `tsc` validates against a stale client after any schema change.
 
 Green locally before you push. **Nothing merges red**, and CI is a required check on main,

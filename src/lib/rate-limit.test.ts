@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { recordAttempt, peekRateLimit } from "./rate-limit";
+import { recordAttempt, peekRateLimit, trackedKeyCount, MAX_TRACKED_KEYS } from "./rate-limit";
 
 // The store is module-level and shared, so every test uses its own key.
 let nextKey = 0;
@@ -47,6 +47,18 @@ describe("recordAttempt", () => {
 
     vi.advanceTimersByTime(10_000);
     expect(recordAttempt(key).retryAfter).toBe(20);
+  });
+
+  it("never reports a zero-second wait", () => {
+    const key = freshKey();
+    for (let i = 0; i < 5; i++) recordAttempt(key);
+
+    // Exactly on the boundary the record still blocks, so the wait it quotes
+    // has to be a wait.
+    vi.advanceTimersByTime(30_000);
+    const blocked = recordAttempt(key);
+    expect(blocked.allowed).toBe(false);
+    expect(blocked.retryAfter).toBe(1);
   });
 
   it("tracks each key independently", () => {
@@ -98,5 +110,37 @@ describe("peekRateLimit", () => {
 
     vi.advanceTimersByTime(30_001);
     expect(peekRateLimit(key)).toEqual({ allowed: true });
+  });
+});
+
+describe("the attempt store", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("stays bounded when an attacker floods it with fresh keys", () => {
+    // The enforcing call sits on an unauthenticated endpoint, so the key is
+    // attacker-chosen and the store must not grow with the attack.
+    for (let i = 0; i < MAX_TRACKED_KEYS + 500; i++) {
+      recordAttempt(`flood-${i}@example.com`);
+    }
+
+    expect(trackedKeyCount()).toBeLessThanOrEqual(MAX_TRACKED_KEYS);
+  });
+
+  it("drops keys whose cooldown has expired rather than holding them forever", () => {
+    const before = trackedKeyCount();
+    for (let i = 0; i < MAX_TRACKED_KEYS; i++) {
+      recordAttempt(`stale-${i}@example.com`);
+    }
+
+    vi.advanceTimersByTime(30_000 + 1);
+    recordAttempt("one-more@example.com");
+
+    expect(trackedKeyCount()).toBeLessThan(before + MAX_TRACKED_KEYS);
   });
 });

@@ -23,7 +23,9 @@ Browser
 
 Root-level `proxy.ts` is Next.js 16's rename of middleware. It re-exports Auth.js's `auth` as `proxy`; the matcher excludes `api/auth`, `_next/static`, `_next/image`, `favicon.ico`, `icon-*.png`, and `manifest.webmanifest`. Every other request passes the session check here **before** routing. The `(dashboard)` layout's `redirect("/login")` is the second gate, not the only one.
 
-**Two parts, and both are load-bearing.** The matcher decides which requests reach the fence; the `authorized` callback in `src/lib/auth.ts` decides what the fence does with them — public paths (`/login`) pass, everything else needs `auth.user`, and an unauthorized request is redirected to the sign-in page. Without that callback Auth.js defaults `authorized` to `true`, so the middleware fetches the session and discards the answer and every route passes (the state this file described until item P1, 2026-08-17). Anything added to the matcher's exclusion list, or to the callback's public set, is unauthenticated from then on.
+**Two parts, and both are load-bearing.** The matcher decides which requests reach the fence; the `authorized` callback in `src/lib/auth.ts` decides what the fence does with them — public paths (`/login`) pass, everything else needs `auth.user.id` — the same predicate `requireAuth()` enforces — and an unauthorized request is redirected to the sign-in page. Without that callback Auth.js defaults `authorized` to `true`, so the middleware fetches the session and discards the answer and every route passes (the state this file described until item P1, 2026-08-17). Anything added to the matcher's exclusion list, or to the callback's public set, is unauthenticated from then on.
+
+**The fence does not protect server actions, and cannot.** App Router action ids are global: a POST carrying any action's id executes it, including at `/login`, which the fence lets through by definition. `requireAuth()` inside every action is what protects mutations — the fence protects _pages_.
 
 ### Layer 1: Routing / Pages (`src/app/`)
 

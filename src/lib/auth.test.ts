@@ -110,6 +110,41 @@ describe("authorizeCredentials", () => {
     await expect(authorizeCredentials({ email, password: PASSWORD })).resolves.not.toBeNull();
   });
 
+  it("returns null for input that is not a login at all", async () => {
+    configureAuthEnv();
+
+    await expect(authorizeCredentials({ email: "nonsense", password: "x" })).resolves.toBeNull();
+    await expect(authorizeCredentials({ email: 42, password: {} })).resolves.toBeNull();
+  });
+
+  it("rejects an email longer than an address can be, so the limiter cannot be flooded with one", async () => {
+    configureAuthEnv();
+    const oversized = `${"a".repeat(250)}@example.com`;
+
+    await expect(
+      authorizeCredentials({ email: oversized, password: PASSWORD }),
+    ).resolves.toBeNull();
+  });
+
+  it("accepts a hash that arrived with surrounding whitespace", async () => {
+    const email = configureAuthEnv(`  ${HASH}\n`);
+
+    await expect(authorizeCredentials({ email, password: PASSWORD })).resolves.not.toBeNull();
+  });
+
+  it("treats the email case-insensitively, on both the match and the limiter", async () => {
+    const email = configureAuthEnv();
+
+    await expect(
+      authorizeCredentials({ email: email.toUpperCase(), password: PASSWORD }),
+    ).resolves.toMatchObject({ id: "1" });
+
+    for (let i = 0; i < 4; i++) {
+      await authorizeCredentials({ email: email.toUpperCase(), password: "wrong" });
+    }
+    await expect(authorizeCredentials({ email, password: PASSWORD })).resolves.toBeNull();
+  });
+
   it("throttles after five attempts, even when the password is correct", async () => {
     const email = configureAuthEnv();
 
@@ -142,11 +177,22 @@ describe("authConfig.callbacks.authorized", () => {
     expect(await authorized({ request: request("/stats"), auth: empty })).toBe(false);
   });
 
+  it("refuses a session whose user has no id, exactly as requireAuth does", async () => {
+    // If the jwt/session callbacks ever regress, the fence and the guard must
+    // agree that this session is not signed in.
+    const idless = {
+      user: { name: "Stitcher", email: "beth@example.com" },
+      expires: "2099-01-01T00:00:00.000Z",
+    } as Session;
+
+    expect(await authorized({ request: request("/stats"), auth: idless })).toBe(false);
+  });
+
   it("admits a signed-in visitor", async () => {
     expect(await authorized({ request: request("/charts/abc123"), auth: session() })).toBe(true);
   });
 
-  it("admits a signed-in visitor at the login page, so there is no redirect loop", async () => {
+  it("admits a signed-in visitor at the login page", async () => {
     expect(await authorized({ request: request("/login"), auth: session() })).toBe(true);
   });
 });
