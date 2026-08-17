@@ -15,42 +15,6 @@ write yours with a clear "this is done when…" so a later session can tell.
 
 ---
 
-## Overhaul steps 4–5 — what steps 2–3 leave you
-
-**Tags:** overhaul · step 4 · step 5 · `.claude/rules/` · migration
-
-Step 2 wrote the memory layer: `work-log.md` (+ `drift.md`, `notes.md`, `backlog.md`),
-`maintenance-ledger.md`, `build-plan.md`. `WORKFLOW-OVERHAUL-HANDOFF.md` §3.7 remains the spec
-for what is left. Four things step 2 discovered that the handoff does not say:
-
-- **The design-track inputs in `backlog.md` are homeless until step 8.** Beth's ruling D-10
-  dissolved Phase 40 and Phase 41's display half into a "Design-track inputs" section of
-  `backlog.md`, filed under the five redesign surfaces. `docs/design/screens.md` does not exist
-  yet. **Step 8 must move them, not re-derive them** — the D-10 routing is a ruling, and losing
-  it would quietly resurrect two phases' worth of work.
-- **~~Step 5 has an ordering constraint step 2 found.~~ Not taken, deliberately — step 5,
-  2026-08-16.** The comment sweep touches `prisma/schema.prisma`, a review-gated core (hard rule
-  3), so folding it into a docs-and-process branch would have dragged the whole overhaul PR into
-  a fresh-`/review` requirement for a batch of comment edits. The archive landed first; the
-  ledger row now records where those references point (`docs/archive/planning/`) and flags the
-  worse case, `TODO(999.0.17)` in `dashboard-actions.ts:125`, an id from a retired scheme.
-- **~~Step 3's rules reconciliation has a fifth file, not four.~~ Done at step 3, 2026-08-16.**
-  The prediction held and then some: `component-implementation.md` needed a wording fix, and so
-  did `server-actions.md`, which carried the identical inaccurate claim. Six rule files changed
-  in total, not four.
-- **~~The branch owes a layer-1 auto-review before it merges.~~ Paid, 2026-08-16 (step 5).** Two
-  independent passes over the whole five-step diff — one on operations and security, one on
-  coherence and honesty — both returning _merge with fixes_. They earned their keep: a live hole
-  in the guard hook (the hook-bypass flag was never blocked on `push`) and five false claims in
-  the freshly refreshed docs, one of which would have told a future session that deleting an
-  ownership check was correct. Fixes in `6c6cc1b`; full record in
-  `docs/process/work-log-archive.md`. **The lesson worth keeping: the review found more in the
-  documents this branch had just rewritten than in the four steps of process it was aimed at.**
-- **~~`.review-prompt.txt` is untracked in the repo root.~~ Decided at step 5, 2026-08-16:
-  archived**, to `docs/archive/workflow-overhaul-review-prompt.txt`. It is the brief Beth
-  commissioned the overhaul's second review with — the framing that produced §4b's findings, and
-  the only record of how the question was asked. Cheap to keep, not cheap to reconstruct.
-
 ## Editing `.claude/settings.json` — one ask to Beth, not a workaround
 
 **Tags:** settings.json · guard-git · permissions · hooks · auto mode · step 5
@@ -78,28 +42,6 @@ Python rewrite of the file. That contradicts five refusals across two earlier se
 wall is **not** deterministic and the note is kept rather than deleted: **try the edit once
 before asking Beth to leave auto mode.** If it is refused, the ask above is still the route that
 works. **Consumed when** someone establishes what actually differs between the two cases.
-
-## Running the A-1 audit — read this before you start it
-
-**Tags:** A-1 · audit · subagents · context budget
-
-**The audit is a fan-out, not a read-through.** Beth's ruling D-14 caps a conversation at
-150–200k tokens, and this codebase is 24 routes and 2448 tests — a single session reading it
-inline will compact halfway and produce a worse report than one that never started. Run one
-read-only subagent per dimension (duplication · dead code · silent-failure paths · query
-patterns · cache coherence · test honesty · the security-checklist sweep), collect structured
-findings, and synthesize in the main session.
-
-**Two things will look like findings and are not:** the 55 eslint warnings and the build-time R2
-noise are already ledger rows from step 1 — cite them, do not re-find them. Same for everything
-else in the ledger's Open table; the seeding note also lists ~30 items **verified fixed** during
-the step-2 split, so if a sweep reports one of those, the sweep is wrong and that is worth
-knowing.
-
-**Consumed when** `docs/process/state-of-the-code-<date>.md` exists.
-
-**Consumed 2026-08-17** — the report exists at
-`docs/process/state-of-the-code-2026-08-17.md`; retire this note at the next `/cleanup`.
 
 ## Why the ledger looks small
 
@@ -148,32 +90,6 @@ explain. Nothing was changed on the strength of either reading — the frontmatt
 and both the binary evidence and the contrary observation are recorded here. **Consumed when**
 someone reconciles the two. Practical upshot either way: treat the four unglobbed files as a
 per-session context tax (~9 KB of the directory's ~22 KB) and keep them dense.
-
-## Promoting `DESIGN-REFERENCE.md` — what still points at the old path
-
-**Tags:** step 5 · migration · `docs/design/` · DesignOS
-
-Step 5 promotes `.planning/DESIGN-REFERENCE.md` to `docs/design/DESIGN-REFERENCE.md` (**promote,
-never archive** — Beth's ruling D-05 needs it live). The migration map in
-`WORKFLOW-OVERHAUL-HANDOFF.md` §3.2 lists the move but not the referrers. These point at the
-old location and go stale the moment it moves:
-
-- **`.claude/rules/ui-design-reference.md`** — carries a blockquoted transition note naming
-  `.planning/DESIGN-REFERENCE.md` as today's location. **Delete that note** when step 5 lands;
-  the rest of the file is already written against the promoted path.
-- **`docs/design-context.md:42`** — "see `.planning/DESIGN-REFERENCE.md` for full map". Repoint.
-  While there: its last line cites `.impeccable.md` in the project root, which does not exist —
-  the real artifacts are `DESIGN.md` and `.impeccable/design.json`.
-- **`PRODUCT.md`** — worse than stale, it points at a design repo that is not on this machine.
-  Carried as its own maintenance-ledger row (2026-08-16, overhaul step 3) rather than fixed
-  mid-item.
-
-**~~Consumed when step 5 has landed the promotion and repointed all three.~~ Done 2026-08-16.**
-All three repointed, plus two the note did not predict: `DESIGN-REFERENCE.md`'s own opening
-pointed at a "UI Implementation Rules" section of CLAUDE.md that the step-1 rewrite deleted, and
-its section headings carried dead phase numbers. The `PRODUCT.md` ledger row is closed (its
-counts were wrong in both directions — 43 section components + 4 shell, 30 screenshots, verified
-by counting).
 
 ## The two doors that open onto nothing yet — what step 5 owes them
 

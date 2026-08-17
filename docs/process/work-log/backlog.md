@@ -83,6 +83,12 @@ leave them behind.
 
 **Chart form + detail** — redesign #1 (D-07), design item DS-2 → build item D-2:
 
+- The supply stitch-total hint is visible only in Details mode — nothing warns, while actually
+  working in supplies, that the stitch count is missing or stale. Was build item **F-3**;
+  rerouted here by Beth at the 2026-08-17 `/cleanup` (fixing placement on a screen about to be
+  redesigned is work done twice). The redesign owns where the hint lives; smallest honest
+  surface, not a new layout region. _(old 999.73, FIX-02)_
+
 - Chart form has an unexplained gap above the breadcrumb/SummaryBar in supply mode. Not a Phase
   27 regression — the Activity component predates it. _(old 999.74, POLISH-05)_
 - `InlineCreateDialog` labels are generic across supply types; they should contextualize per type
@@ -131,3 +137,13 @@ leave them behind.
   _(999.86, SERIES-02)_
 - Pattern Dive Series tab should show chart cover-image previews per series, grid or carousel.
   _(999.89, SERIES-03)_
+
+## Deferred hardening
+
+Not wishes, not warts — hardening Beth has explicitly deferred, recorded so it is findable.
+
+- **Nonce-based CSP `script-src`** _(deferred at the 2026-08-17 `/cleanup`)_: the real fix for
+  `'unsafe-inline'` needs per-request CSP in middleware **and** forces dynamic rendering
+  app-wide (A-1 report §4). The cheap wins (dropping `'unsafe-eval'` in production,
+  `frame-ancestors`/`base-uri`/`form-action`/`object-src`) land via build item P11; this
+  remainder waits until the trade is worth it.

@@ -84,6 +84,164 @@ Path list: `.claude/hooks/review-gated-paths.txt`.
 
 ---
 
+## Stage P — the A-1 burn-down (adopted at the 2026-08-17 `/cleanup`)
+
+The audit's proposed items P1–P12 adopted as build items with Beth's rulings applied, plus two
+items the same `/cleanup` created (P13, P14). **The report section is the brief:** each P1–P12
+item's full spec — evidence, file lists, defect-by-defect detail — is
+`docs/process/state-of-the-code-2026-08-17.md` §3 under the same number; the entries below add
+only the rulings and cross-item wiring decided at triage. Rulings cited below are in
+`docs/process/work-log/drift.md` (Ruled, 2026-08-17). Running order: the work-log queue.
+
+### P1 Outer fence + login rate limit — **gated (auth core)**
+
+- **Objective:** make `proxy.ts` actually protect routes (the `authorized` callback), move
+  `checkRateLimit` inside `authorize()` so both login entry paths are throttled, add the missing
+  auth/rate-limit/JWT-callback tests, and correct the two false doc claims — report §3 P1.
+- **Folded in:** the 2026-08-17 ledger row — missing auth env vars diagnose as "Invalid
+  credentials"; make server misconfiguration distinguishable from a wrong password without
+  leaking which to an attacker.
+- **Done-when:** P1's defect list closed clause by clause, test-first; docs corrected in the same
+  PR; gate green; merges only from a fresh `/review`.
+
+### P2 R2 upload-action hardening — **gated (R2 core)**
+
+- **Objective:** report §3 P2 — real server-side size/type enforcement, ownership-scoped key
+  primitives (copy `chart-file-actions.ts`'s model), Zod on every input, and resolve
+  `confirmUpload` (dead code today; deleting it takes its tests with it — **not** covered by the
+  2026-08-17 approvals, which name only P3 and P12: if deletion is the choice, ask Beth for her
+  word on the record when P2 runs; wiring it instead needs no approval).
+- **Folded in:** the write-path integrity gaps ledger row (2026-08-17) that touch this file —
+  delete-order and client-trusted metadata.
+- **Done-when:** P2's list closed test-first; gate green; fresh `/review` before merge.
+
+### P3 Delete the superseded shopping feature + orphans — **approved 2026-08-17**
+
+- **Objective:** report §3 P3 — remove `getShoppingList`/`markSupplyAcquired` (the two access
+  holes) and the six orphaned components, **with their tests**; Beth's test-removal approval is
+  on the record in drift (2026-08-17).
+- **Folded in:** the dead-code-slivers ledger row (2026-08-17) — dead props, dead types,
+  test-only exports.
+- **Done-when:** zero references remain (grep-demonstrated), suite green, gate green.
+
+### P4 Session dates land one day early in stats — **partly gated (stats queries)**
+
+- **Objective:** report §3 P4 — one storage/read convention for session dates applied across
+  write, stats reads, and display formatters, with honest fixtures (03:00Z, DST boundaries) that
+  make regression impossible.
+- **Folded in:** the cache-TTL ledger row's current-period predicate spread (six files, three
+  shapes, server-local time) — P4/P5 split it: P4 owns the timezone correctness.
+- **Traps:** the convention choice (UTC date-parts vs local-midnight instants) is the builder's,
+  but it must be written down in `docs/ARCHITECTURE.md`; the product outcome is identical.
+  Includes the `completion-estimates`/`pace-metrics` dishonest-assertion repairs named in P4.
+- **Done-when:** a session logged "Aug 17" reads Aug 17 in every stats surface and the browser;
+  fixtures cover the hours that used to hide it; fresh `/review` for the gated half.
+
+### P5 Stats cache invalidation: complete the writer side
+
+- **Objective:** report §3 P5 — every stats-visible mutation invalidates, and **the per-mutation
+  test rule** (Beth's ruling, drift 2026-08-17 ②: every stats-visible mutation carries a test
+  asserting its `revalidateTag("stats", { expire: 0 })` call) becomes the standing pattern,
+  recorded in `.claude/rules/testing-requirements.md` (carry the frontmatter rule).
+- **Folded in:** the cache-TTL ledger row's legibility half — the 300s/3600s TTLs move to
+  shared named constants with a one-line written rule for which a new query picks (P4 owns the
+  same row's timezone half).
+- **Done-when:** chart 6/6, designer + genre covered, supply 23/23, session 3/3 asserted; the
+  rule file states the pattern; TTL constants + the choosing rule in place; gate green.
+
+### P6 Honest failure states: stop rendering errors as zeros
+
+- **Objective:** report §3 P6 — failed loads say "couldn't load", never "you have none";
+  optimistic saves roll back on failure. Includes the 1-of-5-guarded `/charts` ledger row (its
+  named home).
+- **Done-when:** each listed surface demonstrates its failure state test-first; gate green.
+
+### P7 One fabric calculator — **absorbs F-2; gated (fabric calculator)**
+
+- **Objective:** report §3 P7 — unify the three drifted fabric-formula copies on the gated
+  module, pin the rounding with exact assertions, margin **value** untouched (open question
+  Q-005 stays open).
+- **F-2 rides inside:** the fabric-matching-with-no-fabric fix is built here, **after** its
+  domain question (F-2 trap ② — what should a no-fabric project match against?) is answered by
+  Beth via `/stitch-fact` in this session. F-2 no longer runs as its own item.
+- **Done-when:** one implementation, exact rounding pinned, F-2's done-when absorbed and
+  demonstrated, fresh `/review` before merge.
+
+### P8 R2 orphan lifecycle — **gated (R2 core)**
+
+- **Objective:** report §3 P8 — chart deletion cleans up R2, the deterministic thumbnail leak
+  ends, cover-replace can no longer delete the live thumbnail, and the `unsaved/` prefix +
+  reconciliation story is decided. Bucket topology follows R-1's ruling (read real, write
+  scratch — drift 2026-08-17).
+- **Done-when:** P8's four defects closed test-first; reconciliation decision recorded; fresh
+  `/review` before merge.
+
+### P9 Query scale + data integrity: the unbounded-read batch — **index/schema half gated**
+
+- **Objective:** report §3 P9 — pagination and query-shape fixes for the surfaces that break
+  first at 500+ charts, plus one gated migration batching the missing indexes.
+- **Folded in:** the StorageLocation/StitchingApp ledger row — `@@unique([userId, name])`, the
+  unscoped `updateMany` on delete, and the friendly-duplicate P2002 arms land in this batch.
+  The stats-fan-out row's residual cost (row volume) is owned here too.
+- **Done-when:** each listed surface bounded/paginated test-first; one migration carries the
+  indexes + uniqueness; fresh `/review` for the schema half.
+
+### P10 Dependency patch session — **first in the queue**
+
+- **Objective:** report §3 P10 — clear the 2 critical + 13 high advisories now. Mostly
+  `npm audit fix`-clean; the auth/Next-adjacent pieces get hard-rule-8 care (Context7 /
+  `node_modules/` verification) and a real verification pass.
+- **Folded in:** the `@types/node` 20→22 bump (ledger row). The standing ~monthly dependency
+  row continues separately.
+- **Done-when:** advisories cleared or individually explained, gate green, app demonstrated
+  working (login, upload, stats render), versions stay exact-pinned.
+
+### P11 Small honest fixes, one batch
+
+- **Objective:** report §3 P11's list, plus today's rulings: the **quick-add colour-family
+  picker** (Beth: quick-add must ask) and the **over-logging confirm** (Beth: warn but allow)
+  with the display clamp unification.
+- **Folded in:** ledger rows — comment sweep, recharts named imports, `shadcn`→devDependencies,
+  dead `NEXT_PUBLIC_APP_URL`, dependabot package-name fix, `.gitignore` settings.local.json,
+  the two placement oddities, the `R2_BUCKET_NAME` fallback throw (coordinate with R-1).
+- **Traps:** honestly too big for one session if each fix sprouts discussion — apply the
+  protocol §2 size check and split rather than marathon.
+- **Done-when:** each fix demonstrated (behavior fixes test-first; pure copy/config by
+  inspection), gate green.
+
+### P12 Test-honesty repairs — **removals approved 2026-08-17**
+
+- **Objective:** report §3 P12 — repair the tests that pass for the wrong reason; remove the ~40
+  phantoms (Beth's approval on the record in drift); retitle the kitting-% test to match
+  **KIT-004** (0% — `docs/domain/kitting-and-storage.md`); tighten the four factory `as` casts
+  (ledger row) so the union invariant holds in factories too.
+- **Done-when:** every named test fails when its subject breaks (spot-demonstrated), phantom
+  removals listed in the PR, gate green.
+
+### P13 One validation boundary — **created at the 2026-08-17 `/cleanup`**
+
+- **Objective:** unify the duplicated boundary rules in `src/lib`: one trim/empty→null
+  convention across `seriesSchema`/`designerSchema`/`chartFormSchema` (client forms stop
+  compensating), shared friendly-error arms for the twinned storage-location/stitching-app
+  action files, and typed action inputs — the 24 dead `z.infer` exports become the actions'
+  real signatures instead of `unknown`.
+- **Cited specs:** the two 2026-08-17 ledger duplication rows (`src/lib` boundary cluster;
+  unknown-typed actions) · `.claude/rules/form-patterns.md`.
+- **Traps:** behavior-preserving refactor plus small validation fixes — anything that _changes_
+  what validates is TDD'd; no schema/migration scope.
+- **Done-when:** one convention, stated in `form-patterns.md`; zero dead `z.infer` exports;
+  gate green.
+
+### P14 Gate alignment — **gate-config changes pre-approved 2026-08-17**
+
+- **Objective:** burn down the standing eslint warnings (55 minus whatever P11's a11y fixes
+  already took), then flip lint to `--max-warnings 0`; change CI to literally run
+  `npm run gate`. Both approved on the record (drift 2026-08-17).
+- **Cited specs:** the two ledger rows (55-warnings; CI re-implements the gate) ·
+  `.claude/rules/quality-gates.md` — update it and `docs/` in the same PR.
+- **Done-when:** lint step green at zero warnings and failing on any new one (demonstrated with
+  a scratch warning), CI workflow is one gate invocation, rules/docs updated, gate green.
+
 ## Stage F — post-audit fixes (seeded from the dissolved Phase 41, Beth's ruling D-10)
 
 Phase 41 was "Series Polish & Bug Fixes". D-10 dissolved it: **its genuine bugs are these three
@@ -121,6 +279,12 @@ not a promise that the diagnosis below is right.
 
 ### F-2 Fabric matching excludes projects with no fabric assigned
 
+> **Absorbed into P7 (2026-08-17 `/cleanup`).** A-1 confirmed the deeper cause this brief
+> anticipated: the fabric formula exists 3× with drifted rounding and the gated copy is unused
+> (report P7). F-2 no longer runs as its own item — P7 builds the fix inside the unified
+> calculator, asking this brief's domain question (trap ②) via `/stitch-fact` first. The brief
+> below stays as the requirement record P7 inherits.
+
 - **Objective:** the Pattern Dive **Fabric Requirements** tab shows zero matches for projects
   that have no fabric assigned — a `null` `fabricCount` short-circuits the matching logic, so
   exactly the projects most in need of a fabric suggestion are the ones that get none (old
@@ -145,6 +309,10 @@ not a promise that the diagnosis below is right.
   `npm run gate` green; the PR states whether the diff is review-gated; work log updated.
 
 ### F-3 Supply stitch-total hint is invisible outside Details mode
+
+> **Rerouted (2026-08-17 `/cleanup`).** Beth chose trap ①'s fold: the hint's placement joins the
+> chart-form redesign — recorded as a design-track input to DS-2/D-2 in `backlog.md`. Not built
+> in Stage F; the gap stands until D-2 lands.
 
 - **Objective:** the hint telling Beth the supply calculations depend on the chart's stitch count
   is only visible in Details mode — so while she is actually _working in supplies_, nothing tells
@@ -191,7 +359,13 @@ not a promise that the diagnosis below is right.
   (protocol §1). ④ Verify by _looking at a real preview_, not by a green build: the failure mode
   this item exists to kill is invisible to the gate. ⑤ If a preview bucket is chosen, orphan
   cleanup there is nobody's job — say so in the ledger rather than discovering it later.
-- **Done-when:** Beth's bucket ruling recorded; preview deployments serve and accept R2 images;
+- **Bucket ruling (made 2026-08-17 at `/cleanup`, drift Ruled):** **read real, write scratch** —
+  previews display the production bucket's images so design review is honest, but every write a
+  preview makes (upload, delete) lands in a separate scratch bucket/prefix, never production.
+  Trap ① is answered; build to this shape. Also in scope now: document the actual deployment
+  topology (Neon branches, R2 buckets, Vercel environments) — the 2026-08-16 ledger row — in
+  `docs/INTEGRATIONS.md` as part of this item.
+- **Done-when:** the read-real/write-scratch shape demonstrated on a real preview URL; preview deployments serve and accept R2 images;
   a real preview URL demonstrated with a working image (state which PR and which image); no
   secret in the repo; the build-time R2 fallback warning is gone or explained; work log updated.
 

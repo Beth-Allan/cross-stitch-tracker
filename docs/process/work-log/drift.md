@@ -30,30 +30,57 @@ words where possible. Rows are never deleted.
 
 ## Open — awaiting Beth's ruling
 
-### 2026-08-16 · gate-config change, applied out of necessity at overhaul step 5
+_(Empty — every drift row to date was ruled at the 2026-08-17 `/cleanup`.)_
 
-**What happened.** `.planning/` was excluded from both `format:check` and `lint`. Step 5 moved it
-to `docs/archive/planning/` — 663 files renamed, 660 of them markdown — and `docs/` **is** inside the
-formatter's scope, so the move would have pulled every one of them into `npm run gate` and turned
-the gate red on history nobody is going to reformat. The exclusion was carried across the rename:
-`.prettierignore` now ignores `docs/archive/`, and `eslint.config.mjs` ignores `docs/archive/**`
-where it ignored `.planning/**` (its `// GSD tooling` comment went with it).
+## Also open — the question known to be coming
 
-**Why it needs Beth.** Hard rule 6 makes any gate-config change drift, and this one was made
-inside the migration rather than brought to her first — so it is recorded here for her yes or no
-rather than filed as done. **No live code and no live doc lost coverage.** Precisely: 647 of the
-archived files genuinely fail `prettier --check` today, which is what would have turned the gate
-red. Five files moved _out_ of the formatter's scope that were in it on main — the four
-`docs/superpowers/` plan/spec pairs and `docs/tech-stack.md`, all now archived; all five pass
-`prettier --check` as they stand, so nothing is being hidden.
+_(One question is **known to be coming** but is not a drift row yet, because nothing contradicts
+anything until someone builds it: fabric matching for a project with no assigned fabric — what
+should it match against? Asked inside **P7**, which absorbed F-2 at the 2026-08-17 `/cleanup`
+(the question is F-2's trap ②, and P7 inherits it). It is a domain fact, so it goes through
+`/stitch-fact`, not through here, unless her answer contradicts something already written. The
+second question that used to sit here — block/warn/allow on over-logging — was ruled **warn but
+allow** at the same `/cleanup`; see Ruled below.)_
 
-**Her options.** (a) Confirm the carry-over — recommended; archived history is preserved
-byte-for-byte, and reformatting it would rewrite the record. (b) Reverse it and let the gate
-format the archive once — one large mechanical commit, after which the archive is no longer
-verbatim. (c) Move the archive out of `docs/` entirely so the question does not arise.
+## Ruled
 
-**What happens after she chooses.** (a) changes nothing and this row moves to Ruled. (b) or (c)
-is a small `chore/` branch.
+_(Beth's rulings D-01–D-14, which set the process itself up, are in
+`WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
+
+### 2026-08-17 · smaller rulings from the post-audit `/cleanup`
+
+Product decisions Beth made during the A-1 triage that bind future sessions — none started as a
+contradiction, recorded here per this file's "Also here" rule.
+
+- **Quick-add supplies must ask for colour family.** Today the quick-add path silently files
+  every supply under `colorFamily: "NEUTRAL"`, hiding it from the catalogue's colour filter.
+  Ruled: quick-add gains a colour-family picker — one extra tap, honest filter. Rejected:
+  an "uncategorised" bucket; keeping the silent Neutral. Folds into audit item P11.
+- **Logging past 100% warns but allows.** A session that would push a project past its total
+  stitch count gets a confirm — "this takes the project past 100%, sure?" — and saves on her
+  word; progress _displays_ cap at 100% everywhere (the display unification is P11 regardless).
+  Rejected: blocking (wrong whenever the chart's own total is what's off — miscounts, frogging,
+  borders outside the count); silent allowing (an extra-zero typo goes straight into stats).
+  The warning itself folds into P11; closes the parked question from the 2026-08-16 ledger row.
+- **F-3 folds into the chart-form redesign.** The supply stitch-total hint's visibility fix is
+  routed to the design track rather than built now — it becomes an input to DS-2/D-2 (the brief's
+  trap ① raised the overlap; the cheap version would be work done twice). F-3 leaves the Stage F
+  queue; the gap stands until D-2 lands.
+- **Test removals approved, on the record (hard rule 2), twice.** ① **P3**: the superseded
+  shopping feature (`getShoppingList` — no `userId` filter; `markSupplyAcquired` — no ownership
+  check; `shopping-list.tsx`) and the six orphaned components go, **with their ~750 lines of
+  green tests** — dead code deleted at the root rather than patched in place. ② **P12**: the
+  ~40 phantom tests that cannot fail (self-asserting literals, `toBeDefined()` on typed
+  constants) come out; `tsc` already does their real work. Both approved 2026-08-17.
+- **Preview deployments: read real R2, write scratch.** R-1's bucket ruling — previews display
+  the real bucket's images (honest design review) but their uploads/deletes land in a separate
+  scratch space, never production storage. Rejected: full sharing (preview pokes mutate real
+  storage); full isolation (previews stay visually blind). R-1's brief builds to this shape.
+- **Two gate-config changes approved (hard rule 6).** ① The 55 standing eslint warnings get
+  fixed in their own session and the lint step then runs with `--max-warnings 0`, so warnings
+  block from then on. ② CI is changed to literally run `npm run gate` instead of re-implementing
+  its seven steps, so local-green and CI-green cannot drift apart. Both strictly tighten; both
+  approved 2026-08-17; they land together as one gate-alignment fix item.
 
 ### 2026-08-16 · two gate questions raised by the layer-1 review of PR #72
 
@@ -92,6 +119,19 @@ Recommended: confirm. `session-protocol.md` §5 was updated to match.
 
 **What happens after she chooses.** All three are one-line edits to a config file, no code.
 
+**Ruling (2026-08-17, at `/cleanup`):** all three ruled in one sitting.
+**① Confirmed** — `gh pr merge` stays pre-approved; her word is the gate (protocol §5), and
+the `--admin` bypass stays blocked by the guard. **② No gating** — the `revalidateTag("stats")`
+caller files are **not** added to the review-gated list. On the A-1 evidence (report §5:
+every defect was writer-side, and the worst offenders call `revalidateTag` from no file a
+path gate could watch), the protection adopted instead is the **per-mutation test rule**:
+every stats-visible mutation carries a test asserting its `revalidateTag("stats",
+{ expire: 0 })` call — audit item P5 completes it, and it becomes the standing pattern for
+new mutations. The open-question block in `.claude/hooks/review-gated-paths.txt` is closed
+with this ruling. **③ Confirmed** — the four paths added during the PR #72 review
+(`proxy.ts`, `src/lib/r2.ts`, `src/app/(auth)/`, `src/app/api/auth/`) stay on the
+review-gated list.
+
 ### 2026-08-17 · kitting % for a project with no supplies — the rule was decided inside a test file
 
 **What happened.** The A-1 audit found `pattern-dive-actions.test.ts` carrying a test titled
@@ -118,22 +158,40 @@ fact about what kitting % means), the test is retitled or reshaped to match, and
 Next surface follows — small work, foldable into the audit's P12 or the design track's
 DS-3/DS-4.
 
-## Also open — the questions known to be coming
+**Ruling (2026-08-17, at `/cleanup`):** **Keep 0%** — option (a). "No supplies recorded"
+means _not ready; kit list unknown_, and fabric alone does not make a project kittable.
+Recorded as domain fact **KIT-004** (`docs/domain/kitting-and-storage.md`). The code already
+ships this reading, so the only work left is retitling the mis-titled test — folded into
+audit item P12.
 
-_(Two questions are **known to be coming** but are not drift rows yet, because nothing
-contradicts anything until someone tries to build them — they are recorded where they will be
-asked, which is the point of writing them down now:_
+### 2026-08-16 · gate-config change, applied out of necessity at overhaul step 5
 
-- _Fabric matching for a project with no assigned fabric — what should it match against? Build
-  item **F-2**, trap ②. It is a domain fact, so it goes through `/stitch-fact`, not through here,
-  unless her answer contradicts something already written._
-- _Whether logging more stitches than a project's total should be blocked, warned, or allowed.
-  Maintenance-ledger row, 2026-08-16. Same route.)_
+**What happened.** `.planning/` was excluded from both `format:check` and `lint`. Step 5 moved it
+to `docs/archive/planning/` — 663 files renamed, 660 of them markdown — and `docs/` **is** inside the
+formatter's scope, so the move would have pulled every one of them into `npm run gate` and turned
+the gate red on history nobody is going to reformat. The exclusion was carried across the rename:
+`.prettierignore` now ignores `docs/archive/`, and `eslint.config.mjs` ignores `docs/archive/**`
+where it ignored `.planning/**` (its `// GSD tooling` comment went with it).
 
-## Ruled
+**Why it needs Beth.** Hard rule 6 makes any gate-config change drift, and this one was made
+inside the migration rather than brought to her first — so it is recorded here for her yes or no
+rather than filed as done. **No live code and no live doc lost coverage.** Precisely: 647 of the
+archived files genuinely fail `prettier --check` today, which is what would have turned the gate
+red. Five files moved _out_ of the formatter's scope that were in it on main — the four
+`docs/superpowers/` plan/spec pairs and `docs/tech-stack.md`, all now archived; all five pass
+`prettier --check` as they stand, so nothing is being hidden.
 
-_(Empty — no contradiction has been surfaced under this process yet. Beth's rulings D-01–D-14,
-which set the process itself up, are in `WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
+**Her options.** (a) Confirm the carry-over — recommended; archived history is preserved
+byte-for-byte, and reformatting it would rewrite the record. (b) Reverse it and let the gate
+format the archive once — one large mechanical commit, after which the archive is no longer
+verbatim. (c) Move the archive out of `docs/` entirely so the question does not arise.
+
+**What happens after she chooses.** (a) changes nothing and this row moves to Ruled. (b) or (c)
+is a small `chore/` branch.
+
+**Ruling (2026-08-17, at `/cleanup`):** **Confirmed** — option (a). The archive keeps its
+formatter exclusion and stays verbatim, byte for byte. No further work; the carry-over
+stands as made.
 
 ## Noted at seeding — not drift, recorded so no one re-finds them
 
