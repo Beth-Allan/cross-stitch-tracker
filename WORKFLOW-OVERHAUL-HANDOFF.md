@@ -298,6 +298,8 @@ None. Pass 1's two open items were resolved 2026-08-16 at pass 2:
 
 Until that lands, guard-git exists but does not fire; branch protection (now admin-enforced) covers the server side.
 
+**Ledger-seed candidates noticed during step 1** (the ledger arrives at step 2 — record these in it): ① 55 pre-existing eslint warnings pass the gate because eslint exits 0 on warnings (39 `no-unused-vars`, 13 `no-img-element`); making them bite is a `--max-warnings 0` gate-config decision for the burn-down. ② Build-time noise: `R2_BUCKET_NAME not set, falling back to default` ×15 and a "Failed to load series data: Dynamic server usage" log line on `/charts` during static generation — expected without R2 locally, but noisy enough to mask real failures.
+
 **Deferred by design:** `WORKFLOW-REFERENCE.md` (Beth's one-page card) is written at step 4 with the doors, since it is the list of words she can type.
 
 **Not done:** steps 2–5 (memory files, rules reconciliation, doors, migration — the stale `PostToolUse` commit-nag hook in `.claude/settings.json` is repointed at step 5) and working sessions 6–8.
