@@ -92,7 +92,12 @@ change, but it duplicates the email rule the form action also needs, which is ex
 **Recommendation: (a).** It closes the gap the way she has already ruled once, costs one line, and
 leaves the single-boundary shape P13 is heading towards intact.
 
-**Ruling:** _open._
+**Ruling (2026-08-17, in the P1 session): (a) — add the one file.** Beth chose adding
+`^src/lib/validations/auth\.ts$` over gating the whole `validations/` directory or moving the
+rules back into `auth.ts`. Applied in the P1 branch: one line in
+`.claude/hooks/review-gated-paths.txt` and the matching prose in `session-protocol.md` §5, which
+is kept in step by the same rule. No code changed. **This row moves to Ruled at the next
+`/cleanup`.**
 
 ## Also open — the question known to be coming
 

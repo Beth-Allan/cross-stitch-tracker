@@ -24,6 +24,10 @@
 ^src/lib/rate-limit\.ts$
 ^src/app/\(auth\)/
 ^src/app/api/auth/
+# Added 2026-08-17 by Beth's ruling after P1: loginSchema is parsed at
+# authorizeCredentials, so this file carries the cap that bounds the rate-limiter
+# key and the normalization that makes both login entry paths match identically.
+^src/lib/validations/auth\.ts$
 
 # The math (skein + fabric calculators)
 ^src/lib/utils/skein-calculator\.ts$

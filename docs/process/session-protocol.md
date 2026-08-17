@@ -150,9 +150,11 @@ The cores:
 
 - `prisma/schema.prisma` + `prisma/migrations/`
 - `proxy.ts`, `src/lib/auth.ts`, `src/lib/auth-guard.ts`, `src/lib/rate-limit.ts`,
-  `src/app/(auth)/**`, `src/app/api/auth/**` — auth, session, rate limiting. `proxy.ts` carries
-  the matcher that decides which routes are gated **at all**, so a one-line edit there can
-  silently unprotect the app
+  `src/lib/validations/auth.ts`, `src/app/(auth)/**`, `src/app/api/auth/**` — auth, session,
+  rate limiting. `proxy.ts` carries the matcher that decides which routes are gated **at all**,
+  so a one-line edit there can silently unprotect the app; `validations/auth.ts` carries
+  `loginSchema`, which since P1 is parsed inside `authorizeCredentials` and so holds the cap
+  that bounds the rate-limiter key (Beth's ruling, 2026-08-17)
 - `src/lib/utils/skein-calculator.ts`, `src/lib/utils/fabric-calculator.ts` — the math
 - `src/lib/queries/stats/**` — the `unstable_cache` + `revalidateTag("stats")` trap (history: 999.41, 999.42)
 - `src/lib/actions/upload-actions.ts`, `src/lib/actions/chart-file-actions.ts`, `src/lib/r2.ts` — R2 orphan-leak history
