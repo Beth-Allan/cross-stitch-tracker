@@ -65,7 +65,8 @@ Path list: `.claude/hooks/review-gated-paths.txt`.
   category) · `docs/process/maintenance-ledger.md` (what is already known — cite rows, do not
   re-find them) · `docs/process/session-protocol.md` §3 (what test honesty means here) ·
   `CROSS_STITCH_TRACKER_PLAN.md` (what the code is supposed to do) · the codebase docs in
-  `docs/` once overhaul step 5 promotes them.
+  `docs/` (`ARCHITECTURE`, `STRUCTURE`, `CONVENTIONS`, `TESTING`, `STACK`, `INTEGRATIONS`,
+  `CONCERNS`) · `docs/domain/` for anything the craft decides.
 - **Traps:** ① **Read-only posture, fresh session.** ② **Run as parallel subagent sweeps**
   (protocol §9 context budget, Beth's ruling D-14) — one sweep per dimension, findings returned,
   synthesis in the main session. A single session reading 24 routes and 2448 tests inline blows

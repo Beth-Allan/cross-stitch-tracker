@@ -15,16 +15,16 @@ a different order, say so — the queue is yours to reorder, in any session or a
 
 ## Your words
 
-| Type this         | When                                                                                                                          |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `/progress`       | "Where are we?" A short plain summary — what shipped, what's in flight, what's waiting on you. Changes nothing, ever.         |
-| `/broken`         | Something is wrong: an error, a wrong number, behaviour you didn't expect. Describe it however you like.                      |
-| `/tweak`          | You want something different — a preference, an improvement, a "could this be…". Not broken, just not right.                  |
-| `/cleanup`        | Tidy-up time: the open questions, the decisions waiting on you, the list of small known problems. One decision at a time.     |
-| `/stitch-fact`    | You want to tell it something true about cross-stitch — a skein length, what "kitted" means, how a fabric count works.        |
-| `/design-session` | You want to look at how the app _looks_ and react to options. Your favourite becomes the standard the app is then rebuilt to. |
-| `/plan-feature`   | You want something new planned out properly before anyone builds it.                                                          |
-| `/walkthrough`    | A chunk of work is finished and you want to be shown what it does, in plain language, before you sign it off.                 |
+| Type this         | When                                                                                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/progress`       | "Where are we?" A short plain summary — what shipped, what's in flight, what's waiting on you. Changes nothing, ever.                                              |
+| `/broken`         | Something is wrong: an error, a wrong number, behaviour you didn't expect. Describe it however you like.                                                           |
+| `/tweak`          | You want something different — a preference, an improvement, a "could this be…". Not broken, just not right.                                                       |
+| `/cleanup`        | Tidy-up time: the open questions, the decisions waiting on you, the list of small known problems. One decision at a time.                                          |
+| `/stitch-fact`    | You want to tell it something true about cross-stitch — a skein length, what "kitted" means, how a fabric count works. **It also has questions saved up for you.** |
+| `/design-session` | You want to look at how the app _looks_ and react to options. Your favourite becomes the standard the app is then rebuilt to.                                      |
+| `/plan-feature`   | You want something new planned out properly before anyone builds it.                                                                                               |
+| `/walkthrough`    | A chunk of work is finished and you want to be shown what it does, in plain language, before you sign it off.                                                      |
 
 Three more words come from the queue rather than from you — you'll be told to type them:
 `/work-item` (build the next planned piece), `/review` (a second pair of eyes on something

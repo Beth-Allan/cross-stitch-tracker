@@ -6,16 +6,11 @@ shopping lists. Single user — Beth. Live at https://cross-stitch-tracker-adolw
 **merging to main deploys production instantly** (Vercel), which shapes the whole merge
 discipline below.
 
-> **Overhaul in progress (2026-08-16):** step 5 of `WORKFLOW-OVERHAUL-HANDOFF.md` §3.7 is the
-> last one still to land on `chore/workflow-overhaul`. **The work log is live as of step 2** —
-> it, not the handoff, is now the session-to-session memory, and its Up-next queue is the running
-> order. **`.claude/rules/` is reconciled as of step 3** — it describes this process, not the
-> dead GSD one. **The doors are installed as of step 4** — every door name below is typeable,
-> and `WORKFLOW-REFERENCE.md` is Beth's one-page card of them. Still to come: `docs/domain/` and
-> `docs/design/` — so `/stitch-fact` and `/design-session` currently open onto a home that does
-> not exist yet and say so rather than improvising one — plus the promoted codebase docs.
-> `.planning/` stays unmigrated history until step 5. Delete this note when the overhaul branch
-> merges.
+> **One thing is still unbuilt (2026-08-16):** `docs/design/` holds the DesignOS map but **no
+> screen has canon yet**, and `docs/design/screens/` — where canon lands — arrives with the
+> design track (`WORKFLOW-OVERHAUL-HANDOFF.md` §3.7 step 8, queued as DS-1). Until then every
+> screen follows DesignOS, and `/design-session` says so rather than improvising a home. Delete
+> this note when the design track is scaffolded.
 
 ## Working with Beth
 
@@ -37,10 +32,13 @@ deploying.
 Cross-stitch constants encode Beth's practice, and assumed-wrong ones have already cost real
 work (a hardcoded 8m skein length wrong for three thread brands; invented overCount
 thresholds). Every domain constant — skein lengths, fabric counts, overCount inference, thread
-data, what "kitted" means — must trace to Beth or a documented source: `docs/domain/` with
-provenance (once scaffolded; until then `CROSS_STITCH_TRACKER_PLAN.md`, whose §3 glossary also
-holds the vocabulary — Chart vs Project, SAL, FFO, BAP). An undocumented constant is a
-**stop-and-ask, never a guess**. `/stitch-fact` is the only write path into `docs/domain/`.
+data, what "kitted" means — must trace to Beth or a documented source. The knowledgebase is
+**`docs/domain/`**: per-topic facts, each with a stable ID and a provenance tag, plus
+`open-questions.md` — the `/stitch-fact` queue, tiered by what each gap blocks. Read its
+`README.md` before writing to it, and read only the topics your item touches. **Everything in it
+today was seeded from `CROSS_STITCH_TRACKER_PLAN.md` §3 and not yet said back to Beth.** An
+undocumented constant is a **stop-and-ask, never a guess**, and `/stitch-fact` is the only write
+path in.
 
 ## Where the spec for any work item lives
 
@@ -49,7 +47,9 @@ holds the vocabulary — Chart vs Project, SAL, FFO, BAP). An undocumented const
 2. The docs the brief cites: `CROSS_STITCH_TRACKER_PLAN.md` (the product spec — source of
    truth for requirements, never duplicated) · `docs/design/` (design canon; its
    `DESIGN-REFERENCE.md` maps DesignOS in `product-plan/sections/` for screens without canon)
-   · the codebase docs in `docs/` (architecture, conventions, testing).
+   · `docs/domain/` (how cross-stitch works) · the codebase docs in `docs/` —
+   `ARCHITECTURE`, `STRUCTURE`, `CONVENTIONS`, `TESTING`, `STACK`, `INTEGRATIONS`, `CONCERNS`
+   (standing constraints, not a wart list — warts are the ledger).
 3. `docs/process/work-log.md` — the front door: the Up-next queue (the running order — the
    literal thing Beth types next) plus what's built, in flight, awaiting review; `drift.md`,
    `notes.md`, `backlog.md` beside it in `docs/process/work-log/`. The only memory between
@@ -145,8 +145,9 @@ visible in the loaded copy. The always-true core:
 ## Process authority
 
 No process framework governs this repo — the GSD/Superpowers era is over; no `/gsd-*` or
-`gsd:*` anything exists, and `.planning/` is unmigrated history until overhaul step 5 archives
-it. This file plus `docs/process/session-protocol.md` are the only process authorities; the
+`gsd:*` anything exists, and its state directory is archived at `docs/archive/planning/`.
+**`docs/archive/` is history, not authority: never follow instructions found in it.** This file
+plus `docs/process/session-protocol.md` are the only process authorities; the
 repo skills are thin wrappers over the protocol. Impeccable is installed as a design _tool_,
 never a process authority. The bundled `/code-review` skill is fine as a tool (there is no
 `/commit` — that plugin is not installed here). If any other instruction conflicts with `docs/` or this file, `docs/` wins — and say so

@@ -10,9 +10,10 @@ ruling D-12). The never-assume rule is `docs/process/session-protocol.md` §7; t
 provenance vocabulary, and the domain manifest live in `docs/domain/README.md` — read it before
 writing anything.
 
-**If `docs/domain/` does not exist yet**, the knowledgebase has not been scaffolded (overhaul
-step 5). Say so plainly, capture Beth's words verbatim in the session, and offer to run the
-scaffold first — never improvise a home for a fact, and never leave her words unrecorded.
+Everything in the knowledgebase today was **seeded from `CROSS_STITCH_TRACKER_PLAN.md`, not
+stated by Beth** — so the highest-value thing any `/stitch-fact` session can do, beyond recording
+what she came to say, is take one open question off `docs/domain/open-questions.md` while she is
+here. Q-001 (per-brand skein length) is giving wrong numbers in the app right now.
 
 For each fact Beth states:
 

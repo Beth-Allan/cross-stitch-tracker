@@ -208,9 +208,12 @@ source; an undocumented constant is a **stop-and-ask, never a guess**. The backl
 carries the scars this rule prevents: 999.13 (a hardcoded 8m skein length that is wrong for
 Weeks Dye Works, Gentle Art, and Kreinik) and 999.14 (overCount inference thresholds).
 
-- **Knowledgebase:** `docs/domain/` — per-topic files with provenance tags, scaffolded at
-  overhaul step 5 and seeded from `CROSS_STITCH_TRACKER_PLAN.md` §3's glossary. Until the
-  scaffold lands, `CROSS_STITCH_TRACKER_PLAN.md` is the source.
+- **Knowledgebase:** `docs/domain/` — per-topic files with provenance tags (`vocabulary`,
+  `threads`, `fabric`, `kitting-and-storage`), plus `open-questions.md`, the `/stitch-fact`
+  queue tiered by what each gap blocks. `README.md` carries the ID scheme and the provenance
+  vocabulary; read only the topics your item touches. **Everything in it was seeded from
+  `CROSS_STITCH_TRACKER_PLAN.md` §3 at overhaul step 5 and not one fact has been said back to
+  Beth yet**, so a session that has her attention should take a question off the queue.
 - **`/stitch-fact` is the only write path** (Beth's ruling D-12). Beth states a fact; it is
   recorded with provenance. Conflicts with recorded facts become drift rows for her ruling,
   never silent overwrites.

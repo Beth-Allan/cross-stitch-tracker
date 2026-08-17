@@ -20,7 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.command // \"\"' | grep -q 'git commit' && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"REMINDER: You just committed. Check if the Current Status section of CLAUDE.md needs updating (what was done, what is next). If you already updated it this session, ignore this.\"}}' || true",
+            "command": "jq -r '.tool_input.command // \"\"' | grep -q 'git commit' && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"REMINDER: You just committed. The work log (docs/process/work-log.md) is the only memory between sessions — update it, and its Up-next queue, before this session ends. If you already updated it this session, ignore this.\"}}' || true",
             "timeout": 5
           }
         ]

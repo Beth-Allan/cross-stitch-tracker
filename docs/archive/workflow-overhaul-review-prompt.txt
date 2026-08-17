@@ -1,0 +1,18 @@
+I'm the owner of two personal projects and I'm about to replace the entire development process in one of them. I'm not a full-time coder — I'll be living with whatever this produces for the next year of work, and I can't easily judge process design myself, which is why I'm asking you.
+
+The plan is written up here, self-contained:
+/Users/isleofskye/dev/bethallan/cross-stitch-tracker/WORKFLOW-OVERHAUL-HANDOFF.md
+
+Both repos are on disk, read whatever you need:
+- /Users/isleofskye/dev/bethallan/cross-stitch-tracker — the target. Next.js 16, 2448 tests, mid-milestone.
+- /Users/isleofskye/dev/bethallan/ffh-horse-database — the source model. Laravel, same owner, already made this transition. docs/process/session-protocol.md is its authority, .claude/skills/ its doors, .claude/hooks/ its fences.
+
+This is the second review. The first one is already in the document at §4, and its findings have been folded into §3 — so §3 is the revised plan, not the draft that was reviewed. That changes what's useful from you: I don't need the first review repeated back. I need to know where it was wrong, where folding it in made something worse, and what a plan that has now survived one careful reading still gets wrong. Reviewers agreeing with each other is not evidence.
+
+What I'm actually worried about: this is a port between projects that differ in language, testing culture, deployment model, and how hands-on I am. My agent wrote both the plan and the fixes, so it's the wrong judge of whether it has cargo-culted structure that earned its place in the Laravel repo but won't earn it here, or dropped something load-bearing that only shows up in week three. Ceremony that costs more than it returns is a real finding. So is the thing neither of us thought to look for.
+
+Two boundaries. The eight decisions in §2 are mine, already made with the tradeoffs in front of me — if one has a consequence nobody has reckoned with, say so, but don't re-argue the choice. And this is a review, not an implementation: assess and stop. Don't edit files in either repo, don't write the protocol, don't create anything.
+
+Also give me a straight answer on the two open decisions in §5, and treat §6 as claims already verified — spot-check any you doubt rather than re-deriving the lot.
+
+Lead with the outcome: your first sentence should tell me whether to write this as it stands, write it with changes, or stop and rethink. Then only the findings that would change what happens next.

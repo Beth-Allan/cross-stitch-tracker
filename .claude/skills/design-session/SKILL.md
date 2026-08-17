@@ -21,9 +21,10 @@ Two mechanics that are easy to get wrong:
   the `impeccable` skill with the mode as its argument (`critique`, `audit`, `polish`), never
   `/impeccable:audit`.
 
-**If `docs/design/` does not exist yet**, the design track has not been set up (overhaul steps 5
-and 8) — say so plainly and offer to run the setup first, rather than improvising a home for
-canon.
+**Canon has nowhere to land yet.** `docs/design/` exists and holds the DesignOS map, but
+`docs/design/screens/` and the design-track scaffolding arrive with overhaul step 8, and **no
+screen has canon today**. Until step 8 lands, say so plainly and offer to create the canon home
+as part of this session, rather than improvising one.
 
 The design-track inputs each surface inherits — Beth's earlier polish wishes, routed here by her
 ruling D-10 — are in `docs/process/work-log/backlog.md` under "Design-track inputs". Read the

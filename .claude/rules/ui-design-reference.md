@@ -22,10 +22,10 @@ move — there is always a reference, and this file says which one.
 3. **Nothing?** Flag it before building — a screen with no reference is a stop-and-ask, not a
    licence to invent.
 
-> **Transition, 2026-08-16 → overhaul step 5:** `docs/design/` does not exist yet. Until step 5
-> creates it, the DesignOS map is at **`.planning/DESIGN-REFERENCE.md`** and there is no canon
-> for any screen. Step 5 promotes the map to `docs/design/DESIGN-REFERENCE.md` — **promote, never
-> archive; D-05 needs it live.** Delete this note when step 5 lands.
+> **Where things stand, 2026-08-16:** the DesignOS map is live at
+> `docs/design/DESIGN-REFERENCE.md`. **No screen has canon yet** — `docs/design/screens/` arrives
+> with the design track (overhaul step 8), and DS-1 is the first session that produces any.
+> Until then, every screen follows DesignOS.
 
 ## Reading a DesignOS reference
 

@@ -9,7 +9,10 @@ src/generated/
 # Package manager
 node_modules/
 
-# Planning/tooling (not project code)
+# Tooling and reference material (not project code)
 .claude/
-.planning/
 product-plan/
+
+# Archived history — preserved verbatim, never reformatted
+# (carried over from .planning/ when it moved here at overhaul step 5)
+docs/archive/

@@ -28,10 +28,12 @@ for what is left. Four things step 2 discovered that the handoff does not say:
   `backlog.md`, filed under the five redesign surfaces. `docs/design/screens.md` does not exist
   yet. **Step 8 must move them, not re-derive them** — the D-10 routing is a ruling, and losing
   it would quietly resurrect two phases' worth of work.
-- **Step 5 has an ordering constraint step 2 found.** One ledger row is a sweep of planning-doc
-  references in code comments (`// Calculator settings (Phase 7)` in `schema.prisma`, and
-  others). Doing it _before_ `.planning/` is archived is cheap; doing it after means the comments
-  point at a path that no longer exists. Not a blocker — just cheaper in that order.
+- **~~Step 5 has an ordering constraint step 2 found.~~ Not taken, deliberately — step 5,
+  2026-08-16.** The comment sweep touches `prisma/schema.prisma`, a review-gated core (hard rule
+  3), so folding it into a docs-and-process branch would have dragged the whole overhaul PR into
+  a fresh-`/review` requirement for a batch of comment edits. The archive landed first; the
+  ledger row now records where those references point (`docs/archive/planning/`) and flags the
+  worse case, `TODO(999.0.17)` in `dashboard-actions.ts:125`, an id from a retired scheme.
 - **~~Step 3's rules reconciliation has a fifth file, not four.~~ Done at step 3, 2026-08-16.**
   The prediction held and then some: `component-implementation.md` needed a wording fix, and so
   did `server-actions.md`, which carried the identical inaccurate claim. Six rule files changed
@@ -42,9 +44,10 @@ for what is left. Four things step 2 discovered that the handoff does not say:
   diff) has never run on any of it. **Step 5 opens the PR and must run that review over the whole
   branch diff**, not just step 5's own commits. Merge deploys production; this is the only review
   layer standing between four steps of process rewrites and main.
-- **`.review-prompt.txt` is untracked in the repo root** and was already there before step 2. It
-  is not referenced by anything the overhaul writes. Step 5 should decide: archive it or delete
-  it — but look at it first.
+- **~~`.review-prompt.txt` is untracked in the repo root.~~ Decided at step 5, 2026-08-16:
+  archived**, to `docs/archive/workflow-overhaul-review-prompt.txt`. It is the brief Beth
+  commissioned the overhaul's second review with — the framing that produced §4b's findings, and
+  the only record of how the question was asked. Cheap to keep, not cheap to reconstruct.
 
 ## Editing `.claude/settings.json` — one ask to Beth, not a workaround
 
@@ -65,10 +68,14 @@ guard-git wiring landed on 2026-08-16 after being parked twice — about a minut
 Ask once, plainly; do not burn a session probing for a way around, and do not silently drop the
 work instead.
 
-**This is live again at step 5**, which repoints the stale `PostToolUse` commit-nag hook (it still
-tells every session to update a "Current Status" section of CLAUDE.md that the step-1 rewrite
-deleted) — same file, same wall, same one-line ask. **Consumed when** step 5 has landed that
-repoint.
+**~~This is live again at step 5.~~ Landed 2026-08-16 — and the wall did not fire.** Step 5
+repointed the `PostToolUse` commit-nag hook (it had been telling every session to update a
+"Current Status" section of CLAUDE.md that the step-1 rewrite deleted; it now points at the work
+log and its Up-next queue) **in auto mode, first attempt, no prompt and no refusal** — a plain
+Python rewrite of the file. That contradicts five refusals across two earlier sessions, so the
+wall is **not** deterministic and the note is kept rather than deleted: **try the edit once
+before asking Beth to leave auto mode.** If it is refused, the ask above is still the route that
+works. **Consumed when** someone establishes what actually differs between the two cases.
 
 ## Running the A-1 audit — read this before you start it
 
@@ -99,6 +106,15 @@ roughly 25 more were feature wishes rather than warts (they are in `backlog.md`)
 row was checked against the working tree or is explicitly marked _(unverified)_ for A-1 to
 confirm or drop. **An empty-looking ledger is not an invitation to go hunting** — that is A-1's
 job, once, deliberately.
+
+**Update 2026-08-16 (step 5): nine rows added, and they were not hunted for.** They fell out of
+the delegated accuracy audit of the seven codebase docs before promotion — the docs claimed
+things about the code, and checking the claims surfaced the warts. Four are genuine finds
+(recharts wildcard import · the CSP's `unsafe-eval` · the 16-query stats fan-out against Neon's
+pool · no pagination anywhere in the browse path) and five are config warts (`shadcn` CLI in
+`dependencies` · `@types/node` 20.x against `engines: >=22` · dead `NEXT_PUBLIC_APP_URL` ·
+dependabot ignoring a package name that is no longer installed · undocumented deployment
+topology). **A-1 should cite these, not re-find them.**
 
 ## `.claude/rules/` files carry hidden frontmatter — never rewrite one blind
 
@@ -147,7 +163,12 @@ old location and go stale the moment it moves:
   Carried as its own maintenance-ledger row (2026-08-16, overhaul step 3) rather than fixed
   mid-item.
 
-**Consumed when** step 5 has landed the promotion and repointed all three.
+**~~Consumed when step 5 has landed the promotion and repointed all three.~~ Done 2026-08-16.**
+All three repointed, plus two the note did not predict: `DESIGN-REFERENCE.md`'s own opening
+pointed at a "UI Implementation Rules" section of CLAUDE.md that the step-1 rewrite deleted, and
+its section headings carried dead phase numbers. The `PRODUCT.md` ledger row is closed (its
+counts were wrong in both directions — 43 section components + 4 shell, 30 screenshots, verified
+by counting).
 
 ## The two doors that open onto nothing yet — what step 5 owes them
 
@@ -169,8 +190,13 @@ which is safe but is **not** the end state. Step 5 owes each of them something c
 Both doors also assume `docs/process/work-log/backlog.md`'s "Design-track inputs" section stays
 where it is until step 8 moves it — that is the same D-10 routing the steps 4–5 note protects.
 
-**Consumed when** both paragraphs are gone and `docs/domain/README.md` carries the three things
-`/stitch-fact` cites.
+**Half consumed, 2026-08-16 (step 5).** `docs/domain/README.md` now carries all three things
+`/stitch-fact` cites — ID scheme, provenance vocabulary, topic manifest — and the door's
+"does not exist yet" paragraph is gone, replaced by the fact that every seeded fact came from the
+plan rather than from Beth. **`/design-session`'s paragraph deliberately stays**, reworded: the
+directory exists and holds the DesignOS map, but canon still has nowhere to land until step 8
+creates `docs/design/screens/`, and the note's own instruction was to delete it only then.
+**Consumed when** step 8 has built the canon home.
 
 ## `.claude/` is prettier-ignored — the doors are not gate-formatted
 

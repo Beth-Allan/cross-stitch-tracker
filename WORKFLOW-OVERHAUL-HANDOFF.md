@@ -8,6 +8,13 @@
 
 ## 0. Read this first
 
+> **Status, 2026-08-16: steps 1–5 are done and this document is history — with one exception.**
+> The live process is `CLAUDE.md` + `docs/process/session-protocol.md`; the live memory and
+> running order are `docs/process/work-log.md`. **The exception is §2: Beth's rulings D-01–D-14
+> live here and nowhere else, and they still bind.** Steps 6–8 (the audit, the wart burn-down,
+> the design track) are queued as work items, not as overhaul steps. Everything below describes
+> the plan as it stood before implementation; §7 records how steps 1–4 actually went.
+
 Nothing has been implemented. The branch exists; every file below is still a proposal. Two review passes (both Claude Fable 5, reading both repos) have been completed and their findings are folded in — §3 already reflects them; §4 records pass 1, §4b records pass 2, so a later reader judges the revisions rather than re-deriving them.
 
 No decisions are outstanding (§5). Everything is settled; implementation starts at §3.7 step 1.
