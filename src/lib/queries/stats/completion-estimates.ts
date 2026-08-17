@@ -12,6 +12,11 @@ import type { CompletionEstimate } from "@/types/stats";
 
 const MIN_SESSIONS = 3;
 
+// A project stitched slowly enough can project a finish date past the representable calendar.
+// Anything beyond this horizon already reads as "never", and clamping the *label* keeps one
+// glacial project from throwing the whole estimates panel away.
+const MAX_PROJECTION_DAYS = 365_000;
+
 async function computeCompletionEstimates(
   userId: string,
   scope: Scope,
@@ -59,7 +64,7 @@ async function computeCompletionEstimates(
       if (remaining <= 0) continue;
 
       const daysRemaining = Math.ceil(remaining / avgPerDay);
-      const estimatedDate = addCalendarDays(today, daysRemaining);
+      const estimatedDate = addCalendarDays(today, Math.min(daysRemaining, MAX_PROJECTION_DAYS));
       const percentComplete = Math.round((project.stitchesCompleted / totalStitches) * 100);
 
       estimates.push({
@@ -135,7 +140,7 @@ export async function getProjectCompletionEstimate(
     if (remaining <= 0) return null;
 
     const daysRemaining = Math.ceil(remaining / avgPerDay);
-    const estimatedDate = addCalendarDays(today, daysRemaining);
+    const estimatedDate = addCalendarDays(today, Math.min(daysRemaining, MAX_PROJECTION_DAYS));
     const percentComplete = Math.round((project.stitchesCompleted / totalStitches) * 100);
 
     return {

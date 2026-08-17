@@ -569,3 +569,42 @@ describe("project-dashboard-actions", () => {
     });
   });
 });
+
+describe("getProjectDashboardData — calendar-date convention", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockAuth.mockResolvedValue({ user: { id: "user-1" } });
+  });
+
+  it("counts a project finished on January 1st in that year, not the previous one", async () => {
+    const thisYear = new Date().getUTCFullYear();
+    mockPrisma.project.findMany.mockResolvedValue([
+      mockProject({
+        id: "p1",
+        status: "FINISHED",
+        finishDate: new Date(`${thisYear}-01-01T00:00:00.000Z`),
+      }),
+    ]);
+
+    const { getProjectDashboardData } = await import("./project-dashboard-actions");
+    const result: ProjectDashboardData = await getProjectDashboardData();
+
+    expect(result.heroStats.finishedThisYear).toBe(1);
+  });
+
+  it("does not count a project finished on December 31st of the previous year", async () => {
+    const thisYear = new Date().getUTCFullYear();
+    mockPrisma.project.findMany.mockResolvedValue([
+      mockProject({
+        id: "p1",
+        status: "FINISHED",
+        finishDate: new Date(`${thisYear - 1}-12-31T00:00:00.000Z`),
+      }),
+    ]);
+
+    const { getProjectDashboardData } = await import("./project-dashboard-actions");
+    const result: ProjectDashboardData = await getProjectDashboardData();
+
+    expect(result.heroStats.finishedThisYear).toBe(0);
+  });
+});

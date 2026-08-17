@@ -192,7 +192,7 @@ describe("getHeroStats", () => {
     // Today aggregate should use todayStart and todayEnd
     const todayCall = mockPrisma.stitchSession.aggregate.mock.calls[0][0];
     expect(todayCall.where.date.gte).toEqual(new Date("2026-05-17T00:00:00.000Z"));
-    expect(todayCall.where.date.lt).toEqual(new Date("2026-05-17T23:59:59.999Z"));
+    expect(todayCall.where.date.lte).toEqual(new Date("2026-05-17T23:59:59.999Z"));
 
     // Week aggregate uses weekStart
     const weekCall = mockPrisma.stitchSession.aggregate.mock.calls[1][0];
@@ -224,11 +224,26 @@ describe("getHeroStats — calendar-date convention", () => {
     const { getHeroStats } = await import("./hero-stats");
     await getHeroStats("user-1");
 
-    const { gte, lt } = mockPrisma.stitchSession.aggregate.mock.calls[0][0].where.date;
+    const { gte, lte } = mockPrisma.stitchSession.aggregate.mock.calls[0][0].where.date;
     const sessionDatedToday = new Date("2026-05-17T00:00:00.000Z");
 
     expect(sessionDatedToday >= gte).toBe(true);
-    expect(sessionDatedToday < lt).toBe(true);
+    expect(sessionDatedToday <= lte).toBe(true);
+  });
+
+  it("includes a legacy row stored at the last millisecond of the day", async () => {
+    mockPrisma.stitchSession.aggregate.mockResolvedValue({
+      _sum: { stitchCount: null, timeSpentMinutes: null },
+      _count: { id: 0 },
+    });
+    mockPrisma.project.count.mockResolvedValue(0);
+    mockPrisma.chart.aggregate.mockResolvedValue({ _sum: { stitchCount: null } });
+
+    const { getHeroStats } = await import("./hero-stats");
+    await getHeroStats("user-1");
+
+    const { lte } = mockPrisma.stitchSession.aggregate.mock.calls[0][0].where.date;
+    expect(new Date("2026-05-17T23:59:59.999Z") <= lte).toBe(true);
   });
 
   it("counts a session dated the 1st inside the month window", async () => {

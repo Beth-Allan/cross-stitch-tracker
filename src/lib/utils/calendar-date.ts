@@ -36,7 +36,13 @@ export function parseCalendarDate(value: string): Date {
 
 /** Reads the calendar date a stored instant represents, in UTC. */
 export function toCalendarDate(value: Date): string {
-  return value.toISOString().slice(0, 10);
+  const iso = value.toISOString();
+  // Past year 9999 toISOString() switches to expanded years ("+015400-05-07T…"), which would
+  // slice into a malformed date rather than failing
+  if (iso.length !== 24) {
+    throw new Error(`Date outside the calendar-date range: ${iso}`);
+  }
+  return iso.slice(0, 10);
 }
 
 /** The calendar date it is *right now* in the given IANA timezone. */

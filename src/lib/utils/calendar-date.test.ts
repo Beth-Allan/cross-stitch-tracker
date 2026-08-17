@@ -150,3 +150,16 @@ describe("formatCalendarDate", () => {
     expect(formatCalendarDate("2026-01-01")).toBe("Jan 1, 2026");
   });
 });
+
+describe("toCalendarDate — out of range", () => {
+  it("refuses a date beyond the four-digit-year range instead of returning a truncated string", () => {
+    // toISOString() switches to expanded years past 9999: "+015400-05-07T00:00:00.000Z"
+    const farFuture = new Date(Date.UTC(15400, 4, 7));
+
+    expect(() => toCalendarDate(farFuture)).toThrow(/calendar-date range/);
+  });
+
+  it("still accepts a four-digit year at the edge", () => {
+    expect(toCalendarDate(new Date("9999-12-31T00:00:00.000Z"))).toBe("9999-12-31");
+  });
+});

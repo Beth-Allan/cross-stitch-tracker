@@ -158,7 +158,9 @@ Pure functions, no side effects: `calendar-date.ts`, `skein-calculator.ts`, `fab
 ## Calendar dates
 
 Some dates in this app are **calendar dates**, not moments: `StitchSession.date` and a project's
-`startDate` / `finishDate` / `ffoDate`. Beth picks them from a `type="date"` input; they carry no
+`startDate` / `finishDate` / `ffoDate`. Both are read and displayed under this convention;
+`StitchSession.date` is also _written_ under it, while the project dates are still stored through a
+looser `Date.parse` path (maintenance-ledger row, 2026-08-17). Beth picks them from a `type="date"` input; they carry no
 time and belong to no timezone. Everything else that is a `DateTime` (`createdAt`, `updatedAt`,
 `dateAdded`) is a real instant and is _not_ covered by this convention.
 

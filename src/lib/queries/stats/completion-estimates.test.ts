@@ -325,3 +325,50 @@ describe("getCompletionEstimates — calendar-date convention", () => {
     expect(result[0].avgPerDay).toBe(4.3);
   });
 });
+
+describe("getCompletionEstimates — absurdly slow projects", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetModules();
+  });
+
+  it("still returns the other projects when one project's projection runs off the calendar", async () => {
+    mockPrisma.project.findMany.mockResolvedValue([
+      {
+        // 60 stitches in two years on a 400k chart -> a projection thousands of years out
+        id: "p-slow",
+        chartId: "c-slow",
+        status: "IN_PROGRESS",
+        stitchesCompleted: 60,
+        chart: { id: "c-slow", name: "Glacial BAP", stitchCount: 400000 },
+        sessions: [
+          { date: new Date("2024-05-17T00:00:00.000Z"), stitchCount: 20 },
+          { date: new Date("2025-05-17T00:00:00.000Z"), stitchCount: 20 },
+          { date: new Date("2026-05-16T00:00:00.000Z"), stitchCount: 20 },
+        ],
+      },
+      {
+        id: "p-normal",
+        chartId: "c-normal",
+        status: "IN_PROGRESS",
+        stitchesCompleted: 3000,
+        chart: { id: "c-normal", name: "Big Project", stitchCount: 10000 },
+        sessions: [
+          { date: new Date("2026-04-17T00:00:00.000Z"), stitchCount: 1000 },
+          { date: new Date("2026-04-27T00:00:00.000Z"), stitchCount: 1000 },
+          { date: new Date("2026-05-07T00:00:00.000Z"), stitchCount: 1000 },
+        ],
+      },
+    ]);
+
+    const { getCompletionEstimates } = await import("./completion-estimates");
+    const result = await getCompletionEstimates("user-1", "all");
+
+    expect(result.map((r) => r.projectId)).toContain("p-normal");
+    expect(result.find((r) => r.projectId === "p-normal")!.estimatedDate).toBe("Jul 2026");
+    // the glacial one still reports, with a projection the calendar can represent
+    expect(result.find((r) => r.projectId === "p-slow")!.estimatedDate).toMatch(
+      /^[A-Z][a-z]{2} \d{4}$/,
+    );
+  });
+});

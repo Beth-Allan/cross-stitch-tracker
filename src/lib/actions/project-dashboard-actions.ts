@@ -2,6 +2,7 @@
 
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { getUserTimezone, getCurrentPeriod } from "@/lib/queries/stats/timezone";
 import { mapFocalPoint } from "@/types/focal-point";
 import type {
   ProjectDashboardData,
@@ -93,7 +94,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
   });
 
   const wips = projects.filter((p) => p.status === WIP_STATUS);
-  const currentYear = new Date().getFullYear();
+  const { year: currentYear } = getCurrentPeriod(getUserTimezone(user.id));
 
   const wipProgressValues = wips.map((p) =>
     computeProgressPercent(p.stitchesCompleted, p.chart.stitchCount),
@@ -131,7 +132,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
     averageProgress,
     closestToCompletion,
     finishedThisYear: finishedProjects.filter(
-      (p) => p.finishDate && p.finishDate.getFullYear() === currentYear,
+      (p) => p.finishDate && p.finishDate.getUTCFullYear() === currentYear,
     ).length,
     finishedAllTime: finishedProjects.length,
     totalStitchesAllProjects: projects.reduce((sum, p) => sum + p.stitchesCompleted, 0),
