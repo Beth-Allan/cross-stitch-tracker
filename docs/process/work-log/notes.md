@@ -167,7 +167,13 @@ this machine has no Vercel or Cloudflare access — no CLI, no stored login, no 
 (checked 2026-08-17). Beth ruled (D-16) that the keys stay with her and Claude writes the steps, so
 this is that list, written down so the next session does not re-derive it or re-ask her.
 
-**① The pre-merge check — `R2_BUCKET_NAME` in Vercel Production.** R-1 made that variable
+**① The pre-merge check — `R2_BUCKET_NAME` in Vercel Production. CLEARED 2026-08-17 — do not
+re-ask Beth.** She checked the dashboard in-session and it is set, scoped to **Production and
+Preview** both (added Apr 11, marked Sensitive). Production is therefore not running on the removed
+default, and the merge is safe on this axis. The rest of this item is kept for the record and for
+anyone who wonders why the check existed.
+
+**Why it existed.** R-1 made that variable
 **required**: it used to default to `"cross-stitch-tracker"` with a warning, which meant a typo
 silently redirected every presigned URL to the wrong bucket. **`.env.example` suggests the real
 bucket is named exactly that, so Production may be running on the fallback right now with the
@@ -220,6 +226,21 @@ to think about the `.env.local` `\$`-escaping rule (which is a dotenv-parsing ar
 apply to values typed into Vercel). ② `R2_SCRATCH_BUCKET_NAME` must **never** be set on Production
 — and if it is ever set equal to `R2_BUCKET_NAME`, the app throws rather than quietly writing to
 the real bucket, by design.
+
+**Beth's pass, started 2026-08-17.** Her screenshots corrected two things in this list, both now
+fixed in the artifact: ① the Cloudflare token dialog defaults to **"Apply to all buckets in this
+account"** — both tokens want **"Apply to specific buckets only"** (key A → the real bucket, key B →
+the scratch bucket); ② Neon's new-branch dialog defaults **Auto-delete to "After 1 day"**, which
+would have deleted the preview branch and its connection strings overnight and re-broken previews
+with no obvious cause. **Auto-delete must be Never.** Her other choices were already right: parent
+branch `production`, "Branch data and schema", TTL Forever. The branch is refreshed later with Neon's
+_reset from parent_, which keeps the same connection strings.
+
+**Known limitation of the preview branch:** its schema is a point-in-time copy, and neither the Vercel
+build nor CI runs `prisma migrate deploy`. A PR that adds a migration will therefore run new code
+against the older preview schema until someone resets the branch from parent. Not a blocker for
+design review (the surfaces D-13 cares about are read paths), but it is the first thing to suspect if
+a preview errors on a PR that touched `prisma/`.
 
 **Verification, once ④ is done** (this is R-1's remaining done-when): open the PR's preview URL,
 log in, confirm a chart cover renders, upload a new cover, and confirm the new object appears in the
