@@ -39,6 +39,13 @@ Single user (the developer/stitcher) managing 500+ cross-stitch charts through t
 - **Tokens:** `product-plan/design-system/tokens.css`
 - **Typography:** `product-plan/design-system/fonts.md`
 - **Colors:** `product-plan/design-system/tailwind-colors.md`
-- **Components (50+):** `product-plan/sections/` — see `.planning/DESIGN-REFERENCE.md` for full map
+- **Components:** 43 across seven sections in `product-plan/sections/`, plus 4 in
+  `product-plan/shell/` — see `docs/design/DESIGN-REFERENCE.md` for the full map
 - **Screenshots (30):** in each section directory
-- **Full spec:** `.impeccable.md` in project root
+- **The live design direction:** `DESIGN.md` in the project root, with its machine sidecar
+  `.impeccable/design.json`
+
+**Where this ranks.** DesignOS and this file are **historical input, not the spec** (Beth's ruling
+D-05). Design canon in `docs/design/screens/` supersedes them screen by screen as
+`/design-session` produces it; `.claude/rules/ui-design-reference.md` is the rule that decides
+which reference wins.

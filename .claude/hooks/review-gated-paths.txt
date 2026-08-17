@@ -1,0 +1,47 @@
+# Review-gated cores (session-protocol §5) — the sensitive paths that merge only
+# from a fresh /review session, never by their builder (CLAUDE.md hard rule 3).
+# One POSIX extended regex per line, matched against a PR's changed file paths.
+# No guard-merge hook reads this file yet (Beth's ruling D-03) — enforcement is
+# by convention; a maintenance-ledger row tracks the optional wiring. Keep this
+# list in step with session-protocol §5; changing either is a gate-config
+# change (drift, Beth's ruling on the record).
+# Lesson inherited from horse-db (its drifts D21/D26/D48): gate growing
+# families by directory, not filename — a per-filename line goes stale the day
+# a sibling is added.
+
+# Schema and migrations
+^prisma/schema\.prisma$
+^prisma/migrations/
+
+# Auth, session, and rate limiting — the mechanisms AND the routes that apply them.
+# The route group and the API segment are gated as directories, per the lesson above:
+# login/actions.ts is the only checkRateLimit caller, and a sibling added beside it
+# would otherwise arrive ungated.
+^proxy\.ts$
+^src/lib/auth\.ts$
+^src/lib/auth-guard\.ts$
+^src/lib/rate-limit\.ts$
+^src/app/\(auth\)/
+^src/app/api/auth/
+
+# The math (skein + fabric calculators)
+^src/lib/utils/skein-calculator\.ts$
+^src/lib/utils/fabric-calculator\.ts$
+
+# Stats query layer — the unstable_cache + revalidateTag("stats") trap
+# (history: backlog 999.41 and 999.42)
+^src/lib/queries/stats/
+
+# R2 — the upload actions (orphan-leak history) and the client module they both
+# call, which builds the S3 client from the R2 credentials and resolves the bucket.
+^src/lib/actions/upload-actions\.ts$
+^src/lib/actions/chart-file-actions\.ts$
+^src/lib/r2\.ts$
+
+# OPEN QUESTION for Beth, raised by the layer-1 review of PR #72 (2026-08-16) and
+# carried as a drift row: the stats *cache* is gated above by its query directory,
+# but revalidateTag("stats") is called from chart-actions.ts, supply-actions.ts and
+# session-actions.ts, which are not gated. Gating them would pull most of the app's
+# mutation surface into fresh-/review territory; leaving them means the trap that
+# caused 999.41/999.42 can be re-introduced from an ungated file. Her ruling decides;
+# nothing is added here until she gives it.

@@ -38,8 +38,16 @@ The app is refined and quiet by default. It lets the craft and the data speak. B
 
 ### Design System Reference
 
-- **Design tokens:** `~/projects/cross-stitch-tracker-design/product-plan/design-system/tokens.css`
-- **Typography rules:** `~/projects/cross-stitch-tracker-design/product-plan/design-system/fonts.md`
-- **Color usage guide:** `~/projects/cross-stitch-tracker-design/product-plan/design-system/tailwind-colors.md`
-- **Components (43 total):** `~/projects/cross-stitch-tracker-design/product-plan/`
-- **Screenshots (30):** `~/projects/cross-stitch-tracker-design/product-plan/product/sections/`
+All of it lives in this repo — an earlier version of this block pointed at a separate design
+repo that is not on this machine.
+
+- **Design tokens:** `product-plan/design-system/tokens.css`
+- **Typography rules:** `product-plan/design-system/fonts.md`
+- **Color usage guide:** `product-plan/design-system/tailwind-colors.md`
+- **Components:** 43 across seven sections in `product-plan/sections/`, plus 4 in
+  `product-plan/shell/` — mapped by `docs/design/DESIGN-REFERENCE.md`
+- **Screenshots (30):** in each section directory under `product-plan/sections/`
+- **The live design direction:** `DESIGN.md` (root) + `.impeccable/design.json`
+
+These are **historical input, not the spec** (Beth's ruling D-05) — design canon in
+`docs/design/screens/` supersedes them screen by screen as it is produced.

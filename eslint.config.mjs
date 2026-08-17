@@ -12,9 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // GSD tooling (vendored, not project code)
+    // Process tooling and archived history (not project code)
     ".claude/**",
-    ".planning/**",
+    "docs/archive/**",
     // Design reference components (not production code)
     "product-plan/**",
     // Build scripts
