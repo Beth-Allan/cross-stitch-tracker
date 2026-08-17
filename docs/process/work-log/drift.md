@@ -62,6 +62,38 @@ production after merge, with revert as the safety valve_. That is a precedent fo
 (no source change, dependencies only), **not** a general replacement for layer 2: a real UI change
 still has nowhere for Beth to preview it, which is why this row stays open.
 
+### 2026-08-17 · P1 made `src/lib/validations/auth.ts` load-bearing for auth, and it is not review-gated
+
+**What contradicts what.** The review-gated list (`.claude/hooks/review-gated-paths.txt`, mirrored
+in `session-protocol.md` §5) gates "auth, session, and rate limiting — the mechanisms AND the routes
+that apply them", and its own comment says to gate growing families **by directory, not filename**.
+P1 moved the rate limit inside `authorizeCredentials`, which made that function an unauthenticated
+boundary — so the layer-1 review required a Zod parse there, and the schema it parses with is
+`loginSchema` in **`src/lib/validations/auth.ts`**. That file is not on the gated list.
+
+**Why it matters.** Three of the protections P1 added now live in that schema rather than in
+`auth.ts`: the `.max(254)` that bounds the rate-limiter key, the `.trim().toLowerCase()` that makes
+both login entry paths key and match identically, and the email format check itself. Deleting
+`.max(254)` is a one-line edit to an ungated file that silently reopens the unbounded-store hole the
+review caught. That is the same shape as the `proxy.ts` argument Beth already ruled on (③, PR #72
+review): the file whose one-line edit can quietly undo the control belongs on the list.
+
+**Why it needs Beth.** Adding a path to that list is a gate-config change (hard rule 6), and P1's
+builder must not make it unilaterally — the same reasoning that put the four PR #72 additions in
+front of her. **Not applied in the P1 branch.**
+
+**Options.** (a) Add `^src/lib/validations/auth\.ts$` — one line, no code, and consistent with the
+③ precedent. (b) Gate the whole `^src/lib/validations/` directory — follows the by-directory lesson,
+but pulls ~9 non-auth schemas into review-gating and taxes many future items. (c) Leave it, and
+move the three auth-critical rules back into `auth.ts` so the gated file holds them — no list
+change, but it duplicates the email rule the form action also needs, which is exactly what P13
+(one validation boundary) exists to remove.
+
+**Recommendation: (a).** It closes the gap the way she has already ruled once, costs one line, and
+leaves the single-boundary shape P13 is heading towards intact.
+
+**Ruling:** _open._
+
 ## Also open — the question known to be coming
 
 _(One question is **known to be coming** but is not a drift row yet, because nothing contradicts
