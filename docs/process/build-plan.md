@@ -147,8 +147,11 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
 - **Folded in:** the cache-TTL ledger row's legibility half — the 300s/3600s TTLs move to
   shared named constants with a one-line written rule for which a new query picks (P4 owns the
   same row's timezone half).
-- **Done-when:** chart 6/6, designer + genre covered, supply 23/23, session 3/3 asserted; the
+- **Done-when:** chart 6/6, designer + genre covered, supply 22/22, session 3/3 asserted; the
   rule file states the pattern; TTL constants + the choosing rule in place; gate green.
+  _(Count corrected while building, 2026-08-17: `supply-actions.ts` has **22** mutations and 22
+  `revalidateTag` call sites — the brief's 23 and `ARCHITECTURE.md`'s 26 both counted the
+  import line. Descriptive staleness, protocol §6.)_
 
 ### P6 Honest failure states: stop rendering errors as zeros
 

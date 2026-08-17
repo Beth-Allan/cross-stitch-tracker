@@ -1177,6 +1177,16 @@ describe("session-actions", () => {
       expect(result.error).toBe("Session not found");
     });
 
+    it("deleteSession does not invalidate when the session does not exist", async () => {
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce(null);
+
+      const { deleteSession } = await import("./session-actions");
+      const result = await deleteSession("nonexistent");
+
+      assertFailure(result);
+      expect(mockRevalidateTag).not.toHaveBeenCalled();
+    });
+
     it("deleteSession calls revalidatePath and revalidateTag('stats') after successful deletion", async () => {
       mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
         ...createMockStitchSession(),

@@ -57,8 +57,11 @@ it("createThread calls revalidateTag('stats') after successful creation", async 
 });
 ```
 
-Group them in a `describe("cache invalidation", …)` block so the coverage is greppable, and add
-at least one negative per file — a rejected write (ownership failure, missing record) that must
+**Name the mutation in the test title** so the coverage is greppable — that is the requirement.
+Where a file is organised by concern, group the assertions in a `describe("cache invalidation", …)`
+block (`chart-`, `designer-`, `genre-`, `supply-actions`); where it is already organised per action,
+the assertion lives in that action's own describe (`session-actions`). Either way **every file
+carries at least one negative** — a rejected write (ownership failure, missing record) that must
 **not** invalidate. Adding a new mutation without its assertion is a review finding.
 
 **Mock trap:** an action test's `vi.mock("next/cache", …)` factory must list `revalidateTag`
