@@ -6,7 +6,7 @@ globs:
 
 # Auth.js v5 Patterns
 
-> Patterns for Auth.js v5 (next-auth 5.0.0-beta.30) with JWT strategy.
+> Patterns for Auth.js v5 (next-auth 5.0.0-beta.32) with JWT strategy.
 > Last updated: 2026-03-29
 
 ## Session user.id requires JWT + session callbacks

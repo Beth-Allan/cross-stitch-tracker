@@ -49,23 +49,22 @@ default**, and a row says otherwise only when it is otherwise (protocol §1).
 
 | #   | Beth types        | what it is                                                                                                        |
 | --- | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
-| 1   | `/work-item P10`  | **security patch session** — 2 critical + 13 high advisories cleared now, auth stack included (hard-rule-8 care)  |
-| 2   | `/work-item P1`   | outer auth fence + login rate limit — **gated**, a fresh `/review` follows                                        |
-| 3   | `/work-item P4`   | session dates land one day early in stats — **partly gated**, `/review` follows                                   |
-| 4   | `/work-item P3`   | delete the superseded shopping feature + orphans (test removals approved 2026-08-17)                              |
-| 5   | `/work-item R-1`  | R2 on preview deployments — bucket ruled: read real, write scratch; documents deployment topology                 |
-| 6   | `/work-item P6`   | honest failure states — errors stop rendering as zeros                                                            |
-| 7   | `/work-item P5`   | stats cache invalidation, writer side + the per-mutation test rule                                                |
-| 8   | `/work-item P2`   | R2 upload-action hardening — **gated**, `/review` follows                                                         |
-| 9   | `/work-item P8`   | R2 orphan lifecycle — **gated**, `/review` follows                                                                |
-| 10  | `/work-item P7`   | one fabric calculator — absorbs F-2 (its domain question asked in-session) — **gated**, `/review` follows         |
-| 11  | `/work-item F-1`  | series designerName + dialog pending text                                                                         |
-| 12  | `/work-item P12`  | test-honesty repairs (phantom removals approved 2026-08-17; kitting test retitled to KIT-004)                     |
-| 13  | `/work-item P11`  | small honest fixes, one batch — includes the quick-add colour picker and over-log confirm (ruled 2026-08-17)      |
-| 14  | `/work-item P13`  | one validation boundary — unify the duplicated `src/lib` rules                                                    |
-| 15  | `/work-item P9`   | query scale + data integrity batch — **schema half gated**, `/review` follows                                     |
-| 16  | `/work-item P14`  | gate alignment — warnings burn-down + `--max-warnings 0` + CI runs the gate (approved 2026-08-17)                 |
-| 17  | `/design-session` | **DS-1, the foundation session** — palette, type and token direction (D-06); output becomes D-1. **Lane: Fable.** |
+| 1   | `/work-item P1`   | outer auth fence + login rate limit — **gated**, a fresh `/review` follows                                        |
+| 2   | `/work-item P4`   | session dates land one day early in stats — **partly gated**, `/review` follows                                   |
+| 3   | `/work-item P3`   | delete the superseded shopping feature + orphans (test removals approved 2026-08-17)                              |
+| 4   | `/work-item R-1`  | R2 on preview deployments — bucket ruled: read real, write scratch; documents deployment topology                 |
+| 5   | `/work-item P6`   | honest failure states — errors stop rendering as zeros                                                            |
+| 6   | `/work-item P5`   | stats cache invalidation, writer side + the per-mutation test rule                                                |
+| 7   | `/work-item P2`   | R2 upload-action hardening — **gated**, `/review` follows                                                         |
+| 8   | `/work-item P8`   | R2 orphan lifecycle — **gated**, `/review` follows                                                                |
+| 9   | `/work-item P7`   | one fabric calculator — absorbs F-2 (its domain question asked in-session) — **gated**, `/review` follows         |
+| 10  | `/work-item F-1`  | series designerName + dialog pending text                                                                         |
+| 11  | `/work-item P12`  | test-honesty repairs (phantom removals approved 2026-08-17; kitting test retitled to KIT-004)                     |
+| 12  | `/work-item P11`  | small honest fixes, one batch — includes the quick-add colour picker and over-log confirm (ruled 2026-08-17)      |
+| 13  | `/work-item P13`  | one validation boundary — unify the duplicated `src/lib` rules                                                    |
+| 14  | `/work-item P9`   | query scale + data integrity batch — **schema half gated**, `/review` follows                                     |
+| 15  | `/work-item P14`  | gate alignment — warnings burn-down + `--max-warnings 0` + CI runs the gate (approved 2026-08-17)                 |
+| 16  | `/design-session` | **DS-1, the foundation session** — palette, type and token direction (D-06); output becomes D-1. **Lane: Fable.** |
 
 Order approved by Beth at the 2026-08-17 `/cleanup`; hers to reorder anytime. Gated items each
 add a `/review` row when they finish — the builder stops at `built, awaiting review` and the
@@ -74,6 +73,8 @@ says so).
 
 **Standing recurrence — dependency maintenance (~monthly, next due 2026-09).** `npm audit` plus a
 dependency review, in **its own session, never as a side effect of other work** (protocol §9).
+**P10 did not consume this row** — it was the audit's urgent one-off patch pass, which left the
+graph at zero advisories on 2026-08-17; the recurrence exists to keep it there.
 Versions are pinned exact, so nothing arrives unless a session goes and gets it; the stack is
 bleeding-edge and includes an Auth.js **beta**. Carried as a maintenance-ledger row until the
 first one has actually run.
@@ -98,22 +99,22 @@ Full record: `docs/process/work-log-archive.md`.
 Briefs in `docs/process/build-plan.md` §Stage P; P1–P12's full specs are the audit report's §3.
 Running order: the queue above (interleaved with F-1 and R-1).
 
-| item                                            | status | date | model | note                                                            |
-| ----------------------------------------------- | ------ | ---- | ----- | --------------------------------------------------------------- |
-| P1 outer fence + login rate limit               | queued |      |       | gated (auth)                                                    |
-| P2 R2 upload-action hardening                   | queued |      |       | gated (R2)                                                      |
-| P3 delete superseded shopping feature + orphans | queued |      |       | test removals approved 2026-08-17                               |
-| P4 session dates off-by-one in stats            | queued |      |       | partly gated (stats queries)                                    |
-| P5 writer-side invalidation + test rule         | queued |      |       | per-mutation rule is Beth's ruling 2026-08-17                   |
-| P6 honest failure states                        | queued |      |       |                                                                 |
-| P7 one fabric calculator                        | queued |      |       | absorbs F-2; gated (fabric calculator)                          |
-| P8 R2 orphan lifecycle                          | queued |      |       | gated (R2)                                                      |
-| P9 query scale + data integrity batch           | queued |      |       | schema half gated                                               |
-| P10 dependency patch session                    | queued |      |       | first in queue — 2 critical + 13 high                           |
-| P11 small honest fixes batch                    | queued |      |       | includes quick-add picker + over-log confirm (ruled 2026-08-17) |
-| P12 test-honesty repairs                        | queued |      |       | phantom removals approved 2026-08-17; KIT-004 retitle           |
-| P13 one validation boundary                     | queued |      |       | created at `/cleanup`                                           |
-| P14 gate alignment                              | queued |      |       | gate changes approved 2026-08-17                                |
+| item                                            | status | date       | model  | note                                                                                                                                      |
+| ----------------------------------------------- | ------ | ---------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| P1 outer fence + login rate limit               | queued |            |        | gated (auth)                                                                                                                              |
+| P2 R2 upload-action hardening                   | queued |            |        | gated (R2)                                                                                                                                |
+| P3 delete superseded shopping feature + orphans | queued |            |        | test removals approved 2026-08-17                                                                                                         |
+| P4 session dates off-by-one in stats            | queued |            |        | partly gated (stats queries)                                                                                                              |
+| P5 writer-side invalidation + test rule         | queued |            |        | per-mutation rule is Beth's ruling 2026-08-17                                                                                             |
+| P6 honest failure states                        | queued |            |        |                                                                                                                                           |
+| P7 one fabric calculator                        | queued |            |        | absorbs F-2; gated (fabric calculator)                                                                                                    |
+| P8 R2 orphan lifecycle                          | queued |            |        | gated (R2)                                                                                                                                |
+| P9 query scale + data integrity batch           | queued |            |        | schema half gated                                                                                                                         |
+| P10 dependency patch session                    | built  | 2026-08-17 | Opus 5 | all 29 npm advisories cleared (prod graph 2 critical + 13 high → 0); `@types/node` 20→22 folded in; `agentRules: false` per Beth's ruling |
+| P11 small honest fixes batch                    | queued |            |        | includes quick-add picker + over-log confirm (ruled 2026-08-17)                                                                           |
+| P12 test-honesty repairs                        | queued |            |        | phantom removals approved 2026-08-17; KIT-004 retitle                                                                                     |
+| P13 one validation boundary                     | queued |            |        | created at `/cleanup`                                                                                                                     |
+| P14 gate alignment                              | queued |            |        | gate changes approved 2026-08-17                                                                                                          |
 
 ## Stage F — post-audit fixes (seeded from the dissolved Phase 41)
 

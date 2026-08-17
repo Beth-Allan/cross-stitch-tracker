@@ -8,7 +8,7 @@ exists, where, and how to write a test that matches the ones already here.
 
 ## Framework
 
-**Vitest 3.1.1** with `@vitejs/plugin-react`. `vitest.config.ts`:
+**Vitest 3.2.7** with `@vitejs/plugin-react`. `vitest.config.ts`:
 
 - Environment `jsdom`; `globals: true` (so `describe`/`it`/`expect` need no import)
 - Setup file `./src/__tests__/setup.ts`

@@ -47,6 +47,27 @@ allow** at the same `/cleanup`; see Ruled below.)_
 _(Beth's rulings D-01–D-14, which set the process itself up, are in
 `WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
 
+### 2026-08-17 · Next.js may not co-author CLAUDE.md — ruled during P10
+
+**What happened.** The P10 security bump moved Next.js 16.2.4 → 16.3.1, and 16.3 ships a new
+default (`agentRules: true`) that makes `next dev` append its own marked block to `CLAUDE.md`
+and re-add it whenever it is removed. The block's content is benign — "this version differs from
+your training data, read `node_modules/next/dist/docs/` before writing code," which is hard rule 8
+almost verbatim. The contradiction is about **authorship**, not content: CLAUDE.md declares itself
+and `session-protocol.md` the process authorities, and a dependency that edits the authority file
+on every `npm run dev` contradicts that.
+
+**Surfaced to Beth** in-session, as a two-option decision: switch it off (one config line) or
+accept an upstream-maintained section inside the rulebook.
+
+**Her ruling:** switch it off. `agentRules: false` now sits in `next.config.ts` with the reason in
+a comment. Verified: `next dev` no longer touches `CLAUDE.md`.
+
+**What it changed.** CLAUDE.md stays authored only by this project. Future sessions: if the block
+ever reappears, the flag was lost — restore it rather than committing the block. Any future
+tool that wants to write into the process-authority files is the same question again, and it is
+Beth's, not a session's.
+
 ### 2026-08-17 · smaller rulings from the post-audit `/cleanup`
 
 Product decisions Beth made during the A-1 triage that bind future sessions — none started as a
