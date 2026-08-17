@@ -148,3 +148,65 @@ broken frontmatter block in a door or a rule file. `WORKFLOW-REFERENCE.md`, bein
 root, **is** formatted. Practical upshot: after writing a door, confirm it by its own evidence —
 the skill appearing in the session's skills listing — rather than by the gate going green.
 **Not consumed** — this is a standing fact about where the gate's eyes are.
+
+---
+
+## R-1's settings half — the exact list, and the one check that must happen before the code merges
+
+**Tags:** R-1 · preview deployments · Vercel · Cloudflare R2 · Neon · D-15 · D-16 · layer 2
+
+**Consumed when** a preview URL can be logged into and shows a real chart cover, and the three
+ledger rows R-1 owns are Resolved.
+
+**Why this note exists.** R-1 is two halves and only the code half can be done from a session:
+this machine has no Vercel or Cloudflare access — no CLI, no stored login, no `.env.local` at all
+(checked 2026-08-17). Beth ruled (D-16) that the keys stay with her and Claude writes the steps, so
+this is that list, written down so the next session does not re-derive it or re-ask her.
+
+**① The pre-merge check — `R2_BUCKET_NAME` in Vercel Production.** R-1 made that variable
+**required**: it used to default to `"cross-stitch-tracker"` with a warning, which meant a typo
+silently redirected every presigned URL to the wrong bucket. If Production has been relying on that
+default, the code half merging turns working uploads into "File storage is not configured". **So
+before R-1 merges, Production must be confirmed to have `R2_BUCKET_NAME` set to the real bucket's
+name.** That is a dashboard read, not a code question — it belongs to the `/review` session's
+checklist, and the PR says so.
+
+**② Cloudflare — one bucket, two tokens** (dash.cloudflare.com → R2):
+
+- Create a bucket in the same account as the real one, e.g. `cross-stitch-tracker-preview`.
+- Token A — **Object Read only**, scoped to the _real_ bucket. This becomes Preview's main
+  credential pair, which is what makes a preview physically unable to write to production storage
+  rather than merely coded not to.
+- Token B — **Object Read & Write**, scoped to the _scratch_ bucket only.
+- Both tokens are optional in the sense that one read-write pair for both buckets also works — the
+  code enforces the split either way (`getWriteTarget` / `getReadTarget` in `src/lib/r2.ts`). Two
+  tokens move the guarantee from our code to Cloudflare, which is why they are the recommendation.
+
+**③ Neon — a branch, per D-15** (console.neon.tech): branch the production branch (call it
+`preview`), then take its **pooled** connection string for `DATABASE_URL` and its **direct** string
+for `DIRECT_URL`. Previews then show real charts while writing only to the copy.
+
+**④ Vercel — Project → Settings → Environment Variables**, all scoped to **Preview**:
+
+| variable                                                    | value                                               |
+| ----------------------------------------------------------- | --------------------------------------------------- |
+| `AUTH_SECRET`, `AUTH_USER_EMAIL`, `AUTH_USER_PASSWORD_HASH` | tick **Preview** on the existing Production entries |
+| `STATS_TIMEZONE`                                            | tick **Preview** on the existing entry              |
+| `DATABASE_URL`, `DIRECT_URL`                                | the Neon _preview_ branch strings from ③            |
+| `R2_ACCOUNT_ID`                                             | same as Production                                  |
+| `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`                  | token A (read-only on the real bucket)              |
+| `R2_BUCKET_NAME`                                            | the real bucket — previews read it                  |
+| `R2_SCRATCH_BUCKET_NAME`                                    | the scratch bucket from ②                           |
+| `R2_SCRATCH_ACCESS_KEY_ID`, `R2_SCRATCH_SECRET_ACCESS_KEY`  | token B (read-write on scratch)                     |
+
+**Two traps.** ① Ticking the existing entry's **Preview** box is deliberate for the auth variables:
+it reuses the identical value, so Beth logs into a preview with her normal password and nobody has
+to think about the `.env.local` `\$`-escaping rule (which is a dotenv-parsing artefact and does not
+apply to values typed into Vercel). ② `R2_SCRATCH_BUCKET_NAME` must **never** be set on Production
+— and if it is ever set equal to `R2_BUCKET_NAME`, the app throws rather than quietly writing to
+the real bucket, by design.
+
+**Verification, once ④ is done** (this is R-1's remaining done-when): open the PR's preview URL,
+log in, confirm a chart cover renders, upload a new cover, and confirm the new object appears in the
+scratch bucket while the real bucket is unchanged. State the PR number and which image in the work
+log.

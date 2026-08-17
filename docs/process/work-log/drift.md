@@ -114,6 +114,34 @@ allow** at the same `/cleanup`; see Ruled below.)_
 _(Beth's rulings D-01–D-14, which set the process itself up, are in
 `WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
 
+### 2026-08-17 · D-15 and D-16 · what a preview deployment is allowed to touch — ruled during R-1
+
+**What happened.** R-1 opened on a ruled bucket question (read real, write scratch) and hit two
+things the ruling did not cover. First, a preview needs a _database_ before it can show any image
+at all, and nothing had ever said which one. Second, the settings a preview needs live in Beth's
+Cloudflare and Vercel accounts, and no session can reach them from this machine — no CLI, no
+stored credentials, no `.env.local` (checked). Both were put to her in-session.
+
+**D-15 — a preview reads a copy of the database, not the real one.** Previews get their own Neon
+branch: real charts, real numbers, honest review, and a click that edits or deletes something
+changes only the copy. Rejected: pointing Preview at the production database, because a preview is
+a working app — the same hazard the R2 ruling already refused for files, and there is no undo for a
+deleted chart. This is the database half of _read real, write scratch_, and the two together are
+now the documented shape of a preview (`docs/INTEGRATIONS.md`, Deployment topology).
+
+**D-16 — the keys stay with Beth; Claude writes the steps.** Asked whether to do the settings
+herself with an exact list, or hand over a Cloudflare token and a Vercel token so Claude could do
+all of it, Beth chose to do it herself. So the standing shape for infrastructure settings is:
+**Claude never holds credentials to the live site; it produces the numbered steps and verifies the
+result afterwards.** The cost is accepted — a session that needs a new environment variable stops
+and asks rather than setting it. Note this is not the same as the file/command contract (protocol
+§8): Beth is still never asked to edit a repo file or run a command, and dashboards are not that.
+
+**What happens after.** R-1's code half merges through `/review`; the settings list lives in
+`notes.md` tagged R-1; the preview clauses of R-1's done-when are demonstrated once Beth has done
+the dashboard pass. The open row above — _review layer 2 asks Beth to check a preview she cannot
+log into_ — stays open until then, and D-15/D-16 are what will close it.
+
 ### 2026-08-17 · Next.js may not co-author CLAUDE.md — ruled during P10
 
 **What happened.** The P10 security bump moved Next.js 16.2.4 → 16.3.1, and 16.3 ships a new

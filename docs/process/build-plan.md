@@ -204,7 +204,9 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
   with the display clamp unification.
 - **Folded in:** ledger rows — comment sweep, recharts named imports, `shadcn`→devDependencies,
   dead `NEXT_PUBLIC_APP_URL`, dependabot package-name fix, `.gitignore` settings.local.json,
-  the two placement oddities, the `R2_BUCKET_NAME` fallback throw (coordinate with R-1).
+  the two placement oddities. ~~the `R2_BUCKET_NAME` fallback throw~~ — **done in R-1
+  (2026-08-17)**: making the bucket lazy and required was the same edit as the read/write split, so
+  P11 inherits only the `/charts` dynamic-server half of the build-noise row.
 - **Traps:** honestly too big for one session if each fix sprouts discussion — apply the
   protocol §2 size check and split rather than marathon.
 - **Done-when:** each fix demonstrated (behavior fixes test-first; pure copy/config by
