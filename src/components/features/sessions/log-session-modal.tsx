@@ -30,6 +30,8 @@ export interface LogSessionModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   activeProjects: ActiveProjectForPicker[];
+  /** True when the project list failed to load, so an empty list must not read as "you have none" */
+  projectsUnavailable?: boolean;
   imageUrls: Record<string, string>;
   editSession?: EditSessionData | null;
   lockedProjectId?: string;
@@ -44,6 +46,7 @@ export function LogSessionModal({
   isOpen,
   onOpenChange,
   activeProjects,
+  projectsUnavailable = false,
   imageUrls,
   editSession,
   lockedProjectId,
@@ -261,7 +264,8 @@ export function LogSessionModal({
                 className="border-input flex h-8 w-full items-center justify-between rounded-lg border bg-transparent px-2.5 py-1 text-sm"
               >
                 <span className={selectedProject ? "text-foreground" : "text-muted-foreground"}>
-                  {selectedProject?.chartName ?? "Select a project..."}
+                  {selectedProject?.chartName ??
+                    (projectsUnavailable ? "Couldn't load your projects" : "Select a project...")}
                 </span>
                 <ChevronDown className="text-muted-foreground h-4 w-4 shrink-0" />
               </button>
@@ -321,8 +325,13 @@ export function LogSessionModal({
                       </button>
                     ))}
                     {filteredProjects.length === 0 && (
-                      <p className="text-muted-foreground px-3 py-4 text-center text-sm">
-                        No matching projects
+                      <p
+                        className="text-muted-foreground px-3 py-4 text-center text-sm"
+                        role="status"
+                      >
+                        {projectsUnavailable
+                          ? "Couldn't load your projects. Try refreshing the page."
+                          : "No matching projects"}
                       </p>
                     )}
                   </div>

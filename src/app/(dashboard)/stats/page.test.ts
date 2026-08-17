@@ -355,3 +355,65 @@ describe("StatsPage — calendar-date convention", () => {
     expect(mockGetMonthlyTotals).toHaveBeenCalledWith("user-123", 2026);
   });
 });
+
+describe("StatsPage — honest failure states", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRequireAuth.mockResolvedValue({ id: "user-123", name: "Test User" });
+    mockGetHeroStats.mockResolvedValue(mockHeroStats);
+    mockGetCollectionBreakdown.mockResolvedValue(mockCollectionBreakdown);
+    mockGetSizeBreakdown.mockResolvedValue(mockSizeBreakdown);
+    mockGetDesignerBreakdown.mockResolvedValue(mockDesignerBreakdown);
+    mockGetGenreBreakdown.mockResolvedValue(mockGenreBreakdown);
+    mockGetMonthlyTotals.mockResolvedValue(mockMonthlyTotals);
+    mockGetCalendarDays.mockResolvedValue(mockCalendarData);
+    mockGetSessionHistory.mockResolvedValue(mockSessionHistory);
+    mockGetPaceMetrics.mockResolvedValue(mockPaceMetrics);
+    mockGetDayOfWeekPattern.mockResolvedValue(mockDayOfWeekData);
+    mockGetPersonalBests.mockResolvedValue([]);
+    mockGetFastestCompletions.mockResolvedValue([]);
+    mockGetThreadInsights.mockResolvedValue([]);
+    mockGetDesignerInsights.mockResolvedValue([]);
+    mockGetGenreInsights.mockResolvedValue([]);
+    mockGetCompletionEstimates.mockResolvedValue([]);
+    mockParse.mockResolvedValue({ page: 1, sort: "date", dir: "desc", project: "all", status: [] });
+    mockFindMany.mockResolvedValue([]);
+  });
+
+  async function renderPage() {
+    const { default: StatsPage } = await import("./page");
+    return (await StatsPage({ searchParams: Promise.resolve({}) })) as {
+      props: {
+        activityContent: { props: { hasNoSessions: boolean } };
+        recordsContent: { props: { hasNoSessions: boolean } };
+      };
+    };
+  }
+
+  it("does not claim 'no sessions' on either tab when the hero-stats query fails", async () => {
+    mockGetHeroStats.mockRejectedValue(new Error("DB timeout"));
+
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const result = await renderPage();
+    spy.mockRestore();
+
+    expect(result.props.activityContent.props.hasNoSessions).toBe(false);
+    expect(result.props.recordsContent.props.hasNoSessions).toBe(false);
+  });
+
+  it("still claims 'no sessions' on both tabs for an account with zero sessions", async () => {
+    mockGetHeroStats.mockResolvedValue({ ...mockHeroStats, totalSessions: 0 });
+
+    const result = await renderPage();
+
+    expect(result.props.activityContent.props.hasNoSessions).toBe(true);
+    expect(result.props.recordsContent.props.hasNoSessions).toBe(true);
+  });
+
+  it("does not claim 'no sessions' for an account that has sessions", async () => {
+    const result = await renderPage();
+
+    expect(result.props.activityContent.props.hasNoSessions).toBe(false);
+    expect(result.props.recordsContent.props.hasNoSessions).toBe(false);
+  });
+});

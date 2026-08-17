@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, Activity, Hash, TrendingUp, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DataUnavailable } from "@/components/ui/data-unavailable";
 import { SessionTable } from "./session-table";
 import { LogSessionModal } from "./log-session-modal";
 import type {
@@ -16,8 +17,10 @@ import { formatCalendarDate } from "@/lib/utils/calendar-date";
 import type { CompletionEstimate } from "@/types/stats";
 
 interface ProjectSessionsTabProps {
-  sessions: StitchSessionRow[];
-  stats: ProjectSessionStats;
+  /** null when the session query failed -- distinct from [], which means "none logged yet" */
+  sessions: StitchSessionRow[] | null;
+  /** null when the stats query failed -- zeros would read as a project never stitched */
+  stats: ProjectSessionStats | null;
   imageUrls: Record<string, string>;
   activeProjects: ActiveProjectForPicker[];
   projectId: string;
@@ -89,6 +92,27 @@ export function ProjectSessionsTab({
     setModalOpen(true);
   };
 
+  if (sessions === null) {
+    return (
+      <div className="space-y-4">
+        <DataUnavailable label="This project's sessions" />
+        <div className="text-center">
+          <Button onClick={handleOpenLog}>
+            <Plus className="mr-1.5 size-4" />
+            Log Session
+          </Button>
+        </div>
+        <LogSessionModal
+          isOpen={modalOpen}
+          onOpenChange={setModalOpen}
+          activeProjects={activeProjects}
+          imageUrls={imageUrls}
+          lockedProjectId={projectId}
+        />
+      </div>
+    );
+  }
+
   const hasSessions = sessions.length > 0;
 
   // Empty state
@@ -113,40 +137,49 @@ export function ProjectSessionsTab({
     );
   }
 
-  const summaryStats: MiniStatCardProps[] = [
-    {
-      label: "TOTAL STITCHES",
-      value: stats.totalStitches.toLocaleString(),
-      icon: Activity,
-      mono: true,
-    },
-    {
-      label: "SESSIONS LOGGED",
-      value: String(stats.sessionsLogged),
-      icon: Hash,
-      mono: true,
-    },
-    {
-      label: "AVG PER SESSION",
-      value: stats.avgPerSession.toLocaleString(),
-      icon: TrendingUp,
-      mono: true,
-    },
-    {
-      label: "ACTIVE SINCE",
-      value: formatActiveSince(stats.activeSince),
-      icon: Calendar,
-      mono: false,
-    },
-  ];
+  const summaryStats: MiniStatCardProps[] | null =
+    stats === null
+      ? null
+      : [
+          {
+            label: "TOTAL STITCHES",
+            value: stats.totalStitches.toLocaleString(),
+            icon: Activity,
+            mono: true,
+          },
+          {
+            label: "SESSIONS LOGGED",
+            value: String(stats.sessionsLogged),
+            icon: Hash,
+            mono: true,
+          },
+          {
+            label: "AVG PER SESSION",
+            value: stats.avgPerSession.toLocaleString(),
+            icon: TrendingUp,
+            mono: true,
+          },
+          {
+            label: "ACTIVE SINCE",
+            value: formatActiveSince(stats.activeSince),
+            icon: Calendar,
+            mono: false,
+          },
+        ];
 
   return (
     <div>
-      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-        {summaryStats.map((stat) => (
-          <MiniStatCard key={stat.label} {...stat} />
-        ))}
-      </div>
+      {summaryStats !== null ? (
+        <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+          {summaryStats.map((stat) => (
+            <MiniStatCard key={stat.label} {...stat} />
+          ))}
+        </div>
+      ) : (
+        <div className="mb-6">
+          <DataUnavailable label="This project's session totals" />
+        </div>
+      )}
 
       {completionEstimate && (
         <div className="mb-6">

@@ -77,3 +77,27 @@ describe("StitchCountFields", () => {
     });
   });
 });
+
+describe("StitchCountFields — supply total failed to load", () => {
+  const props = {
+    stitchesWide: 100,
+    stitchesHigh: 100,
+    stitchCount: 10000,
+    onWidthChange: vi.fn(),
+    onHeightChange: vi.fn(),
+    onCountChange: vi.fn(),
+  };
+
+  it("says the supply total could not load rather than silently showing nothing", () => {
+    render(<StitchCountFields {...props} supplyStitchTotal={null} />);
+
+    expect(screen.getByText(/supply total couldn't load/i)).toBeInTheDocument();
+  });
+
+  it("stays silent when the project genuinely has no supplies", () => {
+    render(<StitchCountFields {...props} supplyStitchTotal={0} />);
+
+    expect(screen.queryByText(/supply total couldn't load/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/supply total:/i)).not.toBeInTheDocument();
+  });
+});

@@ -131,7 +131,7 @@ interface ChartMergedFormProps {
   unassignedFabrics: (Fabric & { brand: FabricBrand })[];
   mode?: "create" | "edit";
   initialData?: ChartWithProject;
-  initialSupplyStitchTotal?: number;
+  initialSupplyStitchTotal?: number | null;
 }
 
 export function ChartMergedForm({
@@ -547,7 +547,7 @@ export function ChartMergedForm({
               stitchesWide={form.values.stitchesWide}
               stitchesHigh={form.values.stitchesHigh}
               stitchCount={form.values.stitchCount}
-              supplyStitchTotal={isEdit ? (initialSupplyStitchTotal ?? 0) : supplyStitchTotal}
+              supplyStitchTotal={isEdit ? initialSupplyStitchTotal : supplyStitchTotal}
               onWidthChange={(v) => form.setField("stitchesWide", parseInt(v) || 0)}
               onHeightChange={(v) => form.setField("stitchesHigh", parseInt(v) || 0)}
               onCountChange={(v) => form.setField("stitchCount", parseInt(v) || 0)}

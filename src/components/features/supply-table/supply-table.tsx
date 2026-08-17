@@ -117,25 +117,32 @@ export function SupplyTable({
     }
   }, []);
 
+  // Resolves to whether the write landed, so the row can roll its optimistic value back
+  // instead of showing a number the server never accepted
   const handleUpdateQuantity = useCallback(
-    async (
+    (
       type: SupplyType,
       junctionId: string,
       field: "stitchCount" | "need" | "have",
       value: number,
-    ) => {
-      startTransition(async () => {
-        try {
-          const result = await adapter.updateQuantity(type, junctionId, field, value);
-          if (!result.success) {
-            toast.error(result.error ?? "Couldn't update value. Try again.");
+    ): Promise<boolean> =>
+      new Promise((resolve) => {
+        startTransition(async () => {
+          try {
+            const result = await adapter.updateQuantity(type, junctionId, field, value);
+            if (!result.success) {
+              toast.error(result.error ?? "Couldn't update value. Try again.");
+              resolve(false);
+              return;
+            }
+            resolve(true);
+          } catch (error) {
+            console.error("Update supply quantity failed:", error);
+            toast.error("Couldn't update value. Try again.");
+            resolve(false);
           }
-        } catch (error) {
-          console.error("Update supply quantity failed:", error);
-          toast.error("Couldn't update value. Try again.");
-        }
-      });
-    },
+        });
+      }),
     [adapter],
   );
 

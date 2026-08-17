@@ -22,11 +22,14 @@ interface ProjectDetailPageProps {
   chart: ChartWithProject;
   imageUrls: Record<string, string>;
   supplies: ProjectDetailProps["supplies"];
-  sessions: StitchSessionRow[];
-  sessionStats: ProjectSessionStats;
+  /** null when the query failed -- [] means the project genuinely has no sessions */
+  sessions: StitchSessionRow[] | null;
+  /** null when the query failed -- zeros would read as a project never stitched */
+  sessionStats: ProjectSessionStats | null;
   activeProjects: ActiveProjectForPicker[];
   completionEstimate?: CompletionEstimate | null;
-  fabricOptions?: FabricOption[];
+  /** null when the fabric query failed -- [] means no unassigned fabric to pick */
+  fabricOptions?: FabricOption[] | null;
 }
 
 export function ProjectDetailPage({
@@ -74,7 +77,7 @@ export function ProjectDetailPage({
           <OverviewTab
             chart={chartWithCurrentStatus}
             supplies={supplies}
-            sessionCount={sessions.length}
+            sessionCount={sessions?.length ?? null}
           />
         }
         suppliesContent={
@@ -82,7 +85,9 @@ export function ProjectDetailPage({
             <SuppliesTab
               project={project}
               supplies={supplies}
-              calculator={fabricOptions ? { fabricOptions, chartId: chart.id } : undefined}
+              calculator={
+                fabricOptions !== undefined ? { fabricOptions, chartId: chart.id } : undefined
+              }
             />
           ) : (
             <div className="text-muted-foreground py-12 text-center">

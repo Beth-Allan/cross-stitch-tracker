@@ -37,7 +37,7 @@ Two route groups plus an API segment:
 | `(dashboard)` | All app pages         | Auth-gated AppShell (sidebar + topbar) |
 | `api/`        | NextAuth handler only | None                                   |
 
-Pages are async Server Components. They fetch all data eagerly via `Promise.all()` or `Promise.allSettled()` (stats), then pass data as props to client components.
+Pages are async Server Components. They fetch all data eagerly via `Promise.all()` or `Promise.allSettled()`, then pass data as props to client components. **A page that guards a fetch degrades to `null`, never to `[]` or a zero** — the client component then renders `DataUnavailable` for that panel instead of an empty state that would read as "you have none" (item P6).
 
 Key routes:
 
@@ -90,7 +90,7 @@ Shadcn/Base UI component wrappers. No business logic. Key files:
 - `link-button.tsx` — Replaces the `Button render={<Link>}` pattern
 - `dialog.tsx`, `sheet.tsx`, `popover.tsx`, `dropdown-menu.tsx`, `command.tsx`, `tooltip.tsx`, `table.tsx`, `tabs.tsx`, `select.tsx`, `badge.tsx`, `card.tsx`
 - `chart.tsx` — Recharts wrapper
-- `empty-state.tsx`, `error-card.tsx` — Shared zero/failure states
+- `empty-state.tsx`, `error-card.tsx`, `data-unavailable.tsx` — Shared zero/failure states; `DataUnavailable` is the per-panel "couldn't load" card
 
 ### Layer 5: Server Actions (`src/lib/actions/`)
 
@@ -221,7 +221,7 @@ R2 key pattern: `{category}/{projectId}/{nanoid()}-{filename}` (categories: `cov
 - Each query accepts `userId`, uses `unstable_cache()` with a user-scoped key and the `"stats"` tag
 - Invalidated by `revalidateTag("stats", { expire: 0 })` from any mutation that moves a statistic
 - The stats page calls sixteen of them in one `Promise.allSettled()` for graceful degradation, then fetches its project picker list separately in its own try/catch
-- `settled<T>()` unwraps each result to `T | null`
+- `settled<T>()` unwraps each result to `T | null`, logging under a caller-supplied scope (`"stats"` by default; `/charts`, `/sessions`, the chart detail page and the dashboard shell pass their own)
 
 ## Key Abstractions
 

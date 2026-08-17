@@ -15,7 +15,8 @@ interface StitchCountFieldsProps {
   onWidthChange: (value: string) => void;
   onHeightChange: (value: string) => void;
   onCountChange: (value: string) => void;
-  supplyStitchTotal?: number;
+  /** null when the supply-total query failed -- 0 means the project genuinely has no supplies */
+  supplyStitchTotal?: number | null;
   errors?: {
     stitchesWide?: string;
     stitchesHigh?: string;
@@ -94,7 +95,9 @@ export function StitchCountFields({
             [
               errors?.stitchCount && "stitch-count-error",
               "stitch-count-hint",
-              supplyStitchTotal != null && supplyStitchTotal > 0 && "stitch-count-supply-hint",
+              supplyStitchTotal !== undefined &&
+                supplyStitchTotal !== 0 &&
+                "stitch-count-supply-hint",
             ]
               .filter(Boolean)
               .join(" ") || undefined
@@ -113,6 +116,11 @@ export function StitchCountFields({
               </span>
             )}
           </div>
+        )}
+        {supplyStitchTotal === null && (
+          <p id="stitch-count-supply-hint" className="text-muted-foreground mt-1.5 text-xs">
+            Supply total couldn&apos;t load. Try refreshing the page.
+          </p>
         )}
         {supplyStitchTotal != null && supplyStitchTotal > 0 && (
           <p id="stitch-count-supply-hint" className="text-muted-foreground mt-1.5 text-xs">

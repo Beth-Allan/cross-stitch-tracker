@@ -19,7 +19,7 @@ import type {
 interface SuppliesTabProps {
   project: NonNullable<ProjectDetailProps["chart"]["project"]>;
   supplies: NonNullable<ProjectDetailProps["supplies"]>;
-  calculator?: { fabricOptions: FabricOption[]; chartId: string };
+  calculator?: { fabricOptions: FabricOption[] | null; chartId: string };
 }
 
 function threadToSupplyRow(pt: ProjectThreadWithThread): SupplyRow {

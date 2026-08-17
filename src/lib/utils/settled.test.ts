@@ -47,6 +47,19 @@ describe("settled", () => {
     spy.mockRestore();
   });
 
+  it("logs under a caller-supplied scope so non-stats pages do not report as stats", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const result: PromiseSettledResult<number> = {
+      status: "rejected",
+      reason: new Error("db error"),
+    };
+
+    settled(result, "seriesData", "pattern-dive");
+
+    expect(spy).toHaveBeenCalledWith("[pattern-dive] seriesData failed:", "db error");
+    spy.mockRestore();
+  });
+
   it("handles non-Error rejection reasons", () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     const result: PromiseSettledResult<number> = {

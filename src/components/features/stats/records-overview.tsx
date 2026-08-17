@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { RecordsTable } from "./records-table";
 import { CompletionEstimatesSection } from "./completion-estimates-section";
-import { DataUnavailable } from "./data-unavailable";
+import { DataUnavailable } from "@/components/ui/data-unavailable";
 import type { PersonalBestRecord, FastestCompletion, CompletionEstimate } from "@/types/stats";
 
 interface RecordsOverviewProps {

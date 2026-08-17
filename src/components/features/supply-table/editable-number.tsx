@@ -17,6 +17,10 @@ import { useRejectionFlash } from "@/components/hooks/use-rejection-flash";
  *
  * Validates parseInt result is non-negative before calling onSave;
  * reverts on invalid input.
+ *
+ * The optimistic value is provisional: when onSave reports failure (resolves false or throws) it
+ * is rolled back, so the cell never shows a number the server refused. Only the newest save may
+ * roll back -- a slow failure from a superseded edit must not undo the one that was accepted.
  */
 export function EditableNumber({
   value,
@@ -25,7 +29,8 @@ export function EditableNumber({
   className,
 }: {
   value: number;
-  onSave: (value: number) => void;
+  /** Resolving false (or throwing) rolls the optimistic value back */
+  onSave: (value: number) => void | Promise<boolean>;
   ariaLabel: string;
   className?: string;
 }) {
@@ -34,6 +39,7 @@ export function EditableNumber({
   const [optimistic, setOptimistic] = useState<number | null>(null);
   const { showRejection, triggerRejection } = useRejectionFlash();
   const inputRef = useRef<HTMLInputElement>(null);
+  const latestSaveRef = useRef(0);
 
   // Clear optimistic value once the prop catches up
   useEffect(() => {
@@ -51,6 +57,26 @@ export function EditableNumber({
 
   const displayValue = optimistic ?? value;
 
+  function commit(num: number) {
+    const saveId = ++latestSaveRef.current;
+    setOptimistic(num);
+    const outcome = onSave(num);
+    if (!(outcome instanceof Promise)) return;
+    void outcome.then(
+      (saved) => {
+        if (saved === false) rollback(saveId);
+      },
+      () => rollback(saveId),
+    );
+  }
+
+  function rollback(saveId: number) {
+    if (saveId !== latestSaveRef.current) return;
+    setOptimistic(null);
+    setDraft(String(value));
+    triggerRejection();
+  }
+
   if (editing) {
     return (
       <input
@@ -62,8 +88,7 @@ export function EditableNumber({
         onBlur={() => {
           const num = parseInt(draft);
           if (!isNaN(num) && num >= 0) {
-            setOptimistic(num);
-            onSave(num);
+            commit(num);
           } else {
             setDraft(String(displayValue));
             triggerRejection();

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
-import { render, screen, fireEvent, act } from "@/__tests__/test-utils";
+import { render, screen, fireEvent, act, waitFor } from "@/__tests__/test-utils";
 import { EditableNumber } from "./editable-number";
 
 describe("EditableNumber", () => {
@@ -201,5 +201,123 @@ describe("EditableNumber", () => {
       const button = screen.getByRole("button", { name: "Qty" });
       expect(button).toHaveAttribute("aria-invalid", "true");
     });
+  });
+});
+
+describe("EditableNumber — optimistic save that fails", () => {
+  it("rolls back to the saved value when the save reports failure", async () => {
+    const onSave = vi.fn().mockResolvedValue(false);
+    render(<EditableNumber value={5} onSave={onSave} ariaLabel="Have" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Have" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Have" }), {
+      target: { value: "12" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
+
+    expect(screen.getByRole("button", { name: "Have" })).toHaveTextContent("12");
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Have" })).toHaveTextContent("5"),
+    );
+  });
+
+  it("rolls back when the save throws", async () => {
+    const onSave = vi.fn().mockRejectedValue(new Error("network down"));
+    render(<EditableNumber value={5} onSave={onSave} ariaLabel="Have" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Have" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Have" }), {
+      target: { value: "12" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Have" })).toHaveTextContent("5"),
+    );
+  });
+
+  it("flags the rolled-back cell as invalid so the revert is visible", async () => {
+    const onSave = vi.fn().mockResolvedValue(false);
+    render(<EditableNumber value={5} onSave={onSave} ariaLabel="Have" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Have" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Have" }), {
+      target: { value: "12" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Have" })).toHaveAttribute("aria-invalid", "true"),
+    );
+  });
+
+  it("keeps the optimistic value while a successful save is in flight", async () => {
+    const onSave = vi.fn().mockResolvedValue(true);
+    render(<EditableNumber value={5} onSave={onSave} ariaLabel="Have" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Have" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Have" }), {
+      target: { value: "12" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith(12));
+    expect(screen.getByRole("button", { name: "Have" })).toHaveTextContent("12");
+  });
+});
+
+describe("EditableNumber — overlapping saves", () => {
+  it("ignores a stale failure so it cannot clobber a newer accepted edit", async () => {
+    let rejectFirst: (value: boolean) => void = () => {};
+    const onSave = vi
+      .fn()
+      .mockImplementationOnce(() => new Promise<boolean>((res) => (rejectFirst = res)))
+      .mockResolvedValueOnce(true);
+
+    render(<EditableNumber value={5} onSave={onSave} ariaLabel="Have" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Have" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Have" }), {
+      target: { value: "12" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Have" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Have" }), {
+      target: { value: "20" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
+
+    await act(async () => {
+      rejectFirst(false);
+    });
+
+    const button = screen.getByRole("button", { name: "Have" });
+    expect(button).toHaveTextContent("20");
+    expect(button).not.toHaveAttribute("aria-invalid");
+  });
+
+  it("still rolls back when the latest save is the one that fails", async () => {
+    const onSave = vi.fn().mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+
+    render(<EditableNumber value={5} onSave={onSave} ariaLabel="Have" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Have" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Have" }), {
+      target: { value: "12" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Have" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Have" }), {
+      target: { value: "20" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Have" })).toHaveTextContent("5"),
+    );
   });
 });

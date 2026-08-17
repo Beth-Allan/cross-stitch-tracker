@@ -27,7 +27,8 @@ function formatDateOnly(date: Date | null | undefined): string {
 interface OverviewTabProps {
   chart: ProjectDetailProps["chart"];
   supplies: ProjectDetailProps["supplies"];
-  sessionCount: number;
+  /** null when the session query failed -- the auto-calculated note is then omitted, not faked */
+  sessionCount: number | null;
 }
 
 export function OverviewTab({ chart, supplies, sessionCount }: OverviewTabProps) {
@@ -64,7 +65,7 @@ export function OverviewTab({ chart, supplies, sessionCount }: OverviewTabProps)
             <DetailRow
               label="Completed"
               value={
-                sessionCount > 0 ? (
+                sessionCount !== null && sessionCount > 0 ? (
                   <span className="min-h-11 min-w-11 rounded px-1.5 py-0.5 font-mono tabular-nums">
                     {formatNumber(project.stitchesCompleted)} stitches
                   </span>
@@ -73,7 +74,7 @@ export function OverviewTab({ chart, supplies, sessionCount }: OverviewTabProps)
                 )
               }
             />
-            {sessionCount > 0 && (
+            {sessionCount !== null && sessionCount > 0 && (
               <p className="text-muted-foreground mt-0.5 ml-auto text-xs">
                 Auto-calculated from {sessionCount} session{sessionCount !== 1 ? "s" : ""}
               </p>
