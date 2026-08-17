@@ -227,7 +227,17 @@ apply to values typed into Vercel). ② `R2_SCRATCH_BUCKET_NAME` must **never** 
 — and if it is ever set equal to `R2_BUCKET_NAME`, the app throws rather than quietly writing to
 the real bucket, by design.
 
-**Beth's pass, started 2026-08-17.** Her screenshots corrected two things in this list, both now
+**Beth's pass COMPLETED 2026-08-17** — every variable verified from her dashboard screenshots. Final
+Preview state: the seven new Preview-only entries (`DATABASE_URL`, `DIRECT_URL`, `R2_ACCESS_KEY_ID`,
+`R2_SECRET_ACCESS_KEY`, `R2_SCRATCH_BUCKET_NAME`, `R2_SCRATCH_ACCESS_KEY_ID`,
+`R2_SCRATCH_SECRET_ACCESS_KEY`), plus five shared with Production (`AUTH_SECRET`,
+`AUTH_USER_EMAIL`, `AUTH_USER_PASSWORD_HASH`, `R2_ACCOUNT_ID`, `R2_BUCKET_NAME`). The two R2
+credential names each appear **twice with no overlap** — Production holds the live read-write pair,
+Preview holds key A. Cloudflare: scratch bucket created, two tokens scoped to specific buckets. Neon:
+`preview` branch off `production`, data and schema, auto-delete Never. **A deployment built before
+the variables existed cannot see them** — a preview must be rebuilt after this point to pick them up.
+
+**Beth's pass, as originally briefed 2026-08-17.** Her screenshots corrected two things in this list, both now
 fixed in the artifact: ① the Cloudflare token dialog defaults to **"Apply to all buckets in this
 account"** — both tokens want **"Apply to specific buckets only"** (key A → the real bucket, key B →
 the scratch bucket); ② Neon's new-branch dialog defaults **Auto-delete to "After 1 day"**, which
