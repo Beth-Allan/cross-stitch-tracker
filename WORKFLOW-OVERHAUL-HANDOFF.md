@@ -278,8 +278,28 @@ None. Pass 1's two open items were resolved 2026-08-16 at pass 2:
 
 ## 7. State of play
 
-**Done:** branch `chore/workflow-overhaul` created off `main`. Plan written. Two Fable review passes completed and folded in. Beth's rulings D-01–D-14 recorded. This handoff is current as of pass 2 (2026-08-16).
+**Done (pass 2, 2026-08-16):** branch `chore/workflow-overhaul` created off `main`. Plan written. Two Fable review passes completed and folded in. Beth's rulings D-01–D-14 recorded.
 
-**Not done:** no process files written, no rules reconciled, no migration performed, no Claude Design project created, no hooks installed, no `gate` script added.
+**Done (§3.7 step 1 — Foundation, 2026-08-16, Fable authoring + Opus mechanics):**
 
-**Next action:** a fresh session reads this document whole and starts §3.7 step 1 (Foundation).
+- `docs/process/session-protocol.md` written — the authority (§9 carries the D-14 context-budget and handoff rules).
+- `CLAUDE.md` rewritten, 539 → 142 lines, with a transition banner to delete when this branch merges. The old 999.x backlog and session log live only in git history until step 2 splits them into the ledger and backlog files.
+- `docs/process/security-checklist.md` written — five categories, repo-concrete, consulted by every review layer.
+- `npm run gate` added (`prisma generate → format:check → lint → tsc --noEmit → test → build`), husky pre-push now runs it, CI gained the `tsc --noEmit` step. Gate verified green end-to-end: 2448 tests, ~2.5 min.
+- `.claude/hooks/guard-git.sh` ported (deny messages renumbered to hard rules 1 + 6) and self-tested: blocks `--no-verify`, force-push, `--admin` merge; passes benign commands. `.claude/hooks/review-gated-paths.txt` written; all ten gated paths verified to exist.
+- `enforce_admins` flipped ON for main via the adolwyn-token API call (`"enabled": true` confirmed).
+
+**Parked from step 1 (one item):** wiring guard-git into `.claude/settings.json` (PreToolUse hook + the merge-command permissions allowlist). Claude Code's auto-mode permission classifier refuses every route to editing that file — correctly treating a session granting itself permissions as suspect; the horse-db parking doctrine applies (park, never force). **The next interactive session applies this edit first thing** — Beth approves the permission prompt when it appears; that is her only involvement. Target content: keep the existing `PostToolUse` and `enabledPlugins` blocks exactly as they are, and add:
+
+```json
+"permissions": { "allow": ["Bash(GH_TOKEN=$(gh auth token --user adolwyn) gh pr merge:*)"] },
+"hooks": { "PreToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-git.sh\"" }] }] }
+```
+
+Until that lands, guard-git exists but does not fire; branch protection (now admin-enforced) covers the server side.
+
+**Deferred by design:** `WORKFLOW-REFERENCE.md` (Beth's one-page card) is written at step 4 with the doors, since it is the list of words she can type.
+
+**Not done:** steps 2–5 (memory files, rules reconciliation, doors, migration — the stale `PostToolUse` commit-nag hook in `.claude/settings.json` is repointed at step 5) and working sessions 6–8.
+
+**Next action:** a fresh session reads this document whole, applies the parked settings.json edit, and starts §3.7 step 2 (Memory).
