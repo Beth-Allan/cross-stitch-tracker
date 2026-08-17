@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { collectionStatusConfig } from "@/lib/chart-configs";
+import { STATS_CACHE_STABLE } from "./utils";
 import type { ProjectStatus } from "@/generated/prisma/client";
 import type { CollectionBreakdownData, StatusBreakdownItem } from "@/types/stats";
 
@@ -42,6 +43,6 @@ async function computeCollectionBreakdown(userId: string): Promise<CollectionBre
 export function getCollectionBreakdown(userId: string) {
   return unstable_cache(() => computeCollectionBreakdown(userId), [`stats-collection-${userId}`], {
     tags: ["stats"],
-    revalidate: 3600,
+    revalidate: STATS_CACHE_STABLE,
   })();
 }

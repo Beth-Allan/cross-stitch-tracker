@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
@@ -15,6 +15,7 @@ export async function createGenre(formData: unknown) {
     const validated = genreSchema.parse(formData);
     const genre = await prisma.genre.create({ data: validated });
     revalidatePath("/genres");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, genre };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -44,6 +45,7 @@ export async function updateGenre(id: string, formData: unknown) {
     });
     revalidatePath("/genres");
     revalidatePath(`/genres/${id}`);
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, genre };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -84,6 +86,7 @@ export async function deleteGenre(id: string) {
 
     revalidatePath("/genres");
     revalidatePath("/charts");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     console.error("deleteGenre error:", error);

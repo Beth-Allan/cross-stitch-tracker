@@ -6,6 +6,7 @@ import {
   type SizeCategory,
 } from "@/lib/utils/size-category";
 import { sizeCategoryConfig } from "@/lib/chart-configs";
+import { STATS_CACHE_STABLE } from "./utils";
 import type { SizeBreakdownItem } from "@/types/stats";
 
 const CATEGORY_ORDER: SizeCategory[] = ["Mini", "Small", "Medium", "Large", "BAP"];
@@ -50,6 +51,6 @@ async function computeSizeBreakdown(userId: string): Promise<SizeBreakdownItem[]
 export function getSizeBreakdown(userId: string) {
   return unstable_cache(() => computeSizeBreakdown(userId), [`stats-size-${userId}`], {
     tags: ["stats"],
-    revalidate: 3600,
+    revalidate: STATS_CACHE_STABLE,
   })();
 }

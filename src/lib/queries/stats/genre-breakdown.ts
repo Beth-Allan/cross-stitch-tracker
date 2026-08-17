@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
+import { STATS_CACHE_STABLE } from "./utils";
 import type { GenreBreakdownItem } from "@/types/stats";
 
 async function computeGenreBreakdown(userId: string, limit: number): Promise<GenreBreakdownItem[]> {
@@ -40,6 +41,6 @@ export function getGenreBreakdown(userId: string, limit = 10) {
   return unstable_cache(
     () => computeGenreBreakdown(userId, limit),
     [`stats-genre-${userId}-${limit}`],
-    { tags: ["stats"], revalidate: 3600 },
+    { tags: ["stats"], revalidate: STATS_CACHE_STABLE },
   )();
 }

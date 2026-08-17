@@ -171,6 +171,7 @@ that item merges. Stage P items are in `docs/process/build-plan.md`.
   test failed on exactly this and is documented in `INTEGRATIONS.md`. Nothing in the gate could have
   caught it.
 - **Design track (D-1/DS-4)** — the `--status-*` dark-values row, as the row itself says.
+  | 2026-08-17 | `src/lib/actions/shopping-cart-actions.ts` — `updateSupplyAcquired` does not invalidate `"stats"` | **The same field, written from two actions, invalidates from only one.** `updateSupplyAcquired` writes `quantityAcquired` on all three junction tables; `supply-actions.updateProjectSupplyQuantity` writes the same field via `updateQuantitySchema` and calls `revalidateTag("stats", { expire: 0 })`. **Not a live bug:** P5 checked every stats query and none reads `quantityAcquired` (`thread-insights` is the only one touching a junction table, and it groups on `stitchCount`/`_count`), so nothing is stale today — which is why P5 left it rather than widening its own diff. It is an asymmetry that reads as a missing line, and it becomes real the day a stats query learns about acquisition. One line plus its per-mutation test (`.claude/rules/testing-requirements.md`). **Batch with P11.** The other four non-invalidating writers of stats-read models were checked and are genuinely not stats-visible: `series-actions` (unlinks `seriesId`), `storage-location-actions` and `stitching-app-actions` (null out their own FK on `Project`), `focal-point-actions` (chart focal-point coordinates) — no stats query reads any of those fields. | P5 (Opus 5) |
 
 ## Accepted
 

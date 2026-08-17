@@ -7,7 +7,7 @@ import {
   formatCalendarDate,
 } from "@/lib/utils/calendar-date";
 import { getUserTimezone, getTodayCalendarDate, getCurrentPeriod } from "./timezone";
-import { buildDateFilter, type Scope } from "./utils";
+import { buildDateFilter, type Scope, STATS_CACHE_VOLATILE, STATS_CACHE_STABLE } from "./utils";
 import type { CompletionEstimate } from "@/types/stats";
 
 const MIN_SESSIONS = 3;
@@ -92,7 +92,7 @@ async function computeCompletionEstimates(
 export function getCompletionEstimates(userId: string, scope: Scope) {
   const { year: currentYear } = getCurrentPeriod(getUserTimezone(userId));
   const year = parseInt(scope, 10);
-  const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;
+  const revalidate = !isNaN(year) && year < currentYear ? STATS_CACHE_STABLE : STATS_CACHE_VOLATILE;
 
   return unstable_cache(
     () => computeCompletionEstimates(userId, scope),

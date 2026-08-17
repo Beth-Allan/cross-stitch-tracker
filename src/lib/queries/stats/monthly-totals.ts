@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { parseCalendarDate } from "@/lib/utils/calendar-date";
 import { getUserTimezone, getCurrentPeriod } from "./timezone";
+import { STATS_CACHE_VOLATILE, STATS_CACHE_STABLE } from "./utils";
 import type { MonthlyTotal } from "@/types/stats";
 
 const MONTH_LABELS = [
@@ -55,7 +56,7 @@ async function computeMonthlyTotals(userId: string, year: number): Promise<Month
 
 export function getMonthlyTotals(userId: string, year: number) {
   const { year: currentYear } = getCurrentPeriod(getUserTimezone(userId));
-  const revalidate = year < currentYear ? 3600 : 300;
+  const revalidate = year < currentYear ? STATS_CACHE_STABLE : STATS_CACHE_VOLATILE;
 
   return unstable_cache(
     () => computeMonthlyTotals(userId, year),

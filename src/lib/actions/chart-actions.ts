@@ -134,6 +134,7 @@ export async function createChart(formData: unknown) {
     revalidatePath("/charts");
     revalidatePath("/series");
     revalidatePath("/fabric");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, chartId: created.id, warning: thumbnailWarning };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -213,6 +214,7 @@ export async function createChartWithSupplies(formData: unknown, supplyPayload: 
     revalidatePath("/charts");
     revalidatePath("/series");
     revalidatePath("/fabric");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, chartId: created.id, warning: thumbnailWarning };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -349,6 +351,7 @@ export async function updateChart(chartId: string, formData: unknown) {
     revalidatePath(`/charts/${chartId}`);
     revalidatePath("/series");
     revalidatePath("/fabric");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, warning: thumbnailWarning };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -374,6 +377,7 @@ export async function deleteChart(chartId: string) {
 
     await prisma.chart.delete({ where: { id: chartId } });
     revalidatePath("/charts");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     console.error("deleteChart error:", error);
@@ -528,6 +532,7 @@ export async function updateProjectSettings(chartId: string, formData: unknown) 
     });
 
     revalidatePath(`/charts/${chartId}`);
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     if (error instanceof z.ZodError) {

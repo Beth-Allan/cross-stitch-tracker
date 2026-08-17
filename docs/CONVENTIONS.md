@@ -118,14 +118,24 @@ A convention with real teeth, because getting it wrong ships stale numbers silen
 
 Every cached stats query in `src/lib/queries/stats/` splits in two: a private `computeX(userId)`
 holding the Prisma work, and an exported `getX(userId)` that wraps it in `unstable_cache` with a
-per-user key, `tags: ["stats"]`, and a `revalidate` window (300s for volatile figures, 3600s for
-slow-moving ones). `computeX` logs failures as `console.error("[stats] computeX failed:", …)` and
+per-user key, `tags: ["stats"]`, and a `revalidate` window. **The window is a named constant, never
+a number:** `STATS_CACHE_VOLATILE` (300s) or `STATS_CACHE_STABLE` (3600s) from `stats/utils.ts`,
+whose JSDoc carries the rule for which a new query picks — stable for the four collection-shape
+breakdowns and for any period already closed, volatile for everything else and whenever it is a
+close call. `computeX` logs failures as `console.error("[stats] computeX failed:", …)` and
 rethrows; the page layer degrades rather than crashing (`Promise.allSettled` + a `settled()`
 helper).
 
 **Any mutation that can move a statistic must call `revalidateTag("stats", { expire: 0 })`** —
-chart status changes, session logging, and the whole supply surface all do. A write that skips it
-leaves the stats page reporting yesterday. This layer is review-gated (below); its history is why.
+all chart and project writes, session logging, designers, genres, and the whole supply surface.
+A write that skips it leaves the stats page reporting yesterday. The TTL above is only the
+backstop; invalidation is what makes a number current.
+
+**And every one of those mutations carries a test asserting its own call** (Beth's ruling,
+2026-08-17, `docs/process/work-log/drift.md`). That per-mutation assertion — not a path gate — is
+what protects this layer on the writer side, because the failure mode is a mutation that never had
+the line, in a file no gate lists. The mechanics are in `.claude/rules/testing-requirements.md`.
+The reader side is review-gated (below); its history is why.
 
 ## Series
 

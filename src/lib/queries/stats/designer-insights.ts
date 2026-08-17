@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { resolveStatusFilter, type StatusGroup } from "@/lib/utils/status-groups";
+import { STATS_CACHE_VOLATILE } from "./utils";
 import type { DesignerInsight } from "@/types/stats";
 
 const COMPLETED_STATUSES = ["FINISHED", "FFO"] as const;
@@ -84,6 +85,6 @@ export function getDesignerInsights(userId: string, statusGroups: StatusGroup[],
   return unstable_cache(
     () => computeDesignerInsights(userId, statusGroups, limit),
     [`stats-designer-insights-${userId}-${cacheKey}-${limit}`],
-    { tags: ["stats"], revalidate: 300 },
+    { tags: ["stats"], revalidate: STATS_CACHE_VOLATILE },
   )();
 }

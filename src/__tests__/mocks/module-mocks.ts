@@ -31,5 +31,5 @@ export const MOCK_PATTERNS = {
   uploadActions: `vi.mock("@/lib/actions/upload-actions", () => ({ getPresignedUploadUrl: vi.fn() }))`,
   auth: `vi.mock("@/lib/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }))`,
   db: `vi.mock("@/lib/db", () => ({ prisma: mockPrisma }))`,
-  cache: `vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }))`,
+  cache: `vi.mock("next/cache", () => ({ revalidatePath: vi.fn(), revalidateTag: vi.fn() }))`,
 } as const;

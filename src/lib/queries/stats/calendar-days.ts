@@ -2,7 +2,7 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { toCalendarDate } from "@/lib/utils/calendar-date";
 import { getUserTimezone, getCurrentPeriod } from "./timezone";
-import { monthBounds } from "./utils";
+import { monthBounds, STATS_CACHE_VOLATILE, STATS_CACHE_STABLE } from "./utils";
 import type { CalendarDayData } from "@/types/stats";
 
 async function computeCalendarDays(
@@ -56,7 +56,7 @@ async function computeCalendarDays(
 export function getCalendarDays(userId: string, month: number, year: number) {
   const current = getCurrentPeriod(getUserTimezone(userId));
   const isCurrentMonth = month === current.month && year === current.year;
-  const revalidate = isCurrentMonth ? 300 : 3600;
+  const revalidate = isCurrentMonth ? STATS_CACHE_VOLATILE : STATS_CACHE_STABLE;
 
   return unstable_cache(
     () => computeCalendarDays(userId, month, year),

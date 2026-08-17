@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { resolveStatusFilter, type StatusGroup } from "@/lib/utils/status-groups";
+import { STATS_CACHE_VOLATILE } from "./utils";
 import type { ThreadInsight } from "@/types/stats";
 
 async function computeThreadInsights(
@@ -74,6 +75,6 @@ export function getThreadInsights(userId: string, statusGroups: StatusGroup[], l
   return unstable_cache(
     () => computeThreadInsights(userId, statusGroups, limit),
     [`stats-thread-insights-${userId}-${cacheKey}-${limit}`],
-    { tags: ["stats"], revalidate: 300 },
+    { tags: ["stats"], revalidate: STATS_CACHE_VOLATILE },
   )();
 }

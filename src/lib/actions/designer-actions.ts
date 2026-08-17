@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
@@ -15,6 +15,7 @@ export async function createDesigner(formData: unknown) {
     const validated = designerSchema.parse(formData);
     const designer = await prisma.designer.create({ data: validated });
     revalidatePath("/designers");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, designer };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -44,6 +45,7 @@ export async function updateDesigner(id: string, formData: unknown) {
     });
     revalidatePath("/designers");
     revalidatePath(`/designers/${id}`);
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const, designer };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -84,6 +86,7 @@ export async function deleteDesigner(id: string) {
 
     revalidatePath("/designers");
     revalidatePath("/charts");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     console.error("deleteDesigner error:", error);

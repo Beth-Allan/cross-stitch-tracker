@@ -50,40 +50,40 @@ describe("chart-actions auth guard", () => {
   });
 });
 
-describe("createChartWithSupplies", () => {
-  const validChartInput = {
-    chart: {
-      name: "Test Chart",
-      designerId: null,
-      coverImageUrl: null,
-      coverThumbnailUrl: null,
-      digitalFileUrl: null,
-      stitchCount: 5000,
-      stitchCountApproximate: false,
-      stitchesWide: 100,
-      stitchesHigh: 50,
-      genreIds: [],
-      isPaperChart: false,
-      isFormalKit: false,
-      isSAL: false,
-      kitColorCount: null,
-      notes: null,
-    },
-    project: {
-      status: "UNSTARTED",
-      storageLocationId: null,
-      stitchingAppId: null,
-      fabricId: null,
-      needsOnionSkinning: false,
-      startDate: null,
-      finishDate: null,
-      ffoDate: null,
-      wantToStartNext: false,
-      preferredStartSeason: null,
-      startingStitches: 0,
-    },
-  };
+const validChartInput = {
+  chart: {
+    name: "Test Chart",
+    designerId: null,
+    coverImageUrl: null,
+    coverThumbnailUrl: null,
+    digitalFileUrl: null,
+    stitchCount: 5000,
+    stitchCountApproximate: false,
+    stitchesWide: 100,
+    stitchesHigh: 50,
+    genreIds: [],
+    isPaperChart: false,
+    isFormalKit: false,
+    isSAL: false,
+    kitColorCount: null,
+    notes: null,
+  },
+  project: {
+    status: "UNSTARTED",
+    storageLocationId: null,
+    stitchingAppId: null,
+    fabricId: null,
+    needsOnionSkinning: false,
+    startDate: null,
+    finishDate: null,
+    ffoDate: null,
+    wantToStartNext: false,
+    preferredStartSeason: null,
+    startingStitches: 0,
+  },
+};
 
+describe("createChartWithSupplies", () => {
   beforeEach(async () => {
     // Reset all mocks (clears implementations + call counts) to prevent leaking
     vi.resetAllMocks();
@@ -347,7 +347,7 @@ describe("seriesId flow-through", () => {
   });
 });
 
-describe("updateChartStatus cache invalidation", () => {
+describe("chart-actions cache invalidation", () => {
   beforeEach(async () => {
     vi.resetAllMocks();
     const auth = await import("@/lib/auth");
@@ -356,7 +356,90 @@ describe("updateChartStatus cache invalidation", () => {
     });
   });
 
-  it("calls revalidateTag('stats') after successful status update", async () => {
+  it("createChart calls revalidateTag('stats') after successful creation", async () => {
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: unknown) => Promise<unknown>) => {
+        mockPrisma.chart.create.mockResolvedValueOnce({
+          id: "chart-new",
+          project: { id: "proj-new" },
+          designer: null,
+          genres: [],
+        });
+        return fn(mockPrisma);
+      },
+    );
+    const { createChart } = await import("./chart-actions");
+    const { revalidateTag } = await import("next/cache");
+
+    const result = await createChart(validChartInput);
+
+    assertSuccess(result);
+    expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+  });
+
+  it("createChartWithSupplies calls revalidateTag('stats') after successful creation", async () => {
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: unknown) => Promise<unknown>) => {
+        mockPrisma.chart.create.mockResolvedValueOnce({
+          id: "chart-new",
+          project: { id: "proj-new" },
+          designer: null,
+          genres: [],
+        });
+        return fn(mockPrisma);
+      },
+    );
+    const { createChartWithSupplies } = await import("./chart-actions");
+    const { revalidateTag } = await import("next/cache");
+
+    const result = await createChartWithSupplies(validChartInput, {
+      threads: [],
+      beads: [],
+      specialty: [],
+    });
+
+    assertSuccess(result);
+    expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+  });
+
+  it("updateChart calls revalidateTag('stats') after successful update", async () => {
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({
+      coverImageUrl: null,
+      coverThumbnailUrl: null,
+      project: { id: "proj-1", userId: "user-1" },
+    });
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: unknown) => Promise<unknown>) => {
+        mockPrisma.chart.update.mockResolvedValueOnce({
+          id: "chart-1",
+          project: { id: "proj-1" },
+        });
+        mockPrisma.fabric.findUnique.mockResolvedValueOnce(null);
+        return fn(mockPrisma);
+      },
+    );
+    const { updateChart } = await import("./chart-actions");
+    const { revalidateTag } = await import("next/cache");
+
+    const result = await updateChart("chart-1", validChartInput);
+
+    assertSuccess(result);
+    expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+  });
+
+  it("deleteChart calls revalidateTag('stats') after successful deletion", async () => {
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
+    mockPrisma.chart.delete.mockResolvedValueOnce({ id: "chart-1" });
+    const { deleteChart } = await import("./chart-actions");
+    const { revalidateTag } = await import("next/cache");
+
+    const result = await deleteChart("chart-1");
+
+    assertSuccess(result);
+    expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+  });
+
+  it("updateChartStatus calls revalidateTag('stats') after successful status update", async () => {
     mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
     mockPrisma.project.update.mockResolvedValueOnce({ id: "p1", status: "IN_PROGRESS" });
     const { updateChartStatus } = await import("./chart-actions");
@@ -364,7 +447,30 @@ describe("updateChartStatus cache invalidation", () => {
 
     const result = await updateChartStatus("chart-1", "IN_PROGRESS");
 
-    expect(result.success).toBe(true);
+    assertSuccess(result);
     expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+  });
+
+  it("updateProjectSettings calls revalidateTag('stats') after successful update", async () => {
+    mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+    mockPrisma.project.update.mockResolvedValueOnce({ id: "p1", strandCount: 2 });
+    const { updateProjectSettings } = await import("./chart-actions");
+    const { revalidateTag } = await import("next/cache");
+
+    const result = await updateProjectSettings("chart-1", { strandCount: 2 });
+
+    assertSuccess(result);
+    expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+  });
+
+  it("deleteChart does not invalidate when the chart is not owned", async () => {
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({ project: { userId: "someone-else" } });
+    const { deleteChart } = await import("./chart-actions");
+    const { revalidateTag } = await import("next/cache");
+
+    const result = await deleteChart("chart-1");
+
+    assertFailure(result);
+    expect(vi.mocked(revalidateTag)).not.toHaveBeenCalled();
   });
 });

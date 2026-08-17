@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
+import { STATS_CACHE_VOLATILE } from "./utils";
 import type { DayOfWeekData } from "@/types/stats";
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
@@ -37,6 +38,6 @@ async function computeDayOfWeekPattern(userId: string): Promise<DayOfWeekData[]>
 export function getDayOfWeekPattern(userId: string) {
   return unstable_cache(() => computeDayOfWeekPattern(userId), [`stats-dayofweek-${userId}`], {
     tags: ["stats"],
-    revalidate: 300,
+    revalidate: STATS_CACHE_VOLATILE,
   })();
 }
