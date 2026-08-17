@@ -30,38 +30,6 @@ words where possible. Rows are never deleted.
 
 ## Open — awaiting Beth's ruling
 
-### 2026-08-17 · review layer 2 asks Beth to check a preview she cannot log into — found during P10
-
-**What contradicts what.** `session-protocol.md` §5 layer 2 (and CLAUDE.md's summary of it) says a
-UI-touching PR is confirmed by Beth on its Vercel preview before merge — that is the stated safety
-valve on D-01, because merge deploys production instantly. **Preview deployments cannot
-authenticate.** Every preview returns HTTP 500 on `/api/auth/csrf`, `/api/auth/session` and
-`/api/auth/providers` (Auth.js's "problem with the server configuration"), while production returns
-200 on all three: the Vercel **Preview** environment is missing `AUTH_SECRET` and probably the rest
-of the auth vars. So the only page Beth can actually see on a preview is `/login`.
-
-**Pre-existing, not caused by P10** — verified two ways this session: previews built from code
-without the P10 diff fail identically, and the same endpoints return 200 locally the instant a
-secret is present. P10 only surfaced it, by being the first item that needed the preview for its
-own done-when.
-
-**Why it needs Beth.** Layer 2 is written into the process as a merge precondition. Either the
-preview environment gains the auth vars so layer 2 works as written, or layer 2 needs a different
-answer for anything behind the login (confirm in production after merge, with `git revert` as the
-undo, is the honest alternative — the recovery protocol already covers it).
-
-**Owner if it becomes work:** R-1, which already owns preview-deployment environment topology
-(bucket ruled read-real/write-scratch); setting the Preview auth vars belongs beside that.
-Maintenance-ledger row carries the evidence.
-
-**Ruling:** _open on the standing question._ **Interim precedent set 2026-08-17:** asked whether P10
-should merge with its "app demonstrated working" clause unmet, Beth ruled **merge now** — the
-advisories were live in production, every automated check was green, and `git revert` of the squash
-commit is a one-minute undo. So the working answer today is _signed-in surfaces are confirmed in
-production after merge, with revert as the safety valve_. That is a precedent for one low-risk case
-(no source change, dependencies only), **not** a general replacement for layer 2: a real UI change
-still has nowhere for Beth to preview it, which is why this row stays open.
-
 ### 2026-08-17 · P1 made `src/lib/validations/auth.ts` load-bearing for auth, and it is not review-gated
 
 **What contradicts what.** The review-gated list (`.claude/hooks/review-gated-paths.txt`, mirrored
@@ -113,6 +81,46 @@ allow** at the same `/cleanup`; see Ruled below.)_
 
 _(Beth's rulings D-01–D-14, which set the process itself up, are in
 `WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
+
+### 2026-08-17 · review layer 2 asked Beth to check a preview she could not log into — CLOSED by R-1
+
+**What contradicts what.** `session-protocol.md` §5 layer 2 (and CLAUDE.md's summary of it) says a
+UI-touching PR is confirmed by Beth on its Vercel preview before merge — that is the stated safety
+valve on D-01, because merge deploys production instantly. **Preview deployments cannot
+authenticate.** Every preview returns HTTP 500 on `/api/auth/csrf`, `/api/auth/session` and
+`/api/auth/providers` (Auth.js's "problem with the server configuration"), while production returns
+200 on all three: the Vercel **Preview** environment is missing `AUTH_SECRET` and probably the rest
+of the auth vars. So the only page Beth can actually see on a preview is `/login`.
+
+**Pre-existing, not caused by P10** — verified two ways this session: previews built from code
+without the P10 diff fail identically, and the same endpoints return 200 locally the instant a
+secret is present. P10 only surfaced it, by being the first item that needed the preview for its
+own done-when.
+
+**Why it needs Beth.** Layer 2 is written into the process as a merge precondition. Either the
+preview environment gains the auth vars so layer 2 works as written, or layer 2 needs a different
+answer for anything behind the login (confirm in production after merge, with `git revert` as the
+undo, is the honest alternative — the recovery protocol already covers it).
+
+**Owner if it becomes work:** R-1, which already owns preview-deployment environment topology
+(bucket ruled read-real/write-scratch); setting the Preview auth vars belongs beside that.
+Maintenance-ledger row carries the evidence.
+
+**CLOSED 2026-08-17 by R-1.** Previews now authenticate and show real data: Beth signed into PR
+#85's preview with her production credentials, saw her real chart covers, and uploaded a new one that
+landed in the scratch bucket while production's copy stayed put. **Layer 2 works as written for the
+first time** — a UI-touching PR can now be shown to Beth on its own preview before merge, which is
+what D-01's safety valve always assumed. The interim precedent below (confirm in production after
+merge, revert as the undo) is therefore spent, and stands only as the record of how one low-risk
+dependency PR shipped while the preview was blind.
+
+**Ruling:** _closed; the standing question is answered by D-15 and D-16._ **Interim precedent set 2026-08-17:** asked whether P10
+should merge with its "app demonstrated working" clause unmet, Beth ruled **merge now** — the
+advisories were live in production, every automated check was green, and `git revert` of the squash
+commit is a one-minute undo. So the working answer today is _signed-in surfaces are confirmed in
+production after merge, with revert as the safety valve_. That is a precedent for one low-risk case
+(no source change, dependencies only), **not** a general replacement for layer 2: a real UI change
+still has nowhere for Beth to preview it, which is why this row stays open.
 
 ### 2026-08-17 · D-15 and D-16 · what a preview deployment is allowed to touch — ruled during R-1
 

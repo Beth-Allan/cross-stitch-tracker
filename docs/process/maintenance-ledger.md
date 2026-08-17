@@ -161,7 +161,16 @@ that item merges. Stage P items are in `docs/process/build-plan.md`.
   change: the Cloudflare scratch bucket and the Vercel Preview variables do not exist yet, so a
   preview still cannot be logged into and the documented topology is intent, not fact. They close
   when the Preview environment actually holds its values. New row added above: nothing cleans up
-  the scratch bucket, by design.
+  the scratch bucket, by design. **Both halves done and verified the same day — 2026-08-17.** Beth
+  completed the settings pass in-session and the shape was demonstrated on PR #85's preview: signed
+  in, real covers rendered, a new cover uploaded to scratch, production's copy untouched. **Two rows
+  Resolved:** the deployment-topology row (documented _and_ now true) and the 2026-08-17
+  preview-cannot-log-in row (previews authenticate; review layer 2 works as written for the first
+  time). The build-noise row keeps only its `/charts` dynamic-server half. **One new fact for
+  whoever creates the next bucket:** a new R2 bucket refuses browser uploads until it has a CORS
+  policy, which the real bucket has had since April and a new bucket does not inherit — the upload
+  test failed on exactly this and is documented in `INTEGRATIONS.md`. Nothing in the gate could have
+  caught it.
 - **Design track (D-1/DS-4)** — the `--status-*` dark-values row, as the row itself says.
 
 ## Accepted

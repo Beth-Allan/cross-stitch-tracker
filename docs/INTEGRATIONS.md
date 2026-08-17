@@ -144,9 +144,8 @@ deliberately absent.
 - Pull requests get a Vercel preview deployment
 
 **Deployment topology** (2026-08-17, item R-1 — the 2026-08-16 ledger row asked for this to be
-written down rather than assumed). **The Preview row is the ruled intent, not yet the state:** its
-variables have not been set, so today a preview reaches no database and no bucket at all. Local and
-Production are current fact.
+written down rather than assumed). All three rows are current fact as of 2026-08-17,
+when the Preview environment was populated and verified.
 
 | surface        | code            | database                    | R2 reads         | R2 writes                |
 | -------------- | --------------- | --------------------------- | ---------------- | ------------------------ |
@@ -160,11 +159,27 @@ Production are current fact.
   branch, so a click in a preview cannot edit or delete a real chart — and R2 is **read real,
   write scratch**, so a preview shows the real photos but its uploads and deletes land in the
   scratch bucket. Both decisions exist because a preview is a working app, not a screenshot.
+- **Verified working end to end on 2026-08-17** (PR #85's preview): signed in with the production
+  credentials, real chart covers rendered from the real bucket, a new cover uploaded into the scratch
+  bucket, and the same chart in production still showed its original photo. Before that day no preview
+  had ever been loggable-into.
 - **Preview needs its own copy of every variable.** Vercel scopes environment variables per
   environment; a value set for Production only is simply absent on a preview. Until item R-1's
   settings half lands, the Preview environment has **none** of them, which is why preview
   deployments return HTTP 500 on `/api/auth/*` and cannot be logged into at all
   (maintenance-ledger row, 2026-08-17; verified against production, which returns 200).
+- **A new bucket refuses browser uploads until it has a CORS policy.** Uploads are the only R2
+  traffic the _browser_ makes — a presigned PUT via `fetch` — so they are the only path CORS governs;
+  covers render through `<img src>` and chart files open through `window.open`/an anchor, neither of
+  which is CORS-bound. The real bucket has carried a policy since April and a new bucket inherits
+  nothing, so the scratch bucket needs its own: `AllowedOrigins: ["*"]`, `AllowedMethods:
+["GET","PUT"]`, `AllowedHeaders: ["*"]`. **The wildcard origin is deliberate**, and it grants no
+  access: authorization is the 10-minute presigned URL signed with the scratch credentials, and CORS
+  only decides whether the browser is willing to send the request. An exact-origin list is not
+  workable because every pull request gets its own preview hostname. It belongs on the **scratch
+  bucket only** — the real bucket's policy is untouched by any of this. Found by testing the real
+  preview on 2026-08-17, not by any gate; R2 bucket configuration is not inspectable from the repo
+  (audit report §, 2026-08-17), so this is the record of it.
 - **The scratch bucket needs no CSP change — but not for the reason it looks like.** The AWS SDK
   addresses R2 **virtual-hosted style** (no `forcePathStyle` is set), so the bucket is the first
   label of the hostname: a presigned URL for the scratch bucket points at

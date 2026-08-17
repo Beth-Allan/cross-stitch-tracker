@@ -155,8 +155,12 @@ the skill appearing in the session's skills listing — rather than by the gate 
 
 **Tags:** R-1 · preview deployments · Vercel · Cloudflare R2 · Neon · D-15 · D-16 · layer 2
 
-**Consumed when** a preview URL can be logged into and shows a real chart cover, and the three
-ledger rows R-1 owns are Resolved.
+**CONSUMED 2026-08-17** — the settings pass is done and the shape is verified on PR #85's preview
+(signed in, real covers rendered, a new cover uploaded to scratch, production's copy untouched).
+`/cleanup` may retire this note: everything durable in it now lives in `docs/INTEGRATIONS.md`
+(topology, the CORS requirement, the credential split) and the work-log row. It is kept until then
+because it is the only place the _ordering_ of the dashboard steps is written down, which is what a
+rebuild of the Preview environment would need.
 
 **Beth's copy of this list** is a private artifact — a five-step checklist in her language, with
 the two hazards flagged: <https://claude.ai/code/artifact/b6538c58-ce8c-4d54-bdb8-31515242ac6b>
@@ -187,7 +191,15 @@ it as an upload-only failure). **So before R-1 merges, Production must be confir
 `R2_BUCKET_NAME` set to the real bucket's name.** That is a dashboard read, not a code question — it
 belongs to the `/review` session's checklist, and the PR says so.
 
-**② Cloudflare — one bucket, two tokens** (dash.cloudflare.com → R2):
+**② Cloudflare — one bucket, two tokens, one CORS policy** (dash.cloudflare.com → R2):
+
+- **The CORS policy is not optional and was missed on the first pass.** A new bucket refuses browser
+  uploads until it has one; the real bucket has carried one since April and a new bucket inherits
+  nothing. On the scratch bucket → Settings → CORS Policy: `AllowedOrigins: ["*"]`,
+  `AllowedMethods: ["GET","PUT"]`, `AllowedHeaders: ["*"]`. Takes effect immediately, no redeploy.
+  Reasoning for the wildcard is in `INTEGRATIONS.md`. **Symptom if forgotten:** the upload UI says
+  "Upload failed. Please try again." — which is reachable only _after_ the presign succeeds, so a
+  presign-side cause (missing variable, bad key) would have produced a different message.
 
 - Create a bucket in the same account as the real one, e.g. `cross-stitch-tracker-preview`.
 - Token A — **Object Read only**, scoped to the _real_ bucket. This becomes Preview's main
