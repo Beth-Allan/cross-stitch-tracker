@@ -30,7 +30,31 @@ words where possible. Rows are never deleted.
 
 ## Open — awaiting Beth's ruling
 
-_(Empty — every drift row to date was ruled at the 2026-08-17 `/cleanup`.)_
+### 2026-08-17 · review layer 2 asks Beth to check a preview she cannot log into — found during P10
+
+**What contradicts what.** `session-protocol.md` §5 layer 2 (and CLAUDE.md's summary of it) says a
+UI-touching PR is confirmed by Beth on its Vercel preview before merge — that is the stated safety
+valve on D-01, because merge deploys production instantly. **Preview deployments cannot
+authenticate.** Every preview returns HTTP 500 on `/api/auth/csrf`, `/api/auth/session` and
+`/api/auth/providers` (Auth.js's "problem with the server configuration"), while production returns
+200 on all three: the Vercel **Preview** environment is missing `AUTH_SECRET` and probably the rest
+of the auth vars. So the only page Beth can actually see on a preview is `/login`.
+
+**Pre-existing, not caused by P10** — verified two ways this session: previews built from code
+without the P10 diff fail identically, and the same endpoints return 200 locally the instant a
+secret is present. P10 only surfaced it, by being the first item that needed the preview for its
+own done-when.
+
+**Why it needs Beth.** Layer 2 is written into the process as a merge precondition. Either the
+preview environment gains the auth vars so layer 2 works as written, or layer 2 needs a different
+answer for anything behind the login (confirm in production after merge, with `git revert` as the
+undo, is the honest alternative — the recovery protocol already covers it).
+
+**Owner if it becomes work:** R-1, which already owns preview-deployment environment topology
+(bucket ruled read-real/write-scratch); setting the Preview auth vars belongs beside that.
+Maintenance-ledger row carries the evidence.
+
+**Ruling:** _open._
 
 ## Also open — the question known to be coming
 
