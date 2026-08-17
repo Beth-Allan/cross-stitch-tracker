@@ -7,7 +7,7 @@ deliberately absent.
 
 **Image Processing:**
 
-- sharp 0.34.5 - Server-side WebP conversion and thumbnail generation
+- sharp 0.35.3 - Server-side WebP conversion and thumbnail generation
   - Used in: `src/lib/actions/upload-actions.ts` (`processAndStoreImage`, `generateThumbnail`)
   - Not an external API; runs in-process on Vercel serverless functions
 
@@ -25,7 +25,7 @@ deliberately absent.
   - Connection (pooled app): `DATABASE_URL` env var — pooler hostname (`*-pooler.neon.tech`)
   - Connection (direct CLI): `DIRECT_URL` env var — direct hostname (`*.neon.tech`), supplied to
     the Prisma CLI by `prisma.config.ts`
-  - ORM/client: Prisma 7.7.0 with the `@prisma/adapter-neon` 7.7.0 driver adapter
+  - ORM/client: Prisma 7.9.1 with the `@prisma/adapter-neon` 7.9.1 driver adapter
   - Client singleton: `src/lib/db.ts` (lazy Proxy pattern; the client is not constructed until
     first property access, so module evaluation during build does not require `DATABASE_URL`)
   - Schema: `prisma/schema.prisma` (source of truth)
@@ -77,7 +77,7 @@ deliberately absent.
 
 **Auth Provider:**
 
-- Auth.js v5 (next-auth 5.0.0-beta.30) — single-user credentials-based authentication
+- Auth.js v5 (next-auth 5.0.0-beta.32) — single-user credentials-based authentication
   - Implementation: `src/lib/auth.ts`
   - Strategy: JWT sessions (30-day maxAge)
   - Provider: `Credentials` — email + bcrypt password hash from env vars

@@ -186,7 +186,7 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
 - **Done-when:** each listed surface bounded/paginated test-first; one migration carries the
   indexes + uniqueness; fresh `/review` for the schema half.
 
-### P10 Dependency patch session — **first in the queue**
+### P10 Dependency patch session
 
 - **Objective:** report §3 P10 — clear the 2 critical + 13 high advisories now. Mostly
   `npm audit fix`-clean; the auth/Next-adjacent pieces get hard-rule-8 care (Context7 /

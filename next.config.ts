@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Next 16.3 writes its own agent-rules block into CLAUDE.md on every `next dev`
+  // and re-adds it if removed. CLAUDE.md is this repo's process authority, so it
+  // stays ours to author — Beth's ruling, 2026-08-17. The block's advice (verify
+  // bleeding-edge APIs before use) is already hard rule 8.
+  agentRules: false,
+
   async headers() {
     return [
       {

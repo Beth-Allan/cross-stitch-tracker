@@ -33,7 +33,7 @@ into every session.
 
 **Core:**
 
-- Next.js 16.2.4 - Full-stack React framework with App Router; server components by default
+- Next.js 16.3.1 - Full-stack React framework with App Router; server components by default
 - React 19.2.5 - UI rendering
 - React DOM 19.2.5 - DOM bindings
 
@@ -56,12 +56,12 @@ into every session.
 
 **Testing:**
 
-- Vitest 3.1.1 - Test runner, `jsdom` environment, globals on (`vitest.config.ts`)
+- Vitest 3.2.7 - Test runner, `jsdom` environment, globals on (`vitest.config.ts`)
 - jsdom 29.0.2 - DOM implementation for the test environment
 - @testing-library/react 16.3.2 - Component rendering + assertions
 - @testing-library/user-event 14.6.1 - User interaction simulation
 - @testing-library/jest-dom 6.9.1 - DOM matchers
-- @vitest/coverage-v8 3.1.1 - Coverage via V8
+- @vitest/coverage-v8 3.2.7 - Coverage via V8
 - Setup file: `src/__tests__/setup.ts`. Test discovery: `src/**/*.test.ts(x)`, colocated with
   source. Coverage excludes `src/__tests__/**`, `src/generated/**`, test files, and
   `src/app/manifest.ts`
@@ -69,26 +69,27 @@ into every session.
 **Build/Dev:**
 
 - @vitejs/plugin-react 4.4.1 - Vite React plugin for Vitest
-- ESLint 9.39.4 + eslint-config-next 16.2.4 - Flat config
+- ESLint 9.39.4 + eslint-config-next 16.3.1 - Flat config
 - Prettier 3.8.3 + prettier-plugin-tailwindcss 0.7.2 - Formatting and Tailwind class ordering
-- tsx 4.21.0 - TypeScript execution, used by the Prisma seed script
+- tsx 4.23.12 - TypeScript execution, used by the Prisma seed script
 - Husky 9.1.7 - Git hooks (`pre-commit`: `lint-staged`; `pre-push`: `npm run gate`)
 - lint-staged 16.4.0 - Prettier on staged `ts,tsx,js,mjs,json,css,md`; `eslint --fix` on staged
   `ts,tsx`
-- Types: `@types/node` 20.19.37, `@types/react` 19.2.14, `@types/react-dom` 19.2.3,
+- Types: `@types/node` 22.20.1, `@types/react` 19.2.14, `@types/react-dom` 19.2.3,
   `@types/canvas-confetti` 1.9.0
 
 ## Key Dependencies
 
 **Critical:**
 
-- Prisma 7.7.0 (`prisma` CLI + `@prisma/client`) - ORM; schema at `prisma/schema.prisma`,
+- Prisma 7.9.1 (`prisma` CLI + `@prisma/client`) - ORM; schema at `prisma/schema.prisma`,
+- **One dependency override lives in `package.json`:** `@prisma/config` → `deepmerge-ts` `8.0.1`. `@prisma/config` pins `7.1.5`, which carries a high advisory, and npm's only alternative was a backwards major on `prisma`. Scoped so it cannot leak; remove it once `@prisma/config` declares `>=8` itself (maintenance-ledger row carries the condition).
   generated client output to `src/generated/prisma/`
-- `@prisma/adapter-neon` 7.7.0 - Neon serverless PostgreSQL driver adapter, constructed by
+- `@prisma/adapter-neon` 7.9.1 - Neon serverless PostgreSQL driver adapter, constructed by
   `PrismaClient` in `src/lib/db.ts`. The adapter has been GA since Prisma 6.16.0; under Prisma 7
   the connection string is supplied by `prisma.config.ts` for the CLI and by the adapter at
   runtime, never by a `url` field in `schema.prisma`
-- next-auth 5.0.0-beta.30 - Authentication (Auth.js v5 beta); credentials provider + JWT
+- next-auth 5.0.0-beta.32 - Authentication (Auth.js v5 beta); credentials provider + JWT
   strategy; see `src/lib/auth.ts`
 - Zod 3.24.4 - Schema validation at all server action and API boundaries. This is Zod **v3**;
   v4-only APIs are not available
@@ -116,9 +117,9 @@ into every session.
 - next-themes 0.4.6 - Light/dark theme switching via `src/components/theme-provider.tsx`
 - canvas-confetti 1.9.4 - Confetti animation on personal bests in
   `src/components/features/stats/record-celebration.tsx`
-- nanoid 5.1.9 - Random ID generation for R2 object keys
+- nanoid 5.1.16 - Random ID generation for R2 object keys
 - bcryptjs 3.0.3 - Password hash comparison in `src/lib/auth.ts`
-- sharp 0.34.5 - Server-side image optimization in `src/lib/actions/upload-actions.ts` (resizes
+- sharp 0.35.3 - Server-side image optimization in `src/lib/actions/upload-actions.ts` (resizes
   uploads to WebP before storing in R2), and PWA icon generation in `scripts/generate-icons.mjs`
 
 **Fonts (Google Fonts via `next/font`):**

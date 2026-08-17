@@ -11,7 +11,7 @@ This project uses cutting-edge versions. Training data may be WRONG for these.
 | Library | Version | Risk |
 |---------|---------|------|
 | Next.js | 16 | New App Router behaviors |
-| Auth.js | v5 beta.30 | Session API changed from v4 |
+| Auth.js | v5 beta.32 | Session API changed from v4 |
 | shadcn/ui | v4 (Base UI) | Switched from Radix — different component APIs |
 | Tailwind | v4 | New config model, @custom-variant, CSS-first |
 | Prisma | 7 | New import paths, config format |
