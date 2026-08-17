@@ -23,6 +23,8 @@ Browser
 
 Root-level `proxy.ts` is Next.js 16's rename of middleware. It re-exports Auth.js's `auth` as `proxy`; the matcher excludes `api/auth`, `_next/static`, `_next/image`, `favicon.ico`, `icon-*.png`, and `manifest.webmanifest`. Every other request passes the session check here **before** routing. The `(dashboard)` layout's `redirect("/login")` is the second gate, not the only one.
 
+**Two parts, and both are load-bearing.** The matcher decides which requests reach the fence; the `authorized` callback in `src/lib/auth.ts` decides what the fence does with them — public paths (`/login`) pass, everything else needs `auth.user`, and an unauthorized request is redirected to the sign-in page. Without that callback Auth.js defaults `authorized` to `true`, so the middleware fetches the session and discards the answer and every route passes (the state this file described until item P1, 2026-08-17). Anything added to the matcher's exclusion list, or to the callback's public set, is unauthenticated from then on.
+
 ### Layer 1: Routing / Pages (`src/app/`)
 
 Two route groups plus an API segment:
@@ -132,10 +134,10 @@ Caching: `unstable_cache` keyed per user, tagged `"stats"`, invalidated by `reva
 
 ### Layer 9: Auth
 
-- `proxy.ts` — The edge gate (Layer 0)
-- `src/lib/auth.ts` — NextAuth v5 config; single-user credentials from env vars; JWT strategy, 30-day session; `jwt`/`session` callbacks thread `user.id` through
+- `proxy.ts` — The edge gate (Layer 0); the matcher only, with the decision in `auth.ts`'s `authorized` callback
+- `src/lib/auth.ts` — NextAuth v5 config; single-user credentials from env vars; JWT strategy, 30-day session; `jwt`/`session` callbacks thread `user.id` through; `authorized` is the outer fence's decision; `authorizeCredentials` is the one point both login entry paths pass through, so it carries the rate limit and rejects a missing or mangled `AUTH_USER_*` by throwing rather than reporting bad credentials
 - `src/lib/auth-guard.ts` — `requireAuth()`: single enforcement function called by every server action
-- `src/lib/rate-limit.ts` — In-memory rate limiter (5 attempts, 30s cooldown)
+- `src/lib/rate-limit.ts` — In-memory rate limiter (5 attempts, 30s cooldown). `recordAttempt()` enforces and is called only from `authorizeCredentials`; `peekRateLimit()` reads without consuming, so the login form can name the wait
 
 ### Layer 10: Validations (`src/lib/validations/`)
 
