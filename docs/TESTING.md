@@ -32,7 +32,7 @@ excuse for pushing red.
 
 ## What exists
 
-**211 test files · 2448 tests · no E2E** (no Playwright, no Cypress). The numbers go stale; the
+**216 test files · 2511 tests · no E2E** (no Playwright, no Cypress). The numbers go stale; the
 suite footer does not. Run `npm test` and read the last line rather than trusting this paragraph.
 
 | Area                       | Files   |
@@ -43,14 +43,14 @@ suite footer does not. Run `npm test` and read the last line rather than trustin
 | `src/lib/utils/`           | 11      |
 | `src/lib/validations/`     | 5       |
 | `src/types/`               | 3       |
-| `src/lib/` (root)          | 2       |
+| `src/lib/` (root)          | 5       |
 | `src/components/ui/`       | 2       |
-| `src/__tests__/`           | 2       |
+| `src/__tests__/`           | 3       |
 | `src/components/shell/`    | 1       |
 | `src/components/hooks/`    | 1       |
 | `src/components/` (root)   | 1       |
-| `src/app/`                 | 1       |
-| **Total**                  | **211** |
+| `src/app/`                 | 2       |
+| **Total**                  | **216** |
 
 Inside `src/components/features/`, the weight sits in `stats/` (26), `supply-table/` (15),
 `charts/project-detail/` (15), `charts/` (15), `gallery/` (12), `dashboard/` (11),

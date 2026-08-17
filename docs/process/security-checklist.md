@@ -28,10 +28,15 @@ gate-config change (drift, session-protocol §6).
 
 ## 2. Access control
 
-- [ ] **`proxy.ts` still gates the routes it should.** It is the app's outer fence — Next.js 16's
-      middleware rename, re-exporting Auth.js's `auth` with a matcher that excludes `api/auth`,
-      `_next/*`, icons and the manifest. Anything added to that exclusion list is unauthenticated
-      from then on, and nothing else in the app will say so. Review-gated.
+- [ ] **The outer fence still gates the routes it should.** It is two files, and both are
+      load-bearing: `proxy.ts` — Next.js 16's middleware rename, re-exporting Auth.js's `auth`
+      with a matcher that excludes `api/auth`, `_next/*`, icons and the manifest — decides which
+      requests reach the fence, and the **`authorized` callback in `src/lib/auth.ts`** decides
+      what happens to them. Auth.js defaults `authorized` to `true`, so a fence missing that
+      callback passes every request while looking exactly like a working one (the defect item P1
+      closed). Anything added to the matcher's exclusion list **or** to the callback's public-path
+      set is unauthenticated from then on, and nothing else in the app will say so. Both
+      review-gated.
 - [ ] Every server action and API route calls `requireAuth()` from `@/lib/auth-guard` and
       checks `user.id` exists. Fallback IDs (`user.id ?? "1"`) are banned. No local copies of
       the guard.
@@ -44,7 +49,12 @@ gate-config change (drift, session-protocol §6).
 - [ ] The Auth.js v5 JWT/session callbacks in `src/lib/auth.ts` stay intact —
       `session.user.id` threading is load-bearing (`.claude/rules/auth-patterns.md`); without
       it `requireAuth()` rejects everything. The file is review-gated.
-- [ ] Rate limiting (`src/lib/rate-limit.ts`) still covers login; any new public or
+- [ ] Rate limiting (`src/lib/rate-limit.ts`) still covers login **at `authorizeCredentials`**,
+      not at a caller. The Credentials provider is reachable both through the login form action
+      and directly at `POST /api/auth/callback/credentials`, which the matcher must exclude, so a
+      limit applied anywhere but inside `authorize()` leaves the second path unthrottled (the
+      defect item P1 closed). `recordAttempt()` is the enforcing call and belongs there alone;
+      `peekRateLimit()` is read-only and may be called for messaging. Any new public or
       unauthenticated endpoint is considered for it.
 
 ## 3. Inputs & data

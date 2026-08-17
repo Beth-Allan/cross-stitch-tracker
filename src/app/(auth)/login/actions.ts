@@ -1,7 +1,7 @@
 "use server";
 
 import { signIn } from "@/lib/auth";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { peekRateLimit } from "@/lib/rate-limit";
 import { loginSchema } from "@/lib/validations/auth";
 import { AuthError } from "next-auth";
 
@@ -19,8 +19,10 @@ export async function loginAction(
     return { error: parsed.error.errors[0].message };
   }
 
-  // Rate limit check BEFORE signIn so the message reaches the user directly
-  const rateCheck = checkRateLimit(parsed.data.email);
+  // Read-only. The enforcing call is `recordAttempt` inside `authorizeCredentials`,
+  // which is the one point both login entry paths pass through; this only lets the
+  // form name the wait instead of returning the generic failure.
+  const rateCheck = peekRateLimit(parsed.data.email);
   if (!rateCheck.allowed) {
     return {
       error: `Too many attempts. Try again in ${rateCheck.retryAfter} seconds.`,
@@ -39,6 +41,14 @@ export async function loginAction(
       console.error("Auth error:", error.type, error.message);
       if (error.type === "CredentialsSignin") {
         return { error: "Invalid credentials" };
+      }
+      // Everything `authorize()` throws arrives here — a missing or mangled
+      // AUTH_USER_* value above all. Say so: a broken deploy must not read as a
+      // mistyped password.
+      if (error.type === "CallbackRouteError") {
+        return {
+          error: "Sign-in is unavailable — a server setting is wrong. This isn't your password.",
+        };
       }
       return { error: "Something went wrong" };
     }

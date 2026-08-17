@@ -15,14 +15,19 @@
 
 # Auth, session, and rate limiting — the mechanisms AND the routes that apply them.
 # The route group and the API segment are gated as directories, per the lesson above:
-# login/actions.ts is the only checkRateLimit caller, and a sibling added beside it
-# would otherwise arrive ungated.
+# a sibling added beside login/actions.ts would otherwise arrive ungated. (Since
+# item P1, 2026-08-17, the rate limit is enforced in auth.ts's authorizeCredentials
+# — the one point both login entry paths share — and login/actions.ts only peeks.)
 ^proxy\.ts$
 ^src/lib/auth\.ts$
 ^src/lib/auth-guard\.ts$
 ^src/lib/rate-limit\.ts$
 ^src/app/\(auth\)/
 ^src/app/api/auth/
+# Added 2026-08-17 by Beth's ruling after P1: loginSchema is parsed at
+# authorizeCredentials, so this file carries the cap that bounds the rate-limiter
+# key and the normalization that makes both login entry paths match identically.
+^src/lib/validations/auth\.ts$
 
 # The math (skein + fabric calculators)
 ^src/lib/utils/skein-calculator\.ts$
