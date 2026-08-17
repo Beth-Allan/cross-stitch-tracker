@@ -68,6 +68,7 @@ docs/
 │   ├── build-plan.md          # Per-item briefs: objective, specs, traps, done-when
 │   ├── work-log.md            # Front door: Up-next queue, built, in flight, awaiting review
 │   ├── work-log/              # drift.md, notes.md, backlog.md
+│   ├── work-log-archive.md    # Sealed stages, moved verbatim; history, not authority
 │   ├── maintenance-ledger.md  # Pre-existing warts; noticing one obliges logging it
 │   └── security-checklist.md  # What the delegated auto-review checks
 ├── domain/                    # Cross-stitch knowledgebase — /stitch-fact is the only

@@ -38,12 +38,14 @@ for what is left. Four things step 2 discovered that the handoff does not say:
   The prediction held and then some: `component-implementation.md` needed a wording fix, and so
   did `server-actions.md`, which carried the identical inaccurate claim. Six rule files changed
   in total, not four.
-- **The branch owes a layer-1 auto-review before it merges, and nobody has run one yet.** Steps
-  1–3 pushed straight to `chore/workflow-overhaul` with no PR — correct, since the branch merges
-  once at step 5 — but that means protocol §5 layer 1 (delegated independent review of the full
-  diff) has never run on any of it. **Step 5 opens the PR and must run that review over the whole
-  branch diff**, not just step 5's own commits. Merge deploys production; this is the only review
-  layer standing between four steps of process rewrites and main.
+- **~~The branch owes a layer-1 auto-review before it merges.~~ Paid, 2026-08-16 (step 5).** Two
+  independent passes over the whole five-step diff — one on operations and security, one on
+  coherence and honesty — both returning _merge with fixes_. They earned their keep: a live hole
+  in the guard hook (the hook-bypass flag was never blocked on `push`) and five false claims in
+  the freshly refreshed docs, one of which would have told a future session that deleting an
+  ownership check was correct. Fixes in `6c6cc1b`; full record in
+  `docs/process/work-log-archive.md`. **The lesson worth keeping: the review found more in the
+  documents this branch had just rewritten than in the four steps of process it was aimed at.**
 - **~~`.review-prompt.txt` is untracked in the repo root.~~ Decided at step 5, 2026-08-16:
   archived**, to `docs/archive/workflow-overhaul-review-prompt.txt`. It is the brief Beth
   commissioned the overhaul's second review with — the framing that produced §4b's findings, and
