@@ -54,7 +54,13 @@ undo, is the honest alternative — the recovery protocol already covers it).
 (bucket ruled read-real/write-scratch); setting the Preview auth vars belongs beside that.
 Maintenance-ledger row carries the evidence.
 
-**Ruling:** _open._
+**Ruling:** _open on the standing question._ **Interim precedent set 2026-08-17:** asked whether P10
+should merge with its "app demonstrated working" clause unmet, Beth ruled **merge now** — the
+advisories were live in production, every automated check was green, and `git revert` of the squash
+commit is a one-minute undo. So the working answer today is _signed-in surfaces are confirmed in
+production after merge, with revert as the safety valve_. That is a precedent for one low-risk case
+(no source change, dependencies only), **not** a general replacement for layer 2: a real UI change
+still has nowhere for Beth to preview it, which is why this row stays open.
 
 ## Also open — the question known to be coming
 
