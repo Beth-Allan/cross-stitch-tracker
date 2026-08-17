@@ -133,7 +133,6 @@ describe("the attempt store", () => {
   });
 
   it("drops keys whose cooldown has expired rather than holding them forever", () => {
-    const before = trackedKeyCount();
     for (let i = 0; i < MAX_TRACKED_KEYS; i++) {
       recordAttempt(`stale-${i}@example.com`);
     }
@@ -141,6 +140,9 @@ describe("the attempt store", () => {
     vi.advanceTimersByTime(30_000 + 1);
     recordAttempt("one-more@example.com");
 
-    expect(trackedKeyCount()).toBeLessThan(before + MAX_TRACKED_KEYS);
+    // Every stale key is past its cooldown here. Without the expiry purge, the
+    // eviction loop would still trim the store to exactly MAX_TRACKED_KEYS, so
+    // only landing below the cap proves expired keys are dropped, not displaced.
+    expect(trackedKeyCount()).toBeLessThan(MAX_TRACKED_KEYS);
   });
 });
