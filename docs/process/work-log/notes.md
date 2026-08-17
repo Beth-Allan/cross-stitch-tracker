@@ -36,6 +36,12 @@ for what is left. Four things step 2 discovered that the handoff does not say:
   The prediction held and then some: `component-implementation.md` needed a wording fix, and so
   did `server-actions.md`, which carried the identical inaccurate claim. Six rule files changed
   in total, not four.
+- **The branch owes a layer-1 auto-review before it merges, and nobody has run one yet.** Steps
+  1–3 pushed straight to `chore/workflow-overhaul` with no PR — correct, since the branch merges
+  once at step 5 — but that means protocol §5 layer 1 (delegated independent review of the full
+  diff) has never run on any of it. **Step 5 opens the PR and must run that review over the whole
+  branch diff**, not just step 5's own commits. Merge deploys production; this is the only review
+  layer standing between four steps of process rewrites and main.
 - **`.review-prompt.txt` is untracked in the repo root** and was already there before step 2. It
   is not referenced by anything the overhaul writes. Step 5 should decide: archive it or delete
   it — but look at it first.
