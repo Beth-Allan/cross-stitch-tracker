@@ -62,7 +62,7 @@ first one has actually run.
 
 ---
 
-## Stage O — the workflow overhaul · **sealed 2026-08-17**
+## Stage O — the workflow overhaul · **sealed 2026-08-16**
 
 Five steps, replacing the dead GSD references with a working process: the protocol and gates, the
 memory layer, the rules reconciliation, the eleven doors, and the migration. Merged as `99c9ffd`

@@ -320,6 +320,6 @@ Until that lands, guard-git exists but does not fire; branch protection (now adm
 
 **~~Deferred by design:~~ Done at step 4, 2026-08-16.** `WORKFLOW-REFERENCE.md` (Beth's one-page card) was written with the doors, since it is the list of words she can type.
 
-**Not done _at the time §7 was written_ (steps 1–5 have all since landed; see the §0 banner):** step 5 (migration — the stale `PostToolUse` commit-nag hook in `.claude/settings.json` is repointed there, and inherits the block above) and working sessions 6–8. Steps 3 and 4 landed on 2026-08-16; their notes are in the work log's Stage O table, not here.
+**Not done _at the time §7 was written_ (steps 1–5 have all since landed; see the §0 banner):** step 5 (migration — the stale `PostToolUse` commit-nag hook in `.claude/settings.json` is repointed there, and inherits the block above) and working sessions 6–8. Steps 3 and 4 landed on 2026-08-16; their notes are in `docs/process/work-log-archive.md`, where the Stage O table moved when the stage sealed, not here.
 
 **Next action _as recorded then_ (done — step 5 landed 2026-08-16 and opened PR #72):** a fresh session does §3.7 step 5 (migration), then opens the PR that merges this branch — including the layer-1 review it owes over the whole branch diff (`work-log/notes.md`). Its brief is queue row 1 of `docs/process/work-log.md` — **read the work log first now, not this document.** This §7 is no longer the memory; it is kept only so the earlier steps' record stays with the plan that specified them.
