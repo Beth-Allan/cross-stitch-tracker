@@ -269,9 +269,16 @@
 - **Phase 39 shipped** — PR #65 created and merged, 6-agent review completed, all findings fixed, 2448 tests passing
   - Fixed: WR-01 unnecessary onClick arrow wrappers in storage/app lists, WR-02 unsafe StrandCount cast → isStrandCount guard in calculator-card, WR-03 redundant overCount WHAT-comments removed
 
+### Done This Session (2026-08-16)
+
+- **Workflow overhaul review pass 2 completed and folded in** — `WORKFLOW-OVERHAUL-HANDOFF.md` updated and committed on `chore/workflow-overhaul`
+  - Beth's rulings D-09–D-14 recorded (audit-first sequencing, Phase 40/41 dissolved, per-PR auto-review, domain knowledgebase, preview-before-merge, context budget)
+  - New stages added: whole-codebase audit (CQ-1 analogue) + wart burn-down before the design track
+  - No open decisions remain; nothing implemented yet
+
 ### Next Up — RESUME HERE
 
-1. `/gsd-discuss-phase 40` — Gather context for Phase 40 (Visual & Layout Polish)
+1. Read `WORKFLOW-OVERHAUL-HANDOFF.md` whole and start its §3.7 step 1 (Foundation). GSD is gone — do not run any `/gsd-*` command; Phases 40/41 are dissolved per handoff D-10.
 
 ### Backlog
 
