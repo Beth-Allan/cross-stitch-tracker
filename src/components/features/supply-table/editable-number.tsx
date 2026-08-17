@@ -17,6 +17,9 @@ import { useRejectionFlash } from "@/components/hooks/use-rejection-flash";
  *
  * Validates parseInt result is non-negative before calling onSave;
  * reverts on invalid input.
+ *
+ * The optimistic value is only ever a promise: when onSave reports failure (resolves false or
+ * throws) it is rolled back, so the cell never shows a number the server refused.
  */
 export function EditableNumber({
   value,
@@ -25,7 +28,8 @@ export function EditableNumber({
   className,
 }: {
   value: number;
-  onSave: (value: number) => void;
+  /** Resolving false (or throwing) rolls the optimistic value back */
+  onSave: (value: number) => void | Promise<boolean>;
   ariaLabel: string;
   className?: string;
 }) {
@@ -51,6 +55,24 @@ export function EditableNumber({
 
   const displayValue = optimistic ?? value;
 
+  function commit(num: number) {
+    setOptimistic(num);
+    const outcome = onSave(num);
+    if (!(outcome instanceof Promise)) return;
+    void outcome.then(
+      (saved) => {
+        if (saved === false) rollback();
+      },
+      () => rollback(),
+    );
+  }
+
+  function rollback() {
+    setOptimistic(null);
+    setDraft(String(value));
+    triggerRejection();
+  }
+
   if (editing) {
     return (
       <input
@@ -62,8 +84,7 @@ export function EditableNumber({
         onBlur={() => {
           const num = parseInt(draft);
           if (!isNaN(num) && num >= 0) {
-            setOptimistic(num);
-            onSave(num);
+            commit(num);
           } else {
             setDraft(String(displayValue));
             triggerRejection();

@@ -13,7 +13,8 @@ interface EditChartPageClientProps {
   storageLocations: StorageLocationWithStats[];
   stitchingApps: StitchingAppWithStats[];
   unassignedFabrics: (Fabric & { brand: FabricBrand })[];
-  supplyStitchTotal: number;
+  /** null when the aggregate failed -- 0 would read as a project with no supplies */
+  supplyStitchTotal: number | null;
   series: SeriesWithStats[];
 }
 

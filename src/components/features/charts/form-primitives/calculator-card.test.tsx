@@ -181,3 +181,31 @@ describe("CalculatorCard", () => {
     expect(group).toBeInTheDocument();
   });
 });
+
+describe("CalculatorCard — fabric list failed to load", () => {
+  const props = {
+    calcParams: {
+      fabricCount: 14,
+      strandCount: 2,
+      overCount: 1,
+      wastePercent: 20,
+    } as CalcParams,
+    onCalcParamsChange: vi.fn(),
+    fabricId: null as string | null,
+    onFabricChange: vi.fn(),
+  };
+
+  it("says the fabric list could not load instead of offering an empty picker", () => {
+    render(<CalculatorCard {...props} fabricOptions={null} />);
+
+    expect(screen.getByText("Couldn't load your fabric")).toBeInTheDocument();
+    expect(screen.queryByText("Select fabric...")).not.toBeInTheDocument();
+  });
+
+  it("still offers the normal placeholder when the list genuinely has no fabric", () => {
+    render(<CalculatorCard {...props} fabricOptions={[]} />);
+
+    expect(screen.getByText("Select fabric...")).toBeInTheDocument();
+    expect(screen.queryByText("Couldn't load your fabric")).not.toBeInTheDocument();
+  });
+});

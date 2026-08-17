@@ -115,7 +115,9 @@ export default async function StatsPage({
     );
   }
 
-  const hasNoSessions = heroStats === null || heroStats.totalSessions === 0;
+  // A failed hero-stats query is not an empty account: only a successful zero says "none yet",
+  // so a DB failure falls through to each panel's own unavailable state instead of two lying tabs
+  const hasNoSessions = heroStats !== null && heroStats.totalSessions === 0;
 
   return (
     <StatsPageShell

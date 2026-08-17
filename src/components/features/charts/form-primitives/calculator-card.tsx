@@ -11,7 +11,8 @@ interface CalculatorCardProps {
   onCalcParamsChange: (params: CalcParams) => void;
   fabricId: string | null;
   onFabricChange: (fabricId: string | null, fabricCount?: number) => void;
-  fabricOptions: FabricOption[];
+  /** null when the fabric query failed -- [] means there is genuinely no unassigned fabric */
+  fabricOptions: FabricOption[] | null;
 }
 
 export function CalculatorCard({
@@ -23,7 +24,7 @@ export function CalculatorCard({
 }: CalculatorCardProps) {
   const handleFabricSelect = useCallback(
     (value: string | null) => {
-      const fabric = fabricOptions.find((f) => f.value === value);
+      const fabric = fabricOptions?.find((f) => f.value === value);
       // Parent's onFabricChange handles both fabricId and fabricCount update
       onFabricChange(value, fabric?.count);
     },
@@ -70,13 +71,13 @@ export function CalculatorCard({
 
       <div className="mb-3">
         <SearchableSelect
-          options={fabricOptions.map((f) => ({
+          options={(fabricOptions ?? []).map((f) => ({
             value: f.value,
             label: f.label,
           }))}
           value={fabricId}
           onChange={handleFabricSelect}
-          placeholder="Select fabric..."
+          placeholder={fabricOptions === null ? "Couldn't load your fabric" : "Select fabric..."}
         />
       </div>
 

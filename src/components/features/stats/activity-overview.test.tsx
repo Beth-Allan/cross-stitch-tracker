@@ -52,7 +52,7 @@ vi.mock("./session-history-table", () => ({
   ),
 }));
 
-vi.mock("./data-unavailable", () => ({
+vi.mock("@/components/ui/data-unavailable", () => ({
   DataUnavailable: (props: Record<string, unknown>) => (
     <div data-testid="data-unavailable" data-label={props.label} />
   ),

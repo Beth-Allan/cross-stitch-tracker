@@ -6,6 +6,8 @@ import { LocalStateAdapter } from "./local-state-adapter";
 import type { SupplyRow, SupplySearchResult, SupplyTableAdapter } from "./types";
 import { DEFAULT_CALC_PARAMS } from "./types";
 
+const { updateOutcomes } = vi.hoisted(() => ({ updateOutcomes: [] as unknown[] }));
+
 // Mock child components to isolate SupplyTable's structure and logic
 vi.mock("./supply-table-add-row", () => ({
   SupplyTableAddRow: ({ onRowAdded }: { onRowAdded: () => void }) => (
@@ -27,7 +29,12 @@ vi.mock("./supply-table-data-row", () => ({
     isNew,
   }: {
     row: SupplyRow;
-    onUpdateQuantity: (type: string, id: string, field: string, value: number) => void;
+    onUpdateQuantity: (
+      type: string,
+      id: string,
+      field: string,
+      value: number,
+    ) => void | Promise<boolean>;
     onDelete: (type: string, id: string) => void;
     isNew?: boolean;
   }) => (
@@ -40,6 +47,14 @@ vi.mock("./supply-table-data-row", () => ({
           onClick={() => onUpdateQuantity(row.type, row.id, "quantityRequired", 5)}
         >
           Update
+        </button>
+        <button
+          data-testid={`update-qty-outcome-${row.id}`}
+          onClick={async () => {
+            updateOutcomes.push(await onUpdateQuantity(row.type, row.id, "have", 5));
+          }}
+        >
+          Update and report
         </button>
         <button data-testid={`delete-${row.id}`} onClick={() => onDelete(row.type, row.id)}>
           Delete
@@ -541,5 +556,53 @@ describe("SupplyTable", () => {
         expect(stitchCountCalls.map((c: unknown[]) => c[1])).not.toContain("t3");
       });
     });
+  });
+});
+
+describe("SupplyTable — reporting save failure back to the row", () => {
+  let adapter: SupplyTableAdapter;
+
+  beforeEach(() => {
+    adapter = createMockAdapter();
+    updateOutcomes.length = 0;
+    vi.clearAllMocks();
+  });
+
+  it("reports success so the row can keep its optimistic value", async () => {
+    (adapter.updateQuantity as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ success: true });
+
+    render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("update-qty-outcome-t1"));
+    });
+
+    await waitFor(() => expect(updateOutcomes).toEqual([true]));
+  });
+
+  it("reports failure so the row can roll its optimistic value back", async () => {
+    (adapter.updateQuantity as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      success: false,
+      error: "DB error",
+    });
+
+    render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("update-qty-outcome-t1"));
+    });
+
+    await waitFor(() => expect(updateOutcomes).toEqual([false]));
+  });
+
+  it("reports failure when the adapter throws", async () => {
+    (adapter.updateQuantity as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error("network down"),
+    );
+
+    render(<SupplyTable threads={[makeThread()]} beads={[]} specialty={[]} adapter={adapter} />);
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("update-qty-outcome-t1"));
+    });
+
+    await waitFor(() => expect(updateOutcomes).toEqual([false]));
   });
 });

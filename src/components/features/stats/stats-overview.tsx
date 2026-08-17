@@ -9,7 +9,7 @@ import { ThreadInsightList } from "./thread-insight-list";
 import { DesignerInsightList } from "./designer-insight-list";
 import { GenreInsightList } from "./genre-insight-list";
 import { StatusFilterPills } from "./status-filter-pills";
-import { DataUnavailable } from "./data-unavailable";
+import { DataUnavailable } from "@/components/ui/data-unavailable";
 import type {
   StatsHeroData,
   CollectionBreakdownData,

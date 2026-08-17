@@ -10,7 +10,7 @@ vi.mock("./completion-estimates-section", () => ({
   CompletionEstimatesSection: () => <div data-testid="completion-estimates-section" />,
 }));
 
-vi.mock("./data-unavailable", () => ({
+vi.mock("@/components/ui/data-unavailable", () => ({
   DataUnavailable: (props: Record<string, unknown>) => (
     <div data-testid="data-unavailable" data-label={props.label} />
   ),

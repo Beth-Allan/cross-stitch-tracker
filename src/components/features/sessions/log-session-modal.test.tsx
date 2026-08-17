@@ -514,3 +514,46 @@ describe("LogSessionModal", () => {
     });
   });
 });
+
+describe("LogSessionModal — project list failed to load", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 3, 15, 12, 0, 0));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("says the projects could not load instead of offering an empty picker", () => {
+    renderModal({ activeProjects: [], projectsUnavailable: true });
+
+    expect(screen.getByText("Couldn't load your projects")).toBeInTheDocument();
+    expect(screen.queryByText("Select a project...")).not.toBeInTheDocument();
+  });
+
+  it("says the projects could not load inside the dropdown, not 'no matching projects'", async () => {
+    vi.useRealTimers();
+    const user = userEvent.setup();
+    renderModal({ activeProjects: [], projectsUnavailable: true });
+
+    await user.click(screen.getByText("Couldn't load your projects"));
+
+    expect(
+      screen.getByText("Couldn't load your projects. Try refreshing the page."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("No matching projects")).not.toBeInTheDocument();
+  });
+
+  it("still says 'no matching projects' when the list genuinely loaded empty", async () => {
+    vi.useRealTimers();
+    const user = userEvent.setup();
+    renderModal({ activeProjects: [] });
+
+    await user.click(screen.getByText("Select a project..."));
+
+    expect(screen.getByText("No matching projects")).toBeInTheDocument();
+    expect(screen.queryByText(/couldn't load your projects/i)).not.toBeInTheDocument();
+  });
+});

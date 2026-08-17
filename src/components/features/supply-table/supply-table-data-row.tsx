@@ -20,7 +20,7 @@ interface SupplyTableDataRowProps {
     junctionId: string,
     field: "stitchCount" | "need" | "have",
     value: number,
-  ) => void;
+  ) => void | Promise<boolean>;
   onDelete: (type: SupplyType, junctionId: string) => void;
   isNew?: boolean;
 }

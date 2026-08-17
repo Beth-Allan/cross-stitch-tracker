@@ -69,7 +69,7 @@ vi.mock("./status-filter-pills", () => ({
   StatusFilterPills: () => <div data-testid="status-filter-pills" />,
 }));
 
-vi.mock("./data-unavailable", () => ({
+vi.mock("@/components/ui/data-unavailable", () => ({
   DataUnavailable: (props: Record<string, unknown>) => (
     <div data-testid="data-unavailable" data-label={props.label} />
   ),

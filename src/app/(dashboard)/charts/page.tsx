@@ -6,7 +6,10 @@ import {
   getStorageGroups,
 } from "@/lib/actions/pattern-dive-actions";
 import { getSeriesWithStats } from "@/lib/actions/series-actions";
+import { settled } from "@/lib/utils/settled";
+import type { WhatsNextProject, FabricRequirementRow, StorageGroup } from "@/types/session";
 import type { SeriesWithStats } from "@/types/series";
+import { DataUnavailable } from "@/components/ui/data-unavailable";
 import { ProjectGallery } from "@/components/features/gallery/project-gallery";
 import { PatternDiveTabs } from "@/components/features/charts/pattern-dive-tabs";
 import { WhatsNextTab } from "@/components/features/charts/whats-next-tab";
@@ -14,27 +17,34 @@ import { SeriesTabContent } from "@/components/features/charts/series-tab-conten
 import { FabricRequirementsTab } from "@/components/features/charts/fabric-requirements-tab";
 import { StorageViewTab } from "@/components/features/charts/storage-view-tab";
 
-export default async function ChartsPage() {
-  // All four tab datasets fetched eagerly via Promise.all()
-  // Avoids Neon cold start waterfall -- single parallel batch
-  const [charts, whatsNextProjects, fabricRequirements, storageGroups, seriesData] =
-    await Promise.all([
-      getChartsForGallery(),
-      getWhatsNextProjects(),
-      getFabricRequirements(),
-      getStorageGroups(),
-      getSeriesWithStats().catch((err) => {
-        console.error("Failed to load series data:", err instanceof Error ? err.message : err);
-        return [] as SeriesWithStats[];
-      }),
-    ]);
+type GalleryChart = Awaited<ReturnType<typeof getChartsForGallery>>[number];
 
-  // Collect all image keys that need presigned URLs across all tabs
+export default async function ChartsPage() {
+  // All five tab datasets fetched eagerly in one parallel batch -- avoids a Neon cold-start
+  // waterfall. Settled, not all-or-nothing: a tab that fails says so and the other four still work
+  const results = await Promise.allSettled([
+    getChartsForGallery(),
+    getWhatsNextProjects(),
+    getFabricRequirements(),
+    getStorageGroups(),
+    getSeriesWithStats(),
+  ]);
+
+  const charts = settled<GalleryChart[]>(results[0], "charts", "pattern-dive");
+  const whatsNextProjects = settled<WhatsNextProject[]>(results[1], "whatsNext", "pattern-dive");
+  const fabricRequirements = settled<FabricRequirementRow[]>(
+    results[2],
+    "fabricRequirements",
+    "pattern-dive",
+  );
+  const storageGroups = settled<StorageGroup[]>(results[3], "storageGroups", "pattern-dive");
+  const seriesData = settled<SeriesWithStats[]>(results[4], "seriesData", "pattern-dive");
+
   const imageKeys = [
-    ...charts.flatMap((c) => [c.coverImageUrl, c.coverThumbnailUrl]),
-    ...whatsNextProjects.map((p) => p.coverThumbnailUrl),
-    ...fabricRequirements.map((r) => r.coverThumbnailUrl),
-    ...storageGroups.flatMap((g) => g.items.map((i) => i.coverThumbnailUrl)),
+    ...(charts ?? []).flatMap((c) => [c.coverImageUrl, c.coverThumbnailUrl]),
+    ...(whatsNextProjects ?? []).map((p) => p.coverThumbnailUrl),
+    ...(fabricRequirements ?? []).map((r) => r.coverThumbnailUrl),
+    ...(storageGroups ?? []).flatMap((g) => g.items.map((i) => i.coverThumbnailUrl)),
   ];
   const imageUrls = await getPresignedImageUrls(imageKeys);
 
@@ -48,11 +58,41 @@ export default async function ChartsPage() {
       </div>
 
       <PatternDiveTabs
-        browseContent={<ProjectGallery charts={charts} imageUrls={imageUrls} hideHeader />}
-        whatsNextContent={<WhatsNextTab projects={whatsNextProjects} imageUrls={imageUrls} />}
-        seriesContent={<SeriesTabContent series={seriesData} />}
-        fabricContent={<FabricRequirementsTab rows={fabricRequirements} imageUrls={imageUrls} />}
-        storageContent={<StorageViewTab groups={storageGroups} imageUrls={imageUrls} />}
+        browseContent={
+          charts !== null ? (
+            <ProjectGallery charts={charts} imageUrls={imageUrls} hideHeader />
+          ) : (
+            <DataUnavailable label="Your collection" />
+          )
+        }
+        whatsNextContent={
+          whatsNextProjects !== null ? (
+            <WhatsNextTab projects={whatsNextProjects} imageUrls={imageUrls} />
+          ) : (
+            <DataUnavailable label="What's next" />
+          )
+        }
+        seriesContent={
+          seriesData !== null ? (
+            <SeriesTabContent series={seriesData} />
+          ) : (
+            <DataUnavailable label="Series" />
+          )
+        }
+        fabricContent={
+          fabricRequirements !== null ? (
+            <FabricRequirementsTab rows={fabricRequirements} imageUrls={imageUrls} />
+          ) : (
+            <DataUnavailable label="Fabric requirements" />
+          )
+        }
+        storageContent={
+          storageGroups !== null ? (
+            <StorageViewTab groups={storageGroups} imageUrls={imageUrls} />
+          ) : (
+            <DataUnavailable label="Storage view" />
+          )
+        }
       />
     </div>
   );

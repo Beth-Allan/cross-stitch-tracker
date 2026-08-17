@@ -163,3 +163,44 @@ describe("ProjectSessionsTab — calendar-date convention", () => {
     expect(screen.getByText("Nov 2025")).toBeInTheDocument();
   });
 });
+
+describe("ProjectSessionsTab — honest failure states", () => {
+  const baseProps = {
+    imageUrls: {},
+    activeProjects: mockActiveProjects,
+    projectId: "proj-1",
+  };
+
+  it("says the sessions could not load — never that none are logged — when the query fails", () => {
+    render(<ProjectSessionsTab {...baseProps} sessions={null} stats={null} />);
+
+    expect(screen.getByText(/temporarily unavailable/i)).toBeInTheDocument();
+    expect(screen.queryByText(/no sessions logged for this project yet/i)).not.toBeInTheDocument();
+  });
+
+  it("still says none are logged yet when the project genuinely has none", () => {
+    render(
+      <ProjectSessionsTab
+        {...baseProps}
+        sessions={[]}
+        stats={{ totalStitches: 0, sessionsLogged: 0, avgPerSession: 0, activeSince: null }}
+      />,
+    );
+
+    expect(screen.getByText(/no sessions logged for this project yet/i)).toBeInTheDocument();
+    expect(screen.queryByText(/temporarily unavailable/i)).not.toBeInTheDocument();
+  });
+
+  it("never renders zeroed stat cards when the stats query fails", () => {
+    render(<ProjectSessionsTab {...baseProps} sessions={mockSessions} stats={null} />);
+
+    expect(screen.queryByText("TOTAL STITCHES")).not.toBeInTheDocument();
+    expect(screen.getByText(/temporarily unavailable/i)).toBeInTheDocument();
+  });
+
+  it("still lists the sessions it did load when only the stats query fails", () => {
+    render(<ProjectSessionsTab {...baseProps} sessions={mockSessions} stats={null} />);
+
+    expect(screen.getByText("2 sessions logged")).toBeInTheDocument();
+  });
+});

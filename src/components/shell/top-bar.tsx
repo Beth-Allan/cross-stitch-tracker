@@ -17,10 +17,11 @@ import type { ActiveProjectForPicker } from "@/types/session";
 interface TopBarProps {
   user: { name: string; email: string };
   activeProjects: ActiveProjectForPicker[];
+  projectsUnavailable: boolean;
   imageUrls: Record<string, string>;
 }
 
-export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
+export function TopBar({ user, activeProjects, projectsUnavailable, imageUrls }: TopBarProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [logModalOpen, setLogModalOpen] = useState(false);
 
@@ -124,6 +125,7 @@ export function TopBar({ user, activeProjects, imageUrls }: TopBarProps) {
         isOpen={logModalOpen}
         onOpenChange={setLogModalOpen}
         activeProjects={activeProjects}
+        projectsUnavailable={projectsUnavailable}
         imageUrls={imageUrls}
       />
     </header>

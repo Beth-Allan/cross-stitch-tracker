@@ -4,7 +4,7 @@ import { MonthlyStitchChart } from "./monthly-stitch-chart";
 import { DayOfWeekChart } from "./day-of-week-chart";
 import { StitchingCalendar } from "./stitching-calendar";
 import { SessionHistoryTable } from "./session-history-table";
-import { DataUnavailable } from "./data-unavailable";
+import { DataUnavailable } from "@/components/ui/data-unavailable";
 import type {
   MonthlyTotal,
   CalendarDayData,

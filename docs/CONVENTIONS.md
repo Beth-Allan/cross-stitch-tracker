@@ -99,6 +99,19 @@ A discriminated union — **actions never throw to the client**:
 `requireAuth()` → `schema.parse()` → ownership check → Prisma write (often `$transaction`) →
 `revalidatePath()` / `revalidateTag()` → return the result union.
 
+### Failure never renders as emptiness
+
+A page that guards a read collapses the failure to **`null`, never `[]` or `0`** — those are
+Beth's real answers ("nothing kitted yet", "no sessions logged") and a failed query must not
+borrow them. `Promise.allSettled` + `settled()` produces the `null`; the component renders
+`DataUnavailable` (`src/components/ui/data-unavailable.tsx`) or its own "couldn't load" line for
+that panel, so one dead query costs one panel rather than lying across a screen. Guarding a read
+without this is worse than not guarding it, because the error boundary at least tells the truth.
+
+Optimistic writes obey the same rule from the other side: an optimistic value **rolls back when
+the save reports failure**, so the screen never keeps a number the server refused (see
+`EditableNumber` in `src/components/features/supply-table/`).
+
 ## The stats cache layer
 
 A convention with real teeth, because getting it wrong ships stale numbers silently.
