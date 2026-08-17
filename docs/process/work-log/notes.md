@@ -169,11 +169,17 @@ this is that list, written down so the next session does not re-derive it or re-
 
 **① The pre-merge check — `R2_BUCKET_NAME` in Vercel Production.** R-1 made that variable
 **required**: it used to default to `"cross-stitch-tracker"` with a warning, which meant a typo
-silently redirected every presigned URL to the wrong bucket. If Production has been relying on that
-default, the code half merging turns working uploads into "File storage is not configured". **So
-before R-1 merges, Production must be confirmed to have `R2_BUCKET_NAME` set to the real bucket's
-name.** That is a dashboard read, not a code question — it belongs to the `/review` session's
-checklist, and the PR says so.
+silently redirected every presigned URL to the wrong bucket. **`.env.example` suggests the real
+bucket is named exactly that, so Production may be running on the fallback right now with the
+variable unset.**
+
+If it is, merging does more than break uploads — **it blanks every image on the live site, quietly.**
+`getPresignedImageUrls` catches per-key failures with `Promise.allSettled` and returns an empty map,
+so every cover, thumbnail and session photo disappears from every page with nothing but a
+`console.warn` (the layer-1 review of PR #85 traced this; the first draft of this note understated
+it as an upload-only failure). **So before R-1 merges, Production must be confirmed to have
+`R2_BUCKET_NAME` set to the real bucket's name.** That is a dashboard read, not a code question — it
+belongs to the `/review` session's checklist, and the PR says so.
 
 **② Cloudflare — one bucket, two tokens** (dash.cloudflare.com → R2):
 
@@ -182,9 +188,14 @@ checklist, and the PR says so.
   credential pair, which is what makes a preview physically unable to write to production storage
   rather than merely coded not to.
 - Token B — **Object Read & Write**, scoped to the _scratch_ bucket only.
-- Both tokens are optional in the sense that one read-write pair for both buckets also works — the
-  code enforces the split either way (`getWriteTarget` / `getReadTarget` in `src/lib/r2.ts`). Two
-  tokens move the guarantee from our code to Cloudflare, which is why they are the recommendation.
+- Both tokens are optional in the sense that one read-write pair covering **both** buckets also
+  works — the code enforces the split either way (`getWriteTarget` / `getReadTarget` in
+  `src/lib/r2.ts`). Two tokens move the guarantee from our code to Cloudflare, which is why they are
+  the recommendation.
+- **The two configurations do not mix.** A read-only main pair with no token B is the one broken
+  combination: writes are denied and the scratch probe fails, so a preview shows broken images. It is
+  token A **plus** token B, or one read-write pair for both buckets — never half. Half a scratch
+  credential pair now throws outright rather than falling back to the production credentials.
 
 **③ Neon — a branch, per D-15** (console.neon.tech): branch the production branch (call it
 `preview`), then take its **pooled** connection string for `DATABASE_URL` and its **direct** string

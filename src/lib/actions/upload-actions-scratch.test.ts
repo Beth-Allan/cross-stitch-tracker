@@ -1,5 +1,5 @@
 /**
- * R-1: on preview deployments reads and writes land in different buckets — real
+ * On preview deployments, reads and writes land in different buckets — real
  * images are readable, every write goes to a scratch bucket. These tests pin the
  * direction of each R2 call in upload-actions, which is what makes a preview unable
  * to modify or delete one of Beth's real files.

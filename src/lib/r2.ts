@@ -45,10 +45,18 @@ let _scratchClient: S3Client | null = null;
 function getScratchClient(): S3Client {
   const accessKeyId = readEnv("R2_SCRATCH_ACCESS_KEY_ID");
   const secretAccessKey = readEnv("R2_SCRATCH_SECRET_ACCESS_KEY");
-  // Optional: one credential pair can cover both buckets. Supplying a separate
-  // scratch pair lets the main pair be read-only, so Cloudflare — not this code —
-  // is what stops a preview writing to production storage.
-  if (!accessKeyId || !secretAccessKey) return getReadClient();
+
+  // Both or neither. A separate scratch pair lets the main pair be read-only, so
+  // Cloudflare rather than this code is what stops a preview writing to production
+  // storage; omitting both means one pair covers both buckets. Half a pair is a
+  // configuration mistake, and it fails the same way a wrong scratch bucket name
+  // does — loudly, rather than by quietly writing with production credentials.
+  if (!accessKeyId && !secretAccessKey) return getReadClient();
+  if (!accessKeyId || !secretAccessKey) {
+    throw new Error(
+      `${CONFIG_ERROR} Set both R2_SCRATCH_ACCESS_KEY_ID and R2_SCRATCH_SECRET_ACCESS_KEY, or neither.`,
+    );
+  }
 
   if (!_scratchClient) _scratchClient = createClient(accessKeyId, secretAccessKey);
   return _scratchClient;
@@ -63,8 +71,7 @@ function getReadBucket(): string {
 /**
  * The scratch bucket, or null when this deployment reads and writes one bucket.
  * Set on Vercel Preview only: previews display the real bucket's images so design
- * review is honest, but every object they create or delete lands here instead
- * (Beth's ruling, 2026-08-17 — read real, write scratch).
+ * review is honest, but every object they create or delete lands here instead.
  */
 function getScratchBucket(): string | null {
   const scratch = readEnv("R2_SCRATCH_BUCKET_NAME");
@@ -77,6 +84,10 @@ function getScratchBucket(): string | null {
   return scratch;
 }
 
+function getRealTarget(): R2Target {
+  return { client: getReadClient(), bucket: getReadBucket() };
+}
+
 /**
  * Where every `PutObject` and `DeleteObject` goes. In scratch mode this is the only
  * bucket the app can write to at all, which is what makes a preview unable to
@@ -85,17 +96,28 @@ function getScratchBucket(): string | null {
  */
 export function getWriteTarget(): R2Target {
   const scratch = getScratchBucket();
-  if (!scratch) return { client: getReadClient(), bucket: getReadBucket() };
+  if (!scratch) return getRealTarget();
   return { client: getScratchClient(), bucket: scratch };
+}
+
+function isNotFound(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) return false;
+  const { name, $metadata } = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+  return name === "NotFound" || name === "NoSuchKey" || $metadata?.httpStatusCode === 404;
 }
 
 async function objectExists(target: R2Target, key: string): Promise<boolean> {
   try {
     await target.client.send(new HeadObjectCommand({ Bucket: target.bucket, Key: key }));
     return true;
-  } catch {
-    // Missing, or unreachable: either way the real bucket is the safe answer,
-    // because reading it cannot change anything.
+  } catch (error) {
+    // A miss is the normal answer for anything the preview did not upload itself.
+    // Anything else — denied credentials, an unreachable bucket — reads identically
+    // from here and would leave a preview showing broken images with no explanation,
+    // so it is logged before taking the same safe fallback.
+    if (!isNotFound(error)) {
+      console.error("[R2] scratch probe failed, falling back to the read bucket:", key, error);
+    }
     return false;
   }
 }
@@ -108,9 +130,9 @@ async function objectExists(target: R2Target, key: string): Promise<boolean> {
  */
 export async function getReadTarget(key: string): Promise<R2Target> {
   const scratch = getScratchBucket();
-  if (!scratch) return { client: getReadClient(), bucket: getReadBucket() };
+  if (!scratch) return getRealTarget();
 
   const scratchTarget: R2Target = { client: getScratchClient(), bucket: scratch };
   if (await objectExists(scratchTarget, key)) return scratchTarget;
-  return { client: getReadClient(), bucket: getReadBucket() };
+  return getRealTarget();
 }

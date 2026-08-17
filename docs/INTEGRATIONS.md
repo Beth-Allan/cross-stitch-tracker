@@ -143,8 +143,10 @@ deliberately absent.
 - Production URL: `https://cross-stitch-tracker-adolwyn.vercel.app`
 - Pull requests get a Vercel preview deployment
 
-**Deployment topology** (state as of 2026-08-17, item R-1 — the 2026-08-16 ledger row asked for
-this to be written down rather than assumed):
+**Deployment topology** (2026-08-17, item R-1 — the 2026-08-16 ledger row asked for this to be
+written down rather than assumed). **The Preview row is the ruled intent, not yet the state:** its
+variables have not been set, so today a preview reaches no database and no bucket at all. Local and
+Production are current fact.
 
 | surface        | code            | database                    | R2 reads         | R2 writes                |
 | -------------- | --------------- | --------------------------- | ---------------- | ------------------------ |
@@ -163,9 +165,20 @@ this to be written down rather than assumed):
   settings half lands, the Preview environment has **none** of them, which is why preview
   deployments return HTTP 500 on `/api/auth/*` and cannot be logged into at all
   (maintenance-ledger row, 2026-08-17; verified against production, which returns 200).
-- **The scratch bucket needs no CSP change.** R2 puts the bucket in the URL path, not the
-  hostname, so both buckets are served from `https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com`
-  and the existing `img-src`/`connect-src` allowance already covers it.
+- **The scratch bucket needs no CSP change — but not for the reason it looks like.** The AWS SDK
+  addresses R2 **virtual-hosted style** (no `forcePathStyle` is set), so the bucket is the first
+  label of the hostname: a presigned URL for the scratch bucket points at
+  `https://<bucket>.<R2_ACCOUNT_ID>.r2.cloudflarestorage.com`, a different host from the real
+  bucket's. What covers both is that `next.config.ts` allows the **wildcard**
+  `https://*.r2.cloudflarestorage.com`, which suffix-matches the extra label. **Tightening that
+  wildcard to the bare account host would break images in production, not just preview** —
+  verified empirically against this repo's SDK version, 2026-08-17.
+- **"Write scratch" protects objects, not rows.** The split is storage-only: a preview's
+  `deleteChartFile` still deletes the `ChartFile` row from whatever database it is pointed at, while
+  the R2 delete lands harmlessly in scratch. With the Preview Neon branch in place that only touches
+  the copy — but if Preview were ever pointed at the production database, the result would be a real
+  row deleted and its real object left behind: exactly the orphan class item P8 owns. The database
+  half of the guarantee is D-15, not this code.
 - **Nothing cleans up the scratch bucket.** Preview uploads accumulate there with no lifecycle
   rule and no orphan sweep — deliberate (a preview's leftovers are worthless), recorded so it is
   not discovered as a surprise (maintenance-ledger row, 2026-08-17).
@@ -226,7 +239,8 @@ this to be written down rather than assumed):
 - `R2_SCRATCH_BUCKET_NAME` - when set, all writes and deletes go here instead of
   `R2_BUCKET_NAME`. Unset in Production and locally
 - `R2_SCRATCH_ACCESS_KEY_ID`, `R2_SCRATCH_SECRET_ACCESS_KEY` - credentials for the scratch
-  bucket. Both or neither; without them the main pair is used for both buckets
+  bucket. **Both or neither — half a pair throws**; without them the main pair is used for both
+  buckets, which then has to be able to write to the scratch bucket
 
 **Optional, with a code-level default:**
 

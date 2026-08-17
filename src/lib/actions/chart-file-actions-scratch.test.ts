@@ -1,5 +1,5 @@
 /**
- * R-1: the chart-file actions obey the same split as the upload actions — a
+ * The chart-file actions obey the same split as the upload actions — a
  * download is presigned against whichever bucket holds the key, and a delete can
  * only ever reach the write bucket, so a preview deployment cannot remove one of
  * Beth's real chart files.

@@ -111,22 +111,48 @@ describe("r2 target resolution", () => {
       });
     });
 
-    it("falls back to the real bucket when the object is not in scratch", async () => {
+    it("falls back to the real bucket, silently, when the object is simply not in scratch", async () => {
+      const error = vi.spyOn(console, "error").mockImplementation(() => {});
       const { getReadTarget } = await loadR2();
-      mockSend.mockRejectedValue(Object.assign(new Error("NotFound"), { name: "NotFound" }));
+      mockSend.mockRejectedValue(
+        Object.assign(new Error("NotFound"), {
+          name: "NotFound",
+          $metadata: { httpStatusCode: 404 },
+        }),
+      );
 
       const target = await getReadTarget("covers/chart-1/opt-abc.webp");
 
       expect(target.bucket).toBe("real-bucket");
+      expect(error).not.toHaveBeenCalled();
+      error.mockRestore();
     });
 
-    it("falls back to the real bucket when the scratch probe fails for any reason", async () => {
+    it("logs, rather than swallowing, a scratch probe that fails for any other reason", async () => {
+      const error = vi.spyOn(console, "error").mockImplementation(() => {});
       const { getReadTarget } = await loadR2();
-      mockSend.mockRejectedValue(new Error("connection refused"));
+      mockSend.mockRejectedValue(new Error("AccessDenied"));
 
       const target = await getReadTarget("covers/chart-1/opt-abc.webp");
 
       expect(target.bucket).toBe("real-bucket");
+      expect(error).toHaveBeenCalledOnce();
+      expect(error.mock.calls[0].join(" ")).toContain("covers/chart-1/opt-abc.webp");
+      error.mockRestore();
+    });
+
+    it("throws when only half of the scratch credential pair is set", async () => {
+      vi.stubEnv("R2_SCRATCH_ACCESS_KEY_ID", "scratch-key");
+      const { getWriteTarget } = await loadR2();
+
+      expect(() => getWriteTarget()).toThrow(/R2 environment variables not configured/);
+    });
+
+    it("throws when only the scratch secret is set", async () => {
+      vi.stubEnv("R2_SCRATCH_SECRET_ACCESS_KEY", "scratch-secret");
+      const { getWriteTarget } = await loadR2();
+
+      expect(() => getWriteTarget()).toThrow(/R2 environment variables not configured/);
     });
 
     it("uses the scratch credentials for writes when they are supplied", async () => {
