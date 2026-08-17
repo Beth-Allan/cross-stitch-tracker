@@ -13,7 +13,8 @@ import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import { getCelebrationClasses } from "./gallery-utils";
 import { SIZE_COLORS } from "@/lib/utils/size-category";
 import { SIZE_TOOLTIP_TEXT } from "./gallery-format";
-import { formatNumber, formatDate } from "./gallery-format";
+import { formatNumber } from "./gallery-format";
+import { formatCalendarDate } from "@/lib/utils/calendar-date";
 import type { GalleryCardData } from "./gallery-types";
 
 function buildSupplySummary(card: GalleryCardData): string {
@@ -100,9 +101,9 @@ function FinishedFooter({ card }: { card: GalleryCardData }) {
   const isFFO = card.status === "FFO";
 
   const dateLabel = card.ffoDate
-    ? `FFO ${formatDate(card.ffoDate)}`
+    ? `FFO ${formatCalendarDate(card.ffoDate)}`
     : card.finishDate
-      ? `Finished ${formatDate(card.finishDate)}`
+      ? `Finished ${formatCalendarDate(card.finishDate)}`
       : null;
 
   return (

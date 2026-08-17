@@ -1,8 +1,6 @@
 import { unstable_cache } from "next/cache";
-import { TZDate } from "@date-fns/tz";
-import { format } from "date-fns";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
+import { toCalendarDate } from "@/lib/utils/calendar-date";
 import type { Prisma } from "@/generated/prisma/client";
 import type { SessionHistoryData } from "@/types/stats";
 
@@ -16,7 +14,6 @@ async function computeSessionHistory(
   projectId: string | null,
 ): Promise<SessionHistoryData> {
   try {
-    const tz = getUserTimezone(userId);
     const page = Math.max(1, rawPage);
     const where: Prisma.StitchSessionWhereInput = {
       project: { userId },
@@ -54,7 +51,7 @@ async function computeSessionHistory(
     return {
       sessions: sessions.map((s) => ({
         id: s.id,
-        date: format(new TZDate(s.date, tz), "yyyy-MM-dd"),
+        date: toCalendarDate(s.date),
         projectId: s.project.id,
         chartId: s.project.chartId,
         projectName: s.project.chart.name,

@@ -57,12 +57,15 @@ describe("sessionFormSchema", () => {
     );
   });
 
-  it("rejects future dates", () => {
-    const futureDate = new Date();
-    futureDate.setFullYear(futureDate.getFullYear() + 1);
-    const futureDateStr = futureDate.toISOString().split("T")[0];
-    expect(() => sessionFormSchema.parse({ ...validInput, date: futureDateStr })).toThrow(
-      "Date cannot be in the future",
+  it("rejects a date carrying a time component", () => {
+    expect(() => sessionFormSchema.parse({ ...validInput, date: "2026-04-10T12:00:00Z" })).toThrow(
+      "Invalid date",
+    );
+  });
+
+  it("rejects a well-shaped but impossible date", () => {
+    expect(() => sessionFormSchema.parse({ ...validInput, date: "2026-02-31" })).toThrow(
+      "Invalid date",
     );
   });
 

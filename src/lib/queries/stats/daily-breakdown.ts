@@ -1,8 +1,8 @@
 import { unstable_cache } from "next/cache";
-import { TZDate } from "@date-fns/tz";
-import { format } from "date-fns";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
+import { toCalendarDate } from "@/lib/utils/calendar-date";
+import { getUserTimezone, getCurrentPeriod } from "./timezone";
+import { monthBounds } from "./utils";
 import type { DailyBreakdownEntry } from "@/types/stats";
 
 async function computeDailyBreakdown(
@@ -11,10 +11,7 @@ async function computeDailyBreakdown(
   year: number,
 ): Promise<DailyBreakdownEntry[]> {
   try {
-    const tz = getUserTimezone(userId);
-
-    const monthStart = new TZDate(year, month - 1, 1, 0, 0, 0, tz);
-    const nextMonthStart = new TZDate(year, month, 1, 0, 0, 0, tz);
+    const { monthStart, nextMonthStart } = monthBounds(year, month);
 
     const sessions = await prisma.stitchSession.findMany({
       where: {
@@ -30,9 +27,8 @@ async function computeDailyBreakdown(
     });
 
     return sessions.map((session) => {
-      const tzDate = new TZDate(session.date, tz);
       return {
-        date: format(tzDate, "yyyy-MM-dd"),
+        date: toCalendarDate(session.date),
         projectId: session.project.id,
         chartId: session.project.chartId,
         projectName: session.project.chart.name,
@@ -46,8 +42,8 @@ async function computeDailyBreakdown(
 }
 
 export function getDailyBreakdown(userId: string, month: number, year: number) {
-  const now = new Date();
-  const isCurrentMonth = month === now.getMonth() + 1 && year === now.getFullYear();
+  const current = getCurrentPeriod(getUserTimezone(userId));
+  const isCurrentMonth = month === current.month && year === current.year;
   const revalidate = isCurrentMonth ? 300 : 3600;
 
   return unstable_cache(

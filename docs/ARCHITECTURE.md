@@ -110,15 +110,15 @@ Key files:
 
 ### Layer 6: Stats Query Layer (`src/lib/queries/stats/`)
 
-Nineteen query files plus a barrel and a shared helper module. Pure async functions querying Prisma — not server actions, called from pages and actions. Most export a single function; `timezone.ts` and `completion-estimates.ts` export two.
+Nineteen query files plus a barrel and a shared helper module. Pure async functions querying Prisma — not server actions, called from pages and actions. Most export a single function; `completion-estimates.ts` exports two and `timezone.ts` four.
 
 Caching: `unstable_cache` keyed per user, tagged `"stats"`, invalidated by `revalidateTag("stats", { expire: 0 })` from any mutation that moves a statistic. TTL varies by volatility — **300s** for activity-derived queries, **3600s** for collection-shape queries (`collection-breakdown`, `size-breakdown`, `designer-breakdown`, `genre-breakdown`); several take a scope-derived `revalidate`. `timezone.ts` and `record-detection.ts` are uncached.
 
 - `index.ts` — Barrel re-exporting 20 functions. Not exhaustive by design: `record-detection.ts` stays off it entirely and `completion-estimates.ts` puts only one of its two exports on it; both are imported by path instead — from `session-actions.ts` and `charts/[id]/page.tsx` respectively.
 - `hero-stats.ts` — Today/week/month/year/lifetime aggregates
-- `timezone.ts` — IANA timezone resolution + day boundary computation
+- `timezone.ts` — IANA timezone resolution, today's calendar date, the current year/month period, and day boundaries (see "Calendar dates")
 - Plus: `completion-estimates.ts`, `pace-metrics.ts`, `personal-bests.ts`, `record-detection.ts`, `calendar-days.ts`, `session-history.ts`, `monthly-totals.ts`, `daily-breakdown.ts`, `day-of-week.ts`, `fastest-completions.ts`, `thread-insights.ts`, `designer-insights.ts`, `genre-insights.ts`, `collection-breakdown.ts`, `size-breakdown.ts`, `designer-breakdown.ts`, `genre-breakdown.ts`, `available-years.ts`
-- `utils.ts` — Shared `buildDateFilter()` and `Scope` type
+- `utils.ts` — Shared `buildDateFilter()`, `monthBounds()` and the `Scope` type
 
 ### Layer 7: Database
 
@@ -151,9 +151,42 @@ TypeScript interface/type files; no runtime code. Composed from Prisma-generated
 
 ### Layer 12: Utilities (`src/lib/utils/`)
 
-Pure functions, no side effects: `skein-calculator.ts`, `fabric-calculator.ts`, `size-category.ts`, `status.ts`, `status-groups.ts`, `series-progress.ts`, `settled.ts`, `focal-point.ts`, `format-file-size.ts`, `format-time.ts`, `natural-sort.ts`.
+Pure functions, no side effects: `calendar-date.ts`, `skein-calculator.ts`, `fabric-calculator.ts`, `size-category.ts`, `status.ts`, `status-groups.ts`, `series-progress.ts`, `settled.ts`, `focal-point.ts`, `format-file-size.ts`, `format-time.ts`, `natural-sort.ts`.
 
 `src/lib/constants.ts` holds literals shared across modules that belong to no single utility.
+
+## Calendar dates
+
+Some dates in this app are **calendar dates**, not moments: `StitchSession.date` and a project's
+`startDate` / `finishDate` / `ffoDate`. Beth picks them from a `type="date"` input; they carry no
+time and belong to no timezone. Everything else that is a `DateTime` (`createdAt`, `updatedAt`,
+`dateAdded`) is a real instant and is _not_ covered by this convention.
+
+**The convention: a calendar date is stored as the UTC-midnight instant of that date, and every
+date part is read back in UTC.** `src/lib/utils/calendar-date.ts` is the only implementation —
+`parseCalendarDate` on the way in, `toCalendarDate` on the way out, `formatCalendarDate` for
+display (it forces `timeZone: "UTC"`, so the viewer's own zone cannot shift a stored date).
+Calendar arithmetic — `addCalendarDays`, `daysBetweenCalendarDates`, `startOfCalendarWeek` /
+`Month` / `Year` — works on `YYYY-MM-DD` strings, which makes daylight saving structurally unable
+to reach it.
+
+**"Now" is the one genuine instant**, and it is the only place a timezone belongs. `getTodayCalendarDate(tz)`
+resolves it into the user's calendar date and `getCurrentPeriod(tz)` into their year and month
+(`src/lib/queries/stats/timezone.ts`, timezone from `STATS_TIMEZONE`, default `America/Edmonton`).
+Every "today", "this month", "current year" — including the cache-TTL predicates that decide
+whether a period is still live — starts there, never from the server clock.
+
+Two rules follow, and breaking either reintroduces the off-by-one this convention was written to
+kill (a session logged the 1st counting in the previous month, streaks shifting, the browser
+showing yesterday):
+
+- **Never read a stored calendar date in a local timezone.** No `new TZDate(session.date, tz)`, no
+  `toLocaleDateString` without `timeZone: "UTC"`, no `getMonth()`/`getDay()` where `getUTCMonth()`/
+  `getUTCDay()` is meant.
+- **Query boundaries are calendar boundaries.** A month filter runs from the UTC midnight that
+  stores the 1st (`monthBounds` in `queries/stats/utils.ts`), a year filter from the one that
+  stores January 1st (`buildDateFilter`), and an N-day rolling window is the N calendar days
+  ending today.
 
 ## Data Flow Patterns
 
@@ -211,5 +244,6 @@ R2 key pattern: `{category}/{projectId}/{nanoid()}-{filename}` (categories: `cov
 - R2 keys stored in DB, presigned URLs generated per-render (1-hour expiry); image processing (sharp) is server-side only
 - Stats queries share the `"stats"` cache tag; any mutation that moves a statistic must invalidate it with `revalidateTag("stats", { expire: 0 })` — `supply-actions.ts` alone does so at 26 sites, most of which change neither stitch count nor status
 - Ownership is checked directly on the three `userId`-carrying models and transitively on everything that hangs off a project; only true reference data is global (see the mutation sequence above)
+- Calendar dates (session dates, project start/finish/FFO) are stored as UTC-midnight instants and read in UTC; only "now" is resolved in the user's timezone (see "Calendar dates")
 - Security headers set globally in `next.config.ts` (CSP whitelists R2 origins)
 - Component, form, action and testing conventions are in `.claude/rules/` — follow them there rather than duplicating them here

@@ -161,3 +161,28 @@ describe("SessionTable", () => {
     expect(screen.getAllByText("\u2014")).toHaveLength(2);
   });
 });
+
+describe("SessionTable — calendar-date convention", () => {
+  it("shows the stored calendar date, not the browser's local shift of it", () => {
+    render(
+      <SessionTable
+        sessions={[createSession({ id: "s1", date: new Date("2026-08-17T00:00:00.000Z") })]}
+        imageUrls={{}}
+      />,
+    );
+
+    expect(screen.getAllByText("Aug 17, 2026")).toHaveLength(2);
+    expect(screen.queryByText("Aug 16, 2026")).not.toBeInTheDocument();
+  });
+
+  it("shows a DST-transition date unshifted", () => {
+    render(
+      <SessionTable
+        sessions={[createSession({ id: "s1", date: new Date("2026-11-01T00:00:00.000Z") })]}
+        imageUrls={{}}
+      />,
+    );
+
+    expect(screen.getAllByText("Nov 1, 2026")).toHaveLength(2);
+  });
+});

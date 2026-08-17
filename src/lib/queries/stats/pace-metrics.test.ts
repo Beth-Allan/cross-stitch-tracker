@@ -10,14 +10,27 @@ vi.mock("next/cache", () => ({
 
 vi.mock("./timezone", () => ({
   getUserTimezone: () => "America/Denver",
-  getLocalDayBoundaries: () => ({
-    todayStart: new Date("2026-05-17T06:00:00.000Z"),
-    todayEnd: new Date("2026-05-18T05:59:59.999Z"),
-    weekStart: new Date("2026-05-11T06:00:00.000Z"),
-    monthStart: new Date("2026-05-01T06:00:00.000Z"),
-    yearStart: new Date("2026-01-01T07:00:00.000Z"),
-  }),
+  getTodayCalendarDate: () => "2026-05-17",
 }));
+
+type DateWindow = { gte: Date; lt?: Date };
+
+function aggregateWindows(): DateWindow[] {
+  return mockPrisma.stitchSession.aggregate.mock.calls.map(
+    (call: unknown[]) => (call[0] as { where: { date: DateWindow } }).where.date,
+  );
+}
+
+function stubSevenAggregates() {
+  mockPrisma.stitchSession.aggregate
+    .mockResolvedValueOnce({ _sum: { stitchCount: 700 } })
+    .mockResolvedValueOnce({ _sum: { stitchCount: 3000 } })
+    .mockResolvedValueOnce({ _sum: { stitchCount: 9000 } })
+    .mockResolvedValueOnce({ _sum: { stitchCount: 2500 } })
+    .mockResolvedValueOnce({ _sum: { stitchCount: 2000 } })
+    .mockResolvedValueOnce({ _sum: { stitchCount: 5000, timeSpentMinutes: 1000 } })
+    .mockResolvedValueOnce({ _sum: { stitchCount: 4000, timeSpentMinutes: 1000 } });
+}
 
 describe("getPaceMetrics", () => {
   beforeEach(() => {
@@ -110,5 +123,73 @@ describe("getPaceMetrics", () => {
     const result = await getPaceMetrics("user-1");
 
     expect(result.stitchRatePrior).toBe(300); // 3000/600*60 = 300
+  });
+});
+
+describe("getPaceMetrics — window boundaries", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("windows the rolling averages over exactly 7, 30 and 90 calendar days ending today", async () => {
+    stubSevenAggregates();
+
+    const { getPaceMetrics } = await import("./pace-metrics");
+    await getPaceMetrics("user-1");
+
+    const windows = aggregateWindows();
+    // today is 2026-05-17: a 7-day window starts 2026-05-11 and includes today
+    expect(windows[0]).toEqual({ gte: new Date("2026-05-11T00:00:00.000Z") });
+    expect(windows[1]).toEqual({ gte: new Date("2026-04-18T00:00:00.000Z") });
+    expect(windows[2]).toEqual({ gte: new Date("2026-02-17T00:00:00.000Z") });
+  });
+
+  it("windows this month and last month on calendar month boundaries", async () => {
+    stubSevenAggregates();
+
+    const { getPaceMetrics } = await import("./pace-metrics");
+    await getPaceMetrics("user-1");
+
+    const windows = aggregateWindows();
+    expect(windows[3]).toEqual({ gte: new Date("2026-05-01T00:00:00.000Z") });
+    expect(windows[4]).toEqual({
+      gte: new Date("2026-04-01T00:00:00.000Z"),
+      lt: new Date("2026-05-01T00:00:00.000Z"),
+    });
+  });
+
+  it("windows the stitch-rate comparison over two adjacent 30-day windows", async () => {
+    stubSevenAggregates();
+
+    const { getPaceMetrics } = await import("./pace-metrics");
+    await getPaceMetrics("user-1");
+
+    const windows = aggregateWindows();
+    expect(windows[5]).toEqual({ gte: new Date("2026-04-18T00:00:00.000Z") });
+    expect(windows[6]).toEqual({
+      gte: new Date("2026-03-19T00:00:00.000Z"),
+      lt: new Date("2026-04-18T00:00:00.000Z"),
+    });
+  });
+
+  it("includes a session dated today in the 7-day window", async () => {
+    stubSevenAggregates();
+
+    const { getPaceMetrics } = await import("./pace-metrics");
+    await getPaceMetrics("user-1");
+
+    const sessionToday = new Date("2026-05-17T00:00:00.000Z");
+    expect(sessionToday >= aggregateWindows()[0].gte).toBe(true);
+  });
+
+  it("only counts sessions with recorded time in the stitch-rate windows", async () => {
+    stubSevenAggregates();
+
+    const { getPaceMetrics } = await import("./pace-metrics");
+    await getPaceMetrics("user-1");
+
+    const calls = mockPrisma.stitchSession.aggregate.mock.calls;
+    expect(calls[5][0].where.timeSpentMinutes).toEqual({ not: null });
+    expect(calls[6][0].where.timeSpentMinutes).toEqual({ not: null });
   });
 });

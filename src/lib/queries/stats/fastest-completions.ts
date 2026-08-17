@@ -1,8 +1,7 @@
 import { unstable_cache } from "next/cache";
-import { TZDate } from "@date-fns/tz";
-import { differenceInCalendarDays, format } from "date-fns";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
+import { toCalendarDate, daysBetweenCalendarDates } from "@/lib/utils/calendar-date";
+import { getUserTimezone, getCurrentPeriod } from "./timezone";
 import { buildDateFilter, type Scope } from "./utils";
 import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
 import type { FastestCompletion, SizeCategory } from "@/types/stats";
@@ -12,8 +11,7 @@ async function computeFastestCompletions(
   scope: Scope,
 ): Promise<FastestCompletion[]> {
   try {
-    const tz = getUserTimezone(userId);
-    const dateFilter = buildDateFilter(scope, tz);
+    const dateFilter = buildDateFilter(scope);
 
     const projects = await prisma.project.findMany({
       where: {
@@ -48,7 +46,9 @@ async function computeFastestCompletions(
       const effectiveStart = project.startDate ?? project.sessions[0]?.date;
       if (!effectiveStart) continue;
 
-      const daysToComplete = differenceInCalendarDays(project.finishDate, effectiveStart);
+      const startDate = toCalendarDate(effectiveStart);
+      const finishDate = toCalendarDate(project.finishDate);
+      const daysToComplete = daysBetweenCalendarDates(finishDate, startDate);
       if (daysToComplete < 0) continue;
 
       const { count } = getEffectiveStitchCount(
@@ -68,8 +68,8 @@ async function computeFastestCompletions(
           projectId: project.id,
           chartId: project.chart.id,
           projectName: project.chart.name,
-          startDate: format(new TZDate(effectiveStart, tz), "yyyy-MM-dd"),
-          finishDate: format(new TZDate(project.finishDate, tz), "yyyy-MM-dd"),
+          startDate,
+          finishDate,
         });
       }
     }
@@ -85,7 +85,7 @@ async function computeFastestCompletions(
 }
 
 export function getFastestCompletions(userId: string, scope: Scope) {
-  const currentYear = new Date().getFullYear();
+  const { year: currentYear } = getCurrentPeriod(getUserTimezone(userId));
   const year = parseInt(scope, 10);
   const revalidate = !isNaN(year) && year < currentYear ? 3600 : 300;
 

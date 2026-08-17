@@ -1,8 +1,8 @@
 import { unstable_cache } from "next/cache";
-import { TZDate } from "@date-fns/tz";
-import { format } from "date-fns";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
+import { toCalendarDate } from "@/lib/utils/calendar-date";
+import { getUserTimezone, getCurrentPeriod } from "./timezone";
+import { monthBounds } from "./utils";
 import type { CalendarDayData } from "@/types/stats";
 
 async function computeCalendarDays(
@@ -11,10 +11,7 @@ async function computeCalendarDays(
   year: number,
 ): Promise<CalendarDayData[]> {
   try {
-    const tz = getUserTimezone(userId);
-
-    const monthStart = new TZDate(year, month - 1, 1, 0, 0, 0, tz);
-    const nextMonthStart = new TZDate(year, month, 1, 0, 0, 0, tz);
+    const { monthStart, nextMonthStart } = monthBounds(year, month);
 
     const sessions = await prisma.stitchSession.findMany({
       where: {
@@ -35,8 +32,7 @@ async function computeCalendarDays(
     const grouped = new Map<string, CalendarDayData>();
 
     for (const session of sessions) {
-      const tzDate = new TZDate(session.date, tz);
-      const dateKey = format(tzDate, "yyyy-MM-dd");
+      const dateKey = toCalendarDate(session.date);
 
       if (!grouped.has(dateKey)) {
         grouped.set(dateKey, { date: dateKey, sessions: [] });
@@ -58,8 +54,8 @@ async function computeCalendarDays(
 }
 
 export function getCalendarDays(userId: string, month: number, year: number) {
-  const now = new Date();
-  const isCurrentMonth = month === now.getMonth() + 1 && year === now.getFullYear();
+  const current = getCurrentPeriod(getUserTimezone(userId));
+  const isCurrentMonth = month === current.month && year === current.year;
   const revalidate = isCurrentMonth ? 300 : 3600;
 
   return unstable_cache(

@@ -1,12 +1,8 @@
 import { unstable_cache } from "next/cache";
-import { TZDate } from "@date-fns/tz";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
 
 async function computeAvailableYears(userId: string): Promise<number[]> {
   try {
-    const tz = getUserTimezone(userId);
-
     const sessions = await prisma.stitchSession.findMany({
       where: { project: { userId } },
       select: { date: true },
@@ -19,8 +15,7 @@ async function computeAvailableYears(userId: string): Promise<number[]> {
 
     const yearSet = new Set<number>();
     for (const session of sessions) {
-      const localDate = new TZDate(session.date, tz);
-      yearSet.add(localDate.getFullYear());
+      yearSet.add(session.date.getUTCFullYear());
     }
 
     const years = [...yearSet].sort((a, b) => b - a);

@@ -12,7 +12,8 @@ import { SIZE_COLORS } from "@/lib/utils/size-category";
 import { STATUS_GRADIENT_CLASSES } from "./gallery-utils";
 import { KittingDotIcon, getKittingTooltipText } from "./kitting-dots";
 import { GalleryCard } from "./gallery-card";
-import { formatNumber, formatDate, SIZE_TOOLTIP_TEXT } from "./gallery-format";
+import { formatNumber, SIZE_TOOLTIP_TEXT } from "./gallery-format";
+import { formatCalendarDate } from "@/lib/utils/calendar-date";
 import type {
   GalleryCardData,
   ViewMode,
@@ -141,7 +142,7 @@ function ListContextStats({ card }: { card: GalleryCardData }) {
         {formatNumber(card.stitchCount)} stitches &middot; {card.threadColourCount}{" "}
         {card.threadColourCount === 1 ? "colour" : "colours"}
       </p>
-      {card.finishDate && <p>{formatDate(card.finishDate)}</p>}
+      {card.finishDate && <p>{formatCalendarDate(card.finishDate)}</p>}
     </div>
   );
 }
@@ -199,7 +200,7 @@ function ListProgressCell({ card }: { card: GalleryCardData }) {
     <div className="text-muted-foreground text-[11px]">
       {card.finishDate && (
         <>
-          <span>{formatDate(card.finishDate)}</span>
+          <span>{formatCalendarDate(card.finishDate)}</span>
           <p className="text-[10px]">Finished</p>
         </>
       )}
@@ -219,7 +220,7 @@ function ListMobileStat({ card }: { card: GalleryCardData }) {
   if (card.statusGroup === "finished" && card.finishDate) {
     return (
       <span className="text-muted-foreground text-[11px] sm:hidden">
-        Finished {formatDate(card.finishDate)}
+        Finished {formatCalendarDate(card.finishDate)}
       </span>
     );
   }

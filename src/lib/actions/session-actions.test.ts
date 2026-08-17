@@ -1443,3 +1443,210 @@ describe("session-actions", () => {
     });
   });
 });
+
+describe("session-actions — calendar-date convention", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1", name: "Test", email: "test@test.com" },
+    });
+    mockPrisma.project.findUnique.mockResolvedValue({
+      id: "proj-1",
+      userId: "user-1",
+      chartId: "chart-1",
+      startingStitches: 0,
+      stitchesCompleted: 0,
+      chart: { stitchCount: 10000 },
+    });
+  });
+
+  function stubTransaction(captured: { date?: Date }) {
+    mockPrisma.$transaction.mockImplementation(async (cb: (tx: unknown) => unknown) => {
+      return cb({
+        stitchSession: {
+          create: vi.fn().mockImplementation((args: { data: { date: Date } }) => {
+            captured.date = args.data.date;
+            return Promise.resolve(createMockStitchSession({ date: args.data.date }));
+          }),
+          update: vi.fn().mockImplementation((args: { data: { date: Date } }) => {
+            captured.date = args.data.date;
+            return Promise.resolve(createMockStitchSession({ date: args.data.date }));
+          }),
+          aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 100 } }),
+        },
+        project: {
+          findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+          update: vi.fn().mockResolvedValue({ stitchesCompleted: 100 }),
+        },
+      });
+    });
+  }
+
+  it("stores a session date as the UTC-midnight instant of that calendar date", async () => {
+    const captured: { date?: Date } = {};
+    stubTransaction(captured);
+
+    const { createSession } = await import("./session-actions");
+    const result = await createSession({
+      projectId: "proj-1",
+      date: "2026-08-17",
+      stitchCount: 100,
+      timeSpentMinutes: null,
+      photoKey: null,
+    });
+
+    assertSuccess(result);
+    expect(captured.date!.toISOString()).toBe("2026-08-17T00:00:00.000Z");
+  });
+
+  it("stores a DST-transition date without shifting it", async () => {
+    const captured: { date?: Date } = {};
+    stubTransaction(captured);
+
+    const { createSession } = await import("./session-actions");
+    await createSession({
+      projectId: "proj-1",
+      date: "2026-03-08",
+      stitchCount: 100,
+      timeSpentMinutes: null,
+      photoKey: null,
+    });
+
+    expect(captured.date!.toISOString()).toBe("2026-03-08T00:00:00.000Z");
+  });
+
+  it("passes the same instant to record detection", async () => {
+    const captured: { date?: Date } = {};
+    stubTransaction(captured);
+
+    const { createSession } = await import("./session-actions");
+    await createSession({
+      projectId: "proj-1",
+      date: "2026-08-17",
+      stitchCount: 100,
+      timeSpentMinutes: null,
+      photoKey: null,
+    });
+
+    expect(mockDetectBrokenRecords).toHaveBeenCalledWith(
+      "user-1",
+      expect.objectContaining({ date: new Date("2026-08-17T00:00:00.000Z") }),
+    );
+  });
+
+  it("rejects a date that is in the future in the user's timezone", async () => {
+    const captured: { date?: Date } = {};
+    stubTransaction(captured);
+
+    const { createSession } = await import("./session-actions");
+    const result = await createSession({
+      projectId: "proj-1",
+      date: "2999-01-01",
+      stitchCount: 100,
+      timeSpentMinutes: null,
+      photoKey: null,
+    });
+
+    assertFailure(result);
+    expect(result.error).toBe("Date cannot be in the future");
+  });
+
+  it("rejects tomorrow during the evening hours, when UTC has already rolled over", async () => {
+    const captured: { date?: Date } = {};
+    stubTransaction(captured);
+    // 2026-08-18T01:00Z is 19:00 on 2026-08-17 in Edmonton -- tomorrow is 2026-08-18
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-18T01:00:00.000Z"));
+
+    try {
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-08-18",
+        stitchCount: 100,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      assertFailure(result);
+      expect(result.error).toBe("Date cannot be in the future");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("accepts the user's own today during those same evening hours", async () => {
+    const captured: { date?: Date } = {};
+    stubTransaction(captured);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-18T01:00:00.000Z"));
+
+    try {
+      const { createSession } = await import("./session-actions");
+      const result = await createSession({
+        projectId: "proj-1",
+        date: "2026-08-17",
+        stitchCount: 100,
+        timeSpentMinutes: null,
+        photoKey: null,
+      });
+
+      assertSuccess(result);
+      expect(captured.date!.toISOString()).toBe("2026-08-17T00:00:00.000Z");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("accepts today's date in the user's timezone", async () => {
+    const captured: { date?: Date } = {};
+    stubTransaction(captured);
+    const today = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Edmonton",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+
+    const { createSession } = await import("./session-actions");
+    const result = await createSession({
+      projectId: "proj-1",
+      date: today,
+      stitchCount: 100,
+      timeSpentMinutes: null,
+      photoKey: null,
+    });
+
+    assertSuccess(result);
+  });
+
+  it("updateSession stores the calendar date as UTC midnight too", async () => {
+    const captured: { date?: Date } = {};
+    stubTransaction(captured);
+    mockPrisma.stitchSession.findUnique.mockResolvedValue({
+      id: "sess-1",
+      photoKey: null,
+      stitchCount: 50,
+      project: {
+        id: "proj-1",
+        userId: "user-1",
+        chartId: "chart-1",
+        startingStitches: 0,
+        stitchesCompleted: 50,
+        chart: { stitchCount: 10000 },
+      },
+    });
+
+    const { updateSession } = await import("./session-actions");
+    const result = await updateSession("sess-1", {
+      projectId: "proj-1",
+      date: "2026-03-08",
+      stitchCount: 100,
+      timeSpentMinutes: null,
+      photoKey: null,
+    });
+
+    assertSuccess(result);
+    expect(captured.date!.toISOString()).toBe("2026-03-08T00:00:00.000Z");
+  });
+});

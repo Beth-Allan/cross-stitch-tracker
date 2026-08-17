@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { FinishedProjectData } from "@/types/dashboard";
 import { CoverPlaceholder } from "@/components/features/gallery/cover-placeholder";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { formatCalendarDate } from "@/lib/utils/calendar-date";
 
 interface FinishedProjectCardProps {
   project: FinishedProjectData;
@@ -15,12 +16,7 @@ interface FinishedProjectCardProps {
 
 function formatDate(date: Date | null): string {
   if (!date) return "\u2014";
-  return new Date(date).toLocaleDateString("en-CA", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC",
-  });
+  return formatCalendarDate(date, { year: "numeric", month: "short", day: "numeric" }, "en-CA");
 }
 
 function fmt(n: number): string {

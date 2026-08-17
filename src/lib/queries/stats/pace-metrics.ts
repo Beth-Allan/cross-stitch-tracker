@@ -1,45 +1,51 @@
 import { unstable_cache } from "next/cache";
-import { TZDate } from "@date-fns/tz";
-import { subDays, startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
+import {
+  parseCalendarDate,
+  addCalendarDays,
+  startOfCalendarMonth,
+} from "@/lib/utils/calendar-date";
+import { getUserTimezone, getTodayCalendarDate } from "./timezone";
 import type { PaceMetricsData } from "@/types/stats";
 
 async function computePaceMetrics(userId: string): Promise<PaceMetricsData> {
   try {
     const tz = getUserTimezone(userId);
-    const now = TZDate.tz(tz);
+    const today = getTodayCalendarDate(tz);
+
+    // An N-day window is the N calendar days ending today, because the data it
+    // aggregates is calendar-dated (docs/ARCHITECTURE.md, "Calendar dates")
+    const windowStart = (days: number) => parseCalendarDate(addCalendarDays(today, -(days - 1)));
+
+    const recentRateStart = windowStart(30);
+    const priorRateStart = windowStart(60);
+    const thisMonthStart = parseCalendarDate(startOfCalendarMonth(today));
+    const lastMonthStart = parseCalendarDate(
+      startOfCalendarMonth(addCalendarDays(startOfCalendarMonth(today), -1)),
+    );
 
     const [sum7Day, sum30Day, sum90Day, thisMonth, lastMonth, rateRecent, ratePrior] =
       await Promise.all([
-        // 7-day aggregate
         prisma.stitchSession.aggregate({
-          where: { project: { userId }, date: { gte: subDays(now, 7) } },
+          where: { project: { userId }, date: { gte: windowStart(7) } },
           _sum: { stitchCount: true },
         }),
-        // 30-day aggregate
         prisma.stitchSession.aggregate({
-          where: { project: { userId }, date: { gte: subDays(now, 30) } },
+          where: { project: { userId }, date: { gte: windowStart(30) } },
           _sum: { stitchCount: true },
         }),
-        // 90-day aggregate
         prisma.stitchSession.aggregate({
-          where: { project: { userId }, date: { gte: subDays(now, 90) } },
+          where: { project: { userId }, date: { gte: windowStart(90) } },
           _sum: { stitchCount: true },
         }),
-        // Current month aggregate
         prisma.stitchSession.aggregate({
-          where: { project: { userId }, date: { gte: startOfMonth(now) } },
+          where: { project: { userId }, date: { gte: thisMonthStart } },
           _sum: { stitchCount: true },
         }),
-        // Last month aggregate
         prisma.stitchSession.aggregate({
           where: {
             project: { userId },
-            date: {
-              gte: startOfMonth(subMonths(now, 1)),
-              lte: endOfMonth(subMonths(now, 1)),
-            },
+            date: { gte: lastMonthStart, lt: thisMonthStart },
           },
           _sum: { stitchCount: true },
         }),
@@ -47,16 +53,16 @@ async function computePaceMetrics(userId: string): Promise<PaceMetricsData> {
         prisma.stitchSession.aggregate({
           where: {
             project: { userId },
-            date: { gte: subDays(now, 30) },
+            date: { gte: recentRateStart },
             timeSpentMinutes: { not: null },
           },
           _sum: { stitchCount: true, timeSpentMinutes: true },
         }),
-        // Stitch rate (prior 30-day window: -60 to -30 days)
+        // Stitch rate (the 30-day window immediately before the recent one)
         prisma.stitchSession.aggregate({
           where: {
             project: { userId },
-            date: { gte: subDays(now, 60), lt: subDays(now, 30) },
+            date: { gte: priorRateStart, lt: recentRateStart },
             timeSpentMinutes: { not: null },
           },
           _sum: { stitchCount: true, timeSpentMinutes: true },

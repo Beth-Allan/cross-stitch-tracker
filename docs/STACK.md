@@ -110,8 +110,9 @@ into every session.
   `src/components/features/stats/`, wrapped by `src/components/ui/chart.tsx`
 - nuqs 2.8.9 - URL search param state management (`useQueryState`) for gallery filters, tab
   state, session history; adapter mounted in `src/app/layout.tsx`
-- date-fns 4.1.0 + `@date-fns/tz` 1.4.1 - Date arithmetic; `TZDate` from `@date-fns/tz` used in
-  stats queries for user-timezone-aware day boundaries
+- date-fns 4.1.0 - Date arithmetic in the stats client components (`format`, `parseISO`,
+  `isToday`) on browser-local values. Calendar dates never touch it: they go through
+  `src/lib/utils/calendar-date.ts` (docs/ARCHITECTURE.md, "Calendar dates")
 - sonner 2.0.7 - Toast notifications; `<Toaster>` mounted in root layout
 - cmdk 1.1.1 - Command palette primitives in `src/components/ui/command.tsx`
 - next-themes 0.4.6 - Light/dark theme switching via `src/components/theme-provider.tsx`

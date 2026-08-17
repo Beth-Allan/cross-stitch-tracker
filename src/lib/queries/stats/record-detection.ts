@@ -1,7 +1,10 @@
-import { TZDate } from "@date-fns/tz";
-import { startOfDay, addDays, format, differenceInCalendarDays } from "date-fns";
 import { prisma } from "@/lib/db";
-import { getUserTimezone } from "./timezone";
+import {
+  parseCalendarDate,
+  toCalendarDate,
+  addCalendarDays,
+  daysBetweenCalendarDates,
+} from "@/lib/utils/calendar-date";
 import type { BrokenRecord } from "@/types/stats";
 
 /**
@@ -15,11 +18,10 @@ export async function detectBrokenRecords(
 ): Promise<BrokenRecord[]> {
   try {
     const records: BrokenRecord[] = [];
-    const tz = getUserTimezone(userId);
 
-    const sessionLocal = TZDate.tz(tz, session.date);
-    const dayStart = startOfDay(sessionLocal);
-    const dayEnd = addDays(dayStart, 1);
+    const todayStr = toCalendarDate(session.date);
+    const dayStart = parseCalendarDate(todayStr);
+    const dayEnd = parseCalendarDate(addCalendarDays(todayStr, 1));
 
     const [todayAggregate, allSessions] = await Promise.all([
       prisma.stitchSession.aggregate({
@@ -39,10 +41,9 @@ export async function detectBrokenRecords(
     const todayTotal = todayAggregate._sum.stitchCount ?? 0;
 
     const dayMap = new Map<string, number>();
-    const todayStr = format(dayStart, "yyyy-MM-dd");
 
     for (const s of allSessions) {
-      const localDate = format(TZDate.tz(tz, s.date), "yyyy-MM-dd");
+      const localDate = toCalendarDate(s.date);
       if (localDate === todayStr) continue;
       dayMap.set(localDate, (dayMap.get(localDate) ?? 0) + s.stitchCount);
     }
@@ -67,8 +68,7 @@ export async function detectBrokenRecords(
     let skippedSelf = false;
     for (const s of allSessions) {
       if (!skippedSelf && s.stitchCount === session.stitchCount) {
-        const localDate = format(TZDate.tz(tz, s.date), "yyyy-MM-dd");
-        if (localDate === todayStr) {
+        if (toCalendarDate(s.date) === todayStr) {
           skippedSelf = true;
           continue;
         }
@@ -86,9 +86,7 @@ export async function detectBrokenRecords(
       });
     }
 
-    const uniqueDatesAll = [
-      ...new Set(allSessions.map((s) => format(TZDate.tz(tz, s.date), "yyyy-MM-dd"))),
-    ].sort();
+    const uniqueDatesAll = [...new Set(allSessions.map((s) => toCalendarDate(s.date)))].sort();
 
     const longestStreakAll = computeLongestStreak(uniqueDatesAll);
     const uniqueDatesWithoutToday = uniqueDatesAll.filter((d) => d !== todayStr);
@@ -117,9 +115,7 @@ function computeLongestStreak(sortedDates: string[]): number {
   let current = 1;
 
   for (let i = 1; i < sortedDates.length; i++) {
-    const prev = new Date(sortedDates[i - 1]);
-    const curr = new Date(sortedDates[i]);
-    const diff = differenceInCalendarDays(curr, prev);
+    const diff = daysBetweenCalendarDates(sortedDates[i], sortedDates[i - 1]);
     if (diff === 1) {
       current++;
       if (current > longest) longest = current;

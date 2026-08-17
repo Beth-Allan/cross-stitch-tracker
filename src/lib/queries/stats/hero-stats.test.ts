@@ -13,11 +13,11 @@ vi.mock("next/cache", () => ({
 vi.mock("./timezone", () => ({
   getUserTimezone: () => "America/Denver",
   getLocalDayBoundaries: () => ({
-    todayStart: new Date("2026-05-17T06:00:00.000Z"),
-    todayEnd: new Date("2026-05-18T05:59:59.999Z"),
-    weekStart: new Date("2026-05-11T06:00:00.000Z"),
-    monthStart: new Date("2026-05-01T06:00:00.000Z"),
-    yearStart: new Date("2026-01-01T07:00:00.000Z"),
+    todayStart: new Date("2026-05-17T00:00:00.000Z"),
+    todayEnd: new Date("2026-05-17T23:59:59.999Z"),
+    weekStart: new Date("2026-05-17T00:00:00.000Z"),
+    monthStart: new Date("2026-05-01T00:00:00.000Z"),
+    yearStart: new Date("2026-01-01T00:00:00.000Z"),
   }),
 }));
 
@@ -191,19 +191,58 @@ describe("getHeroStats", () => {
 
     // Today aggregate should use todayStart and todayEnd
     const todayCall = mockPrisma.stitchSession.aggregate.mock.calls[0][0];
-    expect(todayCall.where.date.gte).toEqual(new Date("2026-05-17T06:00:00.000Z"));
-    expect(todayCall.where.date.lt).toEqual(new Date("2026-05-18T05:59:59.999Z"));
+    expect(todayCall.where.date.gte).toEqual(new Date("2026-05-17T00:00:00.000Z"));
+    expect(todayCall.where.date.lt).toEqual(new Date("2026-05-17T23:59:59.999Z"));
 
     // Week aggregate uses weekStart
     const weekCall = mockPrisma.stitchSession.aggregate.mock.calls[1][0];
-    expect(weekCall.where.date.gte).toEqual(new Date("2026-05-11T06:00:00.000Z"));
+    expect(weekCall.where.date.gte).toEqual(new Date("2026-05-17T00:00:00.000Z"));
 
     // Month aggregate uses monthStart
     const monthCall = mockPrisma.stitchSession.aggregate.mock.calls[2][0];
-    expect(monthCall.where.date.gte).toEqual(new Date("2026-05-01T06:00:00.000Z"));
+    expect(monthCall.where.date.gte).toEqual(new Date("2026-05-01T00:00:00.000Z"));
 
     // Year aggregate uses yearStart
     const yearCall = mockPrisma.stitchSession.aggregate.mock.calls[3][0];
-    expect(yearCall.where.date.gte).toEqual(new Date("2026-01-01T07:00:00.000Z"));
+    expect(yearCall.where.date.gte).toEqual(new Date("2026-01-01T00:00:00.000Z"));
+  });
+});
+
+describe("getHeroStats — calendar-date convention", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("counts a session dated today inside the today window", async () => {
+    mockPrisma.stitchSession.aggregate.mockResolvedValue({
+      _sum: { stitchCount: null, timeSpentMinutes: null },
+      _count: { id: 0 },
+    });
+    mockPrisma.project.count.mockResolvedValue(0);
+    mockPrisma.chart.aggregate.mockResolvedValue({ _sum: { stitchCount: null } });
+
+    const { getHeroStats } = await import("./hero-stats");
+    await getHeroStats("user-1");
+
+    const { gte, lt } = mockPrisma.stitchSession.aggregate.mock.calls[0][0].where.date;
+    const sessionDatedToday = new Date("2026-05-17T00:00:00.000Z");
+
+    expect(sessionDatedToday >= gte).toBe(true);
+    expect(sessionDatedToday < lt).toBe(true);
+  });
+
+  it("counts a session dated the 1st inside the month window", async () => {
+    mockPrisma.stitchSession.aggregate.mockResolvedValue({
+      _sum: { stitchCount: null, timeSpentMinutes: null },
+      _count: { id: 0 },
+    });
+    mockPrisma.project.count.mockResolvedValue(0);
+    mockPrisma.chart.aggregate.mockResolvedValue({ _sum: { stitchCount: null } });
+
+    const { getHeroStats } = await import("./hero-stats");
+    await getHeroStats("user-1");
+
+    const monthGte = mockPrisma.stitchSession.aggregate.mock.calls[2][0].where.date.gte;
+    expect(new Date("2026-05-01T00:00:00.000Z") >= monthGte).toBe(true);
   });
 });

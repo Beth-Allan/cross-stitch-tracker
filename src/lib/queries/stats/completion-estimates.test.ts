@@ -10,7 +10,13 @@ vi.mock("next/cache", () => ({
 
 vi.mock("./timezone", () => ({
   getUserTimezone: () => "America/Edmonton",
+  getTodayCalendarDate: () => "2026-05-17",
+  getCurrentPeriod: () => ({ year: 2026, month: 5 }),
 }));
+
+// getTodayCalendarDate is mocked to 2026-05-17, so fixtures are anchored to that date
+const TODAY_MS = new Date("2026-05-17T00:00:00.000Z").getTime();
+const daysBeforeToday = (n: number) => new Date(TODAY_MS - n * 24 * 60 * 60 * 1000);
 
 describe("getCompletionEstimates", () => {
   beforeEach(() => {
@@ -19,9 +25,7 @@ describe("getCompletionEstimates", () => {
   });
 
   it("returns active projects with estimate when sufficient data exists", async () => {
-    const dayMs = 24 * 60 * 60 * 1000;
-    const now = new Date();
-    const firstSessionDate = new Date(now.getTime() - 30 * dayMs);
+    const firstSessionDate = daysBeforeToday(30);
 
     mockPrisma.project.findMany.mockResolvedValue([
       {
@@ -32,8 +36,8 @@ describe("getCompletionEstimates", () => {
         chart: { id: "c1", name: "Big Project", stitchCount: 10000 },
         sessions: [
           { date: firstSessionDate, stitchCount: 1000 },
-          { date: new Date(now.getTime() - 20 * dayMs), stitchCount: 1000 },
-          { date: new Date(now.getTime() - 10 * dayMs), stitchCount: 1000 },
+          { date: daysBeforeToday(20), stitchCount: 1000 },
+          { date: daysBeforeToday(10), stitchCount: 1000 },
         ],
       },
     ]);
@@ -48,8 +52,10 @@ describe("getCompletionEstimates", () => {
     expect(result[0].stitchesCompleted).toBe(3000);
     expect(result[0].totalStitches).toBe(10000);
     expect(result[0].percentComplete).toBe(30);
-    expect(result[0].avgPerDay).toBeGreaterThan(0);
-    expect(result[0].estimatedDate).toMatch(/^[A-Z][a-z]{2} \d{4}$/);
+    // 3000 stitches over the 30 calendar days since the first session
+    expect(result[0].avgPerDay).toBe(100);
+    // 7000 remaining / 100 per day = 70 days; 2026-05-17 + 70 days = 2026-07-26
+    expect(result[0].estimatedDate).toBe("Jul 2026");
   });
 
   it("excludes projects with fewer than 3 sessions", async () => {
@@ -96,9 +102,6 @@ describe("getCompletionEstimates", () => {
   });
 
   it('formats estimated date as "~Mon YYYY"', async () => {
-    const dayMs = 24 * 60 * 60 * 1000;
-    const now = new Date();
-
     mockPrisma.project.findMany.mockResolvedValue([
       {
         id: "p1",
@@ -107,9 +110,9 @@ describe("getCompletionEstimates", () => {
         stitchesCompleted: 5000,
         chart: { id: "c1", name: "Test", stitchCount: 10000 },
         sessions: [
-          { date: new Date(now.getTime() - 100 * dayMs), stitchCount: 2000 },
-          { date: new Date(now.getTime() - 50 * dayMs), stitchCount: 1500 },
-          { date: new Date(now.getTime() - 10 * dayMs), stitchCount: 1500 },
+          { date: daysBeforeToday(100), stitchCount: 2000 },
+          { date: daysBeforeToday(50), stitchCount: 1500 },
+          { date: daysBeforeToday(10), stitchCount: 1500 },
         ],
       },
     ]);
@@ -121,9 +124,6 @@ describe("getCompletionEstimates", () => {
   });
 
   it("sorts by soonest estimated date first", async () => {
-    const dayMs = 24 * 60 * 60 * 1000;
-    const now = new Date();
-
     mockPrisma.project.findMany.mockResolvedValue([
       {
         id: "p1",
@@ -132,9 +132,9 @@ describe("getCompletionEstimates", () => {
         stitchesCompleted: 1000,
         chart: { id: "c1", name: "Far Away", stitchCount: 50000 },
         sessions: [
-          { date: new Date(now.getTime() - 30 * dayMs), stitchCount: 300 },
-          { date: new Date(now.getTime() - 20 * dayMs), stitchCount: 300 },
-          { date: new Date(now.getTime() - 10 * dayMs), stitchCount: 400 },
+          { date: daysBeforeToday(30), stitchCount: 300 },
+          { date: daysBeforeToday(20), stitchCount: 300 },
+          { date: daysBeforeToday(10), stitchCount: 400 },
         ],
       },
       {
@@ -144,9 +144,9 @@ describe("getCompletionEstimates", () => {
         stitchesCompleted: 4000,
         chart: { id: "c2", name: "Almost Done", stitchCount: 5000 },
         sessions: [
-          { date: new Date(now.getTime() - 30 * dayMs), stitchCount: 1500 },
-          { date: new Date(now.getTime() - 20 * dayMs), stitchCount: 1500 },
-          { date: new Date(now.getTime() - 10 * dayMs), stitchCount: 1000 },
+          { date: daysBeforeToday(30), stitchCount: 1500 },
+          { date: daysBeforeToday(20), stitchCount: 1500 },
+          { date: daysBeforeToday(10), stitchCount: 1000 },
         ],
       },
     ]);
@@ -169,9 +169,6 @@ describe("getCompletionEstimates", () => {
   });
 
   it("excludes projects where stitchesCompleted equals totalStitches (100% complete)", async () => {
-    const dayMs = 24 * 60 * 60 * 1000;
-    const now = new Date();
-
     mockPrisma.project.findMany.mockResolvedValue([
       {
         id: "p1",
@@ -180,9 +177,9 @@ describe("getCompletionEstimates", () => {
         stitchesCompleted: 5000,
         chart: { id: "c1", name: "Fully Done", stitchCount: 5000 },
         sessions: [
-          { date: new Date(now.getTime() - 30 * dayMs), stitchCount: 2000 },
-          { date: new Date(now.getTime() - 20 * dayMs), stitchCount: 2000 },
-          { date: new Date(now.getTime() - 10 * dayMs), stitchCount: 1000 },
+          { date: daysBeforeToday(30), stitchCount: 2000 },
+          { date: daysBeforeToday(20), stitchCount: 2000 },
+          { date: daysBeforeToday(10), stitchCount: 1000 },
         ],
       },
     ]);
@@ -194,9 +191,6 @@ describe("getCompletionEstimates", () => {
   });
 
   it("excludes projects where stitchesCompleted exceeds totalStitches (over 100%)", async () => {
-    const dayMs = 24 * 60 * 60 * 1000;
-    const now = new Date();
-
     mockPrisma.project.findMany.mockResolvedValue([
       {
         id: "p1",
@@ -205,9 +199,9 @@ describe("getCompletionEstimates", () => {
         stitchesCompleted: 5500,
         chart: { id: "c1", name: "Over-stitched", stitchCount: 5000 },
         sessions: [
-          { date: new Date(now.getTime() - 30 * dayMs), stitchCount: 2000 },
-          { date: new Date(now.getTime() - 20 * dayMs), stitchCount: 2000 },
-          { date: new Date(now.getTime() - 10 * dayMs), stitchCount: 1500 },
+          { date: daysBeforeToday(30), stitchCount: 2000 },
+          { date: daysBeforeToday(20), stitchCount: 2000 },
+          { date: daysBeforeToday(10), stitchCount: 1500 },
         ],
       },
     ]);
@@ -226,9 +220,7 @@ describe("getProjectCompletionEstimate", () => {
   });
 
   it("returns single estimate for a project with sufficient data", async () => {
-    const dayMs = 24 * 60 * 60 * 1000;
-    const now = new Date();
-    const firstSessionDate = new Date(now.getTime() - 30 * dayMs);
+    const firstSessionDate = daysBeforeToday(30);
 
     mockPrisma.project.findUnique.mockResolvedValue({
       id: "p1",
@@ -238,8 +230,8 @@ describe("getProjectCompletionEstimate", () => {
       chart: { id: "c1", name: "Big Project", stitchCount: 10000 },
       sessions: [
         { date: firstSessionDate, stitchCount: 1000 },
-        { date: new Date(now.getTime() - 20 * dayMs), stitchCount: 1000 },
-        { date: new Date(now.getTime() - 10 * dayMs), stitchCount: 1000 },
+        { date: daysBeforeToday(20), stitchCount: 1000 },
+        { date: daysBeforeToday(10), stitchCount: 1000 },
       ],
     });
 
@@ -251,7 +243,8 @@ describe("getProjectCompletionEstimate", () => {
     expect(result!.chartId).toBe("c1");
     expect(result!.projectName).toBe("Big Project");
     expect(result!.percentComplete).toBe(30);
-    expect(result!.estimatedDate).toMatch(/^[A-Z][a-z]{2} \d{4}$/);
+    expect(result!.avgPerDay).toBe(100);
+    expect(result!.estimatedDate).toBe("Jul 2026");
   });
 
   it("returns null when project has no target stitches", async () => {
@@ -300,5 +293,35 @@ describe("getProjectCompletionEstimate", () => {
     const result = await getProjectCompletionEstimate("user-1", "p-nonexistent");
 
     expect(result).toBeNull();
+  });
+});
+
+describe("getCompletionEstimates — calendar-date convention", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetModules();
+  });
+
+  it("counts the days since the first session on calendar dates, DST included", async () => {
+    mockPrisma.project.findMany.mockResolvedValue([
+      {
+        id: "p1",
+        chartId: "c1",
+        status: "IN_PROGRESS",
+        stitchesCompleted: 300,
+        chart: { id: "c1", name: "Big Project", stitchCount: 1300 },
+        sessions: [
+          { date: new Date("2026-03-08T00:00:00.000Z"), stitchCount: 100 },
+          { date: new Date("2026-03-09T00:00:00.000Z"), stitchCount: 100 },
+          { date: new Date("2026-03-10T00:00:00.000Z"), stitchCount: 100 },
+        ],
+      },
+    ]);
+
+    const { getCompletionEstimates } = await import("./completion-estimates");
+    const result = await getCompletionEstimates("user-1", "all");
+
+    // 2026-03-08 to 2026-05-17 is 70 calendar days; 300 stitches / 70 days
+    expect(result[0].avgPerDay).toBe(4.3);
   });
 });
