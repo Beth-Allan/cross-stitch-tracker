@@ -164,10 +164,12 @@ when the Preview environment was populated and verified.
   bucket, and the same chart in production still showed its original photo. Before that day no preview
   had ever been loggable-into.
 - **Preview needs its own copy of every variable.** Vercel scopes environment variables per
-  environment; a value set for Production only is simply absent on a preview. Until item R-1's
-  settings half lands, the Preview environment has **none** of them, which is why preview
-  deployments return HTTP 500 on `/api/auth/*` and cannot be logged into at all
-  (maintenance-ledger row, 2026-08-17; verified against production, which returns 200).
+  environment; a value set for Production only is simply absent on a preview. Until 2026-08-17 the
+  Preview environment held **none** of them, and preview deployments returned HTTP 500 on
+  `/api/auth/*` and could not be logged into at all. Beth populated it that day (twelve entries —
+  the auth trio, the Neon branch pair, and the R2 real/scratch sets), which is what makes the table
+  above fact rather than intent. **A new variable added to Production is still absent from Preview
+  until it is ticked there too** — that is the standing trap, not a one-off.
 - **A new bucket refuses browser uploads until it has a CORS policy.** Uploads are the only R2
   traffic the _browser_ makes — a presigned PUT via `fetch` — so they are the only path CORS governs;
   covers render through `<img src>` and chart files open through `window.open`/an anchor, neither of
