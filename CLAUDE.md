@@ -117,7 +117,7 @@ visible in the loaded copy. The always-true core:
 ## Quality gates
 
 - `npm run gate` = `prisma generate` → `format:check` → `lint` → `tsc --noEmit` → `test` →
-  `build` — exactly what CI runs (~2.5 min; the 2603-test suite itself is ~16s).
+  `build` — exactly what CI runs (~2.5 min; the 2609-test suite itself is ~16s).
   `prisma generate` runs first, always — `tsc` otherwise validates a stale client.
 - Git hooks are live: pre-commit runs `lint-staged`; pre-push runs the full gate. CI is a
   required check on main, enforced for admins too — a red gate cannot merge, and that is the

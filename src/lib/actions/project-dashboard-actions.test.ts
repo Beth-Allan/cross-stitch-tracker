@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { createMockPrisma } from "@/__tests__/mocks";
 import type { ProjectDashboardData } from "@/types/dashboard";
+import { getCurrentPeriod, getUserTimezone } from "@/lib/queries/stats/timezone";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -192,7 +193,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("finishedThisYear counts projects with finishDate in current year", async () => {
-        const thisYear = new Date().getFullYear();
+        const thisYear = getCurrentPeriod(getUserTimezone("user-1")).year;
         mockPrisma.project.findMany.mockResolvedValue([
           mockProject({
             id: "p1",
@@ -577,7 +578,8 @@ describe("getProjectDashboardData — calendar-date convention", () => {
   });
 
   it("counts a project finished on January 1st in that year, not the previous one", async () => {
-    const thisYear = new Date().getUTCFullYear();
+    // Derived exactly as the action derives it, so the two cannot disagree at a year boundary
+    const thisYear = getCurrentPeriod(getUserTimezone("user-1")).year;
     mockPrisma.project.findMany.mockResolvedValue([
       mockProject({
         id: "p1",
@@ -593,7 +595,7 @@ describe("getProjectDashboardData — calendar-date convention", () => {
   });
 
   it("does not count a project finished on December 31st of the previous year", async () => {
-    const thisYear = new Date().getUTCFullYear();
+    const thisYear = getCurrentPeriod(getUserTimezone("user-1")).year;
     mockPrisma.project.findMany.mockResolvedValue([
       mockProject({
         id: "p1",
