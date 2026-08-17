@@ -98,6 +98,9 @@ knowing.
 
 **Consumed when** `docs/process/state-of-the-code-<date>.md` exists.
 
+**Consumed 2026-08-17** — the report exists at
+`docs/process/state-of-the-code-2026-08-17.md`; retire this note at the next `/cleanup`.
+
 ## Why the ledger looks small
 
 **Tags:** ledger · 999.x · triage
