@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { ReactElement } from "react";
 import { DataUnavailable } from "@/components/ui/data-unavailable";
 
+const mockRequireAuth = vi.fn();
 const mockGetChartsForGallery = vi.fn();
 const mockGetWhatsNextProjects = vi.fn();
 const mockGetFabricRequirements = vi.fn();
@@ -9,6 +10,9 @@ const mockGetStorageGroups = vi.fn();
 const mockGetSeriesWithStats = vi.fn();
 const mockGetPresignedImageUrls = vi.fn();
 
+vi.mock("@/lib/auth-guard", () => ({
+  requireAuth: (...args: unknown[]) => mockRequireAuth(...args),
+}));
 vi.mock("@/lib/actions/chart-actions", () => ({
   getChartsForGallery: (...args: unknown[]) => mockGetChartsForGallery(...args),
 }));
@@ -70,6 +74,7 @@ async function renderTabs(): Promise<Record<TabProp, ReactElement>> {
 describe("ChartsPage — honest failure states", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockRequireAuth.mockResolvedValue({ id: "user-1" });
     mockGetChartsForGallery.mockResolvedValue([]);
     mockGetWhatsNextProjects.mockResolvedValue([]);
     mockGetFabricRequirements.mockResolvedValue([]);
@@ -138,5 +143,35 @@ describe("ChartsPage — honest failure states", () => {
       expect(tabs[prop].type).toBe(DataUnavailable);
     }
     expect(mockGetPresignedImageUrls).toHaveBeenCalledWith([]);
+  });
+});
+
+describe("ChartsPage — an expired session is not a data outage", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRequireAuth.mockResolvedValue({ id: "user-1" });
+    mockGetChartsForGallery.mockResolvedValue([]);
+    mockGetWhatsNextProjects.mockResolvedValue([]);
+    mockGetFabricRequirements.mockResolvedValue([]);
+    mockGetStorageGroups.mockResolvedValue([]);
+    mockGetSeriesWithStats.mockResolvedValue([]);
+    mockGetPresignedImageUrls.mockResolvedValue({});
+  });
+
+  it("propagates an auth failure to the error boundary instead of degrading to five unavailable tabs", async () => {
+    mockRequireAuth.mockRejectedValue(new Error("Unauthorized"));
+
+    const { default: ChartsPage } = await import("./page");
+    await expect(ChartsPage()).rejects.toThrow("Unauthorized");
+  });
+
+  it("checks the session before fetching any tab data", async () => {
+    mockRequireAuth.mockRejectedValue(new Error("Unauthorized"));
+
+    const { default: ChartsPage } = await import("./page");
+    await expect(ChartsPage()).rejects.toThrow();
+
+    expect(mockGetChartsForGallery).not.toHaveBeenCalled();
+    expect(mockGetSeriesWithStats).not.toHaveBeenCalled();
   });
 });

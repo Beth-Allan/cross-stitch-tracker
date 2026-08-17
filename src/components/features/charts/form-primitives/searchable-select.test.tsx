@@ -342,3 +342,27 @@ describe("SearchableSelect", () => {
     });
   });
 });
+
+describe("SearchableSelect — empty message", () => {
+  it("falls back to the generic no-results line", () => {
+    render(<SearchableSelect options={[]} value={null} onChange={vi.fn()} />);
+
+    expect(screen.getByText("No results found.")).toBeInTheDocument();
+  });
+
+  it("shows a caller-supplied message instead, so a failed load can say so", () => {
+    render(
+      <SearchableSelect
+        options={[]}
+        value={null}
+        onChange={vi.fn()}
+        emptyMessage="Couldn't load your fabric. Try refreshing the page."
+      />,
+    );
+
+    expect(
+      screen.getByText("Couldn't load your fabric. Try refreshing the page."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("No results found.")).not.toBeInTheDocument();
+  });
+});

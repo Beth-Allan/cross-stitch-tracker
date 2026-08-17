@@ -11,17 +11,20 @@ vi.mock("./searchable-select", () => ({
     value,
     onChange,
     placeholder,
+    emptyMessage,
   }: {
     options: { value: string; label: string }[];
     value: string | null;
     onChange: (value: string | null) => void;
     placeholder?: string;
+    emptyMessage?: string;
   }) => (
     <select
       data-testid="fabric-select"
       value={value ?? ""}
       onChange={(e) => onChange(e.target.value || null)}
       aria-label={placeholder}
+      data-empty-message={emptyMessage ?? ""}
     >
       <option value="">{placeholder}</option>
       {options.map((opt) => (
@@ -207,5 +210,20 @@ describe("CalculatorCard — fabric list failed to load", () => {
 
     expect(screen.getByText("Select fabric...")).toBeInTheDocument();
     expect(screen.queryByText("Couldn't load your fabric")).not.toBeInTheDocument();
+  });
+
+  it("tells the open dropdown the fabric list could not load, not that there are no results", () => {
+    render(<CalculatorCard {...props} fabricOptions={null} />);
+
+    expect(screen.getByTestId("fabric-select")).toHaveAttribute(
+      "data-empty-message",
+      "Couldn't load your fabric. Try refreshing the page.",
+    );
+  });
+
+  it("leaves the dropdown's generic no-results line alone when the list genuinely has no fabric", () => {
+    render(<CalculatorCard {...props} fabricOptions={[]} />);
+
+    expect(screen.getByTestId("fabric-select")).toHaveAttribute("data-empty-message", "");
   });
 });

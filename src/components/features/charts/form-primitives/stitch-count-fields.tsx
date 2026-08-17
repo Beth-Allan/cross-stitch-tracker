@@ -95,7 +95,8 @@ export function StitchCountFields({
             [
               errors?.stitchCount && "stitch-count-error",
               "stitch-count-hint",
-              (supplyStitchTotal === null || (supplyStitchTotal ?? 0) > 0) &&
+              supplyStitchTotal !== undefined &&
+                supplyStitchTotal !== 0 &&
                 "stitch-count-supply-hint",
             ]
               .filter(Boolean)

@@ -25,6 +25,8 @@ interface SearchableSelectProps {
   onChange: (value: string | null) => void;
   onAddNew?: (searchTerm: string) => void;
   placeholder?: string;
+  /** Shown when nothing matches -- a caller whose list failed to load says so here */
+  emptyMessage?: string;
   disabled?: boolean;
 }
 
@@ -34,6 +36,7 @@ export function SearchableSelect({
   onChange,
   onAddNew,
   placeholder = "Select...",
+  emptyMessage = "No results found.",
   disabled,
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false);
@@ -76,7 +79,7 @@ export function SearchableSelect({
           <Command>
             <CommandInput placeholder="Search..." value={search} onValueChange={setSearch} />
             <CommandList id={listboxId} role="listbox">
-              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandEmpty>{emptyMessage}</CommandEmpty>
               <CommandGroup>
                 {options.map((option) => (
                   <CommandItem

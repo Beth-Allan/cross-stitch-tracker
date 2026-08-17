@@ -265,3 +265,59 @@ describe("EditableNumber — optimistic save that fails", () => {
     expect(screen.getByRole("button", { name: "Have" })).toHaveTextContent("12");
   });
 });
+
+describe("EditableNumber — overlapping saves", () => {
+  it("ignores a stale failure so it cannot clobber a newer accepted edit", async () => {
+    let rejectFirst: (value: boolean) => void = () => {};
+    const onSave = vi
+      .fn()
+      .mockImplementationOnce(() => new Promise<boolean>((res) => (rejectFirst = res)))
+      .mockResolvedValueOnce(true);
+
+    render(<EditableNumber value={5} onSave={onSave} ariaLabel="Have" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Have" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Have" }), {
+      target: { value: "12" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Have" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Have" }), {
+      target: { value: "20" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
+
+    await act(async () => {
+      rejectFirst(false);
+    });
+
+    const button = screen.getByRole("button", { name: "Have" });
+    expect(button).toHaveTextContent("20");
+    expect(button).not.toHaveAttribute("aria-invalid");
+  });
+
+  it("still rolls back when the latest save is the one that fails", async () => {
+    const onSave = vi.fn().mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+
+    render(<EditableNumber value={5} onSave={onSave} ariaLabel="Have" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Have" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Have" }), {
+      target: { value: "12" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Have" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Have" }), {
+      target: { value: "20" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Have" })).toHaveTextContent("5"),
+    );
+  });
+});

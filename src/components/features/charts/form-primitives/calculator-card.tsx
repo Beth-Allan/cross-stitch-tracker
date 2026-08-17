@@ -78,6 +78,11 @@ export function CalculatorCard({
           value={fabricId}
           onChange={handleFabricSelect}
           placeholder={fabricOptions === null ? "Couldn't load your fabric" : "Select fabric..."}
+          emptyMessage={
+            fabricOptions === null
+              ? "Couldn't load your fabric. Try refreshing the page."
+              : undefined
+          }
         />
       </div>
 

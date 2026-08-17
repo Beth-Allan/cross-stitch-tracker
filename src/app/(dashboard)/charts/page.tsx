@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth-guard";
 import { getChartsForGallery } from "@/lib/actions/chart-actions";
 import { getPresignedImageUrls } from "@/lib/actions/upload-actions";
 import {
@@ -20,6 +21,11 @@ import { StorageViewTab } from "@/components/features/charts/storage-view-tab";
 type GalleryChart = Awaited<ReturnType<typeof getChartsForGallery>>[number];
 
 export default async function ChartsPage() {
+  // Checked here as well as inside each action: settling the batch would otherwise swallow an
+  // expired session into five "temporarily unavailable" tabs instead of the error boundary's
+  // "log in again"
+  await requireAuth();
+
   // All five tab datasets fetched eagerly in one parallel batch -- avoids a Neon cold-start
   // waterfall. Settled, not all-or-nothing: a tab that fails says so and the other four still work
   const results = await Promise.allSettled([
