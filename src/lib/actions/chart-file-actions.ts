@@ -7,12 +7,7 @@ import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { getReadTarget, getWriteTarget } from "@/lib/r2";
-import {
-  ALLOWED_CHART_FILE_EXTENSIONS,
-  ALLOWED_CHART_FILE_TYPES,
-  MAX_FILE_SIZE,
-  parseStorageKey,
-} from "@/lib/validations/upload";
+import { ALLOWED_CHART_FILE_TYPES, MAX_FILE_SIZE, parseStorageKey } from "@/lib/validations/upload";
 
 const addChartFileSchema = z.object({
   chartId: z.string().min(1),
@@ -27,18 +22,6 @@ const addChartFileSchema = z.object({
 const DEFAULT_MIME_TYPE = "application/octet-stream";
 
 /**
- * The same rule the upload UI applies: a stitching-software file often arrives
- * with a browser-invented type (`.xsd` as `text/xml`), so a recognised extension
- * is accepted alongside the MIME allowlist. Neither is proof of content — the
- * point is that the value stored is the one R2 holds, not the one a caller sent.
- */
-function isAcceptedChartFile(contentType: string, filename: string): boolean {
-  if ((ALLOWED_CHART_FILE_TYPES as readonly string[]).includes(contentType)) return true;
-  const extension = filename.slice(filename.lastIndexOf(".")).toLowerCase();
-  return (ALLOWED_CHART_FILE_EXTENSIONS as readonly string[]).includes(extension);
-}
-
-/**
  * What R2 actually holds under a key. A presigned PUT signs neither the size nor
  * the type of the bytes that follow it, so this is the first point at which
  * either is a fact rather than a claim.
@@ -49,7 +32,9 @@ async function describeStoredObject(
   try {
     const { client, bucket } = await getReadTarget(key);
     const head = await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
-    if (typeof head.ContentLength !== "number") return null;
+    // Zero counts as absent: an aborted PUT leaves an empty object, and a record
+    // pointing at one is a file Beth can see in the list and cannot open.
+    if (typeof head.ContentLength !== "number" || head.ContentLength <= 0) return null;
     return {
       contentLength: head.ContentLength,
       contentType: head.ContentType ?? DEFAULT_MIME_TYPE,
@@ -58,6 +43,18 @@ async function describeStoredObject(
     console.error("Failed to inspect uploaded object:", key, error);
     return null;
   }
+}
+
+/**
+ * Removes an upload that failed verification. A key an existing record already
+ * points at is left alone: the same key can be re-submitted with a filename that
+ * now fails, and deleting it then would strand the record that still uses it —
+ * the exact state `deleteChartFile`'s ordering exists to prevent.
+ */
+async function discardRejectedUpload(key: string): Promise<void> {
+  const inUse = await prisma.chartFile.findFirst({ where: { url: key }, select: { id: true } });
+  if (inUse) return;
+  await discardStoredObject(key);
 }
 
 async function discardStoredObject(key: string): Promise<void> {
@@ -101,11 +98,14 @@ export async function addChartFile(input: unknown) {
     return { success: false as const, error: "That upload could not be found in storage." };
   }
   if (stored.contentLength > MAX_FILE_SIZE) {
-    await discardStoredObject(validated.url);
+    await discardRejectedUpload(validated.url);
     return { success: false as const, error: "That file is too large. Maximum size is 50MB." };
   }
-  if (!isAcceptedChartFile(stored.contentType, validated.filename)) {
-    await discardStoredObject(validated.url);
+  // The stored type, not the caller's filename: an extension is a free-text field
+  // and would let any object in by being named `.pdf`. This is the same allowlist
+  // `getPresignedUploadUrl` applies, now checked against what actually arrived.
+  if (!(ALLOWED_CHART_FILE_TYPES as readonly string[]).includes(stored.contentType)) {
+    await discardRejectedUpload(validated.url);
     return {
       success: false as const,
       error: "Unsupported file type. Accepted: PDF, images, .pat, .xsd, .css, .saga, .zip",
@@ -168,6 +168,9 @@ export async function getChartFileDownloadUrl(fileId: string) {
   });
 
   if (!file || file.chart.project?.userId !== user.id) {
+    return { success: false as const, error: "File not found" };
+  }
+  if (parseStorageKey(file.url)?.category !== "files") {
     return { success: false as const, error: "File not found" };
   }
 

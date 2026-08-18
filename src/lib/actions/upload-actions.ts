@@ -25,21 +25,25 @@ import {
   THUMBNAIL_QUALITY,
 } from "@/lib/validations/upload";
 
-/**
- * A presigned PUT constrains method, bucket, key and expiry — and nothing else.
- * `content-type` is unsignable and the payload hash is `UNSIGNED_PAYLOAD`, so the
- * type and size a client declares when asking for the URL are claims, not limits:
- * whatever bytes it then sends land under that key. Enforcement therefore happens
- * where the object is *consumed* — the real `ContentLength` bounds the read here,
- * and `sharp` deciding what the bytes actually are is the only honest type check.
- * The same rule covers uploads recorded by `chart-file-actions.addChartFile`.
- */
+// A presigned PUT constrains method, bucket, key and expiry — and nothing else.
+// `content-type` is unsignable and the payload hash is `UNSIGNED_PAYLOAD`, so the
+// type and size a client declares when asking for the URL are claims, not limits:
+// whatever bytes it then sends land under that key. Enforcement therefore happens
+// where the object is consumed — in this file when an image is read, and in
+// `chart-file-actions.addChartFile` when a chart file is recorded.
+
 const INVALID_KEY_ERROR = "Invalid storage key";
 
 function invalidKey() {
   return { success: false as const, error: INVALID_KEY_ERROR };
 }
 
+/**
+ * Reads an object and returns it only if it is an image this app accepts: the
+ * declared length is checked before the body is touched, the stream is bounded
+ * again as it accumulates, and the bytes must decode as one of
+ * `ALLOWED_IMAGE_FORMATS`. The decode is the only honest type check available.
+ */
 async function fetchImageBuffer(
   key: string,
 ): Promise<{ success: true; buffer: Buffer } | { success: false; error: string }> {
@@ -54,6 +58,10 @@ async function fetchImageBuffer(
     return { success: false, error: "Original image not found in storage" };
   }
   if (typeof response.ContentLength === "number" && response.ContentLength > MAX_FILE_SIZE) {
+    // Nothing here consumes the body, so release the connection rather than
+    // leaving it open until it times out. (Breaking out of the loop below does
+    // this for us; returning before the loop does not.)
+    (response.Body as { destroy?: () => void }).destroy?.();
     return { success: false, error: "Image is too large to process" };
   }
 
@@ -132,6 +140,12 @@ export async function getPresignedUploadUrl(input: unknown) {
   }
 }
 
+/**
+ * A short-lived read URL for one object. Grammar-checked but not row-resolved:
+ * the cover editor asks for keys under `covers/unsaved/…`, which by definition
+ * belong to no row yet. The ownership-scoped read path for objects that *do*
+ * have a row is `chart-file-actions.getChartFileDownloadUrl`.
+ */
 export async function getPresignedDownloadUrl(key: string) {
   await requireAuth();
 

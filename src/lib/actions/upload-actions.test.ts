@@ -791,9 +791,11 @@ describe("upload-actions size and format enforcement", () => {
   it("refuses an object whose declared length exceeds the cap, before reading its bytes", async () => {
     const { processAndStoreImage } = await import("./upload-actions");
     let bodyRead = false;
+    const destroy = vi.fn();
     mockSend.mockResolvedValueOnce({
       ContentLength: MAX_FILE_SIZE + 1,
       Body: {
+        destroy,
         [Symbol.asyncIterator]: async function* () {
           bodyRead = true;
           yield Buffer.from("fake-image-data");
@@ -806,6 +808,8 @@ describe("upload-actions size and format enforcement", () => {
     assertFailure(result);
     expect(bodyRead).toBe(false);
     expect(mockSharp).not.toHaveBeenCalled();
+    // Refusing without consuming the stream would hold the socket until it timed out.
+    expect(destroy).toHaveBeenCalled();
   });
 
   it("stops reading when the bytes exceed the cap even if the declared length was a lie", async () => {

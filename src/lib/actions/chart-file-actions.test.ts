@@ -360,33 +360,86 @@ describe("chart-file-actions write-path integrity", () => {
     ]);
   });
 
-  it("accepts a stitching-software file whose stored type is not in the MIME allowlist", async () => {
+  it("accepts a pattern file stored as the generic binary type", async () => {
     const { addChartFile } = await import("./chart-file-actions");
-    mockSend.mockResolvedValueOnce({ ContentLength: 2048, ContentType: "text/xml" });
+    mockSend.mockResolvedValueOnce({
+      ContentLength: 2048,
+      ContentType: "application/octet-stream",
+    });
 
     const result = await addChartFile({
       chartId: "chart-1",
-      url: "files/chart-1/abc-winter.xsd",
-      filename: "winter.xsd",
+      url: "files/chart-1/abc-winter.saga",
+      filename: "winter.saga",
       label: null,
     });
 
     assertSuccess(result);
   });
 
-  it("refuses a stored type that is neither allowed nor a known chart-file extension", async () => {
+  it("refuses a stored type outside the allowlist, whatever the filename claims", async () => {
     const { addChartFile } = await import("./chart-file-actions");
     mockSend.mockResolvedValueOnce({ ContentLength: 2048, ContentType: "text/html" });
 
     const result = await addChartFile({
       chartId: "chart-1",
+      // A caller picks this field freely, so it cannot be what decides the answer.
       url: "files/chart-1/abc-page.html",
-      filename: "page.html",
+      filename: "page.pdf",
       label: null,
     });
 
     assertFailure(result);
     expect(mockPrisma.chartFile.create).not.toHaveBeenCalled();
+  });
+
+  it("refuses an empty object rather than listing a file that downloads as nothing", async () => {
+    const { addChartFile } = await import("./chart-file-actions");
+    mockSend.mockResolvedValueOnce({ ContentLength: 0, ContentType: "application/pdf" });
+
+    const result = await addChartFile({
+      chartId: "chart-1",
+      url: "files/chart-1/abc-empty.pdf",
+      filename: "empty.pdf",
+      label: null,
+    });
+
+    assertFailure(result);
+    expect(mockPrisma.chartFile.create).not.toHaveBeenCalled();
+  });
+
+  it("leaves a rejected key's object alone when a saved file already points at it", async () => {
+    const { addChartFile } = await import("./chart-file-actions");
+    mockPrisma.chartFile.findFirst.mockResolvedValue({
+      id: "file-1",
+      url: "files/chart-1/abc-pattern.pdf",
+    });
+    mockSend.mockResolvedValueOnce({ ContentLength: 2048, ContentType: "text/html" });
+
+    const result = await addChartFile({
+      chartId: "chart-1",
+      url: "files/chart-1/abc-pattern.pdf",
+      filename: "pattern.pdf",
+      label: null,
+    });
+
+    assertFailure(result);
+    expect(sentCommands().filter((command) => command.name === "DeleteObjectCommand")).toEqual([]);
+  });
+
+  it("getChartFileDownloadUrl refuses a stored url that is not one of this app's keys", async () => {
+    const { getChartFileDownloadUrl } = await import("./chart-file-actions");
+    mockPrisma.chartFile.findUnique.mockResolvedValue({
+      id: "file-1",
+      url: "../elsewhere",
+      filename: "test.pdf",
+      mimeType: "application/pdf",
+      chart: { id: "chart-1", project: { userId: "user-1" } },
+    });
+
+    const result = await getChartFileDownloadUrl("file-1");
+
+    assertFailure(result);
   });
 
   it("deleteChartFile removes the database row before the storage object", async () => {

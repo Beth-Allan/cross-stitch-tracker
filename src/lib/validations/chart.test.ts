@@ -76,6 +76,64 @@ describe("chartFormSchema", () => {
     });
   });
 
+  describe("R2 storage keys are parsed, not merely non-empty", () => {
+    it("rejects a cover key that is not a cover object", () => {
+      const result = chartFormSchema.safeParse({
+        chart: { ...validChartBase, coverImageUrl: "files/abc/xyz-pattern.pdf" },
+        project: validProject,
+      });
+
+      expect(result.success).toBe(false);
+    });
+
+    it("rejects a cover key that is not one of this app's keys at all", () => {
+      const result = chartFormSchema.safeParse({
+        chart: { ...validChartBase, coverThumbnailUrl: "covers/abc/nested/thumb.webp" },
+        project: validProject,
+      });
+
+      expect(result.success).toBe(false);
+    });
+
+    it("rejects an attached file key that is not a chart-file object", () => {
+      const result = chartFormSchema.safeParse({
+        chart: {
+          ...validChartBase,
+          fileKeys: [
+            {
+              key: "covers/abc/xyz-photo.jpg",
+              filename: "photo.jpg",
+              mimeType: "image/jpeg",
+              fileSize: 1024,
+            },
+          ],
+        },
+        project: validProject,
+      });
+
+      expect(result.success).toBe(false);
+    });
+
+    it("accepts a well-formed attached file key", () => {
+      const result = chartFormSchema.safeParse({
+        chart: {
+          ...validChartBase,
+          fileKeys: [
+            {
+              key: "files/unsaved/abc-pattern.pdf",
+              filename: "pattern.pdf",
+              mimeType: "application/pdf",
+              fileSize: 1024,
+            },
+          ],
+        },
+        project: validProject,
+      });
+
+      expect(result.success).toBe(true);
+    });
+  });
+
   describe("project FK fields (storageLocationId, stitchingAppId, fabricId)", () => {
     it("accepts null storageLocationId", () => {
       const result = chartFormSchema.safeParse({
