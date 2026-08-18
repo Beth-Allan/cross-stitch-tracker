@@ -1,7 +1,7 @@
 /**
  * Fabric size calculator for cross-stitch projects — the single implementation.
  *
- * Formula: (stitches / effectiveCount) + 6 inches, a 3-inch margin on each side
+ * Formula (FAB-005): (stitches / effectiveCount) + 6 inches, a 3-inch margin on each side
  * (attributed to design spec D-20; the value itself is open question Q-005), where
  * effectiveCount = fabricCount / overCount (FAB-004) — stitching over two threads makes each
  * stitch span two of them, so 28ct linen worked over two sizes exactly like 14ct.

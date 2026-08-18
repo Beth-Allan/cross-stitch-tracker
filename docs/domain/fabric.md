@@ -79,3 +79,28 @@ On the Pattern Dive **Fabric Requirements** tab, the pieces offered for a projec
 A project with no fabric assigned reports **no required size at all** — never a size of zero.
 
 [stated by Beth 2026-08-17]
+
+_The parenthetical above was stated before any fabric-size code applied over-count, and
+**FAB-007 refines it**: the count a candidate piece is judged at is divided by the project's
+over-count, and a piece that fits only at over one is shown with that qualifier rather than
+hidden._
+
+### FAB-007 — Over-count, and which spare pieces are offered
+
+Over-count divides the count a candidate piece is judged at, exactly as it divides every other
+size figure (FAB-004). For a project stitched over two, a 28ct spare piece is measured against
+the **14ct** requirement, not the 28ct one — so pieces that would have been offered at over one
+genuinely are too small.
+
+A piece in that position — Beth's words, _"this fits if you're stitching over 1, but not if
+you're stitching over 2"_ — is **shown with that qualifier, not hidden**. Her reasoning: a
+project with no fabric assigned may not have a settled over-count yet, so hiding the piece
+assumes a decision she has not made. A piece too small **either** way is still not offered at
+all, which is FAB-006 unchanged.
+
+**Not true of the app today.** F-4 (2026-08-18) applied over-count to every fabric size but
+still hides the fits-at-over-one pieces along with the too-small ones. Beth ruled the qualifier
+is its own item rather than a change folded into a finished one: build-plan **F-5**, queued
+straight after F-4's review (drift **D-18**).
+
+[stated by Beth 2026-08-18]

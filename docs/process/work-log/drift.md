@@ -67,7 +67,16 @@ rules back into `auth.ts`. Applied in the P1 branch: one line in
 is kept in step by the same rule. No code changed. **This row moves to Ruled at the next
 `/cleanup`.**
 
-### 2026-08-18 · D-18 · over-count changes which stash pieces are offered — FAB-006 needs Beth's word
+## Also open — the question known to be coming
+
+_(This section is empty. The question that used to sit here — fabric matching for a project with
+no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is recorded as
+**FAB-006** in `docs/domain/fabric.md`. The other question that used to sit here — block/warn/allow
+on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
+
+## Ruled
+
+### 2026-08-18 · D-18 · over-count changes which stash pieces are offered — ruled during F-4
 
 **What contradicts what.** FAB-006 is tagged `[stated by Beth 2026-08-17]` and says that for a
 project with **no fabric assigned**, each spare piece is judged at **its own count** — "a 28ct
@@ -100,14 +109,21 @@ the too-small ones marked — that is a new item, not a doc edit; (c) park it fo
 ships the behaviour F-4's brief specified, FAB-006 is left exactly as Beth stated it, and this row
 carries the mismatch until she rules.
 
-## Also open — the question known to be coming
+**Ruling (2026-08-18, in the F-4 session): show them, with the qualifier — and as its own item.**
+Beth's question was the better answer than either option offered: _"Is there a way to add logic
+that says 'this fits if you're stitching over 1, but not if you're stitching over 2'?"_ — so a
+piece that fits only at over one is **shown with that qualifier**, not hidden. Her reasoning, on
+the record: a project with no fabric assigned may not have a settled over-count, and hiding the
+piece assumes a decision she has not made. A piece too small either way stays unoffered.
 
-_(This section is empty. The question that used to sit here — fabric matching for a project with
-no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is recorded as
-**FAB-006** in `docs/domain/fabric.md`. The other question that used to sit here — block/warn/allow
-on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
+She also ruled the **sequencing**: F-4 ships as built rather than growing new behaviour at review
+time, and the qualifier becomes **build-plan item F-5**, queued straight after F-4's review. Until
+F-5 lands, the only pieces hidden are ones that do not fit the way the project is currently set —
+strictly better than the wrong sizes F-4 replaced.
 
-## Ruled
+Recorded as domain fact **FAB-007** (`docs/domain/fabric.md`), which also carries the correction
+FAB-006's parenthetical needed; FAB-006 keeps its ID with a pointer, per `docs/domain/README.md`.
+The FAB-005 formula edit named above stands with it. Q-002 and Q-005 are untouched and stay open.
 
 _(Beth's rulings D-01–D-14, which set the process itself up, are in
 `WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
