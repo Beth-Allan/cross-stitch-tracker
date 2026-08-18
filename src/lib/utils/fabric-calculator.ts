@@ -7,7 +7,7 @@
  * stitch span two of them, so 28ct linen worked over two sizes exactly like 14ct.
  *
  * `overCount` is the project's own setting and is always passed in: there is no default here,
- * because a silent default of 1 is the bug this module carried until F-4 (drift D-17).
+ * because a silent default of 1 is exactly the shape of the bug this module used to carry.
  *
  * The requirement is returned **exact and unrounded**: it is a minimum, and a rounded-down
  * minimum silently accepts fabric that is too small. Rounding is a display decision and

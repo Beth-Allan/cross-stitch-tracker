@@ -67,6 +67,39 @@ rules back into `auth.ts`. Applied in the P1 branch: one line in
 is kept in step by the same rule. No code changed. **This row moves to Ruled at the next
 `/cleanup`.**
 
+### 2026-08-18 · D-18 · over-count changes which stash pieces are offered — FAB-006 needs Beth's word
+
+**What contradicts what.** FAB-006 is tagged `[stated by Beth 2026-08-17]` and says that for a
+project with **no fabric assigned**, each spare piece is judged at **its own count** — "a 28ct
+piece is measured against the 28ct requirement, not the project's, because the project has none".
+F-4 makes every fabric size divide by the project's over-count, so for an over-two project that
+28ct piece is now measured against the **14ct** requirement. Her stated rule still holds in the
+sense she meant it (the piece's own count, not another piece's), but the parenthetical is
+literally false for an over-two project, and the visible effect is real: pieces that used to
+appear under "Fabrics That Fit" for an over-two project with no fabric assigned are now hidden,
+because at over two they genuinely are too small.
+
+**Why it needs her.** This is a Beth-stated domain fact and a list she ruled on twelve hours
+earlier. F-4's behaviour follows necessarily from FAB-004 — over-count changes every size figure —
+so the code is not in question; what needs her word is whether FAB-006 should now say so, and
+whether hiding those pieces is what she wants. The alternative (judging candidates as if the
+project were over one) would offer her fabric that is too small, which is the defect F-4 exists to
+remove.
+
+**Also for her word, in the same conversation:** F-4 edited **FAB-005**'s formula line from
+`stitches ÷ fabricCount + 6` to `stitches ÷ effectiveCount + 6`, and added that the margin does
+not scale with over-count. That is the doc following the code and FAB-004, and the provenance tag
+was left untouched — but `docs/domain/README.md` says no session edits a fact on its own
+initiative, so it is named here rather than passed over.
+
+**Options for her:** (a) record the over-count behaviour on FAB-006 via `/stitch-fact` and keep
+the code as built — recommended; (b) she wants every piece offered regardless of over-count, with
+the too-small ones marked — that is a new item, not a doc edit; (c) park it for `/cleanup`.
+
+**Raised by:** the layer-1 review of PR #98 (F-4), 2026-08-18. **Not silently resolved:** the code
+ships the behaviour F-4's brief specified, FAB-006 is left exactly as Beth stated it, and this row
+carries the mismatch until she rules.
+
 ## Also open — the question known to be coming
 
 _(This section is empty. The question that used to sit here — fabric matching for a project with
