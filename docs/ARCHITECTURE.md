@@ -216,7 +216,7 @@ showing yesterday):
 
 Step 1 constrains nothing about the bytes. A presigned PUT signs method, bucket, key and expiry; `content-type` is unsignable and the payload hash is `UNSIGNED_PAYLOAD`, so the size and type declared in step 1 are claims. Enforcement is therefore in step 3, against what R2 actually holds: `HeadObject`'s `ContentLength` for chart files (recorded instead of the client's number, over-cap uploads deleted), and `GetObject`'s `ContentLength` plus a bounded read plus the format `sharp` decodes for images.
 
-R2 key pattern: `{category}/{entityId}/{nanoid()}-{filename}` (categories: `covers`, `files`, `sessions`). Every key that reaches an action is parsed against that grammar first — directly with `parseStorageKey`, or through the form schema that carries it (`chartFormSchema`) — and the actions that act on an entity resolve the key from an ownership-checked row.
+R2 key pattern: `{category}/{entityId}/{nanoid()}-{filename}` (categories: `covers`, `files`, `sessions`). Every key that reaches an action is parsed against that grammar first — directly with `parseStorageKey`, or through the form schema that carries it (`chartFormSchema`) — and the actions that act on an entity resolve the key from an ownership-checked row. The image pipeline goes one step further: the raw key must be the one that row already records, so no well-formed key in the right namespace can be re-encoded and stored under an entity that never named it.
 
 ### Stats Queries
 

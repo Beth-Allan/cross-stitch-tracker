@@ -6,7 +6,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { discardStoredObjects } from "@/lib/r2";
-import { generateThumbnail } from "@/lib/actions/upload-actions";
+import { processAndStoreImage } from "@/lib/actions/upload-actions";
 import { chartFormSchema, batchSupplySchema } from "@/lib/validations/chart";
 import type { ChartFormInput } from "@/lib/validations/chart";
 import { updateProjectSettingsSchema } from "@/lib/validations/supply";
@@ -105,41 +105,74 @@ async function createChartAndProject(
   return result;
 }
 
-const THUMBNAIL_WARNING = "Thumbnail could not be generated";
+const COVER_WARNING = "Cover photo saved, but a smaller copy could not be made";
 
 /**
- * Regenerates a chart's cover thumbnail outside the transaction and reports which
- * key the chart now points at — `null` when it still points at the previous one.
- * `generateThumbnail` signals failure by *returning*, not by throwing, so a caller
- * that only wrapped it in `try` saw every failure as a success and went on to
- * delete the thumbnail the chart was still displaying.
+ * Puts a newly uploaded cover through the same pipeline session photos use — a
+ * 1200px WebP plus a 400px thumbnail — and points the chart at both. Reports which
+ * keys the row now names; `null` means the row still names what it named before.
+ *
+ * `processAndStoreImage` signals failure by *returning*, not by throwing, so a
+ * caller that only wrapped it in `try` would read every failure as a success and
+ * go on to delete the objects the chart is still displaying.
  */
-async function refreshCoverThumbnail(
+async function optimizeCoverImage(
   chartId: string,
-  coverImageUrl: string,
-): Promise<{ thumbnailKey: string | null; warning?: string }> {
+  rawKey: string,
+): Promise<{ coverKey: string | null; thumbnailKey: string | null; warning?: string }> {
   let result;
   try {
-    result = await generateThumbnail(chartId, coverImageUrl);
+    result = await processAndStoreImage(chartId, rawKey, "covers");
   } catch (err) {
-    console.error("Thumbnail generation failed (chart saved without thumbnail):", err);
-    return { thumbnailKey: null, warning: THUMBNAIL_WARNING };
+    console.error("Cover optimization failed (chart saved with the raw upload):", err);
+    return { coverKey: null, thumbnailKey: null, warning: COVER_WARNING };
   }
 
   if (!result.success) {
-    console.error("Thumbnail generation failed (chart saved without thumbnail):", result.error);
-    return { thumbnailKey: null, warning: THUMBNAIL_WARNING };
+    console.error("Cover optimization failed (chart saved with the raw upload):", result.error);
+    return { coverKey: null, thumbnailKey: null, warning: COVER_WARNING };
   }
-  return { thumbnailKey: result.thumbnailKey };
+
+  // The row names the derivatives before anything is deleted — the ordering that
+  // keeps a chart from ever pointing at an object that is already gone.
+  await prisma.chart.update({
+    where: { id: chartId },
+    data: { coverImageUrl: result.optimizedKey, coverThumbnailUrl: result.thumbnailKey },
+  });
+  return { coverKey: result.optimizedKey, thumbnailKey: result.thumbnailKey };
 }
 
-/** Generate cover thumbnail outside the transaction. Returns warning if it fails. */
-async function handleThumbnail(
+/**
+ * Optimizes whatever cover the form submitted, then removes every object the chart
+ * has stopped naming — the raw upload the optimized copy replaced, and any previous
+ * cover and thumbnail. One rule covers replacing a cover, removing one, and a failed
+ * optimization: **an old key is superseded only once the row has stopped naming it.**
+ */
+async function applyCoverOptimization(
   chartId: string,
-  coverImageUrl: string | null,
+  submitted: { coverImageUrl: string | null; coverThumbnailUrl: string | null },
+  previousKeys: (string | null)[],
 ): Promise<string | undefined> {
-  if (!coverImageUrl) return undefined;
-  return (await refreshCoverThumbnail(chartId, coverImageUrl)).warning;
+  const optimized = submitted.coverImageUrl
+    ? await optimizeCoverImage(chartId, submitted.coverImageUrl)
+    : null;
+
+  // Either the row now names the optimized pair, or optimization did not happen —
+  // no cover, or it failed — and the row still names exactly what the form sent.
+  const stillNamed = new Set(
+    (optimized?.coverKey
+      ? [optimized.coverKey, optimized.thumbnailKey]
+      : [submitted.coverImageUrl, submitted.coverThumbnailUrl]
+    ).filter((key): key is string => Boolean(key)),
+  );
+  await discardStoredObjects(
+    [...previousKeys, submitted.coverImageUrl].map((key) =>
+      key && !stillNamed.has(key) ? key : null,
+    ),
+    `chart ${chartId}`,
+  );
+
+  return optimized?.warning;
 }
 
 export async function createChart(formData: unknown) {
@@ -152,13 +185,15 @@ export async function createChart(formData: unknown) {
       return createChartAndProject(tx, validated, user.id);
     });
 
-    const thumbnailWarning = await handleThumbnail(created.id, validated.chart.coverImageUrl);
+    const coverWarning = validated.chart.coverImageUrl
+      ? await applyCoverOptimization(created.id, validated.chart, [])
+      : undefined;
 
     revalidatePath("/charts");
     revalidatePath("/series");
     revalidatePath("/fabric");
     revalidateTag("stats", { expire: 0 });
-    return { success: true as const, chartId: created.id, warning: thumbnailWarning };
+    return { success: true as const, chartId: created.id, warning: coverWarning };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };
@@ -232,13 +267,15 @@ export async function createChartWithSupplies(formData: unknown, supplyPayload: 
       return result;
     });
 
-    const thumbnailWarning = await handleThumbnail(created.id, validated.chart.coverImageUrl);
+    const coverWarning = validated.chart.coverImageUrl
+      ? await applyCoverOptimization(created.id, validated.chart, [])
+      : undefined;
 
     revalidatePath("/charts");
     revalidatePath("/series");
     revalidatePath("/fabric");
     revalidateTag("stats", { expire: 0 });
-    return { success: true as const, chartId: created.id, warning: thumbnailWarning };
+    return { success: true as const, chartId: created.id, warning: coverWarning };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };
@@ -349,27 +386,14 @@ export async function updateChart(chartId: string, formData: unknown) {
       }
     });
 
-    // Regenerate the thumbnail and clean up when the cover changed — replaced with
-    // a new image, or taken off the chart entirely.
-    let thumbnailWarning: string | undefined;
+    // Optimize and clean up when the cover changed — replaced with a new image, or
+    // taken off the chart entirely.
+    let coverWarning: string | undefined;
     if (chart.coverImageUrl !== existing.coverImageUrl) {
-      const refreshed = chart.coverImageUrl
-        ? await refreshCoverThumbnail(chartId, chart.coverImageUrl)
-        : { thumbnailKey: null, warning: undefined };
-      thumbnailWarning = refreshed.warning;
-
-      // One rule for both objects: an old key is superseded only once the row has
-      // stopped naming it. That is what keeps a failed regeneration from deleting
-      // the thumbnail the chart is still displaying — the form re-submits the old
-      // key, so the row still names it and it stays.
-      const currentThumbnailKey = refreshed.thumbnailKey ?? chart.coverThumbnailUrl;
-      await discardStoredObjects(
-        [
-          existing.coverImageUrl === chart.coverImageUrl ? null : existing.coverImageUrl,
-          existing.coverThumbnailUrl === currentThumbnailKey ? null : existing.coverThumbnailUrl,
-        ],
-        `chart ${chartId}`,
-      );
+      coverWarning = await applyCoverOptimization(chartId, chart, [
+        existing.coverImageUrl,
+        existing.coverThumbnailUrl,
+      ]);
     }
 
     revalidatePath("/charts");
@@ -377,7 +401,7 @@ export async function updateChart(chartId: string, formData: unknown) {
     revalidatePath("/series");
     revalidatePath("/fabric");
     revalidateTag("stats", { expire: 0 });
-    return { success: true as const, warning: thumbnailWarning };
+    return { success: true as const, warning: coverWarning };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };

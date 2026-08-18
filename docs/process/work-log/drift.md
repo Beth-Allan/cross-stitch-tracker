@@ -82,6 +82,47 @@ allow** at the same `/cleanup`; see Ruled below.)_
 _(Beth's rulings D-01–D-14, which set the process itself up, are in
 `WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
 
+### 2026-08-17 · the covers already in the library — ruled during P15
+
+**What happened.** P15 put chart covers on the same pipeline session photos use, so a cover is
+now stored as a 1200px WebP plus a thumbnail instead of at full upload size. That is
+forward-only: it fires when a cover is uploaded or replaced. Every cover already in Beth's
+library keeps its full-size original, which is exactly the complaint the item opens with — the
+chart she opens today is usually one whose cover was uploaded months ago.
+
+Converting them is a different shape of work: hundreds of stored pictures, each needing a
+download, two `sharp` encodes and three R2 calls, which cannot finish inside one request and
+cannot be exercised at all from a machine with no R2 credentials. Riding it along would have put
+an untestable production job inside an already review-gated item.
+
+**Surfaced to Beth** in-session as a decision: queue the conversion as its own session · or leave
+the old covers alone and let each one shrink only if she happens to replace it.
+
+**Her ruling: queue it.** New covers shrink from today; a follow-on session converts the ones
+already there. Recorded as build-plan item **P16**, and it is also the remaining pre-condition
+for the `covers/unsaved/` lifecycle rule P8 parked — the maintenance-ledger row is updated to say
+so.
+
+**What it changed.** No code beyond P15 itself. New build-plan item P16, a queue row, and the
+pre-condition text on the abandoned-uploads ledger row.
+
+### 2026-08-17 · retiring the old cover code's tests — ruled during P15
+
+**What happened.** P15 collapses two image paths into one, which retires `generateThumbnail` —
+the cover-only, thumbnail-only path. Its tests go with it: five naming it directly and a dozen
+whose descriptions did. Hard rule 2 makes a test removal Beth's call, on the record, whatever the
+reason.
+
+**Surfaced to Beth** in-session as a decision, with the fact that mattered: every assertion moves
+to the new path _before_ the old copies go, so nothing stops being checked.
+
+**Her ruling: retire them.** Test removals approved, on the record.
+
+**What it changed.** The key-pin and ownership proofs moved onto `processAndStoreImage`;
+`chart-actions-thumbnail.test.ts` became `chart-actions-cover-image.test.ts` with fifteen clauses
+where it had twelve; the auth file's `generateThumbnail` case folded its assertion into the
+`processAndStoreImage` case. Suite count unchanged at 2747.
+
 ### 2026-08-17 · the reconciliation story for abandoned uploads — ruled during P8
 
 **What happened.** P8's fourth defect was a decision, not a bug: the chart form uploads a cover

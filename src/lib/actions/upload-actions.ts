@@ -4,7 +4,6 @@ import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sd
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { nanoid } from "nanoid";
 import sharp from "sharp";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
@@ -262,21 +261,30 @@ export async function processAndStoreImage(
   const parsedKey = parseStorageKey(rawKey);
   if (!parsedKey || parsedKey.category !== category) return invalidKey();
 
+  // Ownership comes from the row, and so does the key: the raw upload must be the
+  // one the entity already records, so a caller cannot have an arbitrary object in
+  // this namespace read, re-encoded and stored under something it happens to own.
   if (category === "covers") {
     const chart = await prisma.chart.findUnique({
       where: { id: entityId },
-      select: { id: true, project: { select: { userId: true } } },
+      select: { id: true, coverImageUrl: true, project: { select: { userId: true } } },
     });
     if (!chart || chart.project?.userId !== user.id) {
       return { success: false as const, error: "Chart not found" };
     }
+    if (chart.coverImageUrl !== rawKey) {
+      return { success: false as const, error: "Cover image not found for this chart" };
+    }
   } else {
     const session = await prisma.stitchSession.findUnique({
       where: { id: entityId },
-      select: { id: true, project: { select: { userId: true } } },
+      select: { id: true, photoKey: true, project: { select: { userId: true } } },
     });
     if (!session || session.project?.userId !== user.id) {
       return { success: false as const, error: "Session not found" };
+    }
+    if (session.photoKey !== rawKey) {
+      return { success: false as const, error: "Photo not found for this session" };
     }
   }
 
@@ -334,65 +342,6 @@ export async function processAndStoreImage(
     return {
       success: false as const,
       error: "Failed to process image",
-    };
-  }
-}
-
-export async function generateThumbnail(chartId: string, coverKey: string) {
-  const user = await requireAuth();
-
-  if (!keyOwnerSchema.safeParse(chartId).success) {
-    return { success: false as const, error: "Chart not found" };
-  }
-  if (!storageKeySchema.safeParse(coverKey).success) return invalidKey();
-
-  const chart = await prisma.chart.findUnique({
-    where: { id: chartId },
-    select: { id: true, coverImageUrl: true, project: { select: { userId: true } } },
-  });
-  if (!chart || chart.project?.userId !== user.id) {
-    return { success: false as const, error: "Chart not found" };
-  }
-  // The key must be the one already recorded against this chart, so a caller
-  // cannot have an arbitrary object read, re-encoded and hung off a chart it owns.
-  if (chart.coverImageUrl !== coverKey) {
-    return { success: false as const, error: "Cover image not found for this chart" };
-  }
-
-  try {
-    const fetchResult = await fetchImageBuffer(coverKey);
-    if (!fetchResult.success) {
-      return { success: false as const, error: fetchResult.error };
-    }
-    const { buffer } = fetchResult;
-
-    const thumbnailBuffer = await sharp(buffer)
-      .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, { fit: "cover", withoutEnlargement: true })
-      .webp({ quality: THUMBNAIL_QUALITY })
-      .toBuffer();
-
-    const thumbnailKey = `covers/${chartId}/thumb-${nanoid()}.webp`;
-    const { client, bucket } = getWriteTarget();
-    const putCommand = new PutObjectCommand({
-      Bucket: bucket,
-      Key: thumbnailKey,
-      Body: thumbnailBuffer,
-      ContentType: "image/webp",
-    });
-    await client.send(putCommand);
-
-    await prisma.chart.update({
-      where: { id: chartId },
-      data: { coverThumbnailUrl: thumbnailKey },
-    });
-
-    revalidatePath(`/charts/${chartId}`);
-    return { success: true as const, thumbnailKey };
-  } catch (error) {
-    console.error("generateThumbnail error:", error);
-    return {
-      success: false as const,
-      error: "Failed to generate thumbnail",
     };
   }
 }

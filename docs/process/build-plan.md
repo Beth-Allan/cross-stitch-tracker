@@ -273,6 +273,45 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
 - **Done-when:** a newly uploaded cover is stored as an optimized WebP plus a thumbnail,
   test-first; one image pipeline remains; the backfill decision is recorded; gate green;
   fresh `/review` before merge.
+- **Backfill decision (trap ①) — Beth's ruling, 2026-08-17, in the P15 session:** **not in this
+  item; queued as its own item P16.** P15 is forward-only — a cover shrinks when it is uploaded
+  or replaced, and the covers already in the library keep their full-size originals until P16
+  converts them. Asked as a decision because it is her library: converting hundreds of stored
+  pictures cannot be tested from a machine with no R2 credentials and cannot run inside one
+  request, so riding it along would have put an untestable production job inside a gated item.
+  She chose to queue it. It is also the remaining pre-condition for the `covers/unsaved/`
+  lifecycle rule P8 parked (maintenance-ledger row).
+- **Test removals — Beth's approval, 2026-08-17, in the P15 session, on the record** (hard rule
+  2): retiring `generateThumbnail` retires the tests written against it. Every assertion was
+  carried to the new path first — the key-pin and ownership proofs moved onto
+  `processAndStoreImage`, and `chart-actions-thumbnail.test.ts` became
+  `chart-actions-cover-image.test.ts` with more clauses than it had.
+
+### P16 Shrink the chart covers already in the library — **created by Beth's ruling during P15 (2026-08-17)**
+
+- **Objective:** P15 made cover optimization forward-only. Every cover uploaded before it is
+  still stored at full phone-photo size, under whatever key it was uploaded with — including
+  `covers/unsaved/…` for anything saved from the create form. Convert them: run each existing
+  cover through `processAndStoreImage`, point the chart at the derivatives, delete the originals.
+- **Why it exists:** Beth's ruling during P15 (drift 2026-08-17) — the forward path and the
+  conversion are separate work, and the conversion is what makes opening an _old_ chart fast.
+- **Cited specs:** the P15 brief and its diff · `docs/INTEGRATIONS.md` (object lifecycle) · the
+  maintenance-ledger row on abandoned pre-save uploads, whose pre-condition this closes.
+- **Traps:** ① **It cannot run in one request.** Hundreds of charts × a download, two `sharp`
+  encodes and three R2 calls each will exceed any serverless budget — it needs batching with
+  resumable progress, and "how does Beth start it and see it finish" is a real design question,
+  not an afterthought. ② `processAndStoreImage` pins the raw key to the one the row records, so
+  the conversion must read each chart's current `coverImageUrl` and pass exactly that. ③ Already
+  optimized covers must be skipped, and the test for "already optimized" has to be the row, not
+  the key's spelling. ④ A cover whose object is missing from R2 must leave the row alone and be
+  reported, never blanked. ⑤ **Gated** — `upload-actions.ts` and the cover path; `/review` before
+  merge. ⑥ No R2 credentials exist on the build machine, so the run itself is exercised against
+  the Vercel preview's scratch bucket (R-1) before it touches production.
+- **Done-when:** every chart whose cover is not yet an optimized derivative has one, test-first;
+  the originals are deleted only after each row is updated; a chart with a missing object is
+  reported and left intact; Beth can start it and see it finish without running a command; the
+  maintenance-ledger pre-condition is updated to say the `covers/unsaved/` lifecycle rule is now
+  safe; gate green; fresh `/review` before merge.
 
 ## Stage F — post-audit fixes (seeded from the dissolved Phase 41, Beth's ruling D-10)
 
