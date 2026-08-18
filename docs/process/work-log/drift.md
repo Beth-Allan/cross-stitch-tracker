@@ -107,7 +107,10 @@ the too-small ones marked — that is a new item, not a doc edit; (c) park it fo
 
 **Raised by:** the layer-1 review of PR #98 (F-4), 2026-08-18. **Not silently resolved:** the code
 ships the behaviour F-4's brief specified, FAB-006 is left exactly as Beth stated it, and this row
-carries the mismatch until she rules.
+carried the mismatch until she ruled.
+
+**Closed 2026-08-18** — F-4 merged as #98 with her ruling recorded below and FAB-007 written;
+what remains is the build, which is item **F-5**, the queue's top row.
 
 **Ruling (2026-08-18, in the F-4 session): show them, with the qualifier — and as its own item.**
 Beth's question was the better answer than either option offered: _"Is there a way to add logic
