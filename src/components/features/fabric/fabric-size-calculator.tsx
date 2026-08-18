@@ -1,4 +1,8 @@
-import { calculateRequiredFabricSize, doesFabricFit } from "@/lib/utils/fabric-calculator";
+import {
+  calculateRequiredFabricSize,
+  doesFabricFit,
+  formatRequiredInches,
+} from "@/lib/utils/fabric-calculator";
 import { Badge } from "@/components/ui/badge";
 
 interface FabricSizeCalculatorProps {
@@ -43,8 +47,8 @@ export function FabricSizeCalculator({ fabric, project }: FabricSizeCalculatorPr
             Required
           </p>
           <p className="text-foreground mt-1 text-sm font-medium">
-            {required.requiredWidthInches.toFixed(1)}&quot; x{" "}
-            {required.requiredHeightInches.toFixed(1)}&quot;
+            {formatRequiredInches(required.requiredWidthInches)}&quot; x{" "}
+            {formatRequiredInches(required.requiredHeightInches)}&quot;
           </p>
         </div>
 
