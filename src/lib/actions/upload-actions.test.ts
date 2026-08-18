@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { createMockPrisma, assertSuccess, assertFailure } from "@/__tests__/mocks";
 import {
   MAX_FILE_SIZE,
@@ -37,10 +38,39 @@ vi.mock("@aws-sdk/s3-request-presigner", () => ({
 const mockToBuffer = vi.fn().mockResolvedValue(Buffer.from("processed-image-data"));
 const mockWebp = vi.fn().mockReturnValue({ toBuffer: mockToBuffer });
 const mockResize = vi.fn().mockReturnValue({ webp: mockWebp });
-const mockSharp = vi.fn().mockReturnValue({ resize: mockResize });
+const mockMetadata = vi.fn().mockResolvedValue({ format: "png", width: 800, height: 600 });
+const mockSharp = vi.fn().mockReturnValue({ resize: mockResize, metadata: mockMetadata });
 vi.mock("sharp", () => ({ default: mockSharp }));
 
 vi.mock("nanoid", () => ({ nanoid: () => "test-nano-id" }));
+
+type SentCommand = { name: string; Bucket: string; Key: string };
+
+/** Every S3 command the action issued, by type and by the object it addressed. */
+function sentCommands(): SentCommand[] {
+  return mockSend.mock.calls.map(([command]) => ({
+    name: (command as { constructor: { name: string } }).constructor.name,
+    Bucket: (command as { input: { Bucket: string } }).input.Bucket,
+    Key: (command as { input: { Key: string } }).input.Key,
+  }));
+}
+
+function presignedKeys(): string[] {
+  return vi
+    .mocked(getSignedUrl)
+    .mock.calls.map((call) => (call[1] as unknown as { input: { Key: string } }).input.Key);
+}
+
+function imageResponse(body = "fake-image-data") {
+  return {
+    ContentLength: body.length,
+    Body: {
+      [Symbol.asyncIterator]: async function* () {
+        yield Buffer.from(body);
+      },
+    },
+  };
+}
 
 describe("upload-actions failure modes", () => {
   beforeEach(() => {
@@ -51,13 +81,20 @@ describe("upload-actions failure modes", () => {
     mockResize.mockReset();
     mockWebp.mockReset();
     mockToBuffer.mockReset();
+    mockMetadata.mockReset();
     // Restore default implementations
     mockGetR2Client.mockReturnValue({ send: mockSend });
     mockSend.mockResolvedValue({});
-    mockSharp.mockReturnValue({ resize: mockResize });
+    mockSharp.mockReturnValue({ resize: mockResize, metadata: mockMetadata });
+    mockMetadata.mockResolvedValue({ format: "png", width: 800, height: 600 });
     mockResize.mockReturnValue({ webp: mockWebp });
     mockWebp.mockReturnValue({ toBuffer: mockToBuffer });
     mockToBuffer.mockResolvedValue(Buffer.from("processed-image-data"));
+    mockPrisma.chart.findUnique.mockResolvedValue({
+      id: "chart-1",
+      coverImageUrl: "covers/chart-1/raw.png",
+      project: { userId: "user-1" },
+    });
   });
 
   describe("getPresignedUploadUrl", () => {
@@ -164,7 +201,7 @@ describe("upload-actions failure modes", () => {
         throw new Error("R2 environment variables not configured");
       });
 
-      const result = await getPresignedDownloadUrl("some-key");
+      const result = await getPresignedDownloadUrl("files/chart-1/abc-pattern.pdf");
 
       assertFailure(result);
       expect(result.error).toContain("not configured");
@@ -176,148 +213,13 @@ describe("upload-actions failure modes", () => {
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       vi.mocked(getSignedUrl).mockRejectedValueOnce(new Error("Unexpected timeout"));
 
-      const result = await getPresignedDownloadUrl("some-key");
+      const result = await getPresignedDownloadUrl("files/chart-1/abc-pattern.pdf");
 
       assertFailure(result);
       expect(result.error).not.toContain("not configured");
       expect(result.error).toBe("Failed to generate download URL");
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
-    });
-  });
-
-  describe("confirmUpload", () => {
-    it("returns error for invalid field name", async () => {
-      const { confirmUpload } = await import("./upload-actions");
-
-      const result = await confirmUpload({
-        chartId: "c1",
-        field: "hackerField",
-        key: "k1",
-      });
-
-      assertFailure(result);
-      expect(result.error).toContain("Invalid field");
-    });
-
-    it("returns error on DB failure during update", async () => {
-      const { confirmUpload } = await import("./upload-actions");
-      mockPrisma.chart.findUnique.mockResolvedValueOnce({
-        id: "c1",
-        project: { userId: "user-1" },
-      });
-      mockPrisma.chart.update.mockRejectedValueOnce(new Error("DB error"));
-
-      const result = await confirmUpload({
-        chartId: "c1",
-        field: "coverImageUrl",
-        key: "k1",
-      });
-
-      expect(result).toEqual({ success: false, error: "Failed to confirm upload" });
-    });
-
-    it("triggers processAndStoreImage for coverImageUrl and updates DB with optimized keys", async () => {
-      const { confirmUpload } = await import("./upload-actions");
-      mockPrisma.chart.findUnique.mockResolvedValueOnce({
-        id: "c1",
-        project: { userId: "user-1" },
-      });
-      // First call: initial DB update with raw key
-      mockPrisma.chart.update.mockResolvedValue({});
-      // Mock R2 to return an image body for processAndStoreImage
-      const mockBody = {
-        [Symbol.asyncIterator]: async function* () {
-          yield Buffer.from("fake-image-data");
-        },
-      };
-      mockSend
-        .mockResolvedValueOnce({ Body: mockBody }) // GetObjectCommand (fetch original)
-        .mockResolvedValueOnce({}) // PutObjectCommand (upload optimized)
-        .mockResolvedValueOnce({}) // PutObjectCommand (upload thumbnail)
-        .mockResolvedValueOnce({}); // DeleteObjectCommand (delete raw)
-
-      const result = await confirmUpload({
-        chartId: "c1",
-        field: "coverImageUrl",
-        key: "covers/c1/raw-image.png",
-      });
-
-      expect(result.success).toBe(true);
-      // DB should be updated with optimized key (second call updates with processed keys)
-      const updateCalls = mockPrisma.chart.update.mock.calls;
-      expect(updateCalls.length).toBeGreaterThanOrEqual(2);
-      // Second update should have optimized keys containing .webp
-      const secondUpdate = updateCalls[1][0];
-      expect(secondUpdate.data.coverImageUrl).toContain(".webp");
-      expect(secondUpdate.data.coverThumbnailUrl).toContain("thumb-");
-    });
-
-    it("still succeeds when processAndStoreImage fails (graceful fallback with raw image)", async () => {
-      const { confirmUpload } = await import("./upload-actions");
-      mockPrisma.chart.findUnique.mockResolvedValueOnce({
-        id: "c1",
-        project: { userId: "user-1" },
-      });
-      mockPrisma.chart.update.mockResolvedValue({});
-      // R2 GetObject fails -- processAndStoreImage will fail
-      mockSend.mockRejectedValueOnce(new Error("R2 fetch failed"));
-
-      const result = await confirmUpload({
-        chartId: "c1",
-        field: "coverImageUrl",
-        key: "covers/c1/raw-image.png",
-      });
-
-      // Upload still confirmed -- raw key preserved in DB
-      expect(result.success).toBe(true);
-    });
-
-    it("does NOT trigger processAndStoreImage for coverThumbnailUrl", async () => {
-      const { confirmUpload } = await import("./upload-actions");
-      mockPrisma.chart.findUnique.mockResolvedValueOnce({
-        id: "c1",
-        project: { userId: "user-1" },
-      });
-      mockPrisma.chart.update.mockResolvedValue({});
-
-      const result = await confirmUpload({
-        chartId: "c1",
-        field: "coverThumbnailUrl",
-        key: "covers/c1/thumb-existing.webp",
-      });
-
-      expect(result.success).toBe(true);
-      expect(mockSend).not.toHaveBeenCalled();
-    });
-
-    it("rejects when chart does not exist", async () => {
-      const { confirmUpload } = await import("./upload-actions");
-      mockPrisma.chart.findUnique.mockResolvedValueOnce(null);
-
-      const result = await confirmUpload({
-        chartId: "nonexistent",
-        field: "coverImageUrl",
-        key: "covers/c1/image.png",
-      });
-
-      expect(result).toEqual({ success: false, error: "Chart not found" });
-    });
-
-    it("rejects when chart belongs to different user", async () => {
-      const { confirmUpload } = await import("./upload-actions");
-      mockPrisma.chart.findUnique.mockResolvedValueOnce({
-        id: "c1",
-        project: { userId: "other-user" },
-      });
-
-      const result = await confirmUpload({
-        chartId: "c1",
-        field: "coverImageUrl",
-        key: "covers/c1/image.png",
-      });
-
-      expect(result).toEqual({ success: false, error: "Chart not found" });
     });
   });
 
@@ -431,7 +333,7 @@ describe("upload-actions failure modes", () => {
       const { deleteFile } = await import("./upload-actions");
       mockSend.mockRejectedValueOnce(new Error("R2 send failed"));
 
-      const result = await deleteFile("some-key");
+      const result = await deleteFile("files/chart-1/abc-pattern.pdf");
 
       expect(result).toEqual({ success: false, error: "Failed to delete file" });
     });
@@ -451,9 +353,16 @@ describe("upload-actions failure modes", () => {
       const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
       vi.mocked(getSignedUrl).mockResolvedValueOnce("https://presigned.example.com/key1");
 
-      const result = await getPresignedImageUrls([null, undefined, "", "key1"]);
+      const result = await getPresignedImageUrls([
+        null,
+        undefined,
+        "",
+        "covers/chart-1/thumb-key1.webp",
+      ]);
 
-      expect(result).toEqual({ key1: "https://presigned.example.com/key1" });
+      expect(result).toEqual({
+        "covers/chart-1/thumb-key1.webp": "https://presigned.example.com/key1",
+      });
       // getSignedUrl should only be called once (for "key1"), not for nulls/empties
       expect(getSignedUrl).toHaveBeenCalledTimes(1);
     });
@@ -465,11 +374,14 @@ describe("upload-actions failure modes", () => {
         .mockResolvedValueOnce("https://presigned.example.com/key1")
         .mockResolvedValueOnce("https://presigned.example.com/key2");
 
-      const result = await getPresignedImageUrls(["key1", "key2"]);
+      const result = await getPresignedImageUrls([
+        "covers/chart-1/thumb-key1.webp",
+        "covers/chart-2/thumb-key2.webp",
+      ]);
 
       expect(result).toEqual({
-        key1: "https://presigned.example.com/key1",
-        key2: "https://presigned.example.com/key2",
+        "covers/chart-1/thumb-key1.webp": "https://presigned.example.com/key1",
+        "covers/chart-2/thumb-key2.webp": "https://presigned.example.com/key2",
       });
     });
 
@@ -478,9 +390,15 @@ describe("upload-actions failure modes", () => {
       const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
       vi.mocked(getSignedUrl).mockResolvedValueOnce("https://presigned.example.com/key1");
 
-      const result = await getPresignedImageUrls(["key1", "key1", "key1"]);
+      const result = await getPresignedImageUrls([
+        "covers/chart-1/thumb-key1.webp",
+        "covers/chart-1/thumb-key1.webp",
+        "covers/chart-1/thumb-key1.webp",
+      ]);
 
-      expect(result).toEqual({ key1: "https://presigned.example.com/key1" });
+      expect(result).toEqual({
+        "covers/chart-1/thumb-key1.webp": "https://presigned.example.com/key1",
+      });
       expect(getSignedUrl).toHaveBeenCalledTimes(1);
     });
 
@@ -492,9 +410,14 @@ describe("upload-actions failure modes", () => {
         .mockResolvedValueOnce("https://presigned.example.com/good-key")
         .mockRejectedValueOnce(new Error("S3 error for bad-key"));
 
-      const result = await getPresignedImageUrls(["good-key", "bad-key"]);
+      const result = await getPresignedImageUrls([
+        "covers/chart-1/thumb-good.webp",
+        "covers/chart-2/thumb-bad.webp",
+      ]);
 
-      expect(result).toEqual({ "good-key": "https://presigned.example.com/good-key" });
+      expect(result).toEqual({
+        "covers/chart-1/thumb-good.webp": "https://presigned.example.com/good-key",
+      });
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
@@ -506,7 +429,7 @@ describe("upload-actions failure modes", () => {
         throw new Error("R2 environment variables not configured");
       });
 
-      const result = await getPresignedImageUrls(["key1"]);
+      const result = await getPresignedImageUrls(["covers/chart-1/thumb-key1.webp"]);
 
       expect(result).toEqual({});
       consoleSpy.mockRestore();
@@ -617,5 +540,316 @@ describe("upload action zip type enforcement", () => {
 
     assertFailure(result);
     expect(result.error).toContain("Invalid image type");
+  });
+});
+
+describe("upload-actions object key discipline", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSend.mockReset();
+    mockGetR2Client.mockReturnValue({ send: mockSend });
+    mockSend.mockResolvedValue({});
+    vi.mocked(getSignedUrl).mockResolvedValue("https://presigned.example.com/test");
+  });
+
+  it("builds the object key from a sanitized filename", async () => {
+    const { getPresignedUploadUrl } = await import("./upload-actions");
+
+    const result = await getPresignedUploadUrl({
+      fileName: "Winter Robin (2).png",
+      contentType: "image/png",
+      fileSize: 1024,
+      category: "covers",
+      projectId: "chart-1",
+    });
+
+    assertSuccess(result);
+    expect(result.key).toBe("covers/chart-1/test-nano-id-Winter-Robin-2-.png");
+  });
+
+  it("rejects a projectId that would add a segment to the object key", async () => {
+    const { getPresignedUploadUrl } = await import("./upload-actions");
+
+    const result = await getPresignedUploadUrl({
+      fileName: "cover.png",
+      contentType: "image/png",
+      fileSize: 1024,
+      category: "covers",
+      projectId: "chart-1/../files",
+    });
+
+    assertFailure(result);
+    expect(vi.mocked(getSignedUrl)).not.toHaveBeenCalled();
+  });
+
+  it("deleteFile refuses a key outside the app's namespace", async () => {
+    const { deleteFile } = await import("./upload-actions");
+
+    const result = await deleteFile("../../some-other-bucket-object");
+
+    assertFailure(result);
+    expect(result.error).toBe("Invalid storage key");
+    expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it("deleteFile targets exactly the bucket and key it was given", async () => {
+    const { deleteFile } = await import("./upload-actions");
+
+    const result = await deleteFile("covers/chart-1/opt-abc.webp");
+
+    assertSuccess(result);
+    expect(mockSend).toHaveBeenCalledTimes(1);
+    expect(sentCommands()).toEqual([
+      { name: "DeleteObjectCommand", Bucket: "test-bucket", Key: "covers/chart-1/opt-abc.webp" },
+    ]);
+  });
+
+  it("getPresignedDownloadUrl refuses a malformed key", async () => {
+    const { getPresignedDownloadUrl } = await import("./upload-actions");
+
+    const result = await getPresignedDownloadUrl("covers/chart-1/nested/abc.png");
+
+    assertFailure(result);
+    expect(result.error).toBe("Invalid storage key");
+    expect(vi.mocked(getSignedUrl)).not.toHaveBeenCalled();
+  });
+
+  it("getPresignedImageUrls drops malformed keys and presigns the rest", async () => {
+    const { getPresignedImageUrls } = await import("./upload-actions");
+
+    const result = await getPresignedImageUrls([
+      "covers/chart-1/thumb-abc.webp",
+      "not-a-key",
+      "covers/chart-1/nested/deep.webp",
+    ]);
+
+    expect(Object.keys(result)).toEqual(["covers/chart-1/thumb-abc.webp"]);
+    expect(presignedKeys()).toEqual(["covers/chart-1/thumb-abc.webp"]);
+  });
+});
+
+describe("upload-actions ownership scoping", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSend.mockReset();
+    mockGetR2Client.mockReturnValue({ send: mockSend });
+    mockSend.mockResolvedValue({});
+    mockSharp.mockReturnValue({ resize: mockResize, metadata: mockMetadata });
+    mockResize.mockReturnValue({ webp: mockWebp });
+    mockWebp.mockReturnValue({ toBuffer: mockToBuffer });
+    mockToBuffer.mockResolvedValue(Buffer.from("processed-image-data"));
+    mockMetadata.mockResolvedValue({ format: "png", width: 800, height: 600 });
+  });
+
+  it("generateThumbnail refuses a chart the caller does not own", async () => {
+    const { generateThumbnail } = await import("./upload-actions");
+    mockPrisma.chart.findUnique.mockResolvedValue({
+      id: "chart-1",
+      coverImageUrl: "covers/chart-1/abc-raw.png",
+      project: { userId: "someone-else" },
+    });
+
+    const result = await generateThumbnail("chart-1", "covers/chart-1/abc-raw.png");
+
+    assertFailure(result);
+    expect(result.error).toBe("Chart not found");
+    expect(mockSend).not.toHaveBeenCalled();
+    expect(mockPrisma.chart.update).not.toHaveBeenCalled();
+  });
+
+  it("generateThumbnail refuses a key that is not the chart's own cover", async () => {
+    const { generateThumbnail } = await import("./upload-actions");
+    mockPrisma.chart.findUnique.mockResolvedValue({
+      id: "chart-1",
+      coverImageUrl: "covers/chart-1/abc-raw.png",
+      project: { userId: "user-1" },
+    });
+
+    const result = await generateThumbnail("chart-1", "covers/chart-2/abc-someone-elses.png");
+
+    assertFailure(result);
+    expect(mockSend).not.toHaveBeenCalled();
+    expect(mockPrisma.chart.update).not.toHaveBeenCalled();
+  });
+
+  it("generateThumbnail reads the cover and writes the thumbnail at the chart's own key", async () => {
+    const { generateThumbnail } = await import("./upload-actions");
+    mockPrisma.chart.findUnique.mockResolvedValue({
+      id: "chart-1",
+      coverImageUrl: "covers/chart-1/abc-raw.png",
+      project: { userId: "user-1" },
+    });
+    mockSend.mockResolvedValueOnce(imageResponse());
+
+    const result = await generateThumbnail("chart-1", "covers/chart-1/abc-raw.png");
+
+    assertSuccess(result);
+    expect(sentCommands()).toEqual([
+      { name: "GetObjectCommand", Bucket: "test-bucket", Key: "covers/chart-1/abc-raw.png" },
+      {
+        name: "PutObjectCommand",
+        Bucket: "test-bucket",
+        Key: "covers/chart-1/thumb-test-nano-id.webp",
+      },
+    ]);
+    expect(mockPrisma.chart.update).toHaveBeenCalledWith({
+      where: { id: "chart-1" },
+      data: { coverThumbnailUrl: "covers/chart-1/thumb-test-nano-id.webp" },
+    });
+  });
+
+  it("processAndStoreImage refuses a key from a different category", async () => {
+    const { processAndStoreImage } = await import("./upload-actions");
+
+    const result = await processAndStoreImage("chart-1", "files/chart-1/abc-raw.png", "covers");
+
+    assertFailure(result);
+    expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it("processAndStoreImage refuses a chart the caller does not own", async () => {
+    const { processAndStoreImage } = await import("./upload-actions");
+    mockPrisma.chart.findUnique.mockResolvedValue({
+      id: "chart-1",
+      project: { userId: "someone-else" },
+    });
+
+    const result = await processAndStoreImage("chart-1", "covers/chart-1/abc-raw.png", "covers");
+
+    assertFailure(result);
+    expect(result.error).toBe("Chart not found");
+    expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it("processAndStoreImage refuses a session the caller does not own", async () => {
+    const { processAndStoreImage } = await import("./upload-actions");
+    mockPrisma.stitchSession.findUnique.mockResolvedValue({
+      id: "session-1",
+      project: { userId: "someone-else" },
+    });
+
+    const result = await processAndStoreImage(
+      "session-1",
+      "sessions/project-1/abc-raw.png",
+      "sessions",
+    );
+
+    assertFailure(result);
+    expect(result.error).toBe("Session not found");
+    expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it("processAndStoreImage reads the raw key and writes both derivatives under the entity", async () => {
+    const { processAndStoreImage } = await import("./upload-actions");
+    mockPrisma.stitchSession.findUnique.mockResolvedValue({
+      id: "session-1",
+      project: { userId: "user-1" },
+    });
+    mockSend.mockResolvedValueOnce(imageResponse());
+
+    const result = await processAndStoreImage(
+      "session-1",
+      "sessions/project-1/abc-raw.png",
+      "sessions",
+    );
+
+    assertSuccess(result);
+    expect(sentCommands()).toEqual([
+      { name: "GetObjectCommand", Bucket: "test-bucket", Key: "sessions/project-1/abc-raw.png" },
+      {
+        name: "PutObjectCommand",
+        Bucket: "test-bucket",
+        Key: "sessions/session-1/opt-test-nano-id.webp",
+      },
+      {
+        name: "PutObjectCommand",
+        Bucket: "test-bucket",
+        Key: "sessions/session-1/thumb-test-nano-id.webp",
+      },
+    ]);
+  });
+});
+
+describe("upload-actions size and format enforcement", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSend.mockReset();
+    mockGetR2Client.mockReturnValue({ send: mockSend });
+    mockSend.mockResolvedValue({});
+    mockSharp.mockReturnValue({ resize: mockResize, metadata: mockMetadata });
+    mockResize.mockReturnValue({ webp: mockWebp });
+    mockWebp.mockReturnValue({ toBuffer: mockToBuffer });
+    mockToBuffer.mockResolvedValue(Buffer.from("processed-image-data"));
+    mockMetadata.mockResolvedValue({ format: "png", width: 800, height: 600 });
+    mockPrisma.chart.findUnique.mockResolvedValue({
+      id: "chart-1",
+      coverImageUrl: "covers/chart-1/abc-raw.png",
+      project: { userId: "user-1" },
+    });
+  });
+
+  it("refuses an object whose declared length exceeds the cap, before reading its bytes", async () => {
+    const { processAndStoreImage } = await import("./upload-actions");
+    let bodyRead = false;
+    mockSend.mockResolvedValueOnce({
+      ContentLength: MAX_FILE_SIZE + 1,
+      Body: {
+        [Symbol.asyncIterator]: async function* () {
+          bodyRead = true;
+          yield Buffer.from("fake-image-data");
+        },
+      },
+    });
+
+    const result = await processAndStoreImage("chart-1", "covers/chart-1/abc-raw.png", "covers");
+
+    assertFailure(result);
+    expect(bodyRead).toBe(false);
+    expect(mockSharp).not.toHaveBeenCalled();
+  });
+
+  it("stops reading when the bytes exceed the cap even if the declared length was a lie", async () => {
+    const { processAndStoreImage } = await import("./upload-actions");
+    let chunksYielded = 0;
+    mockSend.mockResolvedValueOnce({
+      ContentLength: 1024,
+      Body: {
+        [Symbol.asyncIterator]: async function* () {
+          // Bounded so a missing cap fails the assertion instead of hanging the suite.
+          for (let i = 0; i < MAX_FILE_SIZE / (1024 * 1024) + 10; i += 1) {
+            chunksYielded += 1;
+            yield Buffer.alloc(1024 * 1024);
+          }
+        },
+      },
+    });
+
+    const result = await processAndStoreImage("chart-1", "covers/chart-1/abc-raw.png", "covers");
+
+    assertFailure(result);
+    expect(chunksYielded).toBeLessThanOrEqual(MAX_FILE_SIZE / (1024 * 1024) + 1);
+    expect(mockSharp).not.toHaveBeenCalled();
+  });
+
+  it("refuses bytes that do not decode as an allowed image format", async () => {
+    const { processAndStoreImage } = await import("./upload-actions");
+    mockSend.mockResolvedValueOnce(imageResponse());
+    mockMetadata.mockResolvedValue({ format: "gif", width: 800, height: 600 });
+
+    const result = await processAndStoreImage("chart-1", "covers/chart-1/abc-raw.png", "covers");
+
+    assertFailure(result);
+    const puts = sentCommands().filter((command) => command.name === "PutObjectCommand");
+    expect(puts).toEqual([]);
+  });
+
+  it("accepts bytes that decode as an allowed image format", async () => {
+    const { processAndStoreImage } = await import("./upload-actions");
+    mockSend.mockResolvedValueOnce(imageResponse());
+    mockMetadata.mockResolvedValue({ format: "jpeg", width: 800, height: 600 });
+
+    const result = await processAndStoreImage("chart-1", "covers/chart-1/abc-raw.png", "covers");
+
+    assertSuccess(result);
   });
 });

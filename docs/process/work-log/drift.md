@@ -82,6 +82,33 @@ allow** at the same `/cleanup`; see Ruled below.)_
 _(Beth's rulings D-01–D-14, which set the process itself up, are in
 `WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
 
+### 2026-08-17 · the dead cover-optimizer — ruled during P2
+
+**What happened.** P2's brief left one thing for Beth: `confirmUpload` in
+`src/lib/actions/upload-actions.ts` has had zero non-test callers since the cover flow moved to
+`generateThumbnail`, yet every export of a `"use server"` file is a live POST endpoint — so it sat
+there Zod-less, writing a caller-supplied string into a chart's cover fields. It was also the only
+code path that would ever have _optimized_ a cover, so chart covers are stored at full upload size
+today while session photos are not. Deleting it takes its tests with it, and the 2026-08-17
+test-removal approvals named only P3 and P12, so this needed her word (hard rule 2).
+
+**Surfaced to Beth** in-session as a decision: delete and queue the shrinking separately · delete
+and drop the idea · wire cover optimization up inside P2. She asked what a senior developer would
+recommend, was given the reasoning — dead code that is also an unchecked endpoint is pure risk;
+a behaviour change should not ride inside a hardening fix; and when it is built it should be built
+on the session-photo pipeline that already runs in production, not on code that never has — and
+chose the recommendation.
+
+**Her ruling:** delete `confirmUpload` and its tests in P2 (**test removal approved, on the
+record**), and queue cover-image optimization as its own item **after P8**, since P8 owns the same
+cover-replace and orphan-cleanup code. Nothing about the app changes for her today.
+
+**What it changed.** `confirmUpload` and `VALID_CHART_FIELDS` are gone; the seven `confirmUpload`
+tests went with them. New build-plan item **P15** carries the shrinking, queued behind P8.
+`docs/ARCHITECTURE.md`'s "three-step" upload description — which documented `confirmUpload` as
+step 3 and had been false since the flow changed — is corrected in the same PR (descriptive
+staleness, protocol §6).
+
 ### 2026-08-17 · review layer 2 asked Beth to check a preview she could not log into — CLOSED by R-1
 
 **What contradicts what.** `session-protocol.md` §5 layer 2 (and CLAUDE.md's summary of it) says a

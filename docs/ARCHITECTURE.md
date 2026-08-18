@@ -208,13 +208,15 @@ showing yesterday):
 5. `revalidatePath()` / `revalidateTag("stats", { expire: 0 })` — the Next 16 two-argument form
 6. Return `{ success: true, ... }` or `{ success: false, error: string }`
 
-### File Uploads (R2 Three-Step Presigned URL)
+### File Uploads (presigned PUT, verified on commit)
 
-1. Client → Server Action (`getPresignedUploadUrl`): validates metadata, generates presigned PUT URL (10-min expiry)
+1. Client → Server Action (`getPresignedUploadUrl`): Zod-parses the request, sanitizes the filename into the key, returns a presigned PUT URL (10-min expiry)
 2. Client → R2 directly: `fetch(url, { method: "PUT", body: file })` — bytes never touch Next.js server
-3. Client → Server Action (`confirmUpload`): verifies ownership, writes key to DB, triggers server-side image processing (sharp → WebP + thumbnail → R2)
+3. Client → the action that owns the entity (`addChartFile`, or the chart/session form): ownership is checked, then **the stored object is verified before the key becomes durable**
 
-R2 key pattern: `{category}/{projectId}/{nanoid()}-{filename}` (categories: `covers`, `files`, `sessions`)
+Step 1 constrains nothing about the bytes. A presigned PUT signs method, bucket, key and expiry; `content-type` is unsignable and the payload hash is `UNSIGNED_PAYLOAD`, so the size and type declared in step 1 are claims. Enforcement is therefore in step 3, against what R2 actually holds: `HeadObject`'s `ContentLength` for chart files (recorded instead of the client's number, over-cap uploads deleted), and `GetObject`'s `ContentLength` plus a bounded read plus the format `sharp` decodes for images.
+
+R2 key pattern: `{category}/{entityId}/{nanoid()}-{filename}` (categories: `covers`, `files`, `sessions`). Every action that accepts a key parses it against that grammar first (`parseStorageKey`), and the ones that act on an entity resolve the key from an ownership-checked row.
 
 ### Stats Queries
 

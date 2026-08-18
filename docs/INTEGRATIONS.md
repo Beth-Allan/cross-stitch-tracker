@@ -55,14 +55,17 @@ deliberately absent.
     believes it is isolated and is not is worse than one that fails loudly
   - Endpoint pattern: `https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com`
   - Upload flow: client → presigned PUT URL (10-minute expiry) → R2 directly; the server then
-    confirms the upload and processes it
+    verifies the stored object (`HeadObject` size for chart files, decoded format for images)
+    before the key is recorded, and processes images from there
   - Download flow: server generates a presigned GET URL (1-hour expiry) for client display
   - Browser-side allowance: the CSP in `next.config.ts` permits
     `https://*.r2.cloudflarestorage.com` in `img-src` and `connect-src`. A new R2 hostname needs a
     CSP change or images silently fail to load
   - Storage keys:
     - Raw upload (all categories): `<category>/<entityId>/<nanoid>-<sanitizedName>`, where
-      `<category>` is `covers`, `sessions`, or `files`
+      `<category>` is `covers`, `sessions`, or `files`. `<sanitizedName>` is reduced to
+      `[A-Za-z0-9._-]` at upload time; keys written before that rule still read back, because
+      `parseStorageKey` bounds the name segment rather than re-spelling it
     - Optimized image: `<category>/<entityId>/opt-<nanoid>.webp`
     - Thumbnail: `<category>/<entityId>/thumb-<nanoid>.webp`
   - Image optimization: raw upload → `sharp` WebP conversion → optimized + thumbnail stored →

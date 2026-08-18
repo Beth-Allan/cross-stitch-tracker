@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { createMockPrisma, assertSuccess, assertFailure } from "@/__tests__/mocks";
+import { MAX_FILE_SIZE } from "@/lib/validations/upload";
 
 // Mock auth to return authenticated session
 vi.mock("@/lib/auth", () => ({
@@ -31,7 +32,7 @@ describe("chart-file-actions", () => {
     vi.clearAllMocks();
     mockSend.mockReset();
     mockGetR2Client.mockReturnValue({ send: mockSend });
-    mockSend.mockResolvedValue({});
+    mockSend.mockResolvedValue({ ContentLength: 5000, ContentType: "application/pdf" });
   });
 
   describe("addChartFile", () => {
@@ -254,5 +255,181 @@ describe("chart-file-actions", () => {
       assertFailure(result);
       expect(result.error).toBe("File storage is not configured.");
     });
+  });
+});
+
+describe("chart-file-actions write-path integrity", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSend.mockReset();
+    mockGetR2Client.mockReturnValue({ send: mockSend });
+    mockSend.mockResolvedValue({ ContentLength: 5000, ContentType: "application/pdf" });
+    mockPrisma.chart.findUnique.mockResolvedValue({
+      id: "chart-1",
+      project: { userId: "user-1" },
+    });
+    mockPrisma.chartFile.create.mockResolvedValue({ id: "file-1" });
+  });
+
+  function sentCommands() {
+    return mockSend.mock.calls.map(([command]) => ({
+      name: (command as { constructor: { name: string } }).constructor.name,
+      Key: (command as { input: { Key: string } }).input.Key,
+    }));
+  }
+
+  it("refuses a key belonging to a different chart", async () => {
+    const { addChartFile } = await import("./chart-file-actions");
+
+    const result = await addChartFile({
+      chartId: "chart-1",
+      url: "files/chart-2/abc-pattern.pdf",
+      filename: "pattern.pdf",
+      label: null,
+    });
+
+    assertFailure(result);
+    expect(mockPrisma.chartFile.create).not.toHaveBeenCalled();
+  });
+
+  it("refuses a key with no object behind it", async () => {
+    const { addChartFile } = await import("./chart-file-actions");
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockSend.mockRejectedValueOnce(Object.assign(new Error("NotFound"), { name: "NotFound" }));
+
+    const result = await addChartFile({
+      chartId: "chart-1",
+      url: "files/chart-1/abc-pattern.pdf",
+      filename: "pattern.pdf",
+      label: null,
+    });
+
+    assertFailure(result);
+    expect(result.error).toBe("That upload could not be found in storage.");
+    expect(mockPrisma.chartFile.create).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
+  });
+
+  it("records the size and type the stored object actually has", async () => {
+    const { addChartFile } = await import("./chart-file-actions");
+    mockSend.mockResolvedValueOnce({ ContentLength: 4096, ContentType: "application/pdf" });
+
+    const result = await addChartFile({
+      chartId: "chart-1",
+      url: "files/chart-1/abc-pattern.pdf",
+      filename: "pattern.pdf",
+      label: null,
+      // What a client claims about its own upload is not evidence.
+      mimeType: "image/png",
+      fileSize: 1,
+    });
+
+    assertSuccess(result);
+    expect(mockPrisma.chartFile.create).toHaveBeenCalledWith({
+      data: {
+        chartId: "chart-1",
+        url: "files/chart-1/abc-pattern.pdf",
+        filename: "pattern.pdf",
+        mimeType: "application/pdf",
+        fileSize: 4096,
+        label: null,
+      },
+    });
+  });
+
+  it("refuses an object over the size cap and removes it rather than leaving it orphaned", async () => {
+    const { addChartFile } = await import("./chart-file-actions");
+    mockSend.mockResolvedValueOnce({
+      ContentLength: MAX_FILE_SIZE + 1,
+      ContentType: "application/pdf",
+    });
+
+    const result = await addChartFile({
+      chartId: "chart-1",
+      url: "files/chart-1/abc-huge.pdf",
+      filename: "huge.pdf",
+      label: null,
+    });
+
+    assertFailure(result);
+    expect(result.error).toContain("too large");
+    expect(mockPrisma.chartFile.create).not.toHaveBeenCalled();
+    expect(sentCommands()).toEqual([
+      { name: "HeadObjectCommand", Key: "files/chart-1/abc-huge.pdf" },
+      { name: "DeleteObjectCommand", Key: "files/chart-1/abc-huge.pdf" },
+    ]);
+  });
+
+  it("accepts a stitching-software file whose stored type is not in the MIME allowlist", async () => {
+    const { addChartFile } = await import("./chart-file-actions");
+    mockSend.mockResolvedValueOnce({ ContentLength: 2048, ContentType: "text/xml" });
+
+    const result = await addChartFile({
+      chartId: "chart-1",
+      url: "files/chart-1/abc-winter.xsd",
+      filename: "winter.xsd",
+      label: null,
+    });
+
+    assertSuccess(result);
+  });
+
+  it("refuses a stored type that is neither allowed nor a known chart-file extension", async () => {
+    const { addChartFile } = await import("./chart-file-actions");
+    mockSend.mockResolvedValueOnce({ ContentLength: 2048, ContentType: "text/html" });
+
+    const result = await addChartFile({
+      chartId: "chart-1",
+      url: "files/chart-1/abc-page.html",
+      filename: "page.html",
+      label: null,
+    });
+
+    assertFailure(result);
+    expect(mockPrisma.chartFile.create).not.toHaveBeenCalled();
+  });
+
+  it("deleteChartFile removes the database row before the storage object", async () => {
+    const { deleteChartFile } = await import("./chart-file-actions");
+    const order: string[] = [];
+    mockPrisma.chartFile.findUnique.mockResolvedValue({
+      id: "file-1",
+      url: "files/chart-1/abc-test.pdf",
+      chart: { id: "chart-1", project: { userId: "user-1" } },
+    });
+    mockPrisma.chartFile.delete.mockImplementation(async () => {
+      order.push("db");
+      return { id: "file-1" };
+    });
+    mockSend.mockImplementation(async () => {
+      order.push("r2");
+      return {};
+    });
+
+    const result = await deleteChartFile("file-1");
+
+    expect(result.success).toBe(true);
+    // Reversed order: a failure now leaves an orphaned object, which the app
+    // already tolerates, instead of a record pointing at a deleted file.
+    expect(order).toEqual(["db", "r2"]);
+  });
+
+  it("deleteChartFile still reports success when the storage object cannot be removed", async () => {
+    const { deleteChartFile } = await import("./chart-file-actions");
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockPrisma.chartFile.findUnique.mockResolvedValue({
+      id: "file-1",
+      url: "files/chart-1/abc-test.pdf",
+      chart: { id: "chart-1", project: { userId: "user-1" } },
+    });
+    mockPrisma.chartFile.delete.mockResolvedValue({ id: "file-1" });
+    mockSend.mockRejectedValue(new Error("R2 unreachable"));
+
+    const result = await deleteChartFile("file-1");
+
+    expect(result.success).toBe(true);
+    expect(mockPrisma.chartFile.delete).toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 });

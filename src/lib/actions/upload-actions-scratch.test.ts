@@ -35,6 +35,7 @@ vi.mock("@aws-sdk/s3-request-presigner", () => ({
 const mockToBuffer = vi.fn();
 const mockWebp = vi.fn();
 const mockResize = vi.fn();
+const mockMetadata = vi.fn();
 const mockSharp = vi.fn();
 vi.mock("sharp", () => ({ default: mockSharp }));
 
@@ -65,10 +66,16 @@ describe("upload-actions with a scratch write bucket", () => {
     mockGetReadTarget.mockResolvedValue({ client: readClient, bucket: "real-bucket" });
     mockGetWriteTarget.mockReturnValue({ client: writeClient, bucket: "scratch-bucket" });
     vi.mocked(getSignedUrl).mockResolvedValue("https://presigned.example.com/test");
-    mockSharp.mockReturnValue({ resize: mockResize });
+    mockSharp.mockReturnValue({ resize: mockResize, metadata: mockMetadata });
     mockResize.mockReturnValue({ webp: mockWebp });
     mockWebp.mockReturnValue({ toBuffer: mockToBuffer });
     mockToBuffer.mockResolvedValue(Buffer.from("processed-image-data"));
+    mockMetadata.mockResolvedValue({ format: "jpeg", width: 800, height: 600 });
+    mockPrisma.chart.findUnique.mockResolvedValue({
+      id: "chart-1",
+      coverImageUrl: "covers/chart-1/opt-abc.webp",
+      project: { userId: "user-1" },
+    });
   });
 
   it("presigns an upload against the scratch bucket and its client", async () => {
