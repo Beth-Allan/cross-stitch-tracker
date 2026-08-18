@@ -83,8 +83,8 @@ source most of this directory was seeded from. **This directory is authoritative
 truth**: where the two disagree about how cross-stitch works, a fact here wins and the
 contradiction is a drift row.
 
-**The calculators do not cite fact IDs yet.** `skein-calculator.ts` cites two URLs and
-`fabric-calculator.ts` cites "design spec D-20"; neither names a `THR-` or `FAB-` id, so the trail
-currently runs one way only — from a fact here to the code, not back. The next item that touches
-either file should add the citation while it is in there. Both are review-gated cores, so it is
-not a drive-by edit.
+**Only one calculator cites fact IDs.** `fabric-calculator.ts` names **FAB-005** and **FAB-004**
+in its header as of item F-4 (2026-08-18), so the fabric trail now runs both ways.
+`skein-calculator.ts` still cites two URLs and no `THR-` id, so that one runs from a fact here to
+the code only. The next item that touches it should add the citation while it is in there — it is
+a review-gated core, so not a drive-by edit.

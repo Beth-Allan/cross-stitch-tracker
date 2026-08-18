@@ -36,11 +36,9 @@ fabric count to give the _effective_ count that both calculators use
 (`effectiveCount = fabricCount ÷ overCount`), so it changes every thread and size figure for a
 project. Linen is stitched over two (FAB-003); evenweaves commonly are.
 
-**Not true of the app today** (drift **D-17**, 2026-08-17): `skein-calculator.ts` divides by
-over-count, `fabric-calculator.ts` never has, and no fabric-size code path reads `Project.overCount`
-at all — so every fabric-size figure for an over-two project is roughly half what it should be.
-Beth ruled the fix runs as build-plan item **F-4**, straight after P7's review. The fact above
-states how it should work; this note says what the code does until F-4 lands.
+_Both calculators do divide, as of **F-4** (2026-08-18). Until then `fabric-calculator.ts` never
+had, so every fabric-size figure for an over-two project was roughly half what it should be —
+drift **D-17**, and the reason this paragraph exists._
 
 **The app does not infer it, and the one attempt to write down how it should was invented.** The
 old backlog note proposed "≤25 → over 1, ≥28 → over 2" — thresholds with no source, and with 26
@@ -52,11 +50,12 @@ Tracked in `open-questions.md` Q-002.
 ### FAB-005 — Required fabric size, and the 6-inch margin
 
 ```
-required inches = stitches ÷ fabricCount + 6
+required inches = stitches ÷ effectiveCount + 6        (effectiveCount = fabricCount ÷ overCount, FAB-004)
 ```
 
 The **6 inches** is a 3-inch margin on each side, attributed in `fabric-calculator.ts` to design
-spec D-20. A piece of fabric fits if it covers the required width and height in **either
+spec D-20, and it is added **after** the effective count divides — the margin does not scale with
+over-count. A piece of fabric fits if it covers the required width and height in **either
 orientation** — the app checks the rotated fit as well.
 
 [unverified — do not build on] — the tag is deliberately weak. `fabric-calculator.ts` attributes
@@ -80,3 +79,28 @@ On the Pattern Dive **Fabric Requirements** tab, the pieces offered for a projec
 A project with no fabric assigned reports **no required size at all** — never a size of zero.
 
 [stated by Beth 2026-08-17]
+
+_The parenthetical above was stated before any fabric-size code applied over-count, and
+**FAB-007 refines it**: the count a candidate piece is judged at is divided by the project's
+over-count, and a piece that fits only at over one is shown with that qualifier rather than
+hidden._
+
+### FAB-007 — Over-count, and which spare pieces are offered
+
+Over-count divides the count a candidate piece is judged at, exactly as it divides every other
+size figure (FAB-004). For a project stitched over two, a 28ct spare piece is measured against
+the **14ct** requirement, not the 28ct one — so pieces that would have been offered at over one
+genuinely are too small.
+
+A piece in that position — Beth's words, _"this fits if you're stitching over 1, but not if
+you're stitching over 2"_ — is **shown with that qualifier, not hidden**. Her reasoning: a
+project with no fabric assigned may not have a settled over-count yet, so hiding the piece
+assumes a decision she has not made. A piece too small **either** way is still not offered at
+all, which is FAB-006 unchanged.
+
+**Not true of the app today.** F-4 (2026-08-18) applied over-count to every fabric size but
+still hides the fits-at-over-one pieces along with the too-small ones. Beth ruled the qualifier
+is its own item rather than a change folded into a finished one: build-plan **F-5**, queued
+straight after F-4's review (drift **D-18**).
+
+[stated by Beth 2026-08-18]

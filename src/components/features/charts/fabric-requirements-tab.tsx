@@ -8,6 +8,7 @@ import type { FabricRequirementRow } from "@/types/session";
 import { assignFabricToProject } from "@/lib/actions/pattern-dive-actions";
 import {
   FABRIC_MARGIN_INCHES,
+  calculateEffectiveCount,
   calculateRequiredFabricEdge,
   doesFabricFit,
   formatRequiredInches,
@@ -56,9 +57,11 @@ function StatusIcon({ row }: { row: FabricRequirementRow }) {
 function SizeReferenceTable({
   stitchesWide,
   stitchesHigh,
+  overCount,
 }: {
   stitchesWide: number;
   stitchesHigh: number;
+  overCount: 1 | 2;
 }) {
   return (
     <div className="mt-3 overflow-x-auto">
@@ -78,13 +81,21 @@ function SizeReferenceTable({
         </thead>
         <tbody>
           {FABRIC_COUNTS.map((ct) => {
-            const designW = stitchesWide / ct;
-            const designH = stitchesHigh / ct;
-            const totalW = calculateRequiredFabricEdge(stitchesWide, ct);
-            const totalH = calculateRequiredFabricEdge(stitchesHigh, ct);
+            const effectiveCount = calculateEffectiveCount(ct, overCount);
+            const designW = stitchesWide / effectiveCount;
+            const designH = stitchesHigh / effectiveCount;
+            const totalW = calculateRequiredFabricEdge(stitchesWide, ct, overCount);
+            const totalH = calculateRequiredFabricEdge(stitchesHigh, ct, overCount);
             return (
               <tr key={ct} className="border-border/30 border-b last:border-0">
-                <td className="text-foreground py-2 font-medium">{ct} count</td>
+                <td className="text-foreground py-2 font-medium">
+                  {ct} count
+                  {overCount === 2 && (
+                    <span className="text-muted-foreground ml-2 text-xs font-normal">
+                      works like {effectiveCount}
+                    </span>
+                  )}
+                </td>
                 <td className="text-muted-foreground py-2 text-right tabular-nums">
                   {designW.toFixed(1)}&quot; x {designH.toFixed(1)}&quot;
                 </td>
@@ -157,7 +168,8 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
             for framing allowance.
           </p>
           <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">
-            Formula: (stitch count / fabric count) + {FABRIC_MARGIN_INCHES}&quot; per dimension
+            Formula: (stitch count / fabric count) + {FABRIC_MARGIN_INCHES}&quot; per dimension,
+            halving the fabric count for an over-2 project.
           </p>
         </div>
       </div>
@@ -226,13 +238,14 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                     </p>
                     <p className="text-muted-foreground text-xs">
                       {row.stitchesWide} x {row.stitchesHigh} stitches
+                      {row.overCount === 2 && <span> &middot; stitched over 2</span>}
                     </p>
                   </div>
 
                   <div className="hidden shrink-0 gap-4 md:flex">
                     {([14, 18, 25] as const).map((ct) => {
-                      const w = calculateRequiredFabricEdge(row.stitchesWide, ct);
-                      const h = calculateRequiredFabricEdge(row.stitchesHigh, ct);
+                      const w = calculateRequiredFabricEdge(row.stitchesWide, ct, row.overCount);
+                      const h = calculateRequiredFabricEdge(row.stitchesHigh, ct, row.overCount);
                       return (
                         <div key={ct} className="min-w-[70px] text-center">
                           <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
@@ -372,6 +385,7 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                         <SizeReferenceTable
                           stitchesWide={row.stitchesWide}
                           stitchesHigh={row.stitchesHigh}
+                          overCount={row.overCount}
                         />
                       )}
                     </div>

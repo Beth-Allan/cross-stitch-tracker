@@ -427,6 +427,45 @@ not a promise that the diagnosis below is right.
   call site passes a real value; trap ③'s no-assigned-fabric branch has a stated, tested answer;
   FAB-004's claim about "both calculators" is true when the item lands; `npm run gate` green;
   fresh `/review` before merge; work log updated.
+  _(Built 2026-08-18. **Trap ③'s premise was wrong and the answer is the simpler one:** every
+  project row carries `overCount` (schema default 1), so the no-assigned-fabric branch has one to
+  use — it judges each stash piece at that piece's own count divided by **the project's**
+  over-count, because over-count is how Beth stitches the project, not a property of a piece she
+  might buy for it. Inferring one from the fabric is Q-002 and stays open. Trap ④ resolved as:
+  the reference rows stay the **raw** counts printed on fabric she buys, sized at the effective
+  count, each labelled "works like N" when the project is over 2. `overCount` is a **required**
+  argument on the calculator — no default, since a default of 1 is exactly the shape of the bug.)_
+
+### F-5 "Fits if you stitch it over one" — the qualifier, not the hiding
+
+- **Objective:** a spare fabric piece that fits a project **only** if it is stitched over one is
+  currently hidden along with the pieces that fit no way at all (F-4's behaviour). Show it, with
+  that qualifier. Domain fact **FAB-007**, Beth's ruling 2026-08-18 (drift **D-18**), in her
+  words: _"this fits if you're stitching over 1, but not if you're stitching over 2"_. Her
+  reasoning is the spec: a project with no fabric assigned may not have a settled over-count, so
+  hiding the piece assumes a decision she has not made.
+- **Cited specs:** `docs/domain/fabric.md` **FAB-007** (the rule), **FAB-006** (what stays true —
+  a piece too small either way is still not offered) and **FAB-004** (effective count) ·
+  `src/lib/utils/fabric-calculator.ts` and `src/lib/actions/pattern-dive-actions.ts` — the
+  calculator is a **protocol §5 review-gated core**, so this merges only from a fresh `/review`.
+- **Traps:** ① **There is exactly one new state, not two.** Over two always needs more fabric than
+  over one, so "fits at over two but not over one" cannot happen. Three states total: fits either
+  way · fits only at over one · too small either way. Do not build a general N-way comparison.
+  ② **This is not Q-002.** Nothing infers an over-count from anything; the project's stored value
+  still decides what the project needs, and the qualifier only answers "what if it were the other
+  one". ③ **The qualifier is a label, not a match.** A piece that fits only at over one must not be
+  counted as fitting — the row's fit state, the status icon and any count of fitting pieces stay
+  keyed to the project's real over-count. ④ **The assigned-fabric branch has the same case** — a
+  same-count spare that fits only at over one — so decide and state whether the qualifier appears
+  in both halves of the list, as FAB-006 does. ⑤ **UI copy is a design surface**: canon in
+  `docs/design/` if it exists by then, DesignOS otherwise (hard rule 4); it is a label added to
+  existing rows, not a new region.
+- **Done-when:** a piece fitting only at over one is shown with the qualifier and is not counted as
+  fitting, demonstrated test-first; a piece too small either way is still absent (regression test);
+  an over-one project is completely unchanged (regression test); the both-halves decision of trap ④
+  is stated and tested; FAB-007's "not true of the app today" note is retired when the item lands;
+  `npm run gate` green; Vercel preview to Beth (protocol §5 layer 2); fresh `/review` before merge;
+  work log updated.
 
 ### F-3 Supply stitch-total hint is invisible outside Details mode
 

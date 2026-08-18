@@ -58,6 +58,7 @@ export interface FabricRequirementRow {
   stitchesHigh: number;
   totalStitches: number;
   fabricCount: number | null; // From linked fabric, null if no fabric
+  overCount: 1 | 2; // The project's own setting; divides fabricCount to give the effective count
   fabricName: string | null;
   fabricId: string | null;
   requiredWidth: number | null; // Exact inches from fabric-calculator; null when no fabric assigned

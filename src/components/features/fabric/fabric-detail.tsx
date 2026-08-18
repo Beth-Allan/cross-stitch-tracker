@@ -139,6 +139,8 @@ export function FabricDetail({ fabric, fabricBrands, projects }: FabricDetailPro
             project={{
               stitchesWide: fabric.linkedProject.chart.stitchesWide,
               stitchesHigh: fabric.linkedProject.chart.stitchesHigh,
+              // Prisma types overCount as Int; the write boundary constrains it to 1 | 2.
+              overCount: fabric.linkedProject.overCount as 1 | 2,
             }}
           />
         )}

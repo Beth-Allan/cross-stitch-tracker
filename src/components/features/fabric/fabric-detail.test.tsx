@@ -71,6 +71,7 @@ describe("FabricDetail", () => {
       linkedProjectId: "proj-1",
       linkedProject: {
         id: "proj-1",
+        overCount: 1,
         chart: { id: "chart-1", name: "Dragon Queen", stitchesWide: 200, stitchesHigh: 150 },
       },
     });
@@ -93,6 +94,7 @@ describe("FabricDetail", () => {
       linkedProjectId: "proj-1",
       linkedProject: {
         id: "proj-1",
+        overCount: 1,
         chart: { id: "chart-1", name: "Dragon Queen", stitchesWide: 200, stitchesHigh: 150 },
       },
     });
@@ -110,6 +112,7 @@ describe("FabricDetail", () => {
       linkedProjectId: "proj-1",
       linkedProject: {
         id: "proj-1",
+        overCount: 1,
         chart: { id: "chart-1", name: "Dragon Queen", stitchesWide: 200, stitchesHigh: 150 },
       },
     });
@@ -119,11 +122,64 @@ describe("FabricDetail", () => {
     expect(screen.getByText("Too small")).toBeInTheDocument();
   });
 
+  it("sizes the project at the effective count when it is stitched over two", () => {
+    const fabric = makeFabricWithProject({
+      shortestEdgeInches: 24,
+      longestEdgeInches: 30,
+      linkedProjectId: "proj-1",
+      linkedProject: {
+        id: "proj-1",
+        overCount: 2,
+        chart: { id: "chart-1", name: "Dragon Queen", stitchesWide: 200, stitchesHigh: 150 },
+      },
+    });
+    render(<FabricDetail fabric={fabric} fabricBrands={mockBrands} projects={mockProjects} />);
+
+    // 14ct over two behaves like 7ct: 200/7+6 = 34.6" x 150/7+6 = 27.5", so 24x30 is short.
+    expect(screen.getByText('34.6" x 27.5"')).toBeInTheDocument();
+    expect(screen.getByText("Too small")).toBeInTheDocument();
+  });
+
+  it("says on the fabric page when the project is stitched over two", () => {
+    const fabric = makeFabricWithProject({
+      shortestEdgeInches: 40,
+      longestEdgeInches: 50,
+      linkedProjectId: "proj-1",
+      linkedProject: {
+        id: "proj-1",
+        overCount: 2,
+        chart: { id: "chart-1", name: "Dragon Queen", stitchesWide: 200, stitchesHigh: 150 },
+      },
+    });
+    render(<FabricDetail fabric={fabric} fabricBrands={mockBrands} projects={mockProjects} />);
+
+    expect(screen.getByText(/stitched over 2/i)).toBeInTheDocument();
+    expect(screen.getByText(/works like 7/)).toBeInTheDocument();
+  });
+
+  it("says nothing about over-count when the project is stitched over one", () => {
+    const fabric = makeFabricWithProject({
+      shortestEdgeInches: 24,
+      longestEdgeInches: 30,
+      linkedProjectId: "proj-1",
+      linkedProject: {
+        id: "proj-1",
+        overCount: 1,
+        chart: { id: "chart-1", name: "Dragon Queen", stitchesWide: 200, stitchesHigh: 150 },
+      },
+    });
+    render(<FabricDetail fabric={fabric} fabricBrands={mockBrands} projects={mockProjects} />);
+
+    expect(screen.queryByText(/stitched over 2/i)).not.toBeInTheDocument();
+    expect(screen.getByText("Fits")).toBeInTheDocument();
+  });
+
   it("does not render size calculator when project has no stitch dimensions", () => {
     const fabric = makeFabricWithProject({
       linkedProjectId: "proj-1",
       linkedProject: {
         id: "proj-1",
+        overCount: 1,
         chart: { id: "chart-1", name: "Dragon Queen", stitchesWide: 0, stitchesHigh: 0 },
       },
     });

@@ -76,6 +76,55 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-08-18 · D-18 · over-count changes which stash pieces are offered — ruled during F-4
+
+**What contradicts what.** FAB-006 is tagged `[stated by Beth 2026-08-17]` and says that for a
+project with **no fabric assigned**, each spare piece is judged at **its own count** — "a 28ct
+piece is measured against the 28ct requirement, not the project's, because the project has none".
+F-4 makes every fabric size divide by the project's over-count, so for an over-two project that
+28ct piece is now measured against the **14ct** requirement. Her stated rule still holds in the
+sense she meant it (the piece's own count, not another piece's), but the parenthetical is
+literally false for an over-two project, and the visible effect is real: pieces that used to
+appear under "Fabrics That Fit" for an over-two project with no fabric assigned are now hidden,
+because at over two they genuinely are too small.
+
+**Why it needs her.** This is a Beth-stated domain fact and a list she ruled on twelve hours
+earlier. F-4's behaviour follows necessarily from FAB-004 — over-count changes every size figure —
+so the code is not in question; what needs her word is whether FAB-006 should now say so, and
+whether hiding those pieces is what she wants. The alternative (judging candidates as if the
+project were over one) would offer her fabric that is too small, which is the defect F-4 exists to
+remove.
+
+**Also for her word, in the same conversation:** F-4 edited **FAB-005**'s formula line from
+`stitches ÷ fabricCount + 6` to `stitches ÷ effectiveCount + 6`, and added that the margin does
+not scale with over-count. That is the doc following the code and FAB-004, and the provenance tag
+was left untouched — but `docs/domain/README.md` says no session edits a fact on its own
+initiative, so it is named here rather than passed over.
+
+**Options for her:** (a) record the over-count behaviour on FAB-006 via `/stitch-fact` and keep
+the code as built — recommended; (b) she wants every piece offered regardless of over-count, with
+the too-small ones marked — that is a new item, not a doc edit; (c) park it for `/cleanup`.
+
+**Raised by:** the layer-1 review of PR #98 (F-4), 2026-08-18. **Not silently resolved:** the code
+ships the behaviour F-4's brief specified, FAB-006 is left exactly as Beth stated it, and this row
+carries the mismatch until she rules.
+
+**Ruling (2026-08-18, in the F-4 session): show them, with the qualifier — and as its own item.**
+Beth's question was the better answer than either option offered: _"Is there a way to add logic
+that says 'this fits if you're stitching over 1, but not if you're stitching over 2'?"_ — so a
+piece that fits only at over one is **shown with that qualifier**, not hidden. Her reasoning, on
+the record: a project with no fabric assigned may not have a settled over-count, and hiding the
+piece assumes a decision she has not made. A piece too small either way stays unoffered.
+
+She also ruled the **sequencing**: F-4 ships as built rather than growing new behaviour at review
+time, and the qualifier becomes **build-plan item F-5**, queued straight after F-4's review. Until
+F-5 lands, the only pieces hidden are ones that do not fit the way the project is currently set —
+strictly better than the wrong sizes F-4 replaced.
+
+Recorded as domain fact **FAB-007** (`docs/domain/fabric.md`), which also carries the correction
+FAB-006's parenthetical needed; FAB-006 keeps its ID with a pointer, per `docs/domain/README.md`.
+The FAB-005 formula edit named above stands with it. Q-002 and Q-005 are untouched and stay open.
+
 _(Beth's rulings D-01–D-14, which set the process itself up, are in
 `WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
 
@@ -101,6 +150,14 @@ one-place change afterwards versus a three-place change alongside.
 item **F-4**, queued directly behind P7's `/review`. No calculation changed in P7 itself — the
 unified calculator preserves today's over-count-blind arithmetic exactly, so P7 neither fixes nor
 worsens the error, and F-4 changes it in exactly one place.
+
+**What it changed — closed by F-4, 2026-08-18.** `calculateRequiredFabricEdge` /
+`calculateRequiredFabricSize` now take the project's `overCount` as a **required** argument and
+divide by it (`calculateEffectiveCount`, exported so the one division has one home); all three
+call sites pass the project's real value — `pattern-dive-actions.getFabricRequirements` now selects
+`overCount`, and it is on `FabricRequirementRow` so the UI can label what it is showing. There is
+deliberately **no default of 1**: a default is the shape the bug had. FAB-004 and FAB-005 in
+`docs/domain/fabric.md` follow the code again.
 
 ### 2026-08-17 · fabric matching now shows only pieces that fit — ruled during P7
 
