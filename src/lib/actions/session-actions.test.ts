@@ -1276,6 +1276,44 @@ describe("session-actions", () => {
       warnSpy.mockRestore();
     });
 
+    it("logs when photo cleanup reports failure rather than throwing", async () => {
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
+        ...createMockStitchSession({ id: "session-1", photoKey: "sessions/p1/photo.jpg" }),
+        project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 0 },
+      });
+
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
+        return cb({
+          stitchSession: {
+            delete: vi.fn().mockResolvedValue({}),
+            aggregate: vi.fn().mockResolvedValue({ _sum: { stitchCount: 0 } }),
+          },
+          project: {
+            findUnique: vi.fn().mockResolvedValue({ startingStitches: 0 }),
+            update: vi.fn().mockResolvedValue({ stitchesCompleted: 0 }),
+          },
+        });
+      });
+
+      // deleteFile reports failure by returning, not by throwing — the arm a
+      // `.catch()` alone never sees, which is how a lost photo went unlogged.
+      mockDeleteFile.mockResolvedValueOnce({ success: false, error: "Failed to delete file" });
+
+      const { deleteSession } = await import("./session-actions");
+      const result = await deleteSession("session-1");
+
+      expect(result.success).toBe(true);
+      expect(warnSpy).toHaveBeenCalledWith(
+        "[R2] raw file cleanup failed:",
+        "sessions/p1/photo.jpg",
+        "Failed to delete file",
+      );
+
+      warnSpy.mockRestore();
+    });
+
     it("skips photo cleanup when session has no photoKey", async () => {
       mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
         ...createMockStitchSession({ id: "session-1", photoKey: null }),

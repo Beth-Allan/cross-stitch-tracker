@@ -48,6 +48,21 @@ function isFutureDate(date: string, userId: string): boolean {
   return date > getTodayCalendarDate(getUserTimezone(userId));
 }
 
+/**
+ * Removes a session photo the row no longer points at. `deleteFile` reports failure
+ * by returning rather than throwing, so both arms are read: discarding the returned
+ * result is what made the `.catch()` here decorative, and a lost photo silent.
+ */
+async function discardSessionPhoto(key: string, what: string): Promise<void> {
+  const result = await deleteFile(key).catch((error) => {
+    console.warn(`[R2] ${what} cleanup failed:`, key, error);
+    return null;
+  });
+  if (result && !result.success) {
+    console.warn(`[R2] ${what} cleanup failed:`, key, result.error);
+  }
+}
+
 export async function createSession(formData: unknown) {
   const user = await requireAuth();
 
@@ -100,9 +115,7 @@ export async function createSession(formData: unknown) {
             data: { photoKey: result.optimizedKey },
           });
           returnSession = { ...session, photoKey: result.optimizedKey };
-          await deleteFile(session.photoKey).catch((err) =>
-            console.warn("[R2] raw file cleanup failed:", session.photoKey, err),
-          );
+          await discardSessionPhoto(session.photoKey, "raw file");
         } else {
           console.warn("Image optimization skipped for session photo — using raw image");
         }
@@ -209,13 +222,9 @@ export async function updateSession(sessionId: string, formData: unknown) {
             data: { photoKey: result.optimizedKey },
           });
           returnSession = { ...session, photoKey: result.optimizedKey };
-          await deleteFile(session.photoKey).catch((err) =>
-            console.warn("[R2] raw file cleanup failed:", session.photoKey, err),
-          );
+          await discardSessionPhoto(session.photoKey, "raw file");
           if (existing.photoKey) {
-            await deleteFile(existing.photoKey).catch((err) =>
-              console.warn("[R2] old photo cleanup failed:", existing.photoKey, err),
-            );
+            await discardSessionPhoto(existing.photoKey, "old photo");
           }
         } else {
           console.warn("Image optimization skipped for session photo — using raw image");
@@ -275,9 +284,7 @@ export async function deleteSession(sessionId: string) {
     });
 
     if (existing.photoKey) {
-      await deleteFile(existing.photoKey).catch((err) =>
-        console.warn("[R2] raw file cleanup failed:", existing.photoKey, err),
-      );
+      await discardSessionPhoto(existing.photoKey, "raw file");
     }
 
     revalidatePath(`/charts/${chartId}`);

@@ -739,7 +739,7 @@ describe("upload-actions ownership scoping", () => {
     expect(mockSend).not.toHaveBeenCalled();
   });
 
-  it("processAndStoreImage reads the raw key and writes both derivatives under the entity", async () => {
+  it("processAndStoreImage reads the raw key and writes the derivative under the entity", async () => {
     const { processAndStoreImage } = await import("./upload-actions");
     mockPrisma.stitchSession.findUnique.mockResolvedValue({
       id: "session-1",
@@ -754,6 +754,8 @@ describe("upload-actions ownership scoping", () => {
     );
 
     assertSuccess(result);
+    // A session records one key, so one derivative is written. The thumbnail this
+    // used to produce alongside it was an orphan from the moment it was stored.
     expect(sentCommands()).toEqual([
       { name: "GetObjectCommand", Bucket: "test-bucket", Key: "sessions/project-1/abc-raw.png" },
       {
@@ -761,12 +763,24 @@ describe("upload-actions ownership scoping", () => {
         Bucket: "test-bucket",
         Key: "sessions/session-1/opt-test-nano-id.webp",
       },
-      {
-        name: "PutObjectCommand",
-        Bucket: "test-bucket",
-        Key: "sessions/session-1/thumb-test-nano-id.webp",
-      },
     ]);
+    expect(result.thumbnailKey).toBeNull();
+  });
+
+  it("processAndStoreImage writes both derivatives for a cover, which records both", async () => {
+    const { processAndStoreImage } = await import("./upload-actions");
+    mockPrisma.chart.findUnique.mockResolvedValue({ id: "chart-1", project: { userId: "user-1" } });
+    mockSend.mockResolvedValueOnce(imageResponse());
+
+    const result = await processAndStoreImage("chart-1", "covers/chart-1/abc-raw.png", "covers");
+
+    assertSuccess(result);
+    expect(sentCommands().map((command) => command.Key)).toEqual([
+      "covers/chart-1/abc-raw.png",
+      "covers/chart-1/opt-test-nano-id.webp",
+      "covers/chart-1/thumb-test-nano-id.webp",
+    ]);
+    expect(result.thumbnailKey).toBe("covers/chart-1/thumb-test-nano-id.webp");
   });
 });
 

@@ -82,6 +82,33 @@ allow** at the same `/cleanup`; see Ruled below.)_
 _(Beth's rulings D-01–D-14, which set the process itself up, are in
 `WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
 
+### 2026-08-17 · the reconciliation story for abandoned uploads — ruled during P8
+
+**What happened.** P8's fourth defect was a decision, not a bug: the chart form uploads a cover
+photo or a chart file to R2 **before** Beth presses Save, under the literal prefixes
+`covers/unsaved/…` and `files/unsaved/…`. Close the form without saving and the object stays in
+storage with nothing referencing it — and nothing in the app can enumerate storage, so no code
+can ever find it again. Rate: one stray object per abandoned form, a few pence a year.
+
+The obvious remedy — a Cloudflare object-lifecycle rule deleting anything under those prefixes
+after N days — **is a landmine today**, because a cover or file uploaded from the _create_ form
+keeps its `unsaved/` key permanently once the chart is saved: those keys are live, not scratch.
+Switching the rule on now would delete pictures Beth is still using. Item **P15** (cover
+shrinking) is what moves saved covers off the prefix; only after it does is the rule safe.
+
+**Surfaced to Beth** in-session as a decision with three options: leave it and write the plan
+down · queue a follow-on item after P15 that turns the storage rule on · build a reconciliation
+sweep into the app (list storage, compare to the database, delete what nothing references).
+
+**Her ruling: leave it for now and write down the plan.** No automatic cleanup, no sweep. P8
+closes the three real leaks and records this; the abandoned-upload residue is logged on the
+maintenance ledger with its exact pre-condition, so a later session can switch on the bucket rule
+once P15 has made it safe. Nothing about the app changes for her today.
+
+**What it changed.** No code. A maintenance-ledger row (2026-08-17) carries the residue and the
+pre-condition; `docs/INTEGRATIONS.md`'s object-lifecycle section states the decision beside the
+mechanics it belongs to.
+
 ### 2026-08-17 · the dead cover-optimizer — ruled during P2
 
 **What happened.** P2's brief left one thing for Beth: `confirmUpload` in

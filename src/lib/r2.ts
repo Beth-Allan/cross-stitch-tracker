@@ -1,4 +1,5 @@
-import { HeadObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectsCommand, HeadObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { storageKeySchema } from "@/lib/validations/upload";
 
 /**
  * A bucket and a client authorised for it. Reads and writes can land in different
@@ -135,4 +136,70 @@ export async function getReadTarget(key: string): Promise<R2Target> {
   const scratchTarget: R2Target = { client: getScratchClient(), bucket: scratch };
   if (await objectExists(scratchTarget, key)) return scratchTarget;
   return getRealTarget();
+}
+
+// R2 accepts at most this many keys in one batch delete, as S3 does.
+const MAX_KEYS_PER_DELETE_REQUEST = 1000;
+
+/**
+ * Removes objects whose rows are already gone: a deleted chart's cover, files and
+ * session photos, or the cover a replacement superseded. Nothing is returned and
+ * nothing is thrown — by the time this runs the database is authoritative, so a
+ * storage failure is an orphan to log, never a reason to tell Beth her delete
+ * failed. `context` names the entity in that log, which is all anyone has left
+ * once the keys themselves are unrecoverable.
+ *
+ * It lives here rather than beside `deleteFile` deliberately: every caller resolves
+ * its keys from an ownership-checked row, and exporting a bulk delete from a
+ * `"use server"` file would publish it as an endpoint taking an unbounded list of
+ * keys. Deletes go to the write target, so a preview aims them at scratch.
+ */
+export async function discardStoredObjects(
+  keys: (string | null | undefined)[],
+  context: string,
+): Promise<void> {
+  const present = [...new Set(keys.filter((key): key is string => Boolean(key)))];
+  if (present.length === 0) return;
+
+  try {
+    const { malformed, refused } = await removeObjects(present);
+    if (malformed.length > 0) {
+      // Not keys this app ever wrote, so they name no object and nothing leaked —
+      // but a row holding one is corrupt data worth seeing.
+      console.error(`[R2] keys outside this app's namespace, skipped for ${context}:`, malformed);
+    }
+    if (refused.length > 0) {
+      console.error(`[R2] objects left behind for ${context}:`, refused);
+    }
+  } catch (error) {
+    console.error(`[R2] cleanup failed for ${context} — every object left behind:`, error);
+  }
+}
+
+async function removeObjects(keys: string[]): Promise<{ malformed: string[]; refused: string[] }> {
+  const malformed: string[] = [];
+  const valid: string[] = [];
+  for (const key of keys) {
+    if (storageKeySchema.safeParse(key).success) valid.push(key);
+    else malformed.push(key);
+  }
+
+  const refused: string[] = [];
+  const { client, bucket } = getWriteTarget();
+  for (let index = 0; index < valid.length; index += MAX_KEYS_PER_DELETE_REQUEST) {
+    const batch = valid.slice(index, index + MAX_KEYS_PER_DELETE_REQUEST);
+    // Quiet mode reports only what failed. A partial failure comes back as a 200
+    // carrying an error list, so the reply is read rather than assumed successful.
+    const response = await client.send(
+      new DeleteObjectsCommand({
+        Bucket: bucket,
+        Delete: { Objects: batch.map((Key) => ({ Key })), Quiet: true },
+      }),
+    );
+    for (const failure of response.Errors ?? []) {
+      if (failure.Key) refused.push(failure.Key);
+    }
+  }
+
+  return { malformed, refused };
 }

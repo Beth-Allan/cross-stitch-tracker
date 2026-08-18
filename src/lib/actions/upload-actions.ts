@@ -252,7 +252,8 @@ export async function processAndStoreImage(
   rawKey: string,
   category: "covers" | "sessions",
 ): Promise<
-  { success: true; optimizedKey: string; thumbnailKey: string } | { success: false; error: string }
+  | { success: true; optimizedKey: string; thumbnailKey: string | null }
+  | { success: false; error: string }
 > {
   const user = await requireAuth();
 
@@ -286,39 +287,45 @@ export async function processAndStoreImage(
     }
     const { buffer } = fetchResult;
 
-    const [optimizedBuffer, thumbnailBuffer] = await Promise.all([
+    // A derivative nothing records is an orphan from the moment it is stored, and
+    // nothing can ever name it again. A chart records two keys (`coverImageUrl`
+    // and `coverThumbnailUrl`); a session records one, so one is all it gets.
+    const wantsThumbnail = category === "covers";
+
+    const optimizedKey = `${category}/${entityId}/opt-${nanoid()}.webp`;
+    const thumbnailKey = wantsThumbnail ? `${category}/${entityId}/thumb-${nanoid()}.webp` : null;
+
+    const encoded = await Promise.all([
       sharp(buffer)
         .resize(OPTIMIZED_MAX_WIDTH, null, { withoutEnlargement: true })
         .webp({ quality: OPTIMIZED_QUALITY })
         .toBuffer(),
-      sharp(buffer)
-        .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, { fit: "cover", withoutEnlargement: true })
-        .webp({ quality: THUMBNAIL_QUALITY })
-        .toBuffer(),
+      ...(thumbnailKey
+        ? [
+            sharp(buffer)
+              .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, { fit: "cover", withoutEnlargement: true })
+              .webp({ quality: THUMBNAIL_QUALITY })
+              .toBuffer(),
+          ]
+        : []),
     ]);
-
-    const optimizedKey = `${category}/${entityId}/opt-${nanoid()}.webp`;
-    const thumbnailKey = `${category}/${entityId}/thumb-${nanoid()}.webp`;
+    const derivatives = [optimizedKey, ...(thumbnailKey ? [thumbnailKey] : [])].map(
+      (key, index) => ({ key, body: encoded[index] }),
+    );
 
     const { client, bucket } = getWriteTarget();
-    await Promise.all([
-      client.send(
-        new PutObjectCommand({
-          Bucket: bucket,
-          Key: optimizedKey,
-          Body: optimizedBuffer,
-          ContentType: "image/webp",
-        }),
+    await Promise.all(
+      derivatives.map(({ key, body }) =>
+        client.send(
+          new PutObjectCommand({
+            Bucket: bucket,
+            Key: key,
+            Body: body,
+            ContentType: "image/webp",
+          }),
+        ),
       ),
-      client.send(
-        new PutObjectCommand({
-          Bucket: bucket,
-          Key: thumbnailKey,
-          Body: thumbnailBuffer,
-          ContentType: "image/webp",
-        }),
-      ),
-    ]);
+    );
 
     // Caller is responsible for deleting rawKey after confirming the DB write
     return { success: true as const, optimizedKey, thumbnailKey };

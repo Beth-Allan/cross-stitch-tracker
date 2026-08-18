@@ -67,11 +67,36 @@ deliberately absent.
       `[A-Za-z0-9._-]` at upload time; keys written before that rule still read back, because
       `parseStorageKey` bounds the name segment rather than re-spelling it
     - Optimized image: `<category>/<entityId>/opt-<nanoid>.webp`
-    - Thumbnail: `<category>/<entityId>/thumb-<nanoid>.webp`
-  - Image optimization: raw upload → `sharp` WebP conversion → optimized + thumbnail stored →
-    chart row updated → **only then** is the raw object deleted. If optimization fails, the raw
-    image is preserved and used as-is (`console.warn`, no user-facing error). Objects under
-    `files/` (PDFs and other chart files) are stored as uploaded and never converted
+    - Thumbnail: `covers/<chartId>/thumb-<nanoid>.webp` — **covers only.** A chart records two
+      keys (`coverImageUrl`, `coverThumbnailUrl`); a `StitchSession` records one (`photoKey`), so
+      `processAndStoreImage` writes a session no thumbnail. A derivative nothing records is an
+      orphan the moment it is stored and nothing can ever name it again (item P8, 2026-08-17)
+  - Image optimization: raw upload → `sharp` WebP conversion → derivative(s) stored → row
+    updated → **only then** is the raw object deleted. If optimization fails, the raw image is
+    preserved and used as-is (`console.warn`, no user-facing error). Objects under `files/`
+    (PDFs and other chart files) are stored as uploaded and never converted
+  - **Object lifecycle — what removes what** (item P8, 2026-08-17):
+    - `deleteChart` reads the chart's cover, thumbnail, every `ChartFile.url` and every
+      `StitchSession.photoKey` **before** deleting the row, then removes them in one batched
+      `DeleteObjects` per 1000 keys (`discardStoredObjects`, in `src/lib/r2.ts` rather than an
+      action file — a bulk delete exported from a `"use server"` module would be a live endpoint
+      taking an unbounded key list). The cascade destroys the only record of those keys, so
+      reading them first is the whole game. `Project.finishPhotoUrl` is the one storage column
+      left out, because nothing writes it — maintenance-ledger row
+    - Changing a cover — replacing it, or taking it off the chart — removes each old object
+      **only once the row has stopped naming it**. One rule covers both cases: on a failed
+      regeneration the form re-submits the old thumbnail key, so the row still names it and it
+      stays (`generateThumbnail` reports failure by returning rather than throwing, which is what
+      used to make the cleanup delete a thumbnail the chart was still displaying); on removal the
+      row names neither, so both go
+    - Rows are deleted before objects, everywhere. The tolerated residue is an orphan, never a
+      record pointing at an object that is gone
+    - **Abandoned pre-save uploads are not cleaned up, by decision** (Beth, 2026-08-17). The
+      chart form uploads before Save under `covers/unsaved/…` and `files/unsaved/…`; closing the
+      form without saving leaves the object with nothing referencing it, and no sweep or
+      lifecycle rule looks for it. A bucket-side rule on those prefixes cannot be switched on
+      today because keys saved from the create form **stay** under `unsaved/` and are live —
+      see the maintenance-ledger row for the pre-condition
   - Degradation when R2 is not configured: `src/lib/r2.ts` **throws** on a missing credential.
     The upload and download actions catch that specific error and return
     `{ success: false, error: "File storage is not configured…" }`, so uploads and downloads are
@@ -197,8 +222,8 @@ when the Preview environment was populated and verified.
   `deleteChartFile` still deletes the `ChartFile` row from whatever database it is pointed at, while
   the R2 delete lands harmlessly in scratch. With the Preview Neon branch in place that only touches
   the copy — but if Preview were ever pointed at the production database, the result would be a real
-  row deleted and its real object left behind: exactly the orphan class item P8 owns. The database
-  half of the guarantee is D-15, not this code.
+  row deleted and its real object left behind — the orphan class item P8 closed for the real
+  bucket. The database half of the guarantee is D-15, not this code.
 - **Nothing cleans up the scratch bucket.** Preview uploads accumulate there with no lifecycle
   rule and no orphan sweep — deliberate (a preview's leftovers are worthless), recorded so it is
   not discovered as a surprise (maintenance-ledger row, 2026-08-17).
