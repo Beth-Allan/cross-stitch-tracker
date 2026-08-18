@@ -127,32 +127,32 @@ describe("chart-actions thumbnail generation", () => {
     it("calls generateThumbnail when coverImageUrl changes", async () => {
       const { updateChart } = await import("./chart-actions");
       mockPrisma.chart.findUnique.mockResolvedValueOnce({
-        coverImageUrl: "covers/old.png",
+        coverImageUrl: "covers/chart-1/abc-old.png",
         project: { userId: "user-1" },
       });
       mockPrisma.chart.update.mockResolvedValueOnce({ id: "chart-1" });
 
       const formData = {
         ...validFormData,
-        chart: { ...validFormData.chart, coverImageUrl: "covers/new.png" },
+        chart: { ...validFormData.chart, coverImageUrl: "covers/chart-1/abc-new.png" },
       };
 
       await updateChart("chart-1", formData);
 
-      expect(mockGenerateThumbnail).toHaveBeenCalledWith("chart-1", "covers/new.png");
+      expect(mockGenerateThumbnail).toHaveBeenCalledWith("chart-1", "covers/chart-1/abc-new.png");
     });
 
     it("does NOT call generateThumbnail when coverImageUrl is unchanged", async () => {
       const { updateChart } = await import("./chart-actions");
       mockPrisma.chart.findUnique.mockResolvedValueOnce({
-        coverImageUrl: "covers/same.png",
+        coverImageUrl: "covers/chart-1/abc-same.png",
         project: { userId: "user-1" },
       });
       mockPrisma.chart.update.mockResolvedValueOnce({ id: "chart-1" });
 
       const formData = {
         ...validFormData,
-        chart: { ...validFormData.chart, coverImageUrl: "covers/same.png" },
+        chart: { ...validFormData.chart, coverImageUrl: "covers/chart-1/abc-same.png" },
       };
 
       await updateChart("chart-1", formData);

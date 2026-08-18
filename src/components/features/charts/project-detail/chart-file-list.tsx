@@ -99,12 +99,12 @@ export function ChartFileList({ chartId, files }: ChartFileListProps) {
           }
 
           // Record in database
+          // Size and type are read back from the stored object by the server —
+          // what this component knows about the file is not evidence.
           const addResult = await addChartFile({
             chartId,
             url: presignedResult.key,
             filename: file.name,
-            mimeType: file.type || "application/octet-stream",
-            fileSize: file.size,
             label: null,
           });
 

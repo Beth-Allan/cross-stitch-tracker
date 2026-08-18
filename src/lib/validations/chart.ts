@@ -1,6 +1,19 @@
 import { z } from "zod";
 import type { ProjectStatus } from "@/generated/prisma/client";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
+import { parseStorageKey } from "@/lib/validations/upload";
+
+/**
+ * A stored key is only ever one of this app's own objects in one category. Kept
+ * here rather than trusted downstream: whatever this schema accepts is what ends
+ * up presigned for the browser and handed to the image pipeline.
+ */
+function storageKeyIn(category: "covers" | "files") {
+  return z
+    .string()
+    .min(1)
+    .refine((value) => parseStorageKey(value)?.category === category, "Invalid storage key");
+}
 
 export const chartFormSchema = z.object({
   chart: z
@@ -8,12 +21,12 @@ export const chartFormSchema = z.object({
       name: z.string().trim().min(1, "Chart name is required").max(200, "Chart name too long"),
       designerId: z.string().nullable().default(null),
       seriesId: z.string().nullable().default(null),
-      coverImageUrl: z.string().min(1).nullable().default(null),
-      coverThumbnailUrl: z.string().min(1).nullable().default(null),
+      coverImageUrl: storageKeyIn("covers").nullable().default(null),
+      coverThumbnailUrl: storageKeyIn("covers").nullable().default(null),
       fileKeys: z
         .array(
           z.object({
-            key: z.string().min(1),
+            key: storageKeyIn("files"),
             filename: z.string().trim().min(1).max(255),
             mimeType: z.string().min(1),
             fileSize: z.number().int().positive(),

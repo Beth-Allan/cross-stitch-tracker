@@ -1,24 +1,70 @@
 "use server";
 
-import { DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { getReadTarget, getWriteTarget } from "@/lib/r2";
+import { ALLOWED_CHART_FILE_TYPES, MAX_FILE_SIZE, parseStorageKey } from "@/lib/validations/upload";
 
 const addChartFileSchema = z.object({
   chartId: z.string().min(1),
-  url: z
-    .string()
-    .min(1)
-    .regex(/^files\//, "Invalid file path"),
+  url: z.string().refine((value) => {
+    const parsed = parseStorageKey(value);
+    return parsed !== null && parsed.category === "files";
+  }, "Invalid file path"),
   filename: z.string().trim().min(1).max(255),
-  mimeType: z.string().min(1),
-  fileSize: z.number().int().positive(),
   label: z.string().trim().max(255).nullable().default(null),
 });
+
+const DEFAULT_MIME_TYPE = "application/octet-stream";
+
+/**
+ * What R2 actually holds under a key. A presigned PUT signs neither the size nor
+ * the type of the bytes that follow it, so this is the first point at which
+ * either is a fact rather than a claim.
+ */
+async function describeStoredObject(
+  key: string,
+): Promise<{ contentLength: number; contentType: string } | null> {
+  try {
+    const { client, bucket } = await getReadTarget(key);
+    const head = await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
+    // Zero counts as absent: an aborted PUT leaves an empty object, and a record
+    // pointing at one is a file Beth can see in the list and cannot open.
+    if (typeof head.ContentLength !== "number" || head.ContentLength <= 0) return null;
+    return {
+      contentLength: head.ContentLength,
+      contentType: head.ContentType ?? DEFAULT_MIME_TYPE,
+    };
+  } catch (error) {
+    console.error("Failed to inspect uploaded object:", key, error);
+    return null;
+  }
+}
+
+/**
+ * Removes an upload that failed verification. A key an existing record already
+ * points at is left alone: the same key can be re-submitted with a filename that
+ * now fails, and deleting it then would strand the record that still uses it —
+ * the exact state `deleteChartFile`'s ordering exists to prevent.
+ */
+async function discardRejectedUpload(key: string): Promise<void> {
+  const inUse = await prisma.chartFile.findFirst({ where: { url: key }, select: { id: true } });
+  if (inUse) return;
+  await discardStoredObject(key);
+}
+
+async function discardStoredObject(key: string): Promise<void> {
+  try {
+    const { client, bucket } = getWriteTarget();
+    await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
+  } catch (error) {
+    console.error("Failed to remove rejected upload:", key, error);
+  }
+}
 
 export async function addChartFile(input: unknown) {
   const user = await requireAuth();
@@ -42,13 +88,37 @@ export async function addChartFile(input: unknown) {
     return { success: false as const, error: "Chart not found" };
   }
 
+  // A `files/` key is only this chart's if it sits in this chart's namespace.
+  if (parseStorageKey(validated.url)?.owner !== validated.chartId) {
+    return { success: false as const, error: "Invalid file path" };
+  }
+
+  const stored = await describeStoredObject(validated.url);
+  if (!stored) {
+    return { success: false as const, error: "That upload could not be found in storage." };
+  }
+  if (stored.contentLength > MAX_FILE_SIZE) {
+    await discardRejectedUpload(validated.url);
+    return { success: false as const, error: "That file is too large. Maximum size is 50MB." };
+  }
+  // The stored type, not the caller's filename: an extension is a free-text field
+  // and would let any object in by being named `.pdf`. This is the same allowlist
+  // `getPresignedUploadUrl` applies, now checked against what actually arrived.
+  if (!(ALLOWED_CHART_FILE_TYPES as readonly string[]).includes(stored.contentType)) {
+    await discardRejectedUpload(validated.url);
+    return {
+      success: false as const,
+      error: "Unsupported file type. Accepted: PDF, images, .pat, .xsd, .css, .saga, .zip",
+    };
+  }
+
   const file = await prisma.chartFile.create({
     data: {
       chartId: validated.chartId,
       url: validated.url,
       filename: validated.filename,
-      mimeType: validated.mimeType,
-      fileSize: validated.fileSize,
+      mimeType: stored.contentType,
+      fileSize: stored.contentLength,
       label: validated.label,
     },
   });
@@ -73,22 +143,13 @@ export async function deleteChartFile(fileId: string) {
     return { success: false as const, error: "File not found" };
   }
 
-  // Delete R2 object — if it fails, log but proceed with DB deletion. The write
-  // target is the scratch bucket on a preview deployment, so a preview cannot
-  // remove the real file behind this record.
-  try {
-    const { client, bucket } = getWriteTarget();
-    await client.send(
-      new DeleteObjectCommand({
-        Bucket: bucket,
-        Key: file.url,
-      }),
-    );
-  } catch (error) {
-    console.error("Failed to delete R2 object:", error);
-  }
-
   await prisma.chartFile.delete({ where: { id: fileId } });
+
+  // The record goes first: if the object removal then fails, what is left is an
+  // orphan — the failure this app already tolerates and sweeps — rather than a
+  // record pointing at a file that is gone. The write target is the scratch
+  // bucket on a preview deployment, so a preview cannot remove the real file.
+  await discardStoredObject(file.url);
 
   revalidatePath(`/charts/${file.chart.id}`);
   return { success: true as const };
@@ -107,6 +168,9 @@ export async function getChartFileDownloadUrl(fileId: string) {
   });
 
   if (!file || file.chart.project?.userId !== user.id) {
+    return { success: false as const, error: "File not found" };
+  }
+  if (parseStorageKey(file.url)?.category !== "files") {
     return { success: false as const, error: "File not found" };
   }
 

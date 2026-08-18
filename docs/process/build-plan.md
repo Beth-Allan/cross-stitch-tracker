@@ -112,6 +112,9 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
   `confirmUpload` (dead code today; deleting it takes its tests with it — **not** covered by the
   2026-08-17 approvals, which name only P3 and P12: if deletion is the choice, ask Beth for her
   word on the record when P2 runs; wiring it instead needs no approval).
+  _(Resolved while building, 2026-08-17: **Beth ruled delete**, test removal approved on the
+  record; the cover-optimization capability it carried became item P15, queued after P8 —
+  drift.md, Ruled.)_
 - **Folded in:** the write-path integrity gaps ledger row (2026-08-17) that touch this file —
   delete-order and client-trusted metadata.
 - **Done-when:** P2's list closed test-first; gate green; fresh `/review` before merge.
@@ -247,6 +250,25 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
   `.claude/rules/quality-gates.md` — update it and `docs/` in the same PR.
 - **Done-when:** lint step green at zero warnings and failing on any new one (demonstrated with
   a scratch warning), CI workflow is one gate invocation, rules/docs updated, gate green.
+
+### P15 Optimize chart cover images — **created by Beth's ruling during P2 (2026-08-17)**
+
+- **Objective:** chart covers are stored exactly as uploaded — a full-size phone photo is served
+  in full every time the chart opens. Session photos already go through
+  `processAndStoreImage` (1200px WebP + 400px thumbnail); covers get only a thumbnail via
+  `generateThumbnail`. Put covers on the same pipeline, which also collapses two image paths
+  into one and retires `generateThumbnail`.
+- **Why it exists:** P2 deleted `confirmUpload`, the never-called code that would have done this.
+  Beth ruled: delete it, build the shrinking properly and separately (drift 2026-08-17).
+- **Runs after P8**, which owns cover-replace cleanup and the deterministic-thumbnail leak in the
+  same code — building this first would make P8's brief stale.
+- **Traps:** ① existing covers stay full-size unless a backfill is part of the item — decide and
+  say which ② the optimized key replaces `coverImageUrl`, so the raw original is deleted only
+  after the DB write succeeds (the ordering `session-actions.ts` already uses) ③ gated: this is
+  `upload-actions.ts` and `chart-actions.ts`'s cover path — `/review` before merge.
+- **Done-when:** a newly uploaded cover is stored as an optimized WebP plus a thumbnail,
+  test-first; one image pipeline remains; the backfill decision is recorded; gate green;
+  fresh `/review` before merge.
 
 ## Stage F — post-audit fixes (seeded from the dissolved Phase 41, Beth's ruling D-10)
 

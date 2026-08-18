@@ -11,16 +11,39 @@ import { prisma } from "@/lib/db";
 import { getReadTarget, getWriteTarget } from "@/lib/r2";
 import {
   uploadRequestSchema,
+  storageKeySchema,
+  keyOwnerSchema,
+  parseStorageKey,
+  sanitizeUploadFileName,
   ALLOWED_IMAGE_TYPES,
+  ALLOWED_IMAGE_FORMATS,
   ALLOWED_FILE_TYPES,
+  MAX_FILE_SIZE,
   OPTIMIZED_MAX_WIDTH,
   OPTIMIZED_QUALITY,
   THUMBNAIL_SIZE,
   THUMBNAIL_QUALITY,
 } from "@/lib/validations/upload";
 
-const VALID_CHART_FIELDS = ["coverImageUrl", "coverThumbnailUrl"] as const;
+// A presigned PUT constrains method, bucket, key and expiry — and nothing else.
+// `content-type` is unsignable and the payload hash is `UNSIGNED_PAYLOAD`, so the
+// type and size a client declares when asking for the URL are claims, not limits:
+// whatever bytes it then sends land under that key. Enforcement therefore happens
+// where the object is consumed — in this file when an image is read, and in
+// `chart-file-actions.addChartFile` when a chart file is recorded.
 
+const INVALID_KEY_ERROR = "Invalid storage key";
+
+function invalidKey() {
+  return { success: false as const, error: INVALID_KEY_ERROR };
+}
+
+/**
+ * Reads an object and returns it only if it is an image this app accepts: the
+ * declared length is checked before the body is touched, the stream is bounded
+ * again as it accumulates, and the bytes must decode as one of
+ * `ALLOWED_IMAGE_FORMATS`. The decode is the only honest type check available.
+ */
 async function fetchImageBuffer(
   key: string,
 ): Promise<{ success: true; buffer: Buffer } | { success: false; error: string }> {
@@ -34,16 +57,34 @@ async function fetchImageBuffer(
   if (!response.Body) {
     return { success: false, error: "Original image not found in storage" };
   }
+  if (typeof response.ContentLength === "number" && response.ContentLength > MAX_FILE_SIZE) {
+    // Nothing here consumes the body, so release the connection rather than
+    // leaving it open until it times out. (Breaking out of the loop below does
+    // this for us; returning before the loop does not.)
+    (response.Body as { destroy?: () => void }).destroy?.();
+    return { success: false, error: "Image is too large to process" };
+  }
 
   const chunks: Uint8Array[] = [];
+  let bytesRead = 0;
   const stream = response.Body as AsyncIterable<Uint8Array>;
   for await (const chunk of stream) {
+    bytesRead += chunk.byteLength;
+    // ContentLength is a header; the stream is the fact. Bound both.
+    if (bytesRead > MAX_FILE_SIZE) {
+      return { success: false, error: "Image is too large to process" };
+    }
     chunks.push(chunk);
   }
-  return { success: true, buffer: Buffer.concat(chunks) };
-}
+  const buffer = Buffer.concat(chunks);
 
-type ChartFileField = (typeof VALID_CHART_FIELDS)[number];
+  const { format } = await sharp(buffer).metadata();
+  if (!(ALLOWED_IMAGE_FORMATS as readonly string[]).includes(format)) {
+    return { success: false, error: "That file is not a PNG, JPEG or WebP image" };
+  }
+
+  return { success: true, buffer };
+}
 
 export async function getPresignedUploadUrl(input: unknown) {
   await requireAuth();
@@ -58,37 +99,19 @@ export async function getPresignedUploadUrl(input: unknown) {
     return { success: false as const, error: "Invalid upload request" };
   }
 
-  if (
-    validated.category === "covers" &&
-    !ALLOWED_IMAGE_TYPES.includes(validated.contentType as (typeof ALLOWED_IMAGE_TYPES)[number])
-  ) {
+  const isFileCategory = validated.category === "files";
+  const allowedTypes: readonly string[] = isFileCategory ? ALLOWED_FILE_TYPES : ALLOWED_IMAGE_TYPES;
+  if (!allowedTypes.includes(validated.contentType)) {
     return {
       success: false as const,
-      error: `Invalid image type. Allowed: ${ALLOWED_IMAGE_TYPES.join(", ")}`,
-    };
-  }
-  if (
-    validated.category === "sessions" &&
-    !ALLOWED_IMAGE_TYPES.includes(validated.contentType as (typeof ALLOWED_IMAGE_TYPES)[number])
-  ) {
-    return {
-      success: false as const,
-      error: `Invalid image type. Allowed: ${ALLOWED_IMAGE_TYPES.join(", ")}`,
-    };
-  }
-  if (
-    validated.category === "files" &&
-    !ALLOWED_FILE_TYPES.includes(validated.contentType as (typeof ALLOWED_FILE_TYPES)[number])
-  ) {
-    return {
-      success: false as const,
-      error: `Invalid file type. Allowed: ${ALLOWED_FILE_TYPES.join(", ")}`,
+      error: isFileCategory
+        ? `Invalid file type. Allowed: ${ALLOWED_FILE_TYPES.join(", ")}`
+        : `Invalid image type. Allowed: ${ALLOWED_IMAGE_TYPES.join(", ")}`,
     };
   }
 
   try {
-    const sanitizedName = validated.fileName.replace(/[/\\]/g, "-").slice(0, 100);
-    const key = `${validated.category}/${validated.projectId}/${nanoid()}-${sanitizedName}`;
+    const key = `${validated.category}/${validated.projectId}/${nanoid()}-${sanitizeUploadFileName(validated.fileName)}`;
 
     const { client, bucket } = getWriteTarget();
     const command = new PutObjectCommand({
@@ -117,63 +140,16 @@ export async function getPresignedUploadUrl(input: unknown) {
   }
 }
 
-export async function confirmUpload(input: { chartId: string; field: string; key: string }) {
-  const user = await requireAuth();
-
-  try {
-    if (!VALID_CHART_FIELDS.includes(input.field as ChartFileField)) {
-      return {
-        success: false as const,
-        error: `Invalid field. Allowed: ${VALID_CHART_FIELDS.join(", ")}`,
-      };
-    }
-
-    const chart = await prisma.chart.findUnique({
-      where: { id: input.chartId },
-      select: { id: true, project: { select: { userId: true } } },
-    });
-    if (!chart || chart.project?.userId !== user.id) {
-      return { success: false as const, error: "Chart not found" };
-    }
-
-    await prisma.chart.update({
-      where: { id: input.chartId },
-      data: { [input.field]: input.key },
-    });
-
-    if (input.field === "coverImageUrl") {
-      try {
-        const result = await processAndStoreImage(input.chartId, input.key, "covers");
-        if (result.success) {
-          await prisma.chart.update({
-            where: { id: input.chartId },
-            data: {
-              coverImageUrl: result.optimizedKey,
-              coverThumbnailUrl: result.thumbnailKey,
-            },
-          });
-          // DB write succeeded — safe to delete raw original
-          await deleteFile(input.key).catch((err) =>
-            console.warn("[R2] raw file cleanup failed:", input.key, err),
-          );
-        } else {
-          console.warn("Image optimization skipped for chart cover — using raw image");
-        }
-      } catch (err) {
-        console.warn("Image optimization failed (raw image preserved):", err);
-      }
-    }
-
-    revalidatePath(`/charts/${input.chartId}`);
-    return { success: true as const };
-  } catch (error) {
-    console.error("confirmUpload error:", error);
-    return { success: false as const, error: "Failed to confirm upload" };
-  }
-}
-
+/**
+ * A short-lived read URL for one object. Grammar-checked but not row-resolved:
+ * the cover editor asks for keys under `covers/unsaved/…`, which by definition
+ * belong to no row yet. The ownership-scoped read path for objects that *do*
+ * have a row is `chart-file-actions.getChartFileDownloadUrl`.
+ */
 export async function getPresignedDownloadUrl(key: string) {
   await requireAuth();
+
+  if (!storageKeySchema.safeParse(key).success) return invalidKey();
 
   try {
     const { client, bucket } = await getReadTarget(key);
@@ -207,8 +183,10 @@ export async function getPresignedImageUrls(
 ): Promise<Record<string, string>> {
   await requireAuth();
 
-  // Filter out null/undefined/empty and deduplicate
-  const validKeys = [...new Set(keys.filter((k): k is string => !!k && k.length > 0))];
+  // Anything that is not one of this app's own object keys is dropped rather than
+  // presigned: the caller renders the result as an image src, so a key it did not
+  // get from the database is a key it has no business asking for.
+  const validKeys = [...new Set(keys.filter((k): k is string => parseStorageKey(k) !== null))];
   if (validKeys.length === 0) return {};
 
   try {
@@ -240,8 +218,16 @@ export async function getPresignedImageUrls(
   }
 }
 
+/**
+ * Removes one object. The key is grammar-checked here; *which* object may be
+ * removed is the caller's responsibility, and every caller resolves the key from
+ * an ownership-checked database row before calling — including the raw originals
+ * this file's own optimizer replaces, which by then belong to no row at all.
+ */
 export async function deleteFile(key: string) {
   await requireAuth();
+
+  if (!storageKeySchema.safeParse(key).success) return invalidKey();
 
   try {
     // Write target, not read: on a preview deployment this is the scratch bucket, so
@@ -268,7 +254,30 @@ export async function processAndStoreImage(
 ): Promise<
   { success: true; optimizedKey: string; thumbnailKey: string } | { success: false; error: string }
 > {
-  await requireAuth();
+  const user = await requireAuth();
+
+  if (!keyOwnerSchema.safeParse(entityId).success) return invalidKey();
+  if (!z.enum(["covers", "sessions"]).safeParse(category).success) return invalidKey();
+  const parsedKey = parseStorageKey(rawKey);
+  if (!parsedKey || parsedKey.category !== category) return invalidKey();
+
+  if (category === "covers") {
+    const chart = await prisma.chart.findUnique({
+      where: { id: entityId },
+      select: { id: true, project: { select: { userId: true } } },
+    });
+    if (!chart || chart.project?.userId !== user.id) {
+      return { success: false as const, error: "Chart not found" };
+    }
+  } else {
+    const session = await prisma.stitchSession.findUnique({
+      where: { id: entityId },
+      select: { id: true, project: { select: { userId: true } } },
+    });
+    if (!session || session.project?.userId !== user.id) {
+      return { success: false as const, error: "Session not found" };
+    }
+  }
 
   try {
     const fetchResult = await fetchImageBuffer(rawKey);
@@ -323,7 +332,25 @@ export async function processAndStoreImage(
 }
 
 export async function generateThumbnail(chartId: string, coverKey: string) {
-  await requireAuth();
+  const user = await requireAuth();
+
+  if (!keyOwnerSchema.safeParse(chartId).success) {
+    return { success: false as const, error: "Chart not found" };
+  }
+  if (!storageKeySchema.safeParse(coverKey).success) return invalidKey();
+
+  const chart = await prisma.chart.findUnique({
+    where: { id: chartId },
+    select: { id: true, coverImageUrl: true, project: { select: { userId: true } } },
+  });
+  if (!chart || chart.project?.userId !== user.id) {
+    return { success: false as const, error: "Chart not found" };
+  }
+  // The key must be the one already recorded against this chart, so a caller
+  // cannot have an arbitrary object read, re-encoded and hung off a chart it owns.
+  if (chart.coverImageUrl !== coverKey) {
+    return { success: false as const, error: "Cover image not found for this chart" };
+  }
 
   try {
     const fetchResult = await fetchImageBuffer(coverKey);
