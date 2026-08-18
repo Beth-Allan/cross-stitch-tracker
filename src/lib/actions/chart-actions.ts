@@ -8,6 +8,7 @@ import { prisma } from "@/lib/db";
 import { discardStoredObjects } from "@/lib/r2";
 import { processAndStoreImage } from "@/lib/actions/upload-actions";
 import { chartFormSchema, batchSupplySchema } from "@/lib/validations/chart";
+import { parseStorageKey } from "@/lib/validations/upload";
 import type { ChartFormInput } from "@/lib/validations/chart";
 import { updateProjectSettingsSchema } from "@/lib/validations/supply";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
@@ -135,11 +136,38 @@ async function optimizeCoverImage(
 
   // The row names the derivatives before anything is deleted — the ordering that
   // keeps a chart from ever pointing at an object that is already gone.
-  await prisma.chart.update({
-    where: { id: chartId },
-    data: { coverImageUrl: result.optimizedKey, coverThumbnailUrl: result.thumbnailKey },
-  });
+  try {
+    await prisma.chart.update({
+      where: { id: chartId },
+      data: { coverImageUrl: result.optimizedKey, coverThumbnailUrl: result.thumbnailKey },
+    });
+  } catch (err) {
+    // The chart itself is already committed by now, so this cannot fail the save —
+    // the caller would have the user save a second copy of a chart that exists.
+    console.error("Cover optimization could not be recorded (chart kept the raw upload):", err);
+    // These two are named here and nowhere else. Dropping them now is the only
+    // chance anything ever has to name them again.
+    await discardStoredObjects(
+      [result.optimizedKey, result.thumbnailKey],
+      `chart ${chartId} unrecorded cover`,
+    );
+    return { coverKey: null, thumbnailKey: null, warning: COVER_WARNING };
+  }
   return { coverKey: result.optimizedKey, thumbnailKey: result.thumbnailKey };
+}
+
+/**
+ * Whether a cover key the *form* submitted is one this chart may delete. Every raw
+ * upload the cover editor produces is keyed either to the chart or to `unsaved`
+ * (the create form's staging area, before a chart id exists). `chartFormSchema`
+ * accepts any well-formed `covers/…` key, and action ids are global — so without
+ * this, one crafted save could name another chart's live cover and have the
+ * supersede rule delete it.
+ */
+function isOwnRawUpload(key: string | null, chartId: string): boolean {
+  if (!key) return false;
+  const owner = parseStorageKey(key)?.owner;
+  return owner === "unsaved" || owner === chartId;
 }
 
 /**
@@ -165,10 +193,12 @@ async function applyCoverOptimization(
       : [submitted.coverImageUrl, submitted.coverThumbnailUrl]
     ).filter((key): key is string => Boolean(key)),
   );
+  const candidates = [
+    ...previousKeys,
+    isOwnRawUpload(submitted.coverImageUrl, chartId) ? submitted.coverImageUrl : null,
+  ];
   await discardStoredObjects(
-    [...previousKeys, submitted.coverImageUrl].map((key) =>
-      key && !stillNamed.has(key) ? key : null,
-    ),
+    candidates.map((key) => (key && !stillNamed.has(key) ? key : null)),
     `chart ${chartId}`,
   );
 
@@ -185,9 +215,7 @@ export async function createChart(formData: unknown) {
       return createChartAndProject(tx, validated, user.id);
     });
 
-    const coverWarning = validated.chart.coverImageUrl
-      ? await applyCoverOptimization(created.id, validated.chart, [])
-      : undefined;
+    const coverWarning = await applyCoverOptimization(created.id, validated.chart, []);
 
     revalidatePath("/charts");
     revalidatePath("/series");
@@ -267,9 +295,7 @@ export async function createChartWithSupplies(formData: unknown, supplyPayload: 
       return result;
     });
 
-    const coverWarning = validated.chart.coverImageUrl
-      ? await applyCoverOptimization(created.id, validated.chart, [])
-      : undefined;
+    const coverWarning = await applyCoverOptimization(created.id, validated.chart, []);
 
     revalidatePath("/charts");
     revalidatePath("/series");

@@ -661,6 +661,7 @@ describe("upload-actions ownership scoping", () => {
     );
 
     assertFailure(result);
+    expect(result.error).toBe("Cover image not found for this chart");
     expect(mockSend).not.toHaveBeenCalled();
   });
 
@@ -679,6 +680,7 @@ describe("upload-actions ownership scoping", () => {
     );
 
     assertFailure(result);
+    expect(result.error).toBe("Photo not found for this session");
     expect(mockSend).not.toHaveBeenCalled();
   });
 

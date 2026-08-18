@@ -41,6 +41,19 @@ function discardedKeys(): unknown[] {
   return call ? (call[0] as unknown[]).filter(Boolean) : [];
 }
 
+/** Every key the cleanup helper was asked to act on, across all of its calls. */
+function allDiscardedKeys(): unknown[] {
+  return mockDiscardStoredObjects.mock.calls.flatMap((call) =>
+    (call[0] as unknown[]).filter(Boolean),
+  );
+}
+
+/** The cover key the row was created with, which the pipeline's key pin requires it to match. */
+function coverKeyOnCreate(): unknown {
+  const call = mockPrisma.chart.create.mock.calls.at(-1);
+  return call ? (call[0] as { data: { coverImageUrl: unknown } }).data.coverImageUrl : undefined;
+}
+
 /**
  * The cover keys written back to the row. `updateChart` also writes the form's
  * own fields inside its transaction, so the cover write is the later one.
@@ -158,6 +171,64 @@ describe("chart-actions cover optimization", () => {
       );
     });
 
+    it("hands the pipeline exactly the key the new row records", async () => {
+      const { createChart } = await import("./chart-actions");
+      mockPrisma.chart.create.mockResolvedValueOnce({ id: "new-chart-id" });
+
+      const formData = {
+        ...validFormData,
+        chart: { ...validFormData.chart, coverImageUrl: "covers/unsaved/abc.png" },
+      };
+
+      await createChart(formData);
+
+      // `processAndStoreImage` refuses a key the row does not already record, so the
+      // two must be the same value or every new cover silently stops being optimized.
+      expect(mockProcessAndStoreImage.mock.calls[0][1]).toBe(coverKeyOnCreate());
+    });
+
+    it("still saves the chart with a warning when recording the optimized cover fails", async () => {
+      const { createChart } = await import("./chart-actions");
+      mockPrisma.chart.create.mockResolvedValueOnce({ id: "new-chart-id" });
+      mockPrisma.chart.update.mockRejectedValueOnce(new Error("connection lost"));
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const formData = {
+        ...validFormData,
+        chart: { ...validFormData.chart, coverImageUrl: "covers/unsaved/abc.png" },
+      };
+
+      const result = await createChart(formData);
+
+      // The chart itself is already committed; reporting failure would have Beth
+      // save a second copy of it.
+      assertSuccess(result);
+      expect(result.warning).toBe("Cover photo saved, but a smaller copy could not be made");
+      consoleSpy.mockRestore();
+    });
+
+    it("drops the derivatives nothing will ever name when recording them fails", async () => {
+      const { createChart } = await import("./chart-actions");
+      mockPrisma.chart.create.mockResolvedValueOnce({ id: "new-chart-id" });
+      mockPrisma.chart.update.mockRejectedValueOnce(new Error("connection lost"));
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const formData = {
+        ...validFormData,
+        chart: { ...validFormData.chart, coverImageUrl: "covers/unsaved/abc.png" },
+      };
+
+      await createChart(formData);
+
+      // They are stored and named here and nowhere else — this is the only moment
+      // anything can still name them. The raw upload stays: the row still names it.
+      expect(allDiscardedKeys()).toEqual([
+        "covers/chart-1/opt-new.webp",
+        "covers/chart-1/thumb-new.webp",
+      ]);
+      consoleSpy.mockRestore();
+    });
+
     it("does NOT optimize when no cover was uploaded", async () => {
       const { createChart } = await import("./chart-actions");
       mockPrisma.chart.create.mockResolvedValueOnce({ id: "new-chart-id" });
@@ -264,6 +335,82 @@ describe("chart-actions cover optimization", () => {
         coverImageUrl: "covers/chart-1/opt-new.webp",
         coverThumbnailUrl: "covers/chart-1/thumb-new.webp",
       });
+    });
+
+    it("hands the pipeline exactly the key the updated row records", async () => {
+      const { updateChart } = await import("./chart-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce({
+        coverImageUrl: "covers/chart-1/opt-old.webp",
+        project: { id: "project-1", userId: "user-1" },
+      });
+
+      const formData = {
+        ...validFormData,
+        chart: { ...validFormData.chart, coverImageUrl: "covers/chart-1/abc-new.png" },
+      };
+
+      await updateChart("chart-1", formData);
+
+      const written = mockPrisma.chart.update.mock.calls[0][0] as {
+        data: { coverImageUrl: unknown };
+      };
+      expect(mockProcessAndStoreImage.mock.calls[0][1]).toBe(written.data.coverImageUrl);
+    });
+
+    it("still saves the chart with a warning when recording the optimized cover fails", async () => {
+      const { updateChart } = await import("./chart-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce({
+        coverImageUrl: "covers/chart-1/opt-old.webp",
+        coverThumbnailUrl: "covers/chart-1/thumb-old.webp",
+        project: { id: "project-1", userId: "user-1" },
+      });
+      mockPrisma.chart.update
+        .mockResolvedValueOnce({ id: "chart-1" })
+        .mockRejectedValueOnce(new Error("connection lost"));
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const result = await updateChart("chart-1", {
+        ...validFormData,
+        chart: {
+          ...validFormData.chart,
+          coverImageUrl: "covers/chart-1/abc-new.png",
+          coverThumbnailUrl: "covers/chart-1/thumb-old.webp",
+        },
+      });
+
+      assertSuccess(result);
+      expect(result.warning).toBe("Cover photo saved, but a smaller copy could not be made");
+      // The unrecorded derivatives go; the raw upload and the old thumbnail stay,
+      // because the row still names both.
+      expect(allDiscardedKeys()).toEqual([
+        "covers/chart-1/opt-new.webp",
+        "covers/chart-1/thumb-new.webp",
+        "covers/chart-1/opt-old.webp",
+      ]);
+      consoleSpy.mockRestore();
+    });
+
+    it("never deletes a submitted cover key that belongs to another chart", async () => {
+      const { updateChart } = await import("./chart-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce({
+        coverImageUrl: "covers/chart-1/opt-old.webp",
+        coverThumbnailUrl: "covers/chart-1/thumb-old.webp",
+        project: { id: "project-1", userId: "user-1" },
+      });
+
+      // The form only ever submits this chart's own fresh upload. A direct call can
+      // submit any well-formed covers key, and that key is another chart's live cover.
+      const result = await updateChart("chart-1", {
+        ...validFormData,
+        chart: { ...validFormData.chart, coverImageUrl: "covers/chart-2/opt-live.webp" },
+      });
+
+      assertSuccess(result);
+      expect(allDiscardedKeys()).not.toContain("covers/chart-2/opt-live.webp");
+      expect(discardedKeys()).toEqual([
+        "covers/chart-1/opt-old.webp",
+        "covers/chart-1/thumb-old.webp",
+      ]);
     });
 
     it("does NOT optimize when the cover is unchanged", async () => {

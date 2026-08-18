@@ -121,7 +121,8 @@ to the new path _before_ the old copies go, so nothing stops being checked.
 **What it changed.** The key-pin and ownership proofs moved onto `processAndStoreImage`;
 `chart-actions-thumbnail.test.ts` became `chart-actions-cover-image.test.ts` with fifteen clauses
 where it had twelve; the auth file's `generateThumbnail` case folded its assertion into the
-`processAndStoreImage` case. Suite count unchanged at 2747.
+`processAndStoreImage` case. The retirement itself left the suite count unchanged at 2747; the
+layer-1 review's follow-on fixes then took it to 2753.
 
 ### 2026-08-17 · the reconciliation story for abandoned uploads — ruled during P8
 

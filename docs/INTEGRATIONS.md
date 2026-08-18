@@ -86,7 +86,11 @@ deliberately absent.
     records** (`Chart.coverImageUrl`, `StitchSession.photoKey`), not merely a well-formed key in
     the right namespace: every export of a `"use server"` file is a live POST endpoint, so
     without that an authenticated caller could have any object in the namespace re-encoded and
-    stored under something it owns
+    stored under something it owns. **The pin binds the action, not the whole save flow** —
+    `chartFormSchema` accepts any well-formed `covers/…` key, so `updateChart` can make the row
+    name one before the pin is checked (maintenance-ledger row). What that cannot do is _delete_
+    another chart's cover: the supersede rule only ever discards a submitted key whose owner
+    segment is `unsaved` or the chart's own id
   - **Object lifecycle — what removes what** (item P8, 2026-08-17):
     - `deleteChart` reads the chart's cover, thumbnail, every `ChartFile.url` and every
       `StitchSession.photoKey` **before** deleting the row, then removes them in one batched
