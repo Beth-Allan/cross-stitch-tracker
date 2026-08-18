@@ -5,7 +5,7 @@ import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
-import { deleteFile, generateThumbnail } from "@/lib/actions/upload-actions";
+import { discardStoredObjects, generateThumbnail } from "@/lib/actions/upload-actions";
 import { chartFormSchema, batchSupplySchema } from "@/lib/validations/chart";
 import type { ChartFormInput } from "@/lib/validations/chart";
 import { updateProjectSettingsSchema } from "@/lib/validations/supply";
@@ -104,19 +104,41 @@ async function createChartAndProject(
   return result;
 }
 
+const THUMBNAIL_WARNING = "Thumbnail could not be generated";
+
+/**
+ * Regenerates a chart's cover thumbnail outside the transaction and reports which
+ * key the chart now points at — `null` when it still points at the previous one.
+ * `generateThumbnail` signals failure by *returning*, not by throwing, so a caller
+ * that only wrapped it in `try` saw every failure as a success and went on to
+ * delete the thumbnail the chart was still displaying.
+ */
+async function refreshCoverThumbnail(
+  chartId: string,
+  coverImageUrl: string,
+): Promise<{ thumbnailKey: string | null; warning?: string }> {
+  let result;
+  try {
+    result = await generateThumbnail(chartId, coverImageUrl);
+  } catch (err) {
+    console.error("Thumbnail generation failed (chart saved without thumbnail):", err);
+    return { thumbnailKey: null, warning: THUMBNAIL_WARNING };
+  }
+
+  if (!result.success) {
+    console.error("Thumbnail generation failed (chart saved without thumbnail):", result.error);
+    return { thumbnailKey: null, warning: THUMBNAIL_WARNING };
+  }
+  return { thumbnailKey: result.thumbnailKey };
+}
+
 /** Generate cover thumbnail outside the transaction. Returns warning if it fails. */
 async function handleThumbnail(
   chartId: string,
   coverImageUrl: string | null,
 ): Promise<string | undefined> {
   if (!coverImageUrl) return undefined;
-  try {
-    await generateThumbnail(chartId, coverImageUrl);
-    return undefined;
-  } catch (err) {
-    console.error("Thumbnail generation failed (chart saved without thumbnail):", err);
-    return "Thumbnail could not be generated";
-  }
+  return (await refreshCoverThumbnail(chartId, coverImageUrl)).warning;
 }
 
 export async function createChart(formData: unknown) {
@@ -329,22 +351,18 @@ export async function updateChart(chartId: string, formData: unknown) {
     // Generate thumbnail if cover image changed
     let thumbnailWarning: string | undefined;
     if (chart.coverImageUrl && chart.coverImageUrl !== existing.coverImageUrl) {
-      try {
-        await generateThumbnail(chartId, chart.coverImageUrl);
-      } catch (err) {
-        console.error("Thumbnail generation failed (chart saved without thumbnail):", err);
-        thumbnailWarning = "Thumbnail could not be generated";
+      const refreshed = await refreshCoverThumbnail(chartId, chart.coverImageUrl);
+      thumbnailWarning = refreshed.warning;
+
+      // The old cover stops being referenced the moment the row names the new one.
+      // The old thumbnail does not: when regeneration failed the row still names
+      // it, and deleting it would leave the chart showing a broken image behind a
+      // success message.
+      const superseded: (string | null)[] = [existing.coverImageUrl];
+      if (refreshed.thumbnailKey && refreshed.thumbnailKey !== existing.coverThumbnailUrl) {
+        superseded.push(existing.coverThumbnailUrl);
       }
-      if (existing.coverImageUrl) {
-        await deleteFile(existing.coverImageUrl).catch((err) =>
-          console.warn("[R2] old cover cleanup failed:", existing.coverImageUrl, err),
-        );
-      }
-      if (existing.coverThumbnailUrl) {
-        await deleteFile(existing.coverThumbnailUrl).catch((err) =>
-          console.warn("[R2] old thumbnail cleanup failed:", existing.coverThumbnailUrl, err),
-        );
-      }
+      await discardStoredObjects(superseded, `chart ${chartId}`);
     }
 
     revalidatePath("/charts");
@@ -366,16 +384,38 @@ export async function deleteChart(chartId: string) {
   const user = await requireAuth();
 
   try {
-    // Verify ownership
+    // Verify ownership, and read every object key the chart owns while the rows
+    // that hold them still exist: the cascade takes `ChartFile` and `StitchSession`
+    // with it, and nothing else in the app can name a deleted chart's storage.
     const existing = await prisma.chart.findUnique({
       where: { id: chartId },
-      select: { project: { select: { userId: true } } },
+      select: {
+        coverImageUrl: true,
+        coverThumbnailUrl: true,
+        files: { select: { url: true } },
+        project: { select: { userId: true, sessions: { select: { photoKey: true } } } },
+      },
     });
     if (!existing?.project || existing.project.userId !== user.id) {
       return { success: false as const, error: "Chart not found" };
     }
 
+    const storedKeys = [
+      existing.coverImageUrl,
+      existing.coverThumbnailUrl,
+      ...existing.files.map((file) => file.url),
+      ...existing.project.sessions.map((session) => session.photoKey),
+    ].filter((key): key is string => Boolean(key));
+
     await prisma.chart.delete({ where: { id: chartId } });
+
+    // Rows first, objects second — matching `deleteChartFile`: a failure here
+    // leaves an orphan, the residue this app tolerates, rather than a record
+    // pointing at an object that is already gone.
+    if (storedKeys.length > 0) {
+      await discardStoredObjects(storedKeys, `chart ${chartId}`);
+    }
+
     revalidatePath("/charts");
     revalidateTag("stats", { expire: 0 });
     return { success: true as const };

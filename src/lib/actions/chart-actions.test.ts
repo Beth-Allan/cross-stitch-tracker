@@ -428,7 +428,12 @@ describe("chart-actions cache invalidation", () => {
   });
 
   it("deleteChart calls revalidateTag('stats') after successful deletion", async () => {
-    mockPrisma.chart.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({
+      coverImageUrl: null,
+      coverThumbnailUrl: null,
+      files: [],
+      project: { userId: "user-1", sessions: [] },
+    });
     mockPrisma.chart.delete.mockResolvedValueOnce({ id: "chart-1" });
     const { deleteChart } = await import("./chart-actions");
     const { revalidateTag } = await import("next/cache");
@@ -464,7 +469,12 @@ describe("chart-actions cache invalidation", () => {
   });
 
   it("deleteChart does not invalidate when the chart is not owned", async () => {
-    mockPrisma.chart.findUnique.mockResolvedValueOnce({ project: { userId: "someone-else" } });
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({
+      coverImageUrl: null,
+      coverThumbnailUrl: null,
+      files: [],
+      project: { userId: "someone-else", sessions: [] },
+    });
     const { deleteChart } = await import("./chart-actions");
     const { revalidateTag } = await import("next/cache");
 

@@ -1,6 +1,11 @@
 "use server";
 
-import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import {
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+  DeleteObjectsCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { nanoid } from "nanoid";
 import sharp from "sharp";
@@ -33,6 +38,9 @@ import {
 // `chart-file-actions.addChartFile` when a chart file is recorded.
 
 const INVALID_KEY_ERROR = "Invalid storage key";
+
+// R2 accepts at most this many keys in one batch delete, as S3 does.
+const MAX_KEYS_PER_DELETE_REQUEST = 1000;
 
 function invalidKey() {
   return { success: false as const, error: INVALID_KEY_ERROR };
@@ -246,13 +254,73 @@ export async function deleteFile(key: string) {
   }
 }
 
+/**
+ * Removes objects whose rows are already gone — a deleted chart's cover, files and
+ * session photos, or the cover a replacement superseded. Nothing is returned and
+ * nothing is thrown: by the time this runs the database is authoritative, so a
+ * storage failure is an orphan to log, never a reason to tell Beth her delete
+ * failed. `context` names the entity in that log, which is all anyone has to go on
+ * once the keys themselves are unrecoverable.
+ *
+ * `deleteFile`'s contract applies to every key unchanged — the caller resolved each
+ * one from an ownership-checked row, and the write target means a preview
+ * deployment aims its deletes at the scratch bucket.
+ */
+export async function discardStoredObjects(
+  keys: (string | null | undefined)[],
+  context: string,
+): Promise<void> {
+  const present = [...new Set(keys.filter((key): key is string => Boolean(key)))];
+  if (present.length === 0) return;
+
+  try {
+    const unremovable = await removeObjects(present);
+    if (unremovable.length > 0) {
+      console.error(`[R2] objects left behind for ${context}:`, unremovable);
+    }
+  } catch (error) {
+    console.warn(`[R2] cleanup failed for ${context}:`, error);
+  }
+}
+
+/** Deletes the given keys and returns the ones that are still there. */
+async function removeObjects(keys: string[]): Promise<string[]> {
+  await requireAuth();
+
+  const unremovable: string[] = [];
+  const valid: string[] = [];
+  for (const key of keys) {
+    if (storageKeySchema.safeParse(key).success) valid.push(key);
+    else unremovable.push(key);
+  }
+
+  const { client, bucket } = getWriteTarget();
+  for (let index = 0; index < valid.length; index += MAX_KEYS_PER_DELETE_REQUEST) {
+    const batch = valid.slice(index, index + MAX_KEYS_PER_DELETE_REQUEST);
+    // Quiet mode reports only what failed. R2 answers a partial failure with a 200
+    // and an error list, so the reply is read rather than assumed successful.
+    const response = await client.send(
+      new DeleteObjectsCommand({
+        Bucket: bucket,
+        Delete: { Objects: batch.map((Key) => ({ Key })), Quiet: true },
+      }),
+    );
+    for (const failure of response.Errors ?? []) {
+      if (failure.Key) unremovable.push(failure.Key);
+    }
+  }
+
+  return unremovable;
+}
+
 // On failure the raw original is preserved so the upload is still usable.
 export async function processAndStoreImage(
   entityId: string,
   rawKey: string,
   category: "covers" | "sessions",
 ): Promise<
-  { success: true; optimizedKey: string; thumbnailKey: string } | { success: false; error: string }
+  | { success: true; optimizedKey: string; thumbnailKey: string | null }
+  | { success: false; error: string }
 > {
   const user = await requireAuth();
 
@@ -286,39 +354,46 @@ export async function processAndStoreImage(
     }
     const { buffer } = fetchResult;
 
-    const [optimizedBuffer, thumbnailBuffer] = await Promise.all([
-      sharp(buffer)
-        .resize(OPTIMIZED_MAX_WIDTH, null, { withoutEnlargement: true })
-        .webp({ quality: OPTIMIZED_QUALITY })
-        .toBuffer(),
-      sharp(buffer)
-        .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, { fit: "cover", withoutEnlargement: true })
-        .webp({ quality: THUMBNAIL_QUALITY })
-        .toBuffer(),
-    ]);
+    // A derivative nothing records is an orphan from the moment it is stored, and
+    // nothing can ever name it again. A chart records two keys (`coverImageUrl`
+    // and `coverThumbnailUrl`); a session records one, so one is all it gets.
+    const wantsThumbnail = category === "covers";
 
     const optimizedKey = `${category}/${entityId}/opt-${nanoid()}.webp`;
-    const thumbnailKey = `${category}/${entityId}/thumb-${nanoid()}.webp`;
+    const thumbnailKey = wantsThumbnail ? `${category}/${entityId}/thumb-${nanoid()}.webp` : null;
+
+    const derivatives = [
+      {
+        key: optimizedKey,
+        body: await sharp(buffer)
+          .resize(OPTIMIZED_MAX_WIDTH, null, { withoutEnlargement: true })
+          .webp({ quality: OPTIMIZED_QUALITY })
+          .toBuffer(),
+      },
+    ];
+    if (thumbnailKey) {
+      derivatives.push({
+        key: thumbnailKey,
+        body: await sharp(buffer)
+          .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, { fit: "cover", withoutEnlargement: true })
+          .webp({ quality: THUMBNAIL_QUALITY })
+          .toBuffer(),
+      });
+    }
 
     const { client, bucket } = getWriteTarget();
-    await Promise.all([
-      client.send(
-        new PutObjectCommand({
-          Bucket: bucket,
-          Key: optimizedKey,
-          Body: optimizedBuffer,
-          ContentType: "image/webp",
-        }),
+    await Promise.all(
+      derivatives.map(({ key, body }) =>
+        client.send(
+          new PutObjectCommand({
+            Bucket: bucket,
+            Key: key,
+            Body: body,
+            ContentType: "image/webp",
+          }),
+        ),
       ),
-      client.send(
-        new PutObjectCommand({
-          Bucket: bucket,
-          Key: thumbnailKey,
-          Body: thumbnailBuffer,
-          ContentType: "image/webp",
-        }),
-      ),
-    ]);
+    );
 
     // Caller is responsible for deleting rawKey after confirming the DB write
     return { success: true as const, optimizedKey, thumbnailKey };
