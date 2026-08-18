@@ -80,9 +80,12 @@ deliberately absent.
       `StitchSession.photoKey` **before** deleting the row, then removes them in one batched
       `DeleteObjects` per 1000 keys (`discardStoredObjects`). The cascade destroys the only
       record of those keys, so reading them first is the whole game
-    - Replacing a cover removes the superseded original, and removes the old thumbnail **only
-      once a new one exists**. `generateThumbnail` reports failure by returning rather than
-      throwing; on failure the row still points at the old thumbnail, so it stays
+    - Changing a cover — replacing it, or taking it off the chart — removes each old object
+      **only once the row has stopped naming it**. One rule covers both cases: on a failed
+      regeneration the form re-submits the old thumbnail key, so the row still names it and it
+      stays (`generateThumbnail` reports failure by returning rather than throwing, which is what
+      used to make the cleanup delete a thumbnail the chart was still displaying); on removal the
+      row names neither, so both go
     - Rows are deleted before objects, everywhere. The tolerated residue is an orphan, never a
       record pointing at an object that is gone
     - **Abandoned pre-save uploads are not cleaned up, by decision** (Beth, 2026-08-17). The

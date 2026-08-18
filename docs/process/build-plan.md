@@ -182,6 +182,10 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
   scratch — drift 2026-08-17).
 - **Done-when:** P8's four defects closed test-first; reconciliation decision recorded; fresh
   `/review` before merge.
+  _(Reconciliation resolved while building, 2026-08-17: **Beth ruled leave it and write the plan
+  down** — no sweep, no bucket rule yet, because a lifecycle rule on `covers/unsaved/` would
+  delete live covers until **P15** moves saved covers off that prefix. Residue + pre-condition on
+  the maintenance ledger; ruling in drift.md, Ruled.)_
 
 ### P9 Query scale + data integrity: the unbounded-read batch — **index/schema half gated**
 

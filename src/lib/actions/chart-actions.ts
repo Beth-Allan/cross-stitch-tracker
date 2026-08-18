@@ -348,21 +348,27 @@ export async function updateChart(chartId: string, formData: unknown) {
       }
     });
 
-    // Generate thumbnail if cover image changed
+    // Regenerate the thumbnail and clean up when the cover changed — replaced with
+    // a new image, or taken off the chart entirely.
     let thumbnailWarning: string | undefined;
-    if (chart.coverImageUrl && chart.coverImageUrl !== existing.coverImageUrl) {
-      const refreshed = await refreshCoverThumbnail(chartId, chart.coverImageUrl);
+    if (chart.coverImageUrl !== existing.coverImageUrl) {
+      const refreshed = chart.coverImageUrl
+        ? await refreshCoverThumbnail(chartId, chart.coverImageUrl)
+        : { thumbnailKey: null, warning: undefined };
       thumbnailWarning = refreshed.warning;
 
-      // The old cover stops being referenced the moment the row names the new one.
-      // The old thumbnail does not: when regeneration failed the row still names
-      // it, and deleting it would leave the chart showing a broken image behind a
-      // success message.
-      const superseded: (string | null)[] = [existing.coverImageUrl];
-      if (refreshed.thumbnailKey && refreshed.thumbnailKey !== existing.coverThumbnailUrl) {
-        superseded.push(existing.coverThumbnailUrl);
-      }
-      await discardStoredObjects(superseded, `chart ${chartId}`);
+      // One rule for both objects: an old key is superseded only once the row has
+      // stopped naming it. That is what keeps a failed regeneration from deleting
+      // the thumbnail the chart is still displaying — the form re-submits the old
+      // key, so the row still names it and it stays.
+      const currentThumbnailKey = refreshed.thumbnailKey ?? chart.coverThumbnailUrl;
+      await discardStoredObjects(
+        [
+          existing.coverImageUrl === chart.coverImageUrl ? null : existing.coverImageUrl,
+          existing.coverThumbnailUrl === currentThumbnailKey ? null : existing.coverThumbnailUrl,
+        ],
+        `chart ${chartId}`,
+      );
     }
 
     revalidatePath("/charts");

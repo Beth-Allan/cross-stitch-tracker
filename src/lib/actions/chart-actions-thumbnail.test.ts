@@ -23,10 +23,13 @@ vi.mock("@/lib/actions/upload-actions", () => ({
   discardStoredObjects: (...args: unknown[]) => mockDiscardStoredObjects(...args),
 }));
 
-/** The keys handed to the cleanup helper on the most recent call, or none. */
+/**
+ * The keys the cleanup helper will actually act on from the most recent call.
+ * Absent keys reach it as `null` by design, so they are not part of the subject.
+ */
 function discardedKeys(): unknown[] {
   const call = mockDiscardStoredObjects.mock.calls.at(-1);
-  return call ? (call[0] as unknown[]) : [];
+  return call ? (call[0] as unknown[]).filter(Boolean) : [];
 }
 
 const validFormData = {
@@ -238,9 +241,15 @@ describe("chart-actions thumbnail generation", () => {
       mockGenerateThumbnail.mockResolvedValueOnce({ success: false, error: "Failed" });
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
+      // Replacing a cover leaves the form's thumbnail field alone, so the payload
+      // still carries the old key — and the row goes on naming it.
       const formData = {
         ...validFormData,
-        chart: { ...validFormData.chart, coverImageUrl: "covers/chart-1/abc-new.png" },
+        chart: {
+          ...validFormData.chart,
+          coverImageUrl: "covers/chart-1/abc-new.png",
+          coverThumbnailUrl: "covers/chart-1/thumb-old.webp",
+        },
       };
 
       const result = await updateChart("chart-1", formData);
@@ -250,6 +259,27 @@ describe("chart-actions thumbnail generation", () => {
       expect(discardedKeys()).toEqual(["covers/chart-1/abc-old.png"]);
       expect(discardedKeys()).not.toContain("covers/chart-1/thumb-old.webp");
       consoleSpy.mockRestore();
+    });
+
+    it("removes both objects when the cover is taken off the chart", async () => {
+      const { updateChart } = await import("./chart-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce({
+        coverImageUrl: "covers/chart-1/abc-old.png",
+        coverThumbnailUrl: "covers/chart-1/thumb-old.webp",
+        project: { id: "project-1", userId: "user-1" },
+      });
+      mockPrisma.chart.update.mockResolvedValueOnce({ id: "chart-1" });
+
+      // Removing the cover clears both fields on the form, so the row ends up
+      // naming neither object.
+      const result = await updateChart("chart-1", validFormData);
+
+      assertSuccess(result);
+      expect(mockGenerateThumbnail).not.toHaveBeenCalled();
+      expect(discardedKeys()).toEqual([
+        "covers/chart-1/abc-old.png",
+        "covers/chart-1/thumb-old.webp",
+      ]);
     });
 
     it("keeps the old thumbnail when regeneration throws", async () => {
@@ -265,7 +295,11 @@ describe("chart-actions thumbnail generation", () => {
 
       const result = await updateChart("chart-1", {
         ...validFormData,
-        chart: { ...validFormData.chart, coverImageUrl: "covers/chart-1/abc-new.png" },
+        chart: {
+          ...validFormData.chart,
+          coverImageUrl: "covers/chart-1/abc-new.png",
+          coverThumbnailUrl: "covers/chart-1/thumb-old.webp",
+        },
       });
 
       assertSuccess(result);
