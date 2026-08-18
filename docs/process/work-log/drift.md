@@ -69,18 +69,62 @@ is kept in step by the same rule. No code changed. **This row moves to Ruled at 
 
 ## Also open — the question known to be coming
 
-_(One question is **known to be coming** but is not a drift row yet, because nothing contradicts
-anything until someone builds it: fabric matching for a project with no assigned fabric — what
-should it match against? Asked inside **P7**, which absorbed F-2 at the 2026-08-17 `/cleanup`
-(the question is F-2's trap ②, and P7 inherits it). It is a domain fact, so it goes through
-`/stitch-fact`, not through here, unless her answer contradicts something already written. The
-second question that used to sit here — block/warn/allow on over-logging — was ruled **warn but
-allow** at the same `/cleanup`; see Ruled below.)_
+_(This section is empty. The question that used to sit here — fabric matching for a project with
+no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is recorded as
+**FAB-006** in `docs/domain/fabric.md`. The other question that used to sit here — block/warn/allow
+on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
 
 ## Ruled
 
 _(Beth's rulings D-01–D-14, which set the process itself up, are in
 `WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
+
+### 2026-08-17 · D-17 · over-count is missing from the fabric size calculation — ruled during P7
+
+**What happened.** P7 read all three copies of the fabric formula and found something none of
+them do: **none divides the fabric count by the project's over-count.** Stitching over two
+threads means each stitch spans two fabric threads, so 28ct linen worked over two behaves like
+14ct for size and the design comes out about twice as large. `skein-calculator.ts` already does
+this division (`effectiveCount = fabricCount / overCount`); `fabric-calculator.ts` never has.
+`Project.overCount` exists in the schema, defaults to 1, and no fabric-size code path reads it.
+
+This is a genuine contradiction, not a preference: **FAB-004** in `docs/domain/fabric.md` states
+that the effective count is what "both calculators use". The doc and the code disagree, and for
+any over-two project the app currently understates the fabric needed. Distinct from Q-002, which
+asks how over-count is _decided_ — this is about applying the value Beth has already set.
+
+**Surfaced to Beth** in-session, with the size of the error named and the sequencing trade-off:
+P7's whole job was collapsing three copies of the formula into one, and the over-count fix is a
+one-place change afterwards versus a three-place change alongside.
+
+**Her ruling: record it now, fix it in a short session straight after P7.** Filed as build-plan
+item **F-4**, queued directly behind P7's `/review`. No calculation changed in P7 itself — the
+unified calculator preserves today's over-count-blind arithmetic exactly, so P7 neither fixes nor
+worsens the error, and F-4 changes it in exactly one place.
+
+### 2026-08-17 · fabric matching now shows only pieces that fit — ruled during P7
+
+**What happened.** P7 inherited F-2's domain question (its trap ②): what should a project with no
+assigned fabric be matched against? Reading the code answered half of it first — the behaviour
+had already been written in May 2026 (commit `18859b3`) without anyone asking her, so the
+"missing" F-2 fix was in fact a **guess sitting in production**: every unassigned piece was
+listed, each judged at its own count, fitting and non-fitting alike, under a heading reading
+"Fabrics That Fit".
+
+**Surfaced to Beth** as the decision it always was, including the heading contradiction.
+
+**Her ruling: only show pieces that actually fit — and the same rule applies to both halves of
+the list**, the same-count suggestions for a project that already has fabric as well as the
+all-counts suggestions for a project that has none. Recorded as domain fact **FAB-006**
+(`docs/domain/fabric.md`), which is where the behaviour now lives.
+
+**What it changed.** `matchingFabrics` filters on `doesFabricFit` in both branches;
+`fitsWidth`/`fitsHeight` left `FabricRequirementRow` because every row on the list now fits by
+construction, and the tab's warning-triangle branch went with them. **Six tests were rewritten to
+the ruled behaviour** — three that asserted non-fitting pieces are listed, three that asserted the
+fit flags — plus one existing `updateFabric` test given the ownership mock its new precondition
+needs. Nothing was deleted to get green: each rewritten test still asserts the same scenario,
+against the answer Beth gave.
 
 ### 2026-08-17 · the covers already in the library — ruled during P15
 

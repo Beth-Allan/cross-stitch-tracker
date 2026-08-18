@@ -83,7 +83,7 @@ export async function getFabricBrands() {
 
 // Fabric has no direct userId — ownership is inferred through linkedProject.userId.
 // Unlinked fabrics (linkedProjectId=null) are accessible to all authenticated users.
-// Mutations on linked fabrics verify the linked project belongs to the current user.
+// Mutations verify ownership of both the fabric's existing link and any incoming linkedProjectId.
 // Note: chart-actions.ts also performs fabric ownership checks when linking/unlinking in transactions.
 
 export async function createFabric(formData: unknown) {
@@ -142,6 +142,17 @@ export async function updateFabric(id: string, formData: unknown) {
     }
 
     const validated = fabricSchema.parse(formData);
+
+    if (validated.linkedProjectId) {
+      const project = await prisma.project.findUnique({
+        where: { id: validated.linkedProjectId },
+        select: { userId: true },
+      });
+      if (!project || project.userId !== user.id) {
+        return { success: false as const, error: "Project not found" };
+      }
+    }
+
     const fabric = await prisma.fabric.update({
       where: { id },
       data: validated,

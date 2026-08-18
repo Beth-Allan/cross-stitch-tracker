@@ -55,6 +55,27 @@ describe("FabricRequirementsTab", () => {
     expect(screen.getByText("200 x 300 stitches")).toBeInTheDocument();
   });
 
+  it("shows the required size per count, margin included, in the row summary", () => {
+    render(<FabricRequirementsTab rows={[makeRow()]} imageUrls={{}} />);
+
+    // 200/14+6 = 20.3" x 300/14+6 = 27.4"
+    expect(screen.getByText('20.3" x 27.4"')).toBeInTheDocument();
+    // 200/18+6 = 17.1" x 300/18+6 = 22.7"
+    expect(screen.getByText('17.1" x 22.7"')).toBeInTheDocument();
+  });
+
+  it("size reference table lists design size and size with margins for each count", async () => {
+    render(<FabricRequirementsTab rows={[makeRow()]} imageUrls={{}} />);
+
+    fireEvent.click(screen.getByText("Test Pattern"));
+    fireEvent.click(screen.getByText("Size Reference — All Counts"));
+
+    expect(screen.getByText("28 count")).toBeInTheDocument();
+    // 28ct design 200/28 x 300/28, then the same plus the 6" margin
+    expect(screen.getByText('7.1" x 10.7"')).toBeInTheDocument();
+    expect(screen.getByText('13.1" x 16.7"')).toBeInTheDocument();
+  });
+
   it("shows info banner about 3 inch margins", () => {
     render(<FabricRequirementsTab rows={[makeRow()]} imageUrls={{}} />);
 
@@ -173,8 +194,6 @@ describe("FabricRequirementsTab", () => {
             count: 14,
             shortestEdgeInches: 24,
             longestEdgeInches: 30,
-            fitsWidth: true,
-            fitsHeight: true,
           },
         ],
       }),
@@ -201,8 +220,6 @@ describe("FabricRequirementsTab", () => {
             count: 14,
             shortestEdgeInches: 24,
             longestEdgeInches: 30,
-            fitsWidth: true,
-            fitsHeight: true,
           },
         ],
       }),
@@ -234,8 +251,6 @@ describe("FabricRequirementsTab", () => {
             count: 14,
             shortestEdgeInches: 24,
             longestEdgeInches: 30,
-            fitsWidth: true,
-            fitsHeight: true,
           },
         ],
       }),

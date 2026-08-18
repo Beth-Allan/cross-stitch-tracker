@@ -173,6 +173,16 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
   Beth via `/stitch-fact` in this session. F-2 no longer runs as its own item.
 - **Done-when:** one implementation, exact rounding pinned, F-2's done-when absorbed and
   demonstrated, fresh `/review` before merge.
+  _(Built 2026-08-17. Two findings changed the shape of the item. **F-2 was already implemented**
+  — commit `18859b3`, May 2026 — so its "bug" was a guess in production rather than a gap; Beth
+  ruled on it in-session (FAB-006) and the ruling narrowed the behaviour to fitting pieces only,
+  on both halves of the list. **Over-count is missing from the fabric size formula entirely** —
+  drift D-17, Beth ruled fix-it-next, filed as F-4; P7 preserved today's arithmetic exactly so
+  F-4 changes it in one place. The rounding contract chosen: the calculator returns the **exact**
+  requirement and rounding is a display decision — a rounded-down minimum silently accepts fabric
+  that is too small, which is precisely the 1dp defect the audit found in `pattern-dive-actions`.
+  Margin value untouched; Q-005 stays open. Folded in: the file/fabric write-path ledger row's
+  arm ③.)_
 
 ### P8 R2 orphan lifecycle — **gated (R2 core)**
 
@@ -350,11 +360,15 @@ not a promise that the diagnosis below is right.
 
 ### F-2 Fabric matching excludes projects with no fabric assigned
 
-> **Absorbed into P7 (2026-08-17 `/cleanup`).** A-1 confirmed the deeper cause this brief
+> **Absorbed into P7, and closed there 2026-08-17.** A-1 confirmed the deeper cause this brief
 > anticipated: the fabric formula exists 3× with drifted rounding and the gated copy is unused
-> (report P7). F-2 no longer runs as its own item — P7 builds the fix inside the unified
-> calculator, asking this brief's domain question (trap ②) via `/stitch-fact` first. The brief
-> below stays as the requirement record P7 inherits.
+> (report P7). F-2 never ran as its own item. **Building it revealed the brief's premise was
+> already stale:** the null-`fabricCount` short-circuit had been fixed in May 2026 (commit
+> `18859b3`), so what remained was not a bug but an unasked question answered by code. Beth
+> answered trap ② in the P7 session — **only pieces that actually fit are offered, on both halves
+> of the list** — recorded as **FAB-006** and built inside the unified calculator. Trap ① holds:
+> "no fabric assigned" still reports no required size at all, never a size of zero. The brief
+> below stays as the requirement record.
 
 - **Objective:** the Pattern Dive **Fabric Requirements** tab shows zero matches for projects
   that have no fabric assigned — a `null` `fabricCount` short-circuits the matching logic, so
@@ -378,6 +392,31 @@ not a promise that the diagnosis below is right.
   a project with no assigned fabric returns the matches that answer defines; a project with a
   real fabric count is unchanged (regression test proves it); failing-first tests for both;
   `npm run gate` green; the PR states whether the diff is review-gated; work log updated.
+
+### F-4 Over-count is missing from the fabric size calculation
+
+- **Objective:** `fabric-calculator.ts` never divides the fabric count by the project's
+  `overCount`, so every over-two project (linen, most evenweave) is told it needs roughly half
+  the fabric it actually needs. `skein-calculator.ts` already divides; `FAB-004` says both
+  should. Drift **D-17**, Beth's ruling 2026-08-17: fix it in a short session directly after
+  P7's review.
+- **Cited specs:** `docs/domain/fabric.md` FAB-004 (over-count and effective count) and FAB-005
+  (the size formula) · `src/lib/utils/fabric-calculator.ts` — **protocol §5 review-gated core**,
+  so this merges only from a fresh `/review`.
+- **Traps:** ① **This is not Q-002.** Q-002 asks how over-count is _decided_ and stays open; this
+  item only applies the value already stored on the project. Do not infer an over-count from
+  anything. ② **The margin does not move** — Q-005 stays open, and the margin is added after the
+  effective count divides, exactly as today. ③ Every call site must pass the project's real
+  `overCount`: `pattern-dive-actions.getFabricRequirements` does not currently select it, and the
+  stash-matching branch for a project with no assigned fabric has no project over-count to use —
+  say explicitly what that branch does rather than defaulting silently. ④ The displayed size
+  reference table in `fabric-requirements-tab.tsx` walks seven counts for one project; decide
+  whether those rows are effective counts or raw counts, and label them so Beth can tell.
+- **Done-when:** the fabric size for an over-two project uses `fabricCount / overCount`,
+  demonstrated test-first; a project at over 1 is unchanged (regression test proves it); every
+  call site passes a real value; trap ③'s no-assigned-fabric branch has a stated, tested answer;
+  FAB-004's claim about "both calculators" is true when the item lands; `npm run gate` green;
+  fresh `/review` before merge; work log updated.
 
 ### F-3 Supply stitch-total hint is invisible outside Details mode
 

@@ -2,6 +2,7 @@
 
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { calculateRequiredFabricSize, doesFabricFit } from "@/lib/utils/fabric-calculator";
 import { revalidatePath } from "next/cache";
 import type { WhatsNextProject, FabricRequirementRow, StorageGroup } from "@/types/session";
 
@@ -84,12 +85,13 @@ export async function getWhatsNextProjects(): Promise<WhatsNextProject[]> {
   return projects;
 }
 
-const MARGIN_PER_SIDE = 3; // inches
-const MARGIN_TOTAL = MARGIN_PER_SIDE * 2; // 6 inches
-
 /**
- * Returns all projects with stitch dimensions, calculating required fabric size
- * using the 3" margin-per-side formula and matching against unassigned fabric stash.
+ * Returns all projects with stitch dimensions, calculating required fabric size with
+ * `fabric-calculator.ts` and matching against the unassigned fabric stash.
+ *
+ * A project with no fabric assigned is matched against every unassigned piece, each judged at
+ * its own count; a project with fabric assigned is matched against pieces of that same count.
+ * Either way only pieces that actually fit are returned (Beth's ruling, 2026-08-17).
  */
 export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
   const user = await requireAuth();
@@ -133,12 +135,12 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
       const p = c.project!;
       const fabricCount = p.fabric?.count ?? null;
 
-      const requiredWidth = fabricCount
-        ? Math.round((c.stitchesWide / fabricCount + MARGIN_TOTAL) * 10) / 10
-        : null;
-      const requiredHeight = fabricCount
-        ? Math.round((c.stitchesHigh / fabricCount + MARGIN_TOTAL) * 10) / 10
-        : null;
+      const required =
+        fabricCount === null
+          ? null
+          : calculateRequiredFabricSize(c.stitchesWide, c.stitchesHigh, fabricCount);
+      const requiredWidth = required?.requiredWidthInches ?? null;
+      const requiredHeight = required?.requiredHeightInches ?? null;
 
       const assignedFabric = p.fabric
         ? {
@@ -151,41 +153,23 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
           }
         : null;
 
-      const matchingFabrics = fabricCount
-        ? unassignedFabrics
-            .filter((f) => f.count === fabricCount)
-            .map((f) => {
-              const reqShort = Math.min(requiredWidth!, requiredHeight!);
-              const reqLong = Math.max(requiredWidth!, requiredHeight!);
-              const fits = f.shortestEdgeInches >= reqShort && f.longestEdgeInches >= reqLong;
-              return {
-                id: f.id,
-                name: f.name,
-                brandName: f.brand.name,
-                count: f.count,
-                shortestEdgeInches: f.shortestEdgeInches,
-                longestEdgeInches: f.longestEdgeInches,
-                fitsWidth: fits,
-                fitsHeight: fits,
-              };
-            })
-        : unassignedFabrics.map((f) => {
-            const reqW = Math.round((c.stitchesWide / f.count + MARGIN_TOTAL) * 10) / 10;
-            const reqH = Math.round((c.stitchesHigh / f.count + MARGIN_TOTAL) * 10) / 10;
-            const reqShort = Math.min(reqW, reqH);
-            const reqLong = Math.max(reqW, reqH);
-            const fits = f.shortestEdgeInches >= reqShort && f.longestEdgeInches >= reqLong;
-            return {
-              id: f.id,
-              name: f.name,
-              brandName: f.brand.name,
-              count: f.count,
-              shortestEdgeInches: f.shortestEdgeInches,
-              longestEdgeInches: f.longestEdgeInches,
-              fitsWidth: fits,
-              fitsHeight: fits,
-            };
-          });
+      const candidates =
+        fabricCount === null
+          ? unassignedFabrics
+          : unassignedFabrics.filter((f) => f.count === fabricCount);
+
+      const matchingFabrics = candidates
+        .filter((f) =>
+          doesFabricFit(f, calculateRequiredFabricSize(c.stitchesWide, c.stitchesHigh, f.count)),
+        )
+        .map((f) => ({
+          id: f.id,
+          name: f.name,
+          brandName: f.brand.name,
+          count: f.count,
+          shortestEdgeInches: f.shortestEdgeInches,
+          longestEdgeInches: f.longestEdgeInches,
+        }));
 
       return {
         chartId: c.id,

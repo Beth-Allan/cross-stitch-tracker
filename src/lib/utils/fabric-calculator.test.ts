@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { calculateRequiredFabricSize, doesFabricFit } from "./fabric-calculator";
+import {
+  calculateRequiredFabricEdge,
+  calculateRequiredFabricSize,
+  doesFabricFit,
+} from "./fabric-calculator";
 
 describe("calculateRequiredFabricSize", () => {
   it("calculates required size for 100x150 on 14ct", () => {
@@ -79,6 +83,24 @@ describe("doesFabricFit", () => {
       { shortestEdgeInches: 10, longestEdgeInches: 15 },
       { requiredWidthInches: 17, requiredHeightInches: 12 },
     );
+    expect(result).toBe(false);
+  });
+});
+
+describe("rounding contract", () => {
+  it("returns the exact requirement, unrounded", () => {
+    const result = calculateRequiredFabricSize(289, 100, 14);
+    expect(result.requiredWidthInches).toBe(26.642857142857142);
+    expect(result.requiredHeightInches).toBe(13.142857142857142);
+  });
+
+  it("calculateRequiredFabricEdge returns the exact requirement for one dimension", () => {
+    expect(calculateRequiredFabricEdge(289, 14)).toBe(26.642857142857142);
+  });
+
+  it("rejects a fabric that is short of the exact requirement by less than a tenth of an inch", () => {
+    const required = calculateRequiredFabricSize(289, 289, 14);
+    const result = doesFabricFit({ shortestEdgeInches: 26.6, longestEdgeInches: 26.6 }, required);
     expect(result).toBe(false);
   });
 });

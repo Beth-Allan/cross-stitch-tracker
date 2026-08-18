@@ -638,7 +638,7 @@ describe("pattern-dive-actions", () => {
       expect(result[0].projectId).toBe("project-abc");
     });
 
-    it("sets fitsWidth/fitsHeight flags correctly comparing fabric to required size", async () => {
+    it("excludes same-count fabrics that do not fit", async () => {
       // Required: 200/14+6 = 20.3" wide, 300/14+6 = 27.4" high
       mockPrisma.chart.findMany.mockResolvedValue([
         {
@@ -667,16 +667,16 @@ describe("pattern-dive-actions", () => {
           id: "f1",
           name: "Big Enough",
           count: 14,
-          shortestEdgeInches: 22, // >= 20.3 -> fitsWidth=true
-          longestEdgeInches: 30, // >= 27.4 -> fitsHeight=true
+          shortestEdgeInches: 22, // >= 20.3 required width
+          longestEdgeInches: 30, // >= 27.4 required height
           brand: { name: "Zweigart" },
         },
         {
           id: "f2",
           name: "Too Small",
           count: 14,
-          shortestEdgeInches: 15, // < 20.3 -> fitsWidth depends on longestEdge
-          longestEdgeInches: 25, // >= 20.3 -> fitsWidth=true, but < 27.4 for fitsHeight
+          shortestEdgeInches: 15, // < 20.3 in either orientation
+          longestEdgeInches: 25, // < 27.4 in either orientation
           brand: { name: "Zweigart" },
         },
       ]);
@@ -684,13 +684,7 @@ describe("pattern-dive-actions", () => {
       const { getFabricRequirements } = await import("./pattern-dive-actions");
       const result = await getFabricRequirements();
 
-      const big = result[0].matchingFabrics.find((f) => f.id === "f1")!;
-      expect(big.fitsWidth).toBe(true);
-      expect(big.fitsHeight).toBe(true);
-
-      const small = result[0].matchingFabrics.find((f) => f.id === "f2")!;
-      expect(small.fitsWidth).toBe(false); // 15 < reqShort 20.3 — can't fit either orientation
-      expect(small.fitsHeight).toBe(false);
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f1"]);
     });
 
     it("matches unassigned fabrics by computing required size per-fabric count (no assigned fabric)", async () => {
@@ -731,16 +725,9 @@ describe("pattern-dive-actions", () => {
       const { getFabricRequirements } = await import("./pattern-dive-actions");
       const result = await getFabricRequirements();
 
-      // Both fabrics returned as candidates; fit indicated via fitsWidth/fitsHeight
-      // 14ct: required 200/14+6=20.3" x 100/14+6=13.1" — 37x42 fits both
-      // 18ct: required 200/18+6=17.1" x 100/18+6=11.6" — 10x10 does NOT fit
-      expect(result[0].matchingFabrics).toHaveLength(2);
-      const bigAida = result[0].matchingFabrics.find((f) => f.id === "f-14ct-big")!;
-      expect(bigAida.fitsWidth).toBe(true);
-      expect(bigAida.fitsHeight).toBe(true);
-      const smallAida = result[0].matchingFabrics.find((f) => f.id === "f-18ct-small")!;
-      expect(smallAida.fitsWidth).toBe(false);
-      expect(smallAida.fitsHeight).toBe(false);
+      // 14ct: required 200/14+6=20.3" x 100/14+6=13.1" — 37x42 fits
+      // 18ct: required 200/18+6=17.1" x 100/18+6=11.6" — 10x10 does not
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-14ct-big"]);
     });
 
     it("UAT scenario: 37x42 inch fabric matches project needing 16.7x8 inch fabric", async () => {
@@ -773,13 +760,11 @@ describe("pattern-dive-actions", () => {
       const { getFabricRequirements } = await import("./pattern-dive-actions");
       const result = await getFabricRequirements();
 
-      // Required: 150/14+6=16.7" x 28/14+6=8.0" — 37x42 fits both
-      expect(result[0].matchingFabrics).toHaveLength(1);
-      expect(result[0].matchingFabrics[0].fitsWidth).toBe(true);
-      expect(result[0].matchingFabrics[0].fitsHeight).toBe(true);
+      // Required: 150/14+6=16.7" x 28/14+6=8.0" — 37x42 fits
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-uat"]);
     });
 
-    it("includes non-fitting fabric as candidate with fitsWidth/fitsHeight=false when fabricCount is null", async () => {
+    it("excludes a non-fitting fabric when fabricCount is null", async () => {
       mockPrisma.chart.findMany.mockResolvedValue([
         {
           id: "c1",
@@ -810,14 +795,11 @@ describe("pattern-dive-actions", () => {
       const result = await getFabricRequirements();
 
       // Required: 300/14+6=27.4" x 100/14+6=13.1"
-      // reqShort=13.1, reqLong=27.4
-      // Fabric 15x25: 15 >= 13.1 (ok) but 25 < 27.4 (too short) — included as candidate with fit=false
-      expect(result[0].matchingFabrics).toHaveLength(1);
-      expect(result[0].matchingFabrics[0].fitsWidth).toBe(false);
-      expect(result[0].matchingFabrics[0].fitsHeight).toBe(false);
+      // Fabric 15x25: 15 >= 13.1 but 25 < 27.4 — too short in either orientation
+      expect(result[0].matchingFabrics).toHaveLength(0);
     });
 
-    it("returns ALL fabric candidates when fabricCount is null (not filtered to only fits)", async () => {
+    it("returns only fitting candidates when fabricCount is null", async () => {
       mockPrisma.chart.findMany.mockResolvedValue([
         {
           id: "c1",
@@ -855,15 +837,7 @@ describe("pattern-dive-actions", () => {
       const { getFabricRequirements } = await import("./pattern-dive-actions");
       const result = await getFabricRequirements();
 
-      // Both fabrics should be returned as candidates (not filtered)
-      expect(result[0].matchingFabrics).toHaveLength(2);
-
-      const fits = result[0].matchingFabrics.find((f) => f.id === "f-fits")!;
-      expect(fits.fitsWidth).toBe(true);
-
-      const tooSmall = result[0].matchingFabrics.find((f) => f.id === "f-too-small")!;
-      expect(tooSmall.fitsWidth).toBe(false);
-      expect(tooSmall.fitsHeight).toBe(false);
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-fits"]);
     });
 
     it("when fabricCount is null, each candidate calculates dimensions using its own count", async () => {
@@ -904,16 +878,10 @@ describe("pattern-dive-actions", () => {
       const { getFabricRequirements } = await import("./pattern-dive-actions");
       const result = await getFabricRequirements();
 
-      // Both candidates should be returned
-      expect(result[0].matchingFabrics).toHaveLength(2);
-
-      // 14ct: 140/14+6=16.0" -> 20x20 fits (16<=20 && 16<=20)
-      const f14 = result[0].matchingFabrics.find((f) => f.id === "f-14ct")!;
-      expect(f14.fitsWidth).toBe(true);
-
-      // 28ct: 140/28+6=11.0" -> 12x12 fits (11<=12 && 11<=12)
-      const f28 = result[0].matchingFabrics.find((f) => f.id === "f-28ct")!;
-      expect(f28.fitsWidth).toBe(true);
+      // 14ct: 140/14+6=16.0" -> 20x20 fits
+      // 28ct: 140/28+6=11.0" -> 12x12 fits, and only because it is judged at 28ct;
+      // at the 14ct requirement the same piece would be far too small.
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-14ct", "f-28ct"]);
     });
 
     it("preserves existing behavior: assigned-fabric projects still match by same count", async () => {
@@ -964,6 +932,72 @@ describe("pattern-dive-actions", () => {
       // Only 14ct should match (same count as assigned)
       expect(result[0].matchingFabrics).toHaveLength(1);
       expect(result[0].matchingFabrics[0].id).toBe("f-14ct");
+    });
+
+    it("reports requiredWidth/Height exactly, without rounding to a tenth of an inch", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Chart",
+          coverThumbnailUrl: null,
+          stitchCount: 60000,
+          stitchesWide: 200,
+          stitchesHigh: 300,
+          designer: null,
+          project: {
+            id: "p1",
+            fabric: {
+              id: "f-assigned",
+              name: "Assigned",
+              count: 14,
+              shortestEdgeInches: 25,
+              longestEdgeInches: 30,
+              brand: { name: "Zweigart" },
+            },
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      expect(result[0].requiredWidth).toBe(20.285714285714285);
+      expect(result[0].requiredHeight).toBe(27.428571428571427);
+    });
+
+    it("excludes a fabric that misses the requirement by less than a tenth of an inch", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Near Miss Chart",
+          coverThumbnailUrl: null,
+          stitchCount: 83521,
+          stitchesWide: 289,
+          stitchesHigh: 289,
+          designer: null,
+          project: {
+            id: "p1",
+            fabric: null,
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-near-miss",
+          name: "26.6 inch square",
+          count: 14,
+          shortestEdgeInches: 26.6,
+          longestEdgeInches: 26.6,
+          brand: { name: "Zweigart" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      // Required is 289/14+6 = 26.642857…", so a 26.6" square is short.
+      expect(result[0].matchingFabrics).toHaveLength(0);
     });
   });
 
