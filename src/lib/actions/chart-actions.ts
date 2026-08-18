@@ -157,12 +157,17 @@ async function optimizeCoverImage(
 }
 
 /**
- * Whether a cover key the *form* submitted is one this chart may delete. Every raw
- * upload the cover editor produces is keyed either to the chart or to `unsaved`
- * (the create form's staging area, before a chart id exists). `chartFormSchema`
- * accepts any well-formed `covers/…` key, and action ids are global — so without
- * this, one crafted save could name another chart's live cover and have the
- * supersede rule delete it.
+ * Whether a cover key the *form* submitted is one this chart may delete.
+ * `chartFormSchema` accepts any well-formed `covers/…` key and action ids are
+ * global, so without this a crafted save could name another chart's live cover and
+ * have the supersede rule delete it.
+ *
+ * `unsaved` has to stay allowed: `CoverImageUpload` is never handed a chart id, so
+ * **every** raw cover the form uploads — editing as much as creating — lands under
+ * `covers/unsaved/…`, and refusing that owner segment would leak the raw upload of
+ * every replaced cover. One gap therefore survives this check: covers saved before
+ * item P15 still live on that prefix, so a crafted save naming one of *those* does
+ * reach it (maintenance-ledger row).
  */
 function isOwnRawUpload(key: string | null, chartId: string): boolean {
   if (!key) return false;

@@ -88,9 +88,12 @@ deliberately absent.
     without that an authenticated caller could have any object in the namespace re-encoded and
     stored under something it owns. **The pin binds the action, not the whole save flow** —
     `chartFormSchema` accepts any well-formed `covers/…` key, so `updateChart` can make the row
-    name one before the pin is checked (maintenance-ledger row). What that cannot do is _delete_
-    another chart's cover: the supersede rule only ever discards a submitted key whose owner
-    segment is `unsaved` or the chart's own id
+    name one before the pin is checked (maintenance-ledger row). The supersede rule narrows what
+    that can _delete_ — a submitted key is discarded only when its owner segment is `unsaved` or
+    the chart's own id — but it does not close it, because `CoverImageUpload` is never handed a
+    chart id, so every cover the form uploads lands under `covers/unsaved/…` and covers saved
+    before P15 are still **live** on that prefix. Naming another chart's key under its _id_ is
+    copy-only; naming a pre-P15 `covers/unsaved/…` cover deletes it (maintenance-ledger row)
   - **Object lifecycle — what removes what** (item P8, 2026-08-17):
     - `deleteChart` reads the chart's cover, thumbnail, every `ChartFile.url` and every
       `StitchSession.photoKey` **before** deleting the row, then removes them in one batched
