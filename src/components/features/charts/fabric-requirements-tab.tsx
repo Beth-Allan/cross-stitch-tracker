@@ -342,10 +342,9 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
 
                     {row.unmeasuredCandidateCount > 0 && (
                       <p className="text-muted-foreground mt-3 text-xs">
-                        {row.unmeasuredCandidateCount} piece
-                        {row.unmeasuredCandidateCount !== 1 ? "s" : ""} in your stash have no size
-                        recorded, so they could not be checked. Add their measurements to see
-                        whether they fit.
+                        {row.unmeasuredCandidateCount === 1
+                          ? "1 piece in your stash has no size recorded, so it could not be checked. Add its measurements to see whether it fits."
+                          : `${row.unmeasuredCandidateCount} pieces in your stash have no size recorded, so they could not be checked. Add their measurements to see whether they fit.`}
                       </p>
                     )}
 

@@ -298,6 +298,15 @@ describe("FabricRequirementsTab", () => {
     expect(screen.getByText(/3 pieces in your stash have no size recorded/i)).toBeInTheDocument();
   });
 
+  it("says it in the singular when exactly one piece has no size recorded", () => {
+    const rows = [makeRow({ matchingFabrics: [], unmeasuredCandidateCount: 1 })];
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
+
+    fireEvent.click(screen.getByText("Test Pattern"));
+
+    expect(screen.getByText(/1 piece in your stash has no size recorded/i)).toBeInTheDocument();
+  });
+
   it("says nothing about sizes when every stash piece has one", () => {
     render(<FabricRequirementsTab rows={[makeRow()]} imageUrls={{}} />);
 
