@@ -250,6 +250,14 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
   real signatures instead of `unknown`.
 - **Cited specs:** the two 2026-08-17 ledger duplication rows (`src/lib` boundary cluster;
   unknown-typed actions) · `.claude/rules/form-patterns.md`.
+- **Also inherits — added by P15's `/review`, 2026-08-17:** the ledger row on
+  `chartFormSchema`'s cover and file keys, which are grammar-checked but never checked against
+  _whose_ namespace they name. **Read that row before designing the fix** — the obvious rule
+  (owner segment must be `unsaved` or the chart's own id) closes only half of it, because
+  `CoverImageUpload` is never handed a chart id, so every cover the form uploads lands under
+  `covers/unsaved/…` and pre-P15 charts are still live on that prefix. Refusing `unsaved` is not
+  an option (it would leak the raw upload of every replaced cover); closing the other half needs
+  a "no other chart names this key" test, or it waits for **P16**.
 - **Traps:** behavior-preserving refactor plus small validation fixes — anything that _changes_
   what validates is TDD'd; no schema/migration scope.
 - **Done-when:** one convention, stated in `form-patterns.md`; zero dead `z.infer` exports;
@@ -321,7 +329,9 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
   the originals are deleted only after each row is updated; a chart with a missing object is
   reported and left intact; Beth can start it and see it finish without running a command; the
   maintenance-ledger pre-condition is updated to say the `covers/unsaved/` lifecycle rule is now
-  safe; gate green; fresh `/review` before merge.
+  safe — and, in the same row, that the deletion sliver P15's `/review` found (a crafted save
+  naming another chart's pre-P15 `covers/unsaved/…` cover) closes with it; gate green; fresh
+  `/review` before merge.
 
 ## Stage F — post-audit fixes (seeded from the dissolved Phase 41, Beth's ruling D-10)
 
