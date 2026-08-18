@@ -71,15 +71,18 @@ export interface FabricRequirementRow {
     shortestEdgeInches: number;
     longestEdgeInches: number;
   } | null;
-  matchingFabrics: {
-    id: string;
-    name: string;
-    brandName: string;
-    count: number;
-    shortestEdgeInches: number;
-    longestEdgeInches: number;
-  }[];
+  matchingFabrics: FabricRequirementCandidate[]; // Fit at the project's own over-count
+  overOneOnlyFabrics: FabricRequirementCandidate[]; // FAB-007: shown with the qualifier, never counted as fitting
   unmeasuredCandidateCount: number; // Stash pieces with no size recorded, so not judged either way
+}
+
+export interface FabricRequirementCandidate {
+  id: string;
+  name: string;
+  brandName: string;
+  count: number;
+  shortestEdgeInches: number;
+  longestEdgeInches: number;
 }
 
 export interface StorageGroup {

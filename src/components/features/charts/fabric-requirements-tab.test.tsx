@@ -43,6 +43,7 @@ function makeRow(overrides: Partial<FabricRequirementRow> = {}): FabricRequireme
     requiredHeight: 27.4,
     assignedFabric: null,
     matchingFabrics: [],
+    overOneOnlyFabrics: [],
     unmeasuredCandidateCount: 0,
     ...overrides,
   };
@@ -360,6 +361,98 @@ describe("FabricRequirementsTab", () => {
     fireEvent.click(screen.getByText("Test Pattern"));
 
     expect(screen.queryByText(/no size recorded/i)).not.toBeInTheDocument();
+  });
+
+  it("shows a stash piece that fits only at over one, with the qualifier", () => {
+    const rows = [
+      makeRow({
+        overCount: 2,
+        overOneOnlyFabrics: [
+          {
+            id: "fab-2",
+            name: "Almost Big Enough",
+            brandName: "Zweigart",
+            count: 28,
+            shortestEdgeInches: 15,
+            longestEdgeInches: 20,
+          },
+        ],
+      }),
+    ];
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
+
+    fireEvent.click(screen.getByText("Test Pattern"));
+
+    expect(screen.getByText("Almost Big Enough")).toBeInTheDocument();
+    expect(screen.getByText(/fits if you stitch it over 1/i)).toBeInTheDocument();
+  });
+
+  it("does not offer to assign a piece that fits only at over one", () => {
+    const rows = [
+      makeRow({
+        overCount: 2,
+        matchingFabrics: [
+          {
+            id: "fab-1",
+            name: "Roomy Linen",
+            brandName: "Zweigart",
+            count: 28,
+            shortestEdgeInches: 30,
+            longestEdgeInches: 40,
+          },
+        ],
+        overOneOnlyFabrics: [
+          {
+            id: "fab-2",
+            name: "Almost Big Enough",
+            brandName: "Zweigart",
+            count: 28,
+            shortestEdgeInches: 15,
+            longestEdgeInches: 20,
+          },
+        ],
+      }),
+    ];
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
+
+    fireEvent.click(screen.getByText("Test Pattern"));
+
+    expect(screen.getByText("Almost Big Enough")).toBeInTheDocument();
+    expect(screen.getAllByText("Assign")).toHaveLength(1);
+  });
+
+  it("keeps a piece that fits only at over one out of the fabrics that fit", () => {
+    const rows = [
+      makeRow({
+        overCount: 2,
+        matchingFabrics: [],
+        overOneOnlyFabrics: [
+          {
+            id: "fab-2",
+            name: "Almost Big Enough",
+            brandName: "Zweigart",
+            count: 28,
+            shortestEdgeInches: 15,
+            longestEdgeInches: 20,
+          },
+        ],
+      }),
+    ];
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
+
+    fireEvent.click(screen.getByText("Test Pattern"));
+
+    expect(screen.getByText("Almost Big Enough")).toBeInTheDocument();
+    expect(screen.queryByText("Fabrics That Fit")).not.toBeInTheDocument();
+    expect(screen.getByText(/No fabrics in your stash fit this project/i)).toBeInTheDocument();
+  });
+
+  it("says nothing about over one when no piece is in that state", () => {
+    render(<FabricRequirementsTab rows={[makeRow()]} imageUrls={{}} />);
+
+    fireEvent.click(screen.getByText("Test Pattern"));
+
+    expect(screen.queryByText(/over 1/i)).not.toBeInTheDocument();
   });
 
   it("renders empty state", () => {

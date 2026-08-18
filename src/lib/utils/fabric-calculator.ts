@@ -65,3 +65,44 @@ export function doesFabricFit(
     fabric.shortestEdgeInches >= required.requiredHeightInches;
   return fitsNormal || fitsRotated;
 }
+
+/**
+ * How a stash piece stands against a project: FAB-007's three states.
+ *
+ * There are exactly three, not an N-way comparison — over two always needs more fabric than
+ * over one, so "fits at over two but not at over one" cannot happen.
+ */
+export type FabricFitState = "fits" | "fits-over-one-only" | "too-small";
+
+/**
+ * Judges a stash piece against a project's requirement at the project's own over-count, and —
+ * when it misses — says whether it would have fitted at over one.
+ *
+ * `"fits-over-one-only"` is a **qualifier, not a match** (FAB-007): the piece does not fit the
+ * project as Beth has said she will stitch it, and nothing keyed to the project's real
+ * over-count may count it as fitting. It exists because a project may not have a settled
+ * over-count yet, so hiding the piece would assume a decision she has not made.
+ */
+export function classifyFabricFit(
+  fabric: { shortestEdgeInches: number; longestEdgeInches: number },
+  stitchesWide: number,
+  stitchesHigh: number,
+  fabricCount: number,
+  overCount: 1 | 2,
+): FabricFitState {
+  const fitsAtProjectOverCount = doesFabricFit(
+    fabric,
+    calculateRequiredFabricSize(stitchesWide, stitchesHigh, fabricCount, overCount),
+  );
+  if (fitsAtProjectOverCount) return "fits";
+
+  // Over one is already the smallest requirement, so an over-one project has no third state.
+  if (overCount === 1) return "too-small";
+
+  return doesFabricFit(
+    fabric,
+    calculateRequiredFabricSize(stitchesWide, stitchesHigh, fabricCount, 1),
+  )
+    ? "fits-over-one-only"
+    : "too-small";
+}

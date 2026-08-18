@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Check, AlertTriangle, Package, ChevronDown, ChevronRight, Info } from "lucide-react";
 import { toast } from "sonner";
-import type { FabricRequirementRow } from "@/types/session";
+import type { FabricRequirementCandidate, FabricRequirementRow } from "@/types/session";
 import { assignFabricToProject } from "@/lib/actions/pattern-dive-actions";
 import {
   FABRIC_MARGIN_INCHES,
@@ -24,6 +24,25 @@ function fabricFits(row: FabricRequirementRow): boolean {
     requiredWidthInches: row.requiredWidth,
     requiredHeightInches: row.requiredHeight,
   });
+}
+
+function CandidateDetails({
+  fabric,
+  children,
+}: {
+  fabric: FabricRequirementCandidate;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="min-w-0 flex-1">
+      <p className="text-foreground truncate text-sm font-medium">{fabric.name}</p>
+      <p className="text-muted-foreground text-xs">
+        {fabric.brandName} &middot; {fabric.count}ct &middot; {fabric.shortestEdgeInches}&quot; x{" "}
+        {fabric.longestEdgeInches}&quot;
+      </p>
+      {children}
+    </div>
+  );
 }
 
 function StatusIcon({ row }: { row: FabricRequirementRow }) {
@@ -310,16 +329,7 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                                   strokeWidth={2}
                                 />
 
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-foreground truncate text-sm font-medium">
-                                    {fabric.name}
-                                  </p>
-                                  <p className="text-muted-foreground text-xs">
-                                    {fabric.brandName} &middot; {fabric.count}ct &middot;{" "}
-                                    {fabric.shortestEdgeInches}&quot; x {fabric.longestEdgeInches}
-                                    &quot;
-                                  </p>
-                                </div>
+                                <CandidateDetails fabric={fabric} />
 
                                 {isAssigned ? (
                                   <span className="shrink-0 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
@@ -350,6 +360,32 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                           No fabrics in your stash fit this project. Check the size reference below
                           to know what to buy.
                         </span>
+                      </div>
+                    )}
+
+                    {row.overOneOnlyFabrics.length > 0 && (
+                      <div className="mt-4">
+                        <h4 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
+                          Fits Only If You Stitch Over 1
+                        </h4>
+                        <div className="flex flex-col gap-2">
+                          {row.overOneOnlyFabrics.map((fabric) => (
+                            <div
+                              key={fabric.id}
+                              className="border-border bg-muted/30 flex items-start gap-3 rounded-lg border p-3"
+                            >
+                              <AlertTriangle
+                                className="mt-0.5 h-4 w-4 shrink-0 text-amber-500"
+                                strokeWidth={2}
+                              />
+                              <CandidateDetails fabric={fabric}>
+                                <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
+                                  Fits if you stitch it over 1 &mdash; too small at over 2.
+                                </p>
+                              </CandidateDetails>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
 

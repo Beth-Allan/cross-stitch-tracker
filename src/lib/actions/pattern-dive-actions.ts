@@ -2,7 +2,7 @@
 
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
-import { calculateRequiredFabricSize, doesFabricFit } from "@/lib/utils/fabric-calculator";
+import { calculateRequiredFabricSize, classifyFabricFit } from "@/lib/utils/fabric-calculator";
 import { revalidatePath } from "next/cache";
 import type { WhatsNextProject, FabricRequirementRow, StorageGroup } from "@/types/session";
 
@@ -101,6 +101,13 @@ export async function getWhatsNextProjects(): Promise<WhatsNextProject[]> {
  *
  * A piece with no size recorded cannot be judged either way, so it is counted rather than
  * silently dropped — otherwise an unmeasured stash reads as "nothing you own fits".
+ *
+ * A piece that misses the project's requirement but would have covered the over-one one comes
+ * back in `overOneOnlyFabrics` rather than being hidden (FAB-007): a project may not have a
+ * settled over-count, so dropping the piece assumes a decision Beth has not made. It is a
+ * qualifier, never a match — `matchingFabrics` stays keyed to the project's own over-count.
+ * Both branches get it, assigned fabric or not: over-count is the project's setting either way,
+ * and FAB-006 states its fit rule for both halves alike.
  */
 export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
   const user = await requireAuth();
@@ -178,21 +185,26 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
       );
       const unmeasuredCandidateCount = candidates.length - measurable.length;
 
-      const matchingFabrics = measurable
-        .filter((f) =>
-          doesFabricFit(
-            f,
-            calculateRequiredFabricSize(c.stitchesWide, c.stitchesHigh, f.count, overCount),
-          ),
-        )
-        .map((f) => ({
-          id: f.id,
-          name: f.name,
-          brandName: f.brand.name,
-          count: f.count,
-          shortestEdgeInches: f.shortestEdgeInches,
-          longestEdgeInches: f.longestEdgeInches,
-        }));
+      const toCandidate = (f: (typeof measurable)[number]) => ({
+        id: f.id,
+        name: f.name,
+        brandName: f.brand.name,
+        count: f.count,
+        shortestEdgeInches: f.shortestEdgeInches,
+        longestEdgeInches: f.longestEdgeInches,
+      });
+
+      const judged = measurable.map((f) => ({
+        fabric: f,
+        state: classifyFabricFit(f, c.stitchesWide, c.stitchesHigh, f.count, overCount),
+      }));
+
+      const matchingFabrics = judged
+        .filter((j) => j.state === "fits")
+        .map((j) => toCandidate(j.fabric));
+      const overOneOnlyFabrics = judged
+        .filter((j) => j.state === "fits-over-one-only")
+        .map((j) => toCandidate(j.fabric));
 
       return {
         chartId: c.id,
@@ -211,6 +223,7 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
         requiredHeight,
         assignedFabric,
         matchingFabrics,
+        overOneOnlyFabrics,
         unmeasuredCandidateCount,
       };
     });
