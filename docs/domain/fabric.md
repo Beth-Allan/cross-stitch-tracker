@@ -77,7 +77,6 @@ On the Pattern Dive **Fabric Requirements** tab, the pieces offered for a projec
 - **Either way, only pieces that actually fit** the required size (FAB-005, in either
   orientation). A piece that is too small is not offered at all.
 
-"No fabric assigned" and "a fabric with a count of 0" stay distinct states: with no fabric
-assigned the app reports no required size at all rather than a size of zero.
+A project with no fabric assigned reports **no required size at all** — never a size of zero.
 
 [stated by Beth 2026-08-17]

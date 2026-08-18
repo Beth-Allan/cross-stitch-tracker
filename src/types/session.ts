@@ -78,6 +78,7 @@ export interface FabricRequirementRow {
     shortestEdgeInches: number;
     longestEdgeInches: number;
   }[];
+  unmeasuredCandidateCount: number; // Stash pieces with no size recorded, so not judged either way
 }
 
 export interface StorageGroup {

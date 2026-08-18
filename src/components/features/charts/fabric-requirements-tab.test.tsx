@@ -42,6 +42,7 @@ function makeRow(overrides: Partial<FabricRequirementRow> = {}): FabricRequireme
     requiredHeight: 27.4,
     assignedFabric: null,
     matchingFabrics: [],
+    unmeasuredCandidateCount: 0,
     ...overrides,
   };
 }
@@ -58,10 +59,10 @@ describe("FabricRequirementsTab", () => {
   it("shows the required size per count, margin included, in the row summary", () => {
     render(<FabricRequirementsTab rows={[makeRow()]} imageUrls={{}} />);
 
-    // 200/14+6 = 20.3" x 300/14+6 = 27.4"
-    expect(screen.getByText('20.3" x 27.4"')).toBeInTheDocument();
-    // 200/18+6 = 17.1" x 300/18+6 = 22.7"
-    expect(screen.getByText('17.1" x 22.7"')).toBeInTheDocument();
+    // 200/14+6 = 20.2857…" x 300/14+6 = 27.4285…", each rounded up to the tenth
+    expect(screen.getByText('20.3" x 27.5"')).toBeInTheDocument();
+    // 200/18+6 = 17.111…" x 300/18+6 = 22.666…"
+    expect(screen.getByText('17.2" x 22.7"')).toBeInTheDocument();
   });
 
   it("size reference table lists design size and size with margins for each count", async () => {
@@ -71,9 +72,9 @@ describe("FabricRequirementsTab", () => {
     fireEvent.click(screen.getByText("Size Reference — All Counts"));
 
     expect(screen.getByText("28 count")).toBeInTheDocument();
-    // 28ct design 200/28 x 300/28, then the same plus the 6" margin
+    // 28ct design 200/28 x 300/28, then the same plus the 6" margin, rounded up
     expect(screen.getByText('7.1" x 10.7"')).toBeInTheDocument();
-    expect(screen.getByText('13.1" x 16.7"')).toBeInTheDocument();
+    expect(screen.getByText('13.2" x 16.8"')).toBeInTheDocument();
   });
 
   it("shows info banner about 3 inch margins", () => {
@@ -286,6 +287,23 @@ describe("FabricRequirementsTab", () => {
     render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
 
     expect(screen.queryByRole("img", { name: "Test Pattern" })).not.toBeInTheDocument();
+  });
+
+  it("says how many stash pieces have no size recorded", () => {
+    const rows = [makeRow({ matchingFabrics: [], unmeasuredCandidateCount: 3 })];
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
+
+    fireEvent.click(screen.getByText("Test Pattern"));
+
+    expect(screen.getByText(/3 pieces in your stash have no size recorded/i)).toBeInTheDocument();
+  });
+
+  it("says nothing about sizes when every stash piece has one", () => {
+    render(<FabricRequirementsTab rows={[makeRow()]} imageUrls={{}} />);
+
+    fireEvent.click(screen.getByText("Test Pattern"));
+
+    expect(screen.queryByText(/no size recorded/i)).not.toBeInTheDocument();
   });
 
   it("renders empty state", () => {

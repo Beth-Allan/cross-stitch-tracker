@@ -27,6 +27,17 @@ export function calculateRequiredFabricSize(
   };
 }
 
+/**
+ * Formats a requirement for display, rounded **up** to a tenth of an inch.
+ *
+ * A requirement is a minimum, so it is rounded away from zero: rounding to nearest would print
+ * a number smaller than the one `doesFabricFit` enforces, and Beth would be told to buy a size
+ * the app then rejects.
+ */
+export function formatRequiredInches(inches: number): string {
+  return (Math.ceil(inches * 10) / 10).toFixed(1);
+}
+
 export function doesFabricFit(
   fabric: { shortestEdgeInches: number; longestEdgeInches: number },
   required: { requiredWidthInches: number; requiredHeightInches: number },

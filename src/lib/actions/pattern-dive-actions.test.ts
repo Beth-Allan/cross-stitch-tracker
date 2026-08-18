@@ -934,6 +934,119 @@ describe("pattern-dive-actions", () => {
       expect(result[0].matchingFabrics[0].id).toBe("f-14ct");
     });
 
+    it("counts a stash piece with no size recorded instead of judging it too small", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "No Fabric Chart",
+          coverThumbnailUrl: null,
+          stitchCount: 10000,
+          stitchesWide: 140,
+          stitchesHigh: 140,
+          designer: null,
+          project: { id: "p1", fabric: null },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-unmeasured",
+          name: "Never Measured",
+          count: 14,
+          shortestEdgeInches: 0,
+          longestEdgeInches: 0,
+          brand: { name: "Zweigart" },
+        },
+        {
+          id: "f-fits",
+          name: "Big Aida",
+          count: 14,
+          shortestEdgeInches: 20,
+          longestEdgeInches: 20,
+          brand: { name: "Zweigart" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-fits"]);
+      expect(result[0].unmeasuredCandidateCount).toBe(1);
+    });
+
+    it("reports no unmeasured candidates when every stash piece has a size", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "No Fabric Chart",
+          coverThumbnailUrl: null,
+          stitchCount: 10000,
+          stitchesWide: 140,
+          stitchesHigh: 140,
+          designer: null,
+          project: { id: "p1", fabric: null },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-too-small",
+          name: "Small Aida",
+          count: 14,
+          shortestEdgeInches: 8,
+          longestEdgeInches: 8,
+          brand: { name: "Zweigart" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      expect(result[0].matchingFabrics).toHaveLength(0);
+      expect(result[0].unmeasuredCandidateCount).toBe(0);
+    });
+
+    it("treats a fabric count of zero as no usable count, not an infinite requirement", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Zero Count Chart",
+          coverThumbnailUrl: null,
+          stitchCount: 10000,
+          stitchesWide: 140,
+          stitchesHigh: 140,
+          designer: null,
+          project: {
+            id: "p1",
+            fabric: {
+              id: "f-assigned",
+              name: "Bad Data",
+              count: 0,
+              shortestEdgeInches: 20,
+              longestEdgeInches: 20,
+              brand: { name: "Zweigart" },
+            },
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-14ct",
+          name: "14ct Aida",
+          count: 14,
+          shortestEdgeInches: 20,
+          longestEdgeInches: 20,
+          brand: { name: "Zweigart" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      expect(result[0].requiredWidth).toBeNull();
+      expect(result[0].requiredHeight).toBeNull();
+      // With no usable count, every piece is judged at its own count: 140/14+6 = 16" fits 20x20.
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-14ct"]);
+    });
+
     it("reports requiredWidth/Height exactly, without rounding to a tenth of an inch", async () => {
       mockPrisma.chart.findMany.mockResolvedValue([
         {

@@ -3,6 +3,7 @@ import {
   calculateRequiredFabricEdge,
   calculateRequiredFabricSize,
   doesFabricFit,
+  formatRequiredInches,
 } from "./fabric-calculator";
 
 describe("calculateRequiredFabricSize", () => {
@@ -102,5 +103,19 @@ describe("rounding contract", () => {
     const required = calculateRequiredFabricSize(289, 289, 14);
     const result = doesFabricFit({ shortestEdgeInches: 26.6, longestEdgeInches: 26.6 }, required);
     expect(result).toBe(false);
+  });
+});
+
+describe("formatRequiredInches", () => {
+  it("rounds a requirement up, never down, so the displayed number is never short", () => {
+    // 289/14 + 6 = 26.642857…" — a 26.6" piece is rejected by doesFabricFit, so 26.6 must not
+    // be the number Beth is told to buy.
+    expect(formatRequiredInches(26.642857142857142)).toBe("26.7");
+    expect(formatRequiredInches(13.142857142857142)).toBe("13.2");
+  });
+
+  it("leaves an exact tenth alone", () => {
+    expect(formatRequiredInches(16)).toBe("16.0");
+    expect(formatRequiredInches(20.3)).toBe("20.3");
   });
 });

@@ -10,6 +10,7 @@ import {
   FABRIC_MARGIN_INCHES,
   calculateRequiredFabricEdge,
   doesFabricFit,
+  formatRequiredInches,
 } from "@/lib/utils/fabric-calculator";
 
 const FABRIC_COUNTS = [14, 16, 18, 20, 22, 25, 28] as const;
@@ -88,7 +89,7 @@ function SizeReferenceTable({
                   {designW.toFixed(1)}&quot; x {designH.toFixed(1)}&quot;
                 </td>
                 <td className="py-2 text-right font-medium text-emerald-700 tabular-nums dark:text-emerald-400">
-                  {totalW.toFixed(1)}&quot; x {totalH.toFixed(1)}&quot;
+                  {formatRequiredInches(totalW)}&quot; x {formatRequiredInches(totalH)}&quot;
                 </td>
               </tr>
             );
@@ -238,7 +239,7 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                             {ct}ct
                           </span>
                           <p className="text-foreground text-xs tabular-nums">
-                            {w.toFixed(1)}&quot; x {h.toFixed(1)}&quot;
+                            {formatRequiredInches(w)}&quot; x {formatRequiredInches(h)}&quot;
                           </p>
                         </div>
                       );
@@ -337,6 +338,15 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                           to know what to buy.
                         </span>
                       </div>
+                    )}
+
+                    {row.unmeasuredCandidateCount > 0 && (
+                      <p className="text-muted-foreground mt-3 text-xs">
+                        {row.unmeasuredCandidateCount} piece
+                        {row.unmeasuredCandidateCount !== 1 ? "s" : ""} in your stash have no size
+                        recorded, so they could not be checked. Add their measurements to see
+                        whether they fit.
+                      </p>
                     )}
 
                     <div className="mt-4">

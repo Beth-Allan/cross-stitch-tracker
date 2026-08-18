@@ -91,7 +91,10 @@ export async function getWhatsNextProjects(): Promise<WhatsNextProject[]> {
  *
  * A project with no fabric assigned is matched against every unassigned piece, each judged at
  * its own count; a project with fabric assigned is matched against pieces of that same count.
- * Either way only pieces that actually fit are returned (Beth's ruling, 2026-08-17).
+ * Either way only pieces that actually fit are returned (Beth's ruling, 2026-08-17, FAB-006).
+ *
+ * A piece with no size recorded cannot be judged either way, so it is counted rather than
+ * silently dropped — otherwise an unmeasured stash reads as "nothing you own fits".
  */
 export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
   const user = await requireAuth();
@@ -134,11 +137,14 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
     .map((c) => {
       const p = c.project!;
       const fabricCount = p.fabric?.count ?? null;
+      // A count of 0 is nonsense data the validation boundary forbids; treat it as no count at
+      // all rather than dividing by it.
+      const usableCount = fabricCount !== null && fabricCount > 0 ? fabricCount : null;
 
       const required =
-        fabricCount === null
+        usableCount === null
           ? null
-          : calculateRequiredFabricSize(c.stitchesWide, c.stitchesHigh, fabricCount);
+          : calculateRequiredFabricSize(c.stitchesWide, c.stitchesHigh, usableCount);
       const requiredWidth = required?.requiredWidthInches ?? null;
       const requiredHeight = required?.requiredHeightInches ?? null;
 
@@ -154,11 +160,16 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
         : null;
 
       const candidates =
-        fabricCount === null
+        usableCount === null
           ? unassignedFabrics
-          : unassignedFabrics.filter((f) => f.count === fabricCount);
+          : unassignedFabrics.filter((f) => f.count === usableCount);
 
-      const matchingFabrics = candidates
+      const measurable = candidates.filter(
+        (f) => f.count > 0 && f.shortestEdgeInches > 0 && f.longestEdgeInches > 0,
+      );
+      const unmeasuredCandidateCount = candidates.length - measurable.length;
+
+      const matchingFabrics = measurable
         .filter((f) =>
           doesFabricFit(f, calculateRequiredFabricSize(c.stitchesWide, c.stitchesHigh, f.count)),
         )
@@ -187,6 +198,7 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
         requiredHeight,
         assignedFabric,
         matchingFabrics,
+        unmeasuredCandidateCount,
       };
     });
 }
