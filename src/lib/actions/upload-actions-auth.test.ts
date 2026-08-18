@@ -85,17 +85,6 @@ describe("upload-actions unauthenticated rejection", () => {
     expect(mockSend).not.toHaveBeenCalled();
   });
 
-  it("discardStoredObjects sends no delete when the caller is not authenticated", async () => {
-    const { discardStoredObjects } = await import("./upload-actions");
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-
-    // It swallows failures by contract — the guard shows as an unsent request.
-    await discardStoredObjects(["covers/chart-1/opt-abc.webp"], "chart chart-1");
-
-    expect(mockSend).not.toHaveBeenCalled();
-    consoleSpy.mockRestore();
-  });
-
   it("processAndStoreImage throws Unauthorized when caller is not authenticated", async () => {
     const { processAndStoreImage } = await import("./upload-actions");
 

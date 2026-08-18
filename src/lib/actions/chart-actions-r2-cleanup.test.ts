@@ -15,11 +15,14 @@ vi.mock("next/cache", () => ({
   revalidateTag: vi.fn(),
 }));
 
-const mockDiscardStoredObjects = vi.fn();
 const mockGenerateThumbnail = vi.fn();
 vi.mock("@/lib/actions/upload-actions", () => ({
-  discardStoredObjects: (...args: unknown[]) => mockDiscardStoredObjects(...args),
   generateThumbnail: (...args: unknown[]) => mockGenerateThumbnail(...args),
+}));
+
+const mockDiscardStoredObjects = vi.fn();
+vi.mock("@/lib/r2", () => ({
+  discardStoredObjects: (...args: unknown[]) => mockDiscardStoredObjects(...args),
 }));
 
 /** The chart row `deleteChart` reads before the cascade destroys it. */

@@ -5,7 +5,8 @@ import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
-import { discardStoredObjects, generateThumbnail } from "@/lib/actions/upload-actions";
+import { discardStoredObjects } from "@/lib/r2";
+import { generateThumbnail } from "@/lib/actions/upload-actions";
 import { chartFormSchema, batchSupplySchema } from "@/lib/validations/chart";
 import type { ChartFormInput } from "@/lib/validations/chart";
 import { updateProjectSettingsSchema } from "@/lib/validations/supply";
@@ -399,6 +400,9 @@ export async function deleteChart(chartId: string) {
         coverImageUrl: true,
         coverThumbnailUrl: true,
         files: { select: { url: true } },
+        // `Project.finishPhotoUrl` is the one storage column left out: nothing in
+        // the app writes it today. Wiring it up means adding it here, or deleting
+        // a chart will orphan the photo (maintenance ledger, 2026-08-17).
         project: { select: { userId: true, sessions: { select: { photoKey: true } } } },
       },
     });

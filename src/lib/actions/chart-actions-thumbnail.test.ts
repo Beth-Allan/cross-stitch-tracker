@@ -17,9 +17,12 @@ vi.mock("next/cache", () => ({
 }));
 
 const mockGenerateThumbnail = vi.fn();
-const mockDiscardStoredObjects = vi.fn();
 vi.mock("@/lib/actions/upload-actions", () => ({
   generateThumbnail: (...args: unknown[]) => mockGenerateThumbnail(...args),
+}));
+
+const mockDiscardStoredObjects = vi.fn();
+vi.mock("@/lib/r2", () => ({
   discardStoredObjects: (...args: unknown[]) => mockDiscardStoredObjects(...args),
 }));
 

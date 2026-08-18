@@ -78,8 +78,11 @@ deliberately absent.
   - **Object lifecycle — what removes what** (item P8, 2026-08-17):
     - `deleteChart` reads the chart's cover, thumbnail, every `ChartFile.url` and every
       `StitchSession.photoKey` **before** deleting the row, then removes them in one batched
-      `DeleteObjects` per 1000 keys (`discardStoredObjects`). The cascade destroys the only
-      record of those keys, so reading them first is the whole game
+      `DeleteObjects` per 1000 keys (`discardStoredObjects`, in `src/lib/r2.ts` rather than an
+      action file — a bulk delete exported from a `"use server"` module would be a live endpoint
+      taking an unbounded key list). The cascade destroys the only record of those keys, so
+      reading them first is the whole game. `Project.finishPhotoUrl` is the one storage column
+      left out, because nothing writes it — maintenance-ledger row
     - Changing a cover — replacing it, or taking it off the chart — removes each old object
       **only once the row has stopped naming it**. One rule covers both cases: on a failed
       regeneration the form re-submits the old thumbnail key, so the row still names it and it
