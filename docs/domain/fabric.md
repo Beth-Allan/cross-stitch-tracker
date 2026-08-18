@@ -36,6 +36,12 @@ fabric count to give the _effective_ count that both calculators use
 (`effectiveCount = fabricCount ÷ overCount`), so it changes every thread and size figure for a
 project. Linen is stitched over two (FAB-003); evenweaves commonly are.
 
+**Not true of the app today** (drift **D-17**, 2026-08-17): `skein-calculator.ts` divides by
+over-count, `fabric-calculator.ts` never has, and no fabric-size code path reads `Project.overCount`
+at all — so every fabric-size figure for an over-two project is roughly half what it should be.
+Beth ruled the fix runs as build-plan item **F-4**, straight after P7's review. The fact above
+states how it should work; this note says what the code does until F-4 lands.
+
 **The app does not infer it, and the one attempt to write down how it should was invented.** The
 old backlog note proposed "≤25 → over 1, ≥28 → over 2" — thresholds with no source, and with 26
 and 27 unaccounted for. Whether it is a threshold rule at all is Beth's practice to state.
@@ -59,3 +65,18 @@ archived planning note ("Margin is fixed at 3 inches per side (standard cross-st
 recommendation)"), in a directory this repo declares history and not authority. The margin is in
 the app and the app works, so this is not a reason to change code; it is a reason not to treat
 3 inches as established. Q-005 puts it to Beth.
+
+### FAB-006 — Which stash pieces the app offers for a project
+
+On the Pattern Dive **Fabric Requirements** tab, the pieces offered for a project are:
+
+- **Project with fabric assigned** — spare pieces of the **same count** as the assigned fabric.
+- **Project with no fabric assigned** — **every** spare piece, each judged at **its own count**
+  (a 28ct piece is measured against the 28ct requirement, not the project's, because the project
+  has none).
+- **Either way, only pieces that actually fit** the required size (FAB-005, in either
+  orientation). A piece that is too small is not offered at all.
+
+A project with no fabric assigned reports **no required size at all** — never a size of zero.
+
+[stated by Beth 2026-08-17]

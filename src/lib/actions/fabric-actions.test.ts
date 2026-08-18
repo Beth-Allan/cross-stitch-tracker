@@ -454,6 +454,7 @@ describe("fabric-actions", () => {
 
     it("returns P2002 error for duplicate linkedProjectId", async () => {
       const p2002Error = Object.assign(new Error("Unique constraint"), { code: "P2002" });
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
       mockPrisma.fabric.update.mockRejectedValueOnce(p2002Error);
       const { updateFabric } = await import("./fabric-actions");
 
@@ -488,6 +489,50 @@ describe("fabric-actions", () => {
       assertFailure(result);
       expect(result.error).toBe("Fabric not found");
       expect(mockPrisma.fabric.update).not.toHaveBeenCalled();
+    });
+
+    it("rejects update when the incoming linkedProjectId belongs to another user", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
+      const { updateFabric } = await import("./fabric-actions");
+
+      const result = await updateFabric("fabric-1", {
+        ...validUpdateData,
+        linkedProjectId: "proj-1",
+      });
+
+      assertFailure(result);
+      expect(result.error).toBe("Project not found");
+      expect(mockPrisma.fabric.update).not.toHaveBeenCalled();
+    });
+
+    it("rejects update when the incoming linkedProjectId does not exist", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce(null);
+      const { updateFabric } = await import("./fabric-actions");
+
+      const result = await updateFabric("fabric-1", {
+        ...validUpdateData,
+        linkedProjectId: "nonexistent",
+      });
+
+      assertFailure(result);
+      expect(result.error).toBe("Project not found");
+      expect(mockPrisma.fabric.update).not.toHaveBeenCalled();
+    });
+
+    it("allows update when the incoming linkedProjectId belongs to the authenticated user", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      mockPrisma.fabric.update.mockResolvedValueOnce(
+        createMockFabric({ id: "fabric-1", linkedProjectId: "proj-1" }),
+      );
+      const { updateFabric } = await import("./fabric-actions");
+
+      const result = await updateFabric("fabric-1", {
+        ...validUpdateData,
+        linkedProjectId: "proj-1",
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockPrisma.fabric.update).toHaveBeenCalled();
     });
   });
 

@@ -60,7 +60,7 @@ export interface FabricRequirementRow {
   fabricCount: number | null; // From linked fabric, null if no fabric
   fabricName: string | null;
   fabricId: string | null;
-  requiredWidth: number | null; // Calculated with 3" margin formula
+  requiredWidth: number | null; // Exact inches from fabric-calculator; null when no fabric assigned
   requiredHeight: number | null;
   assignedFabric: {
     id: string;
@@ -77,9 +77,8 @@ export interface FabricRequirementRow {
     count: number;
     shortestEdgeInches: number;
     longestEdgeInches: number;
-    fitsWidth: boolean;
-    fitsHeight: boolean;
   }[];
+  unmeasuredCandidateCount: number; // Stash pieces with no size recorded, so not judged either way
 }
 
 export interface StorageGroup {

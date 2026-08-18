@@ -6,25 +6,23 @@ import { Check, AlertTriangle, Package, ChevronDown, ChevronRight, Info } from "
 import { toast } from "sonner";
 import type { FabricRequirementRow } from "@/types/session";
 import { assignFabricToProject } from "@/lib/actions/pattern-dive-actions";
-
-const MARGIN_PER_SIDE = 3; // inches
-const MARGIN_TOTAL = MARGIN_PER_SIDE * 2;
+import {
+  FABRIC_MARGIN_INCHES,
+  calculateRequiredFabricEdge,
+  doesFabricFit,
+  formatRequiredInches,
+} from "@/lib/utils/fabric-calculator";
 
 const FABRIC_COUNTS = [14, 16, 18, 20, 22, 25, 28] as const;
 
-function calcFabricSize(stitches: number, count: number): number {
-  return stitches / count + MARGIN_TOTAL;
-}
-
 function fabricFits(row: FabricRequirementRow): boolean {
-  if (!row.assignedFabric || !row.requiredWidth || !row.requiredHeight) return false;
-  const { shortestEdgeInches, longestEdgeInches } = row.assignedFabric;
-  // Check if fabric is large enough in both dimensions (can rotate)
-  const fitsOption1 =
-    shortestEdgeInches >= row.requiredWidth && longestEdgeInches >= row.requiredHeight;
-  const fitsOption2 =
-    longestEdgeInches >= row.requiredWidth && shortestEdgeInches >= row.requiredHeight;
-  return fitsOption1 || fitsOption2;
+  if (!row.assignedFabric || row.requiredWidth === null || row.requiredHeight === null) {
+    return false;
+  }
+  return doesFabricFit(row.assignedFabric, {
+    requiredWidthInches: row.requiredWidth,
+    requiredHeightInches: row.requiredHeight,
+  });
 }
 
 function StatusIcon({ row }: { row: FabricRequirementRow }) {
@@ -82,8 +80,8 @@ function SizeReferenceTable({
           {FABRIC_COUNTS.map((ct) => {
             const designW = stitchesWide / ct;
             const designH = stitchesHigh / ct;
-            const totalW = designW + MARGIN_TOTAL;
-            const totalH = designH + MARGIN_TOTAL;
+            const totalW = calculateRequiredFabricEdge(stitchesWide, ct);
+            const totalH = calculateRequiredFabricEdge(stitchesHigh, ct);
             return (
               <tr key={ct} className="border-border/30 border-b last:border-0">
                 <td className="text-foreground py-2 font-medium">{ct} count</td>
@@ -91,7 +89,7 @@ function SizeReferenceTable({
                   {designW.toFixed(1)}&quot; x {designH.toFixed(1)}&quot;
                 </td>
                 <td className="py-2 text-right font-medium text-emerald-700 tabular-nums dark:text-emerald-400">
-                  {totalW.toFixed(1)}&quot; x {totalH.toFixed(1)}&quot;
+                  {formatRequiredInches(totalW)}&quot; x {formatRequiredInches(totalH)}&quot;
                 </td>
               </tr>
             );
@@ -155,10 +153,11 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
         />
         <div>
           <p className="text-sm text-emerald-800 dark:text-emerald-200">
-            All sizes include <strong>3&quot; margins</strong> on each side for framing allowance.
+            All sizes include <strong>{FABRIC_MARGIN_INCHES / 2}&quot; margins</strong> on each side
+            for framing allowance.
           </p>
           <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">
-            Formula: (stitch count / fabric count) + 6&quot; per dimension
+            Formula: (stitch count / fabric count) + {FABRIC_MARGIN_INCHES}&quot; per dimension
           </p>
         </div>
       </div>
@@ -232,15 +231,15 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
 
                   <div className="hidden shrink-0 gap-4 md:flex">
                     {([14, 18, 25] as const).map((ct) => {
-                      const w = calcFabricSize(row.stitchesWide, ct);
-                      const h = calcFabricSize(row.stitchesHigh, ct);
+                      const w = calculateRequiredFabricEdge(row.stitchesWide, ct);
+                      const h = calculateRequiredFabricEdge(row.stitchesHigh, ct);
                       return (
                         <div key={ct} className="min-w-[70px] text-center">
                           <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                             {ct}ct
                           </span>
                           <p className="text-foreground text-xs tabular-nums">
-                            {w.toFixed(1)}&quot; x {h.toFixed(1)}&quot;
+                            {formatRequiredInches(w)}&quot; x {formatRequiredInches(h)}&quot;
                           </p>
                         </div>
                       );
@@ -283,7 +282,6 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                         <div className="flex flex-col gap-2">
                           {row.matchingFabrics.map((fabric) => {
                             const isAssigned = assignedPairs.has(`${fabric.id}-${row.projectId}`);
-                            const fits = fabric.fitsWidth && fabric.fitsHeight;
 
                             return (
                               <div
@@ -294,17 +292,10 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                                     : "border-border bg-muted/30"
                                 }`}
                               >
-                                {fits ? (
-                                  <Check
-                                    className="h-4 w-4 shrink-0 text-emerald-500"
-                                    strokeWidth={2}
-                                  />
-                                ) : (
-                                  <AlertTriangle
-                                    className="h-4 w-4 shrink-0 text-amber-500"
-                                    strokeWidth={2}
-                                  />
-                                )}
+                                <Check
+                                  className="h-4 w-4 shrink-0 text-emerald-500"
+                                  strokeWidth={2}
+                                />
 
                                 <div className="min-w-0 flex-1">
                                   <p className="text-foreground truncate text-sm font-medium">
@@ -347,6 +338,14 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                           to know what to buy.
                         </span>
                       </div>
+                    )}
+
+                    {row.unmeasuredCandidateCount > 0 && (
+                      <p className="text-muted-foreground mt-3 text-xs">
+                        {row.unmeasuredCandidateCount === 1
+                          ? "1 piece in your stash has no size recorded, so it could not be checked. Add its measurements to see whether it fits."
+                          : `${row.unmeasuredCandidateCount} pieces in your stash have no size recorded, so they could not be checked. Add their measurements to see whether they fit.`}
+                      </p>
                     )}
 
                     <div className="mt-4">

@@ -1,11 +1,20 @@
 /**
- * Fabric size calculator for cross-stitch projects.
+ * Fabric size calculator for cross-stitch projects — the single implementation.
  *
- * Formula: (stitches / fabricCount) + 6 inches
- * The 6 inches provides a 3-inch margin on each side (per design spec D-20).
+ * Formula: (stitches / fabricCount) + 6 inches, a 3-inch margin on each side
+ * (attributed to design spec D-20; the value itself is open question Q-005).
+ *
+ * The requirement is returned **exact and unrounded**: it is a minimum, and a rounded-down
+ * minimum silently accepts fabric that is too small. Rounding is a display decision and
+ * belongs at the point of display.
  */
 
-const MARGIN_INCHES = 6;
+export const FABRIC_MARGIN_INCHES = 6;
+
+/** Exact fabric inches needed along one dimension, margin included. */
+export function calculateRequiredFabricEdge(stitches: number, fabricCount: number): number {
+  return stitches / fabricCount + FABRIC_MARGIN_INCHES;
+}
 
 export function calculateRequiredFabricSize(
   stitchesWide: number,
@@ -13,9 +22,20 @@ export function calculateRequiredFabricSize(
   fabricCount: number,
 ): { requiredWidthInches: number; requiredHeightInches: number } {
   return {
-    requiredWidthInches: Math.round((stitchesWide / fabricCount + MARGIN_INCHES) * 100) / 100,
-    requiredHeightInches: Math.round((stitchesHigh / fabricCount + MARGIN_INCHES) * 100) / 100,
+    requiredWidthInches: calculateRequiredFabricEdge(stitchesWide, fabricCount),
+    requiredHeightInches: calculateRequiredFabricEdge(stitchesHigh, fabricCount),
   };
+}
+
+/**
+ * Formats a requirement for display, rounded **up** to a tenth of an inch.
+ *
+ * A requirement is a minimum, so it is rounded away from zero: rounding to nearest would print
+ * a number smaller than the one `doesFabricFit` enforces, and Beth would be told to buy a size
+ * the app then rejects.
+ */
+export function formatRequiredInches(inches: number): string {
+  return (Math.ceil(inches * 10) / 10).toFixed(1);
 }
 
 export function doesFabricFit(
