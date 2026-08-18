@@ -271,6 +271,11 @@ describe("upload-actions failure modes", () => {
 
     it("returns error when R2 GetObject fails (original not found)", async () => {
       const { processAndStoreImage } = await import("./upload-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce({
+        id: "chart-1",
+        coverImageUrl: "covers/chart-1/missing.png",
+        project: { userId: "user-1" },
+      });
       mockSend.mockRejectedValueOnce(new Error("NoSuchKey"));
 
       const result = await processAndStoreImage("chart-1", "covers/chart-1/missing.png", "covers");
@@ -641,61 +646,42 @@ describe("upload-actions ownership scoping", () => {
     mockMetadata.mockResolvedValue({ format: "png", width: 800, height: 600 });
   });
 
-  it("generateThumbnail refuses a chart the caller does not own", async () => {
-    const { generateThumbnail } = await import("./upload-actions");
-    mockPrisma.chart.findUnique.mockResolvedValue({
-      id: "chart-1",
-      coverImageUrl: "covers/chart-1/abc-raw.png",
-      project: { userId: "someone-else" },
-    });
-
-    const result = await generateThumbnail("chart-1", "covers/chart-1/abc-raw.png");
-
-    assertFailure(result);
-    expect(result.error).toBe("Chart not found");
-    expect(mockSend).not.toHaveBeenCalled();
-    expect(mockPrisma.chart.update).not.toHaveBeenCalled();
-  });
-
-  it("generateThumbnail refuses a key that is not the chart's own cover", async () => {
-    const { generateThumbnail } = await import("./upload-actions");
+  it("processAndStoreImage refuses a key that is not the chart's own cover", async () => {
+    const { processAndStoreImage } = await import("./upload-actions");
     mockPrisma.chart.findUnique.mockResolvedValue({
       id: "chart-1",
       coverImageUrl: "covers/chart-1/abc-raw.png",
       project: { userId: "user-1" },
     });
 
-    const result = await generateThumbnail("chart-1", "covers/chart-2/abc-someone-elses.png");
+    const result = await processAndStoreImage(
+      "chart-1",
+      "covers/chart-2/abc-someone-elses.png",
+      "covers",
+    );
 
     assertFailure(result);
+    expect(result.error).toBe("Cover image not found for this chart");
     expect(mockSend).not.toHaveBeenCalled();
-    expect(mockPrisma.chart.update).not.toHaveBeenCalled();
   });
 
-  it("generateThumbnail reads the cover and writes the thumbnail at the chart's own key", async () => {
-    const { generateThumbnail } = await import("./upload-actions");
-    mockPrisma.chart.findUnique.mockResolvedValue({
-      id: "chart-1",
-      coverImageUrl: "covers/chart-1/abc-raw.png",
+  it("processAndStoreImage refuses a key that is not the session's own photo", async () => {
+    const { processAndStoreImage } = await import("./upload-actions");
+    mockPrisma.stitchSession.findUnique.mockResolvedValue({
+      id: "session-1",
+      photoKey: "sessions/project-1/abc-raw.png",
       project: { userId: "user-1" },
     });
-    mockSend.mockResolvedValueOnce(imageResponse());
 
-    const result = await generateThumbnail("chart-1", "covers/chart-1/abc-raw.png");
+    const result = await processAndStoreImage(
+      "session-1",
+      "sessions/project-2/abc-someone-elses.png",
+      "sessions",
+    );
 
-    assertSuccess(result);
-    expect(sentCommands()).toEqual([
-      { name: "GetObjectCommand", Bucket: "test-bucket", Key: "covers/chart-1/abc-raw.png" },
-      {
-        name: "PutObjectCommand",
-        Bucket: "test-bucket",
-        Key: "covers/chart-1/thumb-test-nano-id.webp",
-      },
-    ]);
-    expect(mockPrisma.chart.update).toHaveBeenCalledWith({
-      where: { id: "chart-1" },
-      data: { coverThumbnailUrl: "covers/chart-1/thumb-test-nano-id.webp" },
-    });
+    assertFailure(result);
+    expect(result.error).toBe("Photo not found for this session");
+    expect(mockSend).not.toHaveBeenCalled();
   });
 
   it("processAndStoreImage refuses a key from a different category", async () => {
@@ -711,6 +697,7 @@ describe("upload-actions ownership scoping", () => {
     const { processAndStoreImage } = await import("./upload-actions");
     mockPrisma.chart.findUnique.mockResolvedValue({
       id: "chart-1",
+      coverImageUrl: "covers/chart-1/abc-raw.png",
       project: { userId: "someone-else" },
     });
 
@@ -725,6 +712,7 @@ describe("upload-actions ownership scoping", () => {
     const { processAndStoreImage } = await import("./upload-actions");
     mockPrisma.stitchSession.findUnique.mockResolvedValue({
       id: "session-1",
+      photoKey: "sessions/project-1/abc-raw.png",
       project: { userId: "someone-else" },
     });
 
@@ -743,6 +731,7 @@ describe("upload-actions ownership scoping", () => {
     const { processAndStoreImage } = await import("./upload-actions");
     mockPrisma.stitchSession.findUnique.mockResolvedValue({
       id: "session-1",
+      photoKey: "sessions/project-1/abc-raw.png",
       project: { userId: "user-1" },
     });
     mockSend.mockResolvedValueOnce(imageResponse());
@@ -769,7 +758,11 @@ describe("upload-actions ownership scoping", () => {
 
   it("processAndStoreImage writes both derivatives for a cover, which records both", async () => {
     const { processAndStoreImage } = await import("./upload-actions");
-    mockPrisma.chart.findUnique.mockResolvedValue({ id: "chart-1", project: { userId: "user-1" } });
+    mockPrisma.chart.findUnique.mockResolvedValue({
+      id: "chart-1",
+      coverImageUrl: "covers/chart-1/abc-raw.png",
+      project: { userId: "user-1" },
+    });
     mockSend.mockResolvedValueOnce(imageResponse());
 
     const result = await processAndStoreImage("chart-1", "covers/chart-1/abc-raw.png", "covers");

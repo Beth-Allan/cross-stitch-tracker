@@ -129,6 +129,11 @@ describe("upload-actions with a scratch write bucket", () => {
 
   it("reads the raw image from its own bucket and stores both derivatives in scratch", async () => {
     const { processAndStoreImage } = await import("./upload-actions");
+    mockPrisma.chart.findUnique.mockResolvedValue({
+      id: "chart-1",
+      coverImageUrl: "covers/chart-1/raw-abc.jpg",
+      project: { userId: "user-1" },
+    });
     readSend.mockResolvedValue({ Body: [new Uint8Array([1, 2, 3])] });
 
     const result = await processAndStoreImage("chart-1", "covers/chart-1/raw-abc.jpg", "covers");
@@ -137,16 +142,5 @@ describe("upload-actions with a scratch write bucket", () => {
     expect(mockGetReadTarget).toHaveBeenCalledWith("covers/chart-1/raw-abc.jpg");
     expect(bucketsOf(readSend)).toEqual(["real-bucket"]);
     expect(bucketsOf(writeSend)).toEqual(["scratch-bucket", "scratch-bucket"]);
-  });
-
-  it("stores a regenerated thumbnail in the scratch bucket", async () => {
-    const { generateThumbnail } = await import("./upload-actions");
-    readSend.mockResolvedValue({ Body: [new Uint8Array([1, 2, 3])] });
-    mockPrisma.chart.update.mockResolvedValue({ id: "chart-1" });
-
-    const result = await generateThumbnail("chart-1", "covers/chart-1/opt-abc.webp");
-
-    assertSuccess(result);
-    expect(bucketsOf(writeSend)).toEqual(["scratch-bucket"]);
   });
 });

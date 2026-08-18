@@ -15,9 +15,9 @@ vi.mock("next/cache", () => ({
   revalidateTag: vi.fn(),
 }));
 
-const mockGenerateThumbnail = vi.fn();
+const mockProcessAndStoreImage = vi.fn();
 vi.mock("@/lib/actions/upload-actions", () => ({
-  generateThumbnail: (...args: unknown[]) => mockGenerateThumbnail(...args),
+  processAndStoreImage: (...args: unknown[]) => mockProcessAndStoreImage(...args),
 }));
 
 const mockDiscardStoredObjects = vi.fn();

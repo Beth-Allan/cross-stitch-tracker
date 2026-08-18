@@ -94,16 +94,6 @@ describe("upload-actions unauthenticated rejection", () => {
 
     expect(mockSend).not.toHaveBeenCalled();
     expect(mockPrisma.chart.findUnique).not.toHaveBeenCalled();
-  });
-
-  it("generateThumbnail throws Unauthorized when caller is not authenticated", async () => {
-    const { generateThumbnail } = await import("./upload-actions");
-
-    await expect(generateThumbnail("chart-1", "covers/chart-1/abc-raw.png")).rejects.toThrow(
-      "Unauthorized",
-    );
-
-    expect(mockSend).not.toHaveBeenCalled();
     expect(mockPrisma.chart.update).not.toHaveBeenCalled();
   });
 });

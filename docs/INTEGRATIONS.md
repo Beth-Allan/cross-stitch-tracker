@@ -8,7 +8,8 @@ deliberately absent.
 **Image Processing:**
 
 - sharp 0.35.3 - Server-side WebP conversion and thumbnail generation
-  - Used in: `src/lib/actions/upload-actions.ts` (`processAndStoreImage`, `generateThumbnail`)
+  - Used in: `src/lib/actions/upload-actions.ts` (`processAndStoreImage` — the one image
+    pipeline, shared by chart covers and session photos since item P15, 2026-08-17)
   - Not an external API; runs in-process on Vercel serverless functions
 
 **Font Delivery:**
@@ -71,10 +72,28 @@ deliberately absent.
       keys (`coverImageUrl`, `coverThumbnailUrl`); a `StitchSession` records one (`photoKey`), so
       `processAndStoreImage` writes a session no thumbnail. A derivative nothing records is an
       orphan the moment it is stored and nothing can ever name it again (item P8, 2026-08-17)
+    - **A saved cover always ends up under its own chart id** (item P15, 2026-08-17), because
+      the derivatives are keyed by the entity rather than by where the raw upload landed. That is
+      what moves a cover uploaded from the create form off `covers/unsaved/…`
   - Image optimization: raw upload → `sharp` WebP conversion → derivative(s) stored → row
-    updated → **only then** is the raw object deleted. If optimization fails, the raw image is
-    preserved and used as-is (`console.warn`, no user-facing error). Objects under `files/`
-    (PDFs and other chart files) are stored as uploaded and never converted
+    updated → **only then** is the raw object deleted. **One pipeline, both kinds of image**
+    (item P15): a chart cover and a session photo run the same `processAndStoreImage`, so a cover
+    is stored as a 1200px WebP plus its thumbnail instead of at full upload size. If optimization
+    fails, the raw image is preserved and used as-is — the row keeps naming it, so nothing is
+    deleted; a chart save reports it to the user as a warning, a session logs and moves on.
+    Objects under `files/` (PDFs and other chart files) are stored as uploaded and never converted
+  - The raw key handed to `processAndStoreImage` must be **the key the entity's own row already
+    records** (`Chart.coverImageUrl`, `StitchSession.photoKey`), not merely a well-formed key in
+    the right namespace: every export of a `"use server"` file is a live POST endpoint, so
+    without that an authenticated caller could have any object in the namespace re-encoded and
+    stored under something it owns. **The pin binds the action, not the whole save flow** —
+    `chartFormSchema` accepts any well-formed `covers/…` key, so `updateChart` can make the row
+    name one before the pin is checked (maintenance-ledger row). The supersede rule narrows what
+    that can _delete_ — a submitted key is discarded only when its owner segment is `unsaved` or
+    the chart's own id — but it does not close it, because `CoverImageUpload` is never handed a
+    chart id, so every cover the form uploads lands under `covers/unsaved/…` and covers saved
+    before P15 are still **live** on that prefix. Naming another chart's key under its _id_ is
+    copy-only; naming a pre-P15 `covers/unsaved/…` cover deletes it (maintenance-ledger row)
   - **Object lifecycle — what removes what** (item P8, 2026-08-17):
     - `deleteChart` reads the chart's cover, thumbnail, every `ChartFile.url` and every
       `StitchSession.photoKey` **before** deleting the row, then removes them in one batched
@@ -83,10 +102,11 @@ deliberately absent.
       taking an unbounded key list). The cascade destroys the only record of those keys, so
       reading them first is the whole game. `Project.finishPhotoUrl` is the one storage column
       left out, because nothing writes it — maintenance-ledger row
-    - Changing a cover — replacing it, or taking it off the chart — removes each old object
-      **only once the row has stopped naming it**. One rule covers both cases: on a failed
-      regeneration the form re-submits the old thumbnail key, so the row still names it and it
-      stays (`generateThumbnail` reports failure by returning rather than throwing, which is what
+    - Saving a cover — adding one, replacing it, or taking it off the chart — removes each old
+      object **only once the row has stopped naming it**. One rule covers every case, including
+      the raw upload the optimized copy supersedes: on a failed optimization the row still names
+      the raw upload and the form's re-submitted thumbnail key, so both stay
+      (`processAndStoreImage` reports failure by returning rather than throwing, which is what
       used to make the cleanup delete a thumbnail the chart was still displaying); on removal the
       row names neither, so both go
     - Rows are deleted before objects, everywhere. The tolerated residue is an orphan, never a
@@ -94,9 +114,11 @@ deliberately absent.
     - **Abandoned pre-save uploads are not cleaned up, by decision** (Beth, 2026-08-17). The
       chart form uploads before Save under `covers/unsaved/…` and `files/unsaved/…`; closing the
       form without saving leaves the object with nothing referencing it, and no sweep or
-      lifecycle rule looks for it. A bucket-side rule on those prefixes cannot be switched on
-      today because keys saved from the create form **stay** under `unsaved/` and are live —
-      see the maintenance-ledger row for the pre-condition
+      lifecycle rule looks for it. A bucket-side rule on those prefixes is **still not safe to
+      switch on** after item P15: new covers now move to `covers/<chartId>/…` when the chart is
+      saved, but covers saved before P15 keep their `unsaved/` key and are live, and chart
+      **files** were never moved at all. Item P16 (converting the covers already in the library)
+      is the remaining pre-condition for the covers half — see the maintenance-ledger row
   - Degradation when R2 is not configured: `src/lib/r2.ts` **throws** on a missing credential.
     The upload and download actions catch that specific error and return
     `{ success: false, error: "File storage is not configured…" }`, so uploads and downloads are
