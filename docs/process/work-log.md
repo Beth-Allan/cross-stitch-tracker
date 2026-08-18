@@ -49,7 +49,7 @@ default**, and a row says otherwise only when it is otherwise (protocol §1).
 
 | #   | Beth types        | what it is                                                                                                                                            |
 | --- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | `/work-item F-4`  | over-count is missing from the fabric size calculation (D-17, ruled 2026-08-17) — **gated**, `/review` follows                                        |
+| 1   | `/review F-4`     | the over-count fix on the fabric size calculation — **gated core**, so a fresh session reviews and merges it. **Lane: Fable.**                        |
 | 2   | `/work-item F-1`  | series designerName + dialog pending text                                                                                                             |
 | 3   | `/work-item P12`  | test-honesty repairs (phantom removals approved 2026-08-17; kitting test retitled to KIT-004; **plus the flaky log-session-modal pair logged by P6**) |
 | 4   | `/work-item P11`  | small honest fixes, one batch — includes the quick-add colour picker, the over-log confirm (ruled 2026-08-17) and the 10MB/50MB upload messages       |
@@ -118,12 +118,12 @@ Running order: the queue above (interleaved with F-1 and R-1).
 Seeded, not scheduled — they run after A-1 so both get triaged at one `/cleanup` (D-09). If the
 audit finds a deeper cause under any of them, the brief is rewritten before it is built.
 
-| item                                          | status          | date       | model  | note                                                                                                                                                                                              |
-| --------------------------------------------- | --------------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| F-1 series designerName + dialog pending text | queued          |            |        | old 999.83, 999.85 (SERIES-01)                                                                                                                                                                    |
-| F-2 fabric matching with no fabric assigned   | done inside P7  | 2026-08-17 | Opus 5 | **closed inside P7** — its premise was already stale (the fix shipped May 2026), so what remained was Beth's unasked question; her answer is **FAB-006** and narrowed the list to pieces that fit |
-| F-4 over-count missing from fabric sizing     | queued          |            |        | drift **D-17**, Beth ruled 2026-08-17 — runs straight after P7's `/review`; gated (fabric calculator)                                                                                             |
-| F-3 supply stitch-total hint visibility       | rerouted → DS-2 |            |        | **rerouted to the design track** (Beth, 2026-08-17) — now a DS-2/D-2 input in `backlog.md`; not built in Stage F                                                                                  |
+| item                                          | status                 | date       | model  | note                                                                                                                                                                                                                    |
+| --------------------------------------------- | ---------------------- | ---------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F-1 series designerName + dialog pending text | queued                 |            |        | old 999.83, 999.85 (SERIES-01)                                                                                                                                                                                          |
+| F-2 fabric matching with no fabric assigned   | done inside P7         | 2026-08-17 | Opus 5 | **closed inside P7** — its premise was already stale (the fix shipped May 2026), so what remained was Beth's unasked question; her answer is **FAB-006** and narrowed the list to pieces that fit                       |
+| F-4 over-count missing from fabric sizing     | built, awaiting review | 2026-08-18 | Opus 5 | drift **D-17** closed: the calculator divides by the project's over-count, all three call sites pass a real value, no default. Gated (fabric calculator) — `/review` merges. UI changed, so Beth sees the preview first |
+| F-3 supply stitch-total hint visibility       | rerouted → DS-2        |            |        | **rerouted to the design track** (Beth, 2026-08-17) — now a DS-2/D-2 input in `backlog.md`; not built in Stage F                                                                                                        |
 
 ## Stage R — process-enabling fixes
 

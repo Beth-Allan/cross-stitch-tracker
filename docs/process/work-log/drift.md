@@ -102,6 +102,14 @@ item **F-4**, queued directly behind P7's `/review`. No calculation changed in P
 unified calculator preserves today's over-count-blind arithmetic exactly, so P7 neither fixes nor
 worsens the error, and F-4 changes it in exactly one place.
 
+**What it changed — closed by F-4, 2026-08-18.** `calculateRequiredFabricEdge` /
+`calculateRequiredFabricSize` now take the project's `overCount` as a **required** argument and
+divide by it (`calculateEffectiveCount`, exported so the one division has one home); all three
+call sites pass the project's real value — `pattern-dive-actions.getFabricRequirements` now selects
+`overCount`, and it is on `FabricRequirementRow` so the UI can label what it is showing. There is
+deliberately **no default of 1**: a default is the shape the bug had. FAB-004 and FAB-005 in
+`docs/domain/fabric.md` follow the code again.
+
 ### 2026-08-17 · fabric matching now shows only pieces that fit — ruled during P7
 
 **What happened.** P7 inherited F-2's domain question (its trap ②): what should a project with no

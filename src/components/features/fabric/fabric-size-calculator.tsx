@@ -1,4 +1,5 @@
 import {
+  calculateEffectiveCount,
   calculateRequiredFabricSize,
   doesFabricFit,
   formatRequiredInches,
@@ -14,6 +15,7 @@ interface FabricSizeCalculatorProps {
   project: {
     stitchesWide: number;
     stitchesHigh: number;
+    overCount: 1 | 2;
   } | null;
 }
 
@@ -27,6 +29,7 @@ export function FabricSizeCalculator({ fabric, project }: FabricSizeCalculatorPr
     project.stitchesWide,
     project.stitchesHigh,
     fabric.count,
+    project.overCount,
   );
 
   const fits = doesFabricFit(
@@ -50,6 +53,12 @@ export function FabricSizeCalculator({ fabric, project }: FabricSizeCalculatorPr
             {formatRequiredInches(required.requiredWidthInches)}&quot; x{" "}
             {formatRequiredInches(required.requiredHeightInches)}&quot;
           </p>
+          {project.overCount === 2 && (
+            <p className="text-muted-foreground mt-1 text-xs">
+              Stitched over 2 — {fabric.count} count works like{" "}
+              {calculateEffectiveCount(fabric.count, project.overCount)}
+            </p>
+          )}
         </div>
 
         <div className="bg-muted/50 border-border rounded-lg border p-3">

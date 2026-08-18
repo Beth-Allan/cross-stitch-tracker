@@ -427,6 +427,14 @@ not a promise that the diagnosis below is right.
   call site passes a real value; trap ③'s no-assigned-fabric branch has a stated, tested answer;
   FAB-004's claim about "both calculators" is true when the item lands; `npm run gate` green;
   fresh `/review` before merge; work log updated.
+  _(Built 2026-08-18. **Trap ③'s premise was wrong and the answer is the simpler one:** every
+  project row carries `overCount` (schema default 1), so the no-assigned-fabric branch has one to
+  use — it judges each stash piece at that piece's own count divided by **the project's**
+  over-count, because over-count is how Beth stitches the project, not a property of a piece she
+  might buy for it. Inferring one from the fabric is Q-002 and stays open. Trap ④ resolved as:
+  the reference rows stay the **raw** counts printed on fabric she buys, sized at the effective
+  count, each labelled "works like N" when the project is over 2. `overCount` is a **required**
+  argument on the calculator — no default, since a default of 1 is exactly the shape of the bug.)_
 
 ### F-3 Supply stitch-total hint is invisible outside Details mode
 

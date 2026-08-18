@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
+  FABRIC_MARGIN_INCHES,
+  calculateEffectiveCount,
   calculateRequiredFabricEdge,
   calculateRequiredFabricSize,
   doesFabricFit,
@@ -8,14 +10,14 @@ import {
 
 describe("calculateRequiredFabricSize", () => {
   it("calculates required size for 100x150 on 14ct", () => {
-    const result = calculateRequiredFabricSize(100, 150, 14);
+    const result = calculateRequiredFabricSize(100, 150, 14, 1);
     // (100/14) + 6 = 13.14, (150/14) + 6 = 16.71
     expect(result.requiredWidthInches).toBeCloseTo(13.14, 2);
     expect(result.requiredHeightInches).toBeCloseTo(16.71, 2);
   });
 
   it("calculates required size for 200x300 on 18ct", () => {
-    const result = calculateRequiredFabricSize(200, 300, 18);
+    const result = calculateRequiredFabricSize(200, 300, 18, 1);
     // (200/18) + 6 = 17.11, (300/18) + 6 = 22.67
     expect(result.requiredWidthInches).toBeCloseTo(17.11, 2);
     expect(result.requiredHeightInches).toBeCloseTo(22.67, 2);
@@ -23,7 +25,7 @@ describe("calculateRequiredFabricSize", () => {
 
   it("includes 3-inch margin on each side (6 inches total)", () => {
     // 140 stitches on 14ct = exactly 10 inches + 6 = 16
-    const result = calculateRequiredFabricSize(140, 140, 14);
+    const result = calculateRequiredFabricSize(140, 140, 14, 1);
     expect(result.requiredWidthInches).toBe(16);
     expect(result.requiredHeightInches).toBe(16);
   });
@@ -90,17 +92,17 @@ describe("doesFabricFit", () => {
 
 describe("rounding contract", () => {
   it("returns the exact requirement, unrounded", () => {
-    const result = calculateRequiredFabricSize(289, 100, 14);
+    const result = calculateRequiredFabricSize(289, 100, 14, 1);
     expect(result.requiredWidthInches).toBe(26.642857142857142);
     expect(result.requiredHeightInches).toBe(13.142857142857142);
   });
 
   it("calculateRequiredFabricEdge returns the exact requirement for one dimension", () => {
-    expect(calculateRequiredFabricEdge(289, 14)).toBe(26.642857142857142);
+    expect(calculateRequiredFabricEdge(289, 14, 1)).toBe(26.642857142857142);
   });
 
   it("rejects a fabric that is short of the exact requirement by less than a tenth of an inch", () => {
-    const required = calculateRequiredFabricSize(289, 289, 14);
+    const required = calculateRequiredFabricSize(289, 289, 14, 1);
     const result = doesFabricFit({ shortestEdgeInches: 26.6, longestEdgeInches: 26.6 }, required);
     expect(result).toBe(false);
   });
@@ -117,5 +119,53 @@ describe("formatRequiredInches", () => {
   it("leaves an exact tenth alone", () => {
     expect(formatRequiredInches(16)).toBe("16.0");
     expect(formatRequiredInches(20.3)).toBe("20.3");
+  });
+});
+
+describe("over-count", () => {
+  it("divides the fabric count by the project's over-count", () => {
+    // FAB-004: 28ct worked over two behaves like 14ct, so it needs the 14ct size.
+    expect(calculateRequiredFabricEdge(200, 28, 2)).toBe(calculateRequiredFabricEdge(200, 14, 1));
+  });
+
+  it("adds the margin after the effective count divides, never before", () => {
+    // 280 stitches at 28ct over two = 280 / 14 = 20" of design, then + 6" of margin.
+    expect(calculateRequiredFabricEdge(280, 28, 2)).toBe(26);
+  });
+
+  it("doubles the design inches for an over-two project, leaving the margin alone", () => {
+    const overOne = calculateRequiredFabricSize(200, 300, 28, 1);
+    const overTwo = calculateRequiredFabricSize(200, 300, 28, 2);
+
+    expect(overTwo.requiredWidthInches - FABRIC_MARGIN_INCHES).toBeCloseTo(
+      (overOne.requiredWidthInches - FABRIC_MARGIN_INCHES) * 2,
+      10,
+    );
+    expect(overTwo.requiredHeightInches - FABRIC_MARGIN_INCHES).toBeCloseTo(
+      (overOne.requiredHeightInches - FABRIC_MARGIN_INCHES) * 2,
+      10,
+    );
+  });
+
+  it("leaves an over-one project's size exactly as it was", () => {
+    const result = calculateRequiredFabricSize(100, 150, 14, 1);
+    expect(result.requiredWidthInches).toBe(13.142857142857142);
+    expect(result.requiredHeightInches).toBe(16.714285714285715);
+  });
+
+  it("rejects a piece that would have fitted had the project been stitched over one", () => {
+    const piece = { shortestEdgeInches: 14, longestEdgeInches: 18 };
+    expect(doesFabricFit(piece, calculateRequiredFabricSize(200, 300, 28, 1))).toBe(true);
+    expect(doesFabricFit(piece, calculateRequiredFabricSize(200, 300, 28, 2))).toBe(false);
+  });
+});
+
+describe("calculateEffectiveCount", () => {
+  it("returns the fabric count itself when the project is stitched over one", () => {
+    expect(calculateEffectiveCount(28, 1)).toBe(28);
+  });
+
+  it("halves the fabric count when the project is stitched over two", () => {
+    expect(calculateEffectiveCount(28, 2)).toBe(14);
   });
 });

@@ -440,6 +440,7 @@ describe("pattern-dive-actions", () => {
           designer: { name: "Designer A" },
           project: {
             id: "p1",
+            overCount: 1,
             fabric: null,
           },
         },
@@ -476,6 +477,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: {
               id: "f1",
               name: "White Aida",
@@ -510,6 +512,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: null,
           },
         },
@@ -536,6 +539,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: {
               id: "f1",
               name: "White Aida",
@@ -574,6 +578,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: {
               id: "f-assigned",
               name: "Assigned Fabric",
@@ -626,6 +631,7 @@ describe("pattern-dive-actions", () => {
           designer: { name: "Designer A" },
           project: {
             id: "project-abc",
+            overCount: 1,
             fabric: null,
           },
         },
@@ -651,6 +657,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: {
               id: "f-assigned",
               name: "Assigned",
@@ -699,6 +706,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: null,
           },
         },
@@ -742,6 +750,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: null,
           },
         },
@@ -776,6 +785,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: null,
           },
         },
@@ -811,6 +821,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: null,
           },
         },
@@ -852,6 +863,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: null,
           },
         },
@@ -896,6 +908,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: {
               id: "f-assigned",
               name: "Assigned 14ct",
@@ -944,7 +957,7 @@ describe("pattern-dive-actions", () => {
           stitchesWide: 140,
           stitchesHigh: 140,
           designer: null,
-          project: { id: "p1", fabric: null },
+          project: { id: "p1", overCount: 1, fabric: null },
         },
       ]);
       mockPrisma.fabric.findMany.mockResolvedValue([
@@ -983,7 +996,7 @@ describe("pattern-dive-actions", () => {
           stitchesWide: 140,
           stitchesHigh: 140,
           designer: null,
-          project: { id: "p1", fabric: null },
+          project: { id: "p1", overCount: 1, fabric: null },
         },
       ]);
       mockPrisma.fabric.findMany.mockResolvedValue([
@@ -1016,6 +1029,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: {
               id: "f-assigned",
               name: "Bad Data",
@@ -1059,6 +1073,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: {
               id: "f-assigned",
               name: "Assigned",
@@ -1091,6 +1106,7 @@ describe("pattern-dive-actions", () => {
           designer: null,
           project: {
             id: "p1",
+            overCount: 1,
             fabric: null,
           },
         },
@@ -1111,6 +1127,160 @@ describe("pattern-dive-actions", () => {
 
       // Required is 289/14+6 = 26.642857…", so a 26.6" square is short.
       expect(result[0].matchingFabrics).toHaveLength(0);
+    });
+
+    it("sizes an over-two project at the fabric's effective count", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Linen Chart",
+          coverThumbnailUrl: null,
+          stitchCount: 60000,
+          stitchesWide: 200,
+          stitchesHigh: 300,
+          designer: null,
+          project: {
+            id: "p1",
+            overCount: 2,
+            fabric: {
+              id: "f1",
+              name: "28ct Linen",
+              count: 28,
+              shortestEdgeInches: 30,
+              longestEdgeInches: 40,
+              brand: { name: "Zweigart" },
+            },
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      // 28ct worked over two behaves like 14ct: the size is the 14ct size, exactly.
+      expect(result[0].requiredWidth).toBe(200 / 14 + 6);
+      expect(result[0].requiredHeight).toBe(300 / 14 + 6);
+    });
+
+    it("leaves an over-one project's required size exactly as it was", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Aida Chart",
+          coverThumbnailUrl: null,
+          stitchCount: 60000,
+          stitchesWide: 200,
+          stitchesHigh: 300,
+          designer: null,
+          project: {
+            id: "p1",
+            overCount: 1,
+            fabric: {
+              id: "f1",
+              name: "28ct Aida",
+              count: 28,
+              shortestEdgeInches: 30,
+              longestEdgeInches: 40,
+              brand: { name: "Zweigart" },
+            },
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      expect(result[0].requiredWidth).toBe(200 / 28 + 6);
+      expect(result[0].requiredHeight).toBe(300 / 28 + 6);
+    });
+
+    it("judges each stash piece at its own count divided by the project's over-count", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "No Fabric, Over Two",
+          coverThumbnailUrl: null,
+          stitchCount: 20000,
+          stitchesWide: 200,
+          stitchesHigh: 100,
+          designer: null,
+          project: {
+            id: "p1",
+            overCount: 2,
+            fabric: null,
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-big",
+          name: "Big 28ct",
+          count: 28,
+          shortestEdgeInches: 30,
+          longestEdgeInches: 40,
+          brand: { name: "Zweigart" },
+        },
+        {
+          id: "f-over-one-only",
+          name: "Small 28ct",
+          count: 28,
+          shortestEdgeInches: 15,
+          longestEdgeInches: 20,
+          brand: { name: "Zweigart" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      // At 28ct over two the requirement is 200/14+6 = 20.3" x 100/14+6 = 13.1", so the 15x20
+      // piece — which would have fitted the 13.1" x 9.6" over-one requirement — no longer does.
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-big"]);
+    });
+
+    it("selects the project's over-count so the size never falls back to a guess", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([]);
+      mockPrisma.fabric.findMany.mockResolvedValue([]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      await getFabricRequirements();
+
+      expect(mockPrisma.chart.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          include: expect.objectContaining({
+            project: expect.objectContaining({
+              select: expect.objectContaining({ overCount: true }),
+            }),
+          }),
+        }),
+      );
+    });
+
+    it("reports the project's over-count on the row", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Linen Chart",
+          coverThumbnailUrl: null,
+          stitchCount: 20000,
+          stitchesWide: 200,
+          stitchesHigh: 100,
+          designer: null,
+          project: {
+            id: "p1",
+            overCount: 2,
+            fabric: null,
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      expect(result[0].overCount).toBe(2);
     });
   });
 

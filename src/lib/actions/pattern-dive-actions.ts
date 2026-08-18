@@ -93,6 +93,12 @@ export async function getWhatsNextProjects(): Promise<WhatsNextProject[]> {
  * its own count; a project with fabric assigned is matched against pieces of that same count.
  * Either way only pieces that actually fit are returned (Beth's ruling, 2026-08-17, FAB-006).
  *
+ * Every size here — the project's own requirement and each candidate's — divides by the
+ * project's `overCount` (FAB-004). The count comes from the fabric, the over-count from the
+ * project, including in the no-assigned-fabric branch: over-count is how Beth stitches this
+ * project, not a property of the piece she might buy for it, and inferring one from the fabric
+ * is open question Q-002.
+ *
  * A piece with no size recorded cannot be judged either way, so it is counted rather than
  * silently dropped — otherwise an unmeasured stash reads as "nothing you own fits".
  */
@@ -111,6 +117,7 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
       project: {
         select: {
           id: true,
+          overCount: true,
           fabric: {
             select: {
               id: true,
@@ -136,6 +143,8 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
     .filter((c) => c.project)
     .map((c) => {
       const p = c.project!;
+      // Prisma types overCount as Int; the write boundary constrains it to the domain's 1 | 2.
+      const overCount = p.overCount as 1 | 2;
       const fabricCount = p.fabric?.count ?? null;
       // A count of 0 is nonsense data the validation boundary forbids; treat it as no count at
       // all rather than dividing by it.
@@ -144,7 +153,7 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
       const required =
         usableCount === null
           ? null
-          : calculateRequiredFabricSize(c.stitchesWide, c.stitchesHigh, usableCount);
+          : calculateRequiredFabricSize(c.stitchesWide, c.stitchesHigh, usableCount, overCount);
       const requiredWidth = required?.requiredWidthInches ?? null;
       const requiredHeight = required?.requiredHeightInches ?? null;
 
@@ -171,7 +180,10 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
 
       const matchingFabrics = measurable
         .filter((f) =>
-          doesFabricFit(f, calculateRequiredFabricSize(c.stitchesWide, c.stitchesHigh, f.count)),
+          doesFabricFit(
+            f,
+            calculateRequiredFabricSize(c.stitchesWide, c.stitchesHigh, f.count, overCount),
+          ),
         )
         .map((f) => ({
           id: f.id,
@@ -192,6 +204,7 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
         stitchesHigh: c.stitchesHigh,
         totalStitches: c.stitchCount,
         fabricCount,
+        overCount,
         fabricName: p.fabric?.name ?? null,
         fabricId: p.fabric?.id ?? null,
         requiredWidth,

@@ -36,11 +36,9 @@ fabric count to give the _effective_ count that both calculators use
 (`effectiveCount = fabricCount ÷ overCount`), so it changes every thread and size figure for a
 project. Linen is stitched over two (FAB-003); evenweaves commonly are.
 
-**Not true of the app today** (drift **D-17**, 2026-08-17): `skein-calculator.ts` divides by
-over-count, `fabric-calculator.ts` never has, and no fabric-size code path reads `Project.overCount`
-at all — so every fabric-size figure for an over-two project is roughly half what it should be.
-Beth ruled the fix runs as build-plan item **F-4**, straight after P7's review. The fact above
-states how it should work; this note says what the code does until F-4 lands.
+_Both calculators do divide, as of **F-4** (2026-08-18). Until then `fabric-calculator.ts` never
+had, so every fabric-size figure for an over-two project was roughly half what it should be —
+drift **D-17**, and the reason this paragraph exists._
 
 **The app does not infer it, and the one attempt to write down how it should was invented.** The
 old backlog note proposed "≤25 → over 1, ≥28 → over 2" — thresholds with no source, and with 26
@@ -52,11 +50,12 @@ Tracked in `open-questions.md` Q-002.
 ### FAB-005 — Required fabric size, and the 6-inch margin
 
 ```
-required inches = stitches ÷ fabricCount + 6
+required inches = stitches ÷ effectiveCount + 6        (effectiveCount = fabricCount ÷ overCount, FAB-004)
 ```
 
 The **6 inches** is a 3-inch margin on each side, attributed in `fabric-calculator.ts` to design
-spec D-20. A piece of fabric fits if it covers the required width and height in **either
+spec D-20, and it is added **after** the effective count divides — the margin does not scale with
+over-count. A piece of fabric fits if it covers the required width and height in **either
 orientation** — the app checks the rotated fit as well.
 
 [unverified — do not build on] — the tag is deliberately weak. `fabric-calculator.ts` attributes
