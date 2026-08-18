@@ -444,14 +444,67 @@ describe("FabricRequirementsTab", () => {
 
     expect(screen.getByText("Almost Big Enough")).toBeInTheDocument();
     expect(screen.queryByText("Fabrics That Fit")).not.toBeInTheDocument();
-    expect(screen.getByText(/No fabrics in your stash fit this project/i)).toBeInTheDocument();
   });
 
-  it("says nothing about over one when no piece is in that state", () => {
-    render(<FabricRequirementsTab rows={[makeRow()]} imageUrls={{}} />);
+  it("does not tell Beth to go buy fabric without pointing at the piece she already owns", () => {
+    const rows = [
+      makeRow({
+        overCount: 2,
+        matchingFabrics: [],
+        overOneOnlyFabrics: [
+          {
+            id: "fab-2",
+            name: "Almost Big Enough",
+            brandName: "Zweigart",
+            count: 28,
+            shortestEdgeInches: 15,
+            longestEdgeInches: 20,
+          },
+        ],
+      }),
+    ];
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
 
     fireEvent.click(screen.getByText("Test Pattern"));
 
+    expect(screen.getByText(/See below for what would fit over 1/i)).toBeInTheDocument();
+  });
+
+  it("still just says to check the size reference when nothing in the stash is relevant", () => {
+    const rows = [makeRow({ overCount: 2, matchingFabrics: [], overOneOnlyFabrics: [] })];
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
+
+    fireEvent.click(screen.getByText("Test Pattern"));
+
+    expect(
+      screen.getByText(
+        /No fabrics in your stash fit this project\. Check the size reference below/i,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("says nothing about over one when no piece is in that state", () => {
+    const rows = [
+      makeRow({
+        overCount: 2,
+        matchingFabrics: [
+          {
+            id: "fab-1",
+            name: "Roomy Linen",
+            brandName: "Zweigart",
+            count: 28,
+            shortestEdgeInches: 30,
+            longestEdgeInches: 40,
+          },
+        ],
+        overOneOnlyFabrics: [],
+      }),
+    ];
+    render(<FabricRequirementsTab rows={rows} imageUrls={{}} />);
+
+    fireEvent.click(screen.getByText("Test Pattern"));
+
+    expect(screen.getByText("Roomy Linen")).toBeInTheDocument();
     expect(screen.queryByText(/over 1/i)).not.toBeInTheDocument();
   });
 

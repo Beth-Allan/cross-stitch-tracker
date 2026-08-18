@@ -122,7 +122,10 @@ leave them behind.
   point Beth set is ignored on the dashboard. Needs `focalPointX/Y` threaded through the type,
   the query and `bucket-project-row.tsx`. _(999.18, POLISH-03)_
 - Centralize the 7-status colour palette as CSS custom properties — raw Tailwind scales are
-  scattered across `gallery-card`, `bucket-project-row`, `whats-next-tab` and `status-badge`.
+  scattered across `gallery-card`, `bucket-project-row`, `whats-next-tab`, `status-badge` and
+  `fabric-requirements-tab` (the last named by F-5's layer-1 review, 2026-08-18: the tab is
+  emerald/amber/stone throughout, and F-5's new qualifier card matched its neighbours rather than
+  standing alone in semantic tokens).
   **This is D-1's territory, not a separate job**: the token swap is where it gets fixed, and the
   no-hardcoded-colour grep joining the gate is what stops it growing back. _(999.66)_
 

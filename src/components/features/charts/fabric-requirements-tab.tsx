@@ -357,8 +357,9 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                       <div className="bg-muted text-muted-foreground flex items-center gap-2 rounded-lg p-3 text-sm">
                         <Package className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                         <span>
-                          No fabrics in your stash fit this project. Check the size reference below
-                          to know what to buy.
+                          {row.overOneOnlyFabrics.length > 0
+                            ? "No fabrics in your stash fit this project as you are stitching it. See below for what would fit over 1, or check the size reference to know what to buy."
+                            : "No fabrics in your stash fit this project. Check the size reference below to know what to buy."}
                         </span>
                       </div>
                     )}
