@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
+import { STATS_CACHE_VOLATILE } from "./utils";
 
 async function computeAvailableYears(userId: string): Promise<number[]> {
   try {
@@ -29,6 +30,6 @@ async function computeAvailableYears(userId: string): Promise<number[]> {
 export function getAvailableYears(userId: string) {
   return unstable_cache(() => computeAvailableYears(userId), [`stats-available-years-${userId}`], {
     tags: ["stats"],
-    revalidate: 300,
+    revalidate: STATS_CACHE_VOLATILE,
   })();
 }

@@ -14,6 +14,7 @@ vi.mock("@/lib/db", () => ({
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
 }));
 
 describe("genre-actions", () => {
@@ -161,6 +162,56 @@ describe("genre-actions", () => {
 
       assertFailure(result);
       expect(result.error).toBe("Genre not found");
+    });
+  });
+
+  describe("cache invalidation", () => {
+    it("createGenre calls revalidateTag('stats') after successful creation", async () => {
+      mockPrisma.genre.create.mockResolvedValueOnce(createMockGenre({ name: "New" }));
+      const { createGenre } = await import("./genre-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await createGenre({ name: "New" });
+
+      assertSuccess(result);
+      expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+    });
+
+    it("updateGenre calls revalidateTag('stats') after successful update", async () => {
+      mockPrisma.genre.update.mockResolvedValueOnce(createMockGenre({ id: "g1" }));
+      const { updateGenre } = await import("./genre-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await updateGenre("g1", { name: "Renamed" });
+
+      assertSuccess(result);
+      expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+    });
+
+    it("deleteGenre calls revalidateTag('stats') after successful deletion", async () => {
+      mockPrisma.genre.findUnique.mockResolvedValueOnce({
+        ...createMockGenre({ id: "g1" }),
+        _count: { charts: 2 },
+      });
+      mockPrisma.$transaction.mockResolvedValueOnce([{}, {}]);
+      const { deleteGenre } = await import("./genre-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await deleteGenre("g1");
+
+      assertSuccess(result);
+      expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+    });
+
+    it("deleteGenre does not invalidate when the genre does not exist", async () => {
+      mockPrisma.genre.findUnique.mockResolvedValueOnce(null);
+      const { deleteGenre } = await import("./genre-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await deleteGenre("nonexistent");
+
+      assertFailure(result);
+      expect(vi.mocked(revalidateTag)).not.toHaveBeenCalled();
     });
   });
 

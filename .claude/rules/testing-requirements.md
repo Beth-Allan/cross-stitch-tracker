@@ -30,6 +30,49 @@ do.
 
 Test failure modes, not just happy paths: auth expiry, network errors, missing data.
 
+## The per-mutation stats-invalidation rule
+
+**Every stats-visible mutation carries a test asserting its own
+`revalidateTag("stats", { expire: 0 })` call** — Beth's ruling, 2026-08-17
+(`docs/process/work-log/drift.md`). This is the adopted protection *instead of* review-gating the
+caller files: a path gate can only watch files that already do the right thing, and the failure
+mode is a mutation that never had the line.
+
+A mutation is stats-visible when its write can move a figure on `/stats` — anything touching
+charts, projects, sessions, supplies, designers, or genres. When it is a close call, invalidate:
+an unnecessary recomputation is cheap, a stale number is a bug Beth has to notice herself.
+
+The test is one assertion per mutation, colocated in the action file's own test:
+
+```ts
+it("createThread calls revalidateTag('stats') after successful creation", async () => {
+  mockPrisma.thread.create.mockResolvedValueOnce(createMockThread());
+  const { createThread } = await import("./supply-actions");
+  const { revalidateTag } = await import("next/cache");
+
+  const result = await createThread({ ... });
+
+  assertSuccess(result);
+  expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+});
+```
+
+**Name the mutation in the test title** so the coverage is greppable — that is the requirement.
+Where a file is organised by concern, group the assertions in a `describe("cache invalidation", …)`
+block (`chart-`, `designer-`, `genre-`, `supply-actions`); where it is already organised per action,
+the assertion lives in that action's own describe (`session-actions`). Either way **every file
+carries at least one negative** — a rejected write (ownership failure, missing record) that must
+**not** invalidate. Adding a new mutation without its assertion is a review finding.
+
+**Mock trap:** an action test's `vi.mock("next/cache", …)` factory must list `revalidateTag`
+alongside `revalidatePath`. Omit it and the call throws inside the action's own `try`, so the
+whole mutation returns its generic `{ success: false }` — the test fails on a wrong-looking
+business error instead of naming the missing mock. `MOCK_PATTERNS.cache` in
+`@/__tests__/mocks/module-mocks.ts` carries the correct shape.
+
+The reader side of the same layer is `src/lib/queries/stats/`, which is review-gated; its TTL
+windows are the named constants in `stats/utils.ts`, never bare numbers.
+
 ## What does not
 
 Pure markup and styling changes (verify by looking at the page) and doc/process/tooling changes.

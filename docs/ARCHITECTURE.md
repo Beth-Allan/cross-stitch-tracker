@@ -112,7 +112,7 @@ Key files:
 
 Nineteen query files plus a barrel and a shared helper module. Pure async functions querying Prisma — not server actions, called from pages and actions. Most export a single function; `completion-estimates.ts` exports two and `timezone.ts` four.
 
-Caching: `unstable_cache` keyed per user, tagged `"stats"`, invalidated by `revalidateTag("stats", { expire: 0 })` from any mutation that moves a statistic. TTL varies by volatility — **300s** for activity-derived queries, **3600s** for collection-shape queries (`collection-breakdown`, `size-breakdown`, `designer-breakdown`, `genre-breakdown`); several take a scope-derived `revalidate`. `timezone.ts` and `record-detection.ts` are uncached.
+Caching: `unstable_cache` keyed per user, tagged `"stats"`, invalidated by `revalidateTag("stats", { expire: 0 })` from any mutation that moves a statistic. TTL varies by volatility and is named, never numeric — `STATS_CACHE_VOLATILE` (300s) for activity-derived queries, `STATS_CACHE_STABLE` (3600s) for the four collection-shape breakdowns (`collection`, `size`, `designer`, `genre`); the six period-scoped queries pick between them per call (`isCurrentPeriod ? VOLATILE : STABLE`). Both constants and the rule for choosing live in `stats/utils.ts`. `timezone.ts` and `record-detection.ts` are uncached.
 
 - `index.ts` — Barrel re-exporting 20 functions. Not exhaustive by design: `record-detection.ts` stays off it entirely and `completion-estimates.ts` puts only one of its two exports on it; both are imported by path instead — from `session-actions.ts` and `charts/[id]/page.tsx` respectively.
 - `hero-stats.ts` — Today/week/month/year/lifetime aggregates
@@ -244,7 +244,7 @@ R2 key pattern: `{category}/{projectId}/{nanoid()}-{filename}` (categories: `cov
 - Server Components fetch data; Client Components receive props (split at top-level feature component)
 - Pages that fetch more than one dataset parallelize with `Promise.all()` / `Promise.allSettled()`. It is a habit, not an invariant — around a dozen of the simpler dashboard pages still await sequentially (e.g. `shopping/page.tsx`), which is worth fixing when you are already in the file and is not a review finding on its own
 - R2 keys stored in DB, presigned URLs generated per-render (1-hour expiry); image processing (sharp) is server-side only
-- Stats queries share the `"stats"` cache tag; any mutation that moves a statistic must invalidate it with `revalidateTag("stats", { expire: 0 })` — `supply-actions.ts` alone does so at 26 sites, most of which change neither stitch count nor status
+- Stats queries share the `"stats"` cache tag; any mutation that moves a statistic must invalidate it with `revalidateTag("stats", { expire: 0 })`, and **every such mutation carries a test asserting its own call** (Beth's ruling, 2026-08-17). `supply-actions.ts` alone does so at 22 sites, most of which change neither stitch count nor status
 - Ownership is checked directly on the three `userId`-carrying models and transitively on everything that hangs off a project; only true reference data is global (see the mutation sequence above)
 - Calendar dates (session dates, project start/finish/FFO) are stored as UTC-midnight instants and read in UTC; only "now" is resolved in the user's timezone (see "Calendar dates")
 - Security headers set globally in `next.config.ts` (CSP whitelists R2 origins)

@@ -19,6 +19,7 @@ vi.mock("@/lib/db", () => ({
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
 }));
 
 describe("designer-actions", () => {
@@ -170,6 +171,56 @@ describe("designer-actions", () => {
 
       assertFailure(result);
       expect(result.error).toBe("Designer not found");
+    });
+  });
+
+  describe("cache invalidation", () => {
+    it("createDesigner calls revalidateTag('stats') after successful creation", async () => {
+      mockPrisma.designer.create.mockResolvedValueOnce(createMockDesigner({ name: "New" }));
+      const { createDesigner } = await import("./designer-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await createDesigner({ name: "New" });
+
+      assertSuccess(result);
+      expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+    });
+
+    it("updateDesigner calls revalidateTag('stats') after successful update", async () => {
+      mockPrisma.designer.update.mockResolvedValueOnce(createMockDesigner({ id: "d1" }));
+      const { updateDesigner } = await import("./designer-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await updateDesigner("d1", { name: "Renamed" });
+
+      assertSuccess(result);
+      expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+    });
+
+    it("deleteDesigner calls revalidateTag('stats') after successful deletion", async () => {
+      mockPrisma.designer.findUnique.mockResolvedValueOnce({
+        ...createMockDesigner({ id: "d1" }),
+        _count: { charts: 3 },
+      });
+      mockPrisma.$transaction.mockResolvedValueOnce([{}, {}]);
+      const { deleteDesigner } = await import("./designer-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await deleteDesigner("d1");
+
+      assertSuccess(result);
+      expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+    });
+
+    it("deleteDesigner does not invalidate when the designer does not exist", async () => {
+      mockPrisma.designer.findUnique.mockResolvedValueOnce(null);
+      const { deleteDesigner } = await import("./designer-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await deleteDesigner("nonexistent");
+
+      assertFailure(result);
+      expect(vi.mocked(revalidateTag)).not.toHaveBeenCalled();
     });
   });
 

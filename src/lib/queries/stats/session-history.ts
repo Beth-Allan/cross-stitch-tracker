@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { toCalendarDate } from "@/lib/utils/calendar-date";
+import { STATS_CACHE_VOLATILE } from "./utils";
 import type { Prisma } from "@/generated/prisma/client";
 import type { SessionHistoryData } from "@/types/stats";
 
@@ -87,6 +88,6 @@ export function getSessionHistory(
   return unstable_cache(
     () => computeSessionHistory(userId, page, sortField, sortDir, projectId),
     [`stats-sessions-${userId}-${page}-${sortField}-${sortDir}-${projectId ?? "all"}`],
-    { tags: ["stats"], revalidate: 300 },
+    { tags: ["stats"], revalidate: STATS_CACHE_VOLATILE },
   )();
 }

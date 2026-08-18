@@ -288,7 +288,7 @@ describe("session-actions", () => {
       expect(mockPrisma.$transaction).toHaveBeenCalled();
     });
 
-    it("calls revalidatePath for charts and sessions", async () => {
+    it("createSession calls revalidatePath and revalidateTag('stats') after successful creation", async () => {
       mockPrisma.project.findUnique.mockResolvedValueOnce({
         id: "proj-1",
         userId: "user-1",
@@ -825,7 +825,7 @@ describe("session-actions", () => {
       expect(result.error).toBe("Session not found");
     });
 
-    it("calls revalidatePath after update", async () => {
+    it("updateSession calls revalidatePath and revalidateTag('stats') after successful update", async () => {
       mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
         ...createMockStitchSession(),
         project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 0 },
@@ -1177,7 +1177,17 @@ describe("session-actions", () => {
       expect(result.error).toBe("Session not found");
     });
 
-    it("calls revalidatePath after deletion", async () => {
+    it("deleteSession does not invalidate when the session does not exist", async () => {
+      mockPrisma.stitchSession.findUnique.mockResolvedValueOnce(null);
+
+      const { deleteSession } = await import("./session-actions");
+      const result = await deleteSession("nonexistent");
+
+      assertFailure(result);
+      expect(mockRevalidateTag).not.toHaveBeenCalled();
+    });
+
+    it("deleteSession calls revalidatePath and revalidateTag('stats') after successful deletion", async () => {
       mockPrisma.stitchSession.findUnique.mockResolvedValueOnce({
         ...createMockStitchSession(),
         project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 0 },

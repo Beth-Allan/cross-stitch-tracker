@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
+import { STATS_CACHE_STABLE } from "./utils";
 import type { DesignerBreakdownItem } from "@/types/stats";
 
 async function computeDesignerBreakdown(
@@ -54,6 +55,6 @@ export function getDesignerBreakdown(userId: string, limit = 10) {
   return unstable_cache(
     () => computeDesignerBreakdown(userId, limit),
     [`stats-designer-${userId}-${limit}`],
-    { tags: ["stats"], revalidate: 3600 },
+    { tags: ["stats"], revalidate: STATS_CACHE_STABLE },
   )();
 }

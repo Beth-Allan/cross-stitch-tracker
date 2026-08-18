@@ -6,6 +6,7 @@ import {
   startOfCalendarMonth,
 } from "@/lib/utils/calendar-date";
 import { getUserTimezone, getTodayCalendarDate } from "./timezone";
+import { STATS_CACHE_VOLATILE } from "./utils";
 import type { PaceMetricsData } from "@/types/stats";
 
 async function computePaceMetrics(userId: string): Promise<PaceMetricsData> {
@@ -97,6 +98,6 @@ async function computePaceMetrics(userId: string): Promise<PaceMetricsData> {
 export function getPaceMetrics(userId: string) {
   return unstable_cache(() => computePaceMetrics(userId), [`stats-pace-${userId}`], {
     tags: ["stats"],
-    revalidate: 300,
+    revalidate: STATS_CACHE_VOLATILE,
   })();
 }

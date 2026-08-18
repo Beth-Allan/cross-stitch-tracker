@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getUserTimezone, getLocalDayBoundaries } from "./timezone";
+import { STATS_CACHE_VOLATILE } from "./utils";
 import type { StatsHeroData } from "@/types/stats";
 
 async function computeHeroStats(userId: string): Promise<StatsHeroData> {
@@ -64,6 +65,6 @@ async function computeHeroStats(userId: string): Promise<StatsHeroData> {
 export function getHeroStats(userId: string) {
   return unstable_cache(() => computeHeroStats(userId), [`stats-hero-${userId}`], {
     tags: ["stats"],
-    revalidate: 300,
+    revalidate: STATS_CACHE_VOLATILE,
   })();
 }

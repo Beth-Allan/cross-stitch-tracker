@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { resolveStatusFilter, type StatusGroup } from "@/lib/utils/status-groups";
+import { STATS_CACHE_VOLATILE } from "./utils";
 import type { GenreInsight } from "@/types/stats";
 
 async function computeGenreInsights(
@@ -74,6 +75,6 @@ export function getGenreInsights(userId: string, statusGroups: StatusGroup[], li
   return unstable_cache(
     () => computeGenreInsights(userId, statusGroups, limit),
     [`stats-genre-insights-${userId}-${cacheKey}-${limit}`],
-    { tags: ["stats"], revalidate: 300 },
+    { tags: ["stats"], revalidate: STATS_CACHE_VOLATILE },
   )();
 }
