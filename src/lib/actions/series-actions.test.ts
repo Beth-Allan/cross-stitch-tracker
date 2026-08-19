@@ -87,7 +87,43 @@ describe("series-actions", () => {
           designerId: null,
           notes: "Beautiful fairy designs",
         },
+        include: { designer: { select: { name: true } } },
       });
+    });
+
+    it("returns the created series' designer name", async () => {
+      mockPrisma.series.create.mockResolvedValueOnce({
+        ...createMockSeries({ name: "Mirabilia Fairies", designerId: "des-1" }),
+        designer: { name: "Mirabilia" },
+      });
+      const { createSeries } = await import("./series-actions");
+
+      const result = await createSeries({ name: "Mirabilia Fairies", designerId: "des-1" });
+
+      assertSuccess(result);
+      expect(result.series.designerName).toBe("Mirabilia");
+      expect(mockPrisma.series.create).toHaveBeenCalledWith({
+        data: {
+          name: "Mirabilia Fairies",
+          totalCount: null,
+          designerId: "des-1",
+          notes: null,
+        },
+        include: { designer: { select: { name: true } } },
+      });
+    });
+
+    it("returns a null designer name when the series has no designer", async () => {
+      mockPrisma.series.create.mockResolvedValueOnce({
+        ...createMockSeries({ name: "Unattributed" }),
+        designer: null,
+      });
+      const { createSeries } = await import("./series-actions");
+
+      const result = await createSeries({ name: "Unattributed" });
+
+      assertSuccess(result);
+      expect(result.series.designerName).toBeNull();
     });
 
     it("returns validation error for empty name", async () => {

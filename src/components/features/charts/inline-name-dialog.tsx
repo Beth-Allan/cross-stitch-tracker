@@ -23,6 +23,18 @@ interface InlineNameDialogProps {
   onSubmit: (name: string) => Promise<void>;
 }
 
+/**
+ * Turns a submit label into the text shown while that submit is in flight —
+ * "Add Series" becomes "Adding Series...", so a dialog never reports an action
+ * its own button does not offer. Handles regular verbs only, which is every
+ * label this dialog is given; an irregular one would need its own spelling.
+ */
+function pendingLabelFor(submitLabel: string): string {
+  const [verb, ...rest] = submitLabel.split(" ");
+  const gerund = /[^aeiou]e$/i.test(verb) ? `${verb.slice(0, -1)}ing` : `${verb}ing`;
+  return [gerund, ...rest].join(" ") + "...";
+}
+
 export function InlineNameDialog({
   open,
   onOpenChange,
@@ -109,7 +121,7 @@ export function InlineNameDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Adding..." : submitLabel}
+              {isPending ? pendingLabelFor(submitLabel) : submitLabel}
             </Button>
           </DialogFooter>
         </form>

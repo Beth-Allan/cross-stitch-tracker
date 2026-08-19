@@ -419,7 +419,7 @@ export function useChartForm({
           name: result.series.name,
           totalCount: result.series.totalCount,
           designerId: result.series.designerId,
-          designerName: null,
+          designerName: result.series.designerName,
           notes: result.series.notes,
           progress: { ownedCount: 0, finishedCount: 0, totalCount: result.series.totalCount },
         };
