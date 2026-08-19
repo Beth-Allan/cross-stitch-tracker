@@ -466,6 +466,17 @@ not a promise that the diagnosis below is right.
   is stated and tested; FAB-007's "not true of the app today" note is retired when the item lands;
   `npm run gate` green; Vercel preview to Beth (protocol §5 layer 2); fresh `/review` before merge;
   work log updated.
+  _(Built 2026-08-18. **Trap ④ answered: the qualifier appears in both halves** — a same-count
+  spare that fits only at over one is shown for a project with fabric assigned exactly as for one
+  without, because over-count is the project's own setting either way and FAB-006 states its fit
+  rule for both halves alike. The three states live in the calculator as `classifyFabricFit`, so
+  the "over two always needs more than over one" invariant is tested where the math is: an
+  over-one project can never reach the third state, and that short-circuit is what leaves it
+  unchanged. The qualified pieces come back in their own `overOneOnlyFabrics` array rather than as
+  a flag on `matchingFabrics` — trap ③'s "not counted as fitting" is then structural rather than a
+  discipline every caller must remember. They render under their own heading, "Fits Only If You
+  Stitch Over 1", each row carrying the qualifier in Beth's own words, and **with no Assign
+  button**: assigning one would be assigning fabric that does not fit the project as it stands.)_
 
 ### F-3 Supply stitch-total hint is invisible outside Details mode
 

@@ -98,9 +98,11 @@ project with no fabric assigned may not have a settled over-count yet, so hiding
 assumes a decision she has not made. A piece too small **either** way is still not offered at
 all, which is FAB-006 unchanged.
 
-**Not true of the app today.** F-4 (2026-08-18) applied over-count to every fabric size but
-still hides the fits-at-over-one pieces along with the too-small ones. Beth ruled the qualifier
-is its own item rather than a change folded into a finished one: build-plan **F-5**, queued
-straight after F-4's review (drift **D-18**).
+_True of the app as of **F-5** (2026-08-18)._ On the Fabric Requirements tab a piece in this
+position is listed under its own heading, "Fits Only If You Stitch Over 1", with the qualifier on
+the row itself; it is never counted among the pieces that fit and carries no **Assign** button,
+because assigning it would be assigning fabric that does not fit the project as it stands. It
+appears in **both halves** of FAB-006's list — projects with fabric assigned and projects without
+— since over-count is the project's own setting either way.
 
 [stated by Beth 2026-08-18]

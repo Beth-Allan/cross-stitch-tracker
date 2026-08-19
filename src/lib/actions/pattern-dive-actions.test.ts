@@ -1282,6 +1282,161 @@ describe("pattern-dive-actions", () => {
 
       expect(result[0].overCount).toBe(2);
     });
+
+    it("shows a piece that fits only at over one instead of hiding it, without counting it as fitting", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "No Fabric, Over Two",
+          coverThumbnailUrl: null,
+          stitchCount: 20000,
+          stitchesWide: 200,
+          stitchesHigh: 100,
+          designer: null,
+          project: { id: "p1", overCount: 2, fabric: null },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-big",
+          name: "Big 28ct",
+          count: 28,
+          shortestEdgeInches: 30,
+          longestEdgeInches: 40,
+          brand: { name: "Zweigart" },
+        },
+        {
+          id: "f-over-one-only",
+          name: "Small 28ct",
+          count: 28,
+          shortestEdgeInches: 15,
+          longestEdgeInches: 20,
+          brand: { name: "Zweigart" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      // FAB-007: at 28ct over two the requirement is 20.3" x 13.1" and the 15x20 piece misses it,
+      // but it covers the 13.1" x 9.6" over-one requirement — so it is offered with the qualifier
+      // rather than hidden, and stays out of the pieces that fit.
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-big"]);
+      expect(result[0].overOneOnlyFabrics.map((f) => f.id)).toEqual(["f-over-one-only"]);
+    });
+
+    it("still leaves out a piece that is too small at over one as well", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "No Fabric, Over Two",
+          coverThumbnailUrl: null,
+          stitchCount: 20000,
+          stitchesWide: 200,
+          stitchesHigh: 100,
+          designer: null,
+          project: { id: "p1", overCount: 2, fabric: null },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-tiny",
+          name: "Scrap 28ct",
+          count: 28,
+          shortestEdgeInches: 5,
+          longestEdgeInches: 6,
+          brand: { name: "Zweigart" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      // FAB-006 unchanged: a piece too small either way is not offered at all.
+      expect(result[0].matchingFabrics).toEqual([]);
+      expect(result[0].overOneOnlyFabrics).toEqual([]);
+    });
+
+    it("leaves an over-one project with no over-one-only pieces at all", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "No Fabric, Over One",
+          coverThumbnailUrl: null,
+          stitchCount: 20000,
+          stitchesWide: 200,
+          stitchesHigh: 100,
+          designer: null,
+          project: { id: "p1", overCount: 1, fabric: null },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-fits",
+          name: "Roomy 28ct",
+          count: 28,
+          shortestEdgeInches: 15,
+          longestEdgeInches: 20,
+          brand: { name: "Zweigart" },
+        },
+        {
+          id: "f-tiny",
+          name: "Scrap 28ct",
+          count: 28,
+          shortestEdgeInches: 5,
+          longestEdgeInches: 6,
+          brand: { name: "Zweigart" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-fits"]);
+      expect(result[0].overOneOnlyFabrics).toEqual([]);
+    });
+
+    it("applies the qualifier to a project that already has fabric assigned, too", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Assigned, Over Two",
+          coverThumbnailUrl: null,
+          stitchCount: 20000,
+          stitchesWide: 200,
+          stitchesHigh: 100,
+          designer: null,
+          project: {
+            id: "p1",
+            overCount: 2,
+            fabric: {
+              id: "f-assigned",
+              name: "Assigned 28ct",
+              count: 28,
+              shortestEdgeInches: 30,
+              longestEdgeInches: 40,
+              brand: { name: "Zweigart" },
+            },
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-over-one-only",
+          name: "Spare 28ct",
+          count: 28,
+          shortestEdgeInches: 15,
+          longestEdgeInches: 20,
+          brand: { name: "Zweigart" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      expect(result[0].matchingFabrics).toEqual([]);
+      expect(result[0].overOneOnlyFabrics.map((f) => f.id)).toEqual(["f-over-one-only"]);
+    });
   });
 
   describe("getStorageGroups", () => {

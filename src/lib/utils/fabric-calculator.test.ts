@@ -4,6 +4,7 @@ import {
   calculateEffectiveCount,
   calculateRequiredFabricEdge,
   calculateRequiredFabricSize,
+  classifyFabricFit,
   doesFabricFit,
   formatRequiredInches,
 } from "./fabric-calculator";
@@ -167,5 +168,42 @@ describe("calculateEffectiveCount", () => {
 
   it("halves the fabric count when the project is stitched over two", () => {
     expect(calculateEffectiveCount(28, 2)).toBe(14);
+  });
+});
+
+describe("classifyFabricFit", () => {
+  it("says a piece fits when it covers the requirement at the project's over-count", () => {
+    expect(
+      classifyFabricFit({ shortestEdgeInches: 30, longestEdgeInches: 40 }, 200, 300, 28, 2),
+    ).toBe("fits");
+  });
+
+  it("says a piece fits only at over one when it covers the over-one requirement but not the project's", () => {
+    // FAB-007: 14x18 covers 200x300 at 28ct over one, but not the doubled over-two requirement.
+    expect(
+      classifyFabricFit({ shortestEdgeInches: 14, longestEdgeInches: 18 }, 200, 300, 28, 2),
+    ).toBe("fits-over-one-only");
+  });
+
+  it("says a piece is too small when it covers neither requirement", () => {
+    expect(
+      classifyFabricFit({ shortestEdgeInches: 6, longestEdgeInches: 8 }, 200, 300, 28, 2),
+    ).toBe("too-small");
+  });
+
+  it("never reports the over-one qualifier for an over-one project — over one is already the smallest requirement", () => {
+    expect(
+      classifyFabricFit({ shortestEdgeInches: 6, longestEdgeInches: 8 }, 200, 300, 28, 1),
+    ).toBe("too-small");
+    expect(
+      classifyFabricFit({ shortestEdgeInches: 14, longestEdgeInches: 18 }, 200, 300, 28, 1),
+    ).toBe("fits");
+  });
+
+  it("honours the rotated orientation, exactly as doesFabricFit does", () => {
+    // Required at 14ct over one: 17.1" x 12.1". The piece is 13x18, so only rotated fits.
+    expect(
+      classifyFabricFit({ shortestEdgeInches: 13, longestEdgeInches: 18 }, 156, 86, 14, 1),
+    ).toBe("fits");
   });
 });
