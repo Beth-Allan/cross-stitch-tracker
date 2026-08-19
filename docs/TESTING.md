@@ -74,14 +74,15 @@ Large action modules split their tests by concern rather than growing one file:
 
 Follow the pattern when a test file outgrows readability: split by concern, keep the base name.
 
-### `.nyquist.test.tsx` — legacy naming, do not extend
+### `.gaps.test.tsx` — two files only, do not extend
 
-Two files carry a `.nyquist.` infix
-(`src/components/features/supply-table/supply-table-add-row.nyquist.test.tsx`,
-`src/components/features/charts/project-detail/supplies-tab.nyquist.test.tsx`). The name comes
-from a development process this repo no longer runs; it marked supplemental gap tests written
-after an implementation landed. The tests are real and stay. **New gap tests go in the ordinary
-`.test.tsx` file** — nothing should acquire this suffix again.
+Two files carry a `.gaps.` infix
+(`src/components/features/supply-table/supply-table-add-row.gaps.test.tsx`,
+`src/components/features/charts/project-detail/supplies-tab.gaps.test.tsx`). They hold
+supplemental tests written after an implementation landed, for behaviour the sibling
+`.test.tsx` never reached. The tests are real and stay. **New gap tests go in the ordinary
+`.test.tsx` file** — nothing should acquire this suffix again. _(Renamed from a `.nyquist.`
+infix in item P11; the old name came from a development process this repo no longer runs.)_
 
 ## Shared infrastructure — `src/__tests__/`
 

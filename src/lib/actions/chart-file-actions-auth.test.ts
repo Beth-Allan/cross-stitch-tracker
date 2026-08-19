@@ -1,9 +1,7 @@
 /**
- * Nyquist gap tests for Phase 15: chart-file-actions unauthenticated paths.
- *
- * Gap: T-15-01, T-15-03, T-15-04 — requireAuth() is called but no test verifies
- * the actions reject (throw) when the caller is unauthenticated.
- * The existing chart-file-actions.test.ts always mocks an authenticated session.
+ * The unauthenticated paths through chart-file-actions: every action calls requireAuth(), and
+ * this file is where that rejection is asserted — the sibling chart-file-actions.test.ts always
+ * mocks an authenticated session.
  */
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { createMockPrisma } from "@/__tests__/mocks";

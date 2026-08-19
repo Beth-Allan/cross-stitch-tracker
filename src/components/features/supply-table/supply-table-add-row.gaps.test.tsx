@@ -1,11 +1,6 @@
 /**
- * Nyquist gap tests for Phase 16 — INPUT-01
- *
- * These tests cover behavioral gaps not addressed by the main test suite:
- *   GAP-1: ArrowUp keyboard navigation wiring in supply-table-add-row
- *   GAP-3: aria-activedescendant updates when highlightIndex changes
- *
- * Implementation files are READ-ONLY per Nyquist protocol.
+ * Keyboard-navigation behaviour the main suite does not reach: ArrowUp wiring in
+ * supply-table-add-row, and aria-activedescendant tracking the highlighted option.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
@@ -113,7 +108,7 @@ function TableWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
-describe("SupplyTableAddRow — Nyquist gap tests", () => {
+describe("SupplyTableAddRow — keyboard navigation gaps", () => {
   let adapter: SupplyTableAdapter;
   let calcParams: CalcParams;
   let existingIds: Set<string>;
@@ -144,15 +139,9 @@ describe("SupplyTableAddRow — Nyquist gap tests", () => {
     );
   }
 
-  // ──────────────────────────────────────────────────────────────────────────────
-  // GAP-1: ArrowUp keyboard navigation wiring
-  //
-  // Requirement: "ArrowUp on search input moves highlightIndex to previous
-  // non-disabled item" (Plan 16-01, Task 1 behavior list).
-  //
-  // The main test file covers ArrowDown and ArrowDown+Enter but has no test for
-  // ArrowUp — so the wiring from the ArrowUp key event in handleSearchKeyDown to
-  // moveHighlight(-1, ...) is unverified at the component level.
+  // ArrowUp on the search input moves the highlight to the previous non-disabled item. The main
+  // test file covers ArrowDown and ArrowDown+Enter, so the ArrowUp path from handleSearchKeyDown
+  // to moveHighlight(-1, ...) is verified only here.
   // ──────────────────────────────────────────────────────────────────────────────
 
   describe("GAP-1: ArrowUp keyboard navigation", () => {

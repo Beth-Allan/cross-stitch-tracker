@@ -190,7 +190,7 @@ describe("EditableNumber", () => {
       expect(button.className).toContain("bg-destructive/10");
     });
 
-    it("aria-invalid is set during rejection", () => {
+    it("announces the rejection to assistive technology", () => {
       const onSave = vi.fn();
       render(<EditableNumber value={5} onSave={onSave} ariaLabel="Qty" />);
       fireEvent.click(screen.getByRole("button", { name: "Qty" }));
@@ -198,8 +198,13 @@ describe("EditableNumber", () => {
       fireEvent.change(input, { target: { value: "abc" } });
       fireEvent.blur(input);
 
-      const button = screen.getByRole("button", { name: "Qty" });
-      expect(button).toHaveAttribute("aria-invalid", "true");
+      expect(screen.getByRole("status")).toHaveTextContent("Value not saved");
+    });
+
+    it("announces nothing while no edit has been rejected", () => {
+      render(<EditableNumber value={5} onSave={vi.fn()} ariaLabel="Qty" />);
+
+      expect(screen.getByRole("status")).toBeEmptyDOMElement();
     });
   });
 });
@@ -236,7 +241,7 @@ describe("EditableNumber — optimistic save that fails", () => {
     );
   });
 
-  it("flags the rolled-back cell as invalid so the revert is visible", async () => {
+  it("announces the rollback so the revert is not silent", async () => {
     const onSave = vi.fn().mockResolvedValue(false);
     render(<EditableNumber value={5} onSave={onSave} ariaLabel="Have" />);
 
@@ -246,9 +251,7 @@ describe("EditableNumber — optimistic save that fails", () => {
     });
     fireEvent.blur(screen.getByRole("spinbutton", { name: "Have" }));
 
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Have" })).toHaveAttribute("aria-invalid", "true"),
-    );
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Value not saved"));
   });
 
   it("keeps the optimistic value while a successful save is in flight", async () => {
@@ -296,7 +299,7 @@ describe("EditableNumber — overlapping saves", () => {
 
     const button = screen.getByRole("button", { name: "Have" });
     expect(button).toHaveTextContent("20");
-    expect(button).not.toHaveAttribute("aria-invalid");
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
   });
 
   it("still rolls back when the latest save is the one that fails", async () => {

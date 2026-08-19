@@ -122,7 +122,9 @@ async function getBuriedTreasures(userId: string): Promise<BuriedTreasure[]> {
     where: {
       OR: [
         { project: { userId, status: "UNSTARTED" } },
-        { project: null }, // TODO(999.0.17): add Chart.userId ownership check for multi-user
+        // A chart with no project has no owner to check — Chart carries no userId, so this arm
+        // is only sound while the app has one user
+        { project: null },
       ],
     },
     include: {

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, Upload, X } from "lucide-react";
 import { getPresignedUploadUrl, getPresignedDownloadUrl } from "@/lib/actions/upload-actions";
-import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from "@/lib/validations/upload";
+import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE, MAX_FILE_SIZE_LABEL } from "@/lib/validations/upload";
 import { cn } from "@/lib/utils";
 
 type UploadState = "idle" | "uploading" | "complete" | "error" | "resolving";
@@ -74,7 +74,7 @@ export function CoverImageUpload({
       return "Invalid file type. Please upload a PNG, JPG, or WebP image.";
     }
     if (file.size > MAX_FILE_SIZE) {
-      return "File is too large. Maximum size is 10MB.";
+      return `File is too large. Maximum size is ${MAX_FILE_SIZE_LABEL}.`;
     }
     return null;
   }, []);
@@ -280,7 +280,9 @@ export function CoverImageUpload({
               <span className="text-muted-foreground text-sm">
                 Drop an image here or click to upload
               </span>
-              <span className="text-muted-foreground/70 text-xs">PNG, JPG up to 10MB</span>
+              <span className="text-muted-foreground/70 text-xs">
+                PNG, JPG up to {MAX_FILE_SIZE_LABEL}
+              </span>
             </>
           )}
         </div>

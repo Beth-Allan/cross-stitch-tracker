@@ -171,6 +171,9 @@ src/generated/
 .worktrees/
 .claude/worktrees/
 
+# Claude Code machine-local permission grants
+.claude/settings.local.json
+
 # Superpowers brainstorm sessions
 .superpowers/
 

@@ -109,21 +109,25 @@ export function EditableNumber({
   }
 
   return (
-    <button
-      onClick={() => {
-        setDraft(String(displayValue));
-        setEditing(true);
-      }}
-      className={cn(
-        "hover:bg-primary/5 cursor-text rounded px-1.5 py-0.5 [font-variant-numeric:tabular-nums] transition-colors",
-        showRejection && "border-destructive bg-destructive/10 animate-shake border",
-        className,
-      )}
-      title="Click to edit"
-      aria-label={ariaLabel}
-      aria-invalid={showRejection || undefined}
-    >
-      {displayValue}
-    </button>
+    <>
+      <button
+        onClick={() => {
+          setDraft(String(displayValue));
+          setEditing(true);
+        }}
+        className={cn(
+          "hover:bg-primary/5 cursor-text rounded px-1.5 py-0.5 [font-variant-numeric:tabular-nums] transition-colors",
+          showRejection && "border-destructive bg-destructive/10 animate-shake border",
+          className,
+        )}
+        title="Click to edit"
+        aria-label={ariaLabel}
+      >
+        {displayValue}
+      </button>
+      <span role="status" aria-live="polite" className="sr-only">
+        {showRejection ? "Value not saved" : ""}
+      </span>
+    </>
   );
 }

@@ -68,20 +68,24 @@ export function EditableNumber({
   }
 
   return (
-    <button
-      onClick={() => {
-        setDraft(String(value));
-        setEditing(true);
-      }}
-      className={cn(
-        "hover:bg-muted min-h-11 min-w-11 cursor-text rounded px-1.5 py-0.5 font-mono tabular-nums transition-colors",
-        showRejection && "border-destructive bg-destructive/10 animate-shake border",
-        className,
-      )}
-      title="Click to edit"
-      aria-invalid={showRejection || undefined}
-    >
-      {formatDisplay ? formatDisplay(value) : value}
-    </button>
+    <>
+      <button
+        onClick={() => {
+          setDraft(String(value));
+          setEditing(true);
+        }}
+        className={cn(
+          "hover:bg-muted min-h-11 min-w-11 cursor-text rounded px-1.5 py-0.5 font-mono tabular-nums transition-colors",
+          showRejection && "border-destructive bg-destructive/10 animate-shake border",
+          className,
+        )}
+        title="Click to edit"
+      >
+        {formatDisplay ? formatDisplay(value) : value}
+      </button>
+      <span role="status" aria-live="polite" className="sr-only">
+        {showRejection ? "Value not saved" : ""}
+      </span>
+    </>
   );
 }
