@@ -220,14 +220,14 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
 - **Done-when:** advisories cleared or individually explained, gate green, app demonstrated
   working (login, upload, stats render), versions stay exact-pinned.
 
-### P11 Small honest fixes — **split by Beth 2026-08-19; batch one built**
+### P11 Small honest fixes — **split by Beth 2026-08-19; batch one merged**
 
 The size check fired exactly as the trap predicted: seventeen fixes, three of them on
 review-gated paths. Batching them would have held the fourteen harmless ones behind a `/review`
 session, so Beth split the item two ways and rerouted two fixes to the items that already own
 the same decision.
 
-- **Objective (batch one — `P11`, PR #105, 2026-08-19):** report §3 P11's ungated list plus its
+- **Objective (batch one — `P11`, merged as PR #105, 2026-08-19):** report §3 P11's ungated list plus its
   ledger rows — comment sweep, recharts named imports, `shadcn`→devDependencies, dead
   `NEXT_PUBLIC_APP_URL`, dependabot package-name fix, `.gitignore` settings.local.json, the two
   placement oddities, the `/charts` dynamic-server half of the build-noise row, the CSP quick

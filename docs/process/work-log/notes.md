@@ -15,6 +15,29 @@ write yours with a clear "this is done when…" so a later session can tell.
 
 ---
 
+## P11b · what batch one already settled (2026-08-19)
+
+**Tagged: P11b, P9, P13.**
+
+Batch one is merged (PR #105); P11b is the queue's top row. Three things it does not need to
+rediscover:
+
+- **The display clamp is what makes P11b gated.** `src/lib/queries/stats/designer-insights.ts`
+  and `completion-estimates.ts` each compute a percentage that can exceed 100, and that directory
+  is review-gated. P11b stops at `built, awaiting review`; a `/review` row follows it. Both of its
+  fixes are UI, so Beth also sees the preview.
+- **The quick-add path is `src/lib/actions/supply-actions.ts:769`** — `colorFamily: "NEUTRAL"`
+  hardcoded — and `chart-merged-form.tsx:74,93` passes the same literal from the client. Both sides
+  change, or the picker's answer is discarded on the way in. `src/lib/validations/supply.ts:112`
+  defaults the field, so the schema needs no change to accept a real value, only the callers.
+- **Progress % is hand-written in 18 places**, not the 11 the report counted — 7 unclamped. The
+  full list is `git grep -n "\* 100)" -- src`. The clamped ones already agree with each other
+  (`Math.min(100, …)`), so the helper's shape is settled; it is the seven that disagree.
+
+For **P9**: the `prisma/schema.prisma` comment sweep sliver is `// Calculator settings (Phase 7)`
+on `Project`. For **P13**: the two upload allowlists are in `src/lib/validations/upload.ts`, and the
+row about them disagreeing is already in the ledger — same decision, one fix.
+
 ## Editing `.claude/settings.json` — one ask to Beth, not a workaround
 
 **Tags:** settings.json · guard-git · permissions · hooks · auto mode · step 5
