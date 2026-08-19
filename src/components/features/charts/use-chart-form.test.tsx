@@ -213,6 +213,64 @@ describe("useChartForm inline entity creation", () => {
       });
     });
 
+    it("carries the created series' designer name into the series list", async () => {
+      (createSeries as Mock).mockResolvedValue({
+        success: true,
+        series: {
+          id: "series-new",
+          name: "Designer Series",
+          totalCount: null,
+          designerId: "des-1",
+          designerName: "Mirabilia",
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+
+      const { result } = renderHook(() => useChartForm(defaultProps));
+
+      await act(async () => {
+        result.current.setField("designerId", "des-1");
+      });
+
+      await act(async () => {
+        await result.current.handleAddSeries("Designer Series");
+      });
+
+      expect(result.current.seriesList).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: "series-new", designerName: "Mirabilia" }),
+        ]),
+      );
+    });
+
+    it("carries a null designer name when the series has no designer", async () => {
+      (createSeries as Mock).mockResolvedValue({
+        success: true,
+        series: {
+          id: "series-new",
+          name: "No Designer Series",
+          totalCount: null,
+          designerId: null,
+          designerName: null,
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+
+      const { result } = renderHook(() => useChartForm(defaultProps));
+
+      await act(async () => {
+        await result.current.handleAddSeries("No Designer Series");
+      });
+
+      expect(result.current.seriesList).toEqual(
+        expect.arrayContaining([expect.objectContaining({ id: "series-new", designerName: null })]),
+      );
+    });
+
     it("throws on server error", async () => {
       (createSeries as Mock).mockResolvedValue({
         success: false,

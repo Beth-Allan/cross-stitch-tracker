@@ -367,6 +367,20 @@ not a promise that the diagnosis below is right.
   list row with no reload; `InlineNameDialog` pending text derives from `submitLabel` and falls
   back to "Adding…" when none is given; a failing-first test exists for each; `npm run gate`
   green; work log updated.
+  _(Built 2026-08-18. **Defect ①'s data half was real; its described symptom was not.** The
+  locally built `SeriesWithStats` did carry `designerName: null` while the server knew the name —
+  fixed by widening what `createSeries` returns (trap ①'s preferred fix), so the name comes from
+  the database rather than a client list that can only ever be as fresh as its last load. But no
+  screen renders that copy's designer: the chart form's Series dropdown labels each option with
+  the series name alone, and the two surfaces that do show a series' designer — the Series cards
+  and `/series/[id]` — are server-rendered from `getSeriesWithStats`, which already filled the
+  name in. **So there was no visible "designer-less row" to fix, and the done-when's first clause
+  cannot be literally demonstrated** — what landed is the data being true rather than the screen
+  changing. Defect ② landed as written: the pending label is derived from `submitLabel`
+  ("Add Series" → "Adding Series..."), which reproduces "Adding..." exactly for the default label,
+  so the fallback clause needs no separate branch. A neighbouring gap went to the backlog rather
+  than into this diff: a series' designer can only be set by creating the series inline from a
+  chart form.)_
 
 ### F-2 Fabric matching excludes projects with no fabric assigned
 

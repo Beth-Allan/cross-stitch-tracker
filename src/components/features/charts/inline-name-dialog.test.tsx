@@ -159,6 +159,65 @@ describe("InlineNameDialog", () => {
     expect(screen.getByRole("button", { name: "Add Series" })).toBeInTheDocument();
   });
 
+  it("derives the pending label from submitLabel while submitting", async () => {
+    const user = userEvent.setup();
+    let releaseSubmit: () => void = () => {};
+    const onSubmit = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          releaseSubmit = resolve;
+        }),
+    );
+
+    render(
+      <InlineNameDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        title="Add New Series"
+        submitLabel="Create Series"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await user.type(screen.getByLabelText(/name/i), "Mirabilia Fairies");
+    await user.click(screen.getByRole("button", { name: "Create Series" }));
+
+    expect(await screen.findByRole("button", { name: "Creating Series..." })).toBeInTheDocument();
+
+    await act(async () => {
+      releaseSubmit();
+    });
+  });
+
+  it("falls back to 'Adding...' while submitting when no submitLabel is given", async () => {
+    const user = userEvent.setup();
+    let releaseSubmit: () => void = () => {};
+    const onSubmit = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          releaseSubmit = resolve;
+        }),
+    );
+
+    render(
+      <InlineNameDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        title="Add Storage Location"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await user.type(screen.getByLabelText(/name/i), "Bin A");
+    await user.click(screen.getByRole("button", { name: "Add" }));
+
+    expect(await screen.findByRole("button", { name: "Adding..." })).toBeInTheDocument();
+
+    await act(async () => {
+      releaseSubmit();
+    });
+  });
+
   it("shows custom required error when requiredError provided", async () => {
     const user = userEvent.setup();
 

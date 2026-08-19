@@ -14,9 +14,15 @@ export async function createSeries(formData: unknown) {
 
   try {
     const validated = seriesSchema.parse(formData);
-    const series = await prisma.series.create({ data: validated });
+    const { designer, ...series } = await prisma.series.create({
+      data: validated,
+      include: { designer: { select: { name: true } } },
+    });
     revalidatePath("/series");
-    return { success: true as const, series };
+    return {
+      success: true as const,
+      series: { ...series, designerName: designer?.name ?? null },
+    };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: error.errors[0].message };

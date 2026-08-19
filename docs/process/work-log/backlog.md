@@ -138,6 +138,12 @@ leave them behind.
 
 - Series detail page `/series/[id]` should use card-style rows rather than the current list.
   _(999.86, SERIES-02)_
+- **A series' designer can only ever be set while adding a chart.** The "Add Series" button on
+  the Series page creates the series with no designer and offers no way to pick one, and editing
+  a series afterwards keeps whatever designer it already had. The only path that sets one is the
+  inline "Add New Series" box inside the chart form, which copies the chart's designer. So a
+  series card reads "by <designer>" only if it happened to be born that way. _(Noticed during
+  F-1, 2026-08-18 — F-1's scope was the wrong name, not the missing form field.)_
 - Pattern Dive Series tab should show chart cover-image previews per series, grid or carousel.
   _(999.89, SERIES-03)_
 
