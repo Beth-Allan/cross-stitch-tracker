@@ -184,7 +184,6 @@ export function InlineCreateDialog({
               </label>
               <select
                 id="inline-create-color-family"
-                aria-label="Color Family"
                 value={colorFamily}
                 onChange={(e) => {
                   setColorFamily(e.target.value as ColorFamily);

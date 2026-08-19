@@ -98,7 +98,9 @@ const THREAD_COLUMNS = [
     label: "COLOR FAMILY",
     sortable: true,
     accessor: (item: { colorFamily?: string }) =>
-      COLOR_FAMILY_LABELS[item.colorFamily as ColorFamily] ?? item.colorFamily ?? "",
+      item.colorFamily
+        ? (COLOR_FAMILY_LABELS[item.colorFamily as ColorFamily] ?? item.colorFamily)
+        : "",
   },
 ];
 
@@ -127,7 +129,9 @@ const BEAD_COLUMNS = [
     label: "COLOR FAMILY",
     sortable: true,
     accessor: (item: { colorFamily?: string }) =>
-      COLOR_FAMILY_LABELS[item.colorFamily as ColorFamily] ?? item.colorFamily ?? "",
+      item.colorFamily
+        ? (COLOR_FAMILY_LABELS[item.colorFamily as ColorFamily] ?? item.colorFamily)
+        : "",
   },
 ];
 

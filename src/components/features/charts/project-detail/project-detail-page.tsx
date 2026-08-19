@@ -104,6 +104,14 @@ export function ProjectDetailPage({
               imageUrls={imageUrls}
               activeProjects={activeProjects}
               projectId={project.id}
+              projectTotals={{
+                chartName: chart.name,
+                stitchesCompleted: project.stitchesCompleted,
+                // The raw count, matching both the picker's own `totalStitches` and the
+                // server's over-total check -- an effective count here would make the
+                // modal ask about projects the server never warns about
+                totalStitches: chart.stitchCount,
+              }}
               completionEstimate={completionEstimate}
             />
           ) : (

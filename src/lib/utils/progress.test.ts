@@ -27,7 +27,7 @@ describe("calculateProgressPercent", () => {
     expect(calculateProgressPercent(-500, 20000)).toBe(0);
   });
 
-  it("rounds 99.5% up to 100 only when the count actually reaches it", () => {
+  it("rounds to the nearest whole percent", () => {
     expect(calculateProgressPercent(19999, 20000)).toBe(100);
     expect(calculateProgressPercent(19000, 20000)).toBe(95);
   });

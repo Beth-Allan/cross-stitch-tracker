@@ -663,17 +663,62 @@ describe("LogSessionModal", () => {
       vi.useRealTimers();
       const user = userEvent.setup();
       mockUpdateSession.mockResolvedValue({ success: true, session: { id: "session-1" } });
-      // proj-1 sits at 2500 of 10000 including this session's 150, so 7000 lands at 9350.
+      // proj-1 sits at 2500 of 10000 *including* this session's 150. 7600 must land at
+      // 2350 + 7600 = 9950 (silent). Drop the subtraction and it reads 10,100 and asks --
+      // which is what makes this test discriminate rather than pass either way.
       renderModal({ editSession, lockedProjectId: "proj-1" });
       await waitForDialogFocus();
 
       const stitchInput = screen.getByLabelText(/stitch count/i);
       await user.clear(stitchInput);
-      await user.type(stitchInput, "7000");
+      await user.type(stitchInput, "7600");
       await user.click(screen.getByRole("button", { name: /save changes/i }));
 
       await waitFor(() => expect(mockUpdateSession).toHaveBeenCalled());
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    it("stops subtracting the edited session once a different project is picked", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      // proj-2 sits at 0 of 25000 and never contained this session's 150 stitches, so
+      // 25,100 is over its total. Subtracting anyway reads 24,950 and asks nothing.
+      renderModal({ editSession });
+      await waitForDialogFocus();
+
+      await user.click(screen.getByText("Autumn Sampler"));
+      await user.click(screen.getByText("Winter Wonderland"));
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.clear(stitchInput);
+      await user.type(stitchInput, "25100");
+      await user.click(screen.getByRole("button", { name: /save changes/i }));
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(/past 100%/i);
+      expect(mockUpdateSession).not.toHaveBeenCalled();
+    });
+
+    it("asks about a locked project the picker list does not carry", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      // A FINISHED project is excluded from the active-project picker but its Sessions
+      // tab still logs against it -- exactly the project most likely to be over 100%.
+      renderModal({
+        lockedProjectId: "proj-finished",
+        lockedProjectTotals: {
+          chartName: "Winter Cottage",
+          stitchesCompleted: 44000,
+          totalStitches: 45000,
+        },
+      });
+      await waitForDialogFocus();
+
+      await user.type(screen.getByLabelText(/stitch count/i), "2000");
+      await user.click(getSaveButton());
+
+      const alert = await screen.findByRole("alert");
+      expect(alert).toHaveTextContent("Winter Cottage");
+      expect(alert).toHaveTextContent("46,000");
+      expect(mockCreateSession).not.toHaveBeenCalled();
     });
 
     it("re-asks after the stitch count changes rather than keeping a stale question", async () => {

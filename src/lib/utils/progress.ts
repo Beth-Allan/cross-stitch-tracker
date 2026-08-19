@@ -7,9 +7,17 @@
  * information. Every surface that shows "% complete" goes through here so the
  * same project cannot read 100% on one screen and 137% on another.
  *
+ * **The denominator is the caller's, and callers do not all agree today.** The gallery
+ * card, the chart hero and the designer/genre/series rows pass `getEffectiveStitchCount`
+ * (which derives `wide × high` when `stitchCount` is 0); the dashboards, the session
+ * picker and the completion estimates pass the raw `chart.stitchCount`. For a chart with
+ * no stitch count but known dimensions those two disagree — a maintenance-ledger row
+ * (2026-08-19) tracks picking one. This helper guarantees the arithmetic, not that two
+ * screens were handed the same total.
+ *
  * @param stitchesCompleted stitches logged against the project
- * @param totalStitches the chart's total stitch count (its effective count where
- *   one is derived from dimensions); 0 or less means "unknown", which shows 0%
+ * @param totalStitches the total this caller measures against; 0 or less means
+ *   "unknown", which shows 0%
  */
 export function calculateProgressPercent(stitchesCompleted: number, totalStitches: number): number {
   if (totalStitches <= 0) return 0;

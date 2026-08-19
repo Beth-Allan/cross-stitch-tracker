@@ -246,12 +246,14 @@ the same decision.
   quick-added supply stops filing silently under `NEUTRAL` and invisible to the catalogue's
   colour filter) and the **over-logging confirm** (Beth: warn but allow — a session that would
   push a project past its total stitch count asks first and saves on her word), with the
-  **display-clamp unification** that ruling carries: progress % is hand-written 11× with 7 copies
+  **display-clamp unification** that ruling carries: progress % is hand-written 12× with 7 copies
   unclamped, so one project reads 100% on the gallery card and 137% on the chart hero.
 - **Cited specs:** `docs/process/work-log/drift.md` — the two 2026-08-17 rulings, verbatim ·
   the over-logging ledger row · report §3 P11.
-- **Traps:** the clamp unification reaches `src/lib/queries/stats/` (`designer-insights.ts`,
-  `completion-estimates.ts`), which is **review-gated** — the builder stops at
+- **Traps:** the clamp unification reaches `src/lib/queries/stats/` (**`completion-estimates.ts`
+  only** — this brief also named `designer-insights.ts`, but its `completionRate` is completed
+  projects ÷ total projects, a rate that cannot exceed 100 and is not stitch progress; verified
+  and left alone during the build, 2026-08-19), which is **review-gated** — the builder stops at
   `built, awaiting review`. Both fixes are UI, so Beth sees the Vercel preview before merge.
   Quick-add's picker is a form change on a path with no design canon: follow DesignOS
   (`product-plan/sections/supply-tracking-and-shopping/`), never invent.

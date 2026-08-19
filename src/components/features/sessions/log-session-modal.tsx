@@ -35,6 +35,12 @@ interface OverTotal {
   total: number;
 }
 
+/** What the over-total question needs to know about whichever project is selected. */
+type ProjectTotals = Pick<
+  ActiveProjectForPicker,
+  "chartName" | "stitchesCompleted" | "totalStitches"
+>;
+
 export interface LogSessionModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -44,6 +50,14 @@ export interface LogSessionModalProps {
   imageUrls: Record<string, string>;
   editSession?: EditSessionData | null;
   lockedProjectId?: string;
+  /**
+   * Totals for `lockedProjectId` when it is absent from `activeProjects`. The picker list
+   * only carries active statuses, so a FINISHED, FFO or UNSTARTED project reaches the
+   * modal with no figures -- and those are the ones most likely to be at or past 100%.
+   * Without this the over-total question cannot be asked and the save falls back to the
+   * server's after-the-fact warning.
+   */
+  lockedProjectTotals?: ProjectTotals;
 }
 
 function todayString(): string {
@@ -59,6 +73,7 @@ export function LogSessionModal({
   imageUrls,
   editSession,
   lockedProjectId,
+  lockedProjectTotals,
 }: LogSessionModalProps) {
   const isEditing = !!editSession;
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -120,7 +135,10 @@ export function LogSessionModal({
     setOverTotal(null);
   }, [isOpen, editSession, lockedProjectId]);
 
-  const selectedProject = activeProjects.find((p) => p.projectId === selectedProjectId);
+  const listedProject = activeProjects.find((p) => p.projectId === selectedProjectId);
+  const selectedProject: ProjectTotals | undefined =
+    listedProject ??
+    (selectedProjectId && selectedProjectId === lockedProjectId ? lockedProjectTotals : undefined);
   const filteredProjects = activeProjects.filter((p) =>
     p.chartName.toLowerCase().includes(projectSearch.toLowerCase()),
   );
@@ -188,8 +206,11 @@ export function LogSessionModal({
    */
   function checkOverTotal(): OverTotal | null {
     if (!selectedProject || selectedProject.totalStitches <= 0) return null;
+    // Only this project's own completed count contains this session's stitches -- after a
+    // project switch the subtraction would come off a total that never included them
+    const editingThisProject = editSession?.projectId === selectedProjectId;
     const withoutThisSession =
-      selectedProject.stitchesCompleted - (isEditing && editSession ? editSession.stitchCount : 0);
+      selectedProject.stitchesCompleted - (editingThisProject ? editSession.stitchCount : 0);
     const projected = withoutThisSession + parsedStitchCount;
     if (projected <= selectedProject.totalStitches) return null;
     return {
@@ -564,7 +585,11 @@ export function LogSessionModal({
                 <Button variant="ghost" onClick={() => setOverTotal(null)} disabled={isPending}>
                   Go Back
                 </Button>
-                <Button onClick={() => handleSave(true)} disabled={isPending}>
+                <Button
+                  onClick={() => handleSave(true)}
+                  disabled={isPending || isUploading}
+                  autoFocus
+                >
                   {isEditing ? "Save Anyway" : "Log Anyway"}
                 </Button>
               </>

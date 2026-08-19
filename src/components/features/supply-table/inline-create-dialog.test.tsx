@@ -238,6 +238,19 @@ describe("InlineCreateDialog", () => {
       expect(screen.getByRole("button", { name: "Create & Add" })).toBeEnabled();
     });
 
+    it("names the missing family when Enter bypasses the disabled button", async () => {
+      render(<InlineCreateDialog {...defaultProps} />);
+
+      const nameInput = screen.getByLabelText("Color Name");
+      fireEvent.change(nameInput, { target: { value: "Christmas Red" } });
+      fireEvent.keyDown(nameInput, { key: "Enter" });
+
+      await waitFor(() => {
+        expect(screen.getByText("Choose a color family")).toBeInTheDocument();
+      });
+      expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+    });
+
     it("forgets the previous choice when the dialog reopens", () => {
       const { rerender } = render(<InlineCreateDialog {...defaultProps} />);
       fireEvent.change(screen.getByLabelText("Color Family"), { target: { value: "GREEN" } });
