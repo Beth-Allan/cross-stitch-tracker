@@ -23,6 +23,7 @@ import type { ChartWithProject, ProjectWithRelations } from "@/types/chart";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import type { SeriesWithStats, SeriesChart } from "@/types/series";
 import type { GalleryCardData } from "@/components/features/gallery/gallery-types";
+import type { OptionalFocalPoint } from "@/types/focal-point";
 import { vi } from "vitest";
 
 /**
@@ -30,6 +31,17 @@ import { vi } from "vitest";
  * Each factory returns a full typed object with sensible defaults.
  * Pass Partial<T> overrides to customize specific fields.
  */
+
+/**
+ * Overrides for a type carrying `OptionalFocalPoint`. The focal point is set as a pair
+ * or not at all: without this the fixture could express the half-set state
+ * (`focalPointX: 42, focalPointY: null`) the union exists to make unrepresentable, and
+ * the regression would be provable in the app but invisible in the fixtures.
+ */
+type FocalPointOverrides<T extends OptionalFocalPoint> = Partial<
+  Omit<T, keyof OptionalFocalPoint>
+> &
+  (OptionalFocalPoint | { focalPointX?: undefined; focalPointY?: undefined });
 
 export function createMockDesigner(overrides?: Partial<Designer>): Designer {
   return {
@@ -69,7 +81,9 @@ export function createMockSeriesWithStats(overrides?: Partial<SeriesWithStats>):
   };
 }
 
-export function createMockSeriesChart(overrides?: Partial<SeriesChart>): SeriesChart {
+export function createMockSeriesChart(
+  overrides: FocalPointOverrides<SeriesChart> = {},
+): SeriesChart {
   return {
     id: "chart-1",
     name: "Test Chart",
@@ -83,7 +97,7 @@ export function createMockSeriesChart(overrides?: Partial<SeriesChart>): SeriesC
     status: null,
     stitchesCompleted: 0,
     ...overrides,
-  } as SeriesChart;
+  };
 }
 
 export function createMockDesignerWithStats(
@@ -99,7 +113,9 @@ export function createMockDesignerWithStats(
   };
 }
 
-export function createMockDesignerChart(overrides?: Partial<DesignerChart>): DesignerChart {
+export function createMockDesignerChart(
+  overrides: FocalPointOverrides<DesignerChart> = {},
+): DesignerChart {
   return {
     id: "chart-1",
     name: "Test Chart",
@@ -114,7 +130,7 @@ export function createMockDesignerChart(overrides?: Partial<DesignerChart>): Des
     stitchesCompleted: 0,
     genres: [],
     ...overrides,
-  } as DesignerChart;
+  };
 }
 
 export function createMockGenre(overrides?: Partial<Genre>): Genre {
@@ -136,7 +152,7 @@ export function createMockGenreWithStats(overrides?: Partial<GenreWithStats>): G
   };
 }
 
-export function createMockGenreChart(overrides?: Partial<GenreChart>): GenreChart {
+export function createMockGenreChart(overrides: FocalPointOverrides<GenreChart> = {}): GenreChart {
   return {
     id: "chart-1",
     name: "Test Chart",
@@ -149,7 +165,7 @@ export function createMockGenreChart(overrides?: Partial<GenreChart>): GenreChar
     status: null,
     stitchesCompleted: 0,
     ...overrides,
-  } as GenreChart;
+  };
 }
 
 export function createMockProject(overrides?: Partial<Project>): Project {
@@ -409,7 +425,9 @@ export function createMockStitchingAppWithStats(
   };
 }
 
-export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): GalleryCardData {
+export function createMockGalleryCard(
+  overrides: FocalPointOverrides<GalleryCardData> = {},
+): GalleryCardData {
   return {
     chartId: "chart-1",
     projectId: "proj-1",
@@ -441,7 +459,7 @@ export function createMockGalleryCard(overrides?: Partial<GalleryCardData>): Gal
     seriesName: null,
     dateAdded: new Date("2026-01-15"),
     ...overrides,
-  } as GalleryCardData;
+  };
 }
 
 export function createMockStitchSession(overrides?: Partial<StitchSession>): StitchSession {

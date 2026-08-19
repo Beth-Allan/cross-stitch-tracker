@@ -210,9 +210,8 @@ describe("detectBrokenRecords", () => {
 
     // First-ever day with sessions: oldValue should be 0, and it IS a new record
     const bestDay = result.find((r) => r.type === "bestDay");
-    if (bestDay) {
-      expect(bestDay.oldValue).toBe(0);
-    }
+    expect(bestDay).toBeDefined();
+    expect(bestDay?.oldValue).toBe(0);
   });
 
   it("handles two sessions on same day with identical stitch counts without false positives", async () => {

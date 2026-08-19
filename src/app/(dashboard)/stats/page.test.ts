@@ -210,7 +210,7 @@ describe("StatsPage server component", () => {
     expect(callOrder.indexOf("requireAuth")).toBe(0);
   });
 
-  it("calls all 10 queries with the authenticated user id", async () => {
+  it("passes the authenticated user id to all 16 stats queries", async () => {
     const { default: StatsPage } = await import("./page");
     await StatsPage({ searchParams: Promise.resolve({}) });
 
@@ -231,6 +231,9 @@ describe("StatsPage server component", () => {
     expect(mockGetThreadInsights).toHaveBeenCalledWith("user-123", []);
     expect(mockGetDesignerInsights).toHaveBeenCalledWith("user-123", []);
     expect(mockGetGenreInsights).toHaveBeenCalledWith("user-123", []);
+    expect(mockGetPersonalBests).toHaveBeenCalledWith("user-123", "all");
+    expect(mockGetFastestCompletions).toHaveBeenCalledWith("user-123", "all");
+    expect(mockGetCompletionEstimates).toHaveBeenCalledWith("user-123", "all");
   });
 
   it("propagates auth error and does not call queries when requireAuth rejects", async () => {
@@ -245,7 +248,7 @@ describe("StatsPage server component", () => {
     expect(mockGetPaceMetrics).not.toHaveBeenCalled();
   });
 
-  it("calls all 10 query functions in parallel via Promise.all", async () => {
+  it("calls each of the 16 stats queries exactly once per render", async () => {
     const { default: StatsPage } = await import("./page");
     await StatsPage({ searchParams: Promise.resolve({}) });
 
@@ -259,6 +262,12 @@ describe("StatsPage server component", () => {
     expect(mockGetSessionHistory).toHaveBeenCalledTimes(1);
     expect(mockGetPaceMetrics).toHaveBeenCalledTimes(1);
     expect(mockGetDayOfWeekPattern).toHaveBeenCalledTimes(1);
+    expect(mockGetPersonalBests).toHaveBeenCalledTimes(1);
+    expect(mockGetFastestCompletions).toHaveBeenCalledTimes(1);
+    expect(mockGetThreadInsights).toHaveBeenCalledTimes(1);
+    expect(mockGetDesignerInsights).toHaveBeenCalledTimes(1);
+    expect(mockGetGenreInsights).toHaveBeenCalledTimes(1);
+    expect(mockGetCompletionEstimates).toHaveBeenCalledTimes(1);
   });
 
   it("parses searchParams for session history pagination", async () => {

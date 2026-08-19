@@ -363,22 +363,30 @@ describe("CreationFlowAdapter", () => {
       expect(updated?.need).toBe(1);
     });
 
-    it("does NOT recalculate need when stitchCount changes on an overridden thread row", async () => {
+    it("marks a hand-typed need as overridden and stops recalculating it", async () => {
       const threadResult = makeSearchResult({ id: "t1", type: "THREAD" });
       searchFn.mockResolvedValueOnce([threadResult]);
       await adapter.searchSupplies("THREAD", "310");
       const addResult = await adapter.addThread("t1", 500, 2);
       const rowId = (addResult as { success: true; id: string }).id;
 
-      // Manually override the need
+      adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
+
       await adapter.updateQuantity("THREAD", rowId, "need", 10);
-      // Rows now have isNeedOverridden... wait, addThread sets isNeedOverridden: false
-      // We need to set it to overridden. The "need" field update should set isNeedOverridden.
-      // Actually, CreationFlowAdapter currently does raw spread, so isNeedOverridden stays false.
-      // We need to load a row with isNeedOverridden: true.
+      expect(adapter.getRows().find((r) => r.id === rowId)?.isNeedOverridden).toBe(true);
+
+      await adapter.updateQuantity("THREAD", rowId, "stitchCount", 1000);
+
+      const updated = adapter.getRows().find((r) => r.id === rowId);
+      expect(updated?.stitchCount).toBe(1000);
+      // The calculation would have made this 1 -- the hand-typed 10 is what must survive.
+      expect(updated?.need).toBe(10);
+    });
+
+    it("does NOT recalculate need for a restored draft row that was already overridden", async () => {
       adapter.loadRows([
         {
-          id: rowId,
+          id: "row-1",
           supplyId: "t1",
           type: "THREAD",
           code: "310",
@@ -395,12 +403,10 @@ describe("CreationFlowAdapter", () => {
       adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
       onRowsChange.mockClear();
 
-      await adapter.updateQuantity("THREAD", rowId, "stitchCount", 1000);
+      await adapter.updateQuantity("THREAD", "row-1", "stitchCount", 1000);
 
-      const rows = adapter.getRows();
-      const updated = rows.find((r) => r.id === rowId);
+      const updated = adapter.getRows().find((r) => r.id === "row-1");
       expect(updated?.stitchCount).toBe(1000);
-      // Need should remain 10 since isNeedOverridden is true
       expect(updated?.need).toBe(10);
     });
 

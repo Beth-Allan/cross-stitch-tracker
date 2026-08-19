@@ -266,7 +266,7 @@ describe("dashboard-actions", () => {
     });
 
     // Test 6: buriedTreasures returns oldest 10% of UNSTARTED, max 5, sorted oldest-first
-    it("buriedTreasures returns oldest 10% of UNSTARTED charts, max 5, sorted oldest-first", async () => {
+    it("buriedTreasures returns the oldest 10% of UNSTARTED charts, oldest-first", async () => {
       // Create 20 unstarted charts so 10% = 2
       const charts = Array.from({ length: 20 }, (_, i) => ({
         id: `c${i}`,
@@ -298,6 +298,36 @@ describe("dashboard-actions", () => {
       // Sorted oldest-first
       const dates = result.buriedTreasures.map((b: BuriedTreasure) => b.dateAdded);
       expect(dates[0].getTime()).toBeLessThan(dates[1].getTime());
+    });
+
+    it("buriedTreasures caps at 5 however large the library gets", async () => {
+      const charts = Array.from({ length: 80 }, (_, i) => ({
+        id: `c${i}`,
+        name: `Chart ${i}`,
+        coverThumbnailUrl: null,
+        stitchCount: 5000,
+        dateAdded: new Date(2025, 0, 1 + i),
+        designer: null,
+        genres: [],
+        project: { id: `p${i}`, status: "UNSTARTED" },
+      }));
+
+      mockPrisma.project.findMany.mockResolvedValue([]);
+      mockPrisma.chart.findMany.mockImplementation(
+        async (args: { where?: { project?: { wantToStartNext?: boolean } } }) => {
+          if (args?.where?.project?.wantToStartNext === true) {
+            return [];
+          }
+          return charts;
+        },
+      );
+      mockPrisma.project.count.mockResolvedValue(0);
+
+      const { getMainDashboardData } = await import("./dashboard-actions");
+      const result = await getMainDashboardData();
+
+      // 10% of 80 is 8; the cap is what decides the answer.
+      expect(result.buriedTreasures.length).toBe(5);
     });
 
     // Test 7: buriedTreasures returns at least 1 even when 10% rounds to 0

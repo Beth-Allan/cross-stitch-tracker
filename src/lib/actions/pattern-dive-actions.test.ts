@@ -313,7 +313,7 @@ describe("pattern-dive-actions", () => {
       expect(withFabric.kittingPercent).toBe(100);
     });
 
-    it("returns 100% kitting for project with no supplies needed", async () => {
+    it("KIT-004: a project with no supplies recorded reads 0% kitted, not 100%", async () => {
       mockPrisma.chart.findMany.mockResolvedValue([
         {
           id: "c1",
@@ -337,21 +337,9 @@ describe("pattern-dive-actions", () => {
       const { getWhatsNextProjects } = await import("./pattern-dive-actions");
       const result = await getWhatsNextProjects();
 
-      // No supplies, fabric required=1, acquired=0: required=1, acquired=0 => 0%
-      // Wait -- the plan says "returns 100% for no supplies needed" but fabric is always 1 required...
-      // Actually re-reading: if totalRequired is fabric(1) + supplies(0) = 1, and fabric not linked = 0 acquired
-      // That's 0%. But the plan behavior says "100% for no supplies needed" implying no requirements at all.
-      // The code in the plan sets totalRequired=0 => 100%, but that only happens if no supplies AND fabric not counted.
-      // Since fabric is always counted as 1, a project with no supplies but no fabric = 0% not 100%.
-      // Let me check: the plan code says "if totalRequired === 0 ? 100" but totalRequired always >= 1 (fabric).
-      // This test needs to verify the ACTUAL behavior -- a project with no supplies and fabric linked = 100%
-      // A project with no supplies and no fabric = 0% (1 required, 0 acquired).
-      // The plan behavior line says "returns 100% for project with no supplies needed" -- this likely means
-      // a formal kit where all supplies are included, so fabric is the only thing needed. If linked, 100%.
-      // Actually looking at the plan implementation more carefully: fabricRequired is always 1.
-      // So for "no supplies needed" with fabric linked: 1/1 = 100%. That matches.
-      // Let me adjust: the test should have fabric linked to get 100%.
-      expect(result[0].kittingPercent).toBe(0); // fabric required but not linked
+      // KIT-004 (docs/domain/kitting-and-storage.md): "no kit list recorded" means not ready,
+      // never "nothing left to gather".
+      expect(result[0].kittingPercent).toBe(0);
     });
 
     it("returns 0% kitting for project with fabric but no supply items tracked", async () => {
@@ -378,7 +366,7 @@ describe("pattern-dive-actions", () => {
       const { getWhatsNextProjects } = await import("./pattern-dive-actions");
       const result = await getWhatsNextProjects();
 
-      // Fabric alone doesn't make a project kittable — need at least one supply item
+      // KIT-004, second half: the right fabric alone does not make a project kittable.
       expect(result[0].kittingPercent).toBe(0);
     });
 
