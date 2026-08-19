@@ -68,13 +68,7 @@ describe("doesFabricFit", () => {
   });
 
   it("returns true when fabric fits only in rotated orientation", () => {
-    // Fabric shortest=17, longest=14 means physical dims are 14x17
-    // Required: width=14, height=17
-    // Normal: shortest(17) >= width(14) AND longest(14) >= height(17) -> false (14 < 17)
-    // Rotated: longest(14) >= width(14) AND shortest(17) >= height(17) -> true
-    // Wait - shortest is always <= longest. Let me reconsider.
-    // Fabric: shortest=13, longest=18. Required: width=17, height=12
-    // Normal: 13 >= 17? No. Rotated: 18 >= 17 AND 13 >= 12? Yes.
+    // Unrotated the 13" edge is short of the 17" width; turned, 18 >= 17 and 13 >= 12.
     const result = doesFabricFit(
       { shortestEdgeInches: 13, longestEdgeInches: 18 },
       { requiredWidthInches: 17, requiredHeightInches: 12 },

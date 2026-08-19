@@ -7,7 +7,6 @@ import {
   monthlyBarConfig,
   dayOfWeekConfig,
 } from "./chart-configs";
-import type { ChartConfig } from "@/components/ui/chart";
 
 const EXPECTED_STATUS_KEYS = [
   "UNSTARTED",
@@ -36,12 +35,6 @@ describe("collectionStatusConfig", () => {
       expect(entry.color).toMatch(/^var\(--status-/);
     }
   });
-
-  it("satisfies ChartConfig type", () => {
-    // TypeScript compile-time check via assignment
-    const _config: ChartConfig = collectionStatusConfig;
-    expect(_config).toBeDefined();
-  });
 });
 
 const EXPECTED_SIZE_KEYS = ["Mini", "Small", "Medium", "Large", "BAP"] as const;
@@ -60,11 +53,6 @@ describe("sizeCategoryConfig", () => {
       expect(entry.color).toBe(`var(--chart-${index + 1})`);
     });
   });
-
-  it("satisfies ChartConfig type", () => {
-    const _config: ChartConfig = sizeCategoryConfig;
-    expect(_config).toBeDefined();
-  });
 });
 
 describe("designerBarConfig", () => {
@@ -74,11 +62,6 @@ describe("designerBarConfig", () => {
     expect(keys[0]).toBe("count");
     expect(designerBarConfig.count.label).toBe("Charts");
     expect(designerBarConfig.count.color).toBe("var(--chart-1)");
-  });
-
-  it("satisfies ChartConfig type", () => {
-    const _config: ChartConfig = designerBarConfig;
-    expect(_config).toBeDefined();
   });
 });
 
@@ -90,11 +73,6 @@ describe("genreDistributionConfig", () => {
     expect(genreDistributionConfig.count.label).toBe("Charts");
     expect(genreDistributionConfig.count.color).toBe("var(--chart-3)");
   });
-
-  it("satisfies ChartConfig type", () => {
-    const _config: ChartConfig = genreDistributionConfig;
-    expect(_config).toBeDefined();
-  });
 });
 
 describe("monthlyBarConfig", () => {
@@ -105,11 +83,6 @@ describe("monthlyBarConfig", () => {
     expect(monthlyBarConfig.totalStitches.label).toBe("Stitches");
     expect(monthlyBarConfig.totalStitches.color).toBe("var(--chart-1)");
   });
-
-  it("satisfies ChartConfig type", () => {
-    const _config: ChartConfig = monthlyBarConfig;
-    expect(_config).toBeDefined();
-  });
 });
 
 describe("dayOfWeekConfig", () => {
@@ -119,10 +92,5 @@ describe("dayOfWeekConfig", () => {
     expect(keys[0]).toBe("avgStitches");
     expect(dayOfWeekConfig.avgStitches.label).toBe("Avg Stitches");
     expect(dayOfWeekConfig.avgStitches.color).toBe("var(--chart-1)");
-  });
-
-  it("satisfies ChartConfig type", () => {
-    const _config: ChartConfig = dayOfWeekConfig;
-    expect(_config).toBeDefined();
   });
 });

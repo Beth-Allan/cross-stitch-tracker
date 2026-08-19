@@ -456,7 +456,7 @@ describe("shopping-cart-actions", () => {
       const result = await updateSupplyAcquired("thread", "junction-1", -1);
 
       assertFailure(result);
-      expect(result.error).toBeDefined();
+      expect(result.error).toBe("Number must be greater than or equal to 0");
     });
 
     it("rejects non-integer quantity (Zod validation error)", async () => {
@@ -464,7 +464,7 @@ describe("shopping-cart-actions", () => {
       const result = await updateSupplyAcquired("thread", "junction-1", 1.5);
 
       assertFailure(result);
-      expect(result.error).toBeDefined();
+      expect(result.error).toBe("Expected integer, received float");
     });
 
     it("updates quantityAcquired for thread type and revalidates /shopping path", async () => {

@@ -218,7 +218,7 @@ describe("session-actions", () => {
       });
 
       assertFailure(result);
-      expect(result.error).toBeTruthy();
+      expect(result.error).toBe("Invalid date");
     });
 
     it("createSession rejects zero stitch count", async () => {
@@ -231,7 +231,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(false);
+      assertFailure(result);
+      expect(result.error).toBe("Stitch count must be at least 1");
     });
 
     it("createSession rejects empty projectId", async () => {
@@ -244,7 +245,8 @@ describe("session-actions", () => {
         photoKey: null,
       });
 
-      expect(result.success).toBe(false);
+      assertFailure(result);
+      expect(result.error).toBe("Project is required");
     });
   });
 
@@ -260,7 +262,7 @@ describe("session-actions", () => {
 
       const mockSession = createMockStitchSession({ id: "new-session", stitchCount: 100 });
 
-      // Mock the $transaction callback
+      const txProjectUpdate = vi.fn().mockResolvedValue({ stitchesCompleted: 1100 });
       mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
         return cb({
           stitchSession: {
@@ -269,7 +271,7 @@ describe("session-actions", () => {
           },
           project: {
             findUnique: vi.fn().mockResolvedValue({ startingStitches: 500 }),
-            update: vi.fn().mockResolvedValue({ stitchesCompleted: 1100 }),
+            update: txProjectUpdate,
           },
         });
       });
@@ -286,6 +288,10 @@ describe("session-actions", () => {
       assertSuccess(result);
       expect(result.session).toBeDefined();
       expect(mockPrisma.$transaction).toHaveBeenCalled();
+      expect(txProjectUpdate).toHaveBeenCalledWith({
+        where: { id: "proj-1" },
+        data: { stitchesCompleted: 1100 },
+      });
     });
 
     it("createSession calls revalidatePath and revalidateTag('stats') after successful creation", async () => {
@@ -782,6 +788,7 @@ describe("session-actions", () => {
 
       const updatedSession = createMockStitchSession({ id: "session-1", stitchCount: 300 });
 
+      const txProjectUpdate = vi.fn().mockResolvedValue({ stitchesCompleted: 550 });
       mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
         return cb({
           stitchSession: {
@@ -790,7 +797,7 @@ describe("session-actions", () => {
           },
           project: {
             findUnique: vi.fn().mockResolvedValue({ startingStitches: 100 }),
-            update: vi.fn().mockResolvedValue({ stitchesCompleted: 550 }),
+            update: txProjectUpdate,
           },
         });
       });
@@ -807,6 +814,10 @@ describe("session-actions", () => {
       assertSuccess(result);
       expect(result.session).toBeDefined();
       expect(mockPrisma.$transaction).toHaveBeenCalled();
+      expect(txProjectUpdate).toHaveBeenCalledWith({
+        where: { id: "proj-1" },
+        data: { stitchesCompleted: 550 },
+      });
     });
 
     it("returns not found when session does not exist", async () => {
@@ -1147,6 +1158,7 @@ describe("session-actions", () => {
         project: { id: "proj-1", userId: "user-1", chartId: "chart-1", startingStitches: 200 },
       });
 
+      const txProjectUpdate = vi.fn().mockResolvedValue({ stitchesCompleted: 500 });
       mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
         return cb({
           stitchSession: {
@@ -1155,7 +1167,7 @@ describe("session-actions", () => {
           },
           project: {
             findUnique: vi.fn().mockResolvedValue({ startingStitches: 200 }),
-            update: vi.fn().mockResolvedValue({ stitchesCompleted: 500 }),
+            update: txProjectUpdate,
           },
         });
       });
@@ -1165,6 +1177,10 @@ describe("session-actions", () => {
 
       expect(result.success).toBe(true);
       expect(mockPrisma.$transaction).toHaveBeenCalled();
+      expect(txProjectUpdate).toHaveBeenCalledWith({
+        where: { id: "proj-1" },
+        data: { stitchesCompleted: 500 },
+      });
     });
 
     it("returns not found when session does not exist", async () => {

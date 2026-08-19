@@ -82,6 +82,16 @@ function getSaveButton(name: RegExp = /log stitches/i) {
   return screen.getByRole("button", { name });
 }
 
+/**
+ * Base UI moves focus into the dialog itself after mount. Typing before that lands the
+ * keystrokes in whichever field the dialog focuses rather than the one under test, which
+ * is what made the edit-mode save tests fail about three runs in five.
+ */
+async function waitForDialogFocus() {
+  const dialog = await screen.findByRole("dialog");
+  await waitFor(() => expect(dialog).toContainElement(document.activeElement as HTMLElement));
+}
+
 describe("LogSessionModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -323,6 +333,7 @@ describe("LogSessionModal", () => {
       const user = userEvent.setup();
       mockUpdateSession.mockResolvedValue({ success: true, session: { id: "session-1" } });
       renderModal({ editSession, lockedProjectId: "proj-1" });
+      await waitForDialogFocus();
 
       // Modify stitch count
       const stitchInput = screen.getByLabelText(/stitch count/i);
@@ -382,6 +393,7 @@ describe("LogSessionModal", () => {
         warning: "overTotal",
       });
       renderModal({ editSession, lockedProjectId: "proj-1" });
+      await waitForDialogFocus();
 
       const stitchInput = screen.getByLabelText(/stitch count/i);
       await user.clear(stitchInput);

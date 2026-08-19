@@ -20,6 +20,7 @@ describe("StrandCount type guard", () => {
   });
 
   it("narrows type after guard check", () => {
+    expect.assertions(1);
     const value: number = 3;
     if (isStrandCount(value)) {
       // TypeScript should narrow to StrandCount here

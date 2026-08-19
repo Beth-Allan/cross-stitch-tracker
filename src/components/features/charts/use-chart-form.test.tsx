@@ -5,6 +5,7 @@ import { createMockDesigner, createMockGenre } from "@/__tests__/mocks";
 import { createStorageLocation } from "@/lib/actions/storage-location-actions";
 import { createStitchingApp } from "@/lib/actions/stitching-app-actions";
 import { createSeries } from "@/lib/actions/series-actions";
+import { createChart } from "@/lib/actions/chart-actions";
 
 // Mock all server actions the hook imports
 vi.mock("@/lib/actions/chart-actions", () => ({
@@ -25,6 +26,9 @@ vi.mock("@/lib/actions/stitching-app-actions", () => ({
 }));
 vi.mock("@/lib/actions/series-actions", () => ({
   createSeries: vi.fn(),
+}));
+vi.mock("sonner", () => ({
+  toast: Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn() }),
 }));
 
 const defaultProps = {
@@ -330,6 +334,38 @@ describe("useChartForm inline entity creation", () => {
         name: "No Designer Series",
         designerId: null,
       });
+    });
+  });
+
+  describe("validation errors", () => {
+    it("names the empty chart name rather than the raw Zod path", async () => {
+      const onValidationError = vi.fn();
+      const { result } = renderHook(() => useChartForm({ ...defaultProps, onValidationError }));
+
+      await act(async () => {
+        await result.current.submitForm();
+      });
+
+      expect(result.current.errors["chart.name"]).toBe("Chart name is required");
+      expect(onValidationError).toHaveBeenCalled();
+      expect(createChart).not.toHaveBeenCalled();
+    });
+
+    it("falls back to a generic message for a path with no friendly wording", async () => {
+      const { result } = renderHook(() => useChartForm(defaultProps));
+
+      act(() => {
+        result.current.setField("name", "Autumn Sampler");
+        result.current.setField("stitchCount", 5000);
+        result.current.setField("notes", "x".repeat(5001));
+      });
+
+      await act(async () => {
+        await result.current.submitForm();
+      });
+
+      expect(result.current.errors["chart.notes"]).toBe("This field has an error");
+      expect(createChart).not.toHaveBeenCalled();
     });
   });
 });
