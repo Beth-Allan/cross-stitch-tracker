@@ -1196,7 +1196,7 @@ describe("ChartMergedForm", () => {
       expect(screen.queryByText("Save Draft")).not.toBeInTheDocument();
     });
 
-    it("leaves localStorage untouched on unmount (edit mode skips auto-save)", async () => {
+    it("writes no draft to localStorage on unmount (edit mode skips auto-save)", async () => {
       const user = userEvent.setup();
       const { unmount } = render(<ChartMergedForm {...editFormProps} />);
 
