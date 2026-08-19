@@ -3,6 +3,7 @@
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { getUserTimezone, getCurrentPeriod } from "@/lib/queries/stats/timezone";
+import { calculateProgressPercent } from "@/lib/utils/progress";
 import { mapFocalPoint } from "@/types/focal-point";
 import type {
   ProjectDashboardData,
@@ -28,10 +29,6 @@ const BUCKET_DEFINITIONS: ReadonlyArray<{
 const UNSTARTED_STATUSES = new Set(["UNSTARTED", "KITTING", "KITTED"]);
 const FINISHED_STATUSES = new Set(["FINISHED", "FFO"]);
 const WIP_STATUS = "IN_PROGRESS";
-
-function computeProgressPercent(stitchesCompleted: number, stitchCount: number): number {
-  return stitchCount > 0 ? Math.min(100, Math.round((stitchesCompleted / stitchCount) * 100)) : 0;
-}
 
 function countDistinctSessionDays(sessions: Array<{ date: Date }>): number {
   return new Set(sessions.map((s) => s.date.toISOString().split("T")[0])).size;
@@ -97,7 +94,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
   const { year: currentYear } = getCurrentPeriod(getUserTimezone(user.id));
 
   const wipProgressValues = wips.map((p) =>
-    computeProgressPercent(p.stitchesCompleted, p.chart.stitchCount),
+    calculateProgressPercent(p.stitchesCompleted, p.chart.stitchCount),
   );
 
   const averageProgress =
@@ -110,7 +107,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
     let maxPercent = -1;
     let maxProject: (typeof wips)[number] | null = null;
     for (const p of wips) {
-      const pct = computeProgressPercent(p.stitchesCompleted, p.chart.stitchCount);
+      const pct = calculateProgressPercent(p.stitchesCompleted, p.chart.stitchCount);
       if (pct > maxPercent) {
         maxPercent = pct;
         maxProject = p;
@@ -144,7 +141,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
   }
 
   for (const p of projects) {
-    const progressPercent = computeProgressPercent(p.stitchesCompleted, p.chart.stitchCount);
+    const progressPercent = calculateProgressPercent(p.stitchesCompleted, p.chart.stitchCount);
     const bucketId = assignBucketId(p.status, progressPercent);
     if (bucketId === null) continue; // finished — excluded from buckets
 

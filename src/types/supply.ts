@@ -58,4 +58,19 @@ export const COLOR_FAMILIES: ColorFamily[] = [
   "NEUTRAL",
 ];
 
+/** Human-readable labels for the colour families, shared by every picker and filter. */
+export const COLOR_FAMILY_LABELS: Record<ColorFamily, string> = {
+  BLACK: "Black",
+  WHITE: "White",
+  RED: "Red",
+  ORANGE: "Orange",
+  YELLOW: "Yellow",
+  GREEN: "Green",
+  BLUE: "Blue",
+  PURPLE: "Purple",
+  BROWN: "Brown",
+  GRAY: "Gray",
+  NEUTRAL: "Neutral",
+};
+
 export const SUPPLY_TYPES: SupplyType[] = ["THREAD", "BEAD", "SPECIALTY"];

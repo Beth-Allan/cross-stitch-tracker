@@ -155,4 +155,25 @@ describe("GenreDetail", () => {
     expect(chartLinks[1].textContent).toContain("Fairy Forest");
     expect(chartLinks[2].textContent).toContain("Unicorn Meadow");
   });
+
+  it("caps an over-logged chart's progress at 100%", () => {
+    const genre = createGenreDetail({
+      chartCount: 1,
+      charts: [
+        createMockGenreChart({
+          id: "c1",
+          name: "Over-logged",
+          stitchCount: 20000,
+          stitchesWide: 200,
+          stitchesHigh: 100,
+          status: "IN_PROGRESS",
+          stitchesCompleted: 27400,
+        }),
+      ],
+    });
+    render(<GenreDetail genre={genre} />);
+
+    expect(screen.getByText("100%")).toBeInTheDocument();
+    expect(screen.queryByText("137%")).toBeNull();
+  });
 });

@@ -12,7 +12,7 @@ import { SupplyTableView } from "./supply-table-view";
 import { SupplyFormModal, type InitialData } from "./supply-form-modal";
 import { DeleteConfirmationDialog } from "@/components/features/designers/delete-confirmation-dialog";
 import { deleteThread, deleteBead, deleteSpecialtyItem } from "@/lib/actions/supply-actions";
-import { COLOR_FAMILIES } from "@/types/supply";
+import { COLOR_FAMILIES, COLOR_FAMILY_LABELS } from "@/types/supply";
 import type { ThreadWithBrand, BeadWithBrand, SpecialtyItemWithBrand } from "@/types/supply";
 import type { SupplyBrand, ColorFamily } from "@/generated/prisma/client";
 
@@ -30,20 +30,6 @@ interface SupplyCatalogProps {
 }
 
 /* ─── Color Family Display ──────────────────────────────────────────────────── */
-
-const COLOR_FAMILY_DISPLAY: Record<string, string> = {
-  BLACK: "Black",
-  WHITE: "White",
-  RED: "Red",
-  ORANGE: "Orange",
-  YELLOW: "Yellow",
-  GREEN: "Green",
-  BLUE: "Blue",
-  PURPLE: "Purple",
-  BROWN: "Brown",
-  GRAY: "Gray",
-  NEUTRAL: "Neutral",
-};
 
 /* ─── Default Views ─────────────────────────────────────────────────────────── */
 
@@ -112,7 +98,7 @@ const THREAD_COLUMNS = [
     label: "COLOR FAMILY",
     sortable: true,
     accessor: (item: { colorFamily?: string }) =>
-      COLOR_FAMILY_DISPLAY[item.colorFamily ?? ""] ?? item.colorFamily ?? "",
+      COLOR_FAMILY_LABELS[item.colorFamily as ColorFamily] ?? item.colorFamily ?? "",
   },
 ];
 
@@ -141,7 +127,7 @@ const BEAD_COLUMNS = [
     label: "COLOR FAMILY",
     sortable: true,
     accessor: (item: { colorFamily?: string }) =>
-      COLOR_FAMILY_DISPLAY[item.colorFamily ?? ""] ?? item.colorFamily ?? "",
+      COLOR_FAMILY_LABELS[item.colorFamily as ColorFamily] ?? item.colorFamily ?? "",
   },
 ];
 
@@ -597,7 +583,7 @@ export function SupplyCatalog({
             <option value="">All Colors</option>
             {COLOR_FAMILIES.map((f) => (
               <option key={f} value={f}>
-                {COLOR_FAMILY_DISPLAY[f]}
+                {COLOR_FAMILY_LABELS[f]}
               </option>
             ))}
           </select>

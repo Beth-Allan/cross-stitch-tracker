@@ -8,6 +8,7 @@ import {
 } from "@/lib/utils/calendar-date";
 import { getUserTimezone, getTodayCalendarDate, getCurrentPeriod } from "./timezone";
 import { buildDateFilter, type Scope, STATS_CACHE_VOLATILE, STATS_CACHE_STABLE } from "./utils";
+import { calculateProgressPercent } from "@/lib/utils/progress";
 import type { CompletionEstimate } from "@/types/stats";
 
 const MIN_SESSIONS = 3;
@@ -65,7 +66,7 @@ async function computeCompletionEstimates(
 
       const daysRemaining = Math.ceil(remaining / avgPerDay);
       const estimatedDate = addCalendarDays(today, Math.min(daysRemaining, MAX_PROJECTION_DAYS));
-      const percentComplete = Math.round((project.stitchesCompleted / totalStitches) * 100);
+      const percentComplete = calculateProgressPercent(project.stitchesCompleted, totalStitches);
 
       estimates.push({
         projectId: project.id,
@@ -141,7 +142,7 @@ export async function getProjectCompletionEstimate(
 
     const daysRemaining = Math.ceil(remaining / avgPerDay);
     const estimatedDate = addCalendarDays(today, Math.min(daysRemaining, MAX_PROJECTION_DAYS));
-    const percentComplete = Math.round((project.stitchesCompleted / totalStitches) * 100);
+    const percentComplete = calculateProgressPercent(project.stitchesCompleted, totalStitches);
 
     return {
       projectId: project.id,

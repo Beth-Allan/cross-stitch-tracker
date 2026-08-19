@@ -76,6 +76,27 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-08-19 · D-19 · the quick-add colour picker is required, not defaulted — ruled during P11b
+
+**What needed a ruling.** Her 2026-08-17 ruling said quick-add "gains a colour-family picker —
+one extra tap, honest filter", which leaves one thing open: whether the picker arrives
+pre-filled. A picker that starts on Neutral and is not touched files the supply under Neutral —
+exactly the silent behaviour the ruling exists to end — so the two readings produce opposite
+outcomes whenever she is in a hurry.
+
+**Options put to her:** (a) required — the picker starts empty and "Create & Add" stays disabled
+until a family is chosen; (b) pre-set to Neutral, changeable. Recommendation (a).
+
+**Her ruling: (a) — must pick before saving.** She was shown both as mockups and chose the
+greyed-out button.
+
+**What it changed.** `InlineCreateDialog` starts with no family and disables its submit until one
+is chosen (threads and beads only — specialty items carry no colour family). The server matches:
+`createAndAddThreadSchema` lost its `.default("NEUTRAL")` and `createAndAddBeadSchema` gained a
+required `colorFamily`, so no future caller can re-create the silent Neutral from the back. The
+one route that can still reach a missing family is the Enter key, which now names the field
+rather than doing nothing.
+
 ### 2026-08-18 · D-18 · over-count changes which stash pieces are offered — ruled during F-4
 
 **What contradicts what.** FAB-006 is tagged `[stated by Beth 2026-08-17]` and says that for a

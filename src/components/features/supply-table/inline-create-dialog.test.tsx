@@ -76,6 +76,7 @@ describe("InlineCreateDialog", () => {
 
     fireEvent.change(nameInput, { target: { value: "Custom Thread" } });
     fireEvent.change(codeInput, { target: { value: "CT-001" } });
+    fireEvent.change(screen.getByLabelText("Color Family"), { target: { value: "RED" } });
 
     const submitButton = screen.getByRole("button", { name: "Create & Add" });
     fireEvent.click(submitButton);
@@ -86,12 +87,15 @@ describe("InlineCreateDialog", () => {
         code: "CT-001",
         brandId: "default",
         hexColor: DEFAULT_SUPPLY_HEX,
+        colorFamily: "RED",
       });
     });
   });
 
   it("empty name shows validation error", async () => {
     render(<InlineCreateDialog {...defaultProps} />);
+
+    fireEvent.change(screen.getByLabelText("Color Family"), { target: { value: "RED" } });
 
     const submitButton = screen.getByRole("button", { name: "Create & Add" });
     fireEvent.click(submitButton);
@@ -107,6 +111,7 @@ describe("InlineCreateDialog", () => {
 
     const nameInput = screen.getByLabelText("Color Name");
     fireEvent.change(nameInput, { target: { value: "   " } });
+    fireEvent.change(screen.getByLabelText("Color Family"), { target: { value: "RED" } });
 
     const submitButton = screen.getByRole("button", { name: "Create & Add" });
     fireEvent.click(submitButton);
@@ -173,6 +178,74 @@ describe("InlineCreateDialog", () => {
     it("description still uses contextual type label", () => {
       render(<InlineCreateDialog {...defaultProps} supplyType="BEAD" />);
       expect(screen.getByText(/Create a new bead and add it to the table/)).toBeInTheDocument();
+    });
+  });
+
+  describe("color family", () => {
+    it("asks for a color family when creating a thread", () => {
+      render(<InlineCreateDialog {...defaultProps} />);
+      expect(screen.getByLabelText("Color Family")).toBeInTheDocument();
+    });
+
+    it("asks for a color family when creating a bead", () => {
+      render(<InlineCreateDialog {...defaultProps} supplyType="BEAD" />);
+      expect(screen.getByLabelText("Color Family")).toBeInTheDocument();
+    });
+
+    it("does not ask for a color family for a specialty item", () => {
+      render(<InlineCreateDialog {...defaultProps} supplyType="SPECIALTY" />);
+      expect(screen.queryByLabelText("Color Family")).not.toBeInTheDocument();
+    });
+
+    it("starts with no family chosen rather than defaulting to Neutral", () => {
+      render(<InlineCreateDialog {...defaultProps} />);
+      expect(screen.getByLabelText("Color Family")).toHaveValue("");
+    });
+
+    it("keeps Create & Add disabled until a family is chosen", () => {
+      render(<InlineCreateDialog {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText("Color Name"), {
+        target: { value: "Christmas Red" },
+      });
+
+      expect(screen.getByRole("button", { name: "Create & Add" })).toBeDisabled();
+
+      fireEvent.change(screen.getByLabelText("Color Family"), { target: { value: "RED" } });
+
+      expect(screen.getByRole("button", { name: "Create & Add" })).toBeEnabled();
+    });
+
+    it("submits a bead under the chosen family rather than NEUTRAL", async () => {
+      render(<InlineCreateDialog {...defaultProps} supplyType="BEAD" />);
+
+      fireEvent.change(screen.getByLabelText("Bead Name"), { target: { value: "Sea Glass" } });
+      fireEvent.change(screen.getByLabelText("Color Family"), { target: { value: "BLUE" } });
+      fireEvent.click(screen.getByRole("button", { name: "Create & Add" }));
+
+      await waitFor(() => {
+        expect(defaultProps.onSubmit).toHaveBeenCalledWith(
+          expect.objectContaining({ name: "Sea Glass", colorFamily: "BLUE" }),
+        );
+      });
+    });
+
+    it("leaves Create & Add enabled for a specialty item with only a name", () => {
+      render(<InlineCreateDialog {...defaultProps} supplyType="SPECIALTY" />);
+      fireEvent.change(screen.getByLabelText("Product Name"), {
+        target: { value: "Kreinik Braid" },
+      });
+
+      expect(screen.getByRole("button", { name: "Create & Add" })).toBeEnabled();
+    });
+
+    it("forgets the previous choice when the dialog reopens", () => {
+      const { rerender } = render(<InlineCreateDialog {...defaultProps} />);
+      fireEvent.change(screen.getByLabelText("Color Family"), { target: { value: "GREEN" } });
+
+      rerender(<InlineCreateDialog {...defaultProps} open={false} />);
+      rerender(<InlineCreateDialog {...defaultProps} open={true} />);
+
+      expect(screen.getByLabelText("Color Family")).toHaveValue("");
     });
   });
 });

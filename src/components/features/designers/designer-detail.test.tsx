@@ -251,4 +251,26 @@ describe("DesignerDetail", () => {
       expect(img).toHaveAttribute("src", "https://r2.example.com/full-image.webp");
     });
   });
+
+  it("caps an over-logged chart's progress at 100%", () => {
+    const designer = createDesignerDetail({
+      chartCount: 1,
+      charts: [
+        createMockDesignerChart({
+          id: "c1",
+          name: "Over-logged",
+          stitchCount: 20000,
+          stitchesWide: 200,
+          stitchesHigh: 100,
+          status: "IN_PROGRESS",
+          stitchesCompleted: 27400,
+          genres: [],
+        }),
+      ],
+    });
+    render(<DesignerDetail designer={designer} />);
+
+    expect(screen.getByText("100%")).toBeInTheDocument();
+    expect(screen.queryByText("137%")).toBeNull();
+  });
 });

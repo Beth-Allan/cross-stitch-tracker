@@ -71,7 +71,7 @@ export function buildCreateFn() {
         colorCode: data.code || "CUSTOM",
         brandId: data.brandId,
         hexColor: data.hexColor ?? DEFAULT_SUPPLY_HEX,
-        colorFamily: "NEUTRAL" as const,
+        colorFamily: data.colorFamily,
       });
       if (!result.success) throw new Error(result.error);
       return {
@@ -90,7 +90,7 @@ export function buildCreateFn() {
         productCode: data.code || "CUSTOM",
         brandId: data.brandId,
         hexColor: data.hexColor ?? DEFAULT_SUPPLY_HEX,
-        colorFamily: "NEUTRAL" as const,
+        colorFamily: data.colorFamily,
       });
       if (!result.success) throw new Error(result.error);
       return {

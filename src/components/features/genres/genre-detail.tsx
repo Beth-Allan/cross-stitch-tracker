@@ -21,6 +21,7 @@ import { DeleteConfirmationDialog } from "@/components/features/designers/delete
 import { deleteGenre } from "@/lib/actions/genre-actions";
 import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import { getEffectiveStitchCount } from "@/lib/utils/size-category";
+import { calculateProgressPercent } from "@/lib/utils/progress";
 import type { GenreDetail as GenreDetailType, GenreChart } from "@/types/genre";
 
 /* ---- Types ---- */
@@ -234,7 +235,7 @@ function ChartRow({ chart }: { chart: GenreChart }) {
 
   const progressPercent =
     chart.status === "IN_PROGRESS" && effectiveCount > 0
-      ? Math.round((chart.stitchesCompleted / effectiveCount) * 100)
+      ? calculateProgressPercent(chart.stitchesCompleted, effectiveCount)
       : null;
 
   return (

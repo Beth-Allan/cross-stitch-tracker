@@ -490,6 +490,7 @@ describe("ServerActionAdapter", () => {
         code: "CT1",
         brandId: "brand-1",
         hexColor: "#FF00FF",
+        colorFamily: "PURPLE",
       });
 
       expect(mockCreateAndAddThread).toHaveBeenCalledWith({
@@ -498,6 +499,7 @@ describe("ServerActionAdapter", () => {
         colorCode: "CT1",
         hexColor: "#FF00FF",
         brandId: "brand-1",
+        colorFamily: "PURPLE",
       });
     });
 
@@ -521,6 +523,7 @@ describe("ServerActionAdapter", () => {
         name: "Custom Bead",
         code: "B01",
         brandId: "brand-2",
+        colorFamily: "BLUE",
       });
 
       expect(mockCreateAndAddBead).toHaveBeenCalledWith({
@@ -528,6 +531,7 @@ describe("ServerActionAdapter", () => {
         name: "Custom Bead",
         code: "B01",
         brandId: "brand-2",
+        colorFamily: "BLUE",
       });
     });
 

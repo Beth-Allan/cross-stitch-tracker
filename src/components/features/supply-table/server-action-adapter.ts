@@ -221,6 +221,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
           colorCode: data.code,
           hexColor: data.hexColor,
           brandId: data.brandId,
+          colorFamily: data.colorFamily,
         });
         if (!result.success) {
           throw new Error(result.error);
@@ -242,6 +243,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
           name: data.name,
           code: data.code,
           brandId: data.brandId,
+          colorFamily: data.colorFamily,
         });
         if (!result.success) {
           throw new Error(result.error);

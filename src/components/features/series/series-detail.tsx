@@ -20,6 +20,7 @@ import { SizeBadge } from "@/components/features/charts/size-badge";
 import { DeleteConfirmationDialog } from "../designers/delete-confirmation-dialog";
 import { updateSeries, deleteSeries } from "@/lib/actions/series-actions";
 import { getEffectiveStitchCount } from "@/lib/utils/size-category";
+import { calculateProgressPercent } from "@/lib/utils/progress";
 import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import type { SeriesDetail as SeriesDetailType, SeriesChart } from "@/types/series";
 
@@ -339,7 +340,7 @@ function ChartRow({ chart }: { chart: SeriesChart }) {
 
   const progressPercent =
     chart.status === "IN_PROGRESS" && effectiveCount > 0
-      ? Math.round((chart.stitchesCompleted / effectiveCount) * 100)
+      ? calculateProgressPercent(chart.stitchesCompleted, effectiveCount)
       : null;
 
   const thumbnailSrc = chart.coverThumbnailUrl ?? chart.coverImageUrl;

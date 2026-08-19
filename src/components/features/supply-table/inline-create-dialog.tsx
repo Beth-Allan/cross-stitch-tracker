@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
+import { COLOR_FAMILIES, COLOR_FAMILY_LABELS, type ColorFamily } from "@/types/supply";
 import type { SupplyType, CreateSupplyData } from "./types";
 
 const LABEL_MAP: Record<
@@ -47,6 +48,11 @@ const LABEL_MAP: Record<
   },
 };
 
+interface FieldError {
+  field: "name" | "colorFamily";
+  message: string;
+}
+
 interface InlineCreateDialogProps {
   open: boolean;
   onClose: () => void;
@@ -67,14 +73,19 @@ export function InlineCreateDialog({
 }: InlineCreateDialogProps) {
   const [name, setName] = useState("");
   const [code, setCode] = useState(defaultCode ?? "");
-  const [error, setError] = useState("");
+  const [colorFamily, setColorFamily] = useState<ColorFamily | "">("");
+  const [error, setError] = useState<FieldError | null>(null);
+
+  // Specialty items carry no colour family, so there is nothing to ask them for
+  const needsColorFamily = supplyType !== "SPECIALTY";
 
   // Reset form fields when dialog opens
   useEffect(() => {
     if (open) {
       setName("");
       setCode(defaultCode ?? "");
-      setError("");
+      setColorFamily("");
+      setError(null);
     }
   }, [open, defaultCode]);
 
@@ -82,16 +93,22 @@ export function InlineCreateDialog({
     const trimmedName = name.trim();
 
     if (!trimmedName) {
-      setError("Name is required");
+      setError({ field: "name", message: "Name is required" });
+      return;
+    }
+    // Reachable by Enter only -- the button is disabled -- but a silent no-op is worse
+    if (needsColorFamily && !colorFamily) {
+      setError({ field: "colorFamily", message: "Choose a color family" });
       return;
     }
 
-    setError("");
+    setError(null);
     onSubmit({
       name: trimmedName,
       code: code.trim() || undefined,
       brandId: defaultBrandId,
       hexColor: DEFAULT_SUPPLY_HEX,
+      ...(colorFamily ? { colorFamily } : {}),
     });
   }
 
@@ -120,10 +137,10 @@ export function InlineCreateDialog({
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
-                if (error) setError("");
+                if (error?.field === "name") setError(null);
               }}
               placeholder={labels.namePlaceholder}
-              aria-invalid={!!error}
+              aria-invalid={error?.field === "name"}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -131,7 +148,9 @@ export function InlineCreateDialog({
                 }
               }}
             />
-            {error && <p className="text-destructive mt-1 text-xs">{error}</p>}
+            {error?.field === "name" && (
+              <p className="text-destructive mt-1 text-xs">{error.message}</p>
+            )}
           </div>
 
           <div>
@@ -154,13 +173,50 @@ export function InlineCreateDialog({
               }}
             />
           </div>
+
+          {needsColorFamily && (
+            <div>
+              <label
+                htmlFor="inline-create-color-family"
+                className="text-foreground mb-1 block text-sm font-medium"
+              >
+                Color Family
+              </label>
+              <select
+                id="inline-create-color-family"
+                aria-label="Color Family"
+                value={colorFamily}
+                onChange={(e) => {
+                  setColorFamily(e.target.value as ColorFamily);
+                  if (error?.field === "colorFamily") setError(null);
+                }}
+                aria-invalid={error?.field === "colorFamily"}
+                className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              >
+                <option value="">Choose a family...</option>
+                {COLOR_FAMILIES.map((f) => (
+                  <option key={f} value={f}>
+                    {COLOR_FAMILY_LABELS[f]}
+                  </option>
+                ))}
+              </select>
+              {error?.field === "colorFamily" && (
+                <p className="text-destructive mt-1 text-xs">{error.message}</p>
+              )}
+            </div>
+          )}
         </div>
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleSubmit}>
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            disabled={needsColorFamily && !colorFamily}
+            className="disabled:opacity-40"
+          >
             Create &amp; Add
           </Button>
         </DialogFooter>

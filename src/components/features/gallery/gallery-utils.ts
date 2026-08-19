@@ -1,6 +1,7 @@
 import type { ProjectStatus } from "@/generated/prisma/client";
 import type { SizeCategory } from "@/lib/utils/size-category";
 import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
+import { calculateProgressPercent } from "@/lib/utils/progress";
 import { mapFocalPoint } from "@/types/focal-point";
 import type { GalleryChartData } from "@/types/chart";
 import {
@@ -72,8 +73,7 @@ export function transformToGalleryCard(
   const sizeCategory = calculateSizeCategory(stitchCount);
 
   const stitchesCompleted = chart.project?.stitchesCompleted ?? 0;
-  const progressPercent =
-    stitchCount > 0 ? Math.min(100, Math.round((stitchesCompleted / stitchCount) * 100)) : 0;
+  const progressPercent = calculateProgressPercent(stitchesCompleted, stitchCount);
 
   // Kitting dots — default to not-applicable when no project (no supplies linked)
   let fabricStatus: KittingItemStatus = "needed";

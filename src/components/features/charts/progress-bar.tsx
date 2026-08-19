@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { calculateProgressPercent } from "@/lib/utils/progress";
 
 interface ProgressBarProps {
   value: number;
@@ -8,7 +9,7 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ value, max, className, color = "bg-primary" }: ProgressBarProps) {
-  const percentage = max > 0 ? Math.min(Math.round((value / max) * 100), 100) : 0;
+  const percentage = calculateProgressPercent(value, max);
 
   return (
     <div className={cn("flex items-center gap-3", className)}>

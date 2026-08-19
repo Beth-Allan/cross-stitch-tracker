@@ -21,6 +21,7 @@ import { DesignerFormModal } from "./designer-form-modal";
 import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
 import { deleteDesigner } from "@/lib/actions/designer-actions";
 import { getEffectiveStitchCount } from "@/lib/utils/size-category";
+import { calculateProgressPercent } from "@/lib/utils/progress";
 import { getObjectPositionStyle } from "@/lib/utils/focal-point";
 import type { DesignerDetail as DesignerDetailType, DesignerChart } from "@/types/designer";
 
@@ -279,7 +280,7 @@ function ChartRow({ chart }: { chart: DesignerChart }) {
 
   const progressPercent =
     chart.status === "IN_PROGRESS" && effectiveCount > 0
-      ? Math.round((chart.stitchesCompleted / effectiveCount) * 100)
+      ? calculateProgressPercent(chart.stitchesCompleted, effectiveCount)
       : null;
 
   const thumbnailSrc = chart.coverThumbnailUrl ?? chart.coverImageUrl;
