@@ -150,5 +150,13 @@ describe("EditableNumber", () => {
 
       expect(screen.getByRole("status")).toBeEmptyDOMElement();
     });
+
+    it("keeps the announcement region mounted while the input is showing", () => {
+      render(<EditableNumber value={5} onSave={vi.fn()} min={1} max={10} />);
+      fireEvent.click(screen.getByRole("button", { name: "5" }));
+
+      expect(screen.getByRole("spinbutton")).toBeInTheDocument();
+      expect(screen.getByRole("status")).toBeInTheDocument();
+    });
   });
 });

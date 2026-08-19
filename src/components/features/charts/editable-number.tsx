@@ -38,32 +38,37 @@ export function EditableNumber({
 
   if (editing) {
     return (
-      <input
-        ref={inputRef}
-        type="number"
-        min={min}
-        max={max}
-        value={draft}
-        aria-label={ariaLabel}
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={() => {
-          const num = parseInt(draft);
-          if (!isNaN(num) && num >= min && (max === undefined || num <= max)) {
-            onSave(num);
-          } else {
-            triggerRejection();
-          }
-          setEditing(false);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-          if (e.key === "Escape") {
-            setDraft(String(value));
+      <>
+        <input
+          ref={inputRef}
+          type="number"
+          min={min}
+          max={max}
+          value={draft}
+          aria-label={ariaLabel}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={() => {
+            const num = parseInt(draft);
+            if (!isNaN(num) && num >= min && (max === undefined || num <= max)) {
+              onSave(num);
+            } else {
+              triggerRejection();
+            }
             setEditing(false);
-          }
-        }}
-        className="bg-card text-foreground border-primary focus:ring-primary/40 w-16 rounded border px-1.5 py-0.5 text-center font-mono text-xs tabular-nums focus:ring-2 focus:outline-none"
-      />
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+            if (e.key === "Escape") {
+              setDraft(String(value));
+              setEditing(false);
+            }
+          }}
+          className="bg-card text-foreground border-primary focus:ring-primary/40 w-16 rounded border px-1.5 py-0.5 text-center font-mono text-xs tabular-nums focus:ring-2 focus:outline-none"
+        />
+        <span role="status" aria-live="polite" className="sr-only">
+          {showRejection ? "Value not saved" : ""}
+        </span>
+      </>
     );
   }
 

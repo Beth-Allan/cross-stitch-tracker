@@ -206,6 +206,14 @@ describe("EditableNumber", () => {
 
       expect(screen.getByRole("status")).toBeEmptyDOMElement();
     });
+
+    it("keeps the announcement region mounted while the input is showing", () => {
+      render(<EditableNumber value={5} onSave={vi.fn()} ariaLabel="Qty" />);
+      fireEvent.click(screen.getByRole("button", { name: "Qty" }));
+
+      expect(screen.getByRole("spinbutton", { name: "Qty" })).toBeInTheDocument();
+      expect(screen.getByRole("status")).toBeInTheDocument();
+    });
   });
 });
 

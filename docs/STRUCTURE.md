@@ -113,7 +113,7 @@ src/
 │   │   │                      #   each: page.tsx, [id]/page.tsx, loading.tsx
 │   │   ├── supplies/          # page.tsx, brands/page.tsx, loading.tsx
 │   │   ├── sessions/, shopping/   # page.tsx, loading.tsx
-│   ├── settings/             # page.tsx (placeholder — nothing to load)
+│   │   ├── settings/          # page.tsx (placeholder — nothing to load)
 │   │   ├── stats/             # page.tsx, search-params.ts, loading.tsx
 │   │   ├── layout.tsx         # Session redirect + AppShell (proxy.ts gates first)
 │   │   ├── error.tsx, loading.tsx, not-found.tsx

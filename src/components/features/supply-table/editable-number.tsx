@@ -79,32 +79,37 @@ export function EditableNumber({
 
   if (editing) {
     return (
-      <input
-        ref={inputRef}
-        type="number"
-        min={0}
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={() => {
-          const num = parseInt(draft);
-          if (!isNaN(num) && num >= 0) {
-            commit(num);
-          } else {
-            setDraft(String(displayValue));
-            triggerRejection();
-          }
-          setEditing(false);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-          if (e.key === "Escape") {
-            setDraft(String(displayValue));
+      <>
+        <input
+          ref={inputRef}
+          type="number"
+          min={0}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={() => {
+            const num = parseInt(draft);
+            if (!isNaN(num) && num >= 0) {
+              commit(num);
+            } else {
+              setDraft(String(displayValue));
+              triggerRejection();
+            }
             setEditing(false);
-          }
-        }}
-        aria-label={ariaLabel}
-        className="bg-card text-foreground border-primary focus:ring-primary/40 w-12 rounded border px-1.5 py-0.5 text-center text-sm focus:ring-2 focus:outline-none"
-      />
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+            if (e.key === "Escape") {
+              setDraft(String(displayValue));
+              setEditing(false);
+            }
+          }}
+          aria-label={ariaLabel}
+          className="bg-card text-foreground border-primary focus:ring-primary/40 w-12 rounded border px-1.5 py-0.5 text-center text-sm focus:ring-2 focus:outline-none"
+        />
+        <span role="status" aria-live="polite" className="sr-only">
+          {showRejection ? "Value not saved" : ""}
+        </span>
+      </>
     );
   }
 
