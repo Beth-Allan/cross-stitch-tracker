@@ -209,10 +209,13 @@ describe("EditableNumber", () => {
 
     it("keeps the announcement region mounted while the input is showing", () => {
       render(<EditableNumber value={5} onSave={vi.fn()} ariaLabel="Qty" />);
+      const before = screen.getByRole("status");
       fireEvent.click(screen.getByRole("button", { name: "Qty" }));
 
       expect(screen.getByRole("spinbutton", { name: "Qty" })).toBeInTheDocument();
-      expect(screen.getByRole("status")).toBeInTheDocument();
+      // The same node, not merely a node: a region inserted alongside its text is not
+      // announced, so remounting it across the edit swap would silently undo the fix
+      expect(screen.getByRole("status")).toBe(before);
     });
   });
 });

@@ -159,7 +159,7 @@ that item merges. Stage P items are in `docs/process/build-plan.md`.
   remainder is Accepted** — deferred to the backlog, 2026-08-17).
   **Split by Beth, 2026-08-19** — P11 was seventeen fixes, three of them on review-gated paths,
   and batching them would have held the harmless fourteen behind a `/review`. **Batch one
-  (`P11`, PR #105, 2026-08-19)** closed nine rows — see Resolved. **`P11b`** carries her two
+  (`P11`, merged as PR #105, 2026-08-19)** closed nine rows — see Resolved. **`P11b`** carries her two
   rulings, the ones that change what she sees: the quick-add colour-family picker and the
   over-logging confirm with the display-clamp unification (the clamp reaches
   `src/lib/queries/stats/`, so P11b is gated and a `/review` follows it). The comment-sweep row
@@ -220,7 +220,7 @@ same shape is still a new row.
 
 Rows that have been closed. Kept verbatim; never deleted.
 
-**Closed 2026-08-19 by item P11, batch one — PR #105 (Beth's split ruling the same day).** Nine rows, one
+**Closed 2026-08-19 by item P11, batch one — merged as PR #105 (Beth's split ruling the same day).** Nine rows, one
 branch, no review-gated path touched. Four were not the pure paperwork they looked like:
 
 - **Build-noise row — both halves now shut.** The `/charts` line had already moved to `/sessions`,
