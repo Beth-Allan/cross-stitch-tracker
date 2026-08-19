@@ -314,11 +314,6 @@ when the Preview environment was populated and verified.
 - `STATS_TIMEZONE` - IANA timezone for stats day boundaries; defaults to `America/Edmonton`
   (`src/lib/queries/stats/timezone.ts`). An invalid value throws rather than falling back
 
-**Declared but dead:**
-
-- `NEXT_PUBLIC_APP_URL` is in `.env.example` and is read nowhere — not in `src/`, `next.config.ts`
-  or `proxy.ts`. Setting it does nothing (maintenance-ledger row, 2026-08-16)
-
 **Secrets location:**
 
 - `.env.local` (development) — gitignored

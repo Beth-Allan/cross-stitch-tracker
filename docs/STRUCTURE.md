@@ -30,7 +30,9 @@ cross-stitch-tracker/
 │   ├── sections/              # Component designs + screenshots per section
 │   └── design-system/         # DesignOS-era tokens, fonts, colour notes
 ├── public/                    # Static assets
-├── scripts/generate-icons.mjs # PWA icon generation
+├── scripts/                   # Standalone helpers, run by hand — see its README
+│   ├── generate-icons.mjs     #   PWA icon generation
+│   └── migrate-working-copies.sql  #   one-time data migration, already run
 ├── src/                       # Application source (see below)
 ├── CLAUDE.md                  # Project instructions for Claude
 ├── CROSS_STITCH_TRACKER_PLAN.md  # Product spec — source of truth for requirements
@@ -110,7 +112,8 @@ src/
 │   │   ├── designers/, genres/, fabric/, storage/, apps/
 │   │   │                      #   each: page.tsx, [id]/page.tsx, loading.tsx
 │   │   ├── supplies/          # page.tsx, brands/page.tsx, loading.tsx
-│   │   ├── sessions/, shopping/, settings/   # page.tsx, loading.tsx
+│   │   ├── sessions/, shopping/   # page.tsx, loading.tsx
+│   │   ├── settings/          # page.tsx (placeholder — nothing to load)
 │   │   ├── stats/             # page.tsx, search-params.ts, loading.tsx
 │   │   ├── layout.tsx         # Session redirect + AppShell (proxy.ts gates first)
 │   │   ├── error.tsx, loading.tsx, not-found.tsx
@@ -160,9 +163,6 @@ src/
 │   ├── chart-configs.ts       # Recharts ChartConfig objects
 │   └── utils.ts               # cn() (clsx + tailwind-merge)
 │
-├── scripts/
-│   └── migrate-working-copies.sql
-│
 └── types/                     # Domain TypeScript types (no runtime code)
     ├── chart.ts, dashboard.ts, designer.ts, fabric.ts, focal-point.ts,
     │   genre.ts, series.ts, session.ts, shopping.ts, stats.ts, storage.ts, supply.ts
@@ -195,7 +195,7 @@ src/
 - **kebab-case** for all files: `chart-actions.ts`, `cover-image-upload.tsx`
 - **Page files**: `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`
 - **Test files**: `{name}.test.ts` or `{name}.test.tsx` (colocated)
-- **Nyquist tests**: `{name}.nyquist.test.tsx` (supplemental gap tests)
+- **Gap tests**: `{name}.gaps.test.tsx` — two legacy files only, never a new one (see `TESTING.md`)
 - **Hook files**: `use-{name}.ts`
 - **Action files**: `{domain}-actions.ts`
 - **Type files**: `{domain}.ts` in `src/types/`

@@ -7,6 +7,7 @@ import {
   ALLOWED_CHART_FILE_EXTENSIONS,
   ALLOWED_CHART_FILE_TYPES,
   MAX_FILE_SIZE,
+  MAX_FILE_SIZE_LABEL,
 } from "@/lib/validations/upload";
 import { Button } from "@/components/ui/button";
 import { formatFileSize } from "@/lib/utils/format-file-size";
@@ -43,7 +44,7 @@ function validateFile(file: File): string | null {
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    return "File exceeds 50MB limit.";
+    return `File exceeds ${MAX_FILE_SIZE_LABEL} limit.`;
   }
 
   return null;

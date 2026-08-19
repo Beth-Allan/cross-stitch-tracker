@@ -1,9 +1,7 @@
 /**
- * Nyquist gap test for Phase 15 — D-07 / plan 01 decision:
- * "If R2 delete fails, log error but proceed with DB deletion (orphaned files acceptable)"
- *
- * Gap: No test verifies that deleteChartFile succeeds (returns { success: true })
- * and removes the DB record even when the R2 DeleteObjectCommand throws.
+ * A failed R2 delete must not block the database delete: the file row goes even when
+ * DeleteObjectCommand throws, and the orphaned object is accepted rather than leaving a row
+ * pointing at nothing.
  */
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { createMockPrisma } from "@/__tests__/mocks";

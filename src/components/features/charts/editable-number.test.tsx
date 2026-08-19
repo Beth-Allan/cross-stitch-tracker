@@ -134,7 +134,7 @@ describe("EditableNumber", () => {
       expect(button.className).not.toContain("bg-destructive/10");
     });
 
-    it("aria-invalid is set during rejection", () => {
+    it("announces the rejection to assistive technology", () => {
       const onSave = vi.fn();
       render(<EditableNumber value={5} onSave={onSave} min={1} max={10} />);
       fireEvent.click(screen.getByRole("button", { name: "5" }));
@@ -142,8 +142,21 @@ describe("EditableNumber", () => {
       fireEvent.change(input, { target: { value: "20" } });
       fireEvent.blur(input);
 
-      const button = screen.getByRole("button", { name: "5" });
-      expect(button).toHaveAttribute("aria-invalid", "true");
+      expect(screen.getByRole("status")).toHaveTextContent("Value not saved");
+    });
+
+    it("announces nothing while no edit has been rejected", () => {
+      render(<EditableNumber value={5} onSave={vi.fn()} min={1} max={10} />);
+
+      expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    });
+
+    it("keeps the announcement region mounted while the input is showing", () => {
+      render(<EditableNumber value={5} onSave={vi.fn()} min={1} max={10} />);
+      fireEvent.click(screen.getByRole("button", { name: "5" }));
+
+      expect(screen.getByRole("spinbutton")).toBeInTheDocument();
+      expect(screen.getByRole("status")).toBeInTheDocument();
     });
   });
 });

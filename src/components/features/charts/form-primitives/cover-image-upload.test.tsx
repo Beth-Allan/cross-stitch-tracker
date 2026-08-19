@@ -10,11 +10,6 @@ vi.mock("@/lib/actions/upload-actions", () => ({
   }),
 }));
 
-vi.mock("@/lib/validations/upload", () => ({
-  ALLOWED_IMAGE_TYPES: ["image/png", "image/jpeg", "image/webp"],
-  MAX_FILE_SIZE: 10 * 1024 * 1024,
-}));
-
 describe("CoverImageUpload - cover image display fixes", () => {
   const defaultProps = {
     onUploadComplete: vi.fn(),

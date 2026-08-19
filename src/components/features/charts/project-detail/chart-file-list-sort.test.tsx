@@ -1,8 +1,6 @@
 /**
- * Nyquist gap test for Phase 15 — D-03: files display newest-first.
- *
- * Gap: The existing chart-file-list.test.tsx verifies filenames are present but
- * never asserts order. D-03 requires newest-first sort by createdAt.
+ * Files display newest-first. The sibling chart-file-list.test.tsx asserts the filenames are
+ * present but never their order, so the sort is only covered here.
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@/__tests__/test-utils";

@@ -204,6 +204,9 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
 - **Folded in:** the StorageLocation/StitchingApp ledger row — `@@unique([userId, name])`, the
   unscoped `updateMany` on delete, and the friendly-duplicate P2002 arms land in this batch.
   The stats-fan-out row's residual cost (row volume) is owned here too.
+- **Also inherits — rerouted from P11, 2026-08-19:** `prisma/schema.prisma`'s
+  `// Calculator settings (Phase 7)` comment, a planning-doc reference the conventions ban. P11's
+  sweep could not take it — the file is review-gated and P9 already opens it.
 - **Done-when:** each listed surface bounded/paginated test-first; one migration carries the
   indexes + uniqueness; fresh `/review` for the schema half.
 
@@ -217,20 +220,44 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
 - **Done-when:** advisories cleared or individually explained, gate green, app demonstrated
   working (login, upload, stats render), versions stay exact-pinned.
 
-### P11 Small honest fixes, one batch
+### P11 Small honest fixes — **split by Beth 2026-08-19; batch one built**
 
-- **Objective:** report §3 P11's list, plus today's rulings: the **quick-add colour-family
-  picker** (Beth: quick-add must ask) and the **over-logging confirm** (Beth: warn but allow)
-  with the display clamp unification.
-- **Folded in:** ledger rows — comment sweep, recharts named imports, `shadcn`→devDependencies,
-  dead `NEXT_PUBLIC_APP_URL`, dependabot package-name fix, `.gitignore` settings.local.json,
-  the two placement oddities. ~~the `R2_BUCKET_NAME` fallback throw~~ — **done in R-1
-  (2026-08-17)**: making the bucket lazy and required was the same edit as the read/write split, so
-  P11 inherits only the `/charts` dynamic-server half of the build-noise row.
-- **Traps:** honestly too big for one session if each fix sprouts discussion — apply the
-  protocol §2 size check and split rather than marathon.
-- **Done-when:** each fix demonstrated (behavior fixes test-first; pure copy/config by
-  inspection), gate green.
+The size check fired exactly as the trap predicted: seventeen fixes, three of them on
+review-gated paths. Batching them would have held the fourteen harmless ones behind a `/review`
+session, so Beth split the item two ways and rerouted two fixes to the items that already own
+the same decision.
+
+- **Objective (batch one — `P11`, PR #105, 2026-08-19):** report §3 P11's ungated list plus its
+  ledger rows — comment sweep, recharts named imports, `shadcn`→devDependencies, dead
+  `NEXT_PUBLIC_APP_URL`, dependabot package-name fix, `.gitignore` settings.local.json, the two
+  placement oddities, the `/charts` dynamic-server half of the build-noise row, the CSP quick
+  wins, the 10MB/50MB upload copy, `SupplyGridView`'s unwired `onDelete`, and the three
+  `jsx-a11y` warnings. ~~the `R2_BUCKET_NAME` fallback throw~~ — **done in R-1 (2026-08-17)**.
+- **Done-when (batch one):** each fix demonstrated (behaviour fixes test-first; pure copy/config
+  by inspection), gate green. **Met** — see the work log.
+- **Rerouted, not dropped:** the two upload allowlists → **P13** (same decision as the type-rule
+  row it already owns, and it touches gated `upload-actions.ts`) · `prisma/schema.prisma`'s
+  `Phase 7` comment → **P9** (already opens that file) · `fabric-calculator.ts`'s `D-20 / Q-005`
+  comment → the next gated session in that file.
+
+### P11b The two rulings Beth made on 2026-08-17 — **gated; `/review` follows**
+
+- **Objective:** the **quick-add colour-family picker** (Beth: quick-add must ask, so a
+  quick-added supply stops filing silently under `NEUTRAL` and invisible to the catalogue's
+  colour filter) and the **over-logging confirm** (Beth: warn but allow — a session that would
+  push a project past its total stitch count asks first and saves on her word), with the
+  **display-clamp unification** that ruling carries: progress % is hand-written 11× with 7 copies
+  unclamped, so one project reads 100% on the gallery card and 137% on the chart hero.
+- **Cited specs:** `docs/process/work-log/drift.md` — the two 2026-08-17 rulings, verbatim ·
+  the over-logging ledger row · report §3 P11.
+- **Traps:** the clamp unification reaches `src/lib/queries/stats/` (`designer-insights.ts`,
+  `completion-estimates.ts`), which is **review-gated** — the builder stops at
+  `built, awaiting review`. Both fixes are UI, so Beth sees the Vercel preview before merge.
+  Quick-add's picker is a form change on a path with no design canon: follow DesignOS
+  (`product-plan/sections/supply-tracking-and-shopping/`), never invent.
+- **Done-when:** quick-add asks for colour family and the supply lands in that family
+  (test-first) · logging past 100% warns and saves on confirmation (test-first) · one clamped
+  display helper, every copy using it, no percentage above 100 anywhere · gate green.
 
 ### P12 Test-honesty repairs — **removals approved 2026-08-17**
 
@@ -258,16 +285,22 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
   `covers/unsaved/…` and pre-P15 charts are still live on that prefix. Refusing `unsaved` is not
   an option (it would leak the raw upload of every replaced cover); closing the other half needs
   a "no other chart names this key" test, or it waits for **P16**.
+- **Also inherits — rerouted from P11, 2026-08-19:** the **two byte-identical upload allowlists**
+  (`ALLOWED_FILE_TYPES` / `ALLOWED_CHART_FILE_TYPES`) — the client checks one and the server the
+  other. Merging them is the same decision as the `chart-file-list.tsx` vs `getPresignedUploadUrl`
+  row above: which rule is right, said once. It touches gated `upload-actions.ts`.
 - **Traps:** behavior-preserving refactor plus small validation fixes — anything that _changes_
-  what validates is TDD'd; no schema/migration scope.
+  what validates is TDD'd; no schema/migration scope. **The allowlist merge makes this item
+  review-gated** (`upload-actions.ts`), so a `/review` row follows it.
 - **Done-when:** one convention, stated in `form-patterns.md`; zero dead `z.infer` exports;
   gate green.
 
 ### P14 Gate alignment — **gate-config changes pre-approved 2026-08-17**
 
-- **Objective:** burn down the standing eslint warnings (53 as of P3, minus whatever P11's a11y fixes
-  already took), then flip lint to `--max-warnings 0`; change CI to literally run
-  `npm run gate`. Both approved on the record (drift 2026-08-17).
+- **Objective:** burn down the standing eslint warnings (**48 as of 2026-08-19** — P11 batch one
+  closed the three `jsx-a11y` ones, the only real defects in the list; what is left is 35
+  unused-vars and 13 `no-img-element`), then flip lint to `--max-warnings 0`; change CI to
+  literally run `npm run gate`. Both approved on the record (drift 2026-08-17).
 - **Cited specs:** the two ledger rows (55-warnings; CI re-implements the gate) ·
   `.claude/rules/quality-gates.md` — update it and `docs/` in the same PR.
 - **Done-when:** lint step green at zero warnings and failing on any new one (demonstrated with

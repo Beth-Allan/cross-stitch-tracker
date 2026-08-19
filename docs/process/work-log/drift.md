@@ -186,6 +186,32 @@ fit flags — plus one existing `updateFabric` test given the ownership mock its
 needs. Nothing was deleted to get green: each rewritten test still asserts the same scenario,
 against the answer Beth gave.
 
+### 2026-08-19 · P11 was seventeen fixes, three of them gated — split, ruled during P11
+
+**What happened.** P11's own brief carried the trap "honestly too big for one session if each fix
+sprouts discussion — apply the protocol §2 size check and split rather than marathon." The size
+check found seventeen distinct fixes, and — the part the brief did not anticipate — **three of them
+touch review-gated paths**: the display-clamp unification reaches `src/lib/queries/stats/`, merging
+the two upload allowlists reaches `upload-actions.ts`, and the comment sweep's last references sit
+in `prisma/schema.prisma` and `fabric-calculator.ts`. Batched as one PR, all seventeen would have
+stopped at `built, awaiting review`, holding fourteen harmless fixes — a wrong number in an error
+message, an unwired delete button, a stray config line — behind a review session, unable to deploy.
+
+**Surfaced to Beth** as a four-option decision with a recommendation, before any code was written.
+
+**Her ruling:** two sessions plus two reroutes. **Batch one** — the fourteen ungated fixes — ships
+and deploys the same day. **P11b** carries her two 2026-08-17 rulings, the ones that change what she
+sees: the quick-add colour-family picker and the over-logging confirm with the display clamp. It is
+gated and UI, so it takes both a preview and a `/review`. The two remaining fixes go to the items
+that already own the same decision: the upload allowlists to **P13** (which owns the row about those
+two lists disagreeing) and the `schema.prisma` comment to **P9** (which already opens that file).
+
+**What it changed.** The queue gained a `P11b` row; the build plan carries both briefs; the ledger's
+P11 closer list records the split and both reroutes. **The generalisable part:** the §2 size check is
+not only about token budget — **an item's gated paths are part of its size**, because they decide
+whether the work can deploy at all. Batching ungated fixes with gated ones is how a one-line copy fix
+ends up waiting on a review of something else. Future size checks split on that seam first.
+
 ### 2026-08-17 · the covers already in the library — ruled during P15
 
 **What happened.** P15 put chart covers on the same pipeline session photos use, so a cover is

@@ -38,50 +38,59 @@ export function EditableNumber({
 
   if (editing) {
     return (
-      <input
-        ref={inputRef}
-        type="number"
-        min={min}
-        max={max}
-        value={draft}
-        aria-label={ariaLabel}
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={() => {
-          const num = parseInt(draft);
-          if (!isNaN(num) && num >= min && (max === undefined || num <= max)) {
-            onSave(num);
-          } else {
-            triggerRejection();
-          }
-          setEditing(false);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-          if (e.key === "Escape") {
-            setDraft(String(value));
+      <>
+        <input
+          ref={inputRef}
+          type="number"
+          min={min}
+          max={max}
+          value={draft}
+          aria-label={ariaLabel}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={() => {
+            const num = parseInt(draft);
+            if (!isNaN(num) && num >= min && (max === undefined || num <= max)) {
+              onSave(num);
+            } else {
+              triggerRejection();
+            }
             setEditing(false);
-          }
-        }}
-        className="bg-card text-foreground border-primary focus:ring-primary/40 w-16 rounded border px-1.5 py-0.5 text-center font-mono text-xs tabular-nums focus:ring-2 focus:outline-none"
-      />
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+            if (e.key === "Escape") {
+              setDraft(String(value));
+              setEditing(false);
+            }
+          }}
+          className="bg-card text-foreground border-primary focus:ring-primary/40 w-16 rounded border px-1.5 py-0.5 text-center font-mono text-xs tabular-nums focus:ring-2 focus:outline-none"
+        />
+        <span role="status" aria-live="polite" className="sr-only">
+          {showRejection ? "Value not saved" : ""}
+        </span>
+      </>
     );
   }
 
   return (
-    <button
-      onClick={() => {
-        setDraft(String(value));
-        setEditing(true);
-      }}
-      className={cn(
-        "hover:bg-muted min-h-11 min-w-11 cursor-text rounded px-1.5 py-0.5 font-mono tabular-nums transition-colors",
-        showRejection && "border-destructive bg-destructive/10 animate-shake border",
-        className,
-      )}
-      title="Click to edit"
-      aria-invalid={showRejection || undefined}
-    >
-      {formatDisplay ? formatDisplay(value) : value}
-    </button>
+    <>
+      <button
+        onClick={() => {
+          setDraft(String(value));
+          setEditing(true);
+        }}
+        className={cn(
+          "hover:bg-muted min-h-11 min-w-11 cursor-text rounded px-1.5 py-0.5 font-mono tabular-nums transition-colors",
+          showRejection && "border-destructive bg-destructive/10 animate-shake border",
+          className,
+        )}
+        title="Click to edit"
+      >
+        {formatDisplay ? formatDisplay(value) : value}
+      </button>
+      <span role="status" aria-live="polite" className="sr-only">
+        {showRejection ? "Value not saved" : ""}
+      </span>
+    </>
   );
 }

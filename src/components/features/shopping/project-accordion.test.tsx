@@ -6,8 +6,12 @@ import type { ShoppingCartProject } from "@/types/dashboard";
 import type { ProjectStatus } from "@/generated/prisma/client";
 
 vi.mock("next/image", () => ({
-  default: ({ unoptimized, ...props }: Record<string, unknown>) => (
-    <img data-unoptimized={unoptimized ? "true" : undefined} {...props} />
+  default: ({ unoptimized, alt, ...props }: Record<string, unknown>) => (
+    <img
+      data-unoptimized={unoptimized ? "true" : undefined}
+      alt={typeof alt === "string" ? alt : ""}
+      {...props}
+    />
   ),
 }));
 

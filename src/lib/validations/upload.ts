@@ -47,6 +47,9 @@ export const ALLOWED_CHART_FILE_EXTENSIONS = [
 
 export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
+/** The limit as users read it — derived, so a message can never quote a number the code does not enforce. */
+export const MAX_FILE_SIZE_LABEL = `${MAX_FILE_SIZE / (1024 * 1024)}MB`;
+
 // Image optimization settings
 export const OPTIMIZED_MAX_WIDTH = 1200;
 export const OPTIMIZED_QUALITY = 80;
@@ -131,7 +134,7 @@ export const uploadRequestSchema = z.object({
     .number()
     .int()
     .positive()
-    .max(MAX_FILE_SIZE, "File is too large. Maximum size is 50MB."),
+    .max(MAX_FILE_SIZE, `File is too large. Maximum size is ${MAX_FILE_SIZE_LABEL}.`),
   category: z.enum(STORAGE_CATEGORIES),
   projectId: keyOwnerSchema,
 });

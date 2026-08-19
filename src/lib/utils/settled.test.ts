@@ -73,6 +73,29 @@ describe("settled", () => {
     spy.mockRestore();
   });
 
+  it("rethrows a dynamic-server bailout instead of logging it as a page failure", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const bailout = Object.assign(
+      new Error("Dynamic server usage: Route /sessions couldn't be rendered statically"),
+      { digest: "DYNAMIC_SERVER_USAGE" },
+    );
+    const result: PromiseSettledResult<number> = { status: "rejected", reason: bailout };
+
+    expect(() => settled(result, "allSessions", "sessions")).toThrow(bailout);
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
+
+  it("still logs a rejection whose digest is not the bailout code", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const reason = Object.assign(new Error("boom"), { digest: "SOMETHING_ELSE" });
+    const result: PromiseSettledResult<number> = { status: "rejected", reason };
+
+    expect(settled(result, "allSessions", "sessions")).toBeNull();
+    expect(spy).toHaveBeenCalledWith("[sessions] allSessions failed:", "boom");
+    spy.mockRestore();
+  });
+
   it("does not log for fulfilled results", () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     const result: PromiseSettledResult<number> = { status: "fulfilled", value: 42 };

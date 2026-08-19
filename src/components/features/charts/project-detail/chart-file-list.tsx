@@ -15,6 +15,7 @@ import {
   ALLOWED_CHART_FILE_TYPES,
   ALLOWED_CHART_FILE_EXTENSIONS,
   MAX_FILE_SIZE,
+  MAX_FILE_SIZE_LABEL,
 } from "@/lib/validations/upload";
 
 interface ChartFileListProps {
@@ -68,7 +69,7 @@ export function ChartFileList({ chartId, files }: ChartFileListProps) {
 
         // Validate file size
         if (file.size > MAX_FILE_SIZE) {
-          toast.error("File exceeds 10MB limit.");
+          toast.error(`File exceeds ${MAX_FILE_SIZE_LABEL} limit.`);
           continue;
         }
 

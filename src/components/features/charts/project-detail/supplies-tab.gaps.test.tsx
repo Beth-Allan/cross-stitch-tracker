@@ -1,10 +1,6 @@
 /**
- * Nyquist gap test for Phase 16 — INPUT-01 / D-03
- *
- * GAP-2: Adapter identity stability across re-renders
- *
- * Requirement D-03 from Plan 16-01: "Adapter identity stabilized via useCallback —
- * no debounce cancellation on re-render."
+ * Adapter identity must stay stable across re-renders: the adapter is wrapped in useCallback so
+ * a re-render cannot cancel an in-flight debounce.
  *
  * The plan's behavior list explicitly requires:
  *   "Test: supplies-tab adapter identity is stable across re-renders
@@ -15,8 +11,6 @@
  * object reference) across re-renders when only sortOption changes. If the adapter
  * is recreated on every re-render, it resets the debounce timer in useSupplyTable
  * and drops keystrokes.
- *
- * Implementation files are READ-ONLY per Nyquist protocol.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -213,7 +207,7 @@ describe("SuppliesTab — calcParams error rollback", () => {
   });
 });
 
-describe("SuppliesTab — Nyquist gap tests", () => {
+describe("SuppliesTab — adapter identity", () => {
   // ──────────────────────────────────────────────────────────────────────────────
   // GAP-2: Adapter identity stability across re-renders (D-03)
   //
