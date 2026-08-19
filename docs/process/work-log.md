@@ -58,7 +58,7 @@ default**, and a row says otherwise only when it is otherwise (protocol §1).
 | 7   | `/design-session` | **DS-1, the foundation session** — palette, type and token direction (D-06); output becomes D-1. **Lane: Fable.**                                     |
 
 Order approved by Beth at the 2026-08-17 `/cleanup`; hers to reorder anytime. _(F-1's row popped here:
-built and merged as **#102** on 2026-08-18. It was not gated, so no `/review` row follows it —
+built on 2026-08-18 as PR **#102**. It was not gated, so no `/review` row follows it —
 `/work-item P12` is the new top row. The three `/review` rows before it — F-5's, F-4's and P7's —
 popped the same way on the same day: reviewed on the branch, merged on Beth's word.)_ Gated items each
 add a `/review` row when they finish — the builder stops at `built, awaiting review` and the
