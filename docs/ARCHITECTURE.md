@@ -143,7 +143,7 @@ Caching: `unstable_cache` keyed per user, tagged `"stats"`, invalidated by `reva
 
 ### Layer 10: Validations (`src/lib/validations/`)
 
-Zod schemas by domain (`auth`, `chart`, `fabric`, `focal-point`, `series`, `session`, `storage`, `supply`, `upload`). Shared between actions (server) and form hooks (client). `upload.ts` also owns the allowed MIME/extension lists, the 50MB cap, and the image-optimization constants.
+Zod schemas by domain (`auth`, `chart`, `fabric`, `focal-point`, `series`, `session`, `storage`, `supply`, `upload`). Shared between actions (server) and form hooks (client). `upload.ts` also owns the one accepted-file list for chart files (types, extensions, and the `resolveChartFileContentType` rule that turns a browser's guess into one of them), the allowed image types, the 50MB cap, and the image-optimization constants.
 
 `fields.ts` is the shared field layer every other schema builds from — `optionalText`, `optionalUrl`, `optionalChoice`, `optionalDateString`. **Blank optional input becomes `null` here and nowhere else**, so a client form sends what the user typed rather than pre-normalising it. Each file also exports its payload type as `XInput` = `z.input<…>` — the compile-time contract an action's parameter uses; the runtime `.parse()` inside the action is still the actual defence, because server action ids are global. The convention is written out in `.claude/rules/form-patterns.md`.
 
@@ -212,13 +212,13 @@ showing yesterday):
 
 ### File Uploads (presigned PUT, verified on commit)
 
-1. Client → Server Action (`getPresignedUploadUrl`): Zod-parses the request, sanitizes the filename into the key, returns a presigned PUT URL (10-min expiry)
+1. Client → Server Action (`getPresignedUploadUrl`): Zod-parses the request, sanitizes the filename into the key, returns a presigned PUT URL (10-min expiry). For a chart file the declared type must be exactly what `resolveChartFileContentType` produces for that filename — the one rule the browser applies before uploading, so the two cannot disagree about what is accepted (item P13b)
 2. Client → R2 directly: `fetch(url, { method: "PUT", body: file })` — bytes never touch Next.js server
 3. Client → the action that owns the entity (`addChartFile`, or the chart/session form): ownership is checked, then **the stored object is verified before the key becomes durable**
 
 Step 1 constrains nothing about the bytes. A presigned PUT signs method, bucket, key and expiry; `content-type` is unsignable and the payload hash is `UNSIGNED_PAYLOAD`, so the size and type declared in step 1 are claims. Enforcement is therefore in step 3, against what R2 actually holds: `HeadObject`'s `ContentLength` for chart files (recorded instead of the client's number, over-cap uploads deleted), and `GetObject`'s `ContentLength` plus a bounded read plus the format `sharp` decodes for images.
 
-R2 key pattern: `{category}/{entityId}/{nanoid()}-{filename}` (categories: `covers`, `files`, `sessions`). Every key that reaches an action is parsed against that grammar first — directly with `parseStorageKey`, or through the form schema that carries it (`chartFormSchema`) — and the actions that act on an entity resolve the key from an ownership-checked row. The image pipeline goes one step further: the raw key must be the one that row already records, so `processAndStoreImage` **called on its own** cannot be made to re-encode a well-formed key the entity never named. That is a guarantee about the action, not about the whole flow — `chartFormSchema` accepts any well-formed `covers/…` key, so a save can make the row name one first (maintenance-ledger row, 2026-08-17).
+R2 key pattern: `{category}/{entityId}/{nanoid()}-{filename}` (categories: `covers`, `files`, `sessions`). Every key that reaches an action is parsed against that grammar first — directly with `parseStorageKey`, or through the form schema that carries it (`chartFormSchema`) — and the actions that act on an entity resolve the key from an ownership-checked row. The image pipeline goes one step further: the raw key must be the one that row already records, so `processAndStoreImage` **called on its own** cannot be made to re-encode a well-formed key the entity never named. That is a guarantee about the action, not about the whole flow: `chartFormSchema` accepts any well-formed `covers/…` key, so the chart save paths check the submitted cover keys themselves before their transaction — owner segment `unsaved` or the chart's own id, and no other chart's row already naming the key (item P13b, 2026-08-19).
 
 ### Stats Queries
 

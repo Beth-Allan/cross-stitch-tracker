@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  ALLOWED_CHART_FILE_EXTENSIONS,
+  ALLOWED_CHART_FILE_TYPES,
   MAX_STORAGE_KEY_LENGTH,
   parseStorageKey,
+  resolveChartFileContentType,
   sanitizeUploadFileName,
   storageKeySchema,
   uploadRequestSchema,
@@ -153,5 +156,76 @@ describe("uploadRequestSchema projectId", () => {
     expect(uploadRequestSchema.safeParse({ ...base, projectId: "a".repeat(65) }).success).toBe(
       false,
     );
+  });
+});
+
+describe("resolveChartFileContentType", () => {
+  it("keeps a self-describing type the app accepts", () => {
+    expect(resolveChartFileContentType("chart.pdf", "application/pdf")).toBe("application/pdf");
+    expect(resolveChartFileContentType("scan.png", "image/png")).toBe("image/png");
+    expect(resolveChartFileContentType("scan.jpg", "image/jpeg")).toBe("image/jpeg");
+  });
+
+  it("stores a pattern file the browser cannot identify as the generic type (CHF-002)", () => {
+    expect(resolveChartFileContentType("pattern.xsd", "text/xml")).toBe("application/octet-stream");
+    expect(resolveChartFileContentType("pattern.pat", "")).toBe("application/octet-stream");
+    expect(resolveChartFileContentType("pattern.saga", "application/x-saga")).toBe(
+      "application/octet-stream",
+    );
+    expect(resolveChartFileContentType("pattern.oxs", "text/xml")).toBe("application/octet-stream");
+    expect(resolveChartFileContentType("pattern.css", "text/css")).toBe("application/octet-stream");
+  });
+
+  it("refuses a zip, whatever the browser calls it (CHF-003)", () => {
+    expect(resolveChartFileContentType("pack.zip", "application/zip")).toBeNull();
+    expect(resolveChartFileContentType("pack.zip", "application/x-zip-compressed")).toBeNull();
+    expect(resolveChartFileContentType("pack.zip", "application/octet-stream")).toBeNull();
+  });
+
+  it("refuses the generic type when the name is not one of the accepted files", () => {
+    expect(resolveChartFileContentType("installer.exe", "application/octet-stream")).toBeNull();
+    expect(resolveChartFileContentType("notes.txt", "text/plain")).toBeNull();
+  });
+
+  it("neutralises a renderable type rather than storing it as renderable", () => {
+    expect(resolveChartFileContentType("chart.pdf", "text/html")).toBe("application/octet-stream");
+    expect(resolveChartFileContentType("page.html", "text/html")).toBeNull();
+  });
+
+  it("reads the name case-insensitively and ignores charset parameters", () => {
+    expect(resolveChartFileContentType("CHART.PDF", "application/PDF")).toBe("application/pdf");
+    expect(resolveChartFileContentType("pattern.XSD", "text/xml; charset=utf-8")).toBe(
+      "application/octet-stream",
+    );
+  });
+
+  it("accepts an image with no extension on the strength of its own type", () => {
+    expect(resolveChartFileContentType("screenshot", "image/webp")).toBe("image/webp");
+    expect(resolveChartFileContentType("mystery", "application/octet-stream")).toBeNull();
+  });
+
+  it("only ever returns a type the server allows, for every accepted extension", () => {
+    for (const extension of ALLOWED_CHART_FILE_EXTENSIONS) {
+      const resolved = resolveChartFileContentType(`chart${extension}`, "application/unknown");
+      expect(resolved).not.toBeNull();
+      expect(ALLOWED_CHART_FILE_TYPES as readonly string[]).toContain(resolved);
+    }
+  });
+});
+
+describe("the one accepted-file list", () => {
+  it("names the pattern formats Beth keeps and no zip (CHF-002, CHF-003)", () => {
+    expect(ALLOWED_CHART_FILE_EXTENSIONS).toEqual(
+      expect.arrayContaining([".xsd", ".pat", ".saga", ".oxs", ".pdf", ".png", ".jpg", ".webp"]),
+    );
+    expect(ALLOWED_CHART_FILE_EXTENSIONS).not.toContain(".zip");
+    expect(ALLOWED_CHART_FILE_TYPES).not.toContain("application/zip");
+    expect(ALLOWED_CHART_FILE_TYPES).not.toContain("application/x-zip-compressed");
+  });
+
+  it("stores nothing the browser would render", () => {
+    for (const type of ALLOWED_CHART_FILE_TYPES) {
+      expect(type).not.toMatch(/^text\/html|svg/);
+    }
   });
 });

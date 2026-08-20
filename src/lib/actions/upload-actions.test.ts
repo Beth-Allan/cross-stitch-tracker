@@ -1,13 +1,20 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { createMockPrisma, assertSuccess, assertFailure } from "@/__tests__/mocks";
+import {
+  createMockPrisma,
+  assertSuccess,
+  assertFailure,
+  unvalidatedPayload,
+} from "@/__tests__/mocks";
 import {
   MAX_FILE_SIZE,
-  ALLOWED_FILE_TYPES,
+  ACCEPTED_CHART_FILE_LABEL,
   ALLOWED_CHART_FILE_TYPES,
   ALLOWED_CHART_FILE_EXTENSIONS,
   ALLOWED_IMAGE_TYPES,
+  resolveChartFileContentType,
   uploadRequestSchema,
+  type UploadRequestInput,
 } from "@/lib/validations/upload";
 
 // Mock auth to return authenticated session
@@ -140,7 +147,7 @@ describe("upload-actions failure modes", () => {
       });
 
       assertFailure(result);
-      expect(result.error).toContain("Invalid file type");
+      expect(result.error).toBe(`Unsupported file type. Accepted: ${ACCEPTED_CHART_FILE_LABEL}`);
     });
 
     it("returns error when R2 is not configured", async () => {
@@ -164,7 +171,9 @@ describe("upload-actions failure modes", () => {
     it("returns validation-specific message on Zod validation failure (not 'storage not configured')", async () => {
       const { getPresignedUploadUrl } = await import("./upload-actions");
 
-      const result = await getPresignedUploadUrl({});
+      // The payload the action's own type forbids — which is exactly what a
+      // hand-made POST can send, and what the runtime `.parse()` is there for.
+      const result = await getPresignedUploadUrl(unvalidatedPayload<UploadRequestInput>({}));
 
       assertFailure(result);
       expect(typeof result.error).toBe("string");
@@ -474,18 +483,13 @@ describe("upload validation constants", () => {
     }
   });
 
-  it("ALLOWED_FILE_TYPES includes zip MIME types", () => {
-    expect(ALLOWED_FILE_TYPES).toContain("application/zip");
-    expect(ALLOWED_FILE_TYPES).toContain("application/x-zip-compressed");
+  it("ALLOWED_CHART_FILE_TYPES excludes zip MIME types (CHF-003)", () => {
+    expect(ALLOWED_CHART_FILE_TYPES).not.toContain("application/zip");
+    expect(ALLOWED_CHART_FILE_TYPES).not.toContain("application/x-zip-compressed");
   });
 
-  it("ALLOWED_CHART_FILE_TYPES includes zip MIME types", () => {
-    expect(ALLOWED_CHART_FILE_TYPES).toContain("application/zip");
-    expect(ALLOWED_CHART_FILE_TYPES).toContain("application/x-zip-compressed");
-  });
-
-  it("ALLOWED_CHART_FILE_EXTENSIONS includes .zip", () => {
-    expect(ALLOWED_CHART_FILE_EXTENSIONS).toContain(".zip");
+  it("ALLOWED_CHART_FILE_EXTENSIONS excludes .zip (CHF-003)", () => {
+    expect(ALLOWED_CHART_FILE_EXTENSIONS).not.toContain(".zip");
   });
 
   it("ALLOWED_IMAGE_TYPES does NOT include zip", () => {
@@ -502,7 +506,7 @@ describe("upload action zip type enforcement", () => {
     mockSend.mockResolvedValue({});
   });
 
-  it("accepts zip content type for files category", async () => {
+  it("refuses zip content type for files category (CHF-003)", async () => {
     const { getPresignedUploadUrl } = await import("./upload-actions");
 
     const result = await getPresignedUploadUrl({
@@ -513,8 +517,8 @@ describe("upload action zip type enforcement", () => {
       projectId: "p1",
     });
 
-    assertSuccess(result);
-    expect(result.url).toBeDefined();
+    assertFailure(result);
+    expect(result.error).toBe(`Unsupported file type. Accepted: ${ACCEPTED_CHART_FILE_LABEL}`);
   });
 
   it("rejects zip content type for covers category", async () => {
@@ -545,6 +549,67 @@ describe("upload action zip type enforcement", () => {
 
     assertFailure(result);
     expect(result.error).toContain("Invalid image type");
+  });
+});
+
+describe("the browser and the server agree about chart files", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSend.mockReset();
+    mockGetR2Client.mockReturnValue({ send: mockSend });
+    mockSend.mockResolvedValue({});
+  });
+
+  async function presign(fileName: string, contentType: string) {
+    const { getPresignedUploadUrl } = await import("./upload-actions");
+    return getPresignedUploadUrl({
+      fileName,
+      contentType,
+      fileSize: 1024,
+      category: "files",
+      projectId: "chart-1",
+    });
+  }
+
+  it("accepts every file the browser would accept, at the type it would send", async () => {
+    for (const extension of ALLOWED_CHART_FILE_EXTENSIONS) {
+      const fileName = `pattern${extension}`;
+      // What the browser reports for a pattern file is not a type the server
+      // knows; the shared rule is what turns it into one.
+      const sent = resolveChartFileContentType(fileName, "text/xml");
+      expect(sent).not.toBeNull();
+
+      const result = await presign(fileName, sent as string);
+      assertSuccess(result);
+    }
+  });
+
+  it("signs a Pattern Maker file, the case that used to die at this step", async () => {
+    const sent = resolveChartFileContentType("winter-robin.xsd", "text/xml") as string;
+    const result = await presign("winter-robin.xsd", sent);
+
+    assertSuccess(result);
+    expect(sent).toBe("application/octet-stream");
+  });
+
+  it("refuses a type the shared rule would never have produced", async () => {
+    const result = await presign("winter-robin.xsd", "text/xml");
+
+    assertFailure(result);
+    expect(result.error).toBe(`Unsupported file type. Accepted: ${ACCEPTED_CHART_FILE_LABEL}`);
+  });
+
+  it("refuses the generic type for a name that is not an accepted file", async () => {
+    const result = await presign("installer.exe", "application/octet-stream");
+
+    assertFailure(result);
+    expect(result.error).toBe(`Unsupported file type. Accepted: ${ACCEPTED_CHART_FILE_LABEL}`);
+  });
+
+  it("stores nothing under a type a browser would render", async () => {
+    const result = await presign("chart.pdf", "text/html");
+
+    assertFailure(result);
   });
 });
 

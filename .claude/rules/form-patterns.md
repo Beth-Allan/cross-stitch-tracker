@@ -30,6 +30,30 @@ Required names keep their inline rule (`z.string().trim().min(1, …).max(200, �
 one shape everywhere. A **non-nullable** column keeps its own rule and does not use these:
 `SpecialtyItem.description` is `String @default("")`, so blank stays `""`.
 
+## An upload's type comes from the same rule on both sides
+
+A file picker and the action behind it must not each decide what a file is. They did:
+`chart-file-list.tsx` accepted a file whose MIME type was unknown as long as its extension was
+allowed, and `getPresignedUploadUrl` then refused it — so a Pattern Maker `.xsd`, which browsers
+announce as `text/xml`, passed the browser and died at the server with "Invalid file type".
+
+`resolveChartFileContentType(fileName, declaredType)` in `validations/upload.ts` is the one rule.
+It returns the content type the object is **stored** as, or `null` when the file is not accepted:
+
+- a self-describing type the app accepts (`image/png`, `application/pdf`, …) is kept;
+- otherwise an accepted **extension** stores the file as `application/octet-stream`;
+- anything else is refused.
+
+The browser calls it to decide whether to upload and what `Content-Type` to send; the server
+calls it to check that what it was handed is exactly what the rule would have produced
+(`resolve(...) !== declared` → refuse). This is not the client normalising a value the user typed
+— it is both layers reading one function, which is what keeps them from drifting apart.
+
+Neither side is evidence about the bytes: a presigned PUT signs no payload. What the rule
+guarantees is that **every stored type is one the app allows**, so an unidentified file downloads
+instead of rendering. The file list itself is a domain fact (`docs/domain/chart-files.md`,
+CHF-001–CHF-004), not a developer's guess.
+
 ## Actions type their input from the schema, and still parse it
 
 Every action's payload parameter is `z.input<typeof theSchema>`, exported from the validations file

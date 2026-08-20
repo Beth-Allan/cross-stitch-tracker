@@ -331,7 +331,20 @@ half is P13 and merged the same day; the upload half is **P13b** below.
   Beth's recorded answer behind it; a submitted cover key cannot name another chart by id
   (test-first) and the remaining `covers/unsaved/` half is stated in the work log rather than
   quietly left; both gated actions typed and using the shared error arms; gate green; fresh
-  `/review` before merge.
+  `/review` before merge. **Met, 2026-08-19, with one clause exceeded:** the `covers/unsaved/`
+  half did **not** have to wait for P16 — the trap said it would need a "no other chart names this
+  key" test, and that is one indexed lookup, so all three save paths now check the owner segment
+  _and_ that no other chart's row names the key. Beth's answer (CHF-001–CHF-003) removed `.zip`
+  from the accepted list rather than adding anything: the first constant in the app narrowed by
+  her word rather than widened by a guess. The agreement between browser and server is one shared
+  function, `resolveChartFileContentType`, so the extension is an additional requirement and never
+  a substitute for the declared type — which also tightened `installer.exe`-as-`octet-stream`,
+  previously accepted. `.css` stays accepted and unsourced, recorded as CHF-004 / **Q-007** rather
+  than dropped without asking.
+- **Deliberately left, with a ledger row:** `chartFormSchema`'s `fileKeys` still accept any owner
+  segment — the same defect as the cover keys, in the same create path, but copy-only (nothing
+  discards a submitted file key) and outside a done-when that named cover keys. The fix shape is
+  already written: `submittedCoverKeysAreOwn` applied to `fileKeys`.
 
 ### P14 Gate alignment — **gate-config changes pre-approved 2026-08-17**
 

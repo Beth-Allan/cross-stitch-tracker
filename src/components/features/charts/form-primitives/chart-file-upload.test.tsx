@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@/__tests__/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ChartFileUpload } from "./chart-file-upload";
+import { ACCEPTED_CHART_FILE_LABEL } from "@/lib/validations/upload";
 
 // Mock the upload action
 vi.mock("@/lib/actions/upload-actions", () => ({
@@ -92,9 +93,7 @@ describe("ChartFileUpload", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(
-          "Unsupported file type. Accepted: PDF, images, .pat, .xsd, .css, .saga, .zip",
-        ),
+        screen.getByText(`Unsupported file type. Accepted: ${ACCEPTED_CHART_FILE_LABEL}`),
       ).toBeInTheDocument();
     });
 
@@ -119,13 +118,8 @@ describe("ChartFileUpload", () => {
     expect(onFilesChange).not.toHaveBeenCalled();
   });
 
-  it("accepts .zip file and triggers upload", async () => {
+  it("refuses a .zip, which is not a chart file (CHF-003)", async () => {
     const onFilesChange = vi.fn();
-    mockGetPresignedUploadUrl.mockResolvedValue({
-      success: true as const,
-      url: "https://r2.example.com/presigned",
-      key: "files/unsaved/abc-patterns.zip",
-    });
 
     render(<ChartFileUpload uploadedFiles={[]} onFilesChange={onFilesChange} />);
 
@@ -136,15 +130,53 @@ describe("ChartFileUpload", () => {
     fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
+      expect(
+        screen.getByText(`Unsupported file type. Accepted: ${ACCEPTED_CHART_FILE_LABEL}`),
+      ).toBeInTheDocument();
+    });
+
+    expect(mockGetPresignedUploadUrl).not.toHaveBeenCalled();
+    expect(onFilesChange).not.toHaveBeenCalled();
+  });
+
+  it("uploads a Pattern Maker file under the type the server accepts (CHF-002)", async () => {
+    const onFilesChange = vi.fn();
+    mockGetPresignedUploadUrl.mockResolvedValue({
+      success: true as const,
+      url: "https://r2.example.com/presigned",
+      key: "files/unsaved/abc-winter-robin.xsd",
+    });
+
+    render(<ChartFileUpload uploadedFiles={[]} onFilesChange={onFilesChange} />);
+
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    // What a browser reports for a Pattern Maker chart: it sees XML, not a pattern.
+    const file = new File(["<xml/>"], "winter-robin.xsd", { type: "text/xml" });
+    Object.defineProperty(file, "size", { value: 5000 });
+
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => {
       expect(onFilesChange).toHaveBeenCalledWith([
         {
-          key: "files/unsaved/abc-patterns.zip",
-          filename: "patterns.zip",
-          mimeType: "application/zip",
+          key: "files/unsaved/abc-winter-robin.xsd",
+          filename: "winter-robin.xsd",
+          mimeType: "application/octet-stream",
           fileSize: 5000,
         },
       ]);
     });
+
+    expect(mockGetPresignedUploadUrl).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fileName: "winter-robin.xsd",
+        contentType: "application/octet-stream",
+      }),
+    );
+    expect(mockFetch).toHaveBeenCalledWith(
+      "https://r2.example.com/presigned",
+      expect.objectContaining({ headers: { "Content-Type": "application/octet-stream" } }),
+    );
   });
 
   it("allows removing an uploaded file from the list", () => {

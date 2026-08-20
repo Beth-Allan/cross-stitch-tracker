@@ -7,17 +7,15 @@ import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { getReadTarget, getWriteTarget } from "@/lib/r2";
-import { ALLOWED_CHART_FILE_TYPES, MAX_FILE_SIZE, parseStorageKey } from "@/lib/validations/upload";
-
-const addChartFileSchema = z.object({
-  chartId: z.string().min(1),
-  url: z.string().refine((value) => {
-    const parsed = parseStorageKey(value);
-    return parsed !== null && parsed.category === "files";
-  }, "Invalid file path"),
-  filename: z.string().trim().min(1).max(255),
-  label: z.string().trim().max(255).nullable().default(null),
-});
+import { firstValidationMessage } from "@/lib/utils/action-errors";
+import {
+  ACCEPTED_CHART_FILE_LABEL,
+  addChartFileSchema,
+  type AddChartFileInput,
+  MAX_FILE_SIZE,
+  parseStorageKey,
+  resolveChartFileContentType,
+} from "@/lib/validations/upload";
 
 const DEFAULT_MIME_TYPE = "application/octet-stream";
 
@@ -66,7 +64,7 @@ async function discardStoredObject(key: string): Promise<void> {
   }
 }
 
-export async function addChartFile(input: unknown) {
+export async function addChartFile(input: AddChartFileInput) {
   const user = await requireAuth();
 
   let validated;
@@ -74,7 +72,7 @@ export async function addChartFile(input: unknown) {
     validated = addChartFileSchema.parse(input);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     return { success: false as const, error: "Invalid input" };
   }
@@ -101,14 +99,15 @@ export async function addChartFile(input: unknown) {
     await discardRejectedUpload(validated.url);
     return { success: false as const, error: "That file is too large. Maximum size is 50MB." };
   }
-  // The stored type, not the caller's filename: an extension is a free-text field
-  // and would let any object in by being named `.pdf`. This is the same allowlist
-  // `getPresignedUploadUrl` applies, now checked against what actually arrived.
-  if (!(ALLOWED_CHART_FILE_TYPES as readonly string[]).includes(stored.contentType)) {
+  // The same rule `getPresignedUploadUrl` applies, now against what actually
+  // arrived. The stored type has to be exactly what the rule would produce for
+  // this name — an extension alone would let any object in by being named
+  // `.pdf`, and a type alone is what let the browser and this step disagree.
+  if (resolveChartFileContentType(validated.filename, stored.contentType) !== stored.contentType) {
     await discardRejectedUpload(validated.url);
     return {
       success: false as const,
-      error: "Unsupported file type. Accepted: PDF, images, .pat, .xsd, .css, .saga, .zip",
+      error: `Unsupported file type. Accepted: ${ACCEPTED_CHART_FILE_LABEL}`,
     };
   }
 

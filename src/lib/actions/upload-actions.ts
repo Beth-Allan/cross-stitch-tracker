@@ -8,15 +8,18 @@ import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { getReadTarget, getWriteTarget } from "@/lib/r2";
+import { firstValidationMessage } from "@/lib/utils/action-errors";
 import {
   uploadRequestSchema,
+  type UploadRequestInput,
   storageKeySchema,
   keyOwnerSchema,
   parseStorageKey,
+  resolveChartFileContentType,
   sanitizeUploadFileName,
+  ACCEPTED_CHART_FILE_LABEL,
   ALLOWED_IMAGE_TYPES,
   ALLOWED_IMAGE_FORMATS,
-  ALLOWED_FILE_TYPES,
   MAX_FILE_SIZE,
   OPTIMIZED_MAX_WIDTH,
   OPTIMIZED_QUALITY,
@@ -85,7 +88,7 @@ async function fetchImageBuffer(
   return { success: true, buffer };
 }
 
-export async function getPresignedUploadUrl(input: unknown) {
+export async function getPresignedUploadUrl(input: UploadRequestInput) {
   await requireAuth();
 
   let validated;
@@ -93,19 +96,29 @@ export async function getPresignedUploadUrl(input: unknown) {
     validated = uploadRequestSchema.parse(input);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     return { success: false as const, error: "Invalid upload request" };
   }
 
-  const isFileCategory = validated.category === "files";
-  const allowedTypes: readonly string[] = isFileCategory ? ALLOWED_FILE_TYPES : ALLOWED_IMAGE_TYPES;
-  if (!allowedTypes.includes(validated.contentType)) {
+  if (validated.category === "files") {
+    // The shared rule, applied to what the caller declared: a chart file is signed
+    // only under the exact type that rule would have produced for it, so the
+    // browser cannot accept a file this step then refuses — and every object in
+    // the namespace carries a type from `ALLOWED_CHART_FILE_TYPES`.
+    if (
+      resolveChartFileContentType(validated.fileName, validated.contentType) !==
+      validated.contentType
+    ) {
+      return {
+        success: false as const,
+        error: `Unsupported file type. Accepted: ${ACCEPTED_CHART_FILE_LABEL}`,
+      };
+    }
+  } else if (!(ALLOWED_IMAGE_TYPES as readonly string[]).includes(validated.contentType)) {
     return {
       success: false as const,
-      error: isFileCategory
-        ? `Invalid file type. Allowed: ${ALLOWED_FILE_TYPES.join(", ")}`
-        : `Invalid image type. Allowed: ${ALLOWED_IMAGE_TYPES.join(", ")}`,
+      error: `Invalid image type. Allowed: ${ALLOWED_IMAGE_TYPES.join(", ")}`,
     };
   }
 
