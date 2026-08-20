@@ -30,7 +30,70 @@ describe("dashboard-actions", () => {
     mockAuth.mockResolvedValue({
       user: { id: "user-1", name: "Test", email: "test@test.com" },
     });
+    // Empty defaults for the aggregate reads, so each test mocks only what it asserts on
+    mockPrisma.project.groupBy.mockResolvedValue([]);
+    mockPrisma.project.findFirst.mockResolvedValue(null);
+    mockPrisma.project.count.mockResolvedValue(0);
+    mockPrisma.stitchSession.groupBy.mockResolvedValue([]);
+    mockPrisma.chart.count.mockResolvedValue(0);
   });
+
+  /** True when a findFirst call's orderBy list sorts on the named key. */
+  function orderedBy(args: unknown, key: string): boolean {
+    const orderBy = (args as { orderBy?: unknown })?.orderBy;
+    const clauses = Array.isArray(orderBy) ? orderBy : orderBy ? [orderBy] : [];
+    return clauses.some((clause) => key in (clause as Record<string, unknown>));
+  }
+
+  type StatsProject = {
+    id: string;
+    status: string;
+    stitchesCompleted: number;
+    finishDate: Date | null;
+    chart: { name: string; stitchCount: number };
+  };
+
+  /** Stands in for `project.groupBy({ by: ["status"] })` over a fixture. */
+  function statusGroupsFrom(projects: StatsProject[]) {
+    const byStatus = new Map<string, { count: number; stitches: number }>();
+    for (const p of projects) {
+      const row = byStatus.get(p.status) ?? { count: 0, stitches: 0 };
+      byStatus.set(p.status, {
+        count: row.count + 1,
+        stitches: row.stitches + p.stitchesCompleted,
+      });
+    }
+    return [...byStatus].map(([status, row]) => ({
+      status,
+      _count: { _all: row.count },
+      _sum: { stitchesCompleted: row.stitches },
+    }));
+  }
+
+  /** Stands in for the two ordered `project.findFirst` reads over a fixture. */
+  function orderedProjectsFrom(projects: StatsProject[]) {
+    return async (args: unknown) => {
+      if (orderedBy(args, "finishDate")) {
+        const finished = projects
+          .filter((p) => ["FINISHED", "FFO"].includes(p.status) && p.finishDate !== null)
+          .sort((a, b) => b.finishDate!.getTime() - a.finishDate!.getTime());
+        return finished[0]
+          ? {
+              id: finished[0].id,
+              finishDate: finished[0].finishDate,
+              chart: { name: finished[0].chart.name },
+            }
+          : null;
+      }
+      const largest = [...projects].sort((a, b) => b.chart.stitchCount - a.chart.stitchCount)[0];
+      return largest
+        ? {
+            id: largest.id,
+            chart: { name: largest.chart.name, stitchCount: largest.chart.stitchCount },
+          }
+        : null;
+    };
+  }
 
   describe("getMainDashboardData", () => {
     // Test 1: Auth guard
@@ -55,7 +118,6 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: { name: "Designer A" },
           },
-          sessions: [{ date: new Date("2026-04-10"), stitchCount: 200, timeSpentMinutes: 60 }],
         },
         {
           id: "p2",
@@ -69,7 +131,6 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: null,
           },
-          sessions: [],
         },
       ]);
       // Mock other queries needed by getMainDashboardData
@@ -100,7 +161,6 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: null,
           },
-          sessions: [],
         },
         {
           id: "p2",
@@ -114,7 +174,6 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: null,
           },
-          sessions: [{ date: new Date("2026-04-01"), stitchCount: 100, timeSpentMinutes: 30 }],
         },
         {
           id: "p3",
@@ -128,11 +187,13 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: null,
           },
-          sessions: [{ date: new Date("2026-04-15"), stitchCount: 150, timeSpentMinutes: 45 }],
         },
       ]);
+      mockPrisma.stitchSession.groupBy.mockResolvedValue([
+        { projectId: "p2", date: new Date("2026-04-01"), _sum: { timeSpentMinutes: 30 } },
+        { projectId: "p3", date: new Date("2026-04-15"), _sum: { timeSpentMinutes: 45 } },
+      ]);
       mockPrisma.chart.findMany.mockResolvedValue([]);
-      mockPrisma.project.count.mockResolvedValue(0);
 
       const { getMainDashboardData } = await import("./dashboard-actions");
       const result = await getMainDashboardData();
@@ -159,7 +220,6 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: null,
           },
-          sessions: [{ date: new Date("2026-04-10"), stitchCount: 100, timeSpentMinutes: 30 }],
         },
         {
           id: "p2",
@@ -173,7 +233,6 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: null,
           },
-          sessions: [],
         },
         {
           id: "p3",
@@ -187,7 +246,6 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: null,
           },
-          sessions: [{ date: new Date("2026-04-12"), stitchCount: 100, timeSpentMinutes: 30 }],
         },
       ]);
       mockPrisma.chart.findMany.mockResolvedValue([]);
@@ -216,7 +274,7 @@ describe("dashboard-actions", () => {
     it("startNextProjects returns only projects with wantToStartNext=true and status UNSTARTED or KITTED", async () => {
       mockPrisma.project.findMany.mockResolvedValue([]); // currently stitching
       mockPrisma.chart.findMany.mockImplementation(
-        async (args: { where?: { project?: { wantToStartNext?: boolean } } }) => {
+        async (args: { where?: { project?: { wantToStartNext?: boolean } }; take?: number }) => {
           // Start Next query has wantToStartNext filter
           if (args?.where?.project?.wantToStartNext === true) {
             return [
@@ -281,14 +339,14 @@ describe("dashboard-actions", () => {
 
       mockPrisma.project.findMany.mockResolvedValue([]); // currently stitching
       mockPrisma.chart.findMany.mockImplementation(
-        async (args: { where?: { project?: { wantToStartNext?: boolean } } }) => {
+        async (args: { where?: { project?: { wantToStartNext?: boolean } }; take?: number }) => {
           if (args?.where?.project?.wantToStartNext === true) {
             return []; // start next
           }
-          return charts; // buried treasures (all unstarted)
+          return charts.slice(0, args?.take ?? charts.length); // buried treasures
         },
       );
-      mockPrisma.project.count.mockResolvedValue(0);
+      mockPrisma.chart.count.mockResolvedValue(charts.length);
 
       const { getMainDashboardData } = await import("./dashboard-actions");
       const result = await getMainDashboardData();
@@ -314,14 +372,14 @@ describe("dashboard-actions", () => {
 
       mockPrisma.project.findMany.mockResolvedValue([]);
       mockPrisma.chart.findMany.mockImplementation(
-        async (args: { where?: { project?: { wantToStartNext?: boolean } } }) => {
+        async (args: { where?: { project?: { wantToStartNext?: boolean } }; take?: number }) => {
           if (args?.where?.project?.wantToStartNext === true) {
             return [];
           }
-          return charts;
+          return charts.slice(0, args?.take ?? charts.length);
         },
       );
-      mockPrisma.project.count.mockResolvedValue(0);
+      mockPrisma.chart.count.mockResolvedValue(charts.length);
 
       const { getMainDashboardData } = await import("./dashboard-actions");
       const result = await getMainDashboardData();
@@ -346,14 +404,14 @@ describe("dashboard-actions", () => {
 
       mockPrisma.project.findMany.mockResolvedValue([]); // currently stitching
       mockPrisma.chart.findMany.mockImplementation(
-        async (args: { where?: { project?: { wantToStartNext?: boolean } } }) => {
+        async (args: { where?: { project?: { wantToStartNext?: boolean } }; take?: number }) => {
           if (args?.where?.project?.wantToStartNext === true) {
             return []; // start next
           }
-          return charts;
+          return charts.slice(0, args?.take ?? charts.length);
         },
       );
-      mockPrisma.project.count.mockResolvedValue(0);
+      mockPrisma.chart.count.mockResolvedValue(charts.length);
 
       const { getMainDashboardData } = await import("./dashboard-actions");
       const result = await getMainDashboardData();
@@ -377,7 +435,6 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: null,
           },
-          sessions: [],
         },
         {
           id: "p2",
@@ -391,7 +448,6 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: null,
           },
-          sessions: [],
         },
         {
           id: "p3",
@@ -405,7 +461,6 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: null,
           },
-          sessions: [],
         },
         {
           id: "p4",
@@ -445,14 +500,8 @@ describe("dashboard-actions", () => {
       ];
 
       // Currently stitching query filters by status IN, collection stats has no status filter
-      mockPrisma.project.findMany.mockImplementation(
-        async (args: { where?: { status?: { in?: string[] } } }) => {
-          if (args?.where?.status?.in) {
-            return allProjects.filter((p) => args.where!.status!.in!.includes(p.status));
-          }
-          return allProjects; // collection stats
-        },
-      );
+      mockPrisma.project.groupBy.mockResolvedValue(statusGroupsFrom(allProjects));
+      mockPrisma.project.findFirst.mockImplementation(orderedProjectsFrom(allProjects));
       mockPrisma.chart.findMany.mockResolvedValue([]); // start next + buried treasures
       mockPrisma.project.count.mockResolvedValue(0);
 
@@ -481,7 +530,6 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: null,
           },
-          sessions: [],
         },
         {
           id: "p2",
@@ -499,14 +547,8 @@ describe("dashboard-actions", () => {
         },
       ];
 
-      mockPrisma.project.findMany.mockImplementation(
-        async (args: { where?: { status?: { in?: string[] } } }) => {
-          if (args?.where?.status?.in) {
-            return allProjects.filter((p) => args.where!.status!.in!.includes(p.status));
-          }
-          return allProjects;
-        },
-      );
+      mockPrisma.project.groupBy.mockResolvedValue(statusGroupsFrom(allProjects));
+      mockPrisma.project.findFirst.mockImplementation(orderedProjectsFrom(allProjects));
       mockPrisma.chart.findMany.mockResolvedValue([]);
       mockPrisma.project.count.mockResolvedValue(0);
 
@@ -545,18 +587,11 @@ describe("dashboard-actions", () => {
             coverThumbnailUrl: null,
             designer: null,
           },
-          sessions: [],
         },
       ];
 
-      mockPrisma.project.findMany.mockImplementation(
-        async (args: { where?: { status?: { in?: string[] } } }) => {
-          if (args?.where?.status?.in) {
-            return allProjects.filter((p) => args.where!.status!.in!.includes(p.status));
-          }
-          return allProjects;
-        },
-      );
+      mockPrisma.project.groupBy.mockResolvedValue(statusGroupsFrom(allProjects));
+      mockPrisma.project.findFirst.mockImplementation(orderedProjectsFrom(allProjects));
       mockPrisma.chart.findMany.mockResolvedValue([]);
       mockPrisma.project.count.mockResolvedValue(0);
 
@@ -618,6 +653,168 @@ describe("dashboard-actions", () => {
           }
         }
       }
+    });
+  });
+
+  describe("bounded reads", () => {
+    function mockEmptyDashboard() {
+      mockPrisma.project.findMany.mockResolvedValue([]);
+      mockPrisma.project.groupBy.mockResolvedValue([]);
+      mockPrisma.project.findFirst.mockResolvedValue(null);
+      mockPrisma.project.count.mockResolvedValue(0);
+      mockPrisma.stitchSession.groupBy.mockResolvedValue([]);
+      mockPrisma.chart.findMany.mockResolvedValue([]);
+      mockPrisma.chart.count.mockResolvedValue(0);
+    }
+
+    it("currentlyStitching aggregates sessions per day instead of loading every session row", async () => {
+      mockEmptyDashboard();
+
+      const { getMainDashboardData } = await import("./dashboard-actions");
+      await getMainDashboardData();
+
+      expect(mockPrisma.stitchSession.groupBy).toHaveBeenCalledWith(
+        expect.objectContaining({ by: ["projectId", "date"] }),
+      );
+      for (const [args] of mockPrisma.project.findMany.mock.calls as Array<
+        [{ include?: { sessions?: unknown } }]
+      >) {
+        expect(args.include?.sessions).toBeUndefined();
+      }
+    });
+
+    it("currentlyStitching derives lastSessionDate, totalTimeMinutes and stitchingDays from the per-day rows", async () => {
+      mockEmptyDashboard();
+      mockPrisma.project.findMany.mockResolvedValue([
+        {
+          id: "p1",
+          userId: "user-1",
+          status: "IN_PROGRESS",
+          stitchesCompleted: 1000,
+          chart: {
+            id: "c1",
+            name: "Active Chart",
+            stitchCount: 5000,
+            coverThumbnailUrl: null,
+            designer: null,
+          },
+        },
+      ]);
+      mockPrisma.stitchSession.groupBy.mockResolvedValue([
+        { projectId: "p1", date: new Date("2026-04-10"), _sum: { timeSpentMinutes: 60 } },
+        { projectId: "p1", date: new Date("2026-04-12"), _sum: { timeSpentMinutes: 45 } },
+        { projectId: "p1", date: new Date("2026-04-11"), _sum: { timeSpentMinutes: null } },
+      ]);
+
+      const { getMainDashboardData } = await import("./dashboard-actions");
+      const result = await getMainDashboardData();
+
+      expect(result.currentlyStitching[0].lastSessionDate).toEqual(new Date("2026-04-12"));
+      expect(result.currentlyStitching[0].totalTimeMinutes).toBe(105);
+      expect(result.currentlyStitching[0].stitchingDays).toBe(3);
+    });
+
+    it("buriedTreasures asks the database only for the rows it will render", async () => {
+      mockEmptyDashboard();
+      mockPrisma.chart.count.mockResolvedValue(20);
+      mockPrisma.chart.findMany.mockImplementation(
+        async (args: { where?: { project?: { wantToStartNext?: boolean } }; take?: number }) => {
+          if (args?.where?.project?.wantToStartNext === true) return [];
+          return Array.from({ length: args?.take ?? 0 }, (_, i) => ({
+            id: `c${i}`,
+            name: `Chart ${i}`,
+            coverThumbnailUrl: null,
+            focalPointX: null,
+            focalPointY: null,
+            dateAdded: new Date(2025, 0, 1 + i),
+            designer: null,
+            genres: [],
+            project: { id: `p${i}` },
+          }));
+        },
+      );
+
+      const { getMainDashboardData } = await import("./dashboard-actions");
+      const result = await getMainDashboardData();
+
+      const treasureCall = mockPrisma.chart.findMany.mock.calls.find(
+        ([args]) => (args as { where?: { OR?: unknown } }).where?.OR !== undefined,
+      );
+      // 10% of 20 is 2 — the database is asked for 2 rows, not for all 20
+      expect((treasureCall![0] as { take?: number }).take).toBe(2);
+      expect(mockPrisma.chart.count).toHaveBeenCalled();
+      expect(result.buriedTreasures).toHaveLength(2);
+    });
+
+    it("collectionStats counts by status without loading a project row per project", async () => {
+      mockEmptyDashboard();
+      mockPrisma.project.groupBy.mockResolvedValue([
+        { status: "IN_PROGRESS", _count: { _all: 2 }, _sum: { stitchesCompleted: 3000 } },
+        { status: "ON_HOLD", _count: { _all: 1 }, _sum: { stitchesCompleted: 500 } },
+        { status: "UNSTARTED", _count: { _all: 1 }, _sum: { stitchesCompleted: 0 } },
+        { status: "KITTING", _count: { _all: 1 }, _sum: { stitchesCompleted: 0 } },
+        { status: "KITTED", _count: { _all: 1 }, _sum: { stitchesCompleted: 0 } },
+        { status: "FINISHED", _count: { _all: 1 }, _sum: { stitchesCompleted: 10000 } },
+        { status: "FFO", _count: { _all: 1 }, _sum: { stitchesCompleted: 6000 } },
+      ]);
+
+      const { getMainDashboardData } = await import("./dashboard-actions");
+      const result = await getMainDashboardData();
+
+      expect(mockPrisma.project.groupBy).toHaveBeenCalledWith(
+        expect.objectContaining({ by: ["status"], where: { userId: "user-1" } }),
+      );
+      expect(result.collectionStats.totalProjects).toBe(8);
+      expect(result.collectionStats.totalWIP).toBe(2);
+      expect(result.collectionStats.totalOnHold).toBe(1);
+      expect(result.collectionStats.totalUnstarted).toBe(3);
+      expect(result.collectionStats.totalFinished).toBe(2);
+      expect(result.collectionStats.totalStitchesCompleted).toBe(19500);
+    });
+
+    it("collectionStats asks the database for the most recent finish and the largest project", async () => {
+      mockEmptyDashboard();
+      mockPrisma.project.findFirst.mockImplementation(async (args: unknown) => {
+        if (orderedBy(args, "finishDate")) {
+          return {
+            id: "p2",
+            finishDate: new Date("2026-04-10"),
+            chart: { name: "Recent Finish" },
+          };
+        }
+        if (orderedBy(args, "chart")) {
+          return { id: "p3", chart: { name: "Big WIP", stitchCount: 50000 } };
+        }
+        return null;
+      });
+
+      const { getMainDashboardData } = await import("./dashboard-actions");
+      const result = await getMainDashboardData();
+
+      expect(result.collectionStats.mostRecentFinish).toEqual({
+        projectId: "p2",
+        name: "Recent Finish",
+        finishDate: new Date("2026-04-10"),
+      });
+      expect(result.collectionStats.largestProject).toEqual({
+        projectId: "p3",
+        name: "Big WIP",
+        stitchCount: 50000,
+      });
+    });
+
+    it("collectionStats reports no largest project when the biggest chart has no stitch count", async () => {
+      mockEmptyDashboard();
+      mockPrisma.project.findFirst.mockImplementation(async (args: unknown) =>
+        orderedBy(args, "chart")
+          ? { id: "p1", chart: { name: "Unmeasured", stitchCount: 0 } }
+          : null,
+      );
+
+      const { getMainDashboardData } = await import("./dashboard-actions");
+      const result = await getMainDashboardData();
+
+      expect(result.collectionStats.largestProject).toBeNull();
     });
   });
 

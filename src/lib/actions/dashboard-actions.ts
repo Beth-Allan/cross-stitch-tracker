@@ -2,6 +2,7 @@
 
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import type { Prisma } from "@/generated/prisma/client";
 import { mapFocalPoint } from "@/types/focal-point";
 import { calculateProgressPercent } from "@/lib/utils/progress";
 import type {
@@ -17,35 +18,57 @@ import type {
  * Currently Stitching: IN_PROGRESS and ON_HOLD projects sorted by most recent session.
  */
 async function getCurrentlyStitchingProjects(userId: string): Promise<CurrentlyStitchingProject[]> {
-  const projects = await prisma.project.findMany({
-    where: {
-      userId,
-      status: { in: ["IN_PROGRESS", "ON_HOLD"] },
-    },
-    include: {
-      chart: {
-        select: {
-          id: true,
-          name: true,
-          stitchCount: true,
-          coverThumbnailUrl: true,
-          focalPointX: true,
-          focalPointY: true,
-          designer: { select: { name: true } },
+  const where = {
+    userId,
+    status: { in: ["IN_PROGRESS", "ON_HOLD"] },
+  } satisfies Prisma.ProjectWhereInput;
+
+  // Session dates are stored as UTC-midnight instants, so one group per (project, date) is one
+  // group per stitching day — the three figures below are all derivable from it, and the row
+  // count stops growing with the number of sessions logged.
+  const [projects, dayTotals] = await Promise.all([
+    prisma.project.findMany({
+      where,
+      include: {
+        chart: {
+          select: {
+            id: true,
+            name: true,
+            stitchCount: true,
+            coverThumbnailUrl: true,
+            focalPointX: true,
+            focalPointY: true,
+            designer: { select: { name: true } },
+          },
         },
       },
-      sessions: {
-        select: { date: true, stitchCount: true, timeSpentMinutes: true },
-        orderBy: { date: "desc" },
-      },
-    },
-  });
+    }),
+    prisma.stitchSession.groupBy({
+      by: ["projectId", "date"],
+      where: { project: where },
+      _sum: { timeSpentMinutes: true },
+    }),
+  ]);
+
+  const daysByProject = new Map<string, { lastDate: Date; minutes: number; days: number }>();
+  for (const row of dayTotals) {
+    const existing = daysByProject.get(row.projectId);
+    const minutes = row._sum.timeSpentMinutes ?? 0;
+    if (!existing) {
+      daysByProject.set(row.projectId, { lastDate: row.date, minutes, days: 1 });
+      continue;
+    }
+    existing.minutes += minutes;
+    existing.days += 1;
+    if (row.date.getTime() > existing.lastDate.getTime()) existing.lastDate = row.date;
+  }
 
   return projects
     .map((p) => {
-      const lastSessionDate = p.sessions[0]?.date ?? null;
-      const totalTimeMinutes = p.sessions.reduce((sum, s) => sum + (s.timeSpentMinutes ?? 0), 0);
-      const stitchingDays = new Set(p.sessions.map((s) => s.date.toISOString().split("T")[0])).size;
+      const totals = daysByProject.get(p.id);
+      const lastSessionDate = totals?.lastDate ?? null;
+      const totalTimeMinutes = totals?.minutes ?? 0;
+      const stitchingDays = totals?.days ?? 0;
       const progressPercent = calculateProgressPercent(p.stitchesCompleted, p.chart.stitchCount);
 
       return {
@@ -115,31 +138,37 @@ async function getStartNextProjects(userId: string): Promise<StartNextProject[]>
  * Uses dynamic threshold. At least 1 is always returned.
  */
 async function getBuriedTreasures(userId: string): Promise<BuriedTreasure[]> {
-  // Get all charts that are unstarted (project with UNSTARTED status OR no project at all)
+  // Charts that are unstarted (project with UNSTARTED status OR no project at all)
+  const where = {
+    OR: [
+      { project: { userId, status: "UNSTARTED" } },
+      // A chart with no project has no owner to check — Chart carries no userId, so this arm
+      // is only sound while the app has one user
+      { project: null },
+    ],
+  } satisfies Prisma.ChartWhereInput;
+
+  // The threshold needs the size of the pool, not the pool itself: count first, then fetch only
+  // the rows that will be rendered.
+  const total = await prisma.chart.count({ where });
+  if (total === 0) return [];
+
+  // Dynamic threshold: oldest 10%, minimum 1, maximum 5
+  const threshold = Math.max(Math.ceil(total * 0.1), 1);
+  const count = Math.min(threshold, 5);
+
   const charts = await prisma.chart.findMany({
-    where: {
-      OR: [
-        { project: { userId, status: "UNSTARTED" } },
-        // A chart with no project has no owner to check — Chart carries no userId, so this arm
-        // is only sound while the app has one user
-        { project: null },
-      ],
-    },
+    where,
     include: {
       designer: { select: { name: true } },
       genres: { select: { name: true } },
       project: { select: { id: true } },
     },
     orderBy: { dateAdded: "asc" },
+    take: count,
   });
 
-  if (charts.length === 0) return [];
-
-  // Dynamic threshold: oldest 10%, minimum 1, maximum 5
-  const threshold = Math.max(Math.ceil(charts.length * 0.1), 1);
-  const count = Math.min(threshold, 5);
-
-  return charts.slice(0, count).map((c) => ({
+  return charts.map((c) => ({
     chartId: c.id,
     projectId: c.project?.id ?? null,
     chartName: c.name,
@@ -156,50 +185,59 @@ async function getBuriedTreasures(userId: string): Promise<BuriedTreasure[]> {
  * Collection Stats: Aggregated counts across all user projects.
  */
 async function getCollectionStats(userId: string): Promise<CollectionStats> {
-  const allProjects = await prisma.project.findMany({
-    where: { userId },
-    include: {
-      chart: { select: { id: true, name: true, stitchCount: true } },
-    },
-  });
+  // Eight scalars, none of which needs a project row: the status breakdown carries six of them,
+  // and the remaining two are the first row of an ordered query.
+  const [statusTotals, recentFinish, largest] = await Promise.all([
+    prisma.project.groupBy({
+      by: ["status"],
+      where: { userId },
+      _count: { _all: true },
+      _sum: { stitchesCompleted: true },
+    }),
+    prisma.project.findFirst({
+      where: { userId, status: { in: ["FINISHED", "FFO"] }, finishDate: { not: null } },
+      // id breaks ties, so two finishes on the same day always pick the same one
+      orderBy: [{ finishDate: "desc" }, { id: "asc" }],
+      select: { id: true, finishDate: true, chart: { select: { name: true } } },
+    }),
+    prisma.project.findFirst({
+      where: { userId },
+      orderBy: [{ chart: { stitchCount: "desc" } }, { id: "asc" }],
+      select: { id: true, chart: { select: { name: true, stitchCount: true } } },
+    }),
+  ]);
 
-  const totalProjects = allProjects.length;
-  const totalWIP = allProjects.filter((p) => p.status === "IN_PROGRESS").length;
-  const totalOnHold = allProjects.filter((p) => p.status === "ON_HOLD").length;
-  const totalUnstarted = allProjects.filter((p) =>
-    ["UNSTARTED", "KITTING", "KITTED"].includes(p.status),
-  ).length;
-  const totalFinished = allProjects.filter((p) => ["FINISHED", "FFO"].includes(p.status)).length;
-  const totalStitchesCompleted = allProjects.reduce((sum, p) => sum + p.stitchesCompleted, 0);
+  const countOf = (statuses: readonly string[]) =>
+    statusTotals
+      .filter((row) => statuses.includes(row.status))
+      .reduce((sum, row) => sum + row._count._all, 0);
 
-  // Most recent finish: project with latest finishDate (FINISHED or FFO)
-  const finishedProjects = allProjects.filter(
-    (p) => ["FINISHED", "FFO"].includes(p.status) && p.finishDate !== null,
+  const totalProjects = statusTotals.reduce((sum, row) => sum + row._count._all, 0);
+  const totalWIP = countOf(["IN_PROGRESS"]);
+  const totalOnHold = countOf(["ON_HOLD"]);
+  const totalUnstarted = countOf(["UNSTARTED", "KITTING", "KITTED"]);
+  const totalFinished = countOf(["FINISHED", "FFO"]);
+  const totalStitchesCompleted = statusTotals.reduce(
+    (sum, row) => sum + (row._sum.stitchesCompleted ?? 0),
+    0,
   );
-  let mostRecentFinish: CollectionStats["mostRecentFinish"] = null;
-  if (finishedProjects.length > 0) {
-    const sorted = finishedProjects.sort(
-      (a, b) => b.finishDate!.getTime() - a.finishDate!.getTime(),
-    );
-    mostRecentFinish = {
-      projectId: sorted[0].id,
-      name: sorted[0].chart.name,
-      finishDate: sorted[0].finishDate!,
-    };
-  }
 
-  // Largest project: highest chart.stitchCount across all projects
-  let largestProject: CollectionStats["largestProject"] = null;
-  if (allProjects.length > 0) {
-    const sorted = [...allProjects].sort((a, b) => b.chart.stitchCount - a.chart.stitchCount);
-    if (sorted[0].chart.stitchCount > 0) {
-      largestProject = {
-        projectId: sorted[0].id,
-        name: sorted[0].chart.name,
-        stitchCount: sorted[0].chart.stitchCount,
-      };
-    }
-  }
+  const mostRecentFinish: CollectionStats["mostRecentFinish"] = recentFinish
+    ? {
+        projectId: recentFinish.id,
+        name: recentFinish.chart.name,
+        finishDate: recentFinish.finishDate!,
+      }
+    : null;
+
+  const largestProject: CollectionStats["largestProject"] =
+    largest && largest.chart.stitchCount > 0
+      ? {
+          projectId: largest.id,
+          name: largest.chart.name,
+          stitchCount: largest.chart.stitchCount,
+        }
+      : null;
 
   return {
     totalProjects,
