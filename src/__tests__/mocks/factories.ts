@@ -23,6 +23,7 @@ import type { ChartWithProject, ProjectWithRelations } from "@/types/chart";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import type { SeriesWithStats, SeriesChart } from "@/types/series";
 import type { GalleryCardData } from "@/components/features/gallery/gallery-types";
+import type { ProjectSupplies, SupplyRollup } from "@/lib/queries/project-supplies";
 import type { OptionalFocalPoint } from "@/types/focal-point";
 import { vi } from "vitest";
 
@@ -462,6 +463,104 @@ export function createMockGalleryCard(
   };
 }
 
+type SupplyRow = { quantityRequired: number; quantityAcquired: number };
+
+/**
+ * The rollup a list of junction rows stands for, stated the way the JS pass stated it before the
+ * arithmetic moved into SQL. Tests name the rows they mean and this names what the kitting rule
+ * said about them — independently of the query that now produces the same figures.
+ */
+export function createSupplyRollup(rows: SupplyRow[]): SupplyRollup {
+  return {
+    count: rows.length,
+    required: rows.reduce((sum, r) => sum + r.quantityRequired, 0),
+    acquired: rows.reduce((sum, r) => sum + Math.min(r.quantityAcquired, r.quantityRequired), 0),
+    allFulfilled: rows.every((r) => r.quantityAcquired >= r.quantityRequired),
+    anyAcquired: rows.some((r) => r.quantityAcquired > 0),
+  };
+}
+
+export function createProjectSupplies(
+  rows: { threads?: SupplyRow[]; beads?: SupplyRow[]; specialty?: SupplyRow[] } = {},
+): ProjectSupplies {
+  return {
+    threads: createSupplyRollup(rows.threads ?? []),
+    beads: createSupplyRollup(rows.beads ?? []),
+    specialty: createSupplyRollup(rows.specialty ?? []),
+  };
+}
+
+type SupplyRowsByProject = Array<{
+  projectId: string;
+  threads?: SupplyRow[];
+  beads?: SupplyRow[];
+  specialty?: SupplyRow[];
+}>;
+
+type SupplyGroupRow =
+  | {
+      projectId: string;
+      _count: { _all: number };
+      _sum: { quantityRequired: number };
+      _max: { quantityAcquired: number };
+    }
+  | { projectId: string; _sum: { quantityRequired: number; quantityAcquired: number } };
+
+/**
+ * Answers the six group reads `summariseProjectSupplies` makes, from plain junction rows: a test
+ * states the rows it means and the aggregates are derived, rather than hand-typed from the code
+ * they are meant to check.
+ *
+ * Each read is answered with the aggregate shape that read actually asks for — the shortfall read
+ * gets its two sums and nothing else — so production code that reads a field it never selected
+ * fails here instead of passing on a too-generous mock.
+ */
+export function mockProjectSupplyGroups(
+  mockPrisma: MockPrisma,
+  projects: SupplyRowsByProject,
+): void {
+  const answer =
+    (pick: (project: SupplyRowsByProject[number]) => SupplyRow[] | undefined) =>
+    (args: { where?: { quantityAcquired?: unknown } }) => {
+      const shortfallRead = args?.where?.quantityAcquired !== undefined;
+
+      return Promise.resolve(
+        projects.flatMap((project): SupplyGroupRow[] => {
+          const all = pick(project) ?? [];
+          const group = shortfallRead
+            ? all.filter((r) => r.quantityAcquired < r.quantityRequired)
+            : all;
+          if (group.length === 0) return [];
+
+          const sum = (field: keyof SupplyRow) => group.reduce((total, r) => total + r[field], 0);
+
+          return shortfallRead
+            ? [
+                {
+                  projectId: project.projectId,
+                  _sum: {
+                    quantityRequired: sum("quantityRequired"),
+                    quantityAcquired: sum("quantityAcquired"),
+                  },
+                },
+              ]
+            : [
+                {
+                  projectId: project.projectId,
+                  _count: { _all: group.length },
+                  _sum: { quantityRequired: sum("quantityRequired") },
+                  _max: { quantityAcquired: Math.max(...group.map((r) => r.quantityAcquired)) },
+                },
+              ];
+        }),
+      );
+    };
+
+  mockPrisma.projectThread.groupBy.mockImplementation(answer((p) => p.threads));
+  mockPrisma.projectBead.groupBy.mockImplementation(answer((p) => p.beads));
+  mockPrisma.projectSpecialty.groupBy.mockImplementation(answer((p) => p.specialty));
+}
+
 export function createMockStitchSession(overrides?: Partial<StitchSession>): StitchSession {
   return {
     id: "session-1",
@@ -565,6 +664,13 @@ export function createMockPrisma() {
       delete: vi.fn(),
       upsert: vi.fn(),
       groupBy: vi.fn(),
+      // Prisma exposes a model's column references at `prisma.<model>.fields`; a same-row
+      // comparison (quantityAcquired < quantityRequired) is written with one, so the mock
+      // carries them too or the query cannot be built under test.
+      fields: {
+        quantityRequired: "ProjectThread.quantityRequired",
+        quantityAcquired: "ProjectThread.quantityAcquired",
+      },
     },
     projectBead: {
       create: vi.fn(),
@@ -574,6 +680,11 @@ export function createMockPrisma() {
       update: vi.fn(),
       delete: vi.fn(),
       upsert: vi.fn(),
+      groupBy: vi.fn(),
+      fields: {
+        quantityRequired: "ProjectBead.quantityRequired",
+        quantityAcquired: "ProjectBead.quantityAcquired",
+      },
     },
     projectSpecialty: {
       create: vi.fn(),
@@ -583,6 +694,11 @@ export function createMockPrisma() {
       update: vi.fn(),
       delete: vi.fn(),
       upsert: vi.fn(),
+      groupBy: vi.fn(),
+      fields: {
+        quantityRequired: "ProjectSpecialty.quantityRequired",
+        quantityAcquired: "ProjectSpecialty.quantityAcquired",
+      },
     },
     fabricBrand: {
       create: vi.fn(),

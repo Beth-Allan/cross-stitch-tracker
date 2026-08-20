@@ -5,6 +5,7 @@ import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { EMPTY_PROJECT_SUPPLIES, summariseProjectSupplies } from "@/lib/queries/project-supplies";
 import { firstValidationMessage } from "@/lib/utils/action-errors";
 import { discardStoredObjects } from "@/lib/r2";
 import { processAndStoreImage } from "@/lib/actions/upload-actions";
@@ -633,39 +634,53 @@ export async function getCharts() {
   });
 }
 
+/**
+ * Every chart the gallery draws, each with the kitting figures its card shows.
+ *
+ * The supply figures arrive as one group row per project per junction rather than as the
+ * junction rows themselves: a card needs four dots and three counts, and reading every
+ * `quantityRequired`/`quantityAcquired` row to derive them put the whole supply table on the
+ * wire — and then in the payload sent to the browser — on both `/` and `/charts`.
+ */
 export async function getChartsForGallery() {
   const user = await requireAuth();
 
-  return await prisma.chart.findMany({
-    where: { project: { userId: user.id } },
-    include: {
-      project: {
-        select: {
-          id: true,
-          status: true,
-          stitchesCompleted: true,
-          startDate: true,
-          finishDate: true,
-          ffoDate: true,
-          fabric: { select: { id: true } },
-          projectThreads: {
-            select: { quantityRequired: true, quantityAcquired: true },
-          },
-          projectBeads: {
-            select: { quantityRequired: true, quantityAcquired: true },
-          },
-          projectSpecialty: {
-            select: { quantityRequired: true, quantityAcquired: true },
+  const project = { userId: user.id } satisfies Prisma.ProjectWhereInput;
+
+  const [charts, supplies] = await Promise.all([
+    prisma.chart.findMany({
+      where: { project },
+      include: {
+        project: {
+          select: {
+            id: true,
+            status: true,
+            stitchesCompleted: true,
+            startDate: true,
+            finishDate: true,
+            ffoDate: true,
+            fabric: { select: { id: true } },
           },
         },
+        designer: true,
+        genres: true,
+        series: { select: { id: true, name: true } },
+        _count: { select: { files: true } },
       },
-      designer: true,
-      genres: true,
-      series: { select: { id: true, name: true } },
-      _count: { select: { files: true } },
-    },
-    orderBy: { dateAdded: "desc" },
-  });
+      orderBy: { dateAdded: "desc" },
+    }),
+    summariseProjectSupplies(project),
+  ]);
+
+  return charts.map((chart) => ({
+    ...chart,
+    project: chart.project
+      ? {
+          ...chart.project,
+          supplies: supplies.get(chart.project.id) ?? EMPTY_PROJECT_SUPPLIES,
+        }
+      : null,
+  }));
 }
 
 export async function updateProjectSettings(chartId: string, formData: UpdateProjectSettingsInput) {

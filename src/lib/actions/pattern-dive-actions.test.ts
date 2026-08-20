@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma } from "@/__tests__/mocks";
+import { createMockPrisma, mockProjectSupplyGroups } from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -15,6 +15,44 @@ vi.mock("@/lib/db", () => ({
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
+
+type SupplyRow = { quantityRequired: number; quantityAcquired: number };
+
+type WhatsNextFixture = {
+  project: {
+    id: string;
+    projectThreads: SupplyRow[];
+    projectBeads: SupplyRow[];
+    projectSpecialty: SupplyRow[];
+  } & Record<string, unknown>;
+} & Record<string, unknown>;
+
+/**
+ * Splits a What's Next fixture across the two reads the action now makes: the chart rows, which
+ * no longer carry the junction rows, and the per-project supply groups derived from those same
+ * rows. Fixtures stay written as the supplies a project has.
+ */
+function mockWhatsNextCharts(charts: WhatsNextFixture[]) {
+  mockPrisma.chart.findMany.mockResolvedValue(
+    charts.map(({ project, ...chart }) => {
+      const row: Partial<typeof project> = { ...project };
+      delete row.projectThreads;
+      delete row.projectBeads;
+      delete row.projectSpecialty;
+      return { ...chart, project: row };
+    }),
+  );
+
+  mockProjectSupplyGroups(
+    mockPrisma,
+    charts.map((c) => ({
+      projectId: c.project.id,
+      threads: c.project.projectThreads,
+      beads: c.project.projectBeads,
+      specialty: c.project.projectSpecialty,
+    })),
+  );
+}
 
 describe("pattern-dive-actions", () => {
   beforeEach(() => {
@@ -32,7 +70,7 @@ describe("pattern-dive-actions", () => {
     });
 
     it("returns only UNSTARTED and KITTED projects", async () => {
-      mockPrisma.chart.findMany.mockResolvedValue([
+      mockWhatsNextCharts([
         {
           id: "c1",
           name: "Unstarted Chart",
@@ -91,7 +129,7 @@ describe("pattern-dive-actions", () => {
     });
 
     it("sorts wantToStartNext=true projects before others", async () => {
-      mockPrisma.chart.findMany.mockResolvedValue([
+      mockWhatsNextCharts([
         {
           id: "c1",
           name: "Normal Chart",
@@ -138,7 +176,7 @@ describe("pattern-dive-actions", () => {
     });
 
     it("within same wantToStartNext group, sorts by kitting % descending", async () => {
-      mockPrisma.chart.findMany.mockResolvedValue([
+      mockWhatsNextCharts([
         {
           id: "c1",
           name: "Low Kitting",
@@ -183,7 +221,7 @@ describe("pattern-dive-actions", () => {
     });
 
     it("within same kitting %, sorts by dateAdded ascending (oldest first)", async () => {
-      mockPrisma.chart.findMany.mockResolvedValue([
+      mockWhatsNextCharts([
         {
           id: "c1",
           name: "Newer Chart",
@@ -229,7 +267,7 @@ describe("pattern-dive-actions", () => {
     });
 
     it("calculates kitting % correctly: (sum of min(acquired, required) + fabricAcquired) / (sum of required + 1) * 100", async () => {
-      mockPrisma.chart.findMany.mockResolvedValue([
+      mockWhatsNextCharts([
         {
           id: "c1",
           name: "Partial Kit",
@@ -264,7 +302,7 @@ describe("pattern-dive-actions", () => {
     });
 
     it("counts fabric as 1 required item (1 acquired if linked, 0 if not)", async () => {
-      mockPrisma.chart.findMany.mockResolvedValue([
+      mockWhatsNextCharts([
         {
           id: "c1",
           name: "No Fabric",
@@ -314,7 +352,7 @@ describe("pattern-dive-actions", () => {
     });
 
     it("KIT-004: a project with no supplies recorded reads 0% kitted, not 100%", async () => {
-      mockPrisma.chart.findMany.mockResolvedValue([
+      mockWhatsNextCharts([
         {
           id: "c1",
           name: "No Supplies",
@@ -343,7 +381,7 @@ describe("pattern-dive-actions", () => {
     });
 
     it("returns 0% kitting for project with fabric but no supply items tracked", async () => {
-      mockPrisma.chart.findMany.mockResolvedValue([
+      mockWhatsNextCharts([
         {
           id: "c1",
           name: "Fabric Only",
@@ -372,7 +410,7 @@ describe("pattern-dive-actions", () => {
 
     it("returns correct WhatsNextProject shape", async () => {
       const dateAdded = new Date("2026-01-15");
-      mockPrisma.chart.findMany.mockResolvedValue([
+      mockWhatsNextCharts([
         {
           id: "c1",
           name: "Shape Test",
@@ -1382,6 +1420,108 @@ describe("pattern-dive-actions", () => {
 
       expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-fits"]);
       expect(result[0].overOneOnlyFabrics).toEqual([]);
+    });
+
+    it("offers the same stash piece to every project of that count, not just the first", async () => {
+      const chart = (id: string, projectId: string) => ({
+        id,
+        name: `Chart ${id}`,
+        coverThumbnailUrl: null,
+        stitchCount: 10000,
+        stitchesWide: 100,
+        stitchesHigh: 100,
+        designer: null,
+        project: {
+          id: projectId,
+          overCount: 1,
+          fabric: {
+            id: `f-assigned-${id}`,
+            name: "Assigned 14ct",
+            count: 14,
+            shortestEdgeInches: 20,
+            longestEdgeInches: 25,
+            brand: { name: "Zweigart" },
+          },
+        },
+      });
+      mockPrisma.chart.findMany.mockResolvedValue([chart("c1", "p1"), chart("c2", "p2")]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-14ct",
+          name: "14ct Match",
+          count: 14,
+          shortestEdgeInches: 20,
+          longestEdgeInches: 25,
+          brand: { name: "Zweigart" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-14ct"]);
+      expect(result[1].matchingFabrics.map((f) => f.id)).toEqual(["f-14ct"]);
+    });
+
+    it("serves an unassigned project from the whole stash while its neighbour sees one count", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "No Fabric Yet",
+          coverThumbnailUrl: null,
+          stitchCount: 10000,
+          stitchesWide: 100,
+          stitchesHigh: 100,
+          designer: null,
+          project: { id: "p1", overCount: 1, fabric: null },
+        },
+        {
+          id: "c2",
+          name: "Assigned 14ct",
+          coverThumbnailUrl: null,
+          stitchCount: 10000,
+          stitchesWide: 100,
+          stitchesHigh: 100,
+          designer: null,
+          project: {
+            id: "p2",
+            overCount: 1,
+            fabric: {
+              id: "f-assigned",
+              name: "Assigned 14ct",
+              count: 14,
+              shortestEdgeInches: 20,
+              longestEdgeInches: 25,
+              brand: { name: "Zweigart" },
+            },
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-14ct",
+          name: "14ct Piece",
+          count: 14,
+          shortestEdgeInches: 20,
+          longestEdgeInches: 25,
+          brand: { name: "Zweigart" },
+        },
+        {
+          id: "f-16ct",
+          name: "16ct Piece",
+          count: 16,
+          shortestEdgeInches: 20,
+          longestEdgeInches: 25,
+          brand: { name: "DMC" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      // The unassigned project judges every piece at its own count; the assigned one sees 14ct only
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-14ct", "f-16ct"]);
+      expect(result[1].matchingFabrics.map((f) => f.id)).toEqual(["f-14ct"]);
     });
 
     it("applies the qualifier to a project that already has fabric assigned, too", async () => {
