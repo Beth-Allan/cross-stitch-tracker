@@ -99,6 +99,8 @@ upload fixes and the one question they raise for her — which chart-file format
 which is what decides whether the client's extension fallback or the server's MIME-only rule is
 right. P13b is gated, so a `/review` row follows it.
 
+### 2026-08-19 · D-19 · the quick-add colour picker is required, not defaulted — ruled during P11b
+
 **What needed a ruling.** Her 2026-08-17 ruling said quick-add "gains a colour-family picker —
 one extra tap, honest filter", which leaves one thing open: whether the picker arrives
 pre-filled. A picker that starts on Neutral and is not touched files the supply under Neutral —

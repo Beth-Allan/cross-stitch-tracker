@@ -41,7 +41,7 @@ describe("isDuplicateKeyError", () => {
     expect(isDuplicateKeyError("P2002")).toBe(false);
   });
 
-  it("rejects a non-string code that happens to match loosely", () => {
+  it("rejects a numeric code, which a coercing or substring check would accept", () => {
     expect(isDuplicateKeyError({ code: 2002 })).toBe(false);
   });
 });

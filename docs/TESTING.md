@@ -32,7 +32,7 @@ excuse for pushing red.
 
 ## What exists
 
-**229 test files · 2877 tests · no E2E** (no Playwright, no Cypress). The numbers go stale; the
+**229 test files · 2880 tests · no E2E** (no Playwright, no Cypress). The numbers go stale; the
 suite footer does not. Run `npm test` and read the last line rather than trusting this paragraph.
 
 | Area                       | Files   |

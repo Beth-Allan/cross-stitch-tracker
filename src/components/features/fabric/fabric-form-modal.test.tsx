@@ -144,6 +144,80 @@ describe("FabricFormModal", () => {
     expect(screen.getByRole("button", { name: /Save Changes/i })).toBeInTheDocument();
   });
 
+  describe("a stored type or colour the app's lists do not offer", () => {
+    // Fabric.type/colorFamily/colorType are plain String columns, so a row written
+    // by a seed, Prisma Studio or SQL can hold a value no dropdown contains.
+    const oddFabric = {
+      id: "f-odd",
+      name: "Mystery cloth",
+      brandId: "fb-1",
+      count: 28,
+      type: "Sparkly Aida",
+      colorFamily: "White",
+      colorType: "White",
+      shortestEdgeInches: 18,
+      longestEdgeInches: 24,
+      needToBuy: false,
+      linkedProjectId: null,
+      photoUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    // The Type label is not uniquely addressable by text: a required FormField puts
+    // its screen-reader "(required)" ahead of the label, and "Colour Type" also
+    // contains "Type". The select's own id is unambiguous, and the dialog portals
+    // out of the render container, so it is looked up on the document.
+    const typeSelect = () => document.getElementById("fabric-type") as HTMLSelectElement;
+
+    function renderOdd() {
+      return render(
+        <FabricFormModal
+          open={true}
+          onOpenChange={vi.fn()}
+          fabric={oddFabric}
+          fabricBrands={mockBrands}
+          projects={mockProjects}
+        />,
+      );
+    }
+
+    it("shows the stored value rather than silently displaying a different one", () => {
+      renderOdd();
+
+      expect(typeSelect()).toHaveValue("Sparkly Aida");
+      expect(screen.getByText("Sparkly Aida (not recognised)")).toBeInTheDocument();
+    });
+
+    it("refuses to save it instead of rewriting the row to a default", async () => {
+      const user = userEvent.setup();
+      renderOdd();
+
+      await user.click(screen.getByRole("button", { name: /Save Changes/i }));
+
+      await waitFor(() => {
+        expect(screen.getByText(/type or colour this app does not recognise/i)).toBeInTheDocument();
+      });
+      expect(mockUpdateFabric).not.toHaveBeenCalled();
+    });
+
+    it("saves once a real option is chosen", async () => {
+      mockUpdateFabric.mockResolvedValue({ success: true, fabric: { id: "f-odd" } });
+      const user = userEvent.setup();
+      renderOdd();
+
+      await user.selectOptions(typeSelect(), "Linen");
+      await user.click(screen.getByRole("button", { name: /Save Changes/i }));
+
+      await waitFor(() => {
+        expect(mockUpdateFabric).toHaveBeenCalledWith(
+          "f-odd",
+          expect.objectContaining({ type: "Linen" }),
+        );
+      });
+    });
+  });
+
   describe("brand selection via SearchableSelect", () => {
     it("renders a searchable brand selector with brand options", () => {
       render(

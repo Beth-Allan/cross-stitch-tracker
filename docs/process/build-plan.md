@@ -287,10 +287,13 @@ half is P13 and merged the same day; the upload half is **P13b** below.
 - **Traps:** behavior-preserving refactor plus small validation fixes — anything that _changes_
   what validates is TDD'd; no schema/migration scope.
 - **Done-when:** one convention, stated in `form-patterns.md`; zero dead `z.infer` exports;
-  gate green. **Met, with one stated exception** — `validations/auth.ts`'s `LoginInput` is still
-  `z.infer` and still dead. That file is review-gated by Beth's P1 ruling, and carrying a one-word
-  rename would have put the whole 58-file ungated diff behind a `/review`, which is the trade D-20
-  had just ruled against. Reverted out of the branch and logged.
+  gate green. **Met, precisely:** 22 of the 25 inferred types are now live action signatures;
+  `UpdateFocalPointInput` was **deleted** rather than renamed, because `updateFocalPoint` takes
+  three primitives and the object type could never have a caller; `UploadRequestInput` becomes live
+  when P13b types the gated action it belongs to. The one exception is
+  `validations/auth.ts`'s `LoginInput`, still `z.infer` and still dead — that file is review-gated
+  by Beth's P1 ruling, and carrying a one-word rename would have put the whole ungated diff behind
+  a `/review`, the trade D-20 had just ruled against. Reverted out of the branch and logged.
 - **Deliberately left, with ledger rows:** the boundary-duplication row's three largest arms (the
   junction three-arm dispatch, `CalcParams`/`CalculatorSettings`, and the two gated action files'
   error arms) · `validations/supply.ts`'s private enum copies, because merging them changes the
