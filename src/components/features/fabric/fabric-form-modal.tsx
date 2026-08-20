@@ -16,13 +16,14 @@ import { FormField } from "@/components/features/charts/form-primitives/form-fie
 import { SearchableSelect } from "@/components/features/charts/form-primitives/searchable-select";
 import { InlineBrandDialog } from "@/components/features/shared/inline-brand-dialog";
 import { createFabric, updateFabric, createFabricBrand } from "@/lib/actions/fabric-actions";
+import { optionFrom } from "@/lib/utils/select-option";
 import {
   FABRIC_COUNTS,
   FABRIC_TYPES,
   FABRIC_COLOR_FAMILIES,
   FABRIC_COLOR_TYPES,
 } from "@/types/fabric";
-import type { Fabric } from "@/types/fabric";
+import type { Fabric, FabricColorFamily, FabricColorType, FabricType } from "@/types/fabric";
 import type { FabricBrandWithCounts } from "@/types/fabric";
 
 interface FabricFormModalProps {
@@ -47,9 +48,9 @@ export function FabricFormModal({
   const [name, setName] = useState("");
   const [brandId, setBrandId] = useState("");
   const [count, setCount] = useState<number>(14);
-  const [type, setType] = useState("Aida");
-  const [colorFamily, setColorFamily] = useState("White");
-  const [colorType, setColorType] = useState("White");
+  const [type, setType] = useState<FabricType>("Aida");
+  const [colorFamily, setColorFamily] = useState<FabricColorFamily>("White");
+  const [colorType, setColorType] = useState<FabricColorType>("White");
   const [shortestEdgeInches, setShortestEdgeInches] = useState("");
   const [longestEdgeInches, setLongestEdgeInches] = useState("");
   const [linkedProjectId, setLinkedProjectId] = useState<string | null>(null);
@@ -88,9 +89,9 @@ export function FabricFormModal({
         setName(fabric.name);
         setBrandId(fabric.brandId);
         setCount(fabric.count);
-        setType(fabric.type);
-        setColorFamily(fabric.colorFamily);
-        setColorType(fabric.colorType);
+        setType(optionFrom(FABRIC_TYPES, fabric.type) ?? "Aida");
+        setColorFamily(optionFrom(FABRIC_COLOR_FAMILIES, fabric.colorFamily) ?? "White");
+        setColorType(optionFrom(FABRIC_COLOR_TYPES, fabric.colorType) ?? "White");
         setShortestEdgeInches(
           fabric.shortestEdgeInches > 0 ? String(fabric.shortestEdgeInches) : "",
         );
@@ -230,7 +231,10 @@ export function FabricFormModal({
               <select
                 id="fabric-type"
                 value={type}
-                onChange={(e) => setType(e.target.value)}
+                onChange={(e) => {
+                  const next = optionFrom(FABRIC_TYPES, e.target.value);
+                  if (next) setType(next);
+                }}
                 className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 flex h-8 w-full rounded-lg border px-3 text-sm transition-colors outline-none focus-visible:ring-3"
               >
                 {FABRIC_TYPES.map((t) => (
@@ -247,7 +251,10 @@ export function FabricFormModal({
               <select
                 id="fabric-color-family"
                 value={colorFamily}
-                onChange={(e) => setColorFamily(e.target.value)}
+                onChange={(e) => {
+                  const next = optionFrom(FABRIC_COLOR_FAMILIES, e.target.value);
+                  if (next) setColorFamily(next);
+                }}
                 className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 flex h-8 w-full rounded-lg border px-3 text-sm transition-colors outline-none focus-visible:ring-3"
               >
                 {FABRIC_COLOR_FAMILIES.map((c) => (
@@ -262,7 +269,10 @@ export function FabricFormModal({
               <select
                 id="fabric-color-type"
                 value={colorType}
-                onChange={(e) => setColorType(e.target.value)}
+                onChange={(e) => {
+                  const next = optionFrom(FABRIC_COLOR_TYPES, e.target.value);
+                  if (next) setColorType(next);
+                }}
                 className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 flex h-8 w-full rounded-lg border px-3 text-sm transition-colors outline-none focus-visible:ring-3"
               >
                 {FABRIC_COLOR_TYPES.map((c) => (

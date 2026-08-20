@@ -145,13 +145,15 @@ Caching: `unstable_cache` keyed per user, tagged `"stats"`, invalidated by `reva
 
 Zod schemas by domain (`auth`, `chart`, `fabric`, `focal-point`, `series`, `session`, `storage`, `supply`, `upload`). Shared between actions (server) and form hooks (client). `upload.ts` also owns the allowed MIME/extension lists, the 50MB cap, and the image-optimization constants.
 
+`fields.ts` is the shared field layer every other schema builds from — `optionalText`, `optionalUrl`, `optionalChoice`, `optionalDateString`. **Blank optional input becomes `null` here and nowhere else**, so a client form sends what the user typed rather than pre-normalising it. Each file also exports its payload type as `XInput` = `z.input<…>` — the compile-time contract an action's parameter uses; the runtime `.parse()` inside the action is still the actual defence, because server action ids are global. The convention is written out in `.claude/rules/form-patterns.md`.
+
 ### Layer 11: Domain Types (`src/types/`)
 
 TypeScript interface/type files; no runtime code. Composed from Prisma-generated types using intersection, `Pick`, and `&`. One file per domain: `chart`, `dashboard`, `designer`, `fabric`, `focal-point`, `genre`, `series`, `session`, `shopping`, `stats`, `storage`, `supply`.
 
 ### Layer 12: Utilities (`src/lib/utils/`)
 
-Pure functions, no side effects: `calendar-date.ts`, `skein-calculator.ts`, `fabric-calculator.ts`, `size-category.ts`, `status.ts`, `status-groups.ts`, `series-progress.ts`, `progress.ts`, `settled.ts`, `focal-point.ts`, `format-file-size.ts`, `format-time.ts`, `natural-sort.ts`.
+Pure functions, no side effects: `calendar-date.ts`, `skein-calculator.ts`, `fabric-calculator.ts`, `size-category.ts`, `status.ts`, `status-groups.ts`, `series-progress.ts`, `progress.ts`, `settled.ts`, `focal-point.ts`, `format-file-size.ts`, `format-time.ts`, `natural-sort.ts`, `action-errors.ts` (the two error arms every write action returns), `select-option.ts` (narrowing a native `<select>`'s value back to its own options).
 
 `src/lib/constants.ts` holds literals shared across modules that belong to no single utility.
 

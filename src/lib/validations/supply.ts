@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
+import { optionalUrl } from "@/lib/validations/fields";
 
 const SUPPLY_TYPES = ["THREAD", "BEAD", "SPECIALTY"] as const;
 const COLOR_FAMILIES = [
@@ -18,11 +19,11 @@ const COLOR_FAMILIES = [
 
 export const supplyBrandSchema = z.object({
   name: z.string().trim().min(1, "Brand name is required").max(200, "Brand name too long"),
-  website: z.string().url("Must be a valid URL").nullable().default(null),
+  website: optionalUrl(),
   supplyType: z.enum(SUPPLY_TYPES),
 });
 
-export type SupplyBrandInput = z.infer<typeof supplyBrandSchema>;
+export type SupplyBrandInput = z.input<typeof supplyBrandSchema>;
 
 export const threadSchema = z.object({
   brandId: z.string().min(1, "Brand is required"),
@@ -32,7 +33,7 @@ export const threadSchema = z.object({
   colorFamily: z.enum(COLOR_FAMILIES),
 });
 
-export type ThreadInput = z.infer<typeof threadSchema>;
+export type ThreadInput = z.input<typeof threadSchema>;
 
 export const beadSchema = z.object({
   brandId: z.string().min(1, "Brand is required"),
@@ -42,7 +43,7 @@ export const beadSchema = z.object({
   colorFamily: z.enum(COLOR_FAMILIES),
 });
 
-export type BeadInput = z.infer<typeof beadSchema>;
+export type BeadInput = z.input<typeof beadSchema>;
 
 export const specialtyItemSchema = z.object({
   brandId: z.string().min(1, "Brand is required"),
@@ -52,7 +53,7 @@ export const specialtyItemSchema = z.object({
   hexColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color (e.g., #FF5733)"),
 });
 
-export type SpecialtyItemInput = z.infer<typeof specialtyItemSchema>;
+export type SpecialtyItemInput = z.input<typeof specialtyItemSchema>;
 
 export const projectThreadSchema = z.object({
   projectId: z.string().min(1),
@@ -62,7 +63,7 @@ export const projectThreadSchema = z.object({
   quantityAcquired: z.number().int().min(0).default(0),
 });
 
-export type ProjectThreadInput = z.infer<typeof projectThreadSchema>;
+export type ProjectThreadInput = z.input<typeof projectThreadSchema>;
 
 export const projectBeadSchema = z.object({
   projectId: z.string().min(1),
@@ -71,7 +72,7 @@ export const projectBeadSchema = z.object({
   quantityAcquired: z.number().int().min(0).default(0),
 });
 
-export type ProjectBeadInput = z.infer<typeof projectBeadSchema>;
+export type ProjectBeadInput = z.input<typeof projectBeadSchema>;
 
 export const projectSpecialtySchema = z.object({
   projectId: z.string().min(1),
@@ -80,7 +81,7 @@ export const projectSpecialtySchema = z.object({
   quantityAcquired: z.number().int().min(0).default(0),
 });
 
-export type ProjectSpecialtyInput = z.infer<typeof projectSpecialtySchema>;
+export type ProjectSpecialtyInput = z.input<typeof projectSpecialtySchema>;
 
 export const updateQuantitySchema = z.object({
   quantityRequired: z.number().int().min(1).optional(),
@@ -89,7 +90,7 @@ export const updateQuantitySchema = z.object({
   isNeedOverridden: z.boolean().optional(),
 });
 
-export type UpdateQuantityInput = z.infer<typeof updateQuantitySchema>;
+export type UpdateQuantityInput = z.input<typeof updateQuantitySchema>;
 
 export const updateProjectSettingsSchema = z.object({
   strandCount: z.number().int().min(1).max(6).optional(),
@@ -97,7 +98,7 @@ export const updateProjectSettingsSchema = z.object({
   wastePercent: z.number().int().min(0).max(50).optional(),
 });
 
-export type UpdateProjectSettingsInput = z.infer<typeof updateProjectSettingsSchema>;
+export type UpdateProjectSettingsInput = z.input<typeof updateProjectSettingsSchema>;
 
 export const createAndAddThreadSchema = z.object({
   projectId: z.string().min(1),
@@ -117,7 +118,7 @@ export const createAndAddThreadSchema = z.object({
   }),
 });
 
-export type CreateAndAddThreadInput = z.infer<typeof createAndAddThreadSchema>;
+export type CreateAndAddThreadInput = z.input<typeof createAndAddThreadSchema>;
 
 export const createAndAddBeadSchema = z.object({
   projectId: z.string().min(1),
@@ -130,7 +131,7 @@ export const createAndAddBeadSchema = z.object({
   }),
 });
 
-export type CreateAndAddBeadInput = z.infer<typeof createAndAddBeadSchema>;
+export type CreateAndAddBeadInput = z.input<typeof createAndAddBeadSchema>;
 
 export const createAndAddSpecialtySchema = z.object({
   projectId: z.string().min(1),
@@ -139,4 +140,4 @@ export const createAndAddSpecialtySchema = z.object({
   brandId: z.string().min(1, "Brand is required"),
 });
 
-export type CreateAndAddSpecialtyInput = z.infer<typeof createAndAddSpecialtySchema>;
+export type CreateAndAddSpecialtyInput = z.input<typeof createAndAddSpecialtySchema>;

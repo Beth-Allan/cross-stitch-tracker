@@ -5,12 +5,14 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { firstValidationMessage } from "@/lib/utils/action-errors";
 import type { Prisma } from "@/generated/prisma/client";
 import { processAndStoreImage, deleteFile } from "@/lib/actions/upload-actions";
 import { detectBrokenRecords } from "@/lib/queries/stats/record-detection";
 import { getUserTimezone, getTodayCalendarDate } from "@/lib/queries/stats/timezone";
 import { parseCalendarDate } from "@/lib/utils/calendar-date";
 import { sessionFormSchema } from "@/lib/validations/session";
+import type { SessionFormInput } from "@/lib/validations/session";
 import type {
   StitchSessionRow,
   ActiveProjectForPicker,
@@ -63,7 +65,7 @@ async function discardSessionPhoto(key: string, what: string): Promise<void> {
   }
 }
 
-export async function createSession(formData: unknown) {
+export async function createSession(formData: SessionFormInput) {
   const user = await requireAuth();
 
   try {
@@ -149,14 +151,14 @@ export async function createSession(formData: unknown) {
     return { success: true as const, session: returnSession, brokenRecords, warning };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     console.error("createSession error:", error);
     return { success: false as const, error: "Failed to create session" };
   }
 }
 
-export async function updateSession(sessionId: string, formData: unknown) {
+export async function updateSession(sessionId: string, formData: SessionFormInput) {
   const user = await requireAuth();
 
   try {
@@ -249,7 +251,7 @@ export async function updateSession(sessionId: string, formData: unknown) {
     return { success: true as const, session: returnSession, warning };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     console.error("updateSession error:", error);
     return { success: false as const, error: "Failed to update session" };

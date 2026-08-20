@@ -33,6 +33,12 @@ describe("storageLocationSchema", () => {
     const result = storageLocationSchema.parse({ name: "Test" });
     expect(result.description).toBeNull();
   });
+
+  it("stores a blank description as absent rather than an empty string", () => {
+    expect(
+      storageLocationSchema.parse({ name: "Test", description: "   " }).description,
+    ).toBeNull();
+  });
 });
 
 describe("stitchingAppSchema", () => {
@@ -61,5 +67,11 @@ describe("stitchingAppSchema", () => {
   it("defaults description to null when not provided", () => {
     const result = stitchingAppSchema.parse({ name: "Test App" });
     expect(result.description).toBeNull();
+  });
+
+  it("stores a blank description as absent rather than an empty string", () => {
+    expect(
+      stitchingAppSchema.parse({ name: "Test App", description: "  " }).description,
+    ).toBeNull();
   });
 });

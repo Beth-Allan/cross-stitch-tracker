@@ -32,25 +32,25 @@ excuse for pushing red.
 
 ## What exists
 
-**212 test files · 2560 tests · no E2E** (no Playwright, no Cypress). The numbers go stale; the
+**229 test files · 2877 tests · no E2E** (no Playwright, no Cypress). The numbers go stale; the
 suite footer does not. Run `npm test` and read the last line rather than trusting this paragraph.
 
 | Area                       | Files   |
 | -------------------------- | ------- |
-| `src/components/features/` | 133     |
-| `src/lib/actions/`         | 23      |
+| `src/components/features/` | 135     |
+| `src/lib/actions/`         | 27      |
 | `src/lib/queries/stats/`   | 21      |
-| `src/lib/utils/`           | 12      |
-| `src/lib/validations/`     | 5       |
-| `src/types/`               | 3       |
-| `src/lib/` (root)          | 5       |
+| `src/lib/utils/`           | 15      |
+| `src/lib/validations/`     | 9       |
+| `src/types/`               | 2       |
+| `src/lib/` (root)          | 7       |
 | `src/components/ui/`       | 2       |
 | `src/__tests__/`           | 3       |
 | `src/components/shell/`    | 1       |
 | `src/components/hooks/`    | 1       |
 | `src/components/` (root)   | 1       |
-| `src/app/`                 | 2       |
-| **Total**                  | **212** |
+| `src/app/`                 | 5       |
+| **Total**                  | **229** |
 
 Inside `src/components/features/`, the weight sits in `stats/` (24), `supply-table/` (15),
 `charts/` (15), `charts/project-detail/` (13), `gallery/` (12), `dashboard/` (11),

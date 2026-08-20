@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import type { ChartFormInput } from "@/lib/validations/chart";
 import { createMockPrisma, assertSuccess } from "@/__tests__/mocks";
 
 // Mock auth to return authenticated session
@@ -63,13 +64,12 @@ function coverKeysWritten(): unknown {
   return call ? (call[0] as { data: unknown }).data : undefined;
 }
 
-const validFormData = {
+const validFormData: ChartFormInput = {
   chart: {
     name: "Test Chart",
     designerId: null,
     coverImageUrl: null,
     coverThumbnailUrl: null,
-    digitalFileUrl: null,
     stitchCount: 5000,
     stitchCountApproximate: false,
     stitchesWide: 100,

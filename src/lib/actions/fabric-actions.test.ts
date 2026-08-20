@@ -5,6 +5,7 @@ import {
   createMockFabric,
   assertSuccess,
   assertFailure,
+  unvalidatedPayload,
 } from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
@@ -366,7 +367,9 @@ describe("fabric-actions", () => {
     it("returns validation error for invalid type", async () => {
       const { createFabric } = await import("./fabric-actions");
 
-      const result = await createFabric({ ...validFabricData, type: "InvalidType" });
+      const result = await createFabric(
+        unvalidatedPayload({ ...validFabricData, type: "InvalidType" }),
+      );
 
       expect(result.success).toBe(false);
     });

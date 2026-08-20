@@ -14,8 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/features/charts/form-primitives/form-field";
 import { createSupplyBrand, updateSupplyBrand } from "@/lib/actions/supply-actions";
+import { optionFrom } from "@/lib/utils/select-option";
 import { SUPPLY_TYPES } from "@/types/supply";
-import type { SupplyBrandWithCounts } from "@/types/supply";
+import type { SupplyBrandWithCounts, SupplyType } from "@/types/supply";
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */
 
@@ -48,7 +49,7 @@ export function SupplyBrandFormModal({
 
   const [name, setName] = useState("");
   const [website, setWebsite] = useState("");
-  const [supplyType, setSupplyType] = useState("THREAD");
+  const [supplyType, setSupplyType] = useState<SupplyType>("THREAD");
   const [nameError, setNameError] = useState<string | null>(null);
 
   // Reset form when dialog opens or brand changes
@@ -79,7 +80,7 @@ export function SupplyBrandFormModal({
 
     const formData = {
       name: trimmedName,
-      website: website.trim() || null,
+      website,
       supplyType,
     };
 
@@ -141,7 +142,10 @@ export function SupplyBrandFormModal({
             <select
               id="brand-supply-type"
               value={supplyType}
-              onChange={(e) => setSupplyType(e.target.value)}
+              onChange={(e) => {
+                const next = optionFrom(SUPPLY_TYPES, e.target.value);
+                if (next) setSupplyType(next);
+              }}
               className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               {SUPPLY_TYPES.map((t) => (

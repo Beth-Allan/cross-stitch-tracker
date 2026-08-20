@@ -1,49 +1,13 @@
 import { z } from "zod";
-
-const FABRIC_TYPES = [
-  "Aida",
-  "Linen",
-  "Lugana",
-  "Jobelan",
-  "Evenweave",
-  "Hardanger",
-  "Congress Cloth",
-  "Other",
-] as const;
-
-const FABRIC_COLOR_FAMILIES = [
-  "White",
-  "Cream",
-  "Blue",
-  "Green",
-  "Pink",
-  "Purple",
-  "Red",
-  "Yellow",
-  "Brown",
-  "Gray",
-  "Black",
-  "Multi",
-] as const;
-
-const FABRIC_COLOR_TYPES = [
-  "White",
-  "Cream",
-  "Natural",
-  "Neutrals",
-  "Brights",
-  "Pastels",
-  "Dark",
-  "Hand-dyed",
-  "Overdyed",
-] as const;
+import { optionalChoice, optionalUrl } from "@/lib/validations/fields";
+import { FABRIC_COLOR_FAMILIES, FABRIC_COLOR_TYPES, FABRIC_TYPES } from "@/types/fabric";
 
 export const fabricBrandSchema = z.object({
   name: z.string().trim().min(1, "Brand name is required").max(200, "Brand name too long"),
-  website: z.string().url("Must be a valid URL").nullable().default(null),
+  website: optionalUrl(),
 });
 
-export type FabricBrandInput = z.infer<typeof fabricBrandSchema>;
+export type FabricBrandInput = z.input<typeof fabricBrandSchema>;
 
 export const fabricSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(200, "Name too long"),
@@ -55,7 +19,7 @@ export const fabricSchema = z.object({
   shortestEdgeInches: z.number().min(0).default(0),
   longestEdgeInches: z.number().min(0).default(0),
   needToBuy: z.boolean().default(false),
-  linkedProjectId: z.string().nullable().default(null),
+  linkedProjectId: optionalChoice(),
 });
 
-export type FabricInput = z.infer<typeof fabricSchema>;
+export type FabricInput = z.input<typeof fabricSchema>;

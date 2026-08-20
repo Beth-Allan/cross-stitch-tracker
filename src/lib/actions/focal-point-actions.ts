@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { firstValidationMessage } from "@/lib/utils/action-errors";
 import { updateFocalPointSchema } from "@/lib/validations/focal-point";
 
 export async function updateFocalPoint(chartId: string, x: number | null, y: number | null) {
@@ -35,7 +36,7 @@ export async function updateFocalPoint(chartId: string, x: number | null, y: num
     return { success: true as const };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     console.error("updateFocalPoint error:", error);
     return { success: false as const, error: "Failed to update focal point" };

@@ -1,6 +1,12 @@
 import { z } from "zod";
 import type { ProjectStatus } from "@/generated/prisma/client";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
+import {
+  optionalDateString,
+  optionalChoice,
+  optionalText,
+  optionalUrl,
+} from "@/lib/validations/fields";
 import { parseStorageKey } from "@/lib/validations/upload";
 
 /**
@@ -19,8 +25,8 @@ export const chartFormSchema = z.object({
   chart: z
     .object({
       name: z.string().trim().min(1, "Chart name is required").max(200, "Chart name too long"),
-      designerId: z.string().nullable().default(null),
-      seriesId: z.string().nullable().default(null),
+      designerId: optionalChoice(),
+      seriesId: optionalChoice(),
       coverImageUrl: storageKeyIn("covers").nullable().default(null),
       coverThumbnailUrl: storageKeyIn("covers").nullable().default(null),
       fileKeys: z
@@ -42,7 +48,7 @@ export const chartFormSchema = z.object({
       isFormalKit: z.boolean().default(false),
       isSAL: z.boolean().default(false),
       kitColorCount: z.number().int().min(1).nullable().default(null),
-      notes: z.string().max(5000).nullable().default(null),
+      notes: optionalText(5000, "Notes too long"),
     })
     .refine((data) => data.stitchCount > 0 || (data.stitchesWide > 0 && data.stitchesHigh > 0), {
       message: "Provide stitch count or dimensions",
@@ -52,32 +58,23 @@ export const chartFormSchema = z.object({
     status: z
       .enum(PROJECT_STATUSES as unknown as [ProjectStatus, ...ProjectStatus[]])
       .default("UNSTARTED"),
-    storageLocationId: z.string().nullable().default(null),
-    stitchingAppId: z.string().nullable().default(null),
-    fabricId: z.string().nullable().default(null),
+    storageLocationId: optionalChoice(),
+    stitchingAppId: optionalChoice(),
+    fabricId: optionalChoice(),
     needsOnionSkinning: z.boolean().default(false),
-    startDate: z
-      .string()
-      .nullable()
-      .default(null)
-      .refine((val) => val === null || !isNaN(Date.parse(val)), { message: "Invalid date" }),
-    finishDate: z
-      .string()
-      .nullable()
-      .default(null)
-      .refine((val) => val === null || !isNaN(Date.parse(val)), { message: "Invalid date" }),
-    ffoDate: z
-      .string()
-      .nullable()
-      .default(null)
-      .refine((val) => val === null || !isNaN(Date.parse(val)), { message: "Invalid date" }),
+    startDate: optionalDateString(),
+    finishDate: optionalDateString(),
+    ffoDate: optionalDateString(),
     wantToStartNext: z.boolean().default(false),
-    preferredStartSeason: z.string().nullable().default(null),
+    preferredStartSeason: optionalChoice(),
     startingStitches: z.number().int().min(0).default(0),
   }),
 });
 
-export type ChartFormInput = z.infer<typeof chartFormSchema>;
+export type ChartFormInput = z.input<typeof chartFormSchema>;
+
+/** The parsed payload — what the action holds after `chartFormSchema.parse`. */
+export type ChartFormValidated = z.output<typeof chartFormSchema>;
 
 /**
  * Validates the batch supply payload for createChartWithSupplies.
@@ -116,18 +113,18 @@ export const batchSupplySchema = z.object({
     .default([]),
 });
 
-export type BatchSupplyInput = z.infer<typeof batchSupplySchema>;
+export type BatchSupplyInput = z.input<typeof batchSupplySchema>;
 
 export const designerSchema = z.object({
   name: z.string().trim().min(1, "Designer name is required").max(200, "Designer name too long"),
-  website: z.string().url("Must be a valid URL").nullable().default(null),
-  notes: z.string().max(5000, "Notes too long").nullable().default(null),
+  website: optionalUrl(),
+  notes: optionalText(5000, "Notes too long"),
 });
 
-export type DesignerInput = z.infer<typeof designerSchema>;
+export type DesignerInput = z.input<typeof designerSchema>;
 
 export const genreSchema = z.object({
   name: z.string().trim().min(1, "Genre name is required").max(100, "Genre name too long"),
 });
 
-export type GenreInput = z.infer<typeof genreSchema>;
+export type GenreInput = z.input<typeof genreSchema>;

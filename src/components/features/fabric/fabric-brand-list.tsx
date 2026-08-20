@@ -123,7 +123,7 @@ function FabricBrandFormModal({
 
     const formData = {
       name: trimmedName,
-      website: website.trim() || null,
+      website,
     };
 
     startTransition(async () => {

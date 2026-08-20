@@ -5,9 +5,11 @@ import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { stitchingAppSchema } from "@/lib/validations/storage";
+import type { StitchingAppInput } from "@/lib/validations/storage";
 import type { StitchingAppWithStats, StitchingAppDetail } from "@/types/storage";
+import { firstValidationMessage } from "@/lib/utils/action-errors";
 
-export async function createStitchingApp(formData: unknown) {
+export async function createStitchingApp(formData: StitchingAppInput) {
   const user = await requireAuth();
 
   try {
@@ -19,14 +21,14 @@ export async function createStitchingApp(formData: unknown) {
     return { success: true as const, app };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     console.error("createStitchingApp error:", error);
     return { success: false as const, error: "Failed to create stitching app" };
   }
 }
 
-export async function updateStitchingApp(id: string, formData: unknown) {
+export async function updateStitchingApp(id: string, formData: StitchingAppInput) {
   const user = await requireAuth();
 
   try {
@@ -40,7 +42,7 @@ export async function updateStitchingApp(id: string, formData: unknown) {
     return { success: true as const, app };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     console.error("updateStitchingApp error:", error);
     return { success: false as const, error: "Failed to update stitching app" };

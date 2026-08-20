@@ -5,9 +5,11 @@ import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { storageLocationSchema } from "@/lib/validations/storage";
+import type { StorageLocationInput } from "@/lib/validations/storage";
 import type { StorageLocationWithStats, StorageLocationDetail } from "@/types/storage";
+import { firstValidationMessage } from "@/lib/utils/action-errors";
 
-export async function createStorageLocation(formData: unknown) {
+export async function createStorageLocation(formData: StorageLocationInput) {
   const user = await requireAuth();
 
   try {
@@ -19,14 +21,14 @@ export async function createStorageLocation(formData: unknown) {
     return { success: true as const, location };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     console.error("createStorageLocation error:", error);
     return { success: false as const, error: "Failed to create storage location" };
   }
 }
 
-export async function updateStorageLocation(id: string, formData: unknown) {
+export async function updateStorageLocation(id: string, formData: StorageLocationInput) {
   const user = await requireAuth();
 
   try {
@@ -40,7 +42,7 @@ export async function updateStorageLocation(id: string, formData: unknown) {
     return { success: true as const, location };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     console.error("updateStorageLocation error:", error);
     return { success: false as const, error: "Failed to update storage location" };

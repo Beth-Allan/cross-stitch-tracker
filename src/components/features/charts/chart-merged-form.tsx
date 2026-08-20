@@ -66,6 +66,7 @@ import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 export function buildCreateFn() {
   return async (type: SupplyType, data: CreateSupplyData): Promise<SupplySearchResult> => {
     if (type === "THREAD") {
+      if (!data.colorFamily) throw new Error("Color family is required");
       const result = await createThread({
         colorName: data.name,
         colorCode: data.code || "CUSTOM",
@@ -85,6 +86,7 @@ export function buildCreateFn() {
       };
     }
     if (type === "BEAD") {
+      if (!data.colorFamily) throw new Error("Color family is required");
       const result = await createBead({
         colorName: data.name,
         productCode: data.code || "CUSTOM",

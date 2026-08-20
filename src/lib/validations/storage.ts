@@ -1,15 +1,20 @@
 import { z } from "zod";
+import { optionalText } from "@/lib/validations/fields";
 
-export const storageLocationSchema = z.object({
+/**
+ * A storage location and a stitching app are the same shape — a user-named
+ * thing with an optional description — and were two byte-identical schemas
+ * until they drifted. One definition, two names, so they cannot.
+ */
+const namedWithDescriptionSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(200, "Name too long"),
-  description: z.string().trim().max(500, "Description too long").nullable().default(null),
+  description: optionalText(500, "Description too long"),
 });
 
-export type StorageLocationInput = z.infer<typeof storageLocationSchema>;
+export const storageLocationSchema = namedWithDescriptionSchema;
 
-export const stitchingAppSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(200, "Name too long"),
-  description: z.string().trim().max(500, "Description too long").nullable().default(null),
-});
+export type StorageLocationInput = z.input<typeof storageLocationSchema>;
 
-export type StitchingAppInput = z.infer<typeof stitchingAppSchema>;
+export const stitchingAppSchema = namedWithDescriptionSchema;
+
+export type StitchingAppInput = z.input<typeof stitchingAppSchema>;

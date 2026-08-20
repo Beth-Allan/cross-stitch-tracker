@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { chartFormSchema, batchSupplySchema } from "./chart";
+import { chartFormSchema, batchSupplySchema, designerSchema } from "./chart";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
 import { assertSuccess } from "@/__tests__/mocks";
 
@@ -224,6 +224,68 @@ describe("chartFormSchema", () => {
 
       expect(result.success).toBe(false);
     });
+  });
+});
+
+describe("chartFormSchema optional-field convention", () => {
+  it("stores blank chart notes as absent rather than an empty string", () => {
+    const result = chartFormSchema.safeParse({
+      chart: { ...validChartBase, notes: "   " },
+      project: validProject,
+    });
+
+    assertSuccess(result);
+    expect(result.data.chart.notes).toBeNull();
+  });
+
+  it("reads a cleared designer or series selection as no selection", () => {
+    const result = chartFormSchema.safeParse({
+      chart: { ...validChartBase, designerId: "", seriesId: "" },
+      project: validProject,
+    });
+
+    assertSuccess(result);
+    expect(result.data.chart.designerId).toBeNull();
+    expect(result.data.chart.seriesId).toBeNull();
+  });
+
+  it("reads cleared project selections as no selection", () => {
+    const result = chartFormSchema.safeParse({
+      chart: validChartBase,
+      project: {
+        ...validProject,
+        storageLocationId: "",
+        stitchingAppId: "",
+        fabricId: "",
+        preferredStartSeason: "",
+      },
+    });
+
+    assertSuccess(result);
+    expect(result.data.project.storageLocationId).toBeNull();
+    expect(result.data.project.stitchingAppId).toBeNull();
+    expect(result.data.project.fabricId).toBeNull();
+    expect(result.data.project.preferredStartSeason).toBeNull();
+  });
+});
+
+describe("designerSchema", () => {
+  it("stores blank notes and a blank website as absent", () => {
+    const result = designerSchema.safeParse({
+      name: "Some Designer",
+      website: "   ",
+      notes: "   ",
+    });
+
+    assertSuccess(result);
+    expect(result.data.website).toBeNull();
+    expect(result.data.notes).toBeNull();
+  });
+
+  it("still rejects a website that is not a link", () => {
+    expect(() => designerSchema.parse({ name: "Some Designer", website: "not a link" })).toThrow(
+      "Must be a valid URL",
+    );
   });
 });
 

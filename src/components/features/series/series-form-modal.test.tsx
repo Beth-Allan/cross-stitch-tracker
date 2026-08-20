@@ -63,7 +63,7 @@ describe("SeriesFormModal", () => {
         name: "Mini Bottles",
         totalCount: null,
         designerId: null,
-        notes: null,
+        notes: "",
       });
     });
 

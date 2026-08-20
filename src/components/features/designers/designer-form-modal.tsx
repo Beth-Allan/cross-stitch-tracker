@@ -67,8 +67,8 @@ export function DesignerFormModal({
 
     const formData = {
       name: trimmedName,
-      website: website.trim() || null,
-      notes: notes.trim() || null,
+      website,
+      notes,
     };
 
     startTransition(async () => {

@@ -10,4 +10,4 @@ export const updateFocalPointSchema = z
     message: "Both x and y must be set or both must be null",
   });
 
-export type UpdateFocalPointInput = z.infer<typeof updateFocalPointSchema>;
+export type UpdateFocalPointInput = z.input<typeof updateFocalPointSchema>;

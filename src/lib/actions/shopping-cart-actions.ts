@@ -6,6 +6,7 @@ import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { mapFocalPoint } from "@/types/focal-point";
 import type { ShoppingCartData } from "@/types/dashboard";
+import { firstValidationMessage } from "@/lib/utils/action-errors";
 
 const updateSupplyAcquiredSchema = z.object({
   type: z.enum(["thread", "bead", "specialty"]),
@@ -136,7 +137,7 @@ export async function updateSupplyAcquired(
     acquiredQuantity,
   });
   if (!parseResult.success) {
-    return { success: false, error: parseResult.error.errors[0].message };
+    return { success: false, error: firstValidationMessage(parseResult.error) };
   }
 
   try {

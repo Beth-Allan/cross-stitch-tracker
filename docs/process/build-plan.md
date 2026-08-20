@@ -270,32 +270,65 @@ the same decision.
 - **Done-when:** every named test fails when its subject breaks (spot-demonstrated), phantom
   removals listed in the PR, gate green.
 
-### P13 One validation boundary — **created at the 2026-08-17 `/cleanup`**
+### P13 One validation boundary — **created at the 2026-08-17 `/cleanup`; split by Beth 2026-08-19 (D-20)**
 
-- **Objective:** unify the duplicated boundary rules in `src/lib`: one trim/empty→null
-  convention across `seriesSchema`/`designerSchema`/`chartFormSchema` (client forms stop
-  compensating), shared friendly-error arms for the twinned storage-location/stitching-app
-  action files, and typed action inputs — the 24 dead `z.infer` exports become the actions'
-  real signatures instead of `unknown`.
+The size check fired at the top of the build session: five inherited ledger rows had become seven
+fixes, and three of them land in `upload-actions.ts`, a review-gated core — so batching would have
+held the four harmless ones behind a `/review`. **Beth's ruling (D-20): split.** The form-input
+half is P13 and merged the same day; the upload half is **P13b** below.
+
+- **Objective (P13, merged as PR #109, 2026-08-19):** unify the duplicated boundary rules in
+  `src/lib`: one trim/blank-is-absent convention across every boundary schema (client forms stop
+  compensating), the `storageLocationSchema`/`stitchingAppSchema` twins collapsed to one
+  definition, both friendly-error arms shared out of `utils/action-errors.ts`, and typed action
+  inputs — the 24 dead `z.infer` exports become the actions' real signatures instead of `unknown`.
 - **Cited specs:** the two 2026-08-17 ledger duplication rows (`src/lib` boundary cluster;
   unknown-typed actions) · `.claude/rules/form-patterns.md`.
-- **Also inherits — added by P15's `/review`, 2026-08-17:** the ledger row on
-  `chartFormSchema`'s cover and file keys, which are grammar-checked but never checked against
-  _whose_ namespace they name. **Read that row before designing the fix** — the obvious rule
-  (owner segment must be `unsaved` or the chart's own id) closes only half of it, because
-  `CoverImageUpload` is never handed a chart id, so every cover the form uploads lands under
-  `covers/unsaved/…` and pre-P15 charts are still live on that prefix. Refusing `unsaved` is not
-  an option (it would leak the raw upload of every replaced cover); closing the other half needs
-  a "no other chart names this key" test, or it waits for **P16**.
-- **Also inherits — rerouted from P11, 2026-08-19:** the **two byte-identical upload allowlists**
-  (`ALLOWED_FILE_TYPES` / `ALLOWED_CHART_FILE_TYPES`) — the client checks one and the server the
-  other. Merging them is the same decision as the `chart-file-list.tsx` vs `getPresignedUploadUrl`
-  row above: which rule is right, said once. It touches gated `upload-actions.ts`.
 - **Traps:** behavior-preserving refactor plus small validation fixes — anything that _changes_
-  what validates is TDD'd; no schema/migration scope. **The allowlist merge makes this item
-  review-gated** (`upload-actions.ts`), so a `/review` row follows it.
+  what validates is TDD'd; no schema/migration scope.
 - **Done-when:** one convention, stated in `form-patterns.md`; zero dead `z.infer` exports;
-  gate green.
+  gate green. **Met, with one stated exception** — `validations/auth.ts`'s `LoginInput` is still
+  `z.infer` and still dead. That file is review-gated by Beth's P1 ruling, and carrying a one-word
+  rename would have put the whole 58-file ungated diff behind a `/review`, which is the trade D-20
+  had just ruled against. Reverted out of the branch and logged.
+- **Deliberately left, with ledger rows:** the boundary-duplication row's three largest arms (the
+  junction three-arm dispatch, `CalcParams`/`CalculatorSettings`, and the two gated action files'
+  error arms) · `validations/supply.ts`'s private enum copies, because merging them changes the
+  `required_error` wording **D-19** rules on · the three unconstrained `Fabric` enum columns the
+  new typing exposed · the `digitalFileUrl` phantom in `chart.test.ts`, which is a test change and
+  therefore Beth's call.
+
+### P13b The upload half of one validation boundary — **gated; `/review` follows**
+
+- **Objective:** the three fixes D-20 separated out, all of them about what a submitted key or
+  file is allowed to be. ① The **two byte-identical upload allowlists** (`ALLOWED_FILE_TYPES` /
+  `ALLOWED_CHART_FILE_TYPES`) merged to one. ② The **rule that disagrees with itself**:
+  `chart-file-list.tsx` accepts a file whose MIME type is unknown when its extension is allowed
+  (the `.xsd`-arrives-as-`text/xml` case), and `getPresignedUploadUrl` then refuses it — so the
+  browser says yes and the server says "Invalid file type". ③ The **submitted-cover-key ownership
+  check** P15's review added. Also finish the P13 sweep in the two gated action files: both error
+  arms come from `utils/action-errors.ts`, and `getPresignedUploadUrl`/`addChartFile` type their
+  payload from their schema like every other action now does.
+- **Cited specs:** the `chart-file-list.tsx` vs `getPresignedUploadUrl` ledger row · the
+  `chartFormSchema` cover/file-key ledger row · the `src/lib` boundary-duplication row's gated arm
+  · `.claude/rules/form-patterns.md` (the convention P13 wrote) · drift **D-20**.
+- **Beth's question this item must ask first — the domain fact that decides ②:** which
+  stitching-software file formats does she actually keep? The client's extension list and the
+  server's MIME list can only be reconciled once that is on the record, and an extension is a
+  caller-supplied string, so honouring it blindly would let any object in by being named `.pdf`.
+  Goes through `/stitch-fact` into `docs/domain/`, not into code as a guess.
+- **Traps:** ③ **only half closes.** The obvious rule — the owner segment must be `unsaved` or the
+  chart's own id — leaves the other half open, because `CoverImageUpload` is never handed a chart
+  id, so every cover the form uploads lands under `covers/unsaved/…` and pre-P15 charts are still
+  live on that prefix. Refusing `unsaved` is not an option (it would leak the raw upload of every
+  replaced cover); the rest needs a "no other chart names this key" test, or it waits for **P16**.
+  Read that ledger row in full before designing the fix. **Gated** (`upload-actions.ts`,
+  `chart-file-actions.ts`), so the builder stops at `built, awaiting review`.
+- **Done-when:** one allowlist; the browser and the server agree about what they accept, with
+  Beth's recorded answer behind it; a submitted cover key cannot name another chart by id
+  (test-first) and the remaining `covers/unsaved/` half is stated in the work log rather than
+  quietly left; both gated actions typed and using the shared error arms; gate green; fresh
+  `/review` before merge.
 
 ### P14 Gate alignment — **gate-config changes pre-approved 2026-08-17**
 

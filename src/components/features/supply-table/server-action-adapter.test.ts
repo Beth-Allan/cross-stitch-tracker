@@ -586,6 +586,7 @@ describe("ServerActionAdapter", () => {
         code: "CT1",
         brandId: "brand-1",
         hexColor: "#FF00FF",
+        colorFamily: "PURPLE",
       });
 
       expect(result).toEqual<SupplySearchResult>({
@@ -620,9 +621,22 @@ describe("ServerActionAdapter", () => {
         code: "CT1",
         brandId: "brand-1",
         hexColor: "#FF00FF",
+        colorFamily: "PURPLE",
       });
 
       expect(refreshFn).toHaveBeenCalledTimes(1);
+    });
+
+    it("refuses a thread or bead with no colour family, without calling the action", async () => {
+      await expect(
+        adapter.createSupply("THREAD", { name: "No Family", code: "X", brandId: "brand-1" }),
+      ).rejects.toThrow("Color family is required");
+      await expect(
+        adapter.createSupply("BEAD", { name: "No Family", code: "X", brandId: "brand-1" }),
+      ).rejects.toThrow("Color family is required");
+
+      expect(mockCreateAndAddThread).not.toHaveBeenCalled();
+      expect(mockCreateAndAddBead).not.toHaveBeenCalled();
     });
 
     it("throws on failure", async () => {
@@ -636,6 +650,7 @@ describe("ServerActionAdapter", () => {
           name: "Fail Thread",
           code: "X",
           brandId: "brand-1",
+          colorFamily: "PURPLE",
         }),
       ).rejects.toThrow("Failed to create");
     });
