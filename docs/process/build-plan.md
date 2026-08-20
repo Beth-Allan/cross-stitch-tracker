@@ -197,18 +197,89 @@ only the rulings and cross-item wiring decided at triage. Rulings cited below ar
   delete live covers until **P15** moves saved covers off that prefix. Residue + pre-condition on
   the maintenance ledger; ruling in drift.md, Ruled.)_
 
-### P9 Query scale + data integrity: the unbounded-read batch — **index/schema half gated**
+### P9 Query scale + data integrity: the unbounded-read batch — **split by Beth 2026-08-20**
 
-- **Objective:** report §3 P9 — pagination and query-shape fixes for the surfaces that break
-  first at 500+ charts, plus one gated migration batching the missing indexes.
-- **Folded in:** the StorageLocation/StitchingApp ledger row — `@@unique([userId, name])`, the
-  unscoped `updateMany` on delete, and the friendly-duplicate P2002 arms land in this batch.
-  The stats-fan-out row's residual cost (row volume) is owned here too.
+The size check fired, and a second finding fired with it. P9 as briefed was seven read surfaces
+plus a gated migration — three sessions, not one. The finding is worse than size: **the repo has a
+migrations folder but no migration pipeline** (drift, 2026-08-20). One migration directory covers 5
+of 18 models, nothing in the build or CI runs `migrate deploy`, and this machine has no `.env.local`
+— so a hand-written `migration.sql` would merge green and leave Neon untouched. Beth ruled: build
+the invisible half today, split the rest.
+
+The original objective stands unchanged — report §3 P9, the surfaces that break first at 500+
+charts. It is now carried by three items.
+
+#### P9a The invisible half, dashboard side — **built 2026-08-20**
+
+- **Objective:** the read-volume fixes on the **ungated** action files — the surfaces that fetch
+  the whole collection to render a handful of cards. Rendered output must be byte-identical; this
+  item changes only how the data is fetched.
+- **Scope, exactly (all in `src/lib/actions/`):** `dashboard-actions.ts` —
+  `getCurrentlyStitchingProjects` (every session per project, for one date + two aggregates),
+  `getBuriedTreasures` (fetches N unstarted charts to slice ≤5), `getCollectionStats` (all projects
+  - charts for 8 scalars) · `project-dashboard-actions.ts` — the three junction `select { id }`
+    arrays that exist only to be `.length`-ed · `chart-actions.ts` — `getChartsForGallery`'s junction
+    fan-out (kitting dots + three counts) · `pattern-dive-actions.ts` — `getWhatsNextProjects`'
+    kitting % and `getFabricRequirements`' O(charts × fabrics) cross-product.
+- **Traps:** ① **Equivalence is the whole job** — every replacement must produce the same number
+  the JS pass produced, including the kitting rule for a project with no supplies (drift,
+  2026-08-17) and `Σ min(acquired, required)` capping, which a bare `_sum` does not reproduce.
+  ② Touch no gated path: `src/lib/queries/stats/` and `prisma/schema.prisma` belong to P9c.
+  ③ `getShoppingCartData` is a fourth junction fan-out the audit never named — ledger it, do not
+  fix it here.
+- **Done-when:** each named function demonstrated test-first to return what it returned before
+  while reading bounded rows; no gated path in the diff; gate green.
+  _(Split again while building, 2026-08-20 — the context budget, not a new finding. The two
+  `dashboard-actions.ts`/`project-dashboard-actions.ts` halves landed here; the gallery and
+  Pattern Dive halves are **P9a-2** below, unchanged in scope. Nothing was dropped, and the
+  equivalence traps below still bind both. One thing P9a settled that P9a-2 does not need to
+  rediscover: `groupBy(["projectId", "date"])` **is** a distinct-calendar-day count, because
+  session dates are written only through `parseCalendarDate()` and are therefore always exactly
+  UTC midnight — verified in `session-actions.ts`. Only a fixture disagreed; ledger row.)_
+
+#### P9a-2 The invisible half, gallery and Pattern Dive side
+
+- **Objective:** the remainder of P9a's scope, unchanged — `chart-actions.ts`'s
+  `getChartsForGallery` junction fan-out (kitting dots plus the three `.length` counts, both
+  consumed in `src/components/features/gallery/gallery-utils.ts`) and `pattern-dive-actions.ts`'s
+  `getWhatsNextProjects` kitting % and `getFabricRequirements` cross-product.
+- **Traps:** ① P9a's trap ① with teeth: kitting % is `Σ min(acquired, required)` with fabric
+  counted as one item, which a bare `_sum` does **not** reproduce, and a project with no supplies
+  has a ruled answer (drift, 2026-08-17) — reproduce both or the number moves.
+  ② `getFabricRequirements`' `usableCount === null` branch maps the **whole** unassigned stash;
+  that branch is the O(charts × fabrics) case, not the matched one. ③ `getShoppingCartData` is a
+  fourth junction fan-out the audit never named — ledger row, not this item's to fix.
+- **Done-when:** as P9a's, for the three named functions.
+
+#### P9b The two paginated lists — **UI-touching; preview before merge**
+
+- **Objective:** `/sessions` (every session ever logged, one presigned photo URL each) and
+  `/supplies` (the whole catalogue, ~489 DMC rows, sorted in JS) become page-by-page.
+- **Traps:** ① `getSessionHistory` (`src/lib/queries/stats/session-history.ts`, `PAGE_SIZE = 25`)
+  plus `stats/search-params.ts` and `session-history-table.tsx`'s Prev/Next block are the
+  end-to-end pattern to copy — there is exactly one in the repo and no shared `Pagination`
+  primitive. Reading it is fine; **it is a gated file — do not edit it.** ② `/supplies` is the
+  bigger half: `getThreads` has no SQL `orderBy` because the order is `naturalSortByCode`, and
+  search/filter run client-side over the full catalogue in `supply-catalog.tsx`. Paginating means
+  moving sort **and** search to the server, or the page shows the wrong rows.
+- **Done-when:** both lists paginated test-first, presign bounded to the visible page, Beth has
+  seen the preview; gate green.
+
+#### P9c The gated half — **blocked on the migration-pipeline ruling**
+
+- **Objective:** the four whole-table session scans in `src/lib/queries/stats/`
+  (`available-years.ts`, `day-of-week.ts`, `personal-bests.ts`, `record-detection.ts` — the last
+  runs on **every session write**), the missing indexes as one migration, and the
+  StorageLocation/StitchingApp ledger row (`@@unique([userId, name])`, the unscoped
+  `project.updateMany` on both delete paths, the friendly-duplicate P2002 arms).
 - **Also inherits — rerouted from P11, 2026-08-19:** `prisma/schema.prisma`'s
-  `// Calculator settings (Phase 7)` comment, a planning-doc reference the conventions ban. P11's
-  sweep could not take it — the file is review-gated and P9 already opens it.
-- **Done-when:** each listed surface bounded/paginated test-first; one migration carries the
-  indexes + uniqueness; fresh `/review` for the schema half.
+  `// Calculator settings (Phase 7)` comment, a planning-doc reference the conventions ban.
+- **Blocked, not queued.** The index and uniqueness work cannot honestly complete until the
+  2026-08-20 drift row is ruled: _how does a schema change reach the live database?_ That comes
+  back to Beth as its own decision with options. The stats-scan half is gated but not blocked, and
+  could be lifted out if she wants it sooner.
+- **Done-when:** the four scans bounded test-first; the migration question answered and its answer
+  carried out; indexes + uniqueness real in Neon, not merely committed; fresh `/review`.
 
 ### P10 Dependency patch session
 

@@ -30,6 +30,55 @@ words where possible. Rows are never deleted.
 
 ## Open — awaiting Beth's ruling
 
+### 2026-08-20 · the repo has a migrations folder but no migration pipeline — found at the start of P9
+
+**What contradicts what.** P9's brief and the protocol both assume migrations are how schema
+changes reach the database: the brief's done-when is "**one migration carries the indexes +
+uniqueness**", and protocol §2's definition of done says "migration committed in the same PR
+(`prisma migrate dev`; never a bare `db push` for work that merges)". The repository does not work
+that way today. The evidence, all verified this session:
+
+- `prisma/migrations/` holds **exactly one** directory — `20260328163529_add_chart_project_designer_genre`
+  — whose `migration.sql` creates **5 tables** (`Designer`, `Genre`, `Chart`, `Project`,
+  `_ChartToGenre`). `prisma/schema.prisma` now declares **18 models**. Every model added since
+  March — `StitchSession`, all supply, fabric, storage and stitching-app models — reached the
+  database by `prisma db push`, out of band.
+- There is no `migration_lock.toml`.
+- **Nothing runs `prisma migrate deploy`.** `package.json`'s `build` is `prisma generate && next
+build`; `.github/workflows/ci.yml` runs `npx prisma generate` against a throwaway
+  `postgresql://ci:ci@localhost:5432/ci` and never applies anything; Vercel runs the same `build`.
+  A migration file committed to this repo is therefore inert — merging it changes no database.
+- This working copy has **no `.env.local`** (only `.env.example`), so no session on this machine
+  can reach Neon at all: `npx prisma migrate status` fails at the datasource, and
+  `prisma migrate dev` — which needs both the real database and a shadow database — cannot run.
+
+**Why it matters.** P9's index work is the half that makes the other half worth doing: the schema
+has three `@@index` declarations in total, and `Project.userId` — the column every user-scoped query
+filters on — is unindexed. But an index only helps once it exists **in Neon**, and there is
+currently no route by which this repo puts one there. Writing `migration.sql` by hand and merging it
+would produce a green PR, a satisfied done-when, and a production database entirely unchanged —
+a wrong number of exactly the kind the drift rule exists to stop. The same blocker sits under the
+ledger's StorageLocation/StitchingApp row: `@@unique([userId, name])` is a database constraint, and
+the friendly "that name is already taken" message P9 would add is unreachable until the constraint
+is real.
+
+**Surfaced to Beth** on 2026-08-20 with the P9 size check, as one decision: what P9 builds today,
+given its schema half cannot be finished from here.
+
+**Her ruling (2026-08-20):** **the invisible speed-ups** — P9 splits, and today's session builds
+only the fixes that change nothing on screen. The two paginated lists and the database half each
+become their own item.
+
+**What it changed.** P9 became three items (`docs/process/build-plan.md`): **P9a** — the query-shape
+fixes on the four ungated action files, no visible change, ships on green; **P9b** — the two
+paginated lists (`/sessions`, `/supplies`), UI-touching, preview before merge; **P9c** — the gated
+half: the four whole-table scans in `src/lib/queries/stats/`, the index migration, and the
+StorageLocation/StitchingApp uniqueness. **P9c stays blocked** until the question this row opens is
+answered, and that question is still open: _how does a schema change reach the live database?_ It
+is not P9c's to answer inside its own build — it decides whether P9c can exist at all, so it comes
+back to Beth as its own decision with options before P9c is queued. Until then the ledger's
+StorageLocation/StitchingApp row and the index work both wait here, named, rather than looking done.
+
 ### 2026-08-17 · P1 made `src/lib/validations/auth.ts` load-bearing for auth, and it is not review-gated
 
 **What contradicts what.** The review-gated list (`.claude/hooks/review-gated-paths.txt`, mirrored
