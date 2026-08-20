@@ -30,7 +30,7 @@ The charting programs whose files she has:
 - **Pattern Maker** — `.xsd`
 - **PCStitch** — `.pat`
 - **plus `.saga` and `.oxs`**, which she confirmed she has without naming the program behind
-  them. `.oxs` is an interchange format several programs read and write.
+  them (Q-007 carries the question).
 
 These are the files browsers cannot identify: a `.xsd` is announced as generic XML, so a rule
 written against what the browser claims a file is will reject them (the defect item P13b fixes).

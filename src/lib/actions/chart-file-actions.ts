@@ -13,6 +13,7 @@ import {
   addChartFileSchema,
   type AddChartFileInput,
   MAX_FILE_SIZE,
+  MAX_FILE_SIZE_LABEL,
   parseStorageKey,
   resolveChartFileContentType,
 } from "@/lib/validations/upload";
@@ -97,7 +98,10 @@ export async function addChartFile(input: AddChartFileInput) {
   }
   if (stored.contentLength > MAX_FILE_SIZE) {
     await discardRejectedUpload(validated.url);
-    return { success: false as const, error: "That file is too large. Maximum size is 50MB." };
+    return {
+      success: false as const,
+      error: `That file is too large. Maximum size is ${MAX_FILE_SIZE_LABEL}.`,
+    };
   }
   // The same rule `getPresignedUploadUrl` applies, now against what actually
   // arrived. The stored type has to be exactly what the rule would produce for

@@ -664,6 +664,34 @@ describe("chart-actions submitted cover keys", () => {
     expect(mockPrisma.$transaction).not.toHaveBeenCalled();
   });
 
+  it("refuses a chart created with supplies claiming another chart's cover", async () => {
+    const { createChartWithSupplies } = await import("./chart-actions");
+
+    const result = await createChartWithSupplies(formWithCover("covers/chart-2/opt-live.webp"), {
+      threads: [],
+      beads: [],
+      specialty: [],
+    });
+
+    assertFailure(result);
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+    expect(mockProcessAndStoreImage).not.toHaveBeenCalled();
+  });
+
+  it("refuses a chart created with supplies claiming an unsaved key another chart displays", async () => {
+    const { createChartWithSupplies } = await import("./chart-actions");
+    mockPrisma.chart.findFirst.mockResolvedValueOnce({ id: "chart-2" });
+
+    const result = await createChartWithSupplies(formWithCover("covers/unsaved/abc-someone.png"), {
+      threads: [],
+      beads: [],
+      specialty: [],
+    });
+
+    assertFailure(result);
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+  });
+
   it("still creates a chart with its own fresh upload", async () => {
     const { createChart } = await import("./chart-actions");
     mockPrisma.chart.create.mockResolvedValueOnce({ id: "new-chart-id" });

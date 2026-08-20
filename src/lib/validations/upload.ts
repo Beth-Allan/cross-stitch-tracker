@@ -14,9 +14,10 @@ export const ALLOWED_IMAGE_FORMATS = ["png", "jpeg", "webp"] as const;
 /**
  * The content types a chart file may be **stored** as — the one list both the
  * browser and the server check, replacing the byte-identical pair that used to
- * let the two disagree. Nothing here renders in a browser tab: an object is
- * served back with its stored type, so a type that renders would make the
- * bucket a place to host a page.
+ * let the two disagree. PDFs and images do render in a tab, which is the point;
+ * what is deliberately absent is anything a browser parses as markup, because an
+ * object is served back with its stored type and `text/html` or `image/svg+xml`
+ * would make the bucket a place to host a page.
  *
  * `application/octet-stream` is what a pattern file becomes
  * (`resolveChartFileContentType`), which is also why a file's *name* has to be

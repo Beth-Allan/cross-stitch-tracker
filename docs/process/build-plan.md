@@ -333,7 +333,7 @@ half is P13 and merged the same day; the upload half is **P13b** below.
   quietly left; both gated actions typed and using the shared error arms; gate green; fresh
   `/review` before merge. **Met, 2026-08-19, with one clause exceeded:** the `covers/unsaved/`
   half did **not** have to wait for P16 — the trap said it would need a "no other chart names this
-  key" test, and that is one indexed lookup, so all three save paths now check the owner segment
+  key" test, and that is one extra lookup, so all three save paths now check the owner segment
   _and_ that no other chart's row names the key. Beth's answer (CHF-001–CHF-003) removed `.zip`
   from the accepted list rather than adding anything: the first constant in the app narrowed by
   her word rather than widened by a guess. The agreement between browser and server is one shared

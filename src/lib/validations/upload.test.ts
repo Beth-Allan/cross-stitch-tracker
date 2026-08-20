@@ -223,9 +223,21 @@ describe("the one accepted-file list", () => {
     expect(ALLOWED_CHART_FILE_TYPES).not.toContain("application/x-zip-compressed");
   });
 
-  it("stores nothing the browser would render", () => {
-    for (const type of ALLOWED_CHART_FILE_TYPES) {
-      expect(type).not.toMatch(/^text\/html|svg/);
+  it("stores nothing that could host a page", () => {
+    // PDFs and images render in a tab; that is what they are for. What must never
+    // be storable is a type a browser will parse as markup and run script from.
+    const SCRIPT_BEARING = [
+      "text/html",
+      "application/xhtml+xml",
+      "image/svg+xml",
+      "text/xml",
+      "application/xml",
+      "text/javascript",
+      "application/javascript",
+    ];
+    for (const type of SCRIPT_BEARING) {
+      expect(ALLOWED_CHART_FILE_TYPES as readonly string[]).not.toContain(type);
+      expect(resolveChartFileContentType(`chart.pdf`, type)).not.toBe(type);
     }
   });
 });
