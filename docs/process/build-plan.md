@@ -237,7 +237,7 @@ charts. It is now carried by three items.
   session dates are written only through `parseCalendarDate()` and are therefore always exactly
   UTC midnight — verified in `session-actions.ts`. Only a fixture disagreed; ledger row.)_
 
-#### P9a-2 The invisible half, gallery and Pattern Dive side
+#### P9a-2 The invisible half, gallery and Pattern Dive side — **built 2026-08-20**
 
 - **Objective:** the remainder of P9a's scope, unchanged — `chart-actions.ts`'s
   `getChartsForGallery` junction fan-out (kitting dots plus the three `.length` counts, both
@@ -250,6 +250,15 @@ charts. It is now carried by three items.
   that branch is the O(charts × fabrics) case, not the matched one. ③ `getShoppingCartData` is a
   fourth junction fan-out the audit never named — ledger row, not this item's to fix.
 - **Done-when:** as P9a's, for the three named functions.
+  _(Built 2026-08-20. The two kitting surfaces share one new reader —
+  `summariseProjectSupplies` in `src/lib/queries/project-supplies.ts` — because they wanted the
+  same three sums off the same three tables; the gallery's chart row lost its junction arrays
+  entirely, which also shrinks what `/` and `/charts` serialise to the browser. `getFabricRequirements`
+  was the odd one out: its cost is materialisation, not reads, so it sorts the stash into pools
+  once and judges each piece in a single pass, and its output is unchanged by construction rather
+  than by a new equivalence test. Trap ③ is logged, not fixed: `getShoppingCartData` is the fourth
+  fan-out and the only one whose rows are actually rendered, so it wants P9b's pagination shape
+  instead — maintenance-ledger row, 2026-08-20.)_
 
 #### P9b The two paginated lists — **UI-touching; preview before merge**
 
