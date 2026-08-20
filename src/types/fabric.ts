@@ -54,3 +54,7 @@ export const FABRIC_COLOR_TYPES = [
   "Hand-dyed",
   "Overdyed",
 ] as const;
+
+export type FabricType = (typeof FABRIC_TYPES)[number];
+export type FabricColorFamily = (typeof FABRIC_COLOR_FAMILIES)[number];
+export type FabricColorType = (typeof FABRIC_COLOR_TYPES)[number];

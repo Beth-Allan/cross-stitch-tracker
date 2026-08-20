@@ -16,6 +16,7 @@ import { FormField } from "@/components/features/charts/form-primitives/form-fie
 import { SearchableSelect } from "@/components/features/charts/form-primitives/searchable-select";
 import { InlineBrandDialog } from "@/components/features/shared/inline-brand-dialog";
 import { createFabric, updateFabric, createFabricBrand } from "@/lib/actions/fabric-actions";
+import { optionFrom } from "@/lib/utils/select-option";
 import {
   FABRIC_COUNTS,
   FABRIC_TYPES,
@@ -24,6 +25,19 @@ import {
 } from "@/types/fabric";
 import type { Fabric } from "@/types/fabric";
 import type { FabricBrandWithCounts } from "@/types/fabric";
+
+/**
+ * A stored value the app's own lists do not contain, as an extra option.
+ *
+ * `Fabric.type`, `colorFamily` and `colorType` are plain `String` columns, so a row
+ * written by a seed, Prisma Studio or SQL can hold anything. Rendering it keeps the
+ * dropdown honest about what the row says; `handleSubmit` then refuses to save until
+ * a real option is chosen, rather than quietly substituting a default.
+ */
+function UnlistedOption({ options, value }: { options: readonly string[]; value: string }) {
+  if (optionFrom(options, value)) return null;
+  return <option value={value}>{value} (not recognised)</option>;
+}
 
 interface FabricFormModalProps {
   open: boolean;
@@ -47,9 +61,9 @@ export function FabricFormModal({
   const [name, setName] = useState("");
   const [brandId, setBrandId] = useState("");
   const [count, setCount] = useState<number>(14);
-  const [type, setType] = useState("Aida");
-  const [colorFamily, setColorFamily] = useState("White");
-  const [colorType, setColorType] = useState("White");
+  const [type, setType] = useState<string>("Aida");
+  const [colorFamily, setColorFamily] = useState<string>("White");
+  const [colorType, setColorType] = useState<string>("White");
   const [shortestEdgeInches, setShortestEdgeInches] = useState("");
   const [longestEdgeInches, setLongestEdgeInches] = useState("");
   const [linkedProjectId, setLinkedProjectId] = useState<string | null>(null);
@@ -127,13 +141,26 @@ export function FabricFormModal({
     setNameError(null);
     setGeneralError(null);
 
+    const narrowedType = optionFrom(FABRIC_TYPES, type);
+    const narrowedColorFamily = optionFrom(FABRIC_COLOR_FAMILIES, colorFamily);
+    const narrowedColorType = optionFrom(FABRIC_COLOR_TYPES, colorType);
+    if (!narrowedType || !narrowedColorFamily || !narrowedColorType) {
+      // These three columns are plain strings in the database, so a row written
+      // outside the app can hold a value no dropdown offers. Say so rather than
+      // substituting a default, which would rewrite the row on save.
+      setGeneralError(
+        "This fabric has a type or colour this app does not recognise. Pick one from the lists to save it.",
+      );
+      return;
+    }
+
     const formData = {
       name: trimmedName,
       brandId,
       count,
-      type,
-      colorFamily,
-      colorType,
+      type: narrowedType,
+      colorFamily: narrowedColorFamily,
+      colorType: narrowedColorType,
       shortestEdgeInches: shortestEdgeInches ? Number(shortestEdgeInches) : 0,
       longestEdgeInches: longestEdgeInches ? Number(longestEdgeInches) : 0,
       linkedProjectId: linkedProjectId || null,
@@ -233,6 +260,7 @@ export function FabricFormModal({
                 onChange={(e) => setType(e.target.value)}
                 className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 flex h-8 w-full rounded-lg border px-3 text-sm transition-colors outline-none focus-visible:ring-3"
               >
+                <UnlistedOption options={FABRIC_TYPES} value={type} />
                 {FABRIC_TYPES.map((t) => (
                   <option key={t} value={t}>
                     {t}
@@ -250,6 +278,7 @@ export function FabricFormModal({
                 onChange={(e) => setColorFamily(e.target.value)}
                 className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 flex h-8 w-full rounded-lg border px-3 text-sm transition-colors outline-none focus-visible:ring-3"
               >
+                <UnlistedOption options={FABRIC_COLOR_FAMILIES} value={colorFamily} />
                 {FABRIC_COLOR_FAMILIES.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -265,6 +294,7 @@ export function FabricFormModal({
                 onChange={(e) => setColorType(e.target.value)}
                 className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 flex h-8 w-full rounded-lg border px-3 text-sm transition-colors outline-none focus-visible:ring-3"
               >
+                <UnlistedOption options={FABRIC_COLOR_TYPES} value={colorType} />
                 {FABRIC_COLOR_TYPES.map((c) => (
                   <option key={c} value={c}>
                     {c}

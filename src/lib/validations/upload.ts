@@ -139,4 +139,4 @@ export const uploadRequestSchema = z.object({
   projectId: keyOwnerSchema,
 });
 
-export type UploadRequestInput = z.infer<typeof uploadRequestSchema>;
+export type UploadRequestInput = z.input<typeof uploadRequestSchema>;

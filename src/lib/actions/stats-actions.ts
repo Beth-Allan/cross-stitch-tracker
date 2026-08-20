@@ -4,6 +4,7 @@ import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { getCalendarDays, getDailyBreakdown, getMonthlyTotals } from "@/lib/queries/stats";
 import type { CalendarDayData, DailyBreakdownEntry, MonthlyTotal } from "@/types/stats";
+import { firstValidationMessage } from "@/lib/utils/action-errors";
 
 const monthYearSchema = z.object({
   month: z.number().int().min(1).max(12),
@@ -28,7 +29,7 @@ export async function fetchCalendarMonth(
     return { success: true, data };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: error.errors[0].message };
+      return { success: false, error: firstValidationMessage(error) };
     }
     console.error(
       "fetchCalendarMonth error:",
@@ -50,7 +51,7 @@ export async function fetchDailyBreakdown(
     return { success: true, data };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: error.errors[0].message };
+      return { success: false, error: firstValidationMessage(error) };
     }
     console.error(
       "fetchDailyBreakdown error:",
@@ -69,7 +70,7 @@ export async function fetchMonthlyTotals(year: number): Promise<StatsResult<Mont
     return { success: true, data };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: error.errors[0].message };
+      return { success: false, error: firstValidationMessage(error) };
     }
     console.error(
       "fetchMonthlyTotals error:",

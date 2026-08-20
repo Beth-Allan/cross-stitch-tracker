@@ -10,6 +10,7 @@ import {
   createMockProjectSpecialty,
   assertSuccess,
   assertFailure,
+  unvalidatedPayload,
 } from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
@@ -1341,11 +1342,13 @@ describe("supply-actions", () => {
 
     it("createAndAddThread rejects a payload with no color family", async () => {
       const { createAndAddThread } = await import("./supply-actions");
-      const result = await createAndAddThread({
-        projectId: "p1",
-        name: "Christmas Red",
-        brandId: "brand-1",
-      });
+      const result = await createAndAddThread(
+        unvalidatedPayload({
+          projectId: "p1",
+          name: "Christmas Red",
+          brandId: "brand-1",
+        }),
+      );
 
       // Named error, not the ownership arm -- validation is what refused
       assertFailure(result);
@@ -1356,11 +1359,13 @@ describe("supply-actions", () => {
 
     it("createAndAddBead rejects a payload with no color family", async () => {
       const { createAndAddBead } = await import("./supply-actions");
-      const result = await createAndAddBead({
-        projectId: "p1",
-        name: "Sea Glass",
-        brandId: "brand-1",
-      });
+      const result = await createAndAddBead(
+        unvalidatedPayload({
+          projectId: "p1",
+          name: "Sea Glass",
+          brandId: "brand-1",
+        }),
+      );
 
       assertFailure(result);
       expect(result.error).toBe("Color family is required");

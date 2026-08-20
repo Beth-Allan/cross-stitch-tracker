@@ -76,6 +76,29 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-08-19 · D-20 · P13 splits — the form-input half ships, the upload half waits — ruled at the start of P13
+
+**What needed a ruling.** P13's brief promised "one validation boundary", but the item had
+accumulated five ledger rows and, with them, seven distinct fixes. Three of the seven — merging
+the two byte-identical upload allowlists, settling the extension-vs-MIME rule that
+`chart-file-list.tsx` and `getPresignedUploadUrl` disagree about, and the submitted-cover-key
+ownership check P15's review added — all land in `src/lib/actions/upload-actions.ts`, a
+review-gated core. Building all seven together would therefore hold the four harmless ones behind
+a `/review` session, unreleased. This is the same shape as the P11 size check two days earlier.
+
+**Options put to her:** (a) split — the four form-input fixes ship today, the three upload fixes
+become their own gated item; (b) keep it whole, one item, one review, nothing live until the
+review runs. Recommendation (a).
+
+**Her ruling: (a) — split it.** Stated in-session, 2026-08-19, before any code was written.
+
+**What it changed.** **P13** is the form-input half: one trim/blank-is-absent convention across
+every boundary schema, the storage-location/stitching-app twins collapsed to one definition, both
+error arms shared, and every ungated action typed from its own schema. **P13b** carries the three
+upload fixes and the one question they raise for her — which chart-file formats she actually keeps,
+which is what decides whether the client's extension fallback or the server's MIME-only rule is
+right. P13b is gated, so a `/review` row follows it.
+
 ### 2026-08-19 · D-19 · the quick-add colour picker is required, not defaulted — ruled during P11b
 
 **What needed a ruling.** Her 2026-08-17 ruling said quick-add "gains a colour-family picker —

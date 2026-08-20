@@ -699,3 +699,17 @@ export function assertFailure<T extends { success: boolean }>(
     throw new Error(`Expected failure result but got success: ${JSON.stringify(result)}`);
   }
 }
+
+/**
+ * A payload the action's own parameter type could not describe.
+ *
+ * Server actions now type their input from the schema, so the app's callers get
+ * a compile-time contract — but action ids are global, and a hand-made POST can
+ * still put anything in the body. That is precisely what the runtime `.parse()`
+ * defends against, and a test proving the defence has to be able to send the
+ * payload the type forbids. Use this at those call sites only, so the cast is
+ * named and greppable rather than an anonymous `as`.
+ */
+export function unvalidatedPayload<T>(payload: unknown): T {
+  return payload as T;
+}

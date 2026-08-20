@@ -4,11 +4,13 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { firstValidationMessage, isDuplicateKeyError } from "@/lib/utils/action-errors";
 import { mapFocalPoint } from "@/types/focal-point";
 import { genreSchema } from "@/lib/validations/chart";
+import type { GenreInput } from "@/lib/validations/chart";
 import type { GenreWithStats, GenreDetail } from "@/types/genre";
 
-export async function createGenre(formData: unknown) {
+export async function createGenre(formData: GenreInput) {
   await requireAuth();
 
   try {
@@ -19,14 +21,9 @@ export async function createGenre(formData: unknown) {
     return { success: true as const, genre };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code: string }).code === "P2002"
-    ) {
+    if (isDuplicateKeyError(error)) {
       return { success: false as const, error: "A genre with that name already exists" };
     }
     console.error("createGenre error:", error);
@@ -34,7 +31,7 @@ export async function createGenre(formData: unknown) {
   }
 }
 
-export async function updateGenre(id: string, formData: unknown) {
+export async function updateGenre(id: string, formData: GenreInput) {
   await requireAuth();
 
   try {
@@ -49,14 +46,9 @@ export async function updateGenre(id: string, formData: unknown) {
     return { success: true as const, genre };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code: string }).code === "P2002"
-    ) {
+    if (isDuplicateKeyError(error)) {
       return { success: false as const, error: "A genre with that name already exists" };
     }
     console.error("updateGenre error:", error);

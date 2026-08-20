@@ -103,7 +103,7 @@ describe("DesignerFormModal", () => {
       expect(mockCreateDesigner).toHaveBeenCalledWith({
         name: "Heaven and Earth Designs",
         website: "https://heavenandearthdesigns.com",
-        notes: null,
+        notes: "",
       });
     });
   });
@@ -129,8 +129,8 @@ describe("DesignerFormModal", () => {
     await waitFor(() => {
       expect(mockUpdateDesigner).toHaveBeenCalledWith("d1", {
         name: "Mirabilia Designs",
-        website: null,
-        notes: null,
+        website: "",
+        notes: "",
       });
     });
   });

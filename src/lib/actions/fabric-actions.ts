@@ -4,9 +4,11 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { firstValidationMessage, isDuplicateKeyError } from "@/lib/utils/action-errors";
 import { fabricBrandSchema, fabricSchema } from "@/lib/validations/fabric";
+import type { FabricBrandInput, FabricInput } from "@/lib/validations/fabric";
 
-export async function createFabricBrand(formData: unknown) {
+export async function createFabricBrand(formData: FabricBrandInput) {
   await requireAuth();
 
   try {
@@ -16,14 +18,9 @@ export async function createFabricBrand(formData: unknown) {
     return { success: true as const, brand };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code: string }).code === "P2002"
-    ) {
+    if (isDuplicateKeyError(error)) {
       return { success: false as const, error: "A brand with that name already exists." };
     }
     console.error("createFabricBrand error:", error);
@@ -31,7 +28,7 @@ export async function createFabricBrand(formData: unknown) {
   }
 }
 
-export async function updateFabricBrand(id: string, formData: unknown) {
+export async function updateFabricBrand(id: string, formData: FabricBrandInput) {
   await requireAuth();
 
   try {
@@ -44,14 +41,9 @@ export async function updateFabricBrand(id: string, formData: unknown) {
     return { success: true as const, brand };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code: string }).code === "P2002"
-    ) {
+    if (isDuplicateKeyError(error)) {
       return { success: false as const, error: "A brand with that name already exists." };
     }
     console.error("updateFabricBrand error:", error);
@@ -86,7 +78,7 @@ export async function getFabricBrands() {
 // Mutations verify ownership of both the fabric's existing link and any incoming linkedProjectId.
 // Note: chart-actions.ts also performs fabric ownership checks when linking/unlinking in transactions.
 
-export async function createFabric(formData: unknown) {
+export async function createFabric(formData: FabricInput) {
   const user = await requireAuth();
 
   try {
@@ -111,14 +103,9 @@ export async function createFabric(formData: unknown) {
     return { success: true as const, fabric };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code: string }).code === "P2002"
-    ) {
+    if (isDuplicateKeyError(error)) {
       return {
         success: false as const,
         error: "This project already has fabric linked. Edit the existing fabric instead.",
@@ -129,7 +116,7 @@ export async function createFabric(formData: unknown) {
   }
 }
 
-export async function updateFabric(id: string, formData: unknown) {
+export async function updateFabric(id: string, formData: FabricInput) {
   const user = await requireAuth();
 
   try {
@@ -166,14 +153,9 @@ export async function updateFabric(id: string, formData: unknown) {
     return { success: true as const, fabric };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code: string }).code === "P2002"
-    ) {
+    if (isDuplicateKeyError(error)) {
       return {
         success: false as const,
         error: "This project already has fabric linked. Edit the existing fabric instead.",

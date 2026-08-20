@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, assertFailure } from "@/__tests__/mocks";
+import type { ChartFormInput } from "@/lib/validations/chart";
+import { createMockPrisma, assertFailure, unvalidatedPayload } from "@/__tests__/mocks";
 
 // Mock auth to return authenticated session
 vi.mock("@/lib/auth", () => ({
@@ -16,13 +17,12 @@ vi.mock("next/cache", () => ({
   revalidateTag: vi.fn(),
 }));
 
-const validFormData = {
+const validFormData: ChartFormInput = {
   chart: {
     name: "Test Chart",
     designerId: null,
     coverImageUrl: null,
     coverThumbnailUrl: null,
-    digitalFileUrl: null,
     stitchCount: 5000,
     stitchCountApproximate: false,
     stitchesWide: 100,
@@ -61,7 +61,7 @@ describe("chart-actions authenticated error paths", () => {
 
   it("createChart returns error on Zod validation failure (empty object)", async () => {
     const { createChart } = await import("./chart-actions");
-    const result = await createChart({});
+    const result = await createChart(unvalidatedPayload({}));
 
     assertFailure(result);
     expect(typeof result.error).toBe("string");
@@ -79,7 +79,7 @@ describe("chart-actions authenticated error paths", () => {
 
   it("updateChart returns error on Zod validation failure", async () => {
     const { updateChart } = await import("./chart-actions");
-    const result = await updateChart("chart-1", { bad: "data" });
+    const result = await updateChart("chart-1", unvalidatedPayload({ bad: "data" }));
 
     assertFailure(result);
     expect(typeof result.error).toBe("string");

@@ -25,4 +25,4 @@ export const sessionFormSchema = z.object({
   photoKey: z.string().nullable().default(null),
 });
 
-export type SessionFormInput = z.infer<typeof sessionFormSchema>;
+export type SessionFormInput = z.input<typeof sessionFormSchema>;

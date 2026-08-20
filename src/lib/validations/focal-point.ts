@@ -9,5 +9,3 @@ export const updateFocalPointSchema = z
   .refine((data) => (data.x === null) === (data.y === null), {
     message: "Both x and y must be set or both must be null",
   });
-
-export type UpdateFocalPointInput = z.infer<typeof updateFocalPointSchema>;

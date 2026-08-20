@@ -4,11 +4,13 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { firstValidationMessage, isDuplicateKeyError } from "@/lib/utils/action-errors";
 import { mapFocalPoint } from "@/types/focal-point";
 import { designerSchema } from "@/lib/validations/chart";
+import type { DesignerInput } from "@/lib/validations/chart";
 import type { DesignerWithStats, DesignerDetail } from "@/types/designer";
 
-export async function createDesigner(formData: unknown) {
+export async function createDesigner(formData: DesignerInput) {
   await requireAuth();
 
   try {
@@ -19,14 +21,9 @@ export async function createDesigner(formData: unknown) {
     return { success: true as const, designer };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code: string }).code === "P2002"
-    ) {
+    if (isDuplicateKeyError(error)) {
       return { success: false as const, error: "A designer with that name already exists" };
     }
     console.error("createDesigner error:", error);
@@ -34,7 +31,7 @@ export async function createDesigner(formData: unknown) {
   }
 }
 
-export async function updateDesigner(id: string, formData: unknown) {
+export async function updateDesigner(id: string, formData: DesignerInput) {
   await requireAuth();
 
   try {
@@ -49,14 +46,9 @@ export async function updateDesigner(id: string, formData: unknown) {
     return { success: true as const, designer };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code: string }).code === "P2002"
-    ) {
+    if (isDuplicateKeyError(error)) {
       return { success: false as const, error: "A designer with that name already exists" };
     }
     console.error("updateDesigner error:", error);

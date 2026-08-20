@@ -28,8 +28,16 @@ import {
 import { ColorSwatch } from "./color-swatch";
 import type { SupplyBrand, ColorFamily } from "@/generated/prisma/client";
 import { COLOR_FAMILIES, COLOR_FAMILY_LABELS } from "@/types/supply";
+import type { SupplyType } from "@/types/supply";
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */
+
+/** The lowercase prop the modal is opened with, as the enum the database stores. */
+const SUPPLY_TYPE_BY_MODE: Record<"thread" | "bead" | "specialty", SupplyType> = {
+  thread: "THREAD",
+  bead: "BEAD",
+  specialty: "SPECIALTY",
+};
 
 interface ThreadInitialData {
   id: string;
@@ -125,14 +133,16 @@ export function SupplyFormModal({
   // Errors
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const supplyTypeValue = SUPPLY_TYPE_BY_MODE[supplyType];
+
   const filteredBrandOptions = localBrands
-    .filter((b) => b.supplyType === supplyType.toUpperCase())
+    .filter((b) => b.supplyType === supplyTypeValue)
     .map((b) => ({ value: b.id, label: b.name }));
 
   async function handleAddBrand(name: string, website?: string) {
     const result = await createSupplyBrand({
       name,
-      supplyType: supplyType.toUpperCase(),
+      supplyType: supplyTypeValue,
       website: website ?? null,
     });
     if (result.success && result.brand) {

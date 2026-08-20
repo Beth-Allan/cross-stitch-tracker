@@ -5,11 +5,13 @@ import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { firstValidationMessage } from "@/lib/utils/action-errors";
 import { discardStoredObjects } from "@/lib/r2";
 import { processAndStoreImage } from "@/lib/actions/upload-actions";
 import { chartFormSchema, batchSupplySchema } from "@/lib/validations/chart";
 import { parseStorageKey } from "@/lib/validations/upload";
-import type { ChartFormInput } from "@/lib/validations/chart";
+import type { BatchSupplyInput, ChartFormInput, ChartFormValidated } from "@/lib/validations/chart";
+import type { UpdateProjectSettingsInput } from "@/lib/validations/supply";
 import { updateProjectSettingsSchema } from "@/lib/validations/supply";
 import { PROJECT_STATUSES } from "@/lib/utils/status";
 
@@ -20,7 +22,7 @@ import { PROJECT_STATUSES } from "@/lib/utils/status";
  */
 async function createChartAndProject(
   tx: Prisma.TransactionClient,
-  validated: ChartFormInput,
+  validated: ChartFormValidated,
   userId: string,
 ) {
   const { chart, project } = validated;
@@ -210,7 +212,7 @@ async function applyCoverOptimization(
   return optimized?.warning;
 }
 
-export async function createChart(formData: unknown) {
+export async function createChart(formData: ChartFormInput) {
   const user = await requireAuth();
 
   try {
@@ -229,7 +231,7 @@ export async function createChart(formData: unknown) {
     return { success: true as const, chartId: created.id, warning: coverWarning };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     console.error("createChart error:", error);
     return { success: false as const, error: "Failed to create chart" };
@@ -243,7 +245,10 @@ export async function createChart(formData: unknown) {
  * inserts across all three tables: ProjectThread, ProjectBead, ProjectSpecialty.
  * Nothing is persisted until this atomic $transaction succeeds.
  */
-export async function createChartWithSupplies(formData: unknown, supplyPayload: unknown) {
+export async function createChartWithSupplies(
+  formData: ChartFormInput,
+  supplyPayload: BatchSupplyInput,
+) {
   const user = await requireAuth();
 
   try {
@@ -309,14 +314,14 @@ export async function createChartWithSupplies(formData: unknown, supplyPayload: 
     return { success: true as const, chartId: created.id, warning: coverWarning };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     console.error("createChartWithSupplies error:", error);
     return { success: false as const, error: "Failed to create chart" };
   }
 }
 
-export async function updateChart(chartId: string, formData: unknown) {
+export async function updateChart(chartId: string, formData: ChartFormInput) {
   const user = await requireAuth();
 
   try {
@@ -435,7 +440,7 @@ export async function updateChart(chartId: string, formData: unknown) {
     return { success: true as const, warning: coverWarning };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     console.error("updateChart error:", error);
     return { success: false as const, error: "Failed to update chart" };
@@ -617,7 +622,7 @@ export async function getChartsForGallery() {
   });
 }
 
-export async function updateProjectSettings(chartId: string, formData: unknown) {
+export async function updateProjectSettings(chartId: string, formData: UpdateProjectSettingsInput) {
   const user = await requireAuth();
 
   try {
@@ -641,7 +646,7 @@ export async function updateProjectSettings(chartId: string, formData: unknown) 
     return { success: true as const };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false as const, error: error.errors[0].message };
+      return { success: false as const, error: firstValidationMessage(error) };
     }
     console.error("updateProjectSettings error:", error);
     return { success: false as const, error: "Failed to update project settings" };

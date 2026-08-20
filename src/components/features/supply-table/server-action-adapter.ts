@@ -215,6 +215,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
   async createSupply(type: SupplyType, data: CreateSupplyData): Promise<SupplySearchResult> {
     switch (type) {
       case "THREAD": {
+        if (!data.colorFamily) throw new Error("Color family is required");
         const result = await createAndAddThread({
           projectId: this.projectId,
           name: data.name,
@@ -238,6 +239,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
         };
       }
       case "BEAD": {
+        if (!data.colorFamily) throw new Error("Color family is required");
         const result = await createAndAddBead({
           projectId: this.projectId,
           name: data.name,

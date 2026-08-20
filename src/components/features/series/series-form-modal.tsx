@@ -58,7 +58,7 @@ export function SeriesFormModal({ open, onOpenChange }: SeriesFormModalProps) {
           ? parsedTotalCount
           : null,
       designerId: null,
-      notes: notes.trim() || null,
+      notes,
     };
 
     startTransition(async () => {

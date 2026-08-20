@@ -1,5 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, createMockProject, assertFailure } from "@/__tests__/mocks";
+import {
+  createMockPrisma,
+  createMockProject,
+  assertFailure,
+  unvalidatedPayload,
+} from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -47,7 +52,7 @@ describe("updateProjectSettings", () => {
 
   it("rejects overCount that is not 1 or 2", async () => {
     const { updateProjectSettings } = await import("./chart-actions");
-    const result = await updateProjectSettings("chart-1", { overCount: 3 });
+    const result = await updateProjectSettings("chart-1", unvalidatedPayload({ overCount: 3 }));
     expect(result.success).toBe(false);
   });
 

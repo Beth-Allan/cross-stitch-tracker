@@ -48,4 +48,11 @@ describe("seriesSchema", () => {
     const longNotes = "a".repeat(5001);
     expect(() => seriesSchema.parse({ name: "Test", notes: longNotes })).toThrow("Notes too long");
   });
+
+  it("stores blank notes and a cleared designer selection as absent", () => {
+    const result = seriesSchema.parse({ name: "Test", designerId: "", notes: "   " });
+
+    expect(result.designerId).toBeNull();
+    expect(result.notes).toBeNull();
+  });
 });

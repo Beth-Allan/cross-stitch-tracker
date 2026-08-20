@@ -1,5 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, assertSuccess, assertFailure } from "@/__tests__/mocks";
+import type { ChartFormInput } from "@/lib/validations/chart";
+import {
+  createMockPrisma,
+  assertSuccess,
+  assertFailure,
+  unvalidatedPayload,
+} from "@/__tests__/mocks";
 
 // Mock auth to return null (unauthenticated)
 vi.mock("@/lib/auth", () => ({
@@ -21,7 +27,7 @@ vi.mock("next/cache", () => ({
 describe("chart-actions auth guard", () => {
   it("createChart throws Unauthorized when no session", async () => {
     const { createChart } = await import("./chart-actions");
-    await expect(createChart({})).rejects.toThrow("Unauthorized");
+    await expect(createChart(unvalidatedPayload({}))).rejects.toThrow("Unauthorized");
   });
 
   it("deleteChart throws Unauthorized when no session", async () => {
@@ -46,17 +52,18 @@ describe("chart-actions auth guard", () => {
 
   it("createChartWithSupplies throws Unauthorized when no session", async () => {
     const { createChartWithSupplies } = await import("./chart-actions");
-    await expect(createChartWithSupplies({}, {})).rejects.toThrow("Unauthorized");
+    await expect(
+      createChartWithSupplies(unvalidatedPayload({}), unvalidatedPayload({})),
+    ).rejects.toThrow("Unauthorized");
   });
 });
 
-const validChartInput = {
+const validChartInput: ChartFormInput = {
   chart: {
     name: "Test Chart",
     designerId: null,
     coverImageUrl: null,
     coverThumbnailUrl: null,
-    digitalFileUrl: null,
     stitchCount: 5000,
     stitchCountApproximate: false,
     stitchesWide: 100,
@@ -219,7 +226,7 @@ describe("createChartWithSupplies", () => {
 });
 
 describe("seriesId flow-through", () => {
-  const validChartInput = {
+  const validChartInput: ChartFormInput = {
     chart: {
       name: "Test Chart",
       designerId: null,
