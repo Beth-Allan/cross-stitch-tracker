@@ -3,6 +3,7 @@
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
+import { summariseSessionDays } from "@/lib/utils/session-days";
 import { mapFocalPoint } from "@/types/focal-point";
 import { calculateProgressPercent } from "@/lib/utils/progress";
 import type {
@@ -23,9 +24,8 @@ async function getCurrentlyStitchingProjects(userId: string): Promise<CurrentlyS
     status: { in: ["IN_PROGRESS", "ON_HOLD"] },
   } satisfies Prisma.ProjectWhereInput;
 
-  // Session dates are stored as UTC-midnight instants, so one group per (project, date) is one
-  // group per stitching day — the three figures below are all derivable from it, and the row
-  // count stops growing with the number of sessions logged.
+  // One group per (project, date) instead of one row per session; summariseSessionDays folds
+  // those groups into the three figures below.
   const [projects, dayTotals] = await Promise.all([
     prisma.project.findMany({
       where,
@@ -50,18 +50,7 @@ async function getCurrentlyStitchingProjects(userId: string): Promise<CurrentlyS
     }),
   ]);
 
-  const daysByProject = new Map<string, { lastDate: Date; minutes: number; days: number }>();
-  for (const row of dayTotals) {
-    const existing = daysByProject.get(row.projectId);
-    const minutes = row._sum.timeSpentMinutes ?? 0;
-    if (!existing) {
-      daysByProject.set(row.projectId, { lastDate: row.date, minutes, days: 1 });
-      continue;
-    }
-    existing.minutes += minutes;
-    existing.days += 1;
-    if (row.date.getTime() > existing.lastDate.getTime()) existing.lastDate = row.date;
-  }
+  const daysByProject = summariseSessionDays(dayTotals);
 
   return projects
     .map((p) => {

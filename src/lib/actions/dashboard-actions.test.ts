@@ -618,6 +618,7 @@ describe("dashboard-actions", () => {
       mockPrisma.project.findMany.mockResolvedValue([]);
       mockPrisma.chart.findMany.mockResolvedValue([]);
       mockPrisma.project.count.mockResolvedValue(0);
+      mockPrisma.project.findFirst.mockResolvedValue(null);
 
       const { getMainDashboardData } = await import("./dashboard-actions");
       await getMainDashboardData();
@@ -630,6 +631,23 @@ describe("dashboard-actions", () => {
           }),
         }),
       );
+
+      // The aggregate reads carry their own scoping — collection stats no longer calls
+      // project.findMany at all, so without these three the scope could vanish unnoticed.
+      expect(mockPrisma.project.groupBy).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { userId: "user-1" } }),
+      );
+      expect(mockPrisma.stitchSession.groupBy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { project: expect.objectContaining({ userId: "user-1" }) },
+        }),
+      );
+      expect(mockPrisma.project.findFirst).toHaveBeenCalledTimes(2);
+      for (const [args] of mockPrisma.project.findFirst.mock.calls as Array<
+        [{ where?: { userId?: string } }]
+      >) {
+        expect(args.where?.userId).toBe("user-1");
+      }
 
       // Verify chart queries include userId filter via project relation
       for (const call of mockPrisma.chart.findMany.mock.calls) {
@@ -800,6 +818,18 @@ describe("dashboard-actions", () => {
         projectId: "p3",
         name: "Big WIP",
         stitchCount: 50000,
+      });
+
+      // The mock does the sorting, so only the query itself can be trusted to exclude an
+      // unfinished project that still carries a finish date — assert the filter, not the
+      // answer the mock chose to give.
+      const finishCall = mockPrisma.project.findFirst.mock.calls.find(([args]) =>
+        orderedBy(args, "finishDate"),
+      );
+      expect((finishCall![0] as { where?: unknown }).where).toEqual({
+        userId: "user-1",
+        status: { in: ["FINISHED", "FFO"] },
+        finishDate: { not: null },
       });
     });
 

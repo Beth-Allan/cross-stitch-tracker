@@ -2,6 +2,7 @@
 
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { summariseSessionDays } from "@/lib/utils/session-days";
 import { getUserTimezone, getCurrentPeriod } from "@/lib/queries/stats/timezone";
 import { calculateProgressPercent } from "@/lib/utils/progress";
 import { mapFocalPoint } from "@/types/focal-point";
@@ -30,25 +31,6 @@ const UNSTARTED_STATUSES = new Set(["UNSTARTED", "KITTING", "KITTED"]);
 const FINISHED_STATUSES = new Set(["FINISHED", "FFO"]);
 const WIP_STATUS = "IN_PROGRESS";
 
-/**
- * Session dates are stored as UTC-midnight instants, so one group per (project, date) is one
- * group per stitching day — enough for both the day count and the most recent session, without
- * a row per session.
- */
-function summariseSessionDays(rows: Array<{ projectId: string; date: Date }>) {
-  const byProject = new Map<string, { lastDate: Date; days: number }>();
-  for (const row of rows) {
-    const existing = byProject.get(row.projectId);
-    if (!existing) {
-      byProject.set(row.projectId, { lastDate: row.date, days: 1 });
-      continue;
-    }
-    existing.days += 1;
-    if (row.date.getTime() > existing.lastDate.getTime()) existing.lastDate = row.date;
-  }
-  return byProject;
-}
-
 function assignBucketId(status: string, progressPercent: number): ProgressBucketId | null {
   if (FINISHED_STATUSES.has(status)) return null; // excluded from buckets
   if (UNSTARTED_STATUSES.has(status)) return "unstarted";
@@ -65,11 +47,12 @@ function assignBucketId(status: string, progressPercent: number): ProgressBucket
  * Fetches all data for the Project Dashboard tab: hero stats, progress buckets,
  * and finished project stats.
  *
- * Single query fetches all user projects with includes. All aggregations are
- * computed in-memory from the result set — no N+1 queries.
+ * Two concurrent queries, no N+1: the project rows with their supply counts, and the session
+ * days rolled up per project. Supply counts come back as `_count` and stitching days from a
+ * `groupBy`, so neither grows a row per junction row or per session.
  *
- * Single prisma.project.findMany with userId filter ensures data isolation.
- * requireAuth() called at function entry.
+ * requireAuth() is called at function entry, and **both** queries carry their own userId
+ * filter — data isolation rests on the pair, not on one query.
  */
 export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
   const user = await requireAuth();

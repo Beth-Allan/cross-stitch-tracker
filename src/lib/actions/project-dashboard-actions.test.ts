@@ -92,7 +92,11 @@ type MockProject = ReturnType<typeof mockProject>;
  */
 function mockProjects(projects: MockProject[]) {
   mockPrisma.project.findMany.mockResolvedValue(
-    projects.map(({ sessions: _sessions, ...row }) => row),
+    projects.map((p) => {
+      const row: Partial<MockProject> = { ...p };
+      delete row.sessions;
+      return row;
+    }),
   );
   mockPrisma.stitchSession.groupBy.mockResolvedValue(
     projects.flatMap((p) =>
@@ -422,13 +426,15 @@ describe("project-dashboard-actions", () => {
             status: "FINISHED",
             stitchesCompleted: 10000,
             stitchCount: 10000,
-            // Session dates are stored as UTC-midnight instants (parseCalendarDate), so two
-            // sessions on one day carry the same value — the app cannot write a time of day.
+            // Times of day are deliberate: writes go through parseCalendarDate, so a stored
+            // date should always be UTC midnight — but nothing in the database enforces that,
+            // and every sibling module folds by calendar day rather than trusting it. This
+            // fixture is what keeps these two dashboards folding the same way.
             sessions: [
-              { date: new Date("2026-01-01T00:00:00Z"), stitchCount: 100 },
-              { date: new Date("2026-01-01T00:00:00Z"), stitchCount: 50 }, // same day
-              { date: new Date("2026-01-02T00:00:00Z"), stitchCount: 200 },
-              { date: new Date("2026-01-03T00:00:00Z"), stitchCount: 150 },
+              { date: new Date("2026-01-01T10:00:00Z"), stitchCount: 100 },
+              { date: new Date("2026-01-01T15:00:00Z"), stitchCount: 50 }, // same day
+              { date: new Date("2026-01-02T10:00:00Z"), stitchCount: 200 },
+              { date: new Date("2026-01-03T10:00:00Z"), stitchCount: 150 },
             ],
           }),
         ]);
@@ -584,6 +590,14 @@ describe("project-dashboard-actions", () => {
             where: expect.objectContaining({
               userId: "user-1",
             }),
+          }),
+        );
+
+        // Data isolation rests on both reads, so both are asserted — dropping the scope from
+        // the session groupBy would otherwise change nothing that any test can see.
+        expect(mockPrisma.stitchSession.groupBy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            where: { project: { userId: "user-1" } },
           }),
         );
       });
