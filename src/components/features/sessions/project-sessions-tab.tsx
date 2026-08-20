@@ -5,7 +5,7 @@ import { Plus, Activity, Hash, TrendingUp, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataUnavailable } from "@/components/ui/data-unavailable";
 import { SessionTable } from "./session-table";
-import { LogSessionModal } from "./log-session-modal";
+import { LogSessionModal, type LogSessionModalProps } from "./log-session-modal";
 import type {
   StitchSessionRow,
   ProjectSessionStats,
@@ -24,6 +24,12 @@ interface ProjectSessionsTabProps {
   imageUrls: Record<string, string>;
   activeProjects: ActiveProjectForPicker[];
   projectId: string;
+  /**
+   * This project's own figures. `activeProjects` only carries active statuses, so a
+   * finished or unstarted project is missing from it -- and this tab logs against the
+   * project regardless of status, so the over-total question needs them from here.
+   */
+  projectTotals?: LogSessionModalProps["lockedProjectTotals"];
   completionEstimate?: CompletionEstimate | null;
 }
 
@@ -63,6 +69,7 @@ export function ProjectSessionsTab({
   imageUrls,
   activeProjects,
   projectId,
+  projectTotals,
   completionEstimate,
 }: ProjectSessionsTabProps) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -108,6 +115,7 @@ export function ProjectSessionsTab({
           activeProjects={activeProjects}
           imageUrls={imageUrls}
           lockedProjectId={projectId}
+          lockedProjectTotals={projectTotals}
         />
       </div>
     );
@@ -132,6 +140,7 @@ export function ProjectSessionsTab({
           activeProjects={activeProjects}
           imageUrls={imageUrls}
           lockedProjectId={projectId}
+          lockedProjectTotals={projectTotals}
         />
       </div>
     );
@@ -206,6 +215,7 @@ export function ProjectSessionsTab({
         imageUrls={imageUrls}
         editSession={editSession}
         lockedProjectId={projectId}
+        lockedProjectTotals={projectTotals}
       />
     </div>
   );

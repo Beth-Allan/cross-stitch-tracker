@@ -98,6 +98,19 @@ describe("ProjectDetailHero", () => {
     expect(screen.getByText("68%")).toBeInTheDocument();
   });
 
+  it("caps an over-logged project's progress at 100%", () => {
+    const overLogged = createMockChartWithRelations({
+      name: "Over-logged",
+      stitchCount: 20000,
+      stitchesWide: 200,
+      stitchesHigh: 100,
+      project: { status: "IN_PROGRESS", stitchesCompleted: 27400 },
+    });
+    render(<ProjectDetailHero chart={overLogged} imageUrls={{}} />);
+    expect(screen.getByText("100%")).toBeInTheDocument();
+    expect(screen.queryByText("137%")).toBeNull();
+  });
+
   it("does not render progress for UNSTARTED status", () => {
     const unstartedChart = createMockChartWithRelations({
       name: "Unstarted",

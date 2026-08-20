@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { createSession, updateSession, deleteSession } from "@/lib/actions/session-actions";
 import { getPresignedUploadUrl } from "@/lib/actions/upload-actions";
 import { fireCelebration } from "@/components/features/stats/record-celebration";
+import { formatNumber } from "@/components/features/gallery/gallery-format";
+import { calculateProgressPercent } from "@/lib/utils/progress";
 import type { ActiveProjectForPicker } from "@/types/session";
 
 interface EditSessionData {
@@ -26,6 +28,19 @@ interface EditSessionData {
   photoKey: string | null;
 }
 
+/** The figures behind the "past 100%" question, held while it waits for an answer. */
+interface OverTotal {
+  projectName: string;
+  projected: number;
+  total: number;
+}
+
+/** What the over-total question needs to know about whichever project is selected. */
+type ProjectTotals = Pick<
+  ActiveProjectForPicker,
+  "chartName" | "stitchesCompleted" | "totalStitches"
+>;
+
 export interface LogSessionModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -35,6 +50,14 @@ export interface LogSessionModalProps {
   imageUrls: Record<string, string>;
   editSession?: EditSessionData | null;
   lockedProjectId?: string;
+  /**
+   * Totals for `lockedProjectId` when it is absent from `activeProjects`. The picker list
+   * only carries active statuses, so a FINISHED, FFO or UNSTARTED project reaches the
+   * modal with no figures -- and those are the ones most likely to be at or past 100%.
+   * Without this the over-total question cannot be asked and the save falls back to the
+   * server's after-the-fact warning.
+   */
+  lockedProjectTotals?: ProjectTotals;
 }
 
 function todayString(): string {
@@ -50,6 +73,7 @@ export function LogSessionModal({
   imageUrls,
   editSession,
   lockedProjectId,
+  lockedProjectTotals,
 }: LogSessionModalProps) {
   const isEditing = !!editSession;
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -65,6 +89,7 @@ export function LogSessionModal({
   const [showProjectDropdown, setShowProjectDropdown] = useState(false);
   const [projectSearch, setProjectSearch] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [overTotal, setOverTotal] = useState<OverTotal | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -107,9 +132,13 @@ export function LogSessionModal({
     setProjectSearch("");
     setShowDeleteConfirm(false);
     setShowProjectDropdown(false);
+    setOverTotal(null);
   }, [isOpen, editSession, lockedProjectId]);
 
-  const selectedProject = activeProjects.find((p) => p.projectId === selectedProjectId);
+  const listedProject = activeProjects.find((p) => p.projectId === selectedProjectId);
+  const selectedProject: ProjectTotals | undefined =
+    listedProject ??
+    (selectedProjectId && selectedProjectId === lockedProjectId ? lockedProjectTotals : undefined);
   const filteredProjects = activeProjects.filter((p) =>
     p.chartName.toLowerCase().includes(projectSearch.toLowerCase()),
   );
@@ -167,8 +196,41 @@ export function LogSessionModal({
     }
   }
 
-  function handleSave() {
+  /**
+   * The over-total question Beth ruled on (2026-08-17): warn but allow. Answered from the
+   * picker's own figures so it can be asked *before* the write. An edit is measured against
+   * the project total with the session's current count taken back out, which is the same
+   * delta the server applies. Returns null when there is nothing to ask about — including
+   * when the project is not in the picker list, where the server's `overTotal` warning is
+   * the fallback that still names the over-log afterwards.
+   */
+  function checkOverTotal(): OverTotal | null {
+    if (!selectedProject || selectedProject.totalStitches <= 0) return null;
+    // Only this project's own completed count contains this session's stitches -- after a
+    // project switch the subtraction would come off a total that never included them
+    const editingThisProject = editSession?.projectId === selectedProjectId;
+    const withoutThisSession =
+      selectedProject.stitchesCompleted - (editingThisProject ? editSession.stitchCount : 0);
+    const projected = withoutThisSession + parsedStitchCount;
+    if (projected <= selectedProject.totalStitches) return null;
+    return {
+      projectName: selectedProject.chartName,
+      projected,
+      total: selectedProject.totalStitches,
+    };
+  }
+
+  function handleSave(confirmedOverTotal = false) {
     if (!isValid || isUploading) return;
+
+    if (!confirmedOverTotal) {
+      const pending = checkOverTotal();
+      if (pending) {
+        setOverTotal(pending);
+        return;
+      }
+    }
+    setOverTotal(null);
 
     const formData = {
       projectId: selectedProjectId,
@@ -184,7 +246,7 @@ export function LogSessionModal({
           const result = await updateSession(editSession.id, formData);
           if (result.success) {
             toast.success("Session updated");
-            if (result.warning === "overTotal") {
+            if (result.warning === "overTotal" && !confirmedOverTotal) {
               toast.warning(
                 "This session pushes progress past 100% — is your stitch count accurate?",
               );
@@ -203,7 +265,7 @@ export function LogSessionModal({
             } else {
               toast.success("Session logged");
             }
-            if (result.warning === "overTotal") {
+            if (result.warning === "overTotal" && !confirmedOverTotal) {
               toast.warning(
                 "This session pushes progress past 100% — is your stitch count accurate?",
               );
@@ -294,6 +356,7 @@ export function LogSessionModal({
                           setSelectedProjectId(project.projectId);
                           setShowProjectDropdown(false);
                           setProjectSearch("");
+                          setOverTotal(null);
                         }}
                         className={`hover:bg-accent flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors ${
                           project.projectId === selectedProjectId
@@ -318,7 +381,7 @@ export function LogSessionModal({
                           <p className="truncate font-medium">{project.chartName}</p>
                           <p className="text-muted-foreground text-[11px]">
                             {project.totalStitches > 0
-                              ? `${Math.round((project.stitchesCompleted / project.totalStitches) * 100)}% complete`
+                              ? `${calculateProgressPercent(project.stitchesCompleted, project.totalStitches)}% complete`
                               : "0% complete"}
                           </p>
                         </div>
@@ -371,7 +434,10 @@ export function LogSessionModal({
               type="number"
               min={1}
               value={stitchCount}
-              onChange={(e) => setStitchCount(e.target.value)}
+              onChange={(e) => {
+                setStitchCount(e.target.value);
+                setOverTotal(null);
+              }}
               placeholder="e.g. 423"
             />
             <p className="text-muted-foreground mt-1 text-sm">
@@ -466,6 +532,16 @@ export function LogSessionModal({
               </button>
             )}
           </div>
+
+          {overTotal && (
+            <div
+              role="alert"
+              className="border-warning-border bg-warning-muted text-warning-muted-foreground rounded-lg border p-3 text-sm"
+            >
+              This takes {overTotal.projectName} past 100% — {formatNumber(overTotal.projected)} of{" "}
+              {formatNumber(overTotal.total)} stitches. {isEditing ? "Save" : "Log"} it anyway?
+            </div>
+          )}
         </div>
 
         <DialogFooter className="sm:justify-between">
@@ -504,16 +580,33 @@ export function LogSessionModal({
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isPending}>
-              {isEditing ? "Discard Changes" : "Discard"}
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!isValid || isPending || isUploading}
-              className="disabled:opacity-40"
-            >
-              {isUploading ? "Uploading..." : isEditing ? "Save Changes" : "Log Stitches"}
-            </Button>
+            {overTotal ? (
+              <>
+                <Button variant="ghost" onClick={() => setOverTotal(null)} disabled={isPending}>
+                  Go Back
+                </Button>
+                <Button
+                  onClick={() => handleSave(true)}
+                  disabled={isPending || isUploading}
+                  autoFocus
+                >
+                  {isEditing ? "Save Anyway" : "Log Anyway"}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isPending}>
+                  {isEditing ? "Discard Changes" : "Discard"}
+                </Button>
+                <Button
+                  onClick={() => handleSave()}
+                  disabled={!isValid || isPending || isUploading}
+                  className="disabled:opacity-40"
+                >
+                  {isUploading ? "Uploading..." : isEditing ? "Save Changes" : "Log Stitches"}
+                </Button>
+              </>
+            )}
           </div>
         </DialogFooter>
       </DialogContent>

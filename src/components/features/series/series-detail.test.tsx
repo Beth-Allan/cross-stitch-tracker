@@ -203,4 +203,25 @@ describe("SeriesDetail", () => {
     render(<SeriesDetail series={createSeriesDetail()} />);
     expect(screen.getByText(/3 of 15 owned/)).toBeInTheDocument();
   });
+
+  it("caps an over-logged chart's progress at 100%", () => {
+    const series = createSeriesDetail({
+      charts: [
+        createMockSeriesChart({
+          id: "c1",
+          name: "Over-logged",
+          stitchCount: 20000,
+          stitchesWide: 200,
+          stitchesHigh: 100,
+          status: "IN_PROGRESS",
+          stitchesCompleted: 27400,
+        }),
+      ],
+      progress: { ownedCount: 1, finishedCount: 0, totalCount: 15 },
+    });
+    render(<SeriesDetail series={series} />);
+
+    expect(screen.getByText("100%")).toBeInTheDocument();
+    expect(screen.queryByText("137%")).toBeNull();
+  });
 });

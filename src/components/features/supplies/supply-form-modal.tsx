@@ -27,7 +27,7 @@ import {
 } from "@/lib/actions/supply-actions";
 import { ColorSwatch } from "./color-swatch";
 import type { SupplyBrand, ColorFamily } from "@/generated/prisma/client";
-import { COLOR_FAMILIES } from "@/types/supply";
+import { COLOR_FAMILIES, COLOR_FAMILY_LABELS } from "@/types/supply";
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */
 
@@ -83,20 +83,6 @@ const TITLE_LABELS: Record<string, Record<string, string>> = {
 };
 
 /* ─── Color Family Display ──────────────────────────────────────────────────── */
-
-const COLOR_FAMILY_DISPLAY: Record<string, string> = {
-  BLACK: "Black",
-  WHITE: "White",
-  RED: "Red",
-  ORANGE: "Orange",
-  YELLOW: "Yellow",
-  GREEN: "Green",
-  BLUE: "Blue",
-  PURPLE: "Purple",
-  BROWN: "Brown",
-  GRAY: "Gray",
-  NEUTRAL: "Neutral",
-};
 
 /* ─── Component ─────────────────────────────────────────────────────────────── */
 
@@ -263,7 +249,7 @@ export function SupplyFormModal({
               </p>
               <p className="text-muted-foreground text-xs">
                 {localBrands.find((b) => b.id === brandId)?.name ?? "Brand"}{" "}
-                {colorFamily ? `\u00B7 ${COLOR_FAMILY_DISPLAY[colorFamily] ?? colorFamily}` : ""}
+                {colorFamily ? `\u00B7 ${COLOR_FAMILY_LABELS[colorFamily] ?? colorFamily}` : ""}
               </p>
             </div>
           </div>
@@ -349,7 +335,7 @@ export function SupplyFormModal({
                 >
                   {COLOR_FAMILIES.map((f) => (
                     <option key={f} value={f}>
-                      {COLOR_FAMILY_DISPLAY[f]}
+                      {COLOR_FAMILY_LABELS[f]}
                     </option>
                   ))}
                 </select>

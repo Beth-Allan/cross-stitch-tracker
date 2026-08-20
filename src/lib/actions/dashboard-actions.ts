@@ -3,6 +3,7 @@
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
 import { mapFocalPoint } from "@/types/focal-point";
+import { calculateProgressPercent } from "@/lib/utils/progress";
 import type {
   CurrentlyStitchingProject,
   StartNextProject,
@@ -45,10 +46,7 @@ async function getCurrentlyStitchingProjects(userId: string): Promise<CurrentlyS
       const lastSessionDate = p.sessions[0]?.date ?? null;
       const totalTimeMinutes = p.sessions.reduce((sum, s) => sum + (s.timeSpentMinutes ?? 0), 0);
       const stitchingDays = new Set(p.sessions.map((s) => s.date.toISOString().split("T")[0])).size;
-      const progressPercent =
-        p.chart.stitchCount > 0
-          ? Math.min(100, Math.round((p.stitchesCompleted / p.chart.stitchCount) * 100))
-          : 0;
+      const progressPercent = calculateProgressPercent(p.stitchesCompleted, p.chart.stitchCount);
 
       return {
         projectId: p.id,
@@ -246,10 +244,10 @@ async function getRandomSpotlightProject(userId: string): Promise<SpotlightProje
 
   if (!project) return null;
 
-  const progressPercent =
-    project.chart.stitchCount > 0
-      ? Math.min(100, Math.round((project.stitchesCompleted / project.chart.stitchCount) * 100))
-      : 0;
+  const progressPercent = calculateProgressPercent(
+    project.stitchesCompleted,
+    project.chart.stitchCount,
+  );
 
   return {
     projectId: project.id,

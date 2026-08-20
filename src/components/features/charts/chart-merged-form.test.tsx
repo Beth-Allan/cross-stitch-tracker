@@ -992,6 +992,7 @@ describe("ChartMergedForm", () => {
         code: "999",
         brandId: "brand-1",
         hexColor: "#800080",
+        colorFamily: "PURPLE",
       });
 
       expect(mockCreateThread).toHaveBeenCalledWith(
@@ -1000,7 +1001,7 @@ describe("ChartMergedForm", () => {
           colorCode: "999",
           brandId: "brand-1",
           hexColor: "#800080",
-          colorFamily: "NEUTRAL",
+          colorFamily: "PURPLE",
         }),
       );
       // Must NOT have a 'name' field (wrong field name)
@@ -1032,6 +1033,7 @@ describe("ChartMergedForm", () => {
         name: "Red Glass",
         code: "00001",
         brandId: "brand-2",
+        colorFamily: "RED",
       });
 
       expect(mockCreateBead).toHaveBeenCalledWith(
@@ -1040,7 +1042,7 @@ describe("ChartMergedForm", () => {
           productCode: "00001",
           brandId: "brand-2",
           hexColor: DEFAULT_SUPPLY_HEX,
-          colorFamily: "NEUTRAL",
+          colorFamily: "RED",
         }),
       );
       const callArg = mockCreateBead.mock.calls[0][0] as Record<string, unknown>;

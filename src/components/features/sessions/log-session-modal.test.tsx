@@ -257,10 +257,11 @@ describe("LogSessionModal", () => {
         warning: "overTotal",
       });
 
-      renderModal();
+      // The locked project is absent from the picker list, so the modal has no totals to
+      // ask with -- the server's warning is the fallback that still names the over-log.
+      renderModal({ lockedProjectId: "proj-unlisted" });
+      await waitForDialogFocus();
 
-      await user.click(screen.getByText("Select a project..."));
-      await user.click(screen.getByText("Autumn Sampler"));
       const stitchInput = screen.getByLabelText(/stitch count/i);
       await user.type(stitchInput, "9000");
       await user.click(getSaveButton());
@@ -392,7 +393,12 @@ describe("LogSessionModal", () => {
         session: { id: "session-1" },
         warning: "overTotal",
       });
-      renderModal({ editSession, lockedProjectId: "proj-1" });
+      // Unlisted project: the modal has no totals to ask with, so the server's warning
+      // is the fallback that still names the over-log.
+      renderModal({
+        editSession: { ...editSession, projectId: "proj-unlisted" },
+        lockedProjectId: "proj-unlisted",
+      });
       await waitForDialogFocus();
 
       const stitchInput = screen.getByLabelText(/stitch count/i);
@@ -524,6 +530,248 @@ describe("LogSessionModal", () => {
 
       expect(screen.queryByText("Add progress photo")).not.toBeInTheDocument();
     });
+  });
+
+  describe("over-total confirmation", () => {
+    it("asks before saving a session that would push the project past its total", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      renderModal();
+
+      await user.click(screen.getByText("Select a project..."));
+      await user.click(screen.getByText("Autumn Sampler"));
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.type(stitchInput, "9000");
+      await user.click(getSaveButton());
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(/past 100%/i);
+      expect(mockCreateSession).not.toHaveBeenCalled();
+    });
+
+    it("names the projected total and the chart's total in the question", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      renderModal();
+
+      await user.click(screen.getByText("Select a project..."));
+      await user.click(screen.getByText("Autumn Sampler"));
+      await user.type(screen.getByLabelText(/stitch count/i), "9000");
+      await user.click(getSaveButton());
+
+      const alert = await screen.findByRole("alert");
+      expect(alert).toHaveTextContent("11,500");
+      expect(alert).toHaveTextContent("10,000");
+    });
+
+    it("saves the session when the question is answered yes", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      mockCreateSession.mockResolvedValue({
+        success: true,
+        session: { id: "new-1" },
+        brokenRecords: [],
+        warning: "overTotal",
+      });
+      renderModal();
+
+      await user.click(screen.getByText("Select a project..."));
+      await user.click(screen.getByText("Autumn Sampler"));
+      await user.type(screen.getByLabelText(/stitch count/i), "9000");
+      await user.click(getSaveButton());
+      await user.click(await screen.findByRole("button", { name: /log anyway/i }));
+
+      await waitFor(() => {
+        expect(mockCreateSession).toHaveBeenCalledWith(
+          expect.objectContaining({ projectId: "proj-1", stitchCount: 9000 }),
+        );
+      });
+    });
+
+    it("does not repeat the warning as a toast once the question is answered yes", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      mockCreateSession.mockResolvedValue({
+        success: true,
+        session: { id: "new-1" },
+        brokenRecords: [],
+        warning: "overTotal",
+      });
+      renderModal();
+
+      await user.click(screen.getByText("Select a project..."));
+      await user.click(screen.getByText("Autumn Sampler"));
+      await user.type(screen.getByLabelText(/stitch count/i), "9000");
+      await user.click(getSaveButton());
+      await user.click(await screen.findByRole("button", { name: /log anyway/i }));
+
+      const { toast } = await import("sonner");
+      await waitFor(() => expect(mockCreateSession).toHaveBeenCalled());
+      expect(toast.warning).not.toHaveBeenCalled();
+    });
+
+    it("does not save when the question is answered no", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      renderModal();
+
+      await user.click(screen.getByText("Select a project..."));
+      await user.click(screen.getByText("Autumn Sampler"));
+      await user.type(screen.getByLabelText(/stitch count/i), "9000");
+      await user.click(getSaveButton());
+      await user.click(await screen.findByRole("button", { name: /go back/i }));
+
+      expect(mockCreateSession).not.toHaveBeenCalled();
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(getSaveButton()).toBeInTheDocument();
+    });
+
+    it("does not ask when the session stays within the project's total", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      mockCreateSession.mockResolvedValue({
+        success: true,
+        session: { id: "new-1" },
+        brokenRecords: [],
+      });
+      renderModal();
+
+      await user.click(screen.getByText("Select a project..."));
+      await user.click(screen.getByText("Autumn Sampler"));
+      await user.type(screen.getByLabelText(/stitch count/i), "5000");
+      await user.click(getSaveButton());
+
+      await waitFor(() => expect(mockCreateSession).toHaveBeenCalled());
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    it("asks before saving an edit that would push the project past its total", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      renderModal({ editSession, lockedProjectId: "proj-1" });
+      await waitForDialogFocus();
+
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.clear(stitchInput);
+      await user.type(stitchInput, "9000");
+      await user.click(screen.getByRole("button", { name: /save changes/i }));
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(/past 100%/i);
+      expect(mockUpdateSession).not.toHaveBeenCalled();
+    });
+
+    it("measures an edit against the project total minus the session being edited", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      mockUpdateSession.mockResolvedValue({ success: true, session: { id: "session-1" } });
+      // proj-1 sits at 2500 of 10000 *including* this session's 150. 7600 must land at
+      // 2350 + 7600 = 9950 (silent). Drop the subtraction and it reads 10,100 and asks --
+      // which is what makes this test discriminate rather than pass either way.
+      renderModal({ editSession, lockedProjectId: "proj-1" });
+      await waitForDialogFocus();
+
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.clear(stitchInput);
+      await user.type(stitchInput, "7600");
+      await user.click(screen.getByRole("button", { name: /save changes/i }));
+
+      await waitFor(() => expect(mockUpdateSession).toHaveBeenCalled());
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    it("stops subtracting the edited session once a different project is picked", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      // proj-2 sits at 0 of 25000 and never contained this session's 150 stitches, so
+      // 25,100 is over its total. Subtracting anyway reads 24,950 and asks nothing.
+      renderModal({ editSession });
+      await waitForDialogFocus();
+
+      await user.click(screen.getByText("Autumn Sampler"));
+      await user.click(screen.getByText("Winter Wonderland"));
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.clear(stitchInput);
+      await user.type(stitchInput, "25100");
+      await user.click(screen.getByRole("button", { name: /save changes/i }));
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(/past 100%/i);
+      expect(mockUpdateSession).not.toHaveBeenCalled();
+    });
+
+    it("asks about a locked project the picker list does not carry", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      // A FINISHED project is excluded from the active-project picker but its Sessions
+      // tab still logs against it -- exactly the project most likely to be over 100%.
+      renderModal({
+        lockedProjectId: "proj-finished",
+        lockedProjectTotals: {
+          chartName: "Winter Cottage",
+          stitchesCompleted: 44000,
+          totalStitches: 45000,
+        },
+      });
+      await waitForDialogFocus();
+
+      await user.type(screen.getByLabelText(/stitch count/i), "2000");
+      await user.click(getSaveButton());
+
+      const alert = await screen.findByRole("alert");
+      expect(alert).toHaveTextContent("Winter Cottage");
+      expect(alert).toHaveTextContent("46,000");
+      expect(mockCreateSession).not.toHaveBeenCalled();
+    });
+
+    it("re-asks after the stitch count changes rather than keeping a stale question", async () => {
+      vi.useRealTimers();
+      const user = userEvent.setup();
+      mockCreateSession.mockResolvedValue({
+        success: true,
+        session: { id: "new-1" },
+        brokenRecords: [],
+      });
+      renderModal();
+
+      await user.click(screen.getByText("Select a project..."));
+      await user.click(screen.getByText("Autumn Sampler"));
+      const stitchInput = screen.getByLabelText(/stitch count/i);
+      await user.type(stitchInput, "9000");
+      await user.click(getSaveButton());
+      expect(await screen.findByRole("alert")).toBeInTheDocument();
+
+      await user.clear(stitchInput);
+      await user.type(stitchInput, "100");
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+      await user.click(getSaveButton());
+      await waitFor(() => {
+        expect(mockCreateSession).toHaveBeenCalledWith(
+          expect.objectContaining({ stitchCount: 100 }),
+        );
+      });
+    });
+  });
+
+  it("caps an over-logged project's percentage in the picker at 100%", async () => {
+    vi.useRealTimers();
+    const user = userEvent.setup();
+    renderModal({
+      activeProjects: [
+        {
+          projectId: "proj-over",
+          chartId: "chart-over",
+          chartName: "Over-logged",
+          coverThumbnailUrl: null,
+          status: "IN_PROGRESS",
+          stitchesCompleted: 27400,
+          totalStitches: 20000,
+        },
+      ],
+    });
+
+    await user.click(screen.getByText("Select a project..."));
+
+    expect(screen.getByText("100% complete")).toBeInTheDocument();
+    expect(screen.queryByText("137% complete")).toBeNull();
   });
 });
 

@@ -1108,7 +1108,12 @@ describe("supply-actions", () => {
       mockAuth.mockResolvedValueOnce(null);
       const { createAndAddThread } = await import("./supply-actions");
       await expect(
-        createAndAddThread({ projectId: "p1", name: "Custom Red", brandId: "brand-1" }),
+        createAndAddThread({
+          projectId: "p1",
+          name: "Custom Red",
+          brandId: "brand-1",
+          colorFamily: "RED",
+        }),
       ).rejects.toThrow("Unauthorized");
     });
 
@@ -1119,6 +1124,7 @@ describe("supply-actions", () => {
         projectId: "p1",
         name: "   ",
         brandId: "brand-1",
+        colorFamily: "RED",
       });
 
       assertFailure(result);
@@ -1133,6 +1139,7 @@ describe("supply-actions", () => {
         projectId: "p1",
         name: "Custom Red",
         brandId: "brand-1",
+        colorFamily: "RED",
       });
 
       assertFailure(result);
@@ -1158,6 +1165,7 @@ describe("supply-actions", () => {
         brandId: "brand-1",
         colorCode: "CUS1",
         hexColor: "#FF0000",
+        colorFamily: "RED",
       });
 
       expect(result.success).toBe(true);
@@ -1181,6 +1189,7 @@ describe("supply-actions", () => {
         projectId: "p1",
         name: "Custom Red",
         brandId: "brand-1",
+        colorFamily: "RED",
       });
 
       assertSuccess(result);
@@ -1193,7 +1202,12 @@ describe("supply-actions", () => {
       mockAuth.mockResolvedValueOnce(null);
       const { createAndAddBead } = await import("./supply-actions");
       await expect(
-        createAndAddBead({ projectId: "p1", name: "Custom Bead", brandId: "brand-1" }),
+        createAndAddBead({
+          projectId: "p1",
+          name: "Custom Bead",
+          brandId: "brand-1",
+          colorFamily: "BLUE",
+        }),
       ).rejects.toThrow("Unauthorized");
     });
 
@@ -1204,6 +1218,7 @@ describe("supply-actions", () => {
         projectId: "p1",
         name: "   ",
         brandId: "brand-1",
+        colorFamily: "BLUE",
       });
 
       assertFailure(result);
@@ -1218,6 +1233,7 @@ describe("supply-actions", () => {
         projectId: "p1",
         name: "Custom Bead",
         brandId: "brand-1",
+        colorFamily: "BLUE",
       });
 
       assertFailure(result);
@@ -1242,6 +1258,7 @@ describe("supply-actions", () => {
         name: "Custom Bead",
         brandId: "brand-1",
         code: "CB01",
+        colorFamily: "BLUE",
       });
 
       expect(result.success).toBe(true);
@@ -1265,10 +1282,90 @@ describe("supply-actions", () => {
         projectId: "p1",
         name: "Custom Bead",
         brandId: "brand-1",
+        colorFamily: "BLUE",
       });
 
       assertSuccess(result);
       expect(result.record).toBeDefined();
+    });
+  });
+
+  describe("quick-add asks for a color family (Beth's ruling, 2026-08-17)", () => {
+    it("createAndAddThread files the thread under the chosen family", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const threadCreate = vi.fn().mockResolvedValue(createMockThread({ id: "new-thread" }));
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) =>
+        cb({
+          thread: { create: threadCreate },
+          projectThread: { create: vi.fn().mockResolvedValue(createMockProjectThread()) },
+        }),
+      );
+
+      const { createAndAddThread } = await import("./supply-actions");
+      const result = await createAndAddThread({
+        projectId: "p1",
+        name: "Christmas Red",
+        brandId: "brand-1",
+        colorFamily: "RED",
+      });
+
+      assertSuccess(result);
+      expect(threadCreate).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ colorFamily: "RED" }) }),
+      );
+    });
+
+    it("createAndAddBead files the bead under the chosen family, not NEUTRAL", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      const beadCreate = vi.fn().mockResolvedValue(createMockBead({ id: "new-bead" }));
+      mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) =>
+        cb({
+          bead: { create: beadCreate },
+          projectBead: { create: vi.fn().mockResolvedValue(createMockProjectBead()) },
+        }),
+      );
+
+      const { createAndAddBead } = await import("./supply-actions");
+      const result = await createAndAddBead({
+        projectId: "p1",
+        name: "Sea Glass",
+        brandId: "brand-1",
+        colorFamily: "BLUE",
+      });
+
+      assertSuccess(result);
+      expect(beadCreate).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ colorFamily: "BLUE" }) }),
+      );
+    });
+
+    it("createAndAddThread rejects a payload with no color family", async () => {
+      const { createAndAddThread } = await import("./supply-actions");
+      const result = await createAndAddThread({
+        projectId: "p1",
+        name: "Christmas Red",
+        brandId: "brand-1",
+      });
+
+      // Named error, not the ownership arm -- validation is what refused
+      assertFailure(result);
+      expect(result.error).toBe("Color family is required");
+      expect(mockPrisma.project.findUnique).not.toHaveBeenCalled();
+      expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+    });
+
+    it("createAndAddBead rejects a payload with no color family", async () => {
+      const { createAndAddBead } = await import("./supply-actions");
+      const result = await createAndAddBead({
+        projectId: "p1",
+        name: "Sea Glass",
+        brandId: "brand-1",
+      });
+
+      assertFailure(result);
+      expect(result.error).toBe("Color family is required");
+      expect(mockPrisma.project.findUnique).not.toHaveBeenCalled();
+      expect(mockPrisma.$transaction).not.toHaveBeenCalled();
     });
   });
 
@@ -1684,6 +1781,7 @@ describe("supply-actions", () => {
         projectId: "p1",
         name: "Custom Blue",
         brandId: "brand-1",
+        colorFamily: "BLUE",
       });
 
       assertSuccess(result);
@@ -1706,6 +1804,7 @@ describe("supply-actions", () => {
         projectId: "p1",
         name: "Custom Bead",
         brandId: "brand-1",
+        colorFamily: "GREEN",
       });
 
       assertSuccess(result);

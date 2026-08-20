@@ -9,6 +9,7 @@ import { LinkButton } from "@/components/ui/link-button";
 import { Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getEffectiveStitchCount } from "@/lib/utils/size-category";
+import { calculateProgressPercent } from "@/lib/utils/progress";
 import type { ProjectStatus } from "@/generated/prisma/client";
 import type { ChartWithProject } from "@/types/chart";
 
@@ -54,7 +55,7 @@ export function ProjectDetailHero({ chart, imageUrls, onStatusChange }: ProjectD
   const showProgress = project && PROGRESS_STATUSES.has(status);
   const progressPercent =
     showProgress && effectiveStitchCount > 0
-      ? Math.round((project.stitchesCompleted / effectiveStitchCount) * 100)
+      ? calculateProgressPercent(project.stitchesCompleted, effectiveStitchCount)
       : null;
 
   return (

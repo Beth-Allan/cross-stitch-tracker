@@ -151,7 +151,7 @@ TypeScript interface/type files; no runtime code. Composed from Prisma-generated
 
 ### Layer 12: Utilities (`src/lib/utils/`)
 
-Pure functions, no side effects: `calendar-date.ts`, `skein-calculator.ts`, `fabric-calculator.ts`, `size-category.ts`, `status.ts`, `status-groups.ts`, `series-progress.ts`, `settled.ts`, `focal-point.ts`, `format-file-size.ts`, `format-time.ts`, `natural-sort.ts`.
+Pure functions, no side effects: `calendar-date.ts`, `skein-calculator.ts`, `fabric-calculator.ts`, `size-category.ts`, `status.ts`, `status-groups.ts`, `series-progress.ts`, `progress.ts`, `settled.ts`, `focal-point.ts`, `format-file-size.ts`, `format-time.ts`, `natural-sort.ts`.
 
 `src/lib/constants.ts` holds literals shared across modules that belong to no single utility.
 

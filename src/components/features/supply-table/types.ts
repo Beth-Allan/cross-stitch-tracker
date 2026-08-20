@@ -6,7 +6,7 @@
  * creation-flow adapters).
  */
 
-import type { StrandCount } from "@/types/supply";
+import type { ColorFamily, StrandCount } from "@/types/supply";
 
 export type SupplyType = "THREAD" | "BEAD" | "SPECIALTY";
 
@@ -71,6 +71,12 @@ export interface CreateSupplyData {
   code?: string;
   brandId: string;
   hexColor?: string;
+  /**
+   * Chosen in the create dialog for threads and beads — quick-add must ask rather than
+   * file silently under Neutral (Beth's ruling, 2026-08-17). Absent for specialty items,
+   * which carry no colour family.
+   */
+  colorFamily?: ColorFamily;
 }
 
 export type Result = { success: true; id?: string } | { success: false; error: string };

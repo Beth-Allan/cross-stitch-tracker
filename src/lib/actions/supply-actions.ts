@@ -766,7 +766,7 @@ export async function createAndAddBead(formData: unknown) {
           colorName: validated.name,
           hexColor: DEFAULT_SUPPLY_HEX,
           brandId: resolvedBrandId,
-          colorFamily: "NEUTRAL",
+          colorFamily: validated.colorFamily,
         },
         include: { brand: true },
       });
