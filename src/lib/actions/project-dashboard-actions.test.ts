@@ -71,13 +71,37 @@ function mockProject(overrides: {
       designer: designerName ? { name: designerName } : null,
       genres,
     },
-    sessions: sessions.map((s, i) => ({ id: `sess-${i}`, ...s })),
-    projectThreads,
-    projectBeads,
-    projectSpecialty,
+    _count: {
+      projectThreads: projectThreads.length,
+      projectBeads: projectBeads.length,
+      projectSpecialty: projectSpecialty.length,
+    },
     fabric:
       fabricName && fabricBrandName ? { name: fabricName, brand: { name: fabricBrandName } } : null,
+    // Not part of the row the action selects — kept so a fixture's sessions can drive the
+    // per-day groupBy the action reads them through.
+    sessions: sessions.map((s, i) => ({ id: `sess-${i}`, ...s })),
   };
+}
+
+type MockProject = ReturnType<typeof mockProject>;
+
+/**
+ * Mocks both reads getProjectDashboardData makes, from one fixture list: the project rows
+ * (without their sessions) and the per-day session groups.
+ */
+function mockProjects(projects: MockProject[]) {
+  mockPrisma.project.findMany.mockResolvedValue(
+    projects.map(({ sessions: _sessions, ...row }) => row),
+  );
+  mockPrisma.stitchSession.groupBy.mockResolvedValue(
+    projects.flatMap((p) =>
+      [...new Set(p.sessions.map((s) => s.date.getTime()))].map((time) => ({
+        projectId: p.id,
+        date: new Date(time),
+      })),
+    ),
+  );
 }
 
 describe("project-dashboard-actions", () => {
@@ -97,7 +121,7 @@ describe("project-dashboard-actions", () => {
 
     describe("heroStats", () => {
       it("totalWIPs counts only IN_PROGRESS projects", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({ id: "p1", status: "IN_PROGRESS", stitchesCompleted: 100 }),
           mockProject({ id: "p2", status: "IN_PROGRESS", stitchesCompleted: 200 }),
           mockProject({ id: "p3", status: "UNSTARTED" }),
@@ -113,7 +137,7 @@ describe("project-dashboard-actions", () => {
 
       it("averageProgress computes mean of all WIP progressPercent values, 0 when no WIPs", async () => {
         // Two WIPs: 50% and 80% -> average = 65%
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({
             id: "p1",
             status: "IN_PROGRESS",
@@ -136,9 +160,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("averageProgress returns 0 when no WIPs exist", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
-          mockProject({ id: "p1", status: "UNSTARTED" }),
-        ]);
+        mockProjects([mockProject({ id: "p1", status: "UNSTARTED" })]);
 
         const { getProjectDashboardData } = await import("./project-dashboard-actions");
         const result: ProjectDashboardData = await getProjectDashboardData();
@@ -147,7 +169,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("closestToCompletion returns the WIP with highest progressPercent, null when no WIPs", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({
             id: "p1",
             status: "IN_PROGRESS",
@@ -182,9 +204,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("closestToCompletion returns null when no WIPs exist", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
-          mockProject({ id: "p1", status: "UNSTARTED" }),
-        ]);
+        mockProjects([mockProject({ id: "p1", status: "UNSTARTED" })]);
 
         const { getProjectDashboardData } = await import("./project-dashboard-actions");
         const result: ProjectDashboardData = await getProjectDashboardData();
@@ -194,7 +214,7 @@ describe("project-dashboard-actions", () => {
 
       it("finishedThisYear counts projects with finishDate in current year", async () => {
         const thisYear = getCurrentPeriod(getUserTimezone("user-1")).year;
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({
             id: "p1",
             status: "FINISHED",
@@ -219,7 +239,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("finishedAllTime counts all FINISHED + FFO projects", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({ id: "p1", status: "FINISHED" }),
           mockProject({ id: "p2", status: "FFO" }),
           mockProject({ id: "p3", status: "FINISHED" }),
@@ -233,7 +253,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("totalStitchesAllProjects sums stitchesCompleted across every project", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({ id: "p1", stitchesCompleted: 1000 }),
           mockProject({ id: "p2", stitchesCompleted: 2500 }),
           mockProject({ id: "p3", stitchesCompleted: 500 }),
@@ -248,9 +268,7 @@ describe("project-dashboard-actions", () => {
 
     describe("progressBuckets", () => {
       it("assigns UNSTARTED project to 'unstarted' bucket", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
-          mockProject({ id: "p1", status: "UNSTARTED", stitchesCompleted: 0 }),
-        ]);
+        mockProjects([mockProject({ id: "p1", status: "UNSTARTED", stitchesCompleted: 0 })]);
 
         const { getProjectDashboardData } = await import("./project-dashboard-actions");
         const result: ProjectDashboardData = await getProjectDashboardData();
@@ -261,7 +279,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("assigns KITTING and KITTED projects to 'unstarted' bucket", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({ id: "p1", status: "KITTING" }),
           mockProject({ id: "p2", status: "KITTED" }),
         ]);
@@ -274,7 +292,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("assigns 15% project to '0-25' bucket, 40% to '25-50', 60% to '50-75', 85% to '75-100'", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           // 15% = 1500/10000
           mockProject({
             id: "p15",
@@ -322,7 +340,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("each bucket has correct label and range strings", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([]);
+        mockProjects([]);
 
         const { getProjectDashboardData } = await import("./project-dashboard-actions");
         const result: ProjectDashboardData = await getProjectDashboardData();
@@ -346,7 +364,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("excludes FINISHED and FFO projects from buckets", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({ id: "p1", status: "FINISHED" }),
           mockProject({ id: "p2", status: "FFO" }),
         ]);
@@ -361,7 +379,7 @@ describe("project-dashboard-actions", () => {
 
     describe("finishedProjects", () => {
       it("includes startToFinishDays calculated as days between startDate and finishDate", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({
             id: "p1",
             status: "FINISHED",
@@ -380,7 +398,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("startToFinishDays is null when startDate or finishDate is missing", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({
             id: "p1",
             status: "FINISHED",
@@ -398,17 +416,19 @@ describe("project-dashboard-actions", () => {
       });
 
       it("includes stitchingDays from distinct session dates", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({
             id: "p1",
             status: "FINISHED",
             stitchesCompleted: 10000,
             stitchCount: 10000,
+            // Session dates are stored as UTC-midnight instants (parseCalendarDate), so two
+            // sessions on one day carry the same value — the app cannot write a time of day.
             sessions: [
-              { date: new Date("2026-01-01T10:00:00Z"), stitchCount: 100 },
-              { date: new Date("2026-01-01T15:00:00Z"), stitchCount: 50 }, // same day
-              { date: new Date("2026-01-02T10:00:00Z"), stitchCount: 200 },
-              { date: new Date("2026-01-03T10:00:00Z"), stitchCount: 150 },
+              { date: new Date("2026-01-01T00:00:00Z"), stitchCount: 100 },
+              { date: new Date("2026-01-01T00:00:00Z"), stitchCount: 50 }, // same day
+              { date: new Date("2026-01-02T00:00:00Z"), stitchCount: 200 },
+              { date: new Date("2026-01-03T00:00:00Z"), stitchCount: 150 },
             ],
           }),
         ]);
@@ -421,7 +441,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("includes threadCount, beadCount, specialtyCount from junction table lengths", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({
             id: "p1",
             status: "FINISHED",
@@ -442,7 +462,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("computes avgDailyStitches = totalStitches / stitchingDays (0 when no stitching days)", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({
             id: "p1",
             status: "FINISHED",
@@ -464,7 +484,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("avgDailyStitches is 0 when no sessions (zero stitching days)", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({
             id: "p1",
             status: "FINISHED",
@@ -481,7 +501,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("includes genres from chart", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({
             id: "p1",
             status: "FINISHED",
@@ -498,7 +518,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("includes fabricDescription from linked fabric", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({
             id: "p1",
             status: "FINISHED",
@@ -516,7 +536,7 @@ describe("project-dashboard-actions", () => {
       });
 
       it("sorts finishedProjects by finishDate DESC (most recent first)", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([
+        mockProjects([
           mockProject({
             id: "p1",
             status: "FINISHED",
@@ -554,7 +574,7 @@ describe("project-dashboard-actions", () => {
 
     describe("security", () => {
       it("all queries filter by userId", async () => {
-        mockPrisma.project.findMany.mockResolvedValue([]);
+        mockProjects([]);
 
         const { getProjectDashboardData } = await import("./project-dashboard-actions");
         await getProjectDashboardData();
@@ -580,7 +600,7 @@ describe("getProjectDashboardData — calendar-date convention", () => {
   it("counts a project finished on January 1st in that year, not the previous one", async () => {
     // Derived exactly as the action derives it, so the two cannot disagree at a year boundary
     const thisYear = getCurrentPeriod(getUserTimezone("user-1")).year;
-    mockPrisma.project.findMany.mockResolvedValue([
+    mockProjects([
       mockProject({
         id: "p1",
         status: "FINISHED",
@@ -596,7 +616,7 @@ describe("getProjectDashboardData — calendar-date convention", () => {
 
   it("does not count a project finished on December 31st of the previous year", async () => {
     const thisYear = getCurrentPeriod(getUserTimezone("user-1")).year;
-    mockPrisma.project.findMany.mockResolvedValue([
+    mockProjects([
       mockProject({
         id: "p1",
         status: "FINISHED",
@@ -608,5 +628,67 @@ describe("getProjectDashboardData — calendar-date convention", () => {
     const result: ProjectDashboardData = await getProjectDashboardData();
 
     expect(result.heroStats.finishedThisYear).toBe(0);
+  });
+  describe("bounded reads", () => {
+    it("counts supplies in the database instead of loading the junction rows", async () => {
+      mockProjects([
+        mockProject({
+          id: "p1",
+          projectThreads: [{ id: "pt1" }, { id: "pt2" }, { id: "pt3" }],
+          projectBeads: [{ id: "pb1" }],
+          projectSpecialty: [],
+          status: "FINISHED",
+          finishDate: new Date("2026-03-01"),
+        }),
+      ]);
+
+      const { getProjectDashboardData } = await import("./project-dashboard-actions");
+      const result = await getProjectDashboardData();
+
+      const [args] = mockPrisma.project.findMany.mock.calls[0] as [
+        { include?: Record<string, unknown> },
+      ];
+      expect(args.include?._count).toEqual({
+        select: { projectThreads: true, projectBeads: true, projectSpecialty: true },
+      });
+      expect(args.include?.projectThreads).toBeUndefined();
+      expect(args.include?.projectBeads).toBeUndefined();
+      expect(args.include?.projectSpecialty).toBeUndefined();
+      expect(result.finishedProjects[0].threadCount).toBe(3);
+      expect(result.finishedProjects[0].beadCount).toBe(1);
+      expect(result.finishedProjects[0].specialtyCount).toBe(0);
+    });
+
+    it("aggregates sessions per day instead of loading every session row", async () => {
+      mockProjects([
+        mockProject({
+          id: "p1",
+          status: "IN_PROGRESS",
+          stitchesCompleted: 500,
+          sessions: [
+            { date: new Date("2026-04-10"), stitchCount: 100 },
+            { date: new Date("2026-04-10"), stitchCount: 150 },
+            { date: new Date("2026-04-12"), stitchCount: 200 },
+          ],
+        }),
+      ]);
+
+      const { getProjectDashboardData } = await import("./project-dashboard-actions");
+      const result = await getProjectDashboardData();
+
+      const [args] = mockPrisma.project.findMany.mock.calls[0] as [
+        { include?: Record<string, unknown> },
+      ];
+      expect(args.include?.sessions).toBeUndefined();
+      expect(mockPrisma.stitchSession.groupBy).toHaveBeenCalledWith(
+        expect.objectContaining({ by: ["projectId", "date"] }),
+      );
+
+      const bucketed = result.progressBuckets
+        .flatMap((b) => b.projects)
+        .find((p) => p.projectId === "p1")!;
+      expect(bucketed.stitchingDays).toBe(2);
+      expect(bucketed.lastSessionDate).toEqual(new Date("2026-04-12"));
+    });
   });
 });

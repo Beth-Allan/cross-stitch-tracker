@@ -30,8 +30,23 @@ const UNSTARTED_STATUSES = new Set(["UNSTARTED", "KITTING", "KITTED"]);
 const FINISHED_STATUSES = new Set(["FINISHED", "FFO"]);
 const WIP_STATUS = "IN_PROGRESS";
 
-function countDistinctSessionDays(sessions: Array<{ date: Date }>): number {
-  return new Set(sessions.map((s) => s.date.toISOString().split("T")[0])).size;
+/**
+ * Session dates are stored as UTC-midnight instants, so one group per (project, date) is one
+ * group per stitching day — enough for both the day count and the most recent session, without
+ * a row per session.
+ */
+function summariseSessionDays(rows: Array<{ projectId: string; date: Date }>) {
+  const byProject = new Map<string, { lastDate: Date; days: number }>();
+  for (const row of rows) {
+    const existing = byProject.get(row.projectId);
+    if (!existing) {
+      byProject.set(row.projectId, { lastDate: row.date, days: 1 });
+      continue;
+    }
+    existing.days += 1;
+    if (row.date.getTime() > existing.lastDate.getTime()) existing.lastDate = row.date;
+  }
+  return byProject;
 }
 
 function assignBucketId(status: string, progressPercent: number): ProgressBucketId | null {
@@ -59,36 +74,40 @@ function assignBucketId(status: string, progressPercent: number): ProgressBucket
 export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
   const user = await requireAuth();
 
-  const projects = await prisma.project.findMany({
-    where: { userId: user.id },
-    include: {
-      chart: {
-        select: {
-          id: true,
-          name: true,
-          stitchCount: true,
-          coverThumbnailUrl: true,
-          focalPointX: true,
-          focalPointY: true,
-          designer: { select: { name: true } },
-          genres: { select: { name: true } },
+  const [projects, sessionDayRows] = await Promise.all([
+    prisma.project.findMany({
+      where: { userId: user.id },
+      include: {
+        chart: {
+          select: {
+            id: true,
+            name: true,
+            stitchCount: true,
+            coverThumbnailUrl: true,
+            focalPointX: true,
+            focalPointY: true,
+            designer: { select: { name: true } },
+            genres: { select: { name: true } },
+          },
+        },
+        _count: {
+          select: { projectThreads: true, projectBeads: true, projectSpecialty: true },
+        },
+        fabric: {
+          select: {
+            name: true,
+            brand: { select: { name: true } },
+          },
         },
       },
-      sessions: {
-        select: { date: true, stitchCount: true },
-        orderBy: { date: "desc" },
-      },
-      projectThreads: { select: { id: true } },
-      projectBeads: { select: { id: true } },
-      projectSpecialty: { select: { id: true } },
-      fabric: {
-        select: {
-          name: true,
-          brand: { select: { name: true } },
-        },
-      },
-    },
-  });
+    }),
+    prisma.stitchSession.groupBy({
+      by: ["projectId", "date"],
+      where: { project: { userId: user.id } },
+    }),
+  ]);
+
+  const sessionDays = summariseSessionDays(sessionDayRows);
 
   const wips = projects.filter((p) => p.status === WIP_STATUS);
   const { year: currentYear } = getCurrentPeriod(getUserTimezone(user.id));
@@ -145,8 +164,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
     const bucketId = assignBucketId(p.status, progressPercent);
     if (bucketId === null) continue; // finished — excluded from buckets
 
-    const lastSession = p.sessions[0] ?? null;
-    const stitchingDays = countDistinctSessionDays(p.sessions);
+    const days = sessionDays.get(p.id);
 
     bucketProjectsMap.get(bucketId)!.push({
       projectId: p.id,
@@ -159,8 +177,8 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
       progressPercent,
       totalStitches: p.chart.stitchCount,
       stitchesCompleted: p.stitchesCompleted,
-      lastSessionDate: lastSession?.date ?? null,
-      stitchingDays,
+      lastSessionDate: days?.lastDate ?? null,
+      stitchingDays: days?.days ?? 0,
     });
   }
 
@@ -177,7 +195,7 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
 
   const finishedProjectData: FinishedProjectData[] = finishedProjects
     .map((p) => {
-      const stitchingDays = countDistinctSessionDays(p.sessions);
+      const stitchingDays = sessionDays.get(p.id)?.days ?? 0;
 
       const startToFinishDays =
         p.startDate && p.finishDate
@@ -196,9 +214,9 @@ export async function getProjectDashboardData(): Promise<ProjectDashboardData> {
         startToFinishDays,
         stitchingDays,
         totalStitches: p.chart.stitchCount,
-        threadCount: p.projectThreads.length,
-        beadCount: p.projectBeads.length,
-        specialtyCount: p.projectSpecialty.length,
+        threadCount: p._count.projectThreads,
+        beadCount: p._count.projectBeads,
+        specialtyCount: p._count.projectSpecialty,
         avgDailyStitches: stitchingDays > 0 ? Math.round(p.stitchesCompleted / stitchingDays) : 0,
         genres: p.chart.genres.map((g) => g.name),
       };
