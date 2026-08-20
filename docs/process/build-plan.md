@@ -209,7 +209,7 @@ the invisible half today, split the rest.
 The original objective stands unchanged — report §3 P9, the surfaces that break first at 500+
 charts. It is now carried by three items.
 
-#### P9a The invisible half: query shape, no visible change
+#### P9a The invisible half, dashboard side — **built 2026-08-20**
 
 - **Objective:** the read-volume fixes on the **ungated** action files — the surfaces that fetch
   the whole collection to render a handful of cards. Rendered output must be byte-identical; this
@@ -229,6 +229,27 @@ charts. It is now carried by three items.
   fix it here.
 - **Done-when:** each named function demonstrated test-first to return what it returned before
   while reading bounded rows; no gated path in the diff; gate green.
+  _(Split again while building, 2026-08-20 — the context budget, not a new finding. The two
+  `dashboard-actions.ts`/`project-dashboard-actions.ts` halves landed here; the gallery and
+  Pattern Dive halves are **P9a-2** below, unchanged in scope. Nothing was dropped, and the
+  equivalence traps below still bind both. One thing P9a settled that P9a-2 does not need to
+  rediscover: `groupBy(["projectId", "date"])` **is** a distinct-calendar-day count, because
+  session dates are written only through `parseCalendarDate()` and are therefore always exactly
+  UTC midnight — verified in `session-actions.ts`. Only a fixture disagreed; ledger row.)_
+
+#### P9a-2 The invisible half, gallery and Pattern Dive side
+
+- **Objective:** the remainder of P9a's scope, unchanged — `chart-actions.ts`'s
+  `getChartsForGallery` junction fan-out (kitting dots plus the three `.length` counts, both
+  consumed in `src/components/features/gallery/gallery-utils.ts`) and `pattern-dive-actions.ts`'s
+  `getWhatsNextProjects` kitting % and `getFabricRequirements` cross-product.
+- **Traps:** ① P9a's trap ① with teeth: kitting % is `Σ min(acquired, required)` with fabric
+  counted as one item, which a bare `_sum` does **not** reproduce, and a project with no supplies
+  has a ruled answer (drift, 2026-08-17) — reproduce both or the number moves.
+  ② `getFabricRequirements`' `usableCount === null` branch maps the **whole** unassigned stash;
+  that branch is the O(charts × fabrics) case, not the matched one. ③ `getShoppingCartData` is a
+  fourth junction fan-out the audit never named — ledger row, not this item's to fix.
+- **Done-when:** as P9a's, for the three named functions.
 
 #### P9b The two paginated lists — **UI-touching; preview before merge**
 
