@@ -190,16 +190,25 @@ describe("summariseProjectSupplies", () => {
   });
 
   describe("the shortfall read", () => {
-    it("compares the two columns rather than a fixed number", async () => {
+    it("compares each junction's own two columns, not a fixed number", async () => {
       mockJunctions({});
 
       const { summariseProjectSupplies } = await import("./project-supplies");
       await summariseProjectSupplies({ userId: "user-1" });
 
-      const [, shortfallCall] = mockPrisma.projectThread.groupBy.mock.calls;
-      expect(shortfallCall[0].where.quantityAcquired).toEqual({
-        lt: mockPrisma.projectThread.fields.quantityRequired,
-      });
+      // All three, not just threads: the mock derives the shortfall group from the rows it was
+      // given, so it would answer a clause naming the wrong column — or the wrong operator —
+      // exactly as it answers the right one, and nothing else in the suite would notice.
+      for (const junction of [
+        mockPrisma.projectThread,
+        mockPrisma.projectBead,
+        mockPrisma.projectSpecialty,
+      ]) {
+        const [, shortfallCall] = junction.groupBy.mock.calls;
+        expect(shortfallCall[0].where.quantityAcquired).toEqual({
+          lt: junction.fields.quantityRequired,
+        });
+      }
     });
   });
 });

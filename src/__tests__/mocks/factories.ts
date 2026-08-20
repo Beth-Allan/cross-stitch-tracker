@@ -23,7 +23,7 @@ import type { ChartWithProject, ProjectWithRelations } from "@/types/chart";
 import type { StorageLocationWithStats, StitchingAppWithStats } from "@/types/storage";
 import type { SeriesWithStats, SeriesChart } from "@/types/series";
 import type { GalleryCardData } from "@/components/features/gallery/gallery-types";
-import type { ProjectSupplies, SupplyRollup } from "@/lib/queries/project-supplies";
+import type { ProjectSupplies, SupplyRollup } from "@/types/supplies";
 import type { OptionalFocalPoint } from "@/types/focal-point";
 import { vi } from "vitest";
 

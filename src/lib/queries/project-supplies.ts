@@ -1,27 +1,10 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/db";
+import type { ProjectSupplies, SupplyRollup } from "@/types/supplies";
 
-/**
- * One project's standing in one junction table, as the kitting rule reads it.
- *
- * `acquired` is `Σ min(quantityAcquired, quantityRequired)` — capped per row, never against the
- * project total, so a surplus of one supply cannot cover a shortfall in another. A bare
- * `_sum: { quantityAcquired: true }` does not reproduce it.
- */
-export type SupplyRollup = {
-  count: number;
-  required: number;
-  acquired: number;
-  allFulfilled: boolean;
-  anyAcquired: boolean;
-};
-
-export type ProjectSupplies = {
-  threads: SupplyRollup;
-  beads: SupplyRollup;
-  specialty: SupplyRollup;
-};
-
+// The shapes live in `@/types` and this module reads them, never the other way round: they are
+// consumed by client components, and an arrow pointing here would put `@/lib/db` one plain
+// (non-type) import away from the browser bundle.
 const EMPTY_ROLLUP: SupplyRollup = {
   count: 0,
   required: 0,
@@ -30,13 +13,13 @@ const EMPTY_ROLLUP: SupplyRollup = {
   // at every surface that reads it, and the count is what decides that.
   allFulfilled: true,
   anyAcquired: false,
-};
+} as const;
 
 export const EMPTY_PROJECT_SUPPLIES: ProjectSupplies = {
   threads: EMPTY_ROLLUP,
   beads: EMPTY_ROLLUP,
   specialty: EMPTY_ROLLUP,
-};
+} as const;
 
 type TotalsGroup = {
   projectId: string;

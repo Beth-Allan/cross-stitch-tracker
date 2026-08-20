@@ -1524,6 +1524,103 @@ describe("pattern-dive-actions", () => {
       expect(result[1].matchingFabrics.map((f) => f.id)).toEqual(["f-14ct"]);
     });
 
+    it("offers nothing when the stash holds no piece of the project's count", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Assigned 14ct",
+          coverThumbnailUrl: null,
+          stitchCount: 10000,
+          stitchesWide: 100,
+          stitchesHigh: 100,
+          designer: null,
+          project: {
+            id: "p1",
+            overCount: 1,
+            fabric: {
+              id: "f-assigned",
+              name: "Assigned 14ct",
+              count: 14,
+              shortestEdgeInches: 20,
+              longestEdgeInches: 25,
+              brand: { name: "Zweigart" },
+            },
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-16ct",
+          name: "Roomy 16ct",
+          count: 16,
+          shortestEdgeInches: 30,
+          longestEdgeInches: 40,
+          brand: { name: "DMC" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      // A 16ct piece is not a candidate for a 14ct project however large it is — falling back to
+      // the whole stash here would offer Beth fabric she cannot use.
+      expect(result[0].matchingFabrics).toEqual([]);
+      expect(result[0].overOneOnlyFabrics).toEqual([]);
+      expect(result[0].unmeasuredCandidateCount).toBe(0);
+    });
+
+    it("counts unmeasured pieces of the project's own count only", async () => {
+      mockPrisma.chart.findMany.mockResolvedValue([
+        {
+          id: "c1",
+          name: "Assigned 14ct",
+          coverThumbnailUrl: null,
+          stitchCount: 10000,
+          stitchesWide: 100,
+          stitchesHigh: 100,
+          designer: null,
+          project: {
+            id: "p1",
+            overCount: 1,
+            fabric: {
+              id: "f-assigned",
+              name: "Assigned 14ct",
+              count: 14,
+              shortestEdgeInches: 20,
+              longestEdgeInches: 25,
+              brand: { name: "Zweigart" },
+            },
+          },
+        },
+      ]);
+      mockPrisma.fabric.findMany.mockResolvedValue([
+        {
+          id: "f-14ct",
+          name: "14ct Match",
+          count: 14,
+          shortestEdgeInches: 20,
+          longestEdgeInches: 25,
+          brand: { name: "Zweigart" },
+        },
+        {
+          id: "f-16ct-unmeasured",
+          name: "16ct, no size recorded",
+          count: 16,
+          shortestEdgeInches: 0,
+          longestEdgeInches: 0,
+          brand: { name: "DMC" },
+        },
+      ]);
+
+      const { getFabricRequirements } = await import("./pattern-dive-actions");
+      const result = await getFabricRequirements();
+
+      expect(result[0].matchingFabrics.map((f) => f.id)).toEqual(["f-14ct"]);
+      // The unmeasured piece is a different count, so it is not a candidate and must not appear
+      // in this project's "we could not judge these" tally.
+      expect(result[0].unmeasuredCandidateCount).toBe(0);
+    });
+
     it("applies the qualifier to a project that already has fabric assigned, too", async () => {
       mockPrisma.chart.findMany.mockResolvedValue([
         {

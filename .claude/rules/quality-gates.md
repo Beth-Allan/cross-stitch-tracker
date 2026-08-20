@@ -9,7 +9,7 @@
 prisma generate → format:check → lint → tsc --noEmit → test → build
 ```
 
-~2.5 min end to end; the 2781-test suite itself is ~16s. **`prisma generate` runs first, always**
+~2.5 min end to end; the 2951-test suite itself is ~16s. **`prisma generate` runs first, always**
 — without it `tsc` validates against a stale client after any schema change.
 
 Green locally before you push. **Nothing merges red**, and CI is a required check on main,
@@ -30,9 +30,10 @@ visible failure into an invisible one.
 - importing `@/lib/auth` inside action files is banned — use `@/lib/auth-guard`
   (`no-restricted-imports`)
 
-**Known gap:** eslint exits 0 on warnings, so **53 pre-existing warnings pass the gate**
-(maintenance-ledger row, 2026-08-16, logged at 55; two left with the dead code item P3 deleted
-on 2026-08-17). They are logged, not accepted — do not add to them.
+**Known gap:** eslint exits 0 on warnings, so **48 pre-existing warnings pass the gate**
+(measured 2026-08-20; the maintenance-ledger row logged 55 on 2026-08-16, and the burn-down since
+is the dead code P3 deleted plus the strays P9a and P9a-2 cleared as they passed). They are
+logged, not accepted — do not add to them, and **P14 closes this gap**.
 
 ## What the gate does not check
 

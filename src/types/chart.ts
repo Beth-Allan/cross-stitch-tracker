@@ -1,4 +1,4 @@
-import type { ProjectSupplies } from "@/lib/queries/project-supplies";
+import type { ProjectSupplies } from "@/types/supplies";
 import type {
   Chart,
   ChartFile,

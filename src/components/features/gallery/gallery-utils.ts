@@ -4,7 +4,7 @@ import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size
 import { calculateProgressPercent } from "@/lib/utils/progress";
 import { mapFocalPoint } from "@/types/focal-point";
 import type { GalleryChartData } from "@/types/chart";
-import type { ProjectSupplies, SupplyRollup } from "@/lib/queries/project-supplies";
+import type { ProjectSupplies, SupplyRollup } from "@/types/supplies";
 import {
   UNASSIGNED_FILTER,
   type GalleryCardData,
