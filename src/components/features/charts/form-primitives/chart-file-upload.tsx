@@ -4,8 +4,9 @@ import { useCallback, useRef, useState } from "react";
 import { Loader2, Upload, X } from "lucide-react";
 import { getPresignedUploadUrl } from "@/lib/actions/upload-actions";
 import {
+  ACCEPTED_CHART_FILE_LABEL,
   ALLOWED_CHART_FILE_EXTENSIONS,
-  ALLOWED_CHART_FILE_TYPES,
+  resolveChartFileContentType,
   MAX_FILE_SIZE,
   MAX_FILE_SIZE_LABEL,
 } from "@/lib/validations/upload";
@@ -34,20 +35,22 @@ interface InProgressFile {
   error?: string;
 }
 
-function validateFile(file: File): string | null {
-  const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-  const isValidExtension = (ALLOWED_CHART_FILE_EXTENSIONS as readonly string[]).includes(ext);
-  const isValidMime = (ALLOWED_CHART_FILE_TYPES as readonly string[]).includes(file.type);
-
-  if (!isValidExtension && !isValidMime) {
-    return "Unsupported file type. Accepted: PDF, images, .pat, .xsd, .css, .saga, .zip";
+/**
+ * What this file will be stored as, or `null` with the reason it is refused.
+ * The rule is the validation layer's, so the browser cannot accept a file the
+ * server then refuses — the disagreement that made `.xsd` charts fail.
+ */
+function resolveUpload(file: File): { contentType: string } | { error: string } {
+  const contentType = resolveChartFileContentType(file.name, file.type);
+  if (contentType === null) {
+    return { error: `Unsupported file type. Accepted: ${ACCEPTED_CHART_FILE_LABEL}` };
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    return `File exceeds ${MAX_FILE_SIZE_LABEL} limit.`;
+    return { error: `File exceeds ${MAX_FILE_SIZE_LABEL} limit.` };
   }
 
-  return null;
+  return { contentType };
 }
 
 let fileIdCounter = 0;
@@ -71,11 +74,11 @@ export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: Chart
   );
 
   const uploadSingleFile = useCallback(
-    async (file: File, localId: string) => {
+    async (file: File, localId: string, contentType: string) => {
       try {
         const result = await getPresignedUploadUrl({
           fileName: file.name,
-          contentType: file.type || "application/octet-stream",
+          contentType,
           fileSize: file.size,
           category: "files",
           projectId: chartId || "unsaved",
@@ -106,7 +109,9 @@ export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: Chart
         const uploadResponse = await fetch(result.url, {
           method: "PUT",
           body: file,
-          headers: { "Content-Type": file.type || "application/octet-stream" },
+          // The signed URL commits to this exact type, so it is also what the
+          // stored object carries and what the record will read back.
+          headers: { "Content-Type": contentType },
         });
 
         if (!uploadResponse.ok) {
@@ -116,7 +121,7 @@ export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: Chart
         return {
           key: result.key,
           filename: file.name,
-          mimeType: file.type || "application/octet-stream",
+          mimeType: contentType,
           fileSize: file.size,
         } satisfies UploadedFile;
       } catch (error) {
@@ -143,14 +148,14 @@ export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: Chart
 
       // Validate all files first
       const errors: string[] = [];
-      const validFiles: File[] = [];
+      const validFiles: { file: File; contentType: string }[] = [];
 
       for (const file of selectedFiles) {
-        const error = validateFile(file);
-        if (error) {
-          errors.push(error);
+        const resolved = resolveUpload(file);
+        if ("error" in resolved) {
+          errors.push(resolved.error);
         } else {
-          validFiles.push(file);
+          validFiles.push({ file, contentType: resolved.contentType });
         }
       }
 
@@ -166,7 +171,7 @@ export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: Chart
       }
 
       // Start uploading valid files
-      const newInProgress: InProgressFile[] = validFiles.map((file) => ({
+      const newInProgress: InProgressFile[] = validFiles.map(({ file }) => ({
         id: generateFileId(),
         filename: file.name,
         state: "uploading" as const,
@@ -177,7 +182,11 @@ export function ChartFileUpload({ chartId, uploadedFiles, onFilesChange }: Chart
       // Upload each file
       const results: UploadedFile[] = [];
       for (let i = 0; i < validFiles.length; i++) {
-        const uploaded = await uploadSingleFile(validFiles[i], newInProgress[i].id);
+        const uploaded = await uploadSingleFile(
+          validFiles[i].file,
+          newInProgress[i].id,
+          validFiles[i].contentType,
+        );
         if (uploaded) {
           results.push(uploaded);
           // Remove from in-progress

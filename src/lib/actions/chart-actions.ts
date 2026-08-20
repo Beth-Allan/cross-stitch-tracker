@@ -159,22 +159,59 @@ async function optimizeCoverImage(
 }
 
 /**
- * Whether a cover key the *form* submitted is one this chart may delete.
- * `chartFormSchema` accepts any well-formed `covers/…` key and action ids are
- * global, so without this a crafted save could name another chart's live cover and
- * have the supersede rule delete it.
+ * Whether a cover key the *form* submitted is a raw upload this chart may delete.
  *
- * `unsaved` has to stay allowed: `CoverImageUpload` is never handed a chart id, so
- * **every** raw cover the form uploads — editing as much as creating — lands under
- * `covers/unsaved/…`, and refusing that owner segment would leak the raw upload of
- * every replaced cover. One gap therefore survives this check: covers saved before
- * item P15 still live on that prefix, so a crafted save naming one of *those* does
- * reach it (maintenance-ledger row).
+ * Kept as the narrower second gate rather than merged into
+ * `submittedCoverKeysAreOwn`, which every save now passes through first: that one
+ * decides whether a key may be **saved**, this one decides whether it may be
+ * **deleted** once the optimized copy supersedes it. Nothing that reaches here can
+ * fail it today — the shape is the same — so it is a floor under a rule that lives
+ * three functions away, not a check that fires.
  */
 function isOwnRawUpload(key: string | null, chartId: string): boolean {
   if (!key) return false;
   const owner = parseStorageKey(key)?.owner;
   return owner === "unsaved" || owner === chartId;
+}
+
+const FOREIGN_COVER_ERROR = "That cover photo does not belong to this chart";
+
+/**
+ * Whether the cover keys a save submitted are this chart's to name.
+ *
+ * `chartFormSchema` accepts any well-formed `covers/…` key and action ids are
+ * global, so without this a hand-made save could point one chart's row at
+ * another chart's live cover — which the supersede rule below then deletes.
+ *
+ * Two halves, because the owner segment alone only closes one of them:
+ * a key naming another chart *by id* is refused outright, and `unsaved` — the
+ * prefix every cover the form uploads lands on, since `CoverImageUpload` is
+ * never handed a chart id — is refused when another chart's row already names
+ * it. Refusing `unsaved` wholesale is not an option: it would leak the raw
+ * upload of every replaced cover.
+ */
+async function submittedCoverKeysAreOwn(
+  submitted: { coverImageUrl: string | null; coverThumbnailUrl: string | null },
+  chartId: string | null,
+): Promise<boolean> {
+  const keys = [submitted.coverImageUrl, submitted.coverThumbnailUrl].filter((key): key is string =>
+    Boolean(key),
+  );
+  if (keys.length === 0) return true;
+
+  for (const key of keys) {
+    const owner = parseStorageKey(key)?.owner;
+    if (owner !== "unsaved" && owner !== chartId) return false;
+  }
+
+  const claimedElsewhere = await prisma.chart.findFirst({
+    where: {
+      OR: [{ coverImageUrl: { in: keys } }, { coverThumbnailUrl: { in: keys } }],
+      ...(chartId ? { NOT: { id: chartId } } : {}),
+    },
+    select: { id: true },
+  });
+  return !claimedElsewhere;
 }
 
 /**
@@ -217,6 +254,9 @@ export async function createChart(formData: ChartFormInput) {
 
   try {
     const validated = chartFormSchema.parse(formData);
+    if (!(await submittedCoverKeysAreOwn(validated.chart, null))) {
+      return { success: false as const, error: FOREIGN_COVER_ERROR };
+    }
 
     const created = await prisma.$transaction(async (tx) => {
       return createChartAndProject(tx, validated, user.id);
@@ -254,6 +294,9 @@ export async function createChartWithSupplies(
   try {
     const validated = chartFormSchema.parse(formData);
     const supplies = batchSupplySchema.parse(supplyPayload);
+    if (!(await submittedCoverKeysAreOwn(validated.chart, null))) {
+      return { success: false as const, error: FOREIGN_COVER_ERROR };
+    }
 
     const created = await prisma.$transaction(async (tx) => {
       const result = await createChartAndProject(tx, validated, user.id);
@@ -340,6 +383,9 @@ export async function updateChart(chartId: string, formData: ChartFormInput) {
 
     const validated = chartFormSchema.parse(formData);
     const { chart, project } = validated;
+    if (!(await submittedCoverKeysAreOwn(chart, chartId))) {
+      return { success: false as const, error: FOREIGN_COVER_ERROR };
+    }
 
     let effectiveStitchCount = chart.stitchCount;
     let effectiveApproximate = chart.stitchCountApproximate;

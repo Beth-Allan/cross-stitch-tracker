@@ -12,10 +12,11 @@ import { deleteChartFile, getChartFileDownloadUrl } from "@/lib/actions/chart-fi
 import { getPresignedUploadUrl } from "@/lib/actions/upload-actions";
 import { addChartFile } from "@/lib/actions/chart-file-actions";
 import {
-  ALLOWED_CHART_FILE_TYPES,
+  ACCEPTED_CHART_FILE_LABEL,
   ALLOWED_CHART_FILE_EXTENSIONS,
   MAX_FILE_SIZE,
   MAX_FILE_SIZE_LABEL,
+  resolveChartFileContentType,
 } from "@/lib/validations/upload";
 
 interface ChartFileListProps {
@@ -52,22 +53,15 @@ export function ChartFileList({ chartId, files }: ChartFileListProps) {
 
     startUploadTransition(async () => {
       for (const file of Array.from(selectedFiles)) {
-        // Validate file type
-        if (
-          !ALLOWED_CHART_FILE_TYPES.includes(file.type as (typeof ALLOWED_CHART_FILE_TYPES)[number])
-        ) {
-          const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-          if (
-            !ALLOWED_CHART_FILE_EXTENSIONS.includes(
-              ext as (typeof ALLOWED_CHART_FILE_EXTENSIONS)[number],
-            )
-          ) {
-            toast.error(`Unsupported file type. Accepted: PDF, images, .pat, .xsd, .css, .saga`);
-            continue;
-          }
+        // The validation layer's rule, so this list and the server cannot
+        // disagree about what a chart file is — and the type it returns is what
+        // the object is stored as.
+        const contentType = resolveChartFileContentType(file.name, file.type);
+        if (contentType === null) {
+          toast.error(`Unsupported file type. Accepted: ${ACCEPTED_CHART_FILE_LABEL}`);
+          continue;
         }
 
-        // Validate file size
         if (file.size > MAX_FILE_SIZE) {
           toast.error(`File exceeds ${MAX_FILE_SIZE_LABEL} limit.`);
           continue;
@@ -77,7 +71,7 @@ export function ChartFileList({ chartId, files }: ChartFileListProps) {
           // Get presigned URL
           const presignedResult = await getPresignedUploadUrl({
             fileName: file.name,
-            contentType: file.type || "application/octet-stream",
+            contentType,
             fileSize: file.size,
             category: "files",
             projectId: chartId,
@@ -92,7 +86,7 @@ export function ChartFileList({ chartId, files }: ChartFileListProps) {
           const response = await fetch(presignedResult.url, {
             method: "PUT",
             body: file,
-            headers: { "Content-Type": file.type || "application/octet-stream" },
+            headers: { "Content-Type": contentType },
           });
           if (!response.ok) {
             toast.error("Upload failed. Please try again.");

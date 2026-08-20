@@ -70,3 +70,13 @@ The skein calculator defaults to 20% waste, user-configurable (THR-006). Its ori
 cited formula, not Beth. Confirm the default matches her actual experience of running out.
 
 **Blocks:** nothing.
+
+### Q-007 — Does she keep `.css` chart files, and what program makes `.saga`/`.oxs`?
+
+Two loose ends from the 2026-08-19 answer that produced CHF-001–CHF-003. **`.css`** is accepted
+by the app with no traceable source (CHF-004) and was never put to Beth, so it stays accepted
+until she says otherwise — one plain question closes it either way. **`.saga`/`.oxs`** she
+confirmed she has (CHF-002) without naming the program; the name is not needed to accept the
+files, only to write a message she recognises.
+
+**Blocks:** nothing. Ask whenever she is here — both are one-line answers.

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { optionalText } from "./fields";
 
 export const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
 
@@ -10,28 +11,33 @@ export const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"] as 
  */
 export const ALLOWED_IMAGE_FORMATS = ["png", "jpeg", "webp"] as const;
 
-export const ALLOWED_FILE_TYPES = [
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-  "application/pdf",
-  "application/octet-stream", // .saga, .oxs, .xsd (cross-stitch software formats)
-  "text/css", // .css CrossStitch pattern files report as text/css in browsers
-  "application/zip",
-  "application/x-zip-compressed",
-] as const;
-
+/**
+ * The content types a chart file may be **stored** as — the one list both the
+ * browser and the server check, replacing the byte-identical pair that used to
+ * let the two disagree. PDFs and images do render in a tab, which is the point;
+ * what is deliberately absent is anything a browser parses as markup, because an
+ * object is served back with its stored type and `text/html` or `image/svg+xml`
+ * would make the bucket a place to host a page.
+ *
+ * `application/octet-stream` is what a pattern file becomes
+ * (`resolveChartFileContentType`), which is also why a file's *name* has to be
+ * on the extension list before the generic type is accepted.
+ */
 export const ALLOWED_CHART_FILE_TYPES = [
   "image/png",
   "image/jpeg",
   "image/webp",
   "application/pdf",
-  "application/octet-stream", // .pat, .xsd, .saga (binary pattern formats)
-  "text/css", // .css CrossStitch files report as text/css in browsers
-  "application/zip",
-  "application/x-zip-compressed",
+  "application/octet-stream",
 ] as const;
 
+/**
+ * The file endings this app accepts, per Beth (domain `chart-files.md`):
+ * PDF charts and photos or scans (CHF-001), and the pattern-software formats
+ * she keeps — Pattern Maker, PCStitch, plus `.saga` and `.oxs` (CHF-002).
+ * **No `.zip`**: she does not keep chart packs zipped (CHF-003). `.css` traces
+ * to nobody and stays accepted until she says otherwise (CHF-004, Q-007).
+ */
 export const ALLOWED_CHART_FILE_EXTENSIONS = [
   ".jpg",
   ".jpeg",
@@ -42,8 +48,55 @@ export const ALLOWED_CHART_FILE_EXTENSIONS = [
   ".xsd",
   ".css",
   ".saga",
-  ".zip",
+  ".oxs",
 ] as const;
+
+/** The accepted list as Beth reads it, so no message can quote a rule the code does not apply. */
+export const ACCEPTED_CHART_FILE_LABEL = "PDF, images, .xsd, .pat, .saga, .oxs, .css";
+
+/**
+ * The types that identify themselves: a browser reporting one of these has read
+ * the file's own signature, so the name adds nothing. The generic type is
+ * excluded deliberately — it is a browser saying "no idea", which is exactly the
+ * claim that must not stand on its own.
+ */
+const SELF_DESCRIBING_TYPES = ALLOWED_CHART_FILE_TYPES.filter(
+  (type) => type !== "application/octet-stream",
+);
+
+function fileExtension(fileName: string): string {
+  const dot = fileName.lastIndexOf(".");
+  return dot === -1 ? "" : fileName.slice(dot).toLowerCase();
+}
+
+/**
+ * The single rule for what a chart file may be, and what it is stored as.
+ *
+ * The browser calls it to decide whether to upload and what `Content-Type` to
+ * send; `getPresignedUploadUrl` and `addChartFile` call it to check that what
+ * they were handed is exactly what the rule would have produced. That is what
+ * makes the two agree — before this, the browser accepted a file on its name
+ * (`pattern.xsd` arrives as `text/xml`) and the server refused it on its type.
+ *
+ * Returns the content type to store, or `null` when the file is not accepted.
+ *
+ * Neither the declared type nor the extension is evidence about the bytes — a
+ * presigned PUT signs neither — so this is not a security boundary and does not
+ * pretend to be one. What it does guarantee is that **every stored type is one
+ * of `ALLOWED_CHART_FILE_TYPES`**: an unidentified file is stored as the
+ * generic type, which downloads instead of rendering.
+ */
+export function resolveChartFileContentType(fileName: string, declaredType: string): string | null {
+  const type = declaredType.split(";")[0].trim().toLowerCase();
+  if ((SELF_DESCRIBING_TYPES as readonly string[]).includes(type)) return type;
+
+  const extension = fileExtension(fileName);
+  if ((ALLOWED_CHART_FILE_EXTENSIONS as readonly string[]).includes(extension)) {
+    return "application/octet-stream";
+  }
+
+  return null;
+}
 
 export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
@@ -140,3 +193,20 @@ export const uploadRequestSchema = z.object({
 });
 
 export type UploadRequestInput = z.input<typeof uploadRequestSchema>;
+
+/**
+ * Recording an upload that already happened. The size and type are deliberately
+ * absent: `addChartFile` reads both back off the stored object, because what a
+ * client says about its own upload is not evidence.
+ */
+export const addChartFileSchema = z.object({
+  chartId: z.string().trim().min(1, "Chart is required"),
+  url: z.string().refine((value) => {
+    const parsed = parseStorageKey(value);
+    return parsed !== null && parsed.category === "files";
+  }, "Invalid file path"),
+  filename: z.string().trim().min(1, "Filename is required").max(255, "Filename is too long"),
+  label: optionalText(255, "Label is too long"),
+});
+
+export type AddChartFileInput = z.input<typeof addChartFileSchema>;

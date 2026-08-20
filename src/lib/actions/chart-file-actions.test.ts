@@ -1,6 +1,17 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, assertSuccess, assertFailure } from "@/__tests__/mocks";
-import { MAX_FILE_SIZE } from "@/lib/validations/upload";
+import {
+  createMockPrisma,
+  assertSuccess,
+  assertFailure,
+  unvalidatedPayload,
+} from "@/__tests__/mocks";
+import {
+  ACCEPTED_CHART_FILE_LABEL,
+  ALLOWED_CHART_FILE_EXTENSIONS,
+  MAX_FILE_SIZE,
+  resolveChartFileContentType,
+  type AddChartFileInput,
+} from "@/lib/validations/upload";
 
 // Mock auth to return authenticated session
 vi.mock("@/lib/auth", () => ({
@@ -61,8 +72,6 @@ describe("chart-file-actions", () => {
         chartId: "chart-1",
         url: "files/chart-1/abc-test.pdf",
         filename: "test.pdf",
-        mimeType: "application/pdf",
-        fileSize: 5000,
         label: null,
       });
 
@@ -89,8 +98,6 @@ describe("chart-file-actions", () => {
         chartId: "nonexistent",
         url: "files/x/abc.pdf",
         filename: "test.pdf",
-        mimeType: "application/pdf",
-        fileSize: 1000,
         label: null,
       });
 
@@ -110,8 +117,6 @@ describe("chart-file-actions", () => {
         chartId: "chart-1",
         url: "files/chart-1/abc.pdf",
         filename: "test.pdf",
-        mimeType: "application/pdf",
-        fileSize: 1000,
         label: null,
       });
 
@@ -122,12 +127,14 @@ describe("chart-file-actions", () => {
     it("returns Zod error for invalid input (missing chartId)", async () => {
       const { addChartFile } = await import("./chart-file-actions");
 
-      const result = await addChartFile({
-        url: "files/x/abc.pdf",
-        filename: "test.pdf",
-        mimeType: "application/pdf",
-        fileSize: 1000,
-      });
+      const result = await addChartFile(
+        unvalidatedPayload<AddChartFileInput>({
+          url: "files/x/abc.pdf",
+          filename: "test.pdf",
+          mimeType: "application/pdf",
+          fileSize: 1000,
+        }),
+      );
 
       assertFailure(result);
       expect(result.error).toBeDefined();
@@ -136,14 +143,16 @@ describe("chart-file-actions", () => {
     it("rejects url that does not start with files/ prefix", async () => {
       const { addChartFile } = await import("./chart-file-actions");
 
-      const result = await addChartFile({
-        chartId: "chart-1",
-        url: "covers/other-chart/image.png",
-        filename: "image.png",
-        mimeType: "image/png",
-        fileSize: 1000,
-        label: null,
-      });
+      const result = await addChartFile(
+        unvalidatedPayload<AddChartFileInput>({
+          chartId: "chart-1",
+          url: "covers/other-chart/image.png",
+          filename: "image.png",
+          mimeType: "image/png",
+          fileSize: 1000,
+          label: null,
+        }),
+      );
 
       assertFailure(result);
       expect(result.error).toBe("Invalid file path");
@@ -314,15 +323,17 @@ describe("chart-file-actions write-path integrity", () => {
     const { addChartFile } = await import("./chart-file-actions");
     mockSend.mockResolvedValueOnce({ ContentLength: 4096, ContentType: "application/pdf" });
 
-    const result = await addChartFile({
-      chartId: "chart-1",
-      url: "files/chart-1/abc-pattern.pdf",
-      filename: "pattern.pdf",
-      label: null,
-      // What a client claims about its own upload is not evidence.
-      mimeType: "image/png",
-      fileSize: 1,
-    });
+    const result = await addChartFile(
+      unvalidatedPayload<AddChartFileInput>({
+        chartId: "chart-1",
+        url: "files/chart-1/abc-pattern.pdf",
+        filename: "pattern.pdf",
+        label: null,
+        // What a client claims about its own upload is not evidence.
+        mimeType: "image/png",
+        fileSize: 1,
+      }),
+    );
 
     assertSuccess(result);
     expect(mockPrisma.chartFile.create).toHaveBeenCalledWith({
@@ -358,6 +369,81 @@ describe("chart-file-actions write-path integrity", () => {
       { name: "HeadObjectCommand", Key: "files/chart-1/abc-huge.pdf" },
       { name: "DeleteObjectCommand", Key: "files/chart-1/abc-huge.pdf" },
     ]);
+  });
+
+  it("refuses a zip, which is not a chart file (CHF-003)", async () => {
+    const { addChartFile } = await import("./chart-file-actions");
+    mockSend.mockResolvedValueOnce({ ContentLength: 2048, ContentType: "application/zip" });
+
+    const result = await addChartFile({
+      chartId: "chart-1",
+      url: "files/chart-1/abc-pack.zip",
+      filename: "pack.zip",
+      label: null,
+    });
+
+    assertFailure(result);
+    expect(result.error).toBe(`Unsupported file type. Accepted: ${ACCEPTED_CHART_FILE_LABEL}`);
+    expect(mockPrisma.chartFile.create).not.toHaveBeenCalled();
+  });
+
+  it("refuses the generic type for a name that is not an accepted file", async () => {
+    const { addChartFile } = await import("./chart-file-actions");
+    mockSend.mockResolvedValueOnce({
+      ContentLength: 2048,
+      ContentType: "application/octet-stream",
+    });
+
+    const result = await addChartFile({
+      chartId: "chart-1",
+      url: "files/chart-1/abc-installer.exe",
+      filename: "installer.exe",
+      label: null,
+    });
+
+    assertFailure(result);
+    expect(mockPrisma.chartFile.create).not.toHaveBeenCalled();
+  });
+
+  it("applies the same rule the browser applied, for every accepted file", async () => {
+    const { addChartFile } = await import("./chart-file-actions");
+
+    for (const extension of ALLOWED_CHART_FILE_EXTENSIONS) {
+      vi.clearAllMocks();
+      mockPrisma.chart.findUnique.mockResolvedValue({
+        id: "chart-1",
+        project: { userId: "user-1" },
+      });
+      mockPrisma.chartFile.create.mockResolvedValue({ id: "file-1" });
+      const stored = resolveChartFileContentType(`pattern${extension}`, "text/xml") as string;
+      mockSend.mockResolvedValueOnce({ ContentLength: 2048, ContentType: stored });
+
+      const result = await addChartFile({
+        chartId: "chart-1",
+        url: `files/chart-1/abc-pattern${extension}`,
+        filename: `pattern${extension}`,
+        label: null,
+      });
+
+      assertSuccess(result);
+    }
+  });
+
+  it("stores a blank label as no label, like every other optional text field", async () => {
+    const { addChartFile } = await import("./chart-file-actions");
+    mockSend.mockResolvedValueOnce({ ContentLength: 2048, ContentType: "application/pdf" });
+
+    const result = await addChartFile({
+      chartId: "chart-1",
+      url: "files/chart-1/abc-pattern.pdf",
+      filename: "pattern.pdf",
+      label: "   ",
+    });
+
+    assertSuccess(result);
+    expect(mockPrisma.chartFile.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ label: null }) }),
+    );
   });
 
   it("accepts a pattern file stored as the generic binary type", async () => {

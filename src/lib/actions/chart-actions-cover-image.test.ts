@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import type { ChartFormInput } from "@/lib/validations/chart";
-import { createMockPrisma, assertSuccess } from "@/__tests__/mocks";
+import { createMockPrisma, assertSuccess, assertFailure } from "@/__tests__/mocks";
 
 // Mock auth to return authenticated session
 vi.mock("@/lib/auth", () => ({
@@ -390,7 +390,7 @@ describe("chart-actions cover optimization", () => {
       consoleSpy.mockRestore();
     });
 
-    it("never deletes a submitted cover key that belongs to another chart", async () => {
+    it("never touches a submitted cover key that belongs to another chart", async () => {
       const { updateChart } = await import("./chart-actions");
       mockPrisma.chart.findUnique.mockResolvedValueOnce({
         coverImageUrl: "covers/chart-1/opt-old.webp",
@@ -400,17 +400,17 @@ describe("chart-actions cover optimization", () => {
 
       // The form only ever submits this chart's own fresh upload. A direct call can
       // submit any well-formed covers key, and that key is another chart's live cover.
+      // Until P13b such a save succeeded and merely spared the foreign key; now it
+      // does not save at all, so nothing is optimized, written or discarded.
       const result = await updateChart("chart-1", {
         ...validFormData,
         chart: { ...validFormData.chart, coverImageUrl: "covers/chart-2/opt-live.webp" },
       });
 
-      assertSuccess(result);
+      assertFailure(result);
       expect(allDiscardedKeys()).not.toContain("covers/chart-2/opt-live.webp");
-      expect(discardedKeys()).toEqual([
-        "covers/chart-1/opt-old.webp",
-        "covers/chart-1/thumb-old.webp",
-      ]);
+      expect(allDiscardedKeys()).toEqual([]);
+      expect(mockProcessAndStoreImage).not.toHaveBeenCalled();
     });
 
     it("does NOT optimize when the cover is unchanged", async () => {
@@ -540,5 +540,164 @@ describe("chart-actions cover optimization", () => {
         "covers/chart-1/thumb-old.webp",
       ]);
     });
+  });
+});
+
+describe("chart-actions submitted cover keys", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockProcessAndStoreImage.mockResolvedValue(OPTIMIZED);
+    mockDiscardStoredObjects.mockResolvedValue(undefined);
+    mockPrisma.chart.update.mockResolvedValue({ id: "chart-1" });
+    mockPrisma.chart.create.mockResolvedValue({ id: "chart-1" });
+    mockPrisma.chart.findFirst.mockResolvedValue(null);
+    mockPrisma.chart.findUnique.mockResolvedValue({
+      coverImageUrl: "covers/chart-1/opt-old.webp",
+      coverThumbnailUrl: "covers/chart-1/thumb-old.webp",
+      project: { id: "project-1", userId: "user-1" },
+    });
+    mockPrisma.$transaction.mockImplementation(async (fnOrArray: unknown) => {
+      if (typeof fnOrArray === "function")
+        return (fnOrArray as (tx: typeof mockPrisma) => unknown)(mockPrisma);
+      return fnOrArray;
+    });
+  });
+
+  function formWithCover(coverImageUrl: string | null, coverThumbnailUrl: string | null = null) {
+    return {
+      ...validFormData,
+      chart: { ...validFormData.chart, coverImageUrl, coverThumbnailUrl },
+    };
+  }
+
+  it("refuses a cover key that names another chart by id", async () => {
+    const { updateChart } = await import("./chart-actions");
+
+    const result = await updateChart("chart-1", formWithCover("covers/chart-2/opt-live.webp"));
+
+    assertFailure(result);
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+    expect(mockProcessAndStoreImage).not.toHaveBeenCalled();
+    expect(mockDiscardStoredObjects).not.toHaveBeenCalled();
+  });
+
+  it("refuses a thumbnail key that names another chart by id", async () => {
+    const { updateChart } = await import("./chart-actions");
+
+    const result = await updateChart(
+      "chart-1",
+      formWithCover("covers/unsaved/abc-new.png", "covers/chart-2/thumb-live.webp"),
+    );
+
+    assertFailure(result);
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("refuses an unsaved key another chart is already displaying", async () => {
+    const { updateChart } = await import("./chart-actions");
+    // The half the owner segment alone cannot close: every cover the form
+    // uploads lands under `covers/unsaved/…`, and pre-P15 covers still live there.
+    mockPrisma.chart.findFirst.mockResolvedValueOnce({ id: "chart-2" });
+
+    const result = await updateChart("chart-1", formWithCover("covers/unsaved/abc-someone.png"));
+
+    assertFailure(result);
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+    expect(mockProcessAndStoreImage).not.toHaveBeenCalled();
+  });
+
+  it("does not count the chart's own row as another chart naming the key", async () => {
+    const { updateChart } = await import("./chart-actions");
+
+    await updateChart("chart-1", formWithCover("covers/chart-1/opt-old.webp"));
+
+    expect(mockPrisma.chart.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ NOT: { id: "chart-1" } }) }),
+    );
+  });
+
+  it("accepts a fresh upload from the form", async () => {
+    const { updateChart } = await import("./chart-actions");
+
+    const result = await updateChart("chart-1", formWithCover("covers/unsaved/abc-new.png"));
+
+    assertSuccess(result);
+    expect(mockProcessAndStoreImage).toHaveBeenCalled();
+  });
+
+  it("accepts the chart's own key unchanged", async () => {
+    const { updateChart } = await import("./chart-actions");
+
+    const result = await updateChart(
+      "chart-1",
+      formWithCover("covers/chart-1/opt-old.webp", "covers/chart-1/thumb-old.webp"),
+    );
+
+    assertSuccess(result);
+  });
+
+  it("asks nothing of the database when the save carries no cover", async () => {
+    const { updateChart } = await import("./chart-actions");
+
+    const result = await updateChart("chart-1", formWithCover(null));
+
+    assertSuccess(result);
+    expect(mockPrisma.chart.findFirst).not.toHaveBeenCalled();
+  });
+
+  it("refuses a created chart claiming an existing chart's cover", async () => {
+    const { createChart } = await import("./chart-actions");
+
+    const result = await createChart(formWithCover("covers/chart-2/opt-live.webp"));
+
+    assertFailure(result);
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("refuses a created chart claiming an unsaved key another chart displays", async () => {
+    const { createChart } = await import("./chart-actions");
+    mockPrisma.chart.findFirst.mockResolvedValueOnce({ id: "chart-2" });
+
+    const result = await createChart(formWithCover("covers/unsaved/abc-someone.png"));
+
+    assertFailure(result);
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("refuses a chart created with supplies claiming another chart's cover", async () => {
+    const { createChartWithSupplies } = await import("./chart-actions");
+
+    const result = await createChartWithSupplies(formWithCover("covers/chart-2/opt-live.webp"), {
+      threads: [],
+      beads: [],
+      specialty: [],
+    });
+
+    assertFailure(result);
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+    expect(mockProcessAndStoreImage).not.toHaveBeenCalled();
+  });
+
+  it("refuses a chart created with supplies claiming an unsaved key another chart displays", async () => {
+    const { createChartWithSupplies } = await import("./chart-actions");
+    mockPrisma.chart.findFirst.mockResolvedValueOnce({ id: "chart-2" });
+
+    const result = await createChartWithSupplies(formWithCover("covers/unsaved/abc-someone.png"), {
+      threads: [],
+      beads: [],
+      specialty: [],
+    });
+
+    assertFailure(result);
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("still creates a chart with its own fresh upload", async () => {
+    const { createChart } = await import("./chart-actions");
+    mockPrisma.chart.create.mockResolvedValueOnce({ id: "new-chart-id" });
+
+    const result = await createChart(formWithCover("covers/unsaved/abc-new.png"));
+
+    assertSuccess(result);
   });
 });

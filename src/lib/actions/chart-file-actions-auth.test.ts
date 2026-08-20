@@ -43,8 +43,6 @@ describe("chart-file-actions unauthenticated rejection", () => {
         chartId: "chart-1",
         url: "files/chart-1/abc-test.pdf",
         filename: "test.pdf",
-        mimeType: "application/pdf",
-        fileSize: 5000,
         label: null,
       }),
     ).rejects.toThrow("Unauthorized");
