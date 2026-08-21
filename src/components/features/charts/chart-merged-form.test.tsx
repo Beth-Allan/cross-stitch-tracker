@@ -1342,7 +1342,8 @@ describe("ChartMergedForm", () => {
     await user.type(screen.getByLabelText(/chart name/i), "My Chart");
     await user.click(screen.getByRole("button", { name: /add supplies/i }));
 
-    // Now in supply mode, CalculatorCard should be in the DOM and visible
+    // Absence from the DOM above is what rules out an Activity wrapper: Activity keeps its
+    // subtree mounted and merely hides it, so a wrapped calculator would still be queryable.
     expect(screen.getByRole("group", { name: /skein calculator settings/i })).toBeVisible();
   });
 });

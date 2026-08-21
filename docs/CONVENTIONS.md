@@ -26,16 +26,20 @@ project-specific decisions:
   `@/lib/auth-guard`.
 - **`react-hooks/set-state-in-effect` is off** — dialog form reset via `useEffect` is a deliberate
   pattern here, not an oversight.
-- **`no-unused-vars` honours an `_` prefix** (and rest-sibling omissions) — `_userId` and
-  `{ photoKey: _, ...rest }` say "deliberately unused" on purpose; the second has no other spelling.
-- **`@next/next/no-img-element` is off** — every image is a presigned R2 URL that expires in an
-  hour, so `next/image`'s optimizer cannot cache or transform it (the three components that do use
-  `next/image` all pass `unoptimized`). Images are shrunk at upload, not at render.
+- **`no-unused-vars` honours an `_` prefix** — `_userId` and `{ photoKey: _, ...rest }` say
+  "deliberately unused" on purpose. Args, vars and caught errors all read the same prefix.
+- **`@next/next/no-img-element` is off** — images here are either a presigned R2 URL that expires
+  in an hour or a local `blob:` preview, and `next/image`'s optimizer can cache or transform
+  neither (all four existing `<Image>` elements pass `unoptimized`). Images are shrunk at upload,
+  not at render. Off repo-wide, so a future _static_ asset in an `<img>` is not flagged either.
 
 `globalIgnores` keeps `.next/`, `out/`, `build/`, `product-plan/`, `scripts/` and the tooling
-directories out of scope. **Warnings fail the gate:** `npm run lint` is `eslint --max-warnings 0`
-since P14 (2026-08-20), so there is no passing tier below "error" — the count was burned to zero
-first, and the flip is what keeps it there.
+directories out of scope — but **not** `src/generated/`, so the Prisma client is linted (clean
+today; maintenance-ledger row). **Warnings fail the gate:** `npm run lint` is
+`eslint --max-warnings 0` since P14 (2026-08-20), so there is no passing tier below "error" — the
+count was burned to zero first, and the flip is what keeps it there. `lint-staged` is the one
+place that still runs a bare `eslint --fix`, so a commit does not block on a warning; pre-push
+and CI do.
 
 ### TypeScript
 

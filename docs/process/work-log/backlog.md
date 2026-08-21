@@ -87,8 +87,8 @@ leave them behind.
   ruling) because it asks for something this app cannot do: every image is a presigned R2 URL
   expiring in an hour, so `next/image`'s optimizer cannot cache or transform it, and the three
   components already on `next/image` all pass `unoptimized`. That silenced the warning, **not the
-  question** — the app renders 17 raw `<img>` tags across the gallery, dashboard, chart tabs and
-  the session modal, with no shared component, no consistent placeholder or failure state, and no
+  question** — the app renders **16** raw `<img>` tags across the gallery, dashboard, chart tabs and
+  the session modal (a 17th is a test's mock), with no shared component, no consistent placeholder or failure state, and no
   answer on sizing, `loading`/`decoding` defaults or layout-shift. The real shrinking happens at
   upload (`processAndStoreImage`, P15; P16 backfills the library), which is the right layer — what
   a design session owns is what the browser is asked to draw. _(from the 2026-08-16

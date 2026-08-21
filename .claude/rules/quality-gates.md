@@ -31,14 +31,17 @@ visible failure into an invisible one.
   (`no-restricted-imports`)
 - **a warning fails the step.** `npm run lint` is `eslint --max-warnings 0` since P14
   (2026-08-20), so there is no longer a tier of findings that passes. The count reached zero
-  before the flip; **the only way to add a warning now is to fail the gate.**
+  before the flip, and **a new warning is now a red gate.** Note where that bites: **pre-push and
+  CI**, which run `npm run lint`. `lint-staged` still runs a bare `eslint --fix`, so **`git
+  commit` itself does not stop a warning** — deliberate, so a WIP handoff commit (protocol §9)
+  is never blocked.
 
 Two rule configurations carry their reasoning in `eslint.config.mjs` and are not re-litigated
-per session: an **`_` prefix means deliberately unused** (`_userId`, `{ photoKey: _, ...rest }` —
-a rest-sibling omission cannot be written any other way), and **`@next/next/no-img-element` is
-off**, because every image here is a presigned R2 URL that expires in an hour, which
-`next/image`'s optimizer cannot cache or transform — the shrinking happens at upload
-(`processAndStoreImage`), not at render. Both are Beth's rulings, 2026-08-20.
+per session: an **`_` prefix means deliberately unused** (`_userId`, `{ photoKey: _, ...rest }`),
+and **`@next/next/no-img-element` is off**, because images here are either a presigned R2 URL
+that expires in an hour or a local `blob:` preview — `next/image`'s optimizer can transform
+neither, and the shrinking happens at upload (`processAndStoreImage`), not at render. Both are
+Beth's rulings, 2026-08-20.
 
 ## What the gate does not check
 
