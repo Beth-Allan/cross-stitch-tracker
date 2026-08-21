@@ -21,7 +21,45 @@ import { keyOwnerSchema } from "@/lib/validations/upload";
  * question about the data and never about remembered progress.
  */
 
-const CHART_NOT_FOUND = "Chart not found";
+const CHART_NOT_FOUND = "it could not be found any more";
+
+/**
+ * What Beth is told when a chart is left alone, keyed by what the pipeline
+ * reported. She is the only reader of this list, so it says why in her words —
+ * anything unrecognised falls back rather than leaking an internal message into
+ * the one place the run promises her a chart she knows.
+ */
+const PLAIN_REASONS: Record<string, string> = {
+  "Original image not found in storage": "its photo is no longer in storage",
+  "Image is too large to process": "its photo is too big to shrink",
+  "That file is not a PNG, JPEG or WebP image": "its photo is not a picture this app can read",
+  "Invalid storage key": "its photo is filed in a way this app does not recognise",
+};
+
+const UNRECOGNISED_REASON = "its photo could not be shrunk this time";
+
+/**
+ * The superseded keys this chart may actually delete. A row naming a *different*
+ * chart's cover is possible in data written before the save path started
+ * refusing it, and `coverNeedsOptimizing` deliberately puts such a row in the
+ * work list — so without this the conversion would repoint chart-1 and then
+ * delete chart-2's live picture. Same check the save path makes, same reason.
+ */
+async function unclaimedByAnyOtherChart(keys: string[], chartId: string): Promise<string[]> {
+  if (keys.length === 0) return [];
+
+  const claimants = await prisma.chart.findMany({
+    where: {
+      NOT: { id: chartId },
+      OR: [{ coverImageUrl: { in: keys } }, { coverThumbnailUrl: { in: keys } }],
+    },
+    select: { coverImageUrl: true, coverThumbnailUrl: true },
+  });
+  const claimed = new Set(
+    claimants.flatMap((chart) => [chart.coverImageUrl, chart.coverThumbnailUrl]),
+  );
+  return keys.filter((key) => !claimed.has(key));
+}
 
 /**
  * The charts whose cover has not been through the optimizer, oldest name first.
@@ -84,7 +122,7 @@ export async function optimizeExistingCover(
       return { success: false as const, error: CHART_NOT_FOUND };
     }
     if (!chart.coverImageUrl) {
-      return { success: false as const, error: "This chart has no cover photo" };
+      return { success: false as const, error: "it has no cover photo" };
     }
     if (!coverNeedsOptimizing(chart)) {
       return { success: true as const, status: "skipped" as const };
@@ -93,14 +131,20 @@ export async function optimizeExistingCover(
     const previousKeys = [chart.coverImageUrl, chart.coverThumbnailUrl];
     const optimized = await optimizeCoverImage(chart.id, chart.coverImageUrl);
     if (!optimized.ok) {
-      return { success: false as const, error: optimized.reason };
+      return {
+        success: false as const,
+        error: PLAIN_REASONS[optimized.reason] ?? UNRECOGNISED_REASON,
+      };
     }
 
     const stillNamed = new Set(
       [optimized.coverKey, optimized.thumbnailKey].filter((key): key is string => Boolean(key)),
     );
+    const superseded = previousKeys.filter(
+      (key): key is string => key !== null && !stillNamed.has(key),
+    );
     await discardStoredObjects(
-      previousKeys.map((key) => (key && !stillNamed.has(key) ? key : null)),
+      await unclaimedByAnyOtherChart(superseded, chart.id),
       `chart ${chart.id} superseded cover`,
     );
 
@@ -111,6 +155,6 @@ export async function optimizeExistingCover(
     return { success: true as const, status: "converted" as const };
   } catch (error) {
     console.error("optimizeExistingCover error:", error);
-    return { success: false as const, error: "Could not shrink this cover photo" };
+    return { success: false as const, error: UNRECOGNISED_REASON };
   }
 }

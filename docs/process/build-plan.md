@@ -497,7 +497,7 @@ half is P13 and merged the same day; the upload half is **P13b** below.
   naming another chart's pre-P15 `covers/unsaved/…` cover) closes with it; gate green; fresh
   `/review` before merge.
 - **Met, 2026-08-20, with one clause deliberately conditional.** Every clause is built and
-  test-first (32 new tests, suite 2951 → 2983): the conversion runs one chart per call from a
+  test-first (38 new tests, suite 2951 → 2989): the conversion runs one chart per call from a
   Settings card, the row names the derivatives before either old object is deleted (asserted by
   call order, not by inspection), a missing object leaves the row untouched and comes back named,
   and the run is resumable because the work list is a question about the rows rather than

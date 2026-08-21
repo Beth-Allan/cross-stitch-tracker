@@ -112,6 +112,7 @@ describe("optimizeExistingCover", () => {
     mockAuth.mockResolvedValue({ user: { id: "user-1" } });
     mockProcessAndStoreImage.mockResolvedValue(OPTIMIZED);
     mockPrisma.chart.update.mockResolvedValue({ id: "chart-1" });
+    mockPrisma.chart.findMany.mockResolvedValue([]);
   });
 
   it("throws Unauthorized when the caller is not authenticated", async () => {
@@ -223,7 +224,19 @@ describe("optimizeExistingCover", () => {
     );
   });
 
-  it("leaves the row alone and reports the chart when the picture is gone from storage", async () => {
+  it("keeps a superseded key that another chart's row still names, rather than deleting its cover", async () => {
+    mockPrisma.chart.findUnique.mockResolvedValueOnce(PRE_P15_CHART);
+    mockPrisma.chart.findMany.mockResolvedValueOnce([
+      { coverImageUrl: "covers/unsaved/abc-phone-photo.jpg", coverThumbnailUrl: null },
+    ]);
+    const { optimizeExistingCover } = await import("./cover-backfill-actions");
+
+    await optimizeExistingCover("chart-1");
+
+    expect(discardedKeys()).toEqual(["covers/unsaved/thumb-abc.webp"]);
+  });
+
+  it("leaves the row alone and reports the chart in words Beth can read when the picture is gone", async () => {
     mockPrisma.chart.findUnique.mockResolvedValueOnce(PRE_P15_CHART);
     mockProcessAndStoreImage.mockResolvedValueOnce({
       success: false,
@@ -234,9 +247,24 @@ describe("optimizeExistingCover", () => {
     const result = await optimizeExistingCover("chart-1");
 
     assertFailure(result);
-    expect(result.error).toBe("Original image not found in storage");
+    expect(result.error).toBe("its photo is no longer in storage");
     expect(mockPrisma.chart.update).not.toHaveBeenCalled();
     expect(mockDiscardStoredObjects).not.toHaveBeenCalled();
+  });
+
+  it("never hands back an internal message for a reason it does not recognise", async () => {
+    mockPrisma.chart.findUnique.mockResolvedValueOnce(PRE_P15_CHART);
+    mockProcessAndStoreImage.mockResolvedValueOnce({
+      success: false,
+      error: "Invalid storage key",
+    });
+    const { optimizeExistingCover } = await import("./cover-backfill-actions");
+
+    const result = await optimizeExistingCover("chart-1");
+
+    assertFailure(result);
+    expect(result.error).not.toMatch(/storage key/i);
+    expect(result.error).toMatch(/photo/i);
   });
 
   it("leaves the row alone when the pipeline throws", async () => {

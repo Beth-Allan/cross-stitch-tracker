@@ -59,9 +59,10 @@ async function fetchImageBuffer(
   try {
     response = await client.send(getCommand);
   } catch (error) {
-    // "The object is gone" and "storage is broken" are different answers to the
-    // caller: one is a row to report, the other is a run to stop. Anything that is
-    // not a miss keeps its own path out of here.
+    // Only a miss is reported as a missing object. Anything else — denied
+    // credentials, an unreachable bucket — is rethrown into this function's own
+    // caller, which reports it as a generic failure: calling it "not found" would
+    // tell the cover backfill to name a chart whose picture is fine.
     if (!isNotFound(error)) throw error;
     return { success: false, error: "Original image not found in storage" };
   }

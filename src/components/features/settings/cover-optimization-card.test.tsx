@@ -106,6 +106,46 @@ describe("CoverOptimizationCard", () => {
     expect(screen.getByText(/1 was already done/i)).toBeInTheDocument();
   });
 
+  it("gives up when several in a row fail, rather than grinding through the whole library", async () => {
+    const user = userEvent.setup();
+    const many = Array.from({ length: 20 }, (_, index) => ({
+      id: `chart-${index}`,
+      name: `Chart ${index}`,
+    }));
+    mockOptimizeExistingCover.mockResolvedValue({
+      success: false,
+      error: "its photo is no longer in storage",
+    });
+    render(<CoverOptimizationCard charts={many} />);
+
+    await user.click(screen.getByRole("button", { name: /shrink/i }));
+
+    expect(await screen.findByText(/stopped early/i)).toBeInTheDocument();
+    expect(mockOptimizeExistingCover.mock.calls.length).toBeLessThan(20);
+  });
+
+  it("counts the run of failures from scratch after one that works", async () => {
+    const user = userEvent.setup();
+    const many = Array.from({ length: 12 }, (_, index) => ({
+      id: `chart-${index}`,
+      name: `Chart ${index}`,
+    }));
+    let call = 0;
+    mockOptimizeExistingCover.mockImplementation(async () => {
+      call += 1;
+      // Fail, fail, succeed, repeating: never five in a row, so the run finishes.
+      return call % 3 === 0
+        ? { success: true, status: "converted" }
+        : { success: false, error: "its photo is no longer in storage" };
+    });
+    render(<CoverOptimizationCard charts={many} />);
+
+    await user.click(screen.getByRole("button", { name: /shrink/i }));
+
+    expect(await screen.findByText(/finished/i)).toBeInTheDocument();
+    expect(mockOptimizeExistingCover).toHaveBeenCalledTimes(12);
+  });
+
   it("stops working the moment the card goes away, instead of running on unseen", async () => {
     const user = userEvent.setup();
     let release: (value: { success: true; status: "converted" }) => void = () => {};

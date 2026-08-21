@@ -30,6 +30,35 @@ words where possible. Rows are never deleted.
 
 ## Open — awaiting Beth's ruling
 
+### 2026-08-20 · the review-gate list names files, and P16 added two siblings it does not name — found by P16's layer-1 review
+
+**What happened.** `.claude/hooks/review-gated-paths.txt` lists the R2 core by filename:
+`src/lib/actions/upload-actions.ts`, `chart-file-actions.ts`, `src/lib/r2.ts`. P16 added two files
+that do the same kind of work — `cover-optimization.ts` re-points a chart's row at a pair of
+storage keys, and `cover-backfill-actions.ts` issues the delete that supersedes the old ones — and
+neither matches a line in that list.
+
+**Why it matters.** That file's own header carries the lesson, inherited from another project:
+"gate growing families by directory, not filename — a per-filename line goes stale the day a
+sibling is added." This is that day. P16 itself is gated anyway, because it edits
+`upload-actions.ts` and `r2.ts`; the gap is the **next** change, one confined to the two new files,
+which would merge on green with no fresh `/review` behind it even though it can delete a picture
+Beth cannot get back.
+
+**Why it is not just fixed.** Adding a path to that list is a gate-config change, and gate-config
+changes are Beth's ruling on the record, never a quiet edit (hard rule 6). The protocol's §5 core
+list would move in step with it.
+
+**Options for Beth.** ① Add the two filenames (smallest change, same shape as today, goes stale
+again the next time a sibling appears). ② Gate the whole cover/upload family by directory — every
+action file that writes to storage — which is what the file's own lesson recommends and what
+would have caught this without anyone noticing. ③ Leave it: the two files are finished work and
+nothing is queued against them. **Recommendation: ②**, because the failure mode of getting it
+wrong is a deleted photo with no copy anywhere.
+
+**Status: open.** Nothing in this PR changes the gate. Until it is ruled, a session touching
+either new file should treat it as gated by hand and stop for a `/review`.
+
 ### 2026-08-20 · the repo has a migrations folder but no migration pipeline — found at the start of P9
 
 **What contradicts what.** P9's brief and the protocol both assume migrations are how schema

@@ -13,7 +13,16 @@ interface CoverOptimizationCardProps {
 
 type LeftAlone = { id: string; name: string; reason: string };
 
-const GENERIC_FAILURE = "Something went wrong, so this one was left as it was";
+const GENERIC_FAILURE = "the app could not be reached, so it was left as it was";
+
+/**
+ * How many failures in a row mean the problem is not the photos. One missing
+ * picture is a chart to report; five in a row is storage being unreachable, and
+ * carrying on would issue hundreds of doomed requests and hand Beth a list of
+ * every chart she owns. Stopping costs nothing — the next run picks up what is
+ * left.
+ */
+const CONSECUTIVE_FAILURE_LIMIT = 5;
 
 /**
  * Starts and follows the one-off shrinking of the covers already in the library.
@@ -31,6 +40,7 @@ export function CoverOptimizationCard({ charts }: CoverOptimizationCardProps) {
   const [shrunk, setShrunk] = useState(0);
   const [alreadyDone, setAlreadyDone] = useState(0);
   const [leftAlone, setLeftAlone] = useState<LeftAlone[] | null>(null);
+  const [stoppedEarly, setStoppedEarly] = useState(false);
 
   // A run is a loop of awaited calls, not one request, so leaving the page has to
   // stop it — otherwise it would carry on converting covers with nothing on screen
@@ -52,10 +62,12 @@ export function CoverOptimizationCard({ charts }: CoverOptimizationCardProps) {
     setShrunk(0);
     setAlreadyDone(0);
     setLeftAlone(null);
+    setStoppedEarly(false);
 
     const failures: LeftAlone[] = [];
     let converted = 0;
     let skipped = 0;
+    let inARow = 0;
 
     for (const [index, chart] of work.entries()) {
       if (abandoned.current) return;
@@ -63,22 +75,31 @@ export function CoverOptimizationCard({ charts }: CoverOptimizationCardProps) {
         const result = await optimizeExistingCover(chart.id);
         if (result.success && result.status === "converted") {
           converted += 1;
+          inARow = 0;
           setShrunk(converted);
         } else if (result.success) {
           // The list was drawn before the run; another tab, or an earlier run,
           // may have finished one in between. Counting it as shrunk here would
           // report work this run did not do.
           skipped += 1;
+          inARow = 0;
           setAlreadyDone(skipped);
         } else {
+          inARow += 1;
           failures.push({ id: chart.id, name: chart.name, reason: result.error });
         }
       } catch {
         // One chart failing is not the run failing: the rest of the library still
         // has covers worth shrinking.
+        inARow += 1;
         failures.push({ id: chart.id, name: chart.name, reason: GENERIC_FAILURE });
       }
       setProcessed(index + 1);
+
+      if (inARow >= CONSECUTIVE_FAILURE_LIMIT) {
+        setStoppedEarly(true);
+        break;
+      }
     }
 
     setLeftAlone(failures);
@@ -91,7 +112,7 @@ export function CoverOptimizationCard({ charts }: CoverOptimizationCardProps) {
     running || leftAlone === null
       ? null
       : [
-          `Finished — ${shrunk} shrunk`,
+          `${stoppedEarly ? "Stopped early" : "Finished"} — ${shrunk} shrunk`,
           alreadyDone > 0 && `${alreadyDone} ${alreadyDone === 1 ? "was" : "were"} already done`,
           leftAlone.length > 0 && `${leftAlone.length} left alone`,
         ]
@@ -134,6 +155,14 @@ export function CoverOptimizationCard({ charts }: CoverOptimizationCardProps) {
         <p aria-live="polite" className="text-muted-foreground">
           {running ? `Shrinking… ${processed} of ${total} done.` : summary}
         </p>
+
+        {stoppedEarly && (
+          <p>
+            Several in a row could not be done, which usually means the photo storage itself is
+            having a problem rather than these particular pictures. Nothing was lost. Try again in a
+            while — it will carry on from where it stopped.
+          </p>
+        )}
 
         {leftAlone !== null && leftAlone.length > 0 && (
           <div className="space-y-1">
