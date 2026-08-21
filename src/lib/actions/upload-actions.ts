@@ -7,7 +7,7 @@ import sharp from "sharp";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
-import { getReadTarget, getWriteTarget } from "@/lib/r2";
+import { getReadTarget, getWriteTarget, isNotFound } from "@/lib/r2";
 import { firstValidationMessage } from "@/lib/utils/action-errors";
 import {
   uploadRequestSchema,
@@ -54,7 +54,17 @@ async function fetchImageBuffer(
     Bucket: bucket,
     Key: key,
   });
-  const response = await client.send(getCommand);
+
+  let response;
+  try {
+    response = await client.send(getCommand);
+  } catch (error) {
+    // "The object is gone" and "storage is broken" are different answers to the
+    // caller: one is a row to report, the other is a run to stop. Anything that is
+    // not a miss keeps its own path out of here.
+    if (!isNotFound(error)) throw error;
+    return { success: false, error: "Original image not found in storage" };
+  }
 
   if (!response.Body) {
     return { success: false, error: "Original image not found in storage" };

@@ -33,7 +33,11 @@ vi.mock("next/cache", () => ({
 
 const mockSend = vi.fn();
 const mockGetR2Client = vi.fn();
-vi.mock("@/lib/r2", () => ({
+// `isNotFound` keeps its real implementation: it is the pure predicate that
+// decides whether a read failure is "the object is gone" or "storage is broken",
+// and a stubbed one would make this file agree with itself instead of with R2.
+vi.mock("@/lib/r2", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/r2")>()),
   getReadTarget: async () => ({ client: mockGetR2Client(), bucket: "test-bucket" }),
   getWriteTarget: () => ({ client: mockGetR2Client(), bucket: "test-bucket" }),
 }));
@@ -291,6 +295,26 @@ describe("upload-actions failure modes", () => {
 
       assertFailure(result);
       expect(result.error).toBeDefined();
+    });
+
+    it("names the missing object when R2 answers 404, rather than reporting a generic failure", async () => {
+      const { processAndStoreImage } = await import("./upload-actions");
+      mockPrisma.chart.findUnique.mockResolvedValueOnce({
+        id: "chart-1",
+        coverImageUrl: "covers/chart-1/missing.png",
+        project: { userId: "user-1" },
+      });
+      mockSend.mockRejectedValueOnce(
+        Object.assign(new Error("The specified key does not exist."), {
+          name: "NoSuchKey",
+          $metadata: { httpStatusCode: 404 },
+        }),
+      );
+
+      const result = await processAndStoreImage("chart-1", "covers/chart-1/missing.png", "covers");
+
+      assertFailure(result);
+      expect(result.error).toBe("Original image not found in storage");
     });
 
     it("returns error when response.Body is null", async () => {
