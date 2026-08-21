@@ -30,35 +30,6 @@ words where possible. Rows are never deleted.
 
 ## Open — awaiting Beth's ruling
 
-### 2026-08-20 · the review-gate list names files, and P16 added two siblings it does not name — found by P16's layer-1 review
-
-**What happened.** `.claude/hooks/review-gated-paths.txt` lists the R2 core by filename:
-`src/lib/actions/upload-actions.ts`, `chart-file-actions.ts`, `src/lib/r2.ts`. P16 added two files
-that do the same kind of work — `cover-optimization.ts` re-points a chart's row at a pair of
-storage keys, and `cover-backfill-actions.ts` issues the delete that supersedes the old ones — and
-neither matches a line in that list.
-
-**Why it matters.** That file's own header carries the lesson, inherited from another project:
-"gate growing families by directory, not filename — a per-filename line goes stale the day a
-sibling is added." This is that day. P16 itself is gated anyway, because it edits
-`upload-actions.ts` and `r2.ts`; the gap is the **next** change, one confined to the two new files,
-which would merge on green with no fresh `/review` behind it even though it can delete a picture
-Beth cannot get back.
-
-**Why it is not just fixed.** Adding a path to that list is a gate-config change, and gate-config
-changes are Beth's ruling on the record, never a quiet edit (hard rule 6). The protocol's §5 core
-list would move in step with it.
-
-**Options for Beth.** ① Add the two filenames (smallest change, same shape as today, goes stale
-again the next time a sibling appears). ② Gate the whole cover/upload family by directory — every
-action file that writes to storage — which is what the file's own lesson recommends and what
-would have caught this without anyone noticing. ③ Leave it: the two files are finished work and
-nothing is queued against them. **Recommendation: ②**, because the failure mode of getting it
-wrong is a deleted photo with no copy anywhere.
-
-**Status: open.** Nothing in this PR changes the gate. Until it is ruled, a session touching
-either new file should treat it as gated by hand and stop for a `/review`.
-
 ### 2026-08-20 · the repo has a migrations folder but no migration pipeline — found at the start of P9
 
 **What contradicts what.** P9's brief and the protocol both assume migrations are how schema
@@ -153,6 +124,34 @@ no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is r
 on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
 
 ## Ruled
+
+### 2026-08-21 · D-22 · the review gate covers the storage family, not a list of filenames — ruled during P16
+
+**What needed a ruling.** `.claude/hooks/review-gated-paths.txt` named the R2 core one filename at
+a time. P16 added two files doing the same work — `cover-optimization.ts` re-points a chart's row
+at a pair of storage keys, `cover-backfill-actions.ts` issues the delete that supersedes the old
+ones — and neither matched a line. P16 itself was gated anyway (it edits `upload-actions.ts` and
+`r2.ts`); the gap was the **next** change, one confined to the two new files, which would have
+merged on green with no fresh `/review` behind it even though it can delete a picture with no copy
+anywhere. That file's own header predicted this: "gate growing families by directory, not
+filename — a per-filename line goes stale the day a sibling is added." Found by P16's layer-1
+review; adding a path is a gate-config change, so it is Beth's ruling, never a quiet edit (hard
+rule 6).
+
+**Surfaced to Beth** in-session as a decision: cover the whole photo family · add just the two new
+names · leave the list alone.
+
+**Her ruling: cover the family.** Anything that writes to or deletes from photo storage needs the
+second review, so a file written later is covered the day it exists rather than the day someone
+remembers.
+
+**What it changed.** The three per-filename R2 lines became a family block with
+`^src/lib/actions/cover-[a-z-]+\.ts$` beside them, and `session-protocol.md` §5 and CLAUDE.md's
+hard rule 3 were reworded in the same PR to say "the R2 storage family". **One honest gap
+remains:** `cover-` is a name prefix, not a directory, because these files sit beside ungated
+action files — a new sibling called something else would still slip through. The durable form is a
+`src/lib/actions/storage/` directory, which is a move of gated files and therefore its own item;
+it is a maintenance-ledger row rather than something P16 rides along.
 
 ### 2026-08-20 · D-21 · the cover-shrinking button lives on Settings — ruled at the start of P16
 

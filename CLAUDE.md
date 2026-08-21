@@ -100,7 +100,7 @@ visible in the loaded copy. The always-true core:
 2. **TDD for app behavior: failing test first, always.** Never weaken, skip, or delete a test
    to get green — test removals need Beth's approval, on the record.
 3. **Sensitive cores are review-gated** — schema + migrations, auth/session/rate-limit, the
-   skein and fabric calculators, the stats query/cache layer, and the R2 upload actions merge
+   skein and fabric calculators, the stats query/cache layer, and the R2 storage family merge
    only from a fresh `/review` session, never by their builder (paths:
    `.claude/hooks/review-gated-paths.txt`).
 4. **Design canon is the spec — never build UI from scratch.** Canon in `docs/design/`;

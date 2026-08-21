@@ -37,10 +37,18 @@
 # (history: backlog 999.41 and 999.42)
 ^src/lib/queries/stats/
 
-# R2 — the upload actions (orphan-leak history) and the client module they both
-# call, which builds the S3 client from the R2 credentials and resolves the bucket.
+# R2 — the storage family: the upload actions (orphan-leak history), the cover
+# pipeline and its one-off backfill, and the client module they all call, which
+# builds the S3 client from the R2 credentials and resolves the bucket.
+# Gated as a FAMILY rather than one filename at a time — Beth's ruling D-22
+# (2026-08-21), after P16's layer-1 review found two new siblings arriving
+# ungated, exactly as this file's own header warns. `cover-` is a name prefix
+# rather than a directory because these files sit beside ungated action files;
+# the durable form is a `src/lib/actions/storage/` directory, which is a move of
+# gated files and therefore its own item (maintenance ledger, 2026-08-21).
 ^src/lib/actions/upload-actions\.ts$
 ^src/lib/actions/chart-file-actions\.ts$
+^src/lib/actions/cover-[a-z-]+\.ts$
 ^src/lib/r2\.ts$
 
 # RULED by Beth (2026-08-17, /cleanup; drift.md Ruled): the revalidateTag("stats")
