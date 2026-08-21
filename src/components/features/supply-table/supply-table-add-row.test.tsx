@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, act, waitFor } from "@/__tests__/test-utils";
+import { render, screen, fireEvent, act } from "@/__tests__/test-utils";
 import { SupplyTableAddRow } from "./supply-table-add-row";
 import type { SupplyTableAdapter, CalcParams, SupplySearchResult } from "./types";
 import { DEFAULT_CALC_PARAMS } from "./types";

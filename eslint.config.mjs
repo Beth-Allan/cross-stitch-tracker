@@ -20,18 +20,41 @@ const eslintConfig = defineConfig([
     // Build scripts
     "scripts/**",
   ]),
-  // Disable overly strict React compiler rule — dialog form reset via
-  // useEffect is a common, intentional pattern in this codebase
+  // Project-specific decisions — each one debugged or ruled on, not a default
   {
     files: ["src/**/*.{ts,tsx}"],
     rules: {
+      // Dialog form reset via useEffect is a common, intentional pattern here,
+      // and the React compiler rule is too strict to allow it.
       "react-hooks/set-state-in-effect": "off",
-    },
-  },
-  // Project-specific guardrails — prevent patterns we've debugged
-  {
-    files: ["src/**/*.{ts,tsx}"],
-    rules: {
+
+      // An `_` prefix means "deliberately unused" — the convention this codebase
+      // already writes (`_userId` documenting a future per-user lookup,
+      // `{ photoKey: _, ...rest }` omitting a key). The three patterns spell one
+      // convention uniformly; only `varsIgnorePattern` has live sites today, and
+      // the other two are here so args and caught errors cannot mean something
+      // different from vars. Beth's ruling, 2026-08-20, with the
+      // `--max-warnings 0` flip.
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+
+      // Images here are either a private R2 object behind a presigned URL that
+      // expires in an hour, or a local `blob:` preview — `next/image`'s optimizer
+      // can cache and transform neither, which is why all four existing `<Image>`
+      // elements pass `unoptimized`. The rule therefore asks for something this app
+      // cannot do; the real shrinking happens at upload (`processAndStoreImage`,
+      // P15), not at render. Beth's ruling, 2026-08-20. This turns the rule off
+      // repo-wide, so a future *static* asset rendered with `<img>` goes unflagged —
+      // the standing "how should images load?" question is a design-track input
+      // (`work-log/backlog.md`), not a lint warning.
+      "@next/next/no-img-element": "off",
+
       "no-restricted-syntax": [
         "error",
         {

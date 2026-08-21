@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { CreationFlowAdapter } from "./creation-flow-adapter";
-import type { SupplyRow, SupplySearchResult, SupplyType, CreateSupplyData } from "./types";
+import type { SupplyRow, SupplySearchResult, CreateSupplyData } from "./types";
 
 function makeSearchResult(overrides: Partial<SupplySearchResult> = {}): SupplySearchResult {
   return {

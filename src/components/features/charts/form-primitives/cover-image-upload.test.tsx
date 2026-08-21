@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@/__tests__/test-utils";
+import { render, screen, fireEvent } from "@/__tests__/test-utils";
 import { CoverImageUpload } from "./cover-image-upload";
 
 vi.mock("@/lib/actions/upload-actions", () => ({

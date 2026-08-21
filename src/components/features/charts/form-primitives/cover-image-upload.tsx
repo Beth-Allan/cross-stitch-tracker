@@ -209,7 +209,6 @@ export function CoverImageUpload({
           )}
           style={aspectRatio ? { aspectRatio, maxHeight: "18rem" } : undefined}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={preview}
             alt="Cover image preview"

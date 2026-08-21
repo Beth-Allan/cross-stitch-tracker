@@ -27,19 +27,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx prisma generate
-
-      - name: Check formatting
-        run: npm run format:check
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Type check
-        run: npx tsc --noEmit
-
-      - name: Test
-        run: npm test
-
-      - name: Build
-        run: npm run build
+      # One invocation, so CI and the pre-push hook cannot drift apart: `npm run gate`
+      # is prisma generate → format:check → lint → tsc --noEmit → test → build.
+      - name: Gate
+        run: npm run gate
