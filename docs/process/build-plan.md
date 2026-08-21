@@ -510,6 +510,10 @@ half is P13 and merged the same day; the upload half is **P13b** below.
   row instead of an implicit dependency. Trap ⑥ is the preview run, which doubles as Beth's
   layer-2 look: the preview reads the real bucket, writes to scratch and holds a Neon **copy**, so
   a full rehearsal there cannot touch a real object or a real row.
+- **The conditional clause closed 2026-08-21.** The delta re-review passed, Beth ran the rehearsal on the
+  preview and then the real thing on production the same day, and it finished with nothing left alone —
+  every cover is now an optimized derivative, and the ledger row says the `covers/unsaved/` half of the
+  lifecycle rule is safe and the deletion sliver is closed. Merged as PR #119.
 
 ## Stage F — post-audit fixes (seeded from the dissolved Phase 41, Beth's ruling D-10)
 
