@@ -163,9 +163,11 @@ Pattern Dive (`/charts`).
 Some paths change the merge path, not just the diff. Anything matching
 `.claude/hooks/review-gated-paths.txt` — `prisma/schema.prisma` and `prisma/migrations/`,
 `src/lib/auth.ts` / `auth-guard.ts` / `rate-limit.ts`, the skein and fabric calculators,
-`src/lib/queries/stats/`, and the R2 upload actions — merges **only from a fresh `/review`
-session, never by its builder** (hard rule 3). No hook enforces this; it is convention, which is
-exactly why it is a hard rule. Check the list before you branch, not after you push.
+`src/lib/queries/stats/`, and the R2 storage family (the upload and chart-file actions, the
+cover pipeline and its backfill, `r2.ts` — gated as a family, Beth's ruling D-22) — merges
+**only from a fresh `/review` session, never by its builder** (hard rule 3). No hook enforces
+this; it is convention, which is exactly why it is a hard rule. Check the list before you branch,
+not after you push.
 
 ## State management
 
