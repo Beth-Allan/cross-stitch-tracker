@@ -125,6 +125,29 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-08-20 · D-21 · the cover-shrinking button lives on Settings — ruled at the start of P16
+
+**What needed a ruling.** P16's done-when says Beth can start the conversion and see it finish
+without running a command, so the item needed a button — and hard rule 4 forbids inventing a
+screen. There was no reference to build from: `docs/design/screens/` is still empty, and DesignOS
+never drew a Settings screen (it only put the link in the nav). The Settings page itself has been
+a "coming soon" placeholder since the shell was built, reachable from the sidebar and the mobile
+menu but leading nowhere.
+
+**Surfaced to Beth** in-session as a decision, with the fact that mattered: whatever it looks
+like now, DS-1 sets the direction later, so this is a question of _where the control belongs_,
+not what it should look like. Options: a card on the Settings page · a self-hiding banner across
+the top of Pattern Dive · both.
+
+**Her ruling: the Settings page.** A one-off housekeeping job belongs out of the way of daily
+use, and it gives Settings its first real content.
+
+**What it changed.** `src/app/(dashboard)/settings/page.tsx` stopped being a placeholder and now
+renders one card (`CoverOptimizationCard`) built from the app's existing `Card`/`Button`
+primitives and semantic tokens — no new visual vocabulary, so DS-1 restyles it with everything
+else. It also orphaned `PlaceholderPage`, which is now a maintenance-ledger row rather than a
+deletion inside this diff, because removing it removes its test.
+
 ### 2026-08-19 · D-20 · P13 splits — the form-input half ships, the upload half waits — ruled at the start of P13
 
 **What needed a ruling.** P13's brief promised "one validation boundary", but the item had
