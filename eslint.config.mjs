@@ -28,6 +28,38 @@ const eslintConfig = defineConfig([
       "react-hooks/set-state-in-effect": "off",
     },
   },
+  // An `_` prefix means "deliberately unused" — the convention this codebase already
+  // writes (`_userId` documenting a future per-user lookup, `{ photoKey: _, ...rest }`
+  // omitting a key). Without these options the rule flags the convention as a mistake,
+  // and a rest-sibling omission has no other way to be written at all. Beth's ruling,
+  // 2026-08-20, with the `--max-warnings 0` flip.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
+    },
+  },
+  // Every image this app renders is a private R2 object fetched through a presigned URL
+  // that expires in an hour, so `next/image`'s optimizer cannot cache or transform it —
+  // the three components already using `next/image` all pass `unoptimized` for exactly
+  // that reason, which makes this rule ask for something the app cannot do. The real
+  // shrinking happens at upload (`processAndStoreImage`, P15) rather than at render.
+  // Beth's ruling, 2026-08-20; the standing "how should images load?" question is a
+  // design-track input (backlog), not a lint warning.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "@next/next/no-img-element": "off",
+    },
+  },
   // Project-specific guardrails — prevent patterns we've debugged
   {
     files: ["src/**/*.{ts,tsx}"],

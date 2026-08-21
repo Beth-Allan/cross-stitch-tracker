@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, within } from "@/__tests__/test-utils";
+import { render, screen } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { SuppliesTab } from "./supplies-tab";
 import type { ProjectDetailProps } from "./types";

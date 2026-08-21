@@ -69,7 +69,7 @@ describe("MultiSelectDropdown", () => {
   });
 
   it("applies active styling (selected border) when items selected", () => {
-    const { container } = render(
+    render(
       <MultiSelectDropdown label="Status" options={options} selected={["A"]} onToggle={vi.fn()} />,
     );
     const trigger = screen.getByRole("button", { name: /status/i });

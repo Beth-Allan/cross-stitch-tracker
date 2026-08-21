@@ -82,9 +82,7 @@ describe("EditableNumber", () => {
   });
 
   it("aria-label prop is rendered on both button and input", () => {
-    const { rerender } = render(
-      <EditableNumber value={7} onSave={vi.fn()} ariaLabel="Stitch count" />,
-    );
+    render(<EditableNumber value={7} onSave={vi.fn()} ariaLabel="Stitch count" />);
     // Button mode
     expect(screen.getByRole("button", { name: "Stitch count" })).toBeInTheDocument();
     // Switch to edit mode

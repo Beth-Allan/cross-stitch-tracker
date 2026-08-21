@@ -29,11 +29,16 @@ visible failure into an invisible one.
 - `Button render={<Link>}` is banned — use `LinkButton` (`no-restricted-syntax`)
 - importing `@/lib/auth` inside action files is banned — use `@/lib/auth-guard`
   (`no-restricted-imports`)
+- **a warning fails the step.** `npm run lint` is `eslint --max-warnings 0` since P14
+  (2026-08-20), so there is no longer a tier of findings that passes. The count reached zero
+  before the flip; **the only way to add a warning now is to fail the gate.**
 
-**Known gap:** eslint exits 0 on warnings, so **48 pre-existing warnings pass the gate**
-(measured 2026-08-20; the maintenance-ledger row logged 55 on 2026-08-16, and the burn-down since
-is the dead code P3 deleted plus the strays P9a and P9a-2 cleared as they passed). They are
-logged, not accepted — do not add to them, and **P14 closes this gap**.
+Two rule configurations carry their reasoning in `eslint.config.mjs` and are not re-litigated
+per session: an **`_` prefix means deliberately unused** (`_userId`, `{ photoKey: _, ...rest }` —
+a rest-sibling omission cannot be written any other way), and **`@next/next/no-img-element` is
+off**, because every image here is a presigned R2 URL that expires in an hour, which
+`next/image`'s optimizer cannot cache or transform — the shrinking happens at upload
+(`processAndStoreImage`), not at render. Both are Beth's rulings, 2026-08-20.
 
 ## What the gate does not check
 

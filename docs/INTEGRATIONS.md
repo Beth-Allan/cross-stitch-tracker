@@ -259,8 +259,8 @@ when the Preview environment was populated and verified.
     caching
   - Job env: `DATABASE_URL` is set to a dummy local Postgres string — the build needs the
     variable present, and no CI step reaches a real database
-  - Steps: `npm ci` → `npx prisma generate` → `npm run format:check` → `npm run lint` →
-    `npx tsc --noEmit` → `npm test` → `npm run build`
+  - Steps: `npm ci` → `npm run gate`. Since P14 (2026-08-20) CI invokes the gate script rather
+    than re-listing its steps, so CI and the `pre-push` hook cannot drift apart
   - Concurrency: cancels in-progress runs on the same ref
 - Dependabot (`.github/dependabot.yml`): weekly, Mondays, for both npm and github-actions. npm
   minor and patch bumps are grouped into one PR and major bumps are ignored for `next`, `prisma`,
@@ -272,7 +272,7 @@ when the Preview environment was populated and verified.
 **Git hooks (Husky):**
 
 - `pre-commit` — `npx lint-staged`
-- `pre-push` — `npm run gate`, the same six steps CI runs
+- `pre-push` — `npm run gate`, the identical invocation CI runs
 
 ## Progressive Web App
 

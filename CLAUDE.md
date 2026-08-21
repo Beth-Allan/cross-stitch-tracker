@@ -117,8 +117,11 @@ visible in the loaded copy. The always-true core:
 ## Quality gates
 
 - `npm run gate` = `prisma generate` → `format:check` → `lint` → `tsc --noEmit` → `test` →
-  `build` — exactly what CI runs (~2.5 min; the 2951-test suite itself is ~16s).
-  `prisma generate` runs first, always — `tsc` otherwise validates a stale client.
+  `build` — **the literal invocation CI runs** since P14 (~2.5 min; the 2951-test suite itself is
+  ~16s). `prisma generate` runs first, always — `tsc` otherwise validates a stale client.
+  **`lint` is `--max-warnings 0`:** there is no passing tier below "error", so a new warning is a
+  red gate. Two rule configs carry their reasoning in `eslint.config.mjs` — an `_` prefix means
+  deliberately unused, and `no-img-element` is off (presigned URLs cannot be optimized).
 - Git hooks are live: pre-commit runs `lint-staged`; pre-push runs the full gate. CI is a
   required check on main, enforced for admins too — a red gate cannot merge, and that is the
   design.

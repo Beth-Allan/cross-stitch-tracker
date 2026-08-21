@@ -18,7 +18,7 @@ never reformatted.
 
 ### Linter — ESLint 9 flat config
 
-`eslint.config.mjs` extends `eslint-config-next/core-web-vitals` and `.../typescript`. Three
+`eslint.config.mjs` extends `eslint-config-next/core-web-vitals` and `.../typescript`. Five
 project-specific decisions:
 
 - **`no-restricted-syntax`** — `<Button render={<Link>}>` is an error. Use `<LinkButton>`.
@@ -26,10 +26,16 @@ project-specific decisions:
   `@/lib/auth-guard`.
 - **`react-hooks/set-state-in-effect` is off** — dialog form reset via `useEffect` is a deliberate
   pattern here, not an oversight.
+- **`no-unused-vars` honours an `_` prefix** (and rest-sibling omissions) — `_userId` and
+  `{ photoKey: _, ...rest }` say "deliberately unused" on purpose; the second has no other spelling.
+- **`@next/next/no-img-element` is off** — every image is a presigned R2 URL that expires in an
+  hour, so `next/image`'s optimizer cannot cache or transform it (the three components that do use
+  `next/image` all pass `unoptimized`). Images are shrunk at upload, not at render.
 
 `globalIgnores` keeps `.next/`, `out/`, `build/`, `product-plan/`, `scripts/` and the tooling
-directories out of scope. **ESLint exits 0 on warnings**, so warnings pass the gate — the standing
-count and the `--max-warnings 0` question are a maintenance-ledger row, not something to re-derive.
+directories out of scope. **Warnings fail the gate:** `npm run lint` is `eslint --max-warnings 0`
+since P14 (2026-08-20), so there is no passing tier below "error" — the count was burned to zero
+first, and the flip is what keeps it there.
 
 ### TypeScript
 

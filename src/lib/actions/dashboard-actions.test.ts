@@ -1,13 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { createMockPrisma } from "@/__tests__/mocks";
-import type {
-  CurrentlyStitchingProject,
-  CollectionStats,
-  SpotlightProject,
-  MainDashboardData,
-  BuriedTreasure,
-  StartNextProject,
-} from "@/types/dashboard";
+import type { CurrentlyStitchingProject, BuriedTreasure } from "@/types/dashboard";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();

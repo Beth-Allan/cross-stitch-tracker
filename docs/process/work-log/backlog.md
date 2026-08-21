@@ -81,6 +81,19 @@ reaches. Nothing was dropped.
 filed against the screen each belongs to. Until then this is their only home — do not let step 8
 leave them behind.
 
+**Whole-app, any image-bearing screen** — no single redesign owns it:
+
+- **How should images load?** P14 turned `@next/next/no-img-element` off (2026-08-20, Beth's
+  ruling) because it asks for something this app cannot do: every image is a presigned R2 URL
+  expiring in an hour, so `next/image`'s optimizer cannot cache or transform it, and the three
+  components already on `next/image` all pass `unoptimized`. That silenced the warning, **not the
+  question** — the app renders 17 raw `<img>` tags across the gallery, dashboard, chart tabs and
+  the session modal, with no shared component, no consistent placeholder or failure state, and no
+  answer on sizing, `loading`/`decoding` defaults or layout-shift. The real shrinking happens at
+  upload (`processAndStoreImage`, P15; P16 backfills the library), which is the right layer — what
+  a design session owns is what the browser is asked to draw. _(from the 2026-08-16
+  maintenance-ledger row, which flagged this as a design-track question, not a lint opinion)_
+
 **Chart form + detail** — redesign #1 (D-07), design item DS-2 → build item D-2:
 
 - The supply stitch-total hint is visible only in Details mode — nothing warns, while actually

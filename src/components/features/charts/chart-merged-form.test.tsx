@@ -1333,7 +1333,7 @@ describe("ChartMergedForm", () => {
 
   it("supply mode uses conditional rendering (no Activity wrapper for supply content)", async () => {
     const user = userEvent.setup();
-    const { container } = render(<ChartMergedForm {...defaultFormProps} />);
+    render(<ChartMergedForm {...defaultFormProps} />);
 
     // In form mode, CalculatorCard should NOT be in the DOM at all
     // (conditional rendering means unmounted, not hidden)
@@ -1344,12 +1344,5 @@ describe("ChartMergedForm", () => {
 
     // Now in supply mode, CalculatorCard should be in the DOM and visible
     expect(screen.getByRole("group", { name: /skein calculator settings/i })).toBeVisible();
-
-    // Verify no Activity element wraps the supply content
-    // Activity renders as a hidden subtree -- with conditional rendering
-    // the supply section is simply absent when mode is "form"
-    const supplySection = container.querySelector("[data-supply-mode]");
-    // If we use a data attribute marker, or just verify the content mounts/unmounts
-    // The key assertion is above: calculator not in DOM when mode=form
   });
 });

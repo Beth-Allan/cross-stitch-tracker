@@ -245,7 +245,6 @@ function ChartRow({ chart }: { chart: GenreChart }) {
     >
       {chart.coverThumbnailUrl ? (
         <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={chart.coverThumbnailUrl}
             alt={chart.name}

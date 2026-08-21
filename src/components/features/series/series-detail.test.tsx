@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, within } from "@/__tests__/test-utils";
+import { render, screen } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { SeriesDetail } from "./series-detail";
 import { createMockSeriesWithStats, createMockSeriesChart } from "@/__tests__/mocks";
