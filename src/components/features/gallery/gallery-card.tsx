@@ -98,8 +98,6 @@ function UnstartedFooter({ card }: { card: GalleryCardData }) {
 }
 
 function FinishedFooter({ card }: { card: GalleryCardData }) {
-  const isFFO = card.status === "FFO";
-
   const dateLabel = card.ffoDate
     ? `FFO ${formatCalendarDate(card.ffoDate)}`
     : card.finishDate

@@ -14,7 +14,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, act } from "@/__tests__/test-utils";
+import { render, screen } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { SuppliesTab } from "./supplies-tab";
 import type { ProjectDetailProps } from "./types";
@@ -24,7 +24,6 @@ import {
   createMockProjectThread,
 } from "@/__tests__/mocks/factories";
 import type { ProjectThreadWithThread } from "@/types/supply";
-import { ServerActionAdapter } from "@/components/features/supply-table/server-action-adapter";
 
 // Spy on ServerActionAdapter constructor to count instantiations
 vi.mock("@/components/features/supply-table/server-action-adapter", async (importOriginal) => {
@@ -224,16 +223,6 @@ describe("SuppliesTab — adapter identity", () => {
     it("sort toggle re-render does not create a new ServerActionAdapter instance", async () => {
       const user = userEvent.setup();
 
-      // Count how many times ServerActionAdapter was constructed
-      let constructorCount = 0;
-      const OriginalServerActionAdapter = ServerActionAdapter;
-      const constructorTracker = vi
-        .spyOn(OriginalServerActionAdapter.prototype, "constructor" as never)
-        .mockImplementation(function (this: object, ...args: unknown[]) {
-          constructorCount++;
-          return Reflect.apply(OriginalServerActionAdapter.prototype.constructor, this, args);
-        });
-
       render(
         <SuppliesTab
           project={defaultProject}
@@ -241,12 +230,6 @@ describe("SuppliesTab — adapter identity", () => {
         />,
       );
 
-      // Reset count after initial render (adapter created once on mount — expected)
-      constructorTracker.mockRestore();
-
-      // Track any subsequent constructor calls by counting DOM add-row presence
-      // We verify the adapter isn't recreated by checking the add-row is still
-      // present and functioning after re-render (adapter reference unchanged)
       const addRowBefore = screen.getByTestId("supply-table-add-row");
 
       // Trigger a re-render by toggling sort
@@ -267,28 +250,10 @@ describe("SuppliesTab — adapter identity", () => {
     it("adapter is instantiated exactly once on initial render (not on re-renders)", async () => {
       const user = userEvent.setup();
 
-      // We count ServerActionAdapter instantiations by intercepting the constructor.
-      // A stable adapter (D-03 fix) should only be created once per component mount.
-      // If useCallback is missing and router is in the useMemo deps, the adapter
-      // is recreated on every re-render because router is a new object each time.
-      let constructCount = 0;
-      const OriginalClass = ServerActionAdapter;
-      const trackedClass = class extends OriginalClass {
-        constructor(...args: ConstructorParameters<typeof OriginalClass>) {
-          constructCount++;
-          super(...args);
-        }
-      };
-
-      // We can't easily replace the module-level import mid-test, so instead we
-      // observe the behavioral outcome: if the adapter was recreated, the add-row
-      // would lose state and search text would clear. We verify state persistence
-      // by checking that the add-row element is the same DOM node before and after.
-      //
-      // Note: the constructor count test above (same DOM node) is the primary
-      // behavioral verification. This test provides complementary coverage.
-      void trackedClass; // satisfy linter
-
+      // A stable adapter (D-03 fix) is created once per mount. If useCallback is
+      // missing and router sits in the useMemo deps, the adapter is rebuilt on every
+      // re-render — which remounts SupplyTable and loses the add-row's state. We
+      // observe that outcome: the add-row must stay the same DOM node throughout.
       render(
         <SuppliesTab
           project={defaultProject}

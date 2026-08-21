@@ -1,10 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, within, fireEvent, waitFor, act } from "@/__tests__/test-utils";
+import { render, screen, fireEvent, waitFor, act } from "@/__tests__/test-utils";
 import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 import { SupplyTable } from "./supply-table";
-import { LocalStateAdapter } from "./local-state-adapter";
-import type { SupplyRow, SupplySearchResult, SupplyTableAdapter } from "./types";
-import { DEFAULT_CALC_PARAMS } from "./types";
+import type { SupplyRow, SupplyTableAdapter } from "./types";
 
 const { updateOutcomes } = vi.hoisted(() => ({ updateOutcomes: [] as unknown[] }));
 

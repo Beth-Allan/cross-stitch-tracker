@@ -304,3 +304,46 @@ a preview errors on a PR that touched `prisma/`.
 log in, confirm a chart cover renders, upload a new cover, and confirm the new object appears in the
 scratch bucket while the real bucket is unchanged. State the PR number and which image in the work
 log.
+
+## Writing to `work-log.md`: an underscore in backticks can silently damage the paragraph next to yours
+
+**Tagged: every session** — this file is edited at the end of all of them.
+
+`work-log.md`'s pop-notes are written as one long italic paragraph, `_(…)_`, and its table cells
+are single enormous lines. Prettier reflows both. If the text you add inside one of those italic
+blocks contains an underscore inside a code span — writing the "deliberately unused" convention as
+a backticked underscore is the way to hit this — prettier's emphasis parser mis-reads where the
+italics end, re-serializes the whole run, and **collapses the spaces around code spans in the
+neighbouring text, including text you did not write.** P14 (2026-08-20) shipped that damage into a
+commit: a pre-existing sentence in the P9a-2 pop-note turned into ``no`/review`row behind it``.
+The gate does not catch it — the file is still valid markdown and prettier considers it formatted,
+so `format:check` is green on the mangled version.
+
+**What to do.** Say "underscore" in words inside those italic paragraphs rather than putting one in
+backticks. Then, after running prettier on `work-log.md`, check that you only changed your own
+text:
+
+```
+comm -23 <(git show origin/main:docs/process/work-log.md | grep -o '[a-z]`[a-zA-Z/][^`]*`' | sort -u) \
+         <(grep -o '[a-z]`[a-zA-Z/][^`]*`' docs/process/work-log.md | sort -u)
+```
+
+Empty output means nothing pre-existing was collapsed. If it is not empty, `git checkout
+origin/main -- docs/process/work-log.md` and re-apply your edit with the underscore spelled out —
+that is what P14 did, and the damage never reached main.
+
+**Done when:** never, while the log keeps its one-line-per-cell and italic-pop-note shape. This is
+a standing trap, not a pending fix.
+
+**The sibling trap (found 2026-08-21, entered main with P9a's merge, #112):** a missing newline between
+two table rows — the P10 row had been concatenated onto the end of the P9c row on one physical line —
+makes prettier read one eleven-cell row and **widen the delimiter row to match**, and GitHub stops
+rendering the whole table because the delimiter no longer matches the header. Prettier then
+regenerates the wide delimiter on every run, so fixing the delimiter row does nothing: find the row
+with more cells than the header (count pipes per line, ignoring escaped ones) and split it. Quick
+check after any edit — every delimiter row has the same cell count as its header:
+
+```
+awk '/^\| -+ \|/ { h=prev; gsub(/\\\|/,"",h); gsub(/[^|]/,"",h); d=$0; gsub(/[^|]/,"",d);
+  if (length(h)!=length(d)) print "MISMATCH at", NR } { prev=$0 }' docs/process/work-log.md
+```

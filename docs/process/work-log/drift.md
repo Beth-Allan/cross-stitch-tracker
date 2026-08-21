@@ -125,6 +125,57 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-08-21 · D-22 · the review gate covers the storage family, not a list of filenames — ruled during P16
+
+**What needed a ruling.** `.claude/hooks/review-gated-paths.txt` named the R2 core one filename at
+a time. P16 added two files doing the same work — `cover-optimization.ts` re-points a chart's row
+at a pair of storage keys, `cover-backfill-actions.ts` issues the delete that supersedes the old
+ones — and neither matched a line. P16 itself was gated anyway (it edits `upload-actions.ts` and
+`r2.ts`); the gap was the **next** change, one confined to the two new files, which would have
+merged on green with no fresh `/review` behind it even though it can delete a picture with no copy
+anywhere. That file's own header predicted this: "gate growing families by directory, not
+filename — a per-filename line goes stale the day a sibling is added." Found by P16's layer-1
+review; adding a path is a gate-config change, so it is Beth's ruling, never a quiet edit (hard
+rule 6).
+
+**Surfaced to Beth** in-session as a decision: cover the whole photo family · add just the two new
+names · leave the list alone.
+
+**Her ruling: cover the family.** Anything that writes to or deletes from photo storage needs the
+second review, so a file written later is covered the day it exists rather than the day someone
+remembers.
+
+**What it changed.** The three per-filename R2 lines became a family block with
+`^src/lib/actions/cover-[a-z-]+\.ts$` beside them, and `session-protocol.md` §5 and CLAUDE.md's
+hard rule 3 were reworded in the same PR to say "the R2 storage family". **One honest gap
+remains:** `cover-` is a name prefix, not a directory, because these files sit beside ungated
+action files — a new sibling called something else would still slip through. The durable form is a
+`src/lib/actions/storage/` directory, which is a move of gated files and therefore its own item;
+it is a maintenance-ledger row rather than something P16 rides along.
+
+### 2026-08-20 · D-21 · the cover-shrinking button lives on Settings — ruled at the start of P16
+
+**What needed a ruling.** P16's done-when says Beth can start the conversion and see it finish
+without running a command, so the item needed a button — and hard rule 4 forbids inventing a
+screen. There was no reference to build from: `docs/design/screens/` is still empty, and DesignOS
+never drew a Settings screen (it only put the link in the nav). The Settings page itself has been
+a "coming soon" placeholder since the shell was built, reachable from the sidebar and the mobile
+menu but leading nowhere.
+
+**Surfaced to Beth** in-session as a decision, with the fact that mattered: whatever it looks
+like now, DS-1 sets the direction later, so this is a question of _where the control belongs_,
+not what it should look like. Options: a card on the Settings page · a self-hiding banner across
+the top of Pattern Dive · both.
+
+**Her ruling: the Settings page.** A one-off housekeeping job belongs out of the way of daily
+use, and it gives Settings its first real content.
+
+**What it changed.** `src/app/(dashboard)/settings/page.tsx` stopped being a placeholder and now
+renders one card (`CoverOptimizationCard`) built from the app's existing `Card`/`Button`
+primitives and semantic tokens — no new visual vocabulary, so DS-1 restyles it with everything
+else. It also orphaned `PlaceholderPage`, which is now a maintenance-ledger row rather than a
+deletion inside this diff, because removing it removes its test.
+
 ### 2026-08-19 · D-20 · P13 splits — the form-input half ships, the upload half waits — ruled at the start of P13
 
 **What needed a ruling.** P13's brief promised "one validation boundary", but the item had

@@ -8,7 +8,7 @@ import { prisma } from "@/lib/db";
 import { EMPTY_PROJECT_SUPPLIES, summariseProjectSupplies } from "@/lib/queries/project-supplies";
 import { firstValidationMessage } from "@/lib/utils/action-errors";
 import { discardStoredObjects } from "@/lib/r2";
-import { processAndStoreImage } from "@/lib/actions/upload-actions";
+import { COVER_WARNING, optimizeCoverImage } from "@/lib/actions/cover-optimization";
 import { chartFormSchema, batchSupplySchema } from "@/lib/validations/chart";
 import { parseStorageKey } from "@/lib/validations/upload";
 import type { BatchSupplyInput, ChartFormInput, ChartFormValidated } from "@/lib/validations/chart";
@@ -109,56 +109,6 @@ async function createChartAndProject(
   return result;
 }
 
-const COVER_WARNING = "Cover photo saved, but a smaller copy could not be made";
-
-/**
- * Puts a newly uploaded cover through the same pipeline session photos use — a
- * 1200px WebP plus a 400px thumbnail — and points the chart at both. Reports which
- * keys the row now names; `null` means the row still names what it named before.
- *
- * `processAndStoreImage` signals failure by *returning*, not by throwing, so a
- * caller that only wrapped it in `try` would read every failure as a success and
- * go on to delete the objects the chart is still displaying.
- */
-async function optimizeCoverImage(
-  chartId: string,
-  rawKey: string,
-): Promise<{ coverKey: string | null; thumbnailKey: string | null; warning?: string }> {
-  let result;
-  try {
-    result = await processAndStoreImage(chartId, rawKey, "covers");
-  } catch (err) {
-    console.error("Cover optimization failed (chart saved with the raw upload):", err);
-    return { coverKey: null, thumbnailKey: null, warning: COVER_WARNING };
-  }
-
-  if (!result.success) {
-    console.error("Cover optimization failed (chart saved with the raw upload):", result.error);
-    return { coverKey: null, thumbnailKey: null, warning: COVER_WARNING };
-  }
-
-  // The row names the derivatives before anything is deleted — the ordering that
-  // keeps a chart from ever pointing at an object that is already gone.
-  try {
-    await prisma.chart.update({
-      where: { id: chartId },
-      data: { coverImageUrl: result.optimizedKey, coverThumbnailUrl: result.thumbnailKey },
-    });
-  } catch (err) {
-    // The chart itself is already committed by now, so this cannot fail the save —
-    // the caller would have the user save a second copy of a chart that exists.
-    console.error("Cover optimization could not be recorded (chart kept the raw upload):", err);
-    // These two are named here and nowhere else. Dropping them now is the only
-    // chance anything ever has to name them again.
-    await discardStoredObjects(
-      [result.optimizedKey, result.thumbnailKey],
-      `chart ${chartId} unrecorded cover`,
-    );
-    return { coverKey: null, thumbnailKey: null, warning: COVER_WARNING };
-  }
-  return { coverKey: result.optimizedKey, thumbnailKey: result.thumbnailKey };
-}
-
 /**
  * Whether a cover key the *form* submitted is a raw upload this chart may delete.
  *
@@ -233,7 +183,7 @@ async function applyCoverOptimization(
   // Either the row now names the optimized pair, or optimization did not happen —
   // no cover, or it failed — and the row still names exactly what the form sent.
   const stillNamed = new Set(
-    (optimized?.coverKey
+    (optimized?.ok
       ? [optimized.coverKey, optimized.thumbnailKey]
       : [submitted.coverImageUrl, submitted.coverThumbnailUrl]
     ).filter((key): key is string => Boolean(key)),
@@ -247,7 +197,7 @@ async function applyCoverOptimization(
     `chart ${chartId}`,
   );
 
-  return optimized?.warning;
+  return optimized && !optimized.ok ? COVER_WARNING : undefined;
 }
 
 export async function createChart(formData: ChartFormInput) {

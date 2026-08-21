@@ -51,7 +51,7 @@ Key routes:
 - `/sessions` — Session log
 - `/stats` — Statistics (overview + activity + records)
 - `/shopping` — Shopping list
-- `/settings` — `PlaceholderPage` stub; the only route without an implementation
+- `/settings` — Settings; today one card, the one-off run that shrinks the covers saved before cover optimization existed (`CoverOptimizationCard`; placed here by Beth's ruling D-21)
 
 Twelve routes carry their own `loading.tsx` skeleton alongside the group-level one.
 
@@ -65,7 +65,7 @@ Twelve routes carry their own `loading.tsx` skeleton alongside the group-level o
 
 ### Layer 3: Feature Components (`src/components/features/`)
 
-Fifteen domain-scoped directories. Most are `"use client"` for interactivity.
+Sixteen domain-scoped directories. Most are `"use client"` for interactivity.
 
 - `charts/` — Chart form, Pattern Dive tab contents (what's next, series, fabric requirements, storage view), status controls, badges
 - `charts/form-primitives/` — Reusable form sub-components (upload, calculator, genre picker)
@@ -78,6 +78,7 @@ Fifteen domain-scoped directories. Most are `"use client"` for interactivity.
 - `supply-table/` — Reusable tabular supply editor (threads, beads, specialty); `index.ts` is its declared public API
 - `shopping/` — Shopping list with aggregation, project filtering
 - `shared/` — Components used by more than one feature directory
+- `settings/` — The cover-shrinking card, the Settings page's only content today
 - `designers/`, `fabric/`, `genres/`, `sessions/`, `storage/`, `apps/`
 
 Also directly under `src/components/`: `hooks/` (component-level hooks owned by no single feature), `theme-provider.tsx`, `placeholder-page.tsx`.
@@ -94,13 +95,15 @@ Shadcn/Base UI component wrappers. No business logic. Key files:
 
 ### Layer 5: Server Actions (`src/lib/actions/`)
 
-Eighteen files, each starting with `"use server"`, one per domain. Pattern: `requireAuth()` → Zod validation → Prisma mutation → `revalidatePath()` / `revalidateTag("stats", { expire: 0 })` — the Next 16 two-argument form.
+Nineteen files, one per domain. All but one start with `"use server"` — `cover-optimization.ts` deliberately does not, because its one export re-points a chart's row at keys it is handed and belongs to its two callers, not to a POST endpoint. Pattern: `requireAuth()` → Zod validation → Prisma mutation → `revalidatePath()` / `revalidateTag("stats", { expire: 0 })` — the Next 16 two-argument form.
 
 Key files:
 
 - `chart-actions.ts` — Chart CRUD + gallery/detail queries
 - `series-actions.ts` — Series CRUD plus `getSeriesWithStats()` and `getSeriesDetail()`
 - `upload-actions.ts` — Presigned URL generation, image processing, R2 delete
+- `cover-optimization.ts` — `optimizeCoverImage`, the cover pipeline step shared by the save path and the backfill (not `"use server"`, see above)
+- `cover-backfill-actions.ts` — The one-off conversion of covers saved before the pipeline existed: the work list derived from the rows, one chart per call, run from Settings
 - `session-actions.ts` — StitchSession CRUD, progress recalculation
 - `supply-actions.ts` — Thread/bead/specialty supply mutations
 - `dashboard-actions.ts` — Dashboard data aggregation
@@ -131,7 +134,7 @@ Caching: `unstable_cache` keyed per user, tagged `"stats"`, invalidated by `reva
 ### Layer 8: Object Storage (R2)
 
 - `src/lib/r2.ts` — Lazy S3Client singleton pointing to Cloudflare R2
-- Accessed exclusively through `upload-actions.ts` and `chart-file-actions.ts`
+- Accessed through the storage family — `upload-actions.ts`, `chart-file-actions.ts`, `cover-optimization.ts`, `cover-backfill-actions.ts` — which is review-gated as a family (Beth's ruling D-22); `chart-actions.ts` additionally calls its `discardStoredObjects` to drop the objects a deleted or re-covered chart has stopped naming
 - DB stores R2 object keys (not URLs); presigned URLs generated at render time via `getPresignedImageUrls()`
 
 ### Layer 9: Auth

@@ -82,6 +82,19 @@ deliberately absent.
     fails, the raw image is preserved and used as-is — the row keeps naming it, so nothing is
     deleted; a chart save reports it to the user as a warning, a session logs and moves on.
     Objects under `files/` (PDFs and other chart files) are stored as uploaded and never converted
+  - **The pipeline step itself is `src/lib/actions/cover-optimization.ts`** (item P16,
+    2026-08-20), deliberately without a `"use server"` directive: the save path and the backfill
+    below run the same step, and exporting it from an action file would publish "re-point this
+    chart's row at these keys" as an endpoint
+  - **Covers saved before P15 are converted by a one-off backfill** (item P16), started from the
+    Settings page and run **one chart per call** — hundreds of downloads plus two `sharp` encodes
+    each cannot finish inside one request. It needs no job table: the work list is derived from
+    the rows (`coverNeedsOptimizing` in `src/lib/utils/cover-keys.ts` — a cover is done when
+    **both** its keys sit in the chart's own namespace, which only `processAndStoreImage`
+    produces), so stopping and starting again resumes by asking the database rather than by
+    remembering. A cover whose object is missing answers `Original image not found in storage`
+    (`fetchImageBuffer` tells a 404 from a broken bucket via `isNotFound`) and the row is left
+    exactly as it was, so a chart with a lost picture is reported rather than blanked
   - The raw key handed to `processAndStoreImage` must be **the key the entity's own row already
     records** (`Chart.coverImageUrl`, `StitchSession.photoKey`), not merely a well-formed key in
     the right namespace: every export of a `"use server"` file is a live POST endpoint, so
@@ -115,11 +128,13 @@ deliberately absent.
     - **Abandoned pre-save uploads are not cleaned up, by decision** (Beth, 2026-08-17). The
       chart form uploads before Save under `covers/unsaved/…` and `files/unsaved/…`; closing the
       form without saving leaves the object with nothing referencing it, and no sweep or
-      lifecycle rule looks for it. A bucket-side rule on those prefixes is **still not safe to
-      switch on** after item P15: new covers now move to `covers/<chartId>/…` when the chart is
-      saved, but covers saved before P15 keep their `unsaved/` key and are live, and chart
-      **files** were never moved at all. Item P16 (converting the covers already in the library)
-      is the remaining pre-condition for the covers half — see the maintenance-ledger row
+      lifecycle rule looks for it. A bucket-side rule on those prefixes was **not safe to switch
+      on** after item P15 alone: new covers move to `covers/<chartId>/…` when the chart is saved,
+      but covers saved before P15 kept their `unsaved/` key and were live. Item P16 built the
+      conversion that moves the last of them off, and Beth ran it on production on 2026-08-21 — it
+      finished with nothing left alone, so **the covers half of the rule is now safe** (the ledger
+      row records the run). Chart **files** under `files/unsaved/…` were never moved by anything
+      and still need their own answer
   - Degradation when R2 is not configured: `src/lib/r2.ts` **throws** on a missing credential.
     The upload and download actions catch that specific error and return
     `{ success: false, error: "File storage is not configured…" }`, so uploads and downloads are
@@ -259,8 +274,8 @@ when the Preview environment was populated and verified.
     caching
   - Job env: `DATABASE_URL` is set to a dummy local Postgres string — the build needs the
     variable present, and no CI step reaches a real database
-  - Steps: `npm ci` → `npx prisma generate` → `npm run format:check` → `npm run lint` →
-    `npx tsc --noEmit` → `npm test` → `npm run build`
+  - Steps: `npm ci` → `npm run gate`. Since P14 (2026-08-20) CI invokes the gate script rather
+    than re-listing its steps, so CI and the `pre-push` hook cannot drift apart
   - Concurrency: cancels in-progress runs on the same ref
 - Dependabot (`.github/dependabot.yml`): weekly, Mondays, for both npm and github-actions. npm
   minor and patch bumps are grouped into one PR and major bumps are ignored for `next`, `prisma`,
@@ -272,7 +287,7 @@ when the Preview environment was populated and verified.
 **Git hooks (Husky):**
 
 - `pre-commit` — `npx lint-staged`
-- `pre-push` — `npm run gate`, the same six steps CI runs
+- `pre-push` — `npm run gate`, the identical invocation CI runs
 
 ## Progressive Web App
 

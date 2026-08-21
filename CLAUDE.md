@@ -100,7 +100,7 @@ visible in the loaded copy. The always-true core:
 2. **TDD for app behavior: failing test first, always.** Never weaken, skip, or delete a test
    to get green — test removals need Beth's approval, on the record.
 3. **Sensitive cores are review-gated** — schema + migrations, auth/session/rate-limit, the
-   skein and fabric calculators, the stats query/cache layer, and the R2 upload actions merge
+   skein and fabric calculators, the stats query/cache layer, and the R2 storage family merge
    only from a fresh `/review` session, never by their builder (paths:
    `.claude/hooks/review-gated-paths.txt`).
 4. **Design canon is the spec — never build UI from scratch.** Canon in `docs/design/`;
@@ -117,8 +117,12 @@ visible in the loaded copy. The always-true core:
 ## Quality gates
 
 - `npm run gate` = `prisma generate` → `format:check` → `lint` → `tsc --noEmit` → `test` →
-  `build` — exactly what CI runs (~2.5 min; the 2951-test suite itself is ~16s).
-  `prisma generate` runs first, always — `tsc` otherwise validates a stale client.
+  `build` — **the literal invocation CI runs** since P14 (~2.5 min; the 2951-test suite itself is
+  ~16s). `prisma generate` runs first, always — `tsc` otherwise validates a stale client.
+  **`lint` is `--max-warnings 0`:** there is no passing tier below "error", so a new warning is a
+  red gate (at pre-push and CI — `lint-staged` still lets a commit through). Two rule configs
+  carry their reasoning in `eslint.config.mjs` — an `_` prefix means deliberately unused, and
+  `no-img-element` is off (presigned and `blob:` URLs cannot be optimized).
 - Git hooks are live: pre-commit runs `lint-staged`; pre-push runs the full gate. CI is a
   required check on main, enforced for admins too — a red gate cannot merge, and that is the
   design.

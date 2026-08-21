@@ -274,7 +274,7 @@ describe("FocalPointEditor", () => {
     });
 
     it("action bar does NOT have class 'absolute'", () => {
-      const { container } = render(<FocalPointEditor {...defaultProps} />);
+      render(<FocalPointEditor {...defaultProps} />);
       fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
       const actionBar = screen.getByRole("button", { name: /save/i }).closest("div.border-t");
       expect(actionBar).toBeTruthy();
@@ -282,7 +282,7 @@ describe("FocalPointEditor", () => {
     });
 
     it("action bar has border-t class for visual treatment", () => {
-      const { container } = render(<FocalPointEditor {...defaultProps} />);
+      render(<FocalPointEditor {...defaultProps} />);
       fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
       const actionBar = screen.getByRole("button", { name: /save/i }).closest("div.border-t");
       expect(actionBar).toBeTruthy();

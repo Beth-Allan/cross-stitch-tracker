@@ -7,7 +7,7 @@ import sharp from "sharp";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
-import { getReadTarget, getWriteTarget } from "@/lib/r2";
+import { getReadTarget, getWriteTarget, isNotFound } from "@/lib/r2";
 import { firstValidationMessage } from "@/lib/utils/action-errors";
 import {
   uploadRequestSchema,
@@ -54,7 +54,18 @@ async function fetchImageBuffer(
     Bucket: bucket,
     Key: key,
   });
-  const response = await client.send(getCommand);
+
+  let response;
+  try {
+    response = await client.send(getCommand);
+  } catch (error) {
+    // Only a miss is reported as a missing object. Anything else — denied
+    // credentials, an unreachable bucket — is rethrown into this function's own
+    // caller, which reports it as a generic failure: calling it "not found" would
+    // tell the cover backfill to name a chart whose picture is fine.
+    if (!isNotFound(error)) throw error;
+    return { success: false, error: "Original image not found in storage" };
+  }
 
   if (!response.Body) {
     return { success: false, error: "Original image not found in storage" };

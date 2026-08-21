@@ -496,6 +496,24 @@ half is P13 and merged the same day; the upload half is **P13b** below.
   safe — and, in the same row, that the deletion sliver P15's `/review` found (a crafted save
   naming another chart's pre-P15 `covers/unsaved/…` cover) closes with it; gate green; fresh
   `/review` before merge.
+- **Met, 2026-08-20, with one clause deliberately conditional.** Every clause is built and
+  test-first (38 new tests, suite 2951 → 2989): the conversion runs one chart per call from a
+  Settings card, the row names the derivatives before either old object is deleted (asserted by
+  call order, not by inspection), a missing object leaves the row untouched and comes back named,
+  and the run is resumable because the work list is a question about the rows rather than
+  remembered progress. **The conditional clause is the ledger pre-condition:** built is not run,
+  so the row says the `covers/unsaved/` rule and the deletion sliver close the moment Beth's run
+  reports nothing left — writing "now safe" before the covers have actually moved would be the
+  one sentence in this item that is not true. Trap ① answered with no job table; ③ answered on the
+  row (both keys in the chart's own namespace) rather than on the `opt-` spelling, and the
+  assumption that makes that sound — `CoverImageUpload` is handed no chart id — is now a ledger
+  row instead of an implicit dependency. Trap ⑥ is the preview run, which doubles as Beth's
+  layer-2 look: the preview reads the real bucket, writes to scratch and holds a Neon **copy**, so
+  a full rehearsal there cannot touch a real object or a real row.
+- **The conditional clause closed 2026-08-21.** The delta re-review passed, Beth ran the rehearsal on the
+  preview and then the real thing on production the same day, and it finished with nothing left alone —
+  every cover is now an optimized derivative, and the ledger row says the `covers/unsaved/` half of the
+  lifecycle rule is safe and the deletion sliver is closed. Merged as PR #119.
 
 ## Stage F — post-audit fixes (seeded from the dissolved Phase 41, Beth's ruling D-10)
 

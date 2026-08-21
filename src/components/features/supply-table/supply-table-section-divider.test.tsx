@@ -22,9 +22,7 @@ function renderDivider(props: { icon?: typeof MockIcon; label?: string; count: n
 
 describe("SupplyTableSectionDivider", () => {
   it("renders null when count is 0 (hidden when section is empty)", () => {
-    const { container } = renderDivider({ count: 0 });
-    const rows = container.querySelectorAll("tr");
-    // Only the implicit tbody tr, no section divider tr content
+    renderDivider({ count: 0 });
     expect(screen.queryByText("Thread")).not.toBeInTheDocument();
   });
 

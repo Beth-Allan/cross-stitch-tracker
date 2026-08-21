@@ -101,7 +101,14 @@ export function getWriteTarget(): R2Target {
   return { client: getScratchClient(), bucket: scratch };
 }
 
-function isNotFound(error: unknown): boolean {
+/**
+ * Whether an R2 error means the object is not there, as opposed to a denied
+ * credential or an unreachable bucket. Exported because a caller that reads an
+ * object has to tell "gone" from "broken" — the cover backfill reports a chart
+ * whose picture has vanished and leaves the row alone, which it can only do if
+ * the two answers are distinguishable.
+ */
+export function isNotFound(error: unknown): boolean {
   if (typeof error !== "object" || error === null) return false;
   const { name, $metadata } = error as { name?: string; $metadata?: { httpStatusCode?: number } };
   return name === "NotFound" || name === "NoSuchKey" || $metadata?.httpStatusCode === 404;

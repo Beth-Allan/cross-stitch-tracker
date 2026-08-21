@@ -157,7 +157,11 @@ The cores:
   that bounds the rate-limiter key (Beth's ruling, 2026-08-17)
 - `src/lib/utils/skein-calculator.ts`, `src/lib/utils/fabric-calculator.ts` — the math
 - `src/lib/queries/stats/**` — the `unstable_cache` + `revalidateTag("stats")` trap (history: 999.41, 999.42)
-- `src/lib/actions/upload-actions.ts`, `src/lib/actions/chart-file-actions.ts`, `src/lib/r2.ts` — R2 orphan-leak history
+- `src/lib/actions/upload-actions.ts`, `src/lib/actions/chart-file-actions.ts`,
+  `src/lib/actions/cover-*.ts`, `src/lib/r2.ts` — the R2 storage family: uploads (orphan-leak
+  history), the cover pipeline and its backfill, and the client module they all call. Gated as a
+  **family**, not one filename at a time (Beth's ruling **D-22**, 2026-08-21) — P16 added two
+  siblings that arrived ungated, which is the staleness the path file's own header warns about
 
 Mapped to regexes in `.claude/hooks/review-gated-paths.txt` — keep the two in step; changing
 either is a gate-config change (drift, Beth's ruling on the record). No `guard-merge` enforces

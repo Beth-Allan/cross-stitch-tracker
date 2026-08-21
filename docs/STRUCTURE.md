@@ -113,7 +113,7 @@ src/
 │   │   │                      #   each: page.tsx, [id]/page.tsx, loading.tsx
 │   │   ├── supplies/          # page.tsx, brands/page.tsx, loading.tsx
 │   │   ├── sessions/, shopping/   # page.tsx, loading.tsx
-│   │   ├── settings/          # page.tsx (placeholder — nothing to load)
+│   │   ├── settings/          # page.tsx — the cover-shrinking card (no loading.tsx yet)
 │   │   ├── stats/             # page.tsx, search-params.ts, loading.tsx
 │   │   ├── layout.tsx         # Session redirect + AppShell (proxy.ts gates first)
 │   │   ├── error.tsx, loading.tsx, not-found.tsx
@@ -126,7 +126,7 @@ src/
 │   └── favicon.ico
 │
 ├── components/
-│   ├── features/              # 15 domain-scoped feature directories
+│   ├── features/              # 16 domain-scoped feature directories
 │   │   ├── charts/            # Chart form, Pattern Dive tab contents, badges, status
 │   │   │   ├── form-primitives/  # Reusable form sub-components
 │   │   │   └── project-detail/   # Multi-tab detail view, hero, file list, focal point
@@ -138,18 +138,19 @@ src/
 │   │   ├── supply-table/      # Reusable supply editor; index.ts is its public API
 │   │   ├── shopping/          # Shopping list
 │   │   ├── shared/            # Components used by more than one feature directory
+│   │   ├── settings/          # The cover-shrinking card
 │   │   ├── designers/, fabric/, genres/, sessions/, storage/, apps/
 │   ├── hooks/                 # Component-level hooks owned by no single feature
 │   ├── shell/                 # App shell (sidebar, topbar, nav, user menu, theme toggle)
 │   ├── ui/                    # Shadcn/Base UI primitives (no business logic)
 │   ├── theme-provider.tsx
-│   └── placeholder-page.tsx   # Stub used by routes not yet built
+│   └── placeholder-page.tsx   # Stub for routes not yet built; no route uses it since Settings got content (ledger: its removal is Beth's call)
 │
 ├── generated/
 │   └── prisma/                # Auto-generated Prisma client (never edit)
 │
 ├── lib/
-│   ├── actions/               # Server actions — 18 files, one per domain
+│   ├── actions/               # Server actions — 19 files, one per domain (cover-optimization.ts is the one without "use server")
 │   ├── queries/
 │   │   └── stats/             # 19 query files + index.ts barrel + utils.ts helpers
 │   ├── utils/                 # Pure utility functions

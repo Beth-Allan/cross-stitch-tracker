@@ -1,4 +1,4 @@
-import { render, screen } from "@/__tests__/test-utils";
+import { render } from "@/__tests__/test-utils";
 import { describe, expect, it } from "vitest";
 import { CoverPlaceholder } from "./cover-placeholder";
 import type { ProjectStatus } from "@/generated/prisma/client";
