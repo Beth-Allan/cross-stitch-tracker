@@ -130,11 +130,11 @@ deliberately absent.
       form without saving leaves the object with nothing referencing it, and no sweep or
       lifecycle rule looks for it. A bucket-side rule on those prefixes was **not safe to switch
       on** after item P15 alone: new covers move to `covers/<chartId>/…` when the chart is saved,
-      but covers saved before P15 kept their `unsaved/` key and were live. Item P16 (2026-08-20)
-      built the conversion that moves the last of them off, so **the covers half becomes safe the
-      moment Beth's run reports nothing left** — built is not run, and the ledger row carries that
-      distinction. Chart **files** under `files/unsaved/…` were never moved by anything and still
-      need their own answer
+      but covers saved before P15 kept their `unsaved/` key and were live. Item P16 built the
+      conversion that moves the last of them off, and Beth ran it on production on 2026-08-21 — it
+      finished with nothing left alone, so **the covers half of the rule is now safe** (the ledger
+      row records the run). Chart **files** under `files/unsaved/…` were never moved by anything
+      and still need their own answer
   - Degradation when R2 is not configured: `src/lib/r2.ts` **throws** on a missing credential.
     The upload and download actions catch that specific error and return
     `{ success: false, error: "File storage is not configured…" }`, so uploads and downloads are
