@@ -1,6 +1,6 @@
 ---
 name: review
-description: The review gate for a built item that touched a sensitive core — schema and migrations, auth/session/rate-limit, the skein and fabric calculators, the stats cache layer, the R2 upload actions. Use when a work-log item sits at "built, awaiting review" or Beth asks for the review of a finished item. Never for work built in this same session.
+description: The review gate for a built item that touched a sensitive core — schema and migrations, auth/session/rate-limit, the skein and fabric calculators, the stats cache layer, the R2 storage family (uploads, chart files, the cover pipeline and its backfill, r2.ts). Use when a work-log item sits at "built, awaiting review" or Beth asks for the review of a finished item. Never for work built in this same session.
 ---
 
 # /review — the review gate
