@@ -91,6 +91,21 @@ describe("CoverOptimizationCard", () => {
     expect(screen.getByText(/Winter Robin/)).toBeInTheDocument();
   });
 
+  it("does not count a chart that turned out to be done already as one it shrank", async () => {
+    const user = userEvent.setup();
+    mockOptimizeExistingCover
+      .mockResolvedValueOnce({ success: true, status: "converted" })
+      .mockResolvedValueOnce({ success: true, status: "skipped" })
+      .mockResolvedValueOnce({ success: true, status: "converted" });
+    render(<CoverOptimizationCard charts={THREE_CHARTS} />);
+
+    await user.click(screen.getByRole("button", { name: /shrink/i }));
+
+    expect(await screen.findByText(/finished/i)).toBeInTheDocument();
+    expect(screen.getByText(/2 shrunk/i)).toBeInTheDocument();
+    expect(screen.getByText(/1 was already done/i)).toBeInTheDocument();
+  });
+
   it("stops working the moment the card goes away, instead of running on unseen", async () => {
     const user = userEvent.setup();
     let release: (value: { success: true; status: "converted" }) => void = () => {};

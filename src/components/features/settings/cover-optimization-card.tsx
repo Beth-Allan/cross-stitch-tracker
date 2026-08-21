@@ -29,6 +29,7 @@ export function CoverOptimizationCard({ charts }: CoverOptimizationCardProps) {
   const [total, setTotal] = useState(0);
   const [processed, setProcessed] = useState(0);
   const [shrunk, setShrunk] = useState(0);
+  const [alreadyDone, setAlreadyDone] = useState(0);
   const [leftAlone, setLeftAlone] = useState<LeftAlone[] | null>(null);
 
   // A run is a loop of awaited calls, not one request, so leaving the page has to
@@ -49,18 +50,26 @@ export function CoverOptimizationCard({ charts }: CoverOptimizationCardProps) {
     setTotal(work.length);
     setProcessed(0);
     setShrunk(0);
+    setAlreadyDone(0);
     setLeftAlone(null);
 
     const failures: LeftAlone[] = [];
-    let succeeded = 0;
+    let converted = 0;
+    let skipped = 0;
 
     for (const [index, chart] of work.entries()) {
       if (abandoned.current) return;
       try {
         const result = await optimizeExistingCover(chart.id);
-        if (result.success) {
-          succeeded += 1;
-          setShrunk(succeeded);
+        if (result.success && result.status === "converted") {
+          converted += 1;
+          setShrunk(converted);
+        } else if (result.success) {
+          // The list was drawn before the run; another tab, or an earlier run,
+          // may have finished one in between. Counting it as shrunk here would
+          // report work this run did not do.
+          skipped += 1;
+          setAlreadyDone(skipped);
         } else {
           failures.push({ id: chart.id, name: chart.name, reason: result.error });
         }
@@ -78,6 +87,16 @@ export function CoverOptimizationCard({ charts }: CoverOptimizationCardProps) {
   }
 
   const waiting = charts.length;
+  const summary =
+    running || leftAlone === null
+      ? null
+      : [
+          `Finished — ${shrunk} shrunk`,
+          alreadyDone > 0 && `${alreadyDone} ${alreadyDone === 1 ? "was" : "were"} already done`,
+          leftAlone.length > 0 && `${leftAlone.length} left alone`,
+        ]
+          .filter(Boolean)
+          .join(", ") + ".";
 
   return (
     <Card>
@@ -113,10 +132,7 @@ export function CoverOptimizationCard({ charts }: CoverOptimizationCardProps) {
         )}
 
         <p aria-live="polite" className="text-muted-foreground">
-          {running && `Shrinking… ${processed} of ${total} done.`}
-          {!running &&
-            leftAlone !== null &&
-            `Finished — ${shrunk} shrunk${leftAlone.length > 0 ? `, ${leftAlone.length} left alone.` : "."}`}
+          {running ? `Shrinking… ${processed} of ${total} done.` : summary}
         </p>
 
         {leftAlone !== null && leftAlone.length > 0 && (
