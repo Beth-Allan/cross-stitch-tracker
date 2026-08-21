@@ -66,7 +66,11 @@ describe("CoverOptimizationCard", () => {
     const user = userEvent.setup();
     mockOptimizeExistingCover
       .mockResolvedValueOnce({ success: true, status: "converted" })
-      .mockResolvedValueOnce({ success: false, error: "Original image not found in storage" })
+      .mockResolvedValueOnce({
+        success: false,
+        error: "Original image not found in storage",
+        cause: "chart",
+      })
       .mockResolvedValueOnce({ success: true, status: "converted" });
     render(<CoverOptimizationCard charts={THREE_CHARTS} />);
 
@@ -114,7 +118,8 @@ describe("CoverOptimizationCard", () => {
     }));
     mockOptimizeExistingCover.mockResolvedValue({
       success: false,
-      error: "its photo is no longer in storage",
+      error: "its photo could not be shrunk this time",
+      cause: "unknown",
     });
     render(<CoverOptimizationCard charts={many} />);
 
@@ -122,6 +127,30 @@ describe("CoverOptimizationCard", () => {
 
     expect(await screen.findByText(/stopped early/i)).toBeInTheDocument();
     expect(mockOptimizeExistingCover.mock.calls.length).toBeLessThan(20);
+  });
+
+  it("keeps going through a run of charts whose own pictures are the problem", async () => {
+    // The work list is in a fixed order and a chart whose picture is gone stays on
+    // it, so if these counted towards giving up, the same five would stop every
+    // run at the same place — and the card would keep promising to carry on.
+    const user = userEvent.setup();
+    const many = Array.from({ length: 20 }, (_, index) => ({
+      id: `chart-${index}`,
+      name: `Chart ${index}`,
+    }));
+    mockOptimizeExistingCover.mockResolvedValue({
+      success: false,
+      error: "its photo is no longer in storage",
+      cause: "chart",
+    });
+    render(<CoverOptimizationCard charts={many} />);
+
+    await user.click(screen.getByRole("button", { name: /shrink/i }));
+
+    expect(await screen.findByText(/finished/i)).toBeInTheDocument();
+    expect(screen.queryByText(/stopped early/i)).not.toBeInTheDocument();
+    expect(mockOptimizeExistingCover).toHaveBeenCalledTimes(20);
+    expect(screen.getByText(/20 left alone/i)).toBeInTheDocument();
   });
 
   it("counts the run of failures from scratch after one that works", async () => {
@@ -136,7 +165,7 @@ describe("CoverOptimizationCard", () => {
       // Fail, fail, succeed, repeating: never five in a row, so the run finishes.
       return call % 3 === 0
         ? { success: true, status: "converted" }
-        : { success: false, error: "its photo is no longer in storage" };
+        : { success: false, error: "its photo could not be shrunk this time", cause: "unknown" };
     });
     render(<CoverOptimizationCard charts={many} />);
 

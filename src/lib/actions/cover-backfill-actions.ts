@@ -96,16 +96,25 @@ export async function getCoversNeedingOptimization(): Promise<
  * missing from storage leaves the row exactly as it was and comes back as an
  * error for the caller to report — a chart with a broken picture is Beth's to see,
  * never something to blank on her behalf.
+ *
+ * A failure's `cause` says whether it is about *this chart* — its row, or a
+ * picture the pipeline looked at and named the problem with — or about nothing
+ * the chart explains. The caller loops over a fixed list on which a chart whose
+ * picture is gone stays put, so it has to know which failures mean "move on" and
+ * which, several in a row, mean "storage is down; stop".
  */
 export async function optimizeExistingCover(
   chartId: string,
-): Promise<{ success: true; status: "converted" | "skipped" } | { success: false; error: string }> {
+): Promise<
+  | { success: true; status: "converted" | "skipped" }
+  | { success: false; error: string; cause: "chart" | "unknown" }
+> {
   const user = await requireAuth();
 
   // The id becomes the owner segment of both derivative keys, so it is held to the
   // same grammar every other key segment is.
   if (!keyOwnerSchema.safeParse(chartId).success) {
-    return { success: false as const, error: CHART_NOT_FOUND };
+    return { success: false as const, error: CHART_NOT_FOUND, cause: "chart" as const };
   }
 
   try {
@@ -119,10 +128,10 @@ export async function optimizeExistingCover(
       },
     });
     if (!chart || chart.project?.userId !== user.id) {
-      return { success: false as const, error: CHART_NOT_FOUND };
+      return { success: false as const, error: CHART_NOT_FOUND, cause: "chart" as const };
     }
     if (!chart.coverImageUrl) {
-      return { success: false as const, error: "it has no cover photo" };
+      return { success: false as const, error: "it has no cover photo", cause: "chart" as const };
     }
     if (!coverNeedsOptimizing(chart)) {
       return { success: true as const, status: "skipped" as const };
@@ -131,10 +140,10 @@ export async function optimizeExistingCover(
     const previousKeys = [chart.coverImageUrl, chart.coverThumbnailUrl];
     const optimized = await optimizeCoverImage(chart.id, chart.coverImageUrl);
     if (!optimized.ok) {
-      return {
-        success: false as const,
-        error: PLAIN_REASONS[optimized.reason] ?? UNRECOGNISED_REASON,
-      };
+      const plainReason = PLAIN_REASONS[optimized.reason];
+      return plainReason
+        ? { success: false as const, error: plainReason, cause: "chart" as const }
+        : { success: false as const, error: UNRECOGNISED_REASON, cause: "unknown" as const };
     }
 
     const stillNamed = new Set(
@@ -155,6 +164,6 @@ export async function optimizeExistingCover(
     return { success: true as const, status: "converted" as const };
   } catch (error) {
     console.error("optimizeExistingCover error:", error);
-    return { success: false as const, error: UNRECOGNISED_REASON };
+    return { success: false as const, error: UNRECOGNISED_REASON, cause: "unknown" as const };
   }
 }

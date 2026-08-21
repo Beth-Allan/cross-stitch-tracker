@@ -144,6 +144,7 @@ describe("optimizeExistingCover", () => {
     const result = await optimizeExistingCover("chart-1");
 
     assertFailure(result);
+    expect(result.cause).toBe("chart");
     expect(mockProcessAndStoreImage).not.toHaveBeenCalled();
   });
 
@@ -248,6 +249,7 @@ describe("optimizeExistingCover", () => {
 
     assertFailure(result);
     expect(result.error).toBe("its photo is no longer in storage");
+    expect(result.cause).toBe("chart");
     expect(mockPrisma.chart.update).not.toHaveBeenCalled();
     expect(mockDiscardStoredObjects).not.toHaveBeenCalled();
   });
@@ -265,6 +267,7 @@ describe("optimizeExistingCover", () => {
     assertFailure(result);
     expect(result.error).not.toMatch(/storage key/i);
     expect(result.error).toMatch(/photo/i);
+    expect(result.cause).toBe("chart");
   });
 
   it("leaves the row alone when the pipeline throws", async () => {
@@ -275,8 +278,27 @@ describe("optimizeExistingCover", () => {
     const result = await optimizeExistingCover("chart-1");
 
     assertFailure(result);
+    expect(result.cause).toBe("unknown");
     expect(mockPrisma.chart.update).not.toHaveBeenCalled();
     expect(mockDiscardStoredObjects).not.toHaveBeenCalled();
+  });
+
+  it("does not blame the chart for a failure nothing about the chart explains", async () => {
+    // The generic pipeline failure is what a broken bucket or a denied credential
+    // flattens to, so the caller must be able to tell it from "this picture is
+    // gone" — five of these in a row mean storage, five of those mean five charts.
+    mockPrisma.chart.findUnique.mockResolvedValueOnce(PRE_P15_CHART);
+    mockProcessAndStoreImage.mockResolvedValueOnce({
+      success: false,
+      error: "Failed to process image",
+    });
+    const { optimizeExistingCover } = await import("./cover-backfill-actions");
+
+    const result = await optimizeExistingCover("chart-1");
+
+    assertFailure(result);
+    expect(result.cause).toBe("unknown");
+    expect(result.error).toBe("its photo could not be shrunk this time");
   });
 
   describe("cache invalidation", () => {

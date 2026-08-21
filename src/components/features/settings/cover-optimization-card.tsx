@@ -16,11 +16,14 @@ type LeftAlone = { id: string; name: string; reason: string };
 const GENERIC_FAILURE = "the app could not be reached, so it was left as it was";
 
 /**
- * How many failures in a row mean the problem is not the photos. One missing
- * picture is a chart to report; five in a row is storage being unreachable, and
- * carrying on would issue hundreds of doomed requests and hand Beth a list of
- * every chart she owns. Stopping costs nothing — the next run picks up what is
- * left.
+ * How many *unexplained* failures in a row mean the problem is not the photos.
+ * A failure the server pins on the chart itself — its picture is gone, too big,
+ * unreadable — is a chart to report and move past, and never counts here: the
+ * work list is in a fixed order and such a chart stays on it, so counting those
+ * would stop every run at the same five. Five in a row that nothing about the
+ * chart explains is storage being unreachable, and carrying on would issue
+ * hundreds of doomed requests and hand Beth a list of every chart she owns.
+ * Stopping costs nothing — the next run picks up what is left.
  */
 const CONSECUTIVE_FAILURE_LIMIT = 5;
 
@@ -85,12 +88,16 @@ export function CoverOptimizationCard({ charts }: CoverOptimizationCardProps) {
           inARow = 0;
           setAlreadyDone(skipped);
         } else {
-          inARow += 1;
+          // A failure the server lays at this chart's door is a chart to report
+          // and move past, not a sign storage is down — it does not count towards
+          // giving up, and it ends any run of failures that would.
+          inARow = result.cause === "unknown" ? inARow + 1 : 0;
           failures.push({ id: chart.id, name: chart.name, reason: result.error });
         }
-      } catch {
+      } catch (error) {
         // One chart failing is not the run failing: the rest of the library still
         // has covers worth shrinking.
+        console.error("optimizeExistingCover request failed:", error);
         inARow += 1;
         failures.push({ id: chart.id, name: chart.name, reason: GENERIC_FAILURE });
       }
