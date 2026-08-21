@@ -334,3 +334,16 @@ that is what P14 did, and the damage never reached main.
 
 **Done when:** never, while the log keeps its one-line-per-cell and italic-pop-note shape. This is
 a standing trap, not a pending fix.
+
+**The sibling trap (found 2026-08-21, entered main with P9a's merge, #112):** a missing newline between
+two table rows — the P10 row had been concatenated onto the end of the P9c row on one physical line —
+makes prettier read one eleven-cell row and **widen the delimiter row to match**, and GitHub stops
+rendering the whole table because the delimiter no longer matches the header. Prettier then
+regenerates the wide delimiter on every run, so fixing the delimiter row does nothing: find the row
+with more cells than the header (count pipes per line, ignoring escaped ones) and split it. Quick
+check after any edit — every delimiter row has the same cell count as its header:
+
+```
+awk '/^\| -+ \|/ { h=prev; gsub(/\\\|/,"",h); gsub(/[^|]/,"",h); d=$0; gsub(/[^|]/,"",d);
+  if (length(h)!=length(d)) print "MISMATCH at", NR } { prev=$0 }' docs/process/work-log.md
+```
