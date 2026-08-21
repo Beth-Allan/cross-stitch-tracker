@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@/__tests__/test-utils";
-import { createMockGalleryCard } from "@/__tests__/mocks/factories";
+import { createMockGalleryCard, createProjectSupplies } from "@/__tests__/mocks/factories";
 import type { GalleryCardData } from "./gallery-types";
 import type { GalleryChartData } from "@/types/chart";
 
@@ -89,9 +89,7 @@ function createMockGalleryChartData(overrides?: Partial<GalleryChartData>): Gall
       finishDate: null,
       ffoDate: null,
       fabric: null,
-      projectThreads: [],
-      projectBeads: [],
-      projectSpecialty: [],
+      supplies: createProjectSupplies(),
     },
     designer: {
       id: "d1",

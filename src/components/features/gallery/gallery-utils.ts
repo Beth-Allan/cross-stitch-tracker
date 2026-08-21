@@ -4,6 +4,7 @@ import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size
 import { calculateProgressPercent } from "@/lib/utils/progress";
 import { mapFocalPoint } from "@/types/focal-point";
 import type { GalleryChartData } from "@/types/chart";
+import type { ProjectSupplies, SupplyRollup } from "@/types/supplies";
 import {
   UNASSIGNED_FILTER,
   type GalleryCardData,
@@ -28,22 +29,16 @@ export function getStatusGroup(status: ProjectStatus): StatusGroup {
   }
 }
 
-type SupplyItem = { quantityRequired: number; quantityAcquired: number };
-
-function computeSupplyStatus(items: SupplyItem[]): KittingItemStatus {
-  if (items.length === 0) return "not-applicable";
-  const allAcquired = items.every((i) => i.quantityAcquired >= i.quantityRequired);
-  if (allAcquired) return "fulfilled";
-  const anyAcquired = items.some((i) => i.quantityAcquired > 0);
-  if (anyAcquired) return "partial";
+function computeSupplyStatus(rollup: SupplyRollup): KittingItemStatus {
+  if (rollup.count === 0) return "not-applicable";
+  if (rollup.allFulfilled) return "fulfilled";
+  if (rollup.anyAcquired) return "partial";
   return "needed";
 }
 
 export function computeKittingDots(project: {
   fabric: { id: string } | null;
-  projectThreads: SupplyItem[];
-  projectBeads: SupplyItem[];
-  projectSpecialty: SupplyItem[];
+  supplies: ProjectSupplies;
 }): {
   fabricStatus: KittingItemStatus;
   threadStatus: KittingItemStatus;
@@ -52,9 +47,9 @@ export function computeKittingDots(project: {
 } {
   return {
     fabricStatus: project.fabric ? "fulfilled" : "needed",
-    threadStatus: computeSupplyStatus(project.projectThreads),
-    beadsStatus: computeSupplyStatus(project.projectBeads),
-    specialtyStatus: computeSupplyStatus(project.projectSpecialty),
+    threadStatus: computeSupplyStatus(project.supplies.threads),
+    beadsStatus: computeSupplyStatus(project.supplies.beads),
+    specialtyStatus: computeSupplyStatus(project.supplies.specialty),
   };
 }
 
@@ -84,9 +79,7 @@ export function transformToGalleryCard(
   if (chart.project) {
     const dots = computeKittingDots({
       fabric: chart.project.fabric ? { id: chart.project.fabric.id } : null,
-      projectThreads: chart.project.projectThreads,
-      projectBeads: chart.project.projectBeads,
-      projectSpecialty: chart.project.projectSpecialty,
+      supplies: chart.project.supplies,
     });
     fabricStatus = dots.fabricStatus;
     threadStatus = dots.threadStatus;
@@ -116,9 +109,9 @@ export function transformToGalleryCard(
     threadStatus,
     beadsStatus,
     specialtyStatus,
-    threadColourCount: chart.project?.projectThreads.length ?? 0,
-    beadTypeCount: chart.project?.projectBeads.length ?? 0,
-    specialtyItemCount: chart.project?.projectSpecialty.length ?? 0,
+    threadColourCount: chart.project?.supplies.threads.count ?? 0,
+    beadTypeCount: chart.project?.supplies.beads.count ?? 0,
+    specialtyItemCount: chart.project?.supplies.specialty.count ?? 0,
     finishDate: chart.project?.finishDate ?? null,
     ffoDate: chart.project?.ffoDate ?? null,
     hasDigitalCopy: (chart._count?.files ?? 0) > 0,

@@ -11,7 +11,7 @@ import {
   SIZE_SORT_ORDER,
 } from "./gallery-utils";
 import type { GalleryChartData } from "@/types/chart";
-import { createMockGalleryCard } from "@/__tests__/mocks/factories";
+import { createMockGalleryCard, createProjectSupplies } from "@/__tests__/mocks/factories";
 
 describe("getStatusGroup", () => {
   it("maps IN_PROGRESS to wip", () => {
@@ -44,7 +44,7 @@ describe("getStatusGroup", () => {
 });
 
 describe("computeKittingDots", () => {
-  const noSupplies = { projectThreads: [], projectBeads: [], projectSpecialty: [] };
+  const noSupplies = { supplies: createProjectSupplies() };
   const acquired = { quantityRequired: 1, quantityAcquired: 1 };
   const unacquired = { quantityRequired: 1, quantityAcquired: 0 };
 
@@ -75,9 +75,7 @@ describe("computeKittingDots", () => {
   it("returns partial for threads when some are not acquired", () => {
     const result = computeKittingDots({
       fabric: null,
-      projectThreads: [acquired, unacquired, acquired],
-      projectBeads: [],
-      projectSpecialty: [],
+      supplies: createProjectSupplies({ threads: [acquired, unacquired, acquired] }),
     });
     expect(result.threadStatus).toBe("partial");
   });
@@ -85,9 +83,7 @@ describe("computeKittingDots", () => {
   it("returns fulfilled for threads when all are acquired", () => {
     const result = computeKittingDots({
       fabric: null,
-      projectThreads: [acquired, acquired, acquired],
-      projectBeads: [],
-      projectSpecialty: [],
+      supplies: createProjectSupplies({ threads: [acquired, acquired, acquired] }),
     });
     expect(result.threadStatus).toBe("fulfilled");
   });
@@ -95,9 +91,7 @@ describe("computeKittingDots", () => {
   it("returns needed for threads when none are acquired yet", () => {
     const result = computeKittingDots({
       fabric: null,
-      projectThreads: [unacquired, unacquired],
-      projectBeads: [],
-      projectSpecialty: [],
+      supplies: createProjectSupplies({ threads: [unacquired, unacquired] }),
     });
     expect(result.threadStatus).toBe("needed");
   });
@@ -113,9 +107,7 @@ describe("computeKittingDots", () => {
   it("returns fulfilled for beads when all acquired", () => {
     const result = computeKittingDots({
       fabric: null,
-      projectThreads: [],
-      projectBeads: [acquired, acquired],
-      projectSpecialty: [],
+      supplies: createProjectSupplies({ beads: [acquired, acquired] }),
     });
     expect(result.beadsStatus).toBe("fulfilled");
   });
@@ -123,9 +115,7 @@ describe("computeKittingDots", () => {
   it("returns partial for beads when some not acquired", () => {
     const result = computeKittingDots({
       fabric: null,
-      projectThreads: [],
-      projectBeads: [acquired, unacquired],
-      projectSpecialty: [],
+      supplies: createProjectSupplies({ beads: [acquired, unacquired] }),
     });
     expect(result.beadsStatus).toBe("partial");
   });
@@ -141,11 +131,16 @@ describe("computeKittingDots", () => {
   it("returns fulfilled for specialty when all acquired", () => {
     const result = computeKittingDots({
       fabric: null,
-      projectThreads: [],
-      projectBeads: [],
-      projectSpecialty: [acquired],
+      supplies: createProjectSupplies({ specialty: [acquired] }),
     });
     expect(result.specialtyStatus).toBe("fulfilled");
+  });
+  it("returns partial for a junction whose only progress is a part-gathered row", () => {
+    const result = computeKittingDots({
+      fabric: null,
+      supplies: createProjectSupplies({ threads: [{ quantityRequired: 4, quantityAcquired: 1 }] }),
+    });
+    expect(result.threadStatus).toBe("partial");
   });
 });
 
@@ -192,12 +187,13 @@ describe("transformToGalleryCard", () => {
       finishDate: null,
       ffoDate: null,
       fabric: { id: "f1" },
-      projectThreads: Array.from({ length: 12 }, () => ({
-        quantityRequired: 1,
-        quantityAcquired: 1,
-      })),
-      projectBeads: [],
-      projectSpecialty: [{ quantityRequired: 1, quantityAcquired: 1 }],
+      supplies: createProjectSupplies({
+        threads: Array.from({ length: 12 }, () => ({
+          quantityRequired: 1,
+          quantityAcquired: 1,
+        })),
+        specialty: [{ quantityRequired: 1, quantityAcquired: 1 }],
+      }),
     },
   };
 
@@ -238,7 +234,7 @@ describe("transformToGalleryCard", () => {
     expect(card.specialtyStatus).toBe("fulfilled");
   });
 
-  it("maps supply counts from project supply arrays", () => {
+  it("maps supply counts from the project's supply rollup", () => {
     const card = transformToGalleryCard(baseChart, imageUrls);
     expect(card.threadColourCount).toBe(12);
     expect(card.beadTypeCount).toBe(0);

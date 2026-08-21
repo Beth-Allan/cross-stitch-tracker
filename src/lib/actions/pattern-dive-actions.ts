@@ -1,7 +1,13 @@
 "use server";
 
+import type { Prisma } from "@/generated/prisma/client";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import {
+  EMPTY_PROJECT_SUPPLIES,
+  summariseProjectSupplies,
+  totalSupplyRollup,
+} from "@/lib/queries/project-supplies";
 import { calculateRequiredFabricSize, classifyFabricFit } from "@/lib/utils/fabric-calculator";
 import { revalidatePath } from "next/cache";
 import type { WhatsNextProject, FabricRequirementRow, StorageGroup } from "@/types/session";
@@ -13,51 +19,45 @@ import type { WhatsNextProject, FabricRequirementRow, StorageGroup } from "@/typ
 export async function getWhatsNextProjects(): Promise<WhatsNextProject[]> {
   const user = await requireAuth();
 
-  const charts = await prisma.chart.findMany({
-    where: {
-      project: {
-        userId: user.id,
-        status: { in: ["UNSTARTED", "KITTED"] },
-      },
-    },
-    include: {
-      designer: { select: { name: true } },
-      project: {
-        select: {
-          id: true,
-          status: true,
-          wantToStartNext: true,
-          fabric: { select: { id: true } },
-          projectThreads: {
-            select: { quantityRequired: true, quantityAcquired: true },
-          },
-          projectBeads: {
-            select: { quantityRequired: true, quantityAcquired: true },
-          },
-          projectSpecialty: {
-            select: { quantityRequired: true, quantityAcquired: true },
+  const project = {
+    userId: user.id,
+    status: { in: ["UNSTARTED", "KITTED"] },
+  } satisfies Prisma.ProjectWhereInput;
+
+  // The kitting figure needs three sums per project, not the rows behind them, so the junction
+  // tables are read as one group row per project rather than dragged across whole.
+  const [charts, supplies] = await Promise.all([
+    prisma.chart.findMany({
+      where: { project },
+      include: {
+        designer: { select: { name: true } },
+        project: {
+          select: {
+            id: true,
+            status: true,
+            wantToStartNext: true,
+            fabric: { select: { id: true } },
           },
         },
       },
-    },
-  });
+    }),
+    summariseProjectSupplies(project),
+  ]);
 
   const projects: WhatsNextProject[] = charts
     .filter((c) => c.project)
     .map((c) => {
       const p = c.project!;
-      const supplies = [...p.projectThreads, ...p.projectBeads, ...p.projectSpecialty];
+      const supplyTotals = totalSupplyRollup(supplies.get(p.id) ?? EMPTY_PROJECT_SUPPLIES);
 
       // Fabric counts as 1 supply item
       const fabricRequired = 1;
       const fabricAcquired = p.fabric ? 1 : 0;
 
-      const totalRequired = supplies.reduce((s, i) => s + i.quantityRequired, 0) + fabricRequired;
-      const totalAcquired =
-        supplies.reduce((s, i) => s + Math.min(i.quantityAcquired, i.quantityRequired), 0) +
-        fabricAcquired;
+      const totalRequired = supplyTotals.required + fabricRequired;
+      const totalAcquired = supplyTotals.acquired + fabricAcquired;
 
-      const hasSupplyItems = supplies.length > 0;
+      const hasSupplyItems = supplyTotals.count > 0;
       const kittingPercent = !hasSupplyItems
         ? 0
         : Math.round((totalAcquired / totalRequired) * 100);
@@ -146,6 +146,41 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
     include: { brand: { select: { name: true } } },
   });
 
+  type StashPiece = (typeof unassignedFabrics)[number];
+  type CandidatePool = { measurable: StashPiece[]; unmeasuredCount: number };
+
+  // The stash is sorted into pools once rather than re-scanned per chart: a project with fabric
+  // assigned draws from its own count, one with none is judged against the whole stash. A piece
+  // with no size recorded cannot be judged either way, so each pool carries its own tally of them.
+  const wholeStash: CandidatePool = { measurable: [], unmeasuredCount: 0 };
+  const byCount = new Map<number, CandidatePool>();
+  const noCandidates: CandidatePool = { measurable: [], unmeasuredCount: 0 };
+
+  for (const piece of unassignedFabrics) {
+    let pool = byCount.get(piece.count);
+    if (!pool) {
+      pool = { measurable: [], unmeasuredCount: 0 };
+      byCount.set(piece.count, pool);
+    }
+
+    if (piece.count > 0 && piece.shortestEdgeInches > 0 && piece.longestEdgeInches > 0) {
+      pool.measurable.push(piece);
+      wholeStash.measurable.push(piece);
+    } else {
+      pool.unmeasuredCount += 1;
+      wholeStash.unmeasuredCount += 1;
+    }
+  }
+
+  const toCandidate = (f: StashPiece) => ({
+    id: f.id,
+    name: f.name,
+    brandName: f.brand.name,
+    count: f.count,
+    shortestEdgeInches: f.shortestEdgeInches,
+    longestEdgeInches: f.longestEdgeInches,
+  });
+
   return charts
     .filter((c) => c.project)
     .map((c) => {
@@ -176,35 +211,23 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
         : null;
 
       const candidates =
-        usableCount === null
-          ? unassignedFabrics
-          : unassignedFabrics.filter((f) => f.count === usableCount);
+        usableCount === null ? wholeStash : (byCount.get(usableCount) ?? noCandidates);
 
-      const measurable = candidates.filter(
-        (f) => f.count > 0 && f.shortestEdgeInches > 0 && f.longestEdgeInches > 0,
-      );
-      const unmeasuredCandidateCount = candidates.length - measurable.length;
+      // One pass, one verdict per piece: the pairs that fit nothing never become objects.
+      const matchingFabrics: ReturnType<typeof toCandidate>[] = [];
+      const overOneOnlyFabrics: ReturnType<typeof toCandidate>[] = [];
 
-      const toCandidate = (f: (typeof measurable)[number]) => ({
-        id: f.id,
-        name: f.name,
-        brandName: f.brand.name,
-        count: f.count,
-        shortestEdgeInches: f.shortestEdgeInches,
-        longestEdgeInches: f.longestEdgeInches,
-      });
-
-      const judged = measurable.map((f) => ({
-        fabric: f,
-        state: classifyFabricFit(f, c.stitchesWide, c.stitchesHigh, f.count, overCount),
-      }));
-
-      const matchingFabrics = judged
-        .filter((j) => j.state === "fits")
-        .map((j) => toCandidate(j.fabric));
-      const overOneOnlyFabrics = judged
-        .filter((j) => j.state === "fits-over-one-only")
-        .map((j) => toCandidate(j.fabric));
+      for (const piece of candidates.measurable) {
+        const state = classifyFabricFit(
+          piece,
+          c.stitchesWide,
+          c.stitchesHigh,
+          piece.count,
+          overCount,
+        );
+        if (state === "fits") matchingFabrics.push(toCandidate(piece));
+        else if (state === "fits-over-one-only") overOneOnlyFabrics.push(toCandidate(piece));
+      }
 
       return {
         chartId: c.id,
@@ -224,7 +247,7 @@ export async function getFabricRequirements(): Promise<FabricRequirementRow[]> {
         assignedFabric,
         matchingFabrics,
         overOneOnlyFabrics,
-        unmeasuredCandidateCount,
+        unmeasuredCandidateCount: candidates.unmeasuredCount,
       };
     });
 }

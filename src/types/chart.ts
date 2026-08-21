@@ -1,3 +1,4 @@
+import type { ProjectSupplies } from "@/types/supplies";
 import type {
   Chart,
   ChartFile,
@@ -31,11 +32,6 @@ export type ChartWithProject = Chart & {
 
 // ─── Gallery Query Types ────────────────────────────────────────────────────
 
-export type SupplyQuantity = {
-  quantityRequired: number;
-  quantityAcquired: number;
-};
-
 export type GalleryProjectData = {
   id: string;
   status: ProjectStatus;
@@ -44,9 +40,7 @@ export type GalleryProjectData = {
   finishDate: Date | null;
   ffoDate: Date | null;
   fabric: { id: string } | null;
-  projectThreads: SupplyQuantity[];
-  projectBeads: SupplyQuantity[];
-  projectSpecialty: SupplyQuantity[];
+  supplies: ProjectSupplies;
 };
 
 export type GalleryChartData = Chart & {
