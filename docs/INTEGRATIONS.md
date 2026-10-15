@@ -248,6 +248,17 @@ when the Preview environment was populated and verified.
   bucket only** — the real bucket's policy is untouched by any of this. Found by testing the real
   preview on 2026-08-17, not by any gate; R2 bucket configuration is not inspectable from the repo
   (audit report §, 2026-08-17), so this is the record of it.
+- **The real bucket allows exactly one origin, so the app has exactly one address.** Probed from
+  outside on 2026-10-14: the real bucket answers a `PUT` preflight with 204 only for
+  `https://cross-stitch-tracker-adolwyn.vercel.app`, and 403 for every other origin tried
+  (`cross-stitch-tracker.vercel.app`, `localhost:3000`, other `vercel.app` variants); headers are
+  not restricted. Vercel also serves production on the project's default alias
+  `cross-stitch-tracker.vercel.app`, where every page works and every upload fails at the
+  preflight — Beth's Safari was opening that alias, and the only symptom was "Upload failed".
+  `src/lib/canonical-host.ts` now forwards the alias to the canonical origin (via
+  `next.config.ts` `redirects()`), which keeps one front door instead of widening the bucket's
+  list. **A new production hostname needs adding to `ALIAS_HOSTS` there**, or uploads on it fail
+  the same way.
 - **The scratch bucket needs no CSP change — but not for the reason it looks like.** The AWS SDK
   addresses R2 **virtual-hosted style** (no `forcePathStyle` is set), so the bucket is the first
   label of the hostname: a presigned URL for the scratch bucket points at
