@@ -296,5 +296,21 @@ describe("FocalPointEditor", () => {
       expect(clickArea.className).toContain("absolute");
       expect(clickArea.className).toContain("inset-0");
     });
+
+    it("click area covers only the image, so Save and Cancel stay clickable", () => {
+      render(
+        <FocalPointEditor {...defaultProps}>
+          <img src={defaultProps.imageUrl} alt="Cover" />
+        </FocalPointEditor>,
+      );
+      fireEvent.click(screen.getByRole("button", { name: /set focal point/i }));
+
+      const clickArea = screen.getByRole("button", { name: /click to place focal point/i });
+      const coveredBox = clickArea.parentElement!;
+      expect(coveredBox.className).toContain("relative");
+      expect(coveredBox).toContainElement(screen.getByRole("img", { name: "Cover" }));
+      expect(coveredBox).not.toContainElement(screen.getByRole("button", { name: /save/i }));
+      expect(coveredBox).not.toContainElement(screen.getByRole("button", { name: /cancel/i }));
+    });
   });
 });

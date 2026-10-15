@@ -19,7 +19,8 @@ interface HeroCoverBannerProps {
  *
  * overflow-hidden is on the inner image wrapper so the focal point
  * action bar (rendered by FocalPointEditor) appears below the image
- * in normal document flow and is not clipped.
+ * in normal document flow and is not clipped. The image is passed to
+ * FocalPointEditor as children so its click area is sized to the image.
  */
 export function HeroCoverBanner({
   imageUrl,
@@ -33,34 +34,35 @@ export function HeroCoverBanner({
   if (!imageUrl || imgError) return null;
 
   return (
-    <div className="bg-muted group relative w-full rounded-lg">
-      <div className="max-h-64 overflow-hidden rounded-lg max-[767px]:max-h-40 md:max-h-48">
-        <Image
-          src={imageUrl}
-          alt=""
-          fill
-          aria-hidden="true"
-          className="scale-110 object-cover opacity-60 blur-[20px]"
-          unoptimized
-        />
-        <Image
-          src={imageUrl}
-          alt={`Cover for ${chartName}`}
-          width={1200}
-          height={800}
-          priority
-          className="relative mx-auto max-h-64 w-full object-contain max-[767px]:max-h-40 md:max-h-48"
-          onError={() => setImgError(true)}
-          unoptimized
-        />
-      </div>
+    <div className="bg-muted group w-full rounded-lg">
       <FocalPointEditor
         chartId={chartId}
         initialFocalPoint={
           focalPointX != null && focalPointY != null ? { x: focalPointX, y: focalPointY } : null
         }
         imageUrl={imageUrl}
-      />
+      >
+        <div className="relative max-h-64 overflow-hidden rounded-lg max-[767px]:max-h-40 md:max-h-48">
+          <Image
+            src={imageUrl}
+            alt=""
+            fill
+            aria-hidden="true"
+            className="scale-110 object-cover opacity-60 blur-[20px]"
+            unoptimized
+          />
+          <Image
+            src={imageUrl}
+            alt={`Cover for ${chartName}`}
+            width={1200}
+            height={800}
+            priority
+            className="relative mx-auto max-h-64 w-full object-contain max-[767px]:max-h-40 md:max-h-48"
+            onError={() => setImgError(true)}
+            unoptimized
+          />
+        </div>
+      </FocalPointEditor>
     </div>
   );
 }
