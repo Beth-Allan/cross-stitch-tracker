@@ -11,17 +11,23 @@ interface FocalPointEditorProps {
   chartId: string;
   initialFocalPoint: { x: number; y: number } | null;
   imageUrl: string | null;
+  children?: React.ReactNode;
 }
 
 /**
  * Focal point editor for the hero banner.
  * Provides click-to-set interface with crosshair marker, crop guide preview,
- * and save/cancel/reset controls. Renders as a Fragment with:
- *   - Edit button (absolute, top-right) when not in edit mode
- *   - FocalPointClickArea (absolute inset-0) when in edit mode
- *   - Action bar (normal flow, below image) when in edit mode
+ * and save/cancel/reset controls. `children` is the image; it is wrapped in
+ * its own positioned box together with the edit button and the click area,
+ * so the click area covers the image alone. The action bar renders after
+ * that box — inside it, the click area would sit on top of Save and Cancel.
  */
-export function FocalPointEditor({ chartId, initialFocalPoint, imageUrl }: FocalPointEditorProps) {
+export function FocalPointEditor({
+  chartId,
+  initialFocalPoint,
+  imageUrl,
+  children,
+}: FocalPointEditorProps) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [pendingPoint, setPendingPoint] = useState<{
     x: number;
@@ -110,31 +116,34 @@ export function FocalPointEditor({ chartId, initialFocalPoint, imageUrl }: Focal
     }
   }
 
-  if (!imageUrl) return null;
+  if (!imageUrl) return <>{children}</>;
 
   return (
     <>
-      {!isEditMode && (
-        <button
-          onClick={handleEnterEditMode}
-          className="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white/80 backdrop-blur-sm transition-colors hover:bg-black/70 hover:text-white"
-          aria-label="Set focal point for cover image"
-          title="Set Focal Point"
-        >
-          <Crosshair className="h-3.5 w-3.5" />
-        </button>
-      )}
+      <div className="relative">
+        {children}
+        {!isEditMode && (
+          <button
+            onClick={handleEnterEditMode}
+            className="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white/80 backdrop-blur-sm transition-colors hover:bg-black/70 hover:text-white"
+            aria-label="Set focal point for cover image"
+            title="Set Focal Point"
+          >
+            <Crosshair className="h-3.5 w-3.5" />
+          </button>
+        )}
 
-      {isEditMode && (
-        <FocalPointClickArea
-          pendingPoint={pendingPoint}
-          containerSize={containerSize}
-          onImageClick={handleImageClick}
-          onKeyDown={handleKeyDown}
-          onPlace={() => setPendingPoint({ x: 0.5, y: 0.5 })}
-          containerRef={containerRef}
-        />
-      )}
+        {isEditMode && (
+          <FocalPointClickArea
+            pendingPoint={pendingPoint}
+            containerSize={containerSize}
+            onImageClick={handleImageClick}
+            onKeyDown={handleKeyDown}
+            onPlace={() => setPendingPoint({ x: 0.5, y: 0.5 })}
+            containerRef={containerRef}
+          />
+        )}
+      </div>
 
       {isEditMode && (
         <div
