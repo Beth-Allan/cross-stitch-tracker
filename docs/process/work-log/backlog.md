@@ -86,7 +86,7 @@ leave them behind.
 - **Empty date boxes in Safari look filled.** Safari on macOS draws today's date into an empty
   `<input type="date">`, so a blank Start/Finish/FFO Date reads as set and cannot visibly be
   cleared — the value really is empty and saves as no date (Beth confirmed, 2026-10-14). Every
-  native date box in the app inherits it (chart form, session log, goals). A session deciding date
+  native date box in the app inherits it (chart form, session log), and any future date field will too. A session deciding date
   fields should cover: what an empty date looks like, and how a set date is taken back out. Beth
   deferred the fix here rather than patch it ahead of the redesign (D-23). _(from a 2026-10-14
   `/broken`)_
