@@ -97,6 +97,9 @@ export function GenrePicker({ genres, selectedIds, onToggle, onAddGenre }: Genre
           />
           <button
             type="button"
+            // Safari never focuses a clicked button, so the input's blur would see no
+            // relatedTarget and close the picker before this click lands.
+            onMouseDown={(e) => e.preventDefault()}
             onClick={() => void handleSubmit()}
             disabled={isSubmitting || !newName.trim()}
             className="border-primary/30 text-primary hover:bg-primary/10 disabled:text-muted-foreground rounded-full border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-50"
