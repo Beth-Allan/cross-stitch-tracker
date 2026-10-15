@@ -2,29 +2,35 @@ import { describe, it, expect } from "vitest";
 import nextConfig from "../../next.config";
 import { CANONICAL_ORIGIN, canonicalHostRedirects } from "./canonical-host";
 
+/** Next's own host test: the `has` value compiled as an anchored regex (prepare-destination). */
+function redirectsHost(hostname: string): boolean {
+  return canonicalHostRedirects().some((redirect) =>
+    redirect.has?.some(
+      (condition) => condition.type === "host" && new RegExp(`^${condition.value}$`).test(hostname),
+    ),
+  );
+}
+
 describe("canonicalHostRedirects", () => {
-  const redirects = canonicalHostRedirects();
-
   it("sends the project's default vercel.app alias to the canonical origin, path included", () => {
-    expect(redirects).toContainEqual({
-      source: "/:path*",
-      has: [{ type: "host", value: "cross-stitch-tracker.vercel.app" }],
-      destination: `${CANONICAL_ORIGIN}/:path*`,
-      permanent: false,
-    });
+    expect(canonicalHostRedirects()).toContainEqual(
+      expect.objectContaining({
+        source: "/:path*",
+        destination: `${CANONICAL_ORIGIN}/:path*`,
+        permanent: false,
+      }),
+    );
+    expect(redirectsHost("cross-stitch-tracker.vercel.app")).toBe(true);
   });
 
-  it("never matches the canonical host itself, which would loop", () => {
-    const canonicalHost = new URL(CANONICAL_ORIGIN).host;
-    for (const redirect of redirects) {
-      expect(redirect.has).not.toContainEqual({ type: "host", value: canonicalHost });
-    }
+  it("leaves the canonical host alone, which would otherwise loop", () => {
+    expect(redirectsHost(new URL(CANONICAL_ORIGIN).hostname)).toBe(false);
   });
 
-  it("only ever matches by host, so preview deployments are left alone", () => {
-    for (const redirect of redirects) {
-      expect(redirect.has?.every((condition) => condition.type === "host")).toBe(true);
-    }
+  it("leaves preview deployments and look-alike hosts alone", () => {
+    expect(redirectsHost("cross-stitch-tracker-git-fix-thing-adolwyn.vercel.app")).toBe(false);
+    expect(redirectsHost("cross-stitch-trackerXvercelXapp")).toBe(false);
+    expect(redirectsHost("evil.cross-stitch-tracker.vercel.app")).toBe(false);
   });
 });
 

@@ -258,7 +258,9 @@ when the Preview environment was populated and verified.
   `src/lib/canonical-host.ts` now forwards the alias to the canonical origin (via
   `next.config.ts` `redirects()`), which keeps one front door instead of widening the bucket's
   list. **A new production hostname needs adding to `ALIAS_HOSTS` there**, or uploads on it fail
-  the same way.
+  the same way. Cookies are per host, so anyone who used the alias signs in once more on the
+  canonical address, and a tab left open on the alias from before the redirect shipped fails its
+  next action or sign-in until it is reloaded.
 - **The scratch bucket needs no CSP change — but not for the reason it looks like.** The AWS SDK
   addresses R2 **virtual-hosted style** (no `forcePathStyle` is set), so the bucket is the first
   label of the hostname: a presigned URL for the scratch bucket points at

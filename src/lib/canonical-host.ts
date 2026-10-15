@@ -18,12 +18,14 @@ const ALIAS_HOSTS = ["cross-stitch-tracker.vercel.app"];
 
 /**
  * Matched by host only, so preview deployments (each on its own hostname) are untouched.
- * Temporary rather than permanent: a cached 308 outlives any later change to these hosts.
+ * Next treats a `host` value as an anchored regex, so the dots are escaped to keep each
+ * entry a literal hostname. Temporary rather than permanent: a cached 308 outlives any
+ * later change to these hosts.
  */
 export function canonicalHostRedirects(): Redirect[] {
   return ALIAS_HOSTS.map((host) => ({
     source: "/:path*",
-    has: [{ type: "host", value: host }],
+    has: [{ type: "host", value: host.replaceAll(".", "\\.") }],
     destination: `${CANONICAL_ORIGIN}/:path*`,
     permanent: false,
   }));
