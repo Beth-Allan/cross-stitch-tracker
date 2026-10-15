@@ -125,6 +125,24 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-14 · D-23 · Safari's empty date boxes wait for the design track — ruled during a `/broken`
+
+**What needed a ruling.** Beth reported that adding a chart shows today's date in Start, Finish
+and FFO Date and that she cannot delete them. Located, not theorized: `use-chart-form.ts` starts
+all three as `""` and the submit maps `""` to `null`; Beth confirmed she was in **Safari** and that
+a chart she saved with the boxes untouched **did not** get the dates. So the data is right and the
+app matches its reference — DesignOS's `ChartAddForm.tsx` / `ChartFormModal.tsx` use the plain
+native `<input type="date">` — but Safari on macOS paints today's date into an **empty** date box,
+indistinguishable from a real value, and offers no obvious way to take a set date back out.
+Classified a **gap**, not a defect: built = spec; the spec never considered how a browser draws an
+empty date. Changing how the boxes look has no reference, so it is Beth's call (hard rule 4).
+
+**Surfaced to Beth** in-session: fix now (a faint "No date" for an empty box plus a "Clear" link on
+a filled one, previewed in Safari) · wait for the design work · leave it alone.
+
+**Her ruling: wait for the design work.** Filed as a design-track input in `backlog.md` (whole-app
+— every native date box, not only the chart form). No code changed.
+
 ### 2026-08-21 · D-22 · the review gate covers the storage family, not a list of filenames — ruled during P16
 
 **What needed a ruling.** `.claude/hooks/review-gated-paths.txt` named the R2 core one filename at
