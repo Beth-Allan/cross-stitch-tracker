@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+import { canonicalHostRedirects } from "./src/lib/canonical-host";
 import { contentSecurityPolicy } from "./src/lib/security-headers";
 
 const nextConfig: NextConfig = {
@@ -8,6 +9,10 @@ const nextConfig: NextConfig = {
   // stays ours to author — Beth's ruling, 2026-08-17. The block's advice (verify
   // bleeding-edge APIs before use) is already hard rule 8.
   agentRules: false,
+
+  async redirects() {
+    return canonicalHostRedirects();
+  },
 
   async headers() {
     return [
