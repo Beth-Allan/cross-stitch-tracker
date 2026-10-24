@@ -30,7 +30,51 @@ words where possible. Rows are never deleted.
 
 ## Open — awaiting Beth's ruling
 
-### 2026-08-20 · the repo has a migrations folder but no migration pipeline — found at the start of P9
+_(Nothing is awaiting a ruling — the last two rows moved to Ruled at the 2026-10-24 `/cleanup`.)_
+
+## Also open — the question known to be coming
+
+_(This section is empty. The question that used to sit here — fabric matching for a project with
+no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is recorded as
+**FAB-006** in `docs/domain/fabric.md`. The other question that used to sit here — block/warn/allow
+on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
+
+## Ruled
+
+### 2026-10-24 · D-26 · three small visible fixes — ruled at the `/cleanup`
+
+**What needed a ruling.** Three ledger rows whose fix changes what Beth sees, with no design
+reference: a genre add that fails says nothing; a cover whose thumbnail fails to generate leaves the
+old thumbnail in the lists; a missing completion estimate cannot be told apart from a failed one.
+
+**Surfaced to Beth** one at a time, each with options and a recommendation.
+
+**Her rulings (2026-10-24):** ① a message under the genre box ("'Animal' is already on the list."),
+not a toast or a silent pick of the existing genre · ② show the new full cover, not the old
+thumbnail · ③ a quiet line for each case — "Not enough stitching logged yet to estimate" and
+"Couldn't work out an estimate right now".
+
+**What it changed.** Item **F-14** (`docs/process/build-plan.md`), UI-touching. No code changed in
+the cleanup PR.
+
+### 2026-10-24 · D-25 · four small changes into the housekeeping batch — ruled at the `/cleanup`
+
+**What needed a ruling.** Four ledger rows that are trivial to fix but need Beth's word: one removes
+a test (hard rule 2) and two change the gate (hard rule 6). ① `PlaceholderPage` has no call sites
+since P16, and deleting it deletes its test. ② The test run has no timezone pin, so a local-zone
+display regression passes on CI's UTC runners. ③ `src/generated/` (the Prisma client) is linted
+under `--max-warnings 0`, so a generator update could redden the gate. ④ `test-utils` does not
+re-export `userEvent`, which the testing rule says to import from it; 43 files import it directly.
+
+**Surfaced to Beth** as one decision: approve all four · only ① and ④ (no gate change) · later.
+Recommendation: all four.
+
+**Her ruling (2026-10-24): approve all four.** The test removal is approved on the record.
+
+**What it changed.** All four join **F-8** (`docs/process/build-plan.md`). No code changed in the
+cleanup PR.
+
+### 2026-08-20 · D-24 · schema changes reach the database automatically on deploy — found at the start of P9, ruled at the 2026-10-24 `/cleanup`
 
 **What contradicts what.** P9's brief and the protocol both assume migrations are how schema
 changes reach the database: the brief's done-when is "**one migration carries the indexes +
@@ -79,51 +123,18 @@ is not P9c's to answer inside its own build — it decides whether P9c can exist
 back to Beth as its own decision with options before P9c is queued. Until then the ledger's
 StorageLocation/StitchingApp row and the index work both wait here, named, rather than looking done.
 
-### 2026-08-17 · P1 made `src/lib/validations/auth.ts` load-bearing for auth, and it is not review-gated
+**Surfaced again at the 2026-10-24 `/cleanup`**, as its own decision: automatic on deploy (baseline
+today's database, then each deploy applies pending migrations; previews only ever touch their own
+Neon branch) · a manual step at merge (a session pushes the change by hand after Beth's yes; no
+record, and a push can drop data) · no database changes for now (drop P9c's database half).
+Recommendation: automatic on deploy.
 
-**What contradicts what.** The review-gated list (`.claude/hooks/review-gated-paths.txt`, mirrored
-in `session-protocol.md` §5) gates "auth, session, and rate limiting — the mechanisms AND the routes
-that apply them", and its own comment says to gate growing families **by directory, not filename**.
-P1 moved the rate limit inside `authorizeCredentials`, which made that function an unauthenticated
-boundary — so the layer-1 review required a Zod parse there, and the schema it parses with is
-`loginSchema` in **`src/lib/validations/auth.ts`**. That file is not on the gated list.
+**Her ruling (2026-10-24): automatic on deploy.**
 
-**Why it matters.** Three of the protections P1 added now live in that schema rather than in
-`auth.ts`: the `.max(254)` that bounds the rate-limiter key, the `.trim().toLowerCase()` that makes
-both login entry paths key and match identically, and the email format check itself. Deleting
-`.max(254)` is a one-line edit to an ungated file that silently reopens the unbounded-store hole the
-review caught. That is the same shape as the `proxy.ts` argument Beth already ruled on (③, PR #72
-review): the file whose one-line edit can quietly undo the control belongs on the list.
-
-**Why it needs Beth.** Adding a path to that list is a gate-config change (hard rule 6), and P1's
-builder must not make it unilaterally — the same reasoning that put the four PR #72 additions in
-front of her. **Not applied in the P1 branch.**
-
-**Options.** (a) Add `^src/lib/validations/auth\.ts$` — one line, no code, and consistent with the
-③ precedent. (b) Gate the whole `^src/lib/validations/` directory — follows the by-directory lesson,
-but pulls ~9 non-auth schemas into review-gating and taxes many future items. (c) Leave it, and
-move the three auth-critical rules back into `auth.ts` so the gated file holds them — no list
-change, but it duplicates the email rule the form action also needs, which is exactly what P13
-(one validation boundary) exists to remove.
-
-**Recommendation: (a).** It closes the gap the way she has already ruled once, costs one line, and
-leaves the single-boundary shape P13 is heading towards intact.
-
-**Ruling (2026-08-17, in the P1 session): (a) — add the one file.** Beth chose adding
-`^src/lib/validations/auth\.ts$` over gating the whole `validations/` directory or moving the
-rules back into `auth.ts`. Applied in the P1 branch: one line in
-`.claude/hooks/review-gated-paths.txt` and the matching prose in `session-protocol.md` §5, which
-is kept in step by the same rule. No code changed. **This row moves to Ruled at the next
-`/cleanup`.**
-
-## Also open — the question known to be coming
-
-_(This section is empty. The question that used to sit here — fabric matching for a project with
-no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is recorded as
-**FAB-006** in `docs/domain/fabric.md`. The other question that used to sit here — block/warn/allow
-on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
-
-## Ruled
+**What it changed.** New item **R-2 — a migration pipeline** (`docs/process/build-plan.md` Stage R),
+gated as schema + migrations, so a fresh `/review` merges it. P9c is no longer waiting on a
+question; it waits on R-2. Protocol §2's "migration committed in the same PR" stays as written —
+R-2 is what makes it true.
 
 ### 2026-10-14 · D-23 · Safari's empty date boxes wait for the design track — ruled during a `/broken`
 
@@ -292,6 +303,43 @@ The FAB-005 formula edit named above stands with it. Q-002 and Q-005 are untouch
 
 _(Beth's rulings D-01–D-14, which set the process itself up, are in
 `WORKFLOW-OVERHAUL-HANDOFF.md` §2.)_
+
+### 2026-08-17 · P1 made `src/lib/validations/auth.ts` load-bearing for auth, and it is not review-gated — moved to Ruled at the 2026-10-24 `/cleanup`
+
+**What contradicts what.** The review-gated list (`.claude/hooks/review-gated-paths.txt`, mirrored
+in `session-protocol.md` §5) gates "auth, session, and rate limiting — the mechanisms AND the routes
+that apply them", and its own comment says to gate growing families **by directory, not filename**.
+P1 moved the rate limit inside `authorizeCredentials`, which made that function an unauthenticated
+boundary — so the layer-1 review required a Zod parse there, and the schema it parses with is
+`loginSchema` in **`src/lib/validations/auth.ts`**. That file is not on the gated list.
+
+**Why it matters.** Three of the protections P1 added now live in that schema rather than in
+`auth.ts`: the `.max(254)` that bounds the rate-limiter key, the `.trim().toLowerCase()` that makes
+both login entry paths key and match identically, and the email format check itself. Deleting
+`.max(254)` is a one-line edit to an ungated file that silently reopens the unbounded-store hole the
+review caught. That is the same shape as the `proxy.ts` argument Beth already ruled on (③, PR #72
+review): the file whose one-line edit can quietly undo the control belongs on the list.
+
+**Why it needs Beth.** Adding a path to that list is a gate-config change (hard rule 6), and P1's
+builder must not make it unilaterally — the same reasoning that put the four PR #72 additions in
+front of her. **Not applied in the P1 branch.**
+
+**Options.** (a) Add `^src/lib/validations/auth\.ts$` — one line, no code, and consistent with the
+③ precedent. (b) Gate the whole `^src/lib/validations/` directory — follows the by-directory lesson,
+but pulls ~9 non-auth schemas into review-gating and taxes many future items. (c) Leave it, and
+move the three auth-critical rules back into `auth.ts` so the gated file holds them — no list
+change, but it duplicates the email rule the form action also needs, which is exactly what P13
+(one validation boundary) exists to remove.
+
+**Recommendation: (a).** It closes the gap the way she has already ruled once, costs one line, and
+leaves the single-boundary shape P13 is heading towards intact.
+
+**Ruling (2026-08-17, in the P1 session): (a) — add the one file.** Beth chose adding
+`^src/lib/validations/auth\.ts$` over gating the whole `validations/` directory or moving the
+rules back into `auth.ts`. Applied in the P1 branch: one line in
+`.claude/hooks/review-gated-paths.txt` and the matching prose in `session-protocol.md` §5, which
+is kept in step by the same rule. No code changed. **This row moves to Ruled at the next
+`/cleanup`.**
 
 ### 2026-08-17 · D-17 · over-count is missing from the fabric size calculation — ruled during P7
 

@@ -274,19 +274,23 @@ charts. It is now carried by three items.
 - **Done-when:** both lists paginated test-first, presign bounded to the visible page, Beth has
   seen the preview; gate green.
 
-#### P9c The gated half — **blocked on the migration-pipeline ruling**
+#### P9c The gated half — **ruled 2026-10-24 (D-24); waits on R-2, the migration pipeline**
 
 - **Objective:** the four whole-table session scans in `src/lib/queries/stats/`
   (`available-years.ts`, `day-of-week.ts`, `personal-bests.ts`, `record-detection.ts` — the last
   runs on **every session write**), the missing indexes as one migration, and the
   StorageLocation/StitchingApp ledger row (`@@unique([userId, name])`, the unscoped
   `project.updateMany` on both delete paths, the friendly-duplicate P2002 arms).
+- **Also inherits — routed at the 2026-10-24 `/cleanup`:** a database check that
+  `Project.overCount` is 1 or 2, so the three unchecked `as 1 | 2` narrowings become true by
+  construction (ledger row 08-18), and constraints for `Fabric.type`/`colorFamily`/`colorType`
+  (row 08-19). Both ride R-2's pipeline.
 - **Also inherits — rerouted from P11, 2026-08-19:** `prisma/schema.prisma`'s
   `// Calculator settings (Phase 7)` comment, a planning-doc reference the conventions ban.
 - **Blocked, not queued.** The index and uniqueness work cannot honestly complete until the
-  2026-08-20 drift row is ruled: _how does a schema change reach the live database?_ That comes
-  back to Beth as its own decision with options. The stats-scan half is gated but not blocked, and
-  could be lifted out if she wants it sooner.
+  2026-08-20 drift row is ruled: _how does a schema change reach the live database?_ **Ruled
+  2026-10-24 (D-24): automatic on deploy** — built as **R-2**, and P9c follows it. The stats-scan
+  half is gated but not blocked, and could be lifted out if she wants it sooner.
 - **Done-when:** the four scans bounded test-first; the migration question answered and its answer
   carried out; indexes + uniqueness real in Neon, not merely committed; fresh `/review`.
 
@@ -703,6 +707,134 @@ not a promise that the diagnosis below is right.
 
 ---
 
+### F-7 The chart form's calculator settings are never saved — **created at the 2026-10-24 `/cleanup`**
+
+- **Objective:** the over-1/over-2 toggle, strand count and waste percent on the chart form reach
+  the project when the chart is saved, creating and editing. Today they live only in the
+  localStorage draft (`chart-merged-form.tsx` starts them at `DEFAULT_CALC_PARAMS`), and neither
+  `chartFormSchema` nor `createChartAndProject`/`updateChart` carries them — so a project created
+  "over 2" is stored over 1 and F-4's fabric sizing reads wrong for it (maintenance-ledger row
+  2026-08-18).
+- **Cited specs:** the ledger row · `docs/domain/fabric.md` (FAB-004, effective count) ·
+  `updateProjectSettingsSchema` (the existing write path's rule — reuse it, don't restate it,
+  `.claude/rules/form-patterns.md`).
+- **Traps:** ① The defaults are domain constants — don't invent new ones; use what
+  `DEFAULT_CALC_PARAMS` already traces to, and stop-and-ask if it traces to nothing. ② Editing an
+  existing chart must not overwrite a project's saved settings with the form's defaults — the form
+  has to start from the project's values. ③ Stats-visible mutation: keep the `revalidateTag`
+  assertion (testing rule). ④ Not gated (`chart-actions.ts`, `validations/chart.ts`), but the
+  calculators that read the value are — don't touch them.
+- **Done-when:** test-first — create and edit both persist all three settings; editing preserves
+  saved values; gate green; Beth has seen the preview (a chart created over 2 shows over-2 sizing).
+
+### F-8 Housekeeping batch — **approved by Beth at the 2026-10-24 `/cleanup` (trivial-batch)**
+
+- **Objective:** close eighteen ungated ledger rows in one `fix/` branch, no visible change. Each
+  is a ledger row (verified live 2026-10-24); the row's own text is the spec.
+  - **Behaviour (test-first):** project start/finish/FFO dates written through `parseCalendarDate`
+    (`chart-actions.ts`, row 08-17) · `updateSupplyAcquired` calls `revalidateTag("stats", …)` with
+    its rule test (row 08-17) · `settled()` rethrows every Next control-flow signal via
+    `unstable_rethrow` — verify the export in `node_modules/next` (row 08-19) · Pattern Dive's
+    `include` narrowed to `select`, its shape test following (row 08-20) · the inline brand/designer
+    dialogs stop normalising blanks (row 08-19) · `validations/supply.ts` takes its enum lists from
+    `src/types/supply.ts`, keeping D-19's messages (row 08-19) · the dead `chartId` prop on
+    `CoverImageUpload` removed (row 08-20).
+  - **Hygiene:** the `// ───` marker sweep (row 08-19) · one `formatNumber` in `src/lib/utils/`
+    (row 08-19) · the dead `group` class in `hero-cover-banner.tsx` (row 10-14, part ②) · the
+    `digitalFileUrl` test-title rename (row 08-19) · `supplies-tab.gaps.test.tsx` asserts on its
+    spy or its header stops claiming it (row 08-20 — strengthen, never weaken) · `SECURITY.md`'s
+    10MB figures (row 08-19) · the broken ledger table (row 08-19).
+  - **Beth's four rulings (D-25, same `/cleanup`):** delete `src/components/placeholder-page.tsx`
+    **and its test — removal approved on the record** (row 08-20) · pin the test run to
+    `TZ=America/Edmonton` (row 08-17, no-TZ-pin) · add `src/generated/**` to `globalIgnores` (row
+    08-20, lint edges ①; ② stays as designed) · re-export `userEvent` from `test-utils` and move the
+    43 direct imports onto it (row 08-17). Items 2 and 3 are gate-config changes — pre-approved by
+    D-25, say so in the PR.
+- **Traps:** ① No gated path — if one turns up, that fix leaves the batch. ② A renamed or rewritten
+  test asserts the same or more, never less (hard rule 2). ③ Each row moves to Resolved in the PR.
+- **Done-when:** every listed row Resolved, gate green, layer-1 review passed; merges on green.
+
+### F-9 Auth slivers — **queued by Beth at the 2026-10-24 `/cleanup`; gated — `/review` follows**
+
+- **Objective:** two ledger rows on gated auth files. ① `authorizeCredentials`'s wrong-email
+  short-circuit skips `bcrypt.compare`, so response timing reveals the login address (row 08-17,
+  `src/lib/auth.ts`) — compare against a fixed dummy hash on that path. ② The dead `LoginInput`
+  `z.infer` export in `src/lib/validations/auth.ts` (row 08-19) — delete it.
+- **Traps:** ① The rate limit must still be recorded before any hashing (`.claude/rules/auth-patterns.md`).
+  ② Test the _shape_ (compare is called on both paths), never wall-clock timing — a timing test is flaky.
+- **Done-when:** test-first; both rows Resolved; gate green; fresh `/review`.
+
+### F-10 Calculator hygiene — **queued by Beth at the 2026-10-24 `/cleanup`; gated — `/review` follows**
+
+- **Objective:** ① `skein-calculator.ts` divides `fabricCount / overCount` inline while
+  `fabric-calculator.ts` has `calculateEffectiveCount` — one rule (FAB-004), one implementation (row
+  08-18). ② `classifyFabricFit` takes the piece's count as a separate argument that must always be
+  the piece's own — make the signature say so (row 08-18). ③ The planning-doc comment sliver at
+  `fabric-calculator.ts:5` (comment-sweep row, routed here 2026-08-19).
+- **Traps:** ① Pure refactor — every existing calculator test passes unchanged; no figure on screen
+  moves. ② Domain constants untouched (hard rule 5).
+- **Done-when:** rows Resolved, existing suite green unchanged plus any new seam test; fresh `/review`.
+
+### F-11 Chart-form file verification — **queued by Beth at the 2026-10-24 `/cleanup`; gated — `/review` follows**
+
+- **Objective:** files attached while creating a chart get the verification `addChartFile` already
+  performs. Three ledger rows, one write path: P2's `createChartAndProject` client-metadata row and
+  P8's duplicate of it (both 08-17 — merge them), and `chartFormSchema`'s `fileKeys` accepting any
+  owner segment (row 08-19). Read size/type back from the stored object (`HeadObject`, via the helper
+  in gated `chart-file-actions.ts`) and fence `fileKeys` the way P13b fenced cover keys.
+- **Traps:** ① Reuse P13b's key-ownership rule and `resolveChartFileContentType`; don't write a
+  second one (`.claude/rules/form-patterns.md`). ② A refused file must name itself to Beth, not fail
+  the whole save silently.
+- **Done-when:** test-first; three rows Resolved; gate green; fresh `/review`.
+
+### F-12 R2 request timeout — **queued by Beth at the 2026-10-24 `/cleanup`; gated — `/review` follows**
+
+- **Objective:** the `S3Client` in `src/lib/r2.ts` sets no request timeout, so an R2 outage that
+  hangs can hold `deleteChart` until the Vercel function dies and turn a finished delete into an
+  error (row 08-17). Give the client a bounded timeout and decide, per caller, what a timeout means.
+- **Traps:** ① Verify the AWS SDK v3 `requestHandler` timeout options in `node_modules/` (hard rule 8).
+  ② A delete whose database half succeeded must still report success; the orphan is logged, not surfaced.
+- **Done-when:** test-first; row Resolved; gate green; fresh `/review`.
+
+### F-13 The storage family in its own folder — **queued by Beth at the 2026-10-24 `/cleanup`; gated — `/review` follows**
+
+- **Objective:** D-22 gates the R2 storage family by a filename-prefix pattern, one new sibling away
+  from going stale again (row 08-21). Move the family into `src/lib/actions/storage/` and gate the
+  directory.
+- **Traps:** ① **Opens with a question, not a branch:** changing `.claude/hooks/review-gated-paths.txt`
+  is a gate-config change (hard rule 6) — put the before/after to Beth and get her yes on the record
+  before moving anything. ② Imports move with the files; no behaviour changes. ③ Protocol §5's mirror
+  of the list changes in the same PR.
+- **Done-when:** Beth's yes recorded; files moved, gate list and §5 updated; gate green; fresh `/review`.
+
+### F-14 Three small visible fixes — **Beth's rulings D-26 (2026-10-24 `/cleanup`); UI-touching, preview before merge**
+
+- **Objective:** three ungated ledger rows, each with Beth's answer. ① **Genre add fails silently**
+  (`genre-picker.tsx`, row 10-14): show a short message under the input, e.g. "'Animal' is already
+  on the list." — the form-error pattern, not a toast. ② **Stale thumbnail after a failed
+  optimisation** (`chart-actions.ts` `updateChart`, row 08-17): clear the old thumbnail so the lists
+  fall back to the new full cover (`gallery-grid.tsx`'s fallback). ③ **The completion estimate
+  vanishes** (`charts/[id]/page.tsx`, row 08-17): a quiet muted line for each case — "Not enough
+  stitching logged yet to estimate" vs "Couldn't work out an estimate right now" — P6's
+  honest-failure pattern.
+- **Traps:** ① ② deletes nothing from R2 — the old thumbnail object's cleanup is the orphan story's,
+  not this item's; check the path stays ungated. ③ needs the two cases distinguishable — if that
+  means editing gated `src/lib/queries/stats/completion-estimates.ts`, that half leaves for a gated
+  item rather than riding here. Wording is Beth's; semantic tokens only.
+- **Done-when:** test-first, three rows Resolved, gate green, Beth has seen the preview.
+
+### F-15 Calendar-date test fixtures — **queued by Beth at the 2026-10-24 `/cleanup`; test-only**
+
+- **Objective:** session dates and project start/finish/FFO dates are calendar dates, always stored
+  `T00:00:00.000Z` via `parseCalendarDate()`; ~125 fixtures give them a time of day the app cannot
+  store (ledger row 2026-08-20). Make the fixtures describe data the app can actually hold.
+- **Traps:** ① Each hit needs judgement — a fixture that is deliberately an _instant_ (a timestamp,
+  `createdAt`) stays as it is. ② Rewriting a fixture never loosens its assertion (hard rule 2); if a
+  test only passed because of the impossible time, that is a finding, not a rewrite. ③ Prefer one
+  factory helper over 125 literals. ④ Stats tests sit in gated `src/lib/queries/stats/` — if the
+  sweep reaches them, route the PR to `/review`.
+- **Done-when:** row Resolved, gate green, no assertion weakened; merges on green unless ④ applies.
+
 ## Stage R — process-enabling fixes
 
 ### R-1 R2 on preview deployments
@@ -744,6 +876,60 @@ not a promise that the diagnosis below is right.
   `docs/INTEGRATIONS.md`; work log updated. **Done-when, pass 2:** preview deployments serve and
   accept R2 images, demonstrated on a real preview URL with a working image (state which PR and which
   image), with the preview's writes confirmed to land in scratch and the real bucket unchanged.
+
+### R-2 A migration pipeline — **created by Beth's ruling D-24 (2026-10-24 `/cleanup`); gated (schema + migrations)**
+
+- **Objective:** make a committed Prisma migration actually reach Neon. Today nothing applies one —
+  `build` is `prisma generate && next build`, CI only generates, and every model since March arrived
+  by an out-of-band `db push` (drift D-24 carries the evidence). Beth ruled **automatic on deploy**:
+  record the database as it stands as a baseline, then have each deploy apply pending migrations.
+- **Cited specs:** drift D-24 · `docs/INTEGRATIONS.md` (Neon: `DATABASE_URL` pooled for the app,
+  `DIRECT_URL` direct for the CLI; the R-1 topology — previews have their own Neon branch) ·
+  `prisma.config.ts` · protocol §2's definition of done (migration in the same PR). Prisma 7 —
+  verify every `migrate` command and the baseline procedure in Context7 / `node_modules/`
+  (hard rule 8), never from memory.
+- **Traps:** ① **The baseline is the dangerous step.** The one existing migration
+  (`20260328163529_…`) describes 5 of 18 models; whether Neon's `_prisma_migrations` table even
+  records it is unknown. Find out what the live database holds before writing anything, and baseline
+  so that `migrate deploy` applies **nothing** to an already-current database — a baseline that
+  tries to re-create existing tables fails the production build at best. ② **Previews must never
+  migrate production.** Each environment migrates only its own database (preview → its Neon branch,
+  production → main); prove which URL each environment's build reads. ③ No session on this machine
+  has `.env.local`, so reaching Neon needs a credential from Beth's dashboard — ask her to show the
+  screen before she copies anything (memory: dashboard screenshots), and never commit it. ④ This is
+  a deploy-config change, and a failed migration now fails a deploy: say plainly what Beth would see
+  if one ever did, and how it is recovered. ⑤ Schema drift: a `db push`-era database may differ from
+  `schema.prisma` in small ways (`prisma migrate diff`); any difference found is a drift row, not a
+  silent fix.
+- **Done-when:** baseline recorded and shown to apply nothing to production; deploys apply pending
+  migrations with previews scoped to their own branch; a trivial proving migration (or P9c's first)
+  demonstrated reaching a preview database; `docs/INTEGRATIONS.md` and protocol §2 describe the real
+  route; fresh `/review`. **Unblocks P9c.**
+
+---
+
+## Stage M — maintenance recurrences (created at the 2026-10-24 `/cleanup`)
+
+The work log's standing ~monthly dependency recurrence (protocol §9) had no runnable brief, so it
+was never queued and went seven weeks overdue. Each run is one item here, numbered on.
+
+### M-1 Dependency maintenance — October 2026
+
+- **Objective:** the first real run of the recurrence: `npm audit` plus a dependency review since
+  P10 (2026-08-17, zero advisories). Patch what has advisories; review what has moved, especially
+  the bleeding-edge stack (Next 16, the Auth.js **beta**, Prisma 7, Base UI) and the `overrides`
+  block (ledger row 2026-08-17 — it must not outlive its reason).
+- **Cited specs:** P10's brief above (the precedent) · `.claude/rules/bleeding-edge-libs.md` ·
+  hard rule 8 — release notes / Context7 / `node_modules/`, never memory, for anything auth- or
+  Next-adjacent.
+- **Traps:** ① Versions stay exact-pinned; strip any `^`/`~` npm adds. ② Patch, don't modernise —
+  a major bump is its own decision for Beth, logged, not taken. ③ A green gate does not prove login,
+  upload and stats work: demonstrate them on the preview. ④ Upgrades touching `prisma` or
+  `next-auth` reach gated cores' behaviour — say so in the PR and route to `/review` if any gated
+  file changes.
+- **Done-when:** advisories cleared or individually explained; gate green; preview demonstrated
+  (login, upload, stats render); the work log's recurrence paragraph records this run and the next
+  due date; the ledger's pinned-deps row closes (its condition was "the recurrence has run once").
 
 ---
 

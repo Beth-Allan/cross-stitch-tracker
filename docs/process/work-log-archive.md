@@ -42,3 +42,228 @@ and the fixes landed in `6c6cc1b`.
 her in `work-log/drift.md` · what the doc audit turned up in `maintenance-ledger.md` · the traps
 worth keeping in `work-log/notes.md`. Steps 6, 7 and 8 of the handoff's §3.7 were never overhaul
 steps — they are the queue: A-1, the burn-down, DS-1.
+
+---
+
+## Up-next queue — popped-row history, 2026-08-17 → 2026-10-24
+
+Moved verbatim from the work log's queue section at the 2026-10-24 `/cleanup`. Newest first, as it was written.
+
+_(**2026-10-24 `/broken` — a defect, fixed on `fix/supply-need-never-zero`:** saving a new chart failed with "Number must be greater than or equal to 1". DMC 310 had no stitch count; clicking into its empty Stitches cell and away saved 0, the skein calculator returned 0 for 0 stitches, and the row's Need became 0 — which the save's schema (need ≥ 1) refused, without naming the row. Beth confirmed the row and saved by raising Need by hand. Fix: both supply adapters floor a recalculated Need at 1; the Need cell refuses anything below 1 (`EditableNumber` gained a `min` prop); the new-chart form names any row still below 1 before sending; the schema's message now reads "Every supply needs at least 1". The calculator (gated) is untouched. The add-supply row also floors its calculated Need at 1 (a 0 fabric count made it 0), and the message falls back to the supply's name. Eight new tests, each confirmed failing first; layer-1 review PASS with two nits, both taken. Not a gated path; UI-touching — Beth saw the preview and said "Make it live", and PR **#130** merged and deployed on her word. She has asked for a fresh conversation to reorder the queue — `/design-session` drops to much lower priority; the new order is hers to set there.)_ _(**2026-10-14 third `/broken` — a defect, fixed on `fix/genre-add-safari`:** on the new-chart page, typing a new genre and pressing the green Add button closed the box and added nothing — in Safari only. Safari never focuses a button when it is clicked, so the input's "focus left the picker" check saw no destination and closed the picker on mousedown, before the click could land. The Add button now keeps focus in the input (`onMouseDown` preventDefault — the same fix the storage-location and stitching-app add rows already carry). New `genre-picker.test.tsx` replays Safari's click sequence by hand, since jsdom models Chrome. Not a gated path; UI-touching — the layer-1 review passed (test confirmed to fail without the fix), Beth tried the preview in Safari and said "It works", and PR **#129** merged and deployed on her word. A silent failure on a duplicate genre name is a new ledger row. `/design-session` stays the top row.)_ _(**2026-10-14 second `/broken` — a defect, fixed on `fix/focal-point-save-buttons`:** on the chart page, the cover's "set focal point" click layer was sized to the whole banner, including the Save/Cancel bar beneath the picture, so every click on Save or Cancel landed on the layer and moved the target instead — in any browser, not only Safari. The editor now wraps the picture in its own box and the bar sits outside it. Not a gated path; UI-touching — Beth tried the preview in Safari, said "It worked. Make it live.", and PR **#127** merged and deployed the same evening. The layer-1 review's two pre-existing leftovers (crop-guide dimming spreads over the whole page; an unused `group` class) are a ledger row. `/design-session` stays the top row.)_ _(**2026-10-14 `/broken`, no row popped:** Safari's empty date boxes show today's date — a gap, not a defect (data saves correctly); Beth ruled it waits for the design track, D-23. `/design-session` stays the top row.)_ _(**P16's review row popped on 2026-08-21** — the delta re-review passed, Beth ran the rehearsal on the preview and gave her word, PR **#119** merged and deployed, and Stage P's last built item is `reviewed`. **Built, run, and done:** Beth pressed the real button the same session; it finished with nothing left alone, so the `covers/unsaved/` half of the lifecycle rule is now safe and the deletion sliver is closed (ledger row updated; `files/unsaved/` still needs its own answer). Two things worth carrying forward. **One:** the layer-1 stop rule was right in spirit and wrong about *which* failures to count — the first `/review` caught that five missing pictures in a fixed-order list would have stopped every run at the same place, and the fix was to have the action say whether a failure is about the chart or unexplained, not to loosen the limit. A rule that reads "N in a row" has to say N of *what*. **Two:** a reviewer that fixes a gated file cannot merge its own fix, and that held: the stop-rule commit waited for a second fresh session, which re-read only the delta and was done inside an hour. The cost of honouring hard rule 3 on a one-commit delta is small; skipping it would have made the rule negotiable. `/design-session` is the new top row.)_ _(**P16's build row popped on 2026-08-20** — built on `item/P16-backfill-cover-images`, PR **#119**, and it stopped at built-awaiting-review exactly as its brief predicted. Three things worth carrying forward. **One:** the item opened with a stop-and-ask that was not a domain question but a **design** one — the button had nowhere to live. Settings has been a "coming soon" placeholder since the shell was built and DesignOS never drew it, so hard rule 4 made it Beth's call rather than a screen to invent; she ruled Settings (**D-21**) before any code was written, and the card is built from the app's existing primitives so DS-1 restyles it with everything else. **Two:** the trap that said the already-converted test must be the row and not the key's spelling turned out to rest on a **prop**: `CoverImageUpload` accepts a chart id that its one call site never passes, which is the only reason "both keys in the chart's own namespace" means "the optimizer wrote them". Logged as a ledger row so the assumption is visible instead of implied. **Three:** an incomplete module mock made a landed rule look absent — the gated upload test stubs `@/lib/r2` with two functions, so the newly shared `isNotFound` arrived undefined and the action reported a generic failure instead of the specific one. It is the same trap the testing rules already document for `next/cache`, one module along; the fix was to spread the real module into the factory rather than to stub one more name. `/review P16` is the new top row.)_ _(**P14's row popped on 2026-08-20.** It is the first item where the gate itself bites: a warning is now a red gate, and CI runs the same one command the pre-push hook does. Two things worth carrying forward. **One:** the burn-down was not 48 deletions — 22 of the 48 were decisions about what the checker should enforce, and one of them (the underscore convention) is what kept the item out of a review session, because rewriting the code instead would have edited review-gated stats files. Reaching for the rule config was the cheaper **and** the more honest fix. **Two:** disabling a rule is how you find out who was already suppressing it — four inline disable comments fell out, revealing four image tags nobody had counted. `/work-item P16` is the new top row.)_ _(P9a-2's row popped on 2026-08-20 — the last of P9's invisible half, ungated, merged on green with no `/review` row behind it. It found one thing worth carrying forward: `getChartsForGallery` **did** have a test file (`chart-actions-gallery.test.ts` — not the name a grep for the function inside `*.test.ts` turns up first), and one of its tests asserted the very query shape the item replaces. It was rewritten to assert the same guarantee against the new reads rather than deleted, so no ruling was needed — but the near miss is why the next session greps the suite by *behaviour*, not only by filename. `/work-item P14` is the new top row.)_ Order approved by Beth at the 2026-08-17 `/cleanup`; hers to reorder anytime. _(P11's row popped on
+2026-08-19 — **the item split rather than marathoned**, exactly as its brief said it might. The size
+check found 17 fixes with 3 on review-gated paths, and Beth ruled: ship the harmless 14 today rather
+than hold them behind a `/review`. Batch one merged as PR **#105**; **`P11b`** carries her two rulings
+and is the new top row. Two fixes were rerouted to items that already own the same decision — the
+upload allowlists to P13, the `schema.prisma` comment to P9 — so nothing was dropped. P12's `/review` row
+popped the same day — reviewed and merged as PR **#103**, so the audit's test-honesty item is done. P12 had been through the queue twice: its build row popped first,
+then came straight back as a `/review` row because the diff repairs a test inside
+`src/lib/queries/stats/`, a gated path. F-1's row popped on 2026-08-18 as PR **#102**, ungated, no
+review row behind it; the three `/review` rows before that — F-5's, F-4's and P7's — popped the same
+day, reviewed on the branch and merged on Beth's word.)_ _(P13's row popped on 2026-08-19 — **and
+split, the second item in three days to do so.** Five inherited ledger rows had become seven fixes
+with three in gated `upload-actions.ts`; Beth ruled the split before any code was written (**D-20**),
+so the four form-input fixes merged the same day as PR **#109** and **`P13b`** is the new top row.
+P13b is the first item in a while that **opens with a question rather than a branch**: which
+stitching-software file formats Beth actually keeps is what decides whether the browser's rule or
+the server's is the right one, and that answer goes through `/stitch-fact` before any code.)_
+_(P13b's build row popped on 2026-08-19 — and it opened by finding **PR #109 still open**: P13 had
+written its work log as merged and stopped before Beth's word on the preview, so P13b's own base did
+not exist yet. Beth chose to merge it on the checks rather than open the preview, and P13 deployed
+before this item branched. The question the row promised was asked first and answered: **PDFs,
+photos or scans, and the pattern formats `.xsd`, `.pat`, `.saga`, `.oxs` — and no zip folders**, now
+`docs/domain/chart-files.md` (CHF-001–CHF-004, the first topic file written from Beth rather than
+from the plan) plus **Q-007** for the two loose ends. P13b stopped at `built, awaiting review` as
+predicted, so its `/review` row is the new top row.)_ _(P13b's `/review` row popped on
+2026-08-19 — a fresh Fable session re-ran the gate itself, verified every done-when clause,
+ran the security checklist clean, and mutation-tested both new rules rather than trusting the
+claims. **Beth approved the one deleted test on the record** — it asserted zip's membership in a
+constant that no longer exists, overturned by her own CHF-003. Merged as PR **#110**; production
+deployed. `/work-item P9` is the new top row.)_ Gated items each
+add a `/review` row when they finish — the builder stops at `built, awaiting review` and the
+review session merges. _(P11b's build row popped on 2026-08-19 — built on `item/P11b-rulings`, PR
+**#107**, and it stopped at `built, awaiting review` exactly as predicted: the clamp unification
+reaches `src/lib/queries/stats/completion-estimates.ts`. One new ruling came
+out of the session — **D-19**, the quick-add picker is required rather than pre-set to Neutral.
+Its `/review` row popped the same day: a fresh Fable session ran the gate itself, verified all
+four done-when clauses and both rulings against the diff, found nothing to fix, Beth gave her
+word on the Vercel preview, and PR #107 merged. P13 is the new top row.)_
+
+---
+
+## Retired notes — from `work-log/notes.md`, 2026-10-24 `/cleanup`
+
+Consumed: P11b merged (PR #107) and its P9 sliver is already in P9c's brief; the ledger-size note described the seeding era, long past; R-1's settings note marked itself consumed and its durable facts live in `docs/INTEGRATIONS.md`. Moved verbatim, headings demoted one level.
+
+### P11b · what batch one already settled (2026-08-19)
+
+**Tagged: P11b, P9, P13.**
+
+Batch one is merged (PR #105); P11b is the queue's top row. Three things it does not need to
+rediscover:
+
+- **The display clamp is what makes P11b gated.** `src/lib/queries/stats/designer-insights.ts`
+  and `completion-estimates.ts` each compute a percentage that can exceed 100, and that directory
+  is review-gated. P11b stops at `built, awaiting review`; a `/review` row follows it. Both of its
+  fixes are UI, so Beth also sees the preview.
+- **The quick-add path is `src/lib/actions/supply-actions.ts:769`** — `colorFamily: "NEUTRAL"`
+  hardcoded — and `chart-merged-form.tsx:74,93` passes the same literal from the client. Both sides
+  change, or the picker's answer is discarded on the way in. `src/lib/validations/supply.ts:112`
+  defaults the field, so the schema needs no change to accept a real value, only the callers.
+- **Progress % is hand-written in 18 places**, not the 11 the report counted — 7 unclamped. The
+  full list is `git grep -n "\* 100)" -- src`. The clamped ones already agree with each other
+  (`Math.min(100, …)`), so the helper's shape is settled; it is the seven that disagree.
+
+For **P9**: the `prisma/schema.prisma` comment sweep sliver is `// Calculator settings (Phase 7)`
+on `Project`. For **P13**: the two upload allowlists are in `src/lib/validations/upload.ts`, and the
+row about them disagreeing is already in the ledger — same decision, one fix.
+
+### Why the ledger looks small
+
+**Tags:** ledger · 999.x · triage
+
+It is small because it is honest, not because it is new. The `999.x` list it was seeded from had
+~90 entries, but roughly 30 had already been fixed by phases 35–39 without being struck off, and
+roughly 25 more were feature wishes rather than warts (they are in `backlog.md`). Every carried
+row was checked against the working tree or is explicitly marked _(unverified)_ for A-1 to
+confirm or drop. **An empty-looking ledger is not an invitation to go hunting** — that is A-1's
+job, once, deliberately.
+
+**Update 2026-08-16 (step 5): nine rows added, and they were not hunted for.** They fell out of
+the delegated accuracy audit of the seven codebase docs before promotion — the docs claimed
+things about the code, and checking the claims surfaced the warts. Four are genuine finds
+(recharts wildcard import · the CSP's `unsafe-eval` · the 16-query stats fan-out against Neon's
+pool · no pagination anywhere in the browse path) and five are config warts (`shadcn` CLI in
+`dependencies` · `@types/node` 20.x against `engines: >=22` · dead `NEXT_PUBLIC_APP_URL` ·
+dependabot ignoring a package name that is no longer installed · undocumented deployment
+topology). **A-1 should cite these, not re-find them.**
+
+### R-1's settings half — the exact list, and the one check that must happen before the code merges
+
+**Tags:** R-1 · preview deployments · Vercel · Cloudflare R2 · Neon · D-15 · D-16 · layer 2
+
+**CONSUMED 2026-08-17** — the settings pass is done and the shape is verified on PR #85's preview
+(signed in, real covers rendered, a new cover uploaded to scratch, production's copy untouched).
+`/cleanup` may retire this note: everything durable in it now lives in `docs/INTEGRATIONS.md`
+(topology, the CORS requirement, the credential split) and the work-log row. It is kept until then
+because it is the only place the _ordering_ of the dashboard steps is written down, which is what a
+rebuild of the Preview environment would need.
+
+**Beth's copy of this list** is a private artifact — a five-step checklist in her language, with
+the two hazards flagged: <https://claude.ai/code/artifact/b6538c58-ce8c-4d54-bdb8-31515242ac6b>
+(published 2026-08-17; republishing the same file path from that session updates it in place).
+
+**Why this note exists.** R-1 is two halves and only the code half can be done from a session:
+this machine has no Vercel or Cloudflare access — no CLI, no stored login, no `.env.local` at all
+(checked 2026-08-17). Beth ruled (D-16) that the keys stay with her and Claude writes the steps, so
+this is that list, written down so the next session does not re-derive it or re-ask her.
+
+**① The pre-merge check — `R2_BUCKET_NAME` in Vercel Production. CLEARED 2026-08-17 — do not
+re-ask Beth.** She checked the dashboard in-session and it is set, scoped to **Production and
+Preview** both (added Apr 11, marked Sensitive). Production is therefore not running on the removed
+default, and the merge is safe on this axis. The rest of this item is kept for the record and for
+anyone who wonders why the check existed.
+
+**Why it existed.** R-1 made that variable
+**required**: it used to default to `"cross-stitch-tracker"` with a warning, which meant a typo
+silently redirected every presigned URL to the wrong bucket. **`.env.example` suggests the real
+bucket is named exactly that, so Production may be running on the fallback right now with the
+variable unset.**
+
+If it is, merging does more than break uploads — **it blanks every image on the live site, quietly.**
+`getPresignedImageUrls` catches per-key failures with `Promise.allSettled` and returns an empty map,
+so every cover, thumbnail and session photo disappears from every page with nothing but a
+`console.warn` (the layer-1 review of PR #85 traced this; the first draft of this note understated
+it as an upload-only failure). **So before R-1 merges, Production must be confirmed to have
+`R2_BUCKET_NAME` set to the real bucket's name.** That is a dashboard read, not a code question — it
+belongs to the `/review` session's checklist, and the PR says so.
+
+**② Cloudflare — one bucket, two tokens, one CORS policy** (dash.cloudflare.com → R2):
+
+- **The CORS policy is not optional and was missed on the first pass.** A new bucket refuses browser
+  uploads until it has one; the real bucket has carried one since April and a new bucket inherits
+  nothing. On the scratch bucket → Settings → CORS Policy: `AllowedOrigins: ["*"]`,
+  `AllowedMethods: ["GET","PUT"]`, `AllowedHeaders: ["*"]`. Takes effect immediately, no redeploy.
+  Reasoning for the wildcard is in `INTEGRATIONS.md`. **Symptom if forgotten:** the upload UI says
+  "Upload failed. Please try again." — which is reachable only _after_ the presign succeeds, so a
+  presign-side cause (missing variable, bad key) would have produced a different message.
+
+- Create a bucket in the same account as the real one, e.g. `cross-stitch-tracker-preview`.
+- Token A — **Object Read only**, scoped to the _real_ bucket. This becomes Preview's main
+  credential pair, which is what makes a preview physically unable to write to production storage
+  rather than merely coded not to.
+- Token B — **Object Read & Write**, scoped to the _scratch_ bucket only.
+- Both tokens are optional in the sense that one read-write pair covering **both** buckets also
+  works — the code enforces the split either way (`getWriteTarget` / `getReadTarget` in
+  `src/lib/r2.ts`). Two tokens move the guarantee from our code to Cloudflare, which is why they are
+  the recommendation.
+- **The two configurations do not mix.** A read-only main pair with no token B is the one broken
+  combination: writes are denied and the scratch probe fails, so a preview shows broken images. It is
+  token A **plus** token B, or one read-write pair for both buckets — never half. Half a scratch
+  credential pair now throws outright rather than falling back to the production credentials.
+
+**③ Neon — a branch, per D-15** (console.neon.tech): branch the production branch (call it
+`preview`), then take its **pooled** connection string for `DATABASE_URL` and its **direct** string
+for `DIRECT_URL`. Previews then show real charts while writing only to the copy.
+
+**④ Vercel — Project → Settings → Environment Variables**, all scoped to **Preview**:
+
+| variable                                                    | value                                               |
+| ----------------------------------------------------------- | --------------------------------------------------- |
+| `AUTH_SECRET`, `AUTH_USER_EMAIL`, `AUTH_USER_PASSWORD_HASH` | tick **Preview** on the existing Production entries |
+| `STATS_TIMEZONE`                                            | tick **Preview** on the existing entry              |
+| `DATABASE_URL`, `DIRECT_URL`                                | the Neon _preview_ branch strings from ③            |
+| `R2_ACCOUNT_ID`                                             | same as Production                                  |
+| `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`                  | token A (read-only on the real bucket)              |
+| `R2_BUCKET_NAME`                                            | the real bucket — previews read it                  |
+| `R2_SCRATCH_BUCKET_NAME`                                    | the scratch bucket from ②                           |
+| `R2_SCRATCH_ACCESS_KEY_ID`, `R2_SCRATCH_SECRET_ACCESS_KEY`  | token B (read-write on scratch)                     |
+
+**Two traps.** ① Ticking the existing entry's **Preview** box is deliberate for the auth variables:
+it reuses the identical value, so Beth logs into a preview with her normal password and nobody has
+to think about the `.env.local` `\$`-escaping rule (which is a dotenv-parsing artefact and does not
+apply to values typed into Vercel). ② `R2_SCRATCH_BUCKET_NAME` must **never** be set on Production
+— and if it is ever set equal to `R2_BUCKET_NAME`, the app throws rather than quietly writing to
+the real bucket, by design.
+
+**Beth's pass COMPLETED 2026-08-17** — every variable verified from her dashboard screenshots. Final
+Preview state: the seven new Preview-only entries (`DATABASE_URL`, `DIRECT_URL`, `R2_ACCESS_KEY_ID`,
+`R2_SECRET_ACCESS_KEY`, `R2_SCRATCH_BUCKET_NAME`, `R2_SCRATCH_ACCESS_KEY_ID`,
+`R2_SCRATCH_SECRET_ACCESS_KEY`), plus five shared with Production (`AUTH_SECRET`,
+`AUTH_USER_EMAIL`, `AUTH_USER_PASSWORD_HASH`, `R2_ACCOUNT_ID`, `R2_BUCKET_NAME`). The two R2
+credential names each appear **twice with no overlap** — Production holds the live read-write pair,
+Preview holds key A. Cloudflare: scratch bucket created, two tokens scoped to specific buckets. Neon:
+`preview` branch off `production`, data and schema, auto-delete Never. **A deployment built before
+the variables existed cannot see them** — a preview must be rebuilt after this point to pick them up.
+
+**Beth's pass, as originally briefed 2026-08-17.** Her screenshots corrected two things in this list, both now
+fixed in the artifact: ① the Cloudflare token dialog defaults to **"Apply to all buckets in this
+account"** — both tokens want **"Apply to specific buckets only"** (key A → the real bucket, key B →
+the scratch bucket); ② Neon's new-branch dialog defaults **Auto-delete to "After 1 day"**, which
+would have deleted the preview branch and its connection strings overnight and re-broken previews
+with no obvious cause. **Auto-delete must be Never.** Her other choices were already right: parent
+branch `production`, "Branch data and schema", TTL Forever. The branch is refreshed later with Neon's
+_reset from parent_, which keeps the same connection strings.
+
+**Discovered mid-pass, and it matters: the R2 credentials were _already_ shared with Preview.**
+`R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` have been scoped **Production and Preview** since
+April, so Preview inherits the production pair — which is read-**write** on the real bucket. Left
+that way, key A is pointless: the code would still route writes to scratch, but a preview would be
+holding a credential capable of altering real files, and the Cloudflare-enforced half of the
+guarantee would not exist. **Vercel models per-environment values as separate entries**, so the fix
+is ordered: un-tick Preview on the existing entry (leaving Production), _then_ add a same-named
+Preview-only entry with key A's value — adding first is rejected as a duplicate. Same pattern for
+`DATABASE_URL`/`DIRECT_URL`, except those are Production-only today so they need no un-tick.
+`STATS_TIMEZONE` does not exist in Vercel at all (the code default, `America/Edmonton`, is what
+production has always used), and `NEXT_PUBLIC_APP_URL` is the dead variable from its own ledger row —
+neither needs a Preview copy.
+
+**Known limitation of the preview branch:** its schema is a point-in-time copy, and neither the Vercel
+build nor CI runs `prisma migrate deploy`. A PR that adds a migration will therefore run new code
+against the older preview schema until someone resets the branch from parent. Not a blocker for
+design review (the surfaces D-13 cares about are read paths), but it is the first thing to suspect if
+a preview errors on a PR that touched `prisma/`.
+
+**Verification, once ④ is done** (this is R-1's remaining done-when): open the PR's preview URL,
+log in, confirm a chart cover renders, upload a new cover, and confirm the new object appears in the
+scratch bucket while the real bucket is unchanged. State the PR number and which image in the work
+log.
