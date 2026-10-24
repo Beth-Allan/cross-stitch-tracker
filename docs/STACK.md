@@ -33,7 +33,7 @@ into every session.
 
 **Core:**
 
-- Next.js 16.3.1 - Full-stack React framework with App Router; server components by default
+- Next.js 16.4.3 - Full-stack React framework with App Router; server components by default
 - React 19.2.5 - UI rendering
 - React DOM 19.2.5 - DOM bindings
 
@@ -49,7 +49,7 @@ into every session.
 
 - `@base-ui/react` 1.4.1 - The headless primitives components are built on (shadcn/ui v4 moved
   from Radix to Base UI)
-- `shadcn` 4.3.1 - The component-generator CLI. `components.json` configures it: style
+- `shadcn` 4.22.1 - The component-generator CLI. `components.json` configures it: style
   `base-nova`, baseColor `neutral`, CSS variables on, `lucide` icon library, aliases for
   `@/components`, `@/lib`, `@/components/ui`, `@/hooks`
 - Generated components are project code and are edited in place under `src/components/ui/`
@@ -69,7 +69,10 @@ into every session.
 **Build/Dev:**
 
 - @vitejs/plugin-react 4.4.1 - Vite React plugin for Vitest
-- ESLint 9.39.4 + eslint-config-next 16.3.1 - Flat config
+- ESLint 9.39.4 + eslint-config-next 16.3.1 - Flat config. **Deliberately one minor behind `next`**, with
+  `eslint-plugin-react-hooks` pinned at 7.0.1 as a direct devDependency: 16.4.x brings the 7.1 React
+  Compiler rules, which raise six errors in existing code (maintenance-ledger row, 2026-10-24, carries
+  the removal condition)
 - Prettier 3.8.3 + prettier-plugin-tailwindcss 0.7.2 - Formatting and Tailwind class ordering
 - tsx 4.23.12 - TypeScript execution, used by the Prisma seed script
 - Husky 9.1.7 - Git hooks (`pre-commit`: `lint-staged`; `pre-push`: `npm run gate`)
@@ -82,10 +85,9 @@ into every session.
 
 **Critical:**
 
-- Prisma 7.9.1 (`prisma` CLI + `@prisma/client`) - ORM; schema at `prisma/schema.prisma`,
-- **One dependency override lives in `package.json`:** `@prisma/config` → `deepmerge-ts` `8.0.1`. `@prisma/config` pins `7.1.5`, which carries a high advisory, and npm's only alternative was a backwards major on `prisma`. Scoped so it cannot leak; remove it once `@prisma/config` declares `>=8` itself (maintenance-ledger row carries the condition).
+- Prisma 7.10.1 (`prisma` CLI + `@prisma/client`) - ORM; schema at `prisma/schema.prisma`,
   generated client output to `src/generated/prisma/`
-- `@prisma/adapter-neon` 7.9.1 - Neon serverless PostgreSQL driver adapter, constructed by
+- `@prisma/adapter-neon` 7.10.1 - Neon serverless PostgreSQL driver adapter, constructed by
   `PrismaClient` in `src/lib/db.ts`. The adapter has been GA since Prisma 6.16.0; under Prisma 7
   the connection string is supplied by `prisma.config.ts` for the CLI and by the adapter at
   runtime, never by a `url` field in `schema.prisma`
@@ -120,7 +122,7 @@ into every session.
   `src/components/features/stats/record-celebration.tsx`
 - nanoid 5.1.16 - Random ID generation for R2 object keys
 - bcryptjs 3.0.3 - Password hash comparison in `src/lib/auth.ts`
-- sharp 0.35.3 - Server-side image optimization in `src/lib/actions/upload-actions.ts` (resizes
+- sharp 0.35.5 - Server-side image optimization in `src/lib/actions/upload-actions.ts` (resizes
   uploads to WebP before storing in R2), and PWA icon generation in `scripts/generate-icons.mjs`
 
 **Fonts (Google Fonts via `next/font`):**
