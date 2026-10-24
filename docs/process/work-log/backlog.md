@@ -106,6 +106,11 @@ leave them behind.
 
 **Chart form + detail** — redesign #1 (D-07), design item DS-2 → build item D-2:
 
+- **The cover's crop guide dims the whole page.** In focal-point edit mode the 4:3 guide dims
+  everything outside it with a `9999px` box-shadow and no clipping ancestor, so the title, buttons
+  and header darken too, not just the picture. What the edit mode should look like is a design call
+  — Beth handed it here at the 2026-10-24 `/cleanup` (ledger row 2026-10-14 ①). _(from the ledger)_
+
 - The supply stitch-total hint is visible only in Details mode — nothing warns, while actually
   working in supplies, that the stitch count is missing or stale. Was build item **F-3**;
   rerouted here by Beth at the 2026-08-17 `/cleanup` (fixing placement on a screen about to be
@@ -130,6 +135,12 @@ leave them behind.
 
 **Browse + gallery** — redesign #2, DS-3 → D-3:
 
+- **`/charts` loads everything at once.** `findMany` with no `take`/`skip`, and the page eagerly
+  loads all five tab datasets every render (≈33 queries at today's volume; junction rows ≈30×
+  chart count). The product is specified for 500+ charts, so page-by-page loading is designed into
+  this screen rather than retrofitted — Beth's ruling at the 2026-10-24 `/cleanup` (ledger row
+  2026-08-16, pagination). P9b's `/sessions` pattern is the one to reuse. _(from the ledger)_
+
 - Shopping-for bar pills should be squared-off chips with borders in a contained card-like bar,
   matching the mockup, instead of full-round pills. _(999.12, POLISH-02)_
 - Series name on gallery and project cards. _(999.88, SERIES-02)_
@@ -153,6 +164,12 @@ leave them behind.
   no-hardcoded-colour grep joining the gate is what stops it growing back. _(999.66)_
 
 **Supplies + shopping** — redesign #4, DS-5 → D-5:
+
+- **The shopping list reads every junction row.** `getShoppingCartData` loads every
+  thread/bead/specialty row of every unfinished project with its supply and brand joined — the
+  only unbounded read whose rows are the point. Designed into the D-5 shopping screen, not
+  retrofitted — Beth's ruling at the 2026-10-24 `/cleanup` (ledger row 2026-08-20). _(from the
+  ledger)_
 
 - Supplies page flashes a wrong view on first load — likely SSR cookie or middleware. _(999.5,
   POLISH-05)_
