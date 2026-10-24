@@ -146,7 +146,7 @@ export function useSupplyTable(
           overCount: calcParams.overCount,
           wastePercent: calcParams.wastePercent,
         });
-        setNeed(calculated);
+        setNeed(Math.max(1, calculated));
       }
     },
     [supplyType, isAutoCalc, calcParams],

@@ -385,6 +385,38 @@ describe("useChartForm inline entity creation", () => {
       expect(createChartWithSupplies).not.toHaveBeenCalled();
     });
 
+    it("falls back to the supply's name when it has no brand or code", async () => {
+      const getSupplyRows = () => [
+        {
+          id: "row-1",
+          supplyId: "s1",
+          type: "SPECIALTY" as const,
+          code: "",
+          name: "Gold charm",
+          brandName: "",
+          hexColor: "#000000",
+          stitchCount: 0,
+          need: 0,
+          have: 0,
+          isNeedOverridden: false,
+        },
+      ];
+      const { result } = renderHook(() => useChartForm({ ...defaultProps, getSupplyRows }));
+
+      act(() => {
+        result.current.setField("name", "Autumn Sampler");
+        result.current.setField("stitchCount", 5000);
+      });
+
+      await act(async () => {
+        await result.current.submitForm();
+      });
+
+      expect(result.current.errors._form).toBe(
+        "Gold charm needs at least 1 — change its Need in the supplies list.",
+      );
+    });
+
     it("falls back to a generic message for a path with no friendly wording", async () => {
       const { result } = renderHook(() => useChartForm(defaultProps));
 
