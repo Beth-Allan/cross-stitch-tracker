@@ -196,3 +196,14 @@ Not wishes, not warts — hardening Beth has explicitly deferred, recorded so it
   app-wide (A-1 report §4). The cheap wins (dropping `'unsafe-eval'` in production,
   `frame-ancestors`/`base-uri`/`form-action`/`object-src`) land via build item P11; this
   remainder waits until the trade is worth it.
+
+## Process wishes
+
+Improvements to how sessions run — nothing contradicts, it could just be better.
+
+- **One home per rule** _(noticed 2026-10-24, D-27)_: several rules are stated in three to five
+  places — branch-first and nothing-merges-red (CLAUDE.md, session-protocol §1, `git-workflow.md`,
+  `quality-gates.md`), the gate sequence word-for-word in CLAUDE.md and `quality-gates.md`, TDD,
+  warts-to-the-ledger, the context budget. Every copy costs context each session and the copies can
+  drift apart. A tidy-up would keep each rule in one home and point to it from the others. It
+  touches CLAUDE.md and the always-loaded rule files, so it is Beth's to schedule.

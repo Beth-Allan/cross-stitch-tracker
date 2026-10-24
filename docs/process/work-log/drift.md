@@ -41,6 +41,30 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-24 · D-27 · the process, tuned for Opus 5.5 and Fable 5.1 — ruled before M-1
+
+**What needed a ruling.** Beth asked whether the workflow, skills, rules and hooks should change
+now that Opus 5.5 and Fable 5.1 are out. Both prompting guides were read against the repo's setup.
+Most of it already fits: the tone is calm, no model version is pinned anywhere a version could go
+stale, and nothing in either guide argues against the Opus-builds / Fable-reviews lanes. Three
+gaps were found. ① The guides say both models follow an explicit list of what a handoff summary
+must keep, and the protocol's handoff note had four loose headings. ② Both models sometimes end a
+turn early, by announcing the next step or asking "shall I?". The guides say naming those habits
+fixes it, and this repo has stops that must stay. ③ The layer-1 review was improvised per session,
+sometimes a subagent and sometimes `/code-review`, and Opus 5.5 is notably stronger at code review.
+
+**Surfaced to Beth** as three changes with a recommendation of yes, plus a CodeRabbit question.
+CodeRabbit runs on every PR, unconfigured and absent from the process.
+
+**Her ruling (2026-10-24):** "Yes, the three changes you recommend I agree with." On CodeRabbit:
+"maybe a separate session to figure out how to use it? Right now it's the free plan but I don't
+really think it's doing much?"
+
+**What it changed.** Protocol §9 now lists six things a handoff note must keep, and adds a
+session-wide rule naming the wanted and unwanted stops. Protocol §5 layer 1 is now the same two
+passes every time: `/code-review high` plus one delegated subagent for the checklist. CodeRabbit is
+a queued process session of its own. Nothing about it changed here.
+
 ### 2026-10-24 · D-26 · three small visible fixes — ruled at the `/cleanup`
 
 **What needed a ruling.** Three ledger rows whose fix changes what Beth sees, with no design
