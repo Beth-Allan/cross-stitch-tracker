@@ -13,9 +13,9 @@ import { useRejectionFlash } from "@/components/hooks/use-rejection-flash";
  * Keyboard:
  * - Enter: saves value
  * - Escape: reverts to original value
- * - Blur: saves if valid, reverts if invalid (NaN or negative)
+ * - Blur: saves if valid, reverts if invalid (NaN or below `min`)
  *
- * Validates parseInt result is non-negative before calling onSave;
+ * Validates parseInt result is at least `min` (default 0) before calling onSave;
  * reverts on invalid input.
  *
  * The optimistic value is provisional: when onSave reports failure (resolves false or throws) it
@@ -27,12 +27,14 @@ export function EditableNumber({
   onSave,
   ariaLabel,
   className,
+  min = 0,
 }: {
   value: number;
   /** Resolving false (or throwing) rolls the optimistic value back */
   onSave: (value: number) => void | Promise<boolean>;
   ariaLabel: string;
   className?: string;
+  min?: number;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(value));
@@ -83,12 +85,12 @@ export function EditableNumber({
         <input
           ref={inputRef}
           type="number"
-          min={0}
+          min={min}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onBlur={() => {
             const num = parseInt(draft);
-            if (!isNaN(num) && num >= 0) {
+            if (!isNaN(num) && num >= min) {
               commit(num);
             } else {
               setDraft(String(displayValue));

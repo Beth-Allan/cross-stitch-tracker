@@ -76,6 +76,8 @@ export type ChartFormInput = z.input<typeof chartFormSchema>;
 /** The parsed payload — what the action holds after `chartFormSchema.parse`. */
 export type ChartFormValidated = z.output<typeof chartFormSchema>;
 
+const NEED_AT_LEAST_ONE = "Every supply needs at least 1";
+
 /**
  * Validates the batch supply payload for createChartWithSupplies.
  * Each array is capped at 500 items to prevent oversized payloads.
@@ -87,7 +89,7 @@ export const batchSupplySchema = z.object({
       z.object({
         supplyId: z.string().min(1, "Supply ID required"),
         stitchCount: z.number().int().min(0),
-        need: z.number().int().min(1),
+        need: z.number().int().min(1, NEED_AT_LEAST_ONE),
         isNeedOverridden: z.boolean(),
       }),
     )
@@ -97,7 +99,7 @@ export const batchSupplySchema = z.object({
     .array(
       z.object({
         supplyId: z.string().min(1, "Supply ID required"),
-        need: z.number().int().min(1),
+        need: z.number().int().min(1, NEED_AT_LEAST_ONE),
       }),
     )
     .max(500)
@@ -106,7 +108,7 @@ export const batchSupplySchema = z.object({
     .array(
       z.object({
         supplyId: z.string().min(1, "Supply ID required"),
-        need: z.number().int().min(1),
+        need: z.number().int().min(1, NEED_AT_LEAST_ONE),
       }),
     )
     .max(500)

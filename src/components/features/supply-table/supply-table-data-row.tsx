@@ -77,6 +77,7 @@ export function SupplyTableDataRow({
             value={row.need}
             onSave={(v) => onUpdateQuantity(row.type, row.id, "need", v)}
             ariaLabel={`Need for ${row.code}`}
+            min={1}
           />
           <span className="text-muted-foreground text-xs">{UNIT_LABELS[row.type]}</span>
           {showAutoCalc && (

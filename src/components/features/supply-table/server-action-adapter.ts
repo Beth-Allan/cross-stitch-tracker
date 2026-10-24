@@ -128,7 +128,9 @@ export class ServerActionAdapter implements SupplyTableAdapter {
             overCount: this.calcParams.overCount,
             wastePercent: this.calcParams.wastePercent,
           });
-          mappedData.quantityRequired = recalculated;
+          // A supply always needs at least 1: the calculator says 0 for an empty stitch count,
+          // which the server would refuse.
+          mappedData.quantityRequired = Math.max(1, recalculated);
         }
         break;
       }

@@ -135,7 +135,9 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
         overCount: this.calcParams.overCount,
         wastePercent: this.calcParams.wastePercent,
       });
-      updated = { ...row, stitchCount: value, need: recalculated };
+      // A supply always needs at least 1: the calculator says 0 for an empty stitch count,
+      // which the save would refuse.
+      updated = { ...row, stitchCount: value, need: Math.max(1, recalculated) };
     } else if (field === "need" && row.type === "THREAD") {
       updated = { ...row, need: value, isNeedOverridden: true };
     } else {

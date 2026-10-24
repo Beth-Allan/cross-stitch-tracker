@@ -5,11 +5,12 @@ import { createMockDesigner, createMockGenre } from "@/__tests__/mocks";
 import { createStorageLocation } from "@/lib/actions/storage-location-actions";
 import { createStitchingApp } from "@/lib/actions/stitching-app-actions";
 import { createSeries } from "@/lib/actions/series-actions";
-import { createChart } from "@/lib/actions/chart-actions";
+import { createChart, createChartWithSupplies } from "@/lib/actions/chart-actions";
 
 // Mock all server actions the hook imports
 vi.mock("@/lib/actions/chart-actions", () => ({
   createChart: vi.fn(),
+  createChartWithSupplies: vi.fn(),
   updateChart: vi.fn(),
 }));
 vi.mock("@/lib/actions/designer-actions", () => ({
@@ -349,6 +350,39 @@ describe("useChartForm inline entity creation", () => {
       expect(result.current.errors["chart.name"]).toBe("Chart name is required");
       expect(onValidationError).toHaveBeenCalled();
       expect(createChart).not.toHaveBeenCalled();
+    });
+
+    it("names the supply whose need is below 1 instead of sending it", async () => {
+      const getSupplyRows = () => [
+        {
+          id: "row-1",
+          supplyId: "t1",
+          type: "THREAD" as const,
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 0,
+          need: 0,
+          have: 0,
+          isNeedOverridden: false,
+        },
+      ];
+      const { result } = renderHook(() => useChartForm({ ...defaultProps, getSupplyRows }));
+
+      act(() => {
+        result.current.setField("name", "Autumn Sampler");
+        result.current.setField("stitchCount", 5000);
+      });
+
+      await act(async () => {
+        await result.current.submitForm();
+      });
+
+      expect(result.current.errors._form).toBe(
+        "DMC 310 needs at least 1 — change its Need in the supplies list.",
+      );
+      expect(createChartWithSupplies).not.toHaveBeenCalled();
     });
 
     it("falls back to a generic message for a path with no friendly wording", async () => {
