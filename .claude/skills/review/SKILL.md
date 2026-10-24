@@ -21,9 +21,9 @@ a review. **Pass:** squash-merge, work-log status `reviewed`, a one-line REVIEW 
 **Findings:** PR comments plus a REVIEW block in the work log; fixes land on the same branch
 (trivial ones the reviewer may fix); re-review only the delta.
 
-The bundled `/code-review` skill is a fine tool to lean on inside this door and for the layer-1
-pass on ordinary PRs — it is not a substitute for this gate, which also checks done-whens,
-domain-fact provenance, and the work log.
+The bundled `/code-review` skill is a fine tool to lean on inside this door, and on ordinary PRs
+it is the first of layer 1's two passes (§5) — it is not a substitute for this gate, which also
+checks done-whens, domain-fact provenance, and the work log.
 
 This file is deliberately thin. It contains no process detail, and the protocol always wins.
 

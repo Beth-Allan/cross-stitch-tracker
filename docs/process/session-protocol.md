@@ -136,15 +136,18 @@ because the process consults that file, never because Beth remembers to ask.
 **Layer 1 — every PR: delegated auto-review.** Before any merge, an independent pass reviews
 the full diff against `security-checklist.md` and the quality bar: DRY/SOLID/YAGNI/KISS, repo
 conventions (`.claude/rules/`), test honesty (§3). Independent means never the builder
-re-reading its own diff. **It is the same two passes every time** (Beth's ruling D-27), both
-with fresh context, which also keeps the session lean (§9):
+re-reading its own diff. **It is the same two passes every time** (Beth's ruling D-27), each
+run outside the builder's own context — a forked skill or a subagent — which also keeps the
+session lean (§9):
 
 1. **`/code-review high`** on the PR — correctness bugs.
 2. **One delegated subagent** that reads the full diff against `security-checklist.md`, the
    quality bar, and test honesty — the parts a bug hunt does not cover.
 
-Findings from either pass are fixed or ledgered before merge, on the record in the PR as
-"Layer-1 review — `/code-review high` + checklist pass".
+Each finding is checked against the code before acting on it, then **fixed, ledgered, or
+dismissed with one line saying why it is not real** — the bug hunt at `high` errs toward
+surfacing, so false alarms are expected and are never "fixed" for the sake of it. All of it goes
+on the record in the PR as "Layer-1 review — `/code-review high` + checklist pass".
 
 **Layer 2 — UI-touching PRs: preview before merge.** Beth gets the Vercel preview link with a
 plain-language note of what to look at; her word ships it. This is the walkthrough analogue at
@@ -317,7 +320,8 @@ drive everything without reading logs, editing files, or opening GitHub.
   read-only subagent sweeps. At every natural seam, assess: if the session has been
   compacted/summarized or the remaining work is another session-sized chunk, stop cleanly —
   commit WIP on the branch, write a handoff note in the work log, and tell Beth the one command
-  that resumes fresh. **The handoff note must retain six things** (Beth's ruling D-27):
+  that resumes fresh. The handoff note is its own block beside the item's row — the one-line
+  note format does not apply to it. **It must retain six things** (Beth's ruling D-27):
   1. problems hit and how each was handled;
   2. options tried or set aside, and why;
   3. Beth's decisions and the constraints in force, **stated exactly** — her words, not a
@@ -332,23 +336,30 @@ drive everything without reading logs, editing files, or opening GitHub.
 - **Finish the work; stop only where a stop is wanted** (Beth's ruling D-27). A text-only
   progress update is a report, not a finish — an item is done when §2's definition of done is.
   **Wanted stops:**
-  - **Beth's word is needed:** scope ambiguity, a missing domain fact, drift, the Vercel preview
-    before a UI merge, a test removal, a gate change.
+  - **Beth's word is needed** — every stop-and-ask this protocol names, including: scope
+    ambiguity, a missing domain fact, drift, a screen with no design reference (hard rule 4),
+    an item too big for one session (§2 size check), the Vercel preview before a UI merge, a
+    test removal, a gate change.
   - **The next step is protected from this session:** a review-gated diff waits for a fresh
     `/review`, and a guard-hook refusal is never something to route around.
+  - **The item is finished** — its close-out done (§1), the session ends by telling Beth the
+    queue's next row. One item per session: the next row is announced, never started.
+  - **The recovery protocol says stop** (below) — the debugging bound is reached, or you are
+    stuck twice.
   - **The context budget's seam** (above) — stop by handing off cleanly.
 
   **Unwanted stops — keep going instead:**
-  - ending a turn by announcing the next step ("next I'll…") instead of taking it;
+  - ending a turn by announcing this item's next step ("next I'll…") instead of taking it;
   - asking "shall I?" about work the item or Beth already asked for;
   - pausing at a milestone only to report;
   - listing decisions that block nothing — take the documented default, note it in the work
     log, and carry on.
 
-  **When Beth describes a problem, asks a question, or is thinking out loud, and no door she
-  opened already says what to do with it, the deliverable is your assessment:** report it and
-  stop. Acting on it waits for her word. Inside a door, the door decides — `/broken` fixes,
-  `/progress` changes nothing (§8).
+  **When Beth describes a problem, asks a question, or is thinking out loud, and has not asked
+  for action, the deliverable is your assessment:** report it and stop. Acting on it waits for
+  her word. Inside a door she typed, the door decides — `/broken` fixes, `/progress` changes
+  nothing (§8). A door that opened itself from her words (a skill matching a passing remark)
+  is not that word: confirm she wants it acted on before changing anything.
 
 - **Merges by spoken approval:** wherever this process wants Beth's sign-off, her explicit
   in-session approval IS the ruling, and Claude executes the merge. She never needs GitHub.
