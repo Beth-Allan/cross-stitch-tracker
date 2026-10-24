@@ -256,6 +256,14 @@ export function useChartForm({
     try {
       if (mode === "create") {
         const supplyRows = getSupplyRows?.() ?? [];
+        const zeroNeed = supplyRows.find((r) => r.need < 1);
+        if (zeroNeed) {
+          const label =
+            [zeroNeed.brandName, zeroNeed.code].filter(Boolean).join(" ") || zeroNeed.name;
+          setErrors({ _form: `${label} needs at least 1 — change its Need in the supplies list.` });
+          suppressUnloadRef.current = false;
+          return;
+        }
         let response;
         if (supplyRows.length > 0) {
           const supplyPayload = {

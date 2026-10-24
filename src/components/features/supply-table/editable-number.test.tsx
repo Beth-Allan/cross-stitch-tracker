@@ -48,6 +48,17 @@ describe("EditableNumber", () => {
     expect(onSave).not.toHaveBeenCalled();
   });
 
+  it("refuses a value below min and keeps the old one", () => {
+    const onSave = vi.fn();
+    render(<EditableNumber value={2} onSave={onSave} ariaLabel="Need" min={1} />);
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+    const input = screen.getByRole("spinbutton", { name: "Need" });
+    fireEvent.change(input, { target: { value: "0" } });
+    fireEvent.blur(input);
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Need" })).toHaveTextContent("2");
+  });
+
   it("blur saves valid value", () => {
     const onSave = vi.fn();
     render(<EditableNumber value={5} onSave={onSave} ariaLabel="Qty" />);

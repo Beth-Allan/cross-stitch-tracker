@@ -410,6 +410,22 @@ describe("CreationFlowAdapter", () => {
       expect(updated?.need).toBe(10);
     });
 
+    it("keeps need at 1 when a thread's stitch count is set to 0", async () => {
+      const threadResult = makeSearchResult({ id: "t1", type: "THREAD" });
+      searchFn.mockResolvedValueOnce([threadResult]);
+      await adapter.searchSupplies("THREAD", "310");
+      const addResult = await adapter.addThread("t1", 0, 1);
+      const rowId = (addResult as { success: true; id: string }).id;
+      adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
+
+      // Clicking into an empty Stitches cell and away saves 0 -- the save must not zero the need.
+      await adapter.updateQuantity("THREAD", rowId, "stitchCount", 0);
+
+      const updated = adapter.getRows().find((r) => r.id === rowId);
+      expect(updated?.stitchCount).toBe(0);
+      expect(updated?.need).toBe(1);
+    });
+
     it("does NOT recalculate need when field is 'need' or 'have' (unchanged behavior)", async () => {
       const threadResult = makeSearchResult({ id: "t1", type: "THREAD" });
       searchFn.mockResolvedValueOnce([threadResult]);

@@ -170,6 +170,18 @@ describe("SupplyTableDataRow", () => {
     expect(row).toBeInTheDocument();
   });
 
+  it("refuses a need of 0", () => {
+    const onUpdateQuantity = vi.fn();
+    renderRow(makeRow({ code: "310", need: 3 }), { onUpdateQuantity });
+
+    fireEvent.click(screen.getByRole("button", { name: "Need for 310" }));
+    const input = screen.getByRole("spinbutton", { name: "Need for 310" });
+    fireEvent.change(input, { target: { value: "0" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    expect(onUpdateQuantity).not.toHaveBeenCalled();
+  });
+
   it("onUpdateQuantity is called with correct args when EditableNumber saves", () => {
     const onUpdateQuantity = vi.fn();
     renderRow(makeRow({ type: "THREAD", id: "junc-1", code: "310", have: 1 }), {

@@ -281,6 +281,33 @@ describe("ServerActionAdapter", () => {
       });
     });
 
+    it("sends quantityRequired 1, never 0, when a thread's stitch count is set to 0", async () => {
+      mockUpdateQuantity.mockResolvedValue({ success: true });
+      adapter.setRows([
+        {
+          id: "jt-1",
+          supplyId: "supply-1",
+          type: "THREAD",
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 500,
+          need: 2,
+          have: 0,
+          isNeedOverridden: false,
+        },
+      ]);
+      adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
+
+      await adapter.updateQuantity("THREAD", "jt-1", "stitchCount", 0);
+
+      expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
+        stitchCount: 0,
+        quantityRequired: 1,
+      });
+    });
+
     it("does NOT recalculate when updating stitchCount on an overridden thread row", async () => {
       mockUpdateQuantity.mockResolvedValue({ success: true });
 

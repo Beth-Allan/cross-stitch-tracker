@@ -290,6 +290,16 @@ describe("designerSchema", () => {
 });
 
 describe("batchSupplySchema", () => {
+  it("says in plain words that a supply needs at least 1", () => {
+    const result = batchSupplySchema.safeParse({
+      threads: [],
+      beads: [{ supplyId: "b1", need: 0 }],
+      specialty: [],
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0].message).toBe("Every supply needs at least 1");
+  });
+
   it("validates correct input with threads, beads, and specialty arrays", () => {
     const result = batchSupplySchema.safeParse({
       threads: [

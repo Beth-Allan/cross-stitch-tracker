@@ -179,6 +179,20 @@ describe("useSupplyTable", () => {
     expect(result.current.isAutoCalc).toBe(true);
   });
 
+  it("setStitchCount keeps need at 1 when the calculation comes out 0 (no fabric count)", () => {
+    calcParams = { ...DEFAULT_CALC_PARAMS, fabricCount: 0 };
+    const { result } = renderSupplyTableHook();
+
+    act(() => {
+      result.current.selectItem(makeSearchResult({ type: "THREAD" }));
+    });
+    act(() => {
+      result.current.setStitchCount(5000);
+    });
+
+    expect(result.current.need).toBe(1);
+  });
+
   it("setStitchCount does NOT auto-calc for BEAD type", () => {
     const item = makeSearchResult({ type: "BEAD" });
     const { result } = renderSupplyTableHook();
