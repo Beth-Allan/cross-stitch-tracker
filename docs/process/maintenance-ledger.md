@@ -270,6 +270,7 @@ same shape is still a new row.
 ## Resolved
 
 Rows that have been closed. Kept verbatim; never deleted.
+
 **Closed 2026-10-24 at the `/cleanup` — fixed by P11b (PR #107, 2026-08-19).** Beth's ruling was warn but allow; `session-actions.ts` now returns an `overTotal` warning on create and update, and the display clamp is unified. Never moved here when P11b merged; found by the cleanup's verification pass.
 
 | 2026-08-16 | session logging — no guard between a logged session and the project's total | **Nothing prevents logging more stitches than a project has**, so progress can be pushed past 100% and every derived figure downstream (progress bars, completion estimates, personal bests, the stats layer) inherits the impossible number. Was old backlog 999.31; confirmed still absent from `lib/validations/`. **Whether this should be a hard block, a warning, or allowed is a domain question, not an implementation one** — Beth may legitimately over-log against an approximate stitch count (`stitchCountApproximate` is a real field on `Chart`). So this row is **stop-and-ask before it is fixed** (hard rule 5, protocol §7): the ruling goes through `/stitch-fact` into `docs/domain/` first, and only then is there something to build. _(verified open 2026-08-16)_ | overhaul step 2 (Opus 5) |
