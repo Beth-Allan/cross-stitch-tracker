@@ -62,10 +62,10 @@ put to her either, so its absence from her list is not a rejection.
 because dropping an ending she may use without asking is the more expensive mistake; the question
 is Q-007.
 
-[in the app, origin unknown — treat as unverified]
-
 _Superseded by **CHF-005** (2026-10-24): Beth keeps `.css` chart files, so the ending now traces
 to her. The code comment's claim about what browsers report is still unsourced._
+
+[in the app, origin unknown — treat as unverified]
 
 ### CHF-005 — `.css` is a chart file she keeps
 
@@ -80,13 +80,12 @@ CHF-006.
 ### CHF-006 — `.css`, `.saga` and `.oxs` are Cross Stitch Saga files
 
 The program behind all three endings is **Cross Stitch Saga**. Beth's words: _"It's Cross Stitch
-Saga — usually .css, .saga and .oxs are all Saga application files."_ "Usually" is hers: these are
-the endings she meets as Saga files, not a claim that no other program ever writes them.
-
-So the app's message about these files can name **Cross Stitch Saga**, alongside Pattern Maker
-(`.xsd`) and PCStitch (`.pat`) from CHF-002. The unsourced code comment at CHF-004 ("CrossStitch
-pattern files report as text/css") was most likely gesturing at this program. Its claim about
-what browsers report is still unverified and does not matter, because the upload rule decides by
-file ending (`resolveChartFileContentType`).
+Saga - usually .css, .saga. and .oxs are all Saga application files."_ "Usually" is hers: these
+are the endings she meets as Saga files, not a claim that no other program ever writes them.
 
 [stated by Beth 2026-10-24]
+
+_Session note, not Beth's statement:_ with the program named, a message about these files can say
+**Cross Stitch Saga** alongside Pattern Maker (`.xsd`) and PCStitch (`.pat`) from CHF-002. What
+browsers report for a `.css` file (CHF-004) does not matter to the app, because the upload rule
+decides by file ending (`resolveChartFileContentType`).
