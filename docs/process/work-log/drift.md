@@ -61,7 +61,7 @@ when every PR already gets two automatic reviews).
 **Her ruling:** "Trial on risky changes (Recommended)", on the terms put to her: Claude asks it to
 review the gated pull requests during the Fable `/review`, with settings that carry the house rules.
 After the next three (R-2, P9c, F-9) the record is judged, and if it caught nothing the other
-reviews missed, it is switched off. No work for Beth.
+reviews missed, it is switched off. No extra work for Beth.
 
 **What it changed.** `.coderabbit.yaml` is new: automatic review stays off even if the repository
 gains stars; every feature that would commit to a branch (auto-fix, generated tests, generated
