@@ -13,9 +13,10 @@ do.
 
 ## Test infrastructure
 
-- Import `render`, `screen`, `userEvent` from `@/__tests__/test-utils` — **never**
-  `@testing-library/react` directly. `test-utils` re-exports the library plus this project's
-  `customRender` as `render`.
+- Import `render`, `screen` (and the rest of the library) from `@/__tests__/test-utils` —
+  **never** `@testing-library/react` directly. `test-utils` re-exports the library plus this
+  project's `customRender` as `render`. It does **not** re-export `userEvent`: that comes from
+  `@testing-library/user-event`, as every interaction test here imports it.
 - Import shared mocks and factories from `@/__tests__/mocks/` (`factories.ts`,
   `module-mocks.ts`, both re-exported from the index). Do not duplicate mock setup per file.
 - Prefer a factory over a hand-built object.

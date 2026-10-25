@@ -79,6 +79,11 @@ vi.mock("@/lib/actions/chart-actions", () => ({
   updateProjectSettings: vi.fn(() => Promise.resolve({ success: true })),
 }));
 
+vi.mock("@/lib/actions/pattern-dive-actions", () => ({
+  assignFabricToProject: vi.fn(() => Promise.resolve({ success: true })),
+  unassignFabricFromProject: vi.fn(() => Promise.resolve({ success: true })),
+}));
+
 vi.mock("sonner", () => ({
   toast: {
     success: vi.fn(),

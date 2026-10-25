@@ -10,6 +10,7 @@ import {
 } from "@/lib/queries/project-supplies";
 import { calculateRequiredFabricSize, classifyFabricFit } from "@/lib/utils/fabric-calculator";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import type { WhatsNextProject, FabricRequirementRow, StorageGroup } from "@/types/session";
 
 /**
@@ -393,4 +394,41 @@ export async function assignFabricToProject(fabricId: string, projectId: string)
   revalidatePath(`/charts/${project.chartId}`);
   revalidatePath("/charts");
   return { success: true as const };
+}
+
+/**
+ * Unlinks a project's fabric, returning the piece to the stash. A project with no fabric is
+ * already in the asked-for state, so it succeeds without a write.
+ */
+export async function unassignFabricFromProject(projectId: string) {
+  const user = await requireAuth();
+
+  const parsed = z.string().min(1).safeParse(projectId);
+  if (!parsed.success) {
+    return { success: false as const, error: "Project not found" };
+  }
+
+  try {
+    const project = await prisma.project.findUnique({
+      where: { id: parsed.data },
+      select: { userId: true, chartId: true, fabric: { select: { id: true } } },
+    });
+    if (!project || project.userId !== user.id) {
+      return { success: false as const, error: "Project not found" };
+    }
+
+    if (project.fabric) {
+      await prisma.fabric.update({
+        where: { id: project.fabric.id },
+        data: { linkedProjectId: null },
+      });
+    }
+
+    revalidatePath(`/charts/${project.chartId}`);
+    revalidatePath("/charts");
+    return { success: true as const };
+  } catch (error) {
+    console.error("unassignFabricFromProject error:", error);
+    return { success: false as const, error: "Failed to remove fabric" };
+  }
 }
