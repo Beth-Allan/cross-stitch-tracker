@@ -41,6 +41,38 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-25 · D-33 · CodeRabbit gets a three-review trial on gated pull requests — ruled in its own session
+
+**What needed a ruling.** D-27 left CodeRabbit for a session of its own: it ran on every PR,
+unconfigured, and nothing in the process mentioned it. The record shows it reviewed **one PR of
+roughly a hundred**, #50 in May. On the others it hit the free plan's hourly limit (May) or, from
+August on, skipped: its plan reviews a public repository under 10 stars only when asked (this one
+has none), yet its check still reads "pass". On #50 it posted 20 findings. Three were real bugs, all
+fixed at the time: two places in the designer and genre lists where a screen reader could read out
+the wrong label, and a cover preview that stayed hidden after one failed load. The other seventeen
+were formatting notes on planning files since archived. Its free plan needs the repository to stay
+public, which it is today.
+
+**Surfaced to Beth** as three options: a trial on the gated changes only (recommended, since a
+different vendor's reviewer has different blind spots, and the gated cores are where a miss costs
+most); switch it off; or a review of every PR (not recommended: minutes of waiting in every session,
+when every PR already gets two automatic reviews).
+
+**Her ruling:** "Trial on risky changes (Recommended)", on the terms put to her: Claude asks it to
+review the gated pull requests during the Fable `/review`, with settings that carry the house rules.
+After the next three (R-2, P9c, F-9) the record is judged, and if it caught nothing the other
+reviews missed, it is switched off. No extra work for Beth.
+
+**What it changed.** `.coderabbit.yaml` is new: automatic review stays off even if the repository
+gains stars; every feature that would commit to a branch (auto-fix, generated tests, generated
+docstrings) is off, though the app itself keeps the access GitHub gave it; it cannot approve a pull
+request; and it reads CLAUDE.md, `.claude/rules/`, the conventions doc, the security checklist and
+`docs/domain/` as its review criteria. Protocol §5 has the trial steps inside the `/review` flow,
+the `/review` skill points at them, and the tally table is a note in `notes.md`. Two terms were
+settled in this PR's own review: a review in which CodeRabbit did not run does not count toward the
+three (two in a row go to Beth), and switching off means removing the app first, the settings file
+only after.
+
 ### 2026-10-25 · D-32 · a chart carries at most 50 genres — ruled during M-2
 
 **What happened.** The M-1 layer-1 review found `chartFormSchema.genreIds` had no upper limit

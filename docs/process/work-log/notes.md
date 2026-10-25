@@ -173,3 +173,25 @@ check after any edit — every delimiter row has the same cell count as its head
 awk '/^\| -+ \|/ { h=prev; gsub(/\\\|/,"",h); gsub(/[^|]/,"",h); d=$0; gsub(/[^|]/,"",d);
   if (length(h)!=length(d)) print "MISMATCH at", NR } { prev=$0 }' docs/process/work-log.md
 ```
+
+## The CodeRabbit trial — the tally (D-33)
+
+**Tags:** `/review` · R-2 · P9c · F-9 · CodeRabbit · review layers
+
+Each gated `/review` during the trial adds one row here, following protocol §5's CodeRabbit steps.
+**"Missed by the others"** counts a real CodeRabbit finding that appears in neither the PR's
+layer-1 record nor the reviewing session's own findings — the reviewer finishes its own pass
+before reading CodeRabbit's, or this column cannot be filled honestly.
+
+| #   | review | PR  | ran? | its findings | real | real and missed by the others | note |
+| --- | ------ | --- | ---- | ------------ | ---- | ----------------------------- | ---- |
+
+A "did not run" row is kept but does not count toward the three (protocol §5 step 3).
+**The session that tallies the third run puts the table to Beth**, whatever the queue order (the
+queue marks R-2, P9c and F-9 only because they are the next three today). The drift ruling D-33
+sets the rule: no real catch the others missed → switch it off, and her OK to remove the app is
+what gets recorded; at least one → she rules on keeping it. Either way that session records her
+word as a new drift row.
+
+**Done when:** that ruling is recorded. Then `/cleanup` retires this note, and protocol §5's
+CodeRabbit paragraph is rewritten or removed to match.
