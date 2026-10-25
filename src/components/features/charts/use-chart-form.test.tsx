@@ -1,11 +1,15 @@
 import { renderHook, act } from "@/__tests__/test-utils";
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { useChartForm } from "./use-chart-form";
-import { createMockDesigner, createMockGenre } from "@/__tests__/mocks";
+import {
+  createMockChartWithRelations,
+  createMockDesigner,
+  createMockGenre,
+} from "@/__tests__/mocks";
 import { createStorageLocation } from "@/lib/actions/storage-location-actions";
 import { createStitchingApp } from "@/lib/actions/stitching-app-actions";
 import { createSeries } from "@/lib/actions/series-actions";
-import { createChart, createChartWithSupplies } from "@/lib/actions/chart-actions";
+import { createChart, createChartWithSupplies, updateChart } from "@/lib/actions/chart-actions";
 
 // Mock all server actions the hook imports
 vi.mock("@/lib/actions/chart-actions", () => ({
@@ -433,5 +437,57 @@ describe("useChartForm inline entity creation", () => {
       expect(result.current.errors["chart.notes"]).toBe("This field has an error");
       expect(createChart).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe("useChartForm calculator settings", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("sends the calculator's strand count, over-count and waste percent when creating", async () => {
+    (createChart as Mock).mockResolvedValueOnce({ success: true, chartId: "chart-new" });
+    const getCalcParams = () => ({
+      fabricCount: 28,
+      strandCount: 1 as const,
+      overCount: 2 as const,
+      wastePercent: 10,
+    });
+    const { result } = renderHook(() => useChartForm({ ...defaultProps, getCalcParams }));
+
+    act(() => {
+      result.current.setField("name", "Linen Sampler");
+      result.current.setField("stitchCount", 5000);
+    });
+
+    await act(async () => {
+      await result.current.submitForm();
+    });
+
+    expect((createChart as Mock).mock.calls[0][0].project).toMatchObject({
+      strandCount: 1,
+      overCount: 2,
+      wastePercent: 10,
+    });
+  });
+
+  it("sends no calculator settings when editing, so the project's saved ones stand", async () => {
+    (updateChart as Mock).mockResolvedValueOnce({ success: true });
+    const initialData = createMockChartWithRelations({
+      stitchCount: 5000,
+      project: { overCount: 2, strandCount: 1, wastePercent: 10 },
+    });
+    const { result } = renderHook(() =>
+      useChartForm({ ...defaultProps, mode: "edit", initialData }),
+    );
+
+    await act(async () => {
+      await result.current.submitForm();
+    });
+
+    const project = (updateChart as Mock).mock.calls[0][1].project;
+    expect(project).not.toHaveProperty("strandCount");
+    expect(project).not.toHaveProperty("overCount");
+    expect(project).not.toHaveProperty("wastePercent");
   });
 });

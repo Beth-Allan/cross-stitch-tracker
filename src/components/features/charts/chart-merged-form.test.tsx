@@ -757,6 +757,28 @@ describe("ChartMergedForm", () => {
     expect(mockCreateChartWithSupplies).not.toHaveBeenCalled();
   });
 
+  it("saves the over-2 choice made in the supply calculator with the new chart", async () => {
+    mockCreateChart.mockResolvedValue({ success: true, chartId: "new-id" });
+
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    await user.type(screen.getByLabelText(/chart name/i), "Linen Sampler");
+    await user.type(screen.getByLabelText(/total stitch count/i), "5000");
+    await user.click(screen.getByRole("button", { name: /add supplies/i }));
+    await user.click(screen.getByRole("button", { name: "Stitch over 2 threads" }));
+    await user.click(screen.getByRole("button", { name: "Create" }));
+
+    await waitFor(() => {
+      expect(mockCreateChart).toHaveBeenCalledTimes(1);
+    });
+    expect(mockCreateChart.mock.calls[0][0].project).toMatchObject({
+      overCount: 2,
+      strandCount: 2,
+      wastePercent: 20,
+    });
+  });
+
   it("draft save includes supply rows via saveDraftV2", async () => {
     // Pre-populate a V2 draft with supplies to test that saving preserves them
     const v2Draft = {

@@ -354,6 +354,120 @@ describe("seriesId flow-through", () => {
   });
 });
 
+describe("calculator settings", () => {
+  const settings = { strandCount: 1, overCount: 2 as const, wastePercent: 10 };
+  const inputWithSettings: ChartFormInput = {
+    ...validChartInput,
+    project: { ...validChartInput.project, ...settings },
+  };
+
+  beforeEach(async () => {
+    vi.resetAllMocks();
+    const auth = await import("@/lib/auth");
+    (auth.auth as ReturnType<typeof vi.fn>).mockResolvedValue({
+      user: { id: "user-1", email: "test@test.com" },
+    });
+  });
+
+  function mockCreateTransaction() {
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: unknown) => Promise<unknown>) => {
+        mockPrisma.chart.create.mockResolvedValueOnce({
+          id: "chart-new",
+          project: { id: "proj-new" },
+          designer: null,
+          genres: [],
+        });
+        return fn(mockPrisma);
+      },
+    );
+  }
+
+  function mockUpdateTransaction() {
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({
+      coverImageUrl: null,
+      coverThumbnailUrl: null,
+      project: { id: "proj-1", userId: "user-1" },
+    });
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: unknown) => Promise<unknown>) => {
+        mockPrisma.chart.update.mockResolvedValueOnce({ id: "chart-1", project: { id: "proj-1" } });
+        mockPrisma.fabric.findUnique.mockResolvedValueOnce(null);
+        return fn(mockPrisma);
+      },
+    );
+  }
+
+  function projectWrite(call: unknown, key: "create" | "update") {
+    return (call as { data: { project: Record<string, Record<string, unknown>> } }).data.project[
+      key
+    ];
+  }
+
+  it("createChart saves the strand count, over-count and waste percent on the project", async () => {
+    mockCreateTransaction();
+    const { createChart } = await import("./chart-actions");
+
+    const result = await createChart(inputWithSettings);
+
+    assertSuccess(result);
+    expect(projectWrite(mockPrisma.chart.create.mock.calls[0][0], "create")).toMatchObject(
+      settings,
+    );
+  });
+
+  it("createChartWithSupplies saves the strand count, over-count and waste percent on the project", async () => {
+    mockCreateTransaction();
+    const { createChartWithSupplies } = await import("./chart-actions");
+
+    const result = await createChartWithSupplies(inputWithSettings, {});
+
+    assertSuccess(result);
+    expect(projectWrite(mockPrisma.chart.create.mock.calls[0][0], "create")).toMatchObject(
+      settings,
+    );
+  });
+
+  it("updateChart saves the strand count, over-count and waste percent when sent", async () => {
+    mockUpdateTransaction();
+    const { updateChart } = await import("./chart-actions");
+
+    const result = await updateChart("chart-1", inputWithSettings);
+
+    assertSuccess(result);
+    expect(projectWrite(mockPrisma.chart.update.mock.calls[0][0], "update")).toMatchObject(
+      settings,
+    );
+  });
+
+  it("updateChart leaves the saved settings alone when the form sends none", async () => {
+    mockUpdateTransaction();
+    const { updateChart } = await import("./chart-actions");
+
+    const result = await updateChart("chart-1", validChartInput);
+
+    assertSuccess(result);
+    const written = projectWrite(mockPrisma.chart.update.mock.calls[0][0], "update");
+    expect(written.strandCount).toBeUndefined();
+    expect(written.overCount).toBeUndefined();
+    expect(written.wastePercent).toBeUndefined();
+  });
+
+  it("createChart refuses an over-count that is not 1 or 2", async () => {
+    const { createChart } = await import("./chart-actions");
+
+    const result = await createChart(
+      unvalidatedPayload({
+        ...validChartInput,
+        project: { ...validChartInput.project, overCount: 3 },
+      }),
+    );
+
+    assertFailure(result);
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+  });
+});
+
 describe("chart-actions cache invalidation", () => {
   beforeEach(async () => {
     vi.resetAllMocks();

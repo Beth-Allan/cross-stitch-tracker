@@ -239,6 +239,7 @@ export function ChartMergedForm({
     stitchingApps,
     onSuccess,
     getSupplyRows: isEdit ? undefined : () => adapterRef.current?.getRows() ?? [],
+    getCalcParams: isEdit ? undefined : () => calcParamsRef.current,
     onValidationError: isEdit ? undefined : () => setMode("form"),
   });
 

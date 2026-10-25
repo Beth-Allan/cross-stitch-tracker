@@ -8,7 +8,7 @@ import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size
 import { chartFormSchema } from "@/lib/validations/chart";
 import { toast } from "sonner";
 import { createChart, createChartWithSupplies, updateChart } from "@/lib/actions/chart-actions";
-import type { SupplyRow } from "@/components/features/supply-table/types";
+import type { CalcParams, SupplyRow } from "@/components/features/supply-table/types";
 import { createDesigner } from "@/lib/actions/designer-actions";
 import { createGenre } from "@/lib/actions/genre-actions";
 import { createStorageLocation } from "@/lib/actions/storage-location-actions";
@@ -58,6 +58,8 @@ interface UseChartFormOptions {
   series?: SeriesWithStats[];
   onSuccess: (chartId: string) => void;
   getSupplyRows?: () => SupplyRow[];
+  /** The supply calculator's settings, saved on the new project. Create mode only. */
+  getCalcParams?: () => CalcParams;
   onValidationError?: () => void;
 }
 
@@ -160,6 +162,7 @@ export function useChartForm({
   series: initialSeries = [],
   onSuccess,
   getSupplyRows,
+  getCalcParams,
   onValidationError,
 }: UseChartFormOptions) {
   const initial = useMemo(() => buildInitialValues(initialData), [initialData]);
@@ -207,6 +210,7 @@ export function useChartForm({
   const suppressUnloadRef = useRef(false);
 
   const submitForm = useCallback(async () => {
+    const calcParams = getCalcParams?.();
     const formData = {
       chart: {
         name: values.name,
@@ -238,6 +242,11 @@ export function useChartForm({
         wantToStartNext: values.wantToStartNext,
         preferredStartSeason: values.preferredStartSeason,
         startingStitches: values.startingStitches,
+        ...(calcParams && {
+          strandCount: calcParams.strandCount,
+          overCount: calcParams.overCount,
+          wastePercent: calcParams.wastePercent,
+        }),
       },
     };
 
@@ -322,7 +331,7 @@ export function useChartForm({
     } finally {
       setIsPending(false);
     }
-  }, [values, mode, initialData, onSuccess, getSupplyRows, onValidationError]);
+  }, [values, mode, initialData, onSuccess, getSupplyRows, getCalcParams, onValidationError]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
