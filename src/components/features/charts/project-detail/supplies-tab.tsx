@@ -5,9 +5,14 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { SupplyTable } from "@/components/features/supply-table";
 import type { SupplyRow, CalcParams, FabricOption } from "@/components/features/supply-table";
+import { DEFAULT_CALC_PARAMS } from "@/components/features/supply-table/types";
 import { ServerActionAdapter } from "@/components/features/supply-table/server-action-adapter";
 import { CalculatorCard } from "@/components/features/charts/form-primitives/calculator-card";
 import { updateProjectSettings } from "@/lib/actions/chart-actions";
+import {
+  assignFabricToProject,
+  unassignFabricFromProject,
+} from "@/lib/actions/pattern-dive-actions";
 import { isStrandCount } from "@/types/supply";
 import type { ProjectDetailProps, SupplySortOption } from "./types";
 import type {
@@ -96,7 +101,7 @@ export function SuppliesTab({ project, supplies, calculator }: SuppliesTabProps)
   // Server-authoritative calc params (source of truth for rollback)
   const serverCalcParams: CalcParams = useMemo(
     () => ({
-      fabricCount: project.fabric?.count ?? 14,
+      fabricCount: project.fabric?.count ?? DEFAULT_CALC_PARAMS.fabricCount,
       strandCount: isStrandCount(project.strandCount) ? project.strandCount : 2,
       overCount: project.overCount,
       wastePercent: project.wastePercent,
@@ -105,19 +110,23 @@ export function SuppliesTab({ project, supplies, calculator }: SuppliesTabProps)
   );
 
   const [calcParams, setCalcParams] = useState<CalcParams>(serverCalcParams);
-  const [localFabricId, setLocalFabricId] = useState<string | null>(project.fabric?.id ?? null);
+  const serverFabricId = project.fabric?.id ?? null;
+  const [localFabricId, setLocalFabricId] = useState<string | null>(serverFabricId);
 
   const serverParamsRef = useRef(serverCalcParams);
+  const serverFabricIdRef = useRef(serverFabricId);
   useEffect(() => {
     serverParamsRef.current = serverCalcParams;
-  }, [serverCalcParams]);
+    serverFabricIdRef.current = serverFabricId;
+  }, [serverCalcParams, serverFabricId]);
 
   // Sync local state from server when server data changes (after successful save)
   useEffect(() => {
     if (!isPending) {
       setCalcParams(serverCalcParams);
+      setLocalFabricId(serverFabricId);
     }
-  }, [serverCalcParams, isPending]);
+  }, [serverCalcParams, serverFabricId, isPending]);
 
   const chartId = calculator?.chartId;
   const handleCalcParamsChange = useCallback(
@@ -153,12 +162,32 @@ export function SuppliesTab({ project, supplies, calculator }: SuppliesTabProps)
     [chartId],
   );
 
-  const handleFabricChange = useCallback((fabricId: string | null, fabricCount?: number) => {
-    setLocalFabricId(fabricId);
-    if (fabricCount != null) {
-      setCalcParams((prev) => ({ ...prev, fabricCount }));
-    }
-  }, []);
+  const projectId = project.id;
+  const handleFabricChange = useCallback(
+    (fabricId: string | null, fabricCount?: number) => {
+      setLocalFabricId(fabricId);
+      if (fabricCount != null) {
+        setCalcParams((prev) => ({ ...prev, fabricCount }));
+      }
+
+      startTransition(async () => {
+        let message = "Couldn't save the fabric. Please try again.";
+        try {
+          const result = fabricId
+            ? await assignFabricToProject(fabricId, projectId)
+            : await unassignFabricFromProject(projectId);
+          if (result.success) return;
+          message = result.error;
+        } catch (error) {
+          console.error("SuppliesTab fabric save failed:", error);
+        }
+        setLocalFabricId(serverFabricIdRef.current);
+        setCalcParams(serverParamsRef.current);
+        toast.error(message);
+      });
+    },
+    [projectId],
+  );
 
   // Transform + sort supply rows (parent pre-sorts, table is sort-unaware)
   const threads = useMemo(

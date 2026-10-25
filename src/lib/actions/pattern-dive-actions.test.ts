@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, mockProjectSupplyGroups } from "@/__tests__/mocks";
+import { createMockPrisma, mockProjectSupplyGroups, unvalidatedPayload } from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -1972,6 +1972,95 @@ describe("pattern-dive-actions", () => {
 
       expect(revalidatePath).toHaveBeenCalledWith("/charts/c1");
       expect(revalidatePath).toHaveBeenCalledWith("/charts");
+    });
+  });
+
+  describe("unassignFabricFromProject", () => {
+    it("rejects unauthenticated calls", async () => {
+      mockAuth.mockResolvedValueOnce(null);
+      const { unassignFabricFromProject } = await import("./pattern-dive-actions");
+      await expect(unassignFabricFromProject("project-1")).rejects.toThrow("Unauthorized");
+    });
+
+    it("refuses a project that belongs to someone else, touching no fabric", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "other-user",
+        chartId: "c1",
+        fabric: { id: "fabric-1" },
+      });
+
+      const { unassignFabricFromProject } = await import("./pattern-dive-actions");
+      const result = await unassignFabricFromProject("project-1");
+
+      expect(result).toEqual({ success: false, error: "Project not found" });
+      expect(mockPrisma.fabric.update).not.toHaveBeenCalled();
+    });
+
+    it("returns an error when the project does not exist", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue(null);
+
+      const { unassignFabricFromProject } = await import("./pattern-dive-actions");
+      const result = await unassignFabricFromProject("nonexistent");
+
+      expect(result).toEqual({ success: false, error: "Project not found" });
+    });
+
+    it("refuses a project id that is not a string", async () => {
+      const { unassignFabricFromProject } = await import("./pattern-dive-actions");
+      const result = await unassignFabricFromProject(unvalidatedPayload({ id: "project-1" }));
+
+      expect(result).toEqual({ success: false, error: "Project not found" });
+      expect(mockPrisma.project.findUnique).not.toHaveBeenCalled();
+    });
+
+    it("unlinks the project's fabric, returning it to the stash", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "user-1",
+        chartId: "c1",
+        fabric: { id: "fabric-1" },
+      });
+      mockPrisma.fabric.update.mockResolvedValue({});
+
+      const { revalidatePath } = await import("next/cache");
+      const { unassignFabricFromProject } = await import("./pattern-dive-actions");
+      const result = await unassignFabricFromProject("project-1");
+
+      expect(result).toEqual({ success: true });
+      expect(mockPrisma.fabric.update).toHaveBeenCalledWith({
+        where: { id: "fabric-1" },
+        data: { linkedProjectId: null },
+      });
+      expect(revalidatePath).toHaveBeenCalledWith("/charts/c1");
+      expect(revalidatePath).toHaveBeenCalledWith("/charts");
+    });
+
+    it("succeeds without a write when the project has no fabric", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "user-1",
+        chartId: "c1",
+        fabric: null,
+      });
+
+      const { unassignFabricFromProject } = await import("./pattern-dive-actions");
+      const result = await unassignFabricFromProject("project-1");
+
+      expect(result).toEqual({ success: true });
+      expect(mockPrisma.fabric.update).not.toHaveBeenCalled();
+    });
+
+    it("returns an error instead of throwing when the write fails", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "user-1",
+        chartId: "c1",
+        fabric: { id: "fabric-1" },
+      });
+      mockPrisma.fabric.update.mockRejectedValueOnce(new Error("DB down"));
+      vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const { unassignFabricFromProject } = await import("./pattern-dive-actions");
+      const result = await unassignFabricFromProject("project-1");
+
+      expect(result).toEqual({ success: false, error: "Failed to remove fabric" });
     });
   });
 });

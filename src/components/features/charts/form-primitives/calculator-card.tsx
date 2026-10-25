@@ -3,7 +3,11 @@
 import { useCallback } from "react";
 import { SearchableSelect } from "./searchable-select";
 import { EditableNumber } from "@/components/features/charts/editable-number";
-import type { CalcParams, FabricOption } from "@/components/features/supply-table/types";
+import {
+  DEFAULT_CALC_PARAMS,
+  type CalcParams,
+  type FabricOption,
+} from "@/components/features/supply-table/types";
 import { isStrandCount } from "@/types/supply";
 
 interface CalculatorCardProps {
@@ -24,9 +28,13 @@ export function CalculatorCard({
 }: CalculatorCardProps) {
   const handleFabricSelect = useCallback(
     (value: string | null) => {
-      const fabric = fabricOptions?.find((f) => f.value === value);
-      // Parent's onFabricChange handles both fabricId and fabricCount update
-      onFabricChange(value, fabric?.count);
+      // Clearing must hand back a count too, or the cleared piece's count stays on screen and
+      // every thread figure is worked at it until a reload shows the no-fabric default.
+      const count =
+        value === null
+          ? DEFAULT_CALC_PARAMS.fabricCount
+          : fabricOptions?.find((f) => f.value === value)?.count;
+      onFabricChange(value, count);
     },
     [fabricOptions, onFabricChange],
   );

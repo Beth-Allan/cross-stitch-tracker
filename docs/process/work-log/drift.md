@@ -41,6 +41,20 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-24 · D-30 · picking a fabric on the Supplies tab attaches it — ruled during a `/broken`
+
+**What happened.** On F-7's preview Beth picked a fabric in a project's Supplies-tab calculator
+and believed it was attached. It was not: the picker there only changed the figures on screen
+and was gone on reload, while the identical picker on the new-chart screen attaches the fabric
+on Create. Neither the product spec nor DesignOS says which the Supplies tab should do — a gap.
+
+**Surfaced to Beth** as: attach it, like the new-chart screen (recommended); keep it a labelled
+preview that saves nothing; or remove the picker there.
+
+**Her ruling:** attach it. Choosing a fabric links that piece to the project, clearing it returns
+the piece to the stash; trying a different count without attaching stays possible through the
+COUNT box.
+
 ### 2026-10-24 · D-29 · one list of fabric counts, the same ten everywhere — ruled during F-7
 
 **What happened.** Checking F-7's preview, Beth opened Pattern Dive → Fabric Requirements and found

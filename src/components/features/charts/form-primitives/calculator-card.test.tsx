@@ -176,6 +176,23 @@ describe("CalculatorCard", () => {
     expect(onCalcParamsChange).not.toHaveBeenCalled();
   });
 
+  it("clearing the fabric hands back the no-fabric count, not the cleared piece's count", async () => {
+    const user = userEvent.setup();
+    const onFabricChange = vi.fn();
+    render(
+      <CalculatorCard
+        {...defaultProps}
+        calcParams={{ ...defaultCalcParams, fabricCount: 28 }}
+        fabricId="fab-1"
+        onFabricChange={onFabricChange}
+      />,
+    );
+
+    await user.selectOptions(screen.getByTestId("fabric-select"), "");
+
+    expect(onFabricChange).toHaveBeenCalledWith(null, 14);
+  });
+
   it('has role="group" and aria-label="Skein calculator settings"', () => {
     render(<CalculatorCard {...defaultProps} />);
     const group = screen.getByRole("group", {
