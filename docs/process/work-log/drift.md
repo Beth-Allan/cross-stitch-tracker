@@ -71,6 +71,8 @@ set.
 now Beth's stated list, not a developer's guess — `/stitch-fact` records them in
 `docs/domain/fabric.md` (queued), and the size reference then reads the one shared list (queued).
 
+_Recorded 2026-10-24 as **FAB-008**. The size-reference fix is still queued (`/tweak`)._
+
 ### 2026-10-24 · D-28 · Next.js may not stop a build to nudge an upgrade — ruled during M-1
 
 **What happened.** M-1 moved Next.js 16.3.1 → 16.4.3 for its advisories. Reading the 16.4 source

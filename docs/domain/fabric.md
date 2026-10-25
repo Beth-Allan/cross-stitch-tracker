@@ -106,3 +106,20 @@ appears in **both halves** of FAB-006's list — projects with fabric assigned a
 — since over-count is the project's own setting either way.
 
 [stated by Beth 2026-08-18]
+
+### FAB-008 — The fabric counts the app offers: the same ten everywhere
+
+Wherever the app lists fabric counts — the fabric picker, the Fabric Requirements size
+reference, any future place — it offers the same ten, from one list:
+
+**14 · 16 · 18 · 20 · 22 · 25 · 28 · 32 · 36 · 40**
+
+Beth's words: _"they should be the same everywhere. The same 10 as the fabric picker."_ Before
+this the ten were a developer's list with no source (`FABRIC_COUNTS` in `src/types/fabric.ts`),
+and a second, private copy in `fabric-requirements-tab.tsx` stopped at 28 — leaving out 32, 36
+and 40, the counts most often stitched over two (FAB-004). Ruled as drift **D-29**.
+
+_Not yet true of the app everywhere (2026-10-24):_ the size reference still carries its own
+seven-count list; the `/tweak` queued behind this fact makes it read the shared ten.
+
+[stated by Beth 2026-10-24]
