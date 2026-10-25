@@ -69,6 +69,18 @@ is **not** in this list. Its access-control half — no ownership validation on 
 security wart and lives in the maintenance ledger, where the A-1 audit will pick it up. Only the
 multi-user _feature_ would be a wish, and this is a single-user app.
 
+## Tweaks taken on the spot
+
+A `/tweak` Beth chose to have built **now** is logged here in her own words and marked taken, so
+the wish is on paper even though it never waited in the list above.
+
+- **One count list everywhere** _(2026-10-24, D-29 / D-31 — taken now, `fix/one-count-list`)_:
+  _"they should be the same everywhere. The same 10 as the fabric picker."_ Pattern Dive's size
+  reference stopped at 28; it now reads the fabric picker's ten. On the closed row's quick look,
+  first _"Keep 14, 18, 25 — but all three should always be over 1"_, then, on seeing over-1 sizes
+  beside "stitched over 2": _"You're right that the always over 1 is weird when they're
+  specifically marked over two"_ — so over-1 rows show 14, 18, 25 and over-2 rows 28, 32, 36.
+
 ## Design-track inputs
 
 **Not wishes and not queued work** — these are the things a `/design-session` must have in front

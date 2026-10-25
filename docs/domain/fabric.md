@@ -119,7 +119,10 @@ this the ten were a developer's list with no source (`FABRIC_COUNTS` in `src/typ
 and a second, private copy in `fabric-requirements-tab.tsx` stopped at 28 — leaving out 32, 36
 and 40. Ruled as drift **D-29**.
 
-_Not yet true of the app everywhere (2026-10-24):_ the size reference still carries its own
-seven-count list; the `/tweak` queued behind this fact makes it read the shared ten.
+_True of the app as of the one-count-list `/tweak` (2026-10-24):_ the fabric picker and the
+Fabric Requirements size reference both read `FABRIC_COUNTS`; the private seven-count copy is
+gone. A closed project row there shows a quick look at three of the ten — 14, 18, 25 for a
+project stitched over 1, 28, 32, 36 for one stitched over 2 — held to the same list. Which three
+is Beth's display ruling D-31, not a fact about which counts are stitched over two (Q-002).
 
 [stated by Beth 2026-10-24]
