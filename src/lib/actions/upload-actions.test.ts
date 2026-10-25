@@ -503,7 +503,7 @@ describe("upload validation constants", () => {
 
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.errors[0].message).toContain("50MB");
+      expect(result.error.issues[0].message).toContain("50MB");
     }
   });
 

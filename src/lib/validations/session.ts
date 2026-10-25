@@ -6,17 +6,14 @@ export const sessionFormSchema = z.object({
   // A session date is a calendar date, never an instant (docs/ARCHITECTURE.md).
   // "Not in the future" is a per-user judgement and lives in the action, which
   // knows whose timezone decides what "today" means.
-  date: z.string().refine(
-    (val) => {
-      try {
-        parseCalendarDate(val);
-        return true;
-      } catch {
-        return false;
-      }
-    },
-    { message: "Invalid date" },
-  ),
+  date: z.string().refine((val) => {
+    try {
+      parseCalendarDate(val);
+      return true;
+    } catch {
+      return false;
+    }
+  }, "Invalid date"),
   stitchCount: z
     .number()
     .int("Stitch count must be a whole number")

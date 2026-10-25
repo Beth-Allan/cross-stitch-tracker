@@ -6,6 +6,7 @@ export const updateFocalPointSchema = z
     x: z.number().min(0).max(1).nullable(),
     y: z.number().min(0).max(1).nullable(),
   })
-  .refine((data) => (data.x === null) === (data.y === null), {
-    message: "Both x and y must be set or both must be null",
-  });
+  .refine(
+    (data) => (data.x === null) === (data.y === null),
+    "Both x and y must be set or both must be null",
+  );

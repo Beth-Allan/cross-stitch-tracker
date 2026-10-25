@@ -2,6 +2,7 @@
 
 import { signIn } from "@/lib/auth";
 import { peekRateLimit } from "@/lib/rate-limit";
+import { firstValidationMessage } from "@/lib/utils/action-errors";
 import { loginSchema } from "@/lib/validations/auth";
 import { AuthError } from "next-auth";
 
@@ -16,7 +17,7 @@ export async function loginAction(
 
   const parsed = loginSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.errors[0].message };
+    return { error: firstValidationMessage(parsed.error) };
   }
 
   // Read-only. The enforcing call is `recordAttempt` inside `authorizeCredentials`,

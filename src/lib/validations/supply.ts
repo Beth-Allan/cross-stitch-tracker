@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
-import { optionalUrl } from "@/lib/validations/fields";
+import { optionalUrl, wholeNumber, ZOD3_WORDING } from "@/lib/validations/fields";
 
 const SUPPLY_TYPES = ["THREAD", "BEAD", "SPECIALTY"] as const;
 const COLOR_FAMILIES = [
@@ -17,6 +17,15 @@ const COLOR_FAMILIES = [
   "NEUTRAL",
 ] as const;
 
+/**
+ * Required, not defaulted: quick-add asks rather than filing silently under NEUTRAL
+ * (Beth's ruling, 2026-08-17). Only a missing or non-text value is "required" — a
+ * value that was sent but is off the list keeps Zod's own message, as it did in Zod 3.
+ */
+const requiredColorFamily = z.enum(COLOR_FAMILIES, {
+  error: (issue) => (typeof issue.input === "string" ? undefined : "Color family is required"),
+});
+
 export const supplyBrandSchema = z.object({
   name: z.string().trim().min(1, "Brand name is required").max(200, "Brand name too long"),
   website: optionalUrl(),
@@ -27,8 +36,8 @@ export type SupplyBrandInput = z.input<typeof supplyBrandSchema>;
 
 export const threadSchema = z.object({
   brandId: z.string().min(1, "Brand is required"),
-  colorCode: z.string().trim().min(1, "Color code is required").max(50),
-  colorName: z.string().trim().min(1, "Color name is required").max(200),
+  colorCode: z.string().trim().min(1, "Color code is required").max(50, ZOD3_WORDING.tooLong(50)),
+  colorName: z.string().trim().min(1, "Color name is required").max(200, ZOD3_WORDING.tooLong(200)),
   hexColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color (e.g., #FF5733)"),
   colorFamily: z.enum(COLOR_FAMILIES),
 });
@@ -37,8 +46,12 @@ export type ThreadInput = z.input<typeof threadSchema>;
 
 export const beadSchema = z.object({
   brandId: z.string().min(1, "Brand is required"),
-  productCode: z.string().trim().min(1, "Product code is required").max(50),
-  colorName: z.string().trim().min(1, "Color name is required").max(200),
+  productCode: z
+    .string()
+    .trim()
+    .min(1, "Product code is required")
+    .max(50, ZOD3_WORDING.tooLong(50)),
+  colorName: z.string().trim().min(1, "Color name is required").max(200, ZOD3_WORDING.tooLong(200)),
   hexColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color (e.g., #FF5733)"),
   colorFamily: z.enum(COLOR_FAMILIES),
 });
@@ -47,9 +60,13 @@ export type BeadInput = z.input<typeof beadSchema>;
 
 export const specialtyItemSchema = z.object({
   brandId: z.string().min(1, "Brand is required"),
-  productCode: z.string().trim().min(1, "Product code is required").max(50),
-  colorName: z.string().trim().min(1, "Name is required").max(200),
-  description: z.string().max(2000).default(""),
+  productCode: z
+    .string()
+    .trim()
+    .min(1, "Product code is required")
+    .max(50, ZOD3_WORDING.tooLong(50)),
+  colorName: z.string().trim().min(1, "Name is required").max(200, ZOD3_WORDING.tooLong(200)),
+  description: z.string().max(2000, ZOD3_WORDING.tooLong(2000)).default(""),
   hexColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color (e.g., #FF5733)"),
 });
 
@@ -58,8 +75,8 @@ export type SpecialtyItemInput = z.input<typeof specialtyItemSchema>;
 export const projectThreadSchema = z.object({
   projectId: z.string().min(1),
   threadId: z.string().min(1),
-  stitchCount: z.number().int().min(0).default(0),
-  quantityRequired: z.number().int().min(1).default(1),
+  stitchCount: wholeNumber().min(0).default(0),
+  quantityRequired: wholeNumber().min(1).default(1),
   quantityAcquired: z.number().int().min(0).default(0),
 });
 
@@ -68,7 +85,7 @@ export type ProjectThreadInput = z.input<typeof projectThreadSchema>;
 export const projectBeadSchema = z.object({
   projectId: z.string().min(1),
   beadId: z.string().min(1),
-  quantityRequired: z.number().int().min(1).default(1),
+  quantityRequired: wholeNumber().min(1).default(1),
   quantityAcquired: z.number().int().min(0).default(0),
 });
 
@@ -77,7 +94,7 @@ export type ProjectBeadInput = z.input<typeof projectBeadSchema>;
 export const projectSpecialtySchema = z.object({
   projectId: z.string().min(1),
   specialtyItemId: z.string().min(1),
-  quantityRequired: z.number().int().min(1).default(1),
+  quantityRequired: wholeNumber().min(1).default(1),
   quantityAcquired: z.number().int().min(0).default(0),
 });
 
@@ -110,12 +127,7 @@ export const createAndAddThreadSchema = z.object({
     .optional()
     .default(DEFAULT_SUPPLY_HEX),
   brandId: z.string().min(1, "Brand is required"),
-  // Required, not defaulted: quick-add asks rather than filing silently under NEUTRAL
-  // (Beth's ruling, 2026-08-17)
-  colorFamily: z.enum(COLOR_FAMILIES, {
-    required_error: "Color family is required",
-    invalid_type_error: "Color family is required",
-  }),
+  colorFamily: requiredColorFamily,
 });
 
 export type CreateAndAddThreadInput = z.input<typeof createAndAddThreadSchema>;
@@ -125,10 +137,7 @@ export const createAndAddBeadSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(200),
   code: z.string().trim().max(20).optional().default(""),
   brandId: z.string().min(1, "Brand is required"),
-  colorFamily: z.enum(COLOR_FAMILIES, {
-    required_error: "Color family is required",
-    invalid_type_error: "Color family is required",
-  }),
+  colorFamily: requiredColorFamily,
 });
 
 export type CreateAndAddBeadInput = z.input<typeof createAndAddBeadSchema>;

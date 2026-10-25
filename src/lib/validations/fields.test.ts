@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { optionalDateString, optionalChoice, optionalText, optionalUrl } from "./fields";
+import {
+  optionalDateString,
+  optionalChoice,
+  optionalText,
+  optionalUrl,
+  wholeNumber,
+} from "./fields";
 
 describe("optionalText", () => {
   const schema = z.object({ notes: optionalText(20, "Notes too long") });
@@ -89,5 +95,24 @@ describe("optionalDateString", () => {
 
   it("rejects an unparseable date", () => {
     expect(() => schema.parse({ startDate: "not-a-date" })).toThrow("Invalid date");
+  });
+});
+
+describe("wholeNumber", () => {
+  const schema = wholeNumber();
+
+  it("accepts a whole number", () => {
+    expect(schema.parse(12)).toBe(12);
+  });
+
+  it("keeps Zod 3's wording for a fraction, which a number box can send", () => {
+    expect(schema.safeParse(2.5).error?.issues[0].message).toBe("Expected integer, received float");
+  });
+
+  it("refuses a number too large to hold exactly without calling it a fraction", () => {
+    const result = schema.safeParse(1e20);
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0].message).not.toBe("Expected integer, received float");
   });
 });

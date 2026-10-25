@@ -10,6 +10,7 @@ import { createStorageLocation } from "@/lib/actions/storage-location-actions";
 import { createStitchingApp } from "@/lib/actions/stitching-app-actions";
 import { createSeries } from "@/lib/actions/series-actions";
 import { createChart, createChartWithSupplies, updateChart } from "@/lib/actions/chart-actions";
+import { toast } from "sonner";
 
 // Mock all server actions the hook imports
 vi.mock("@/lib/actions/chart-actions", () => ({
@@ -435,6 +436,27 @@ describe("useChartForm inline entity creation", () => {
       });
 
       expect(result.current.errors["chart.notes"]).toBe("This field has an error");
+      expect(createChart).not.toHaveBeenCalled();
+    });
+
+    it("names the genre cap instead of the generic fallback", async () => {
+      const { result } = renderHook(() => useChartForm(defaultProps));
+
+      act(() => {
+        result.current.setField("name", "Autumn Sampler");
+        result.current.setField("stitchCount", 5000);
+        result.current.setField(
+          "genreIds",
+          Array.from({ length: 51 }, (_, i) => `genre-${i}`),
+        );
+      });
+
+      await act(async () => {
+        await result.current.submitForm();
+      });
+
+      expect(result.current.errors["chart.genreIds"]).toBe("A chart can have at most 50 genres");
+      expect(toast.error).toHaveBeenCalledWith("A chart can have at most 50 genres");
       expect(createChart).not.toHaveBeenCalled();
     });
   });

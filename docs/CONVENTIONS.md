@@ -97,10 +97,10 @@ A discriminated union — **actions never throw to the client**:
 
 ### Error tiers, in order
 
-1. **`ZodError`** → surface `error.errors[0].message` to the user.
+1. **`ZodError`** → surface `firstValidationMessage(error)` to the user — the first issue's
+   message, from `src/lib/utils/action-errors.ts`.
 2. **Prisma `P2002`** → a written unique-constraint message ("A designer with that name already
-   exists"). Actions with several constrained fields extract an `isP2002(error)` helper rather
-   than repeating the `code in error` narrowing.
+   exists"), detected with `isDuplicateKeyError(error)` from the same file — never re-inlined.
 3. **Catch-all** → generic client message plus `console.error("<action> error:", error)`. The
    client never sees a raw error object or a stack.
 

@@ -15,7 +15,34 @@ import { z } from "zod";
  * convenience for the app's own code, never a guarantee about the payload.
  */
 
-const URL_RULE = z.string().url();
+const URL_RULE = z.url();
+
+/**
+ * Zod 3's built-in wording, for checks that never had a message of their own.
+ * Zod 4 rewords its defaults, and a library upgrade must not change what Beth
+ * reads, so wherever a screen shows one of these the schema spells the old text
+ * out. Checks whose text no screen shows — the UI replaces it, or no input can
+ * produce the value — keep Zod's own wording.
+ */
+export const ZOD3_WORDING = {
+  notWhole: "Expected integer, received float",
+  tooLong: (max: number) => `String must contain at most ${max} character(s)`,
+  atLeast: (min: number) => `Number must be greater than or equal to ${min}`,
+  atMost: (max: number) => `Number must be less than or equal to ${max}`,
+  aboveZero: "Number must be greater than 0",
+} as const;
+
+/**
+ * A whole number from a box that can send a fraction. Only the fraction keeps
+ * Zod 3's wording: Zod 4's `.int()` also refuses numbers past
+ * `Number.MAX_SAFE_INTEGER`, which Zod 3 let through, and calling a 20-digit
+ * number a fraction would be wrong — that case keeps Zod 4's own message.
+ */
+export function wholeNumber() {
+  return z
+    .number()
+    .int({ error: (issue) => (issue.code === "invalid_type" ? ZOD3_WORDING.notWhole : undefined) });
+}
 
 const blankToNull = (value: string) => (value === "" ? null : value);
 
@@ -43,7 +70,7 @@ export function optionalUrl(message = "Must be a valid URL") {
     .transform(blankToNull)
     .nullable()
     .default(null)
-    .refine((value) => value === null || URL_RULE.safeParse(value).success, { message });
+    .refine((value) => value === null || URL_RULE.safeParse(value).success, message);
 }
 
 /**
@@ -68,5 +95,5 @@ export function optionalDateString(message = "Invalid date") {
     .string()
     .nullable()
     .default(null)
-    .refine((value) => value === null || !Number.isNaN(Date.parse(value)), { message });
+    .refine((value) => value === null || !Number.isNaN(Date.parse(value)), message);
 }

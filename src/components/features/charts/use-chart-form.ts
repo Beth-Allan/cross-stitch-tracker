@@ -5,7 +5,7 @@ import type { Designer, Genre, ProjectStatus } from "@/generated/prisma/client";
 import type { ChartWithProject } from "@/types/chart";
 import type { SizeCategory } from "@/lib/utils/size-category";
 import { calculateSizeCategory, getEffectiveStitchCount } from "@/lib/utils/size-category";
-import { chartFormSchema } from "@/lib/validations/chart";
+import { chartFormSchema, TOO_MANY_GENRES } from "@/lib/validations/chart";
 import { toast } from "sonner";
 import { createChart, createChartWithSupplies, updateChart } from "@/lib/actions/chart-actions";
 import type { CalcParams, SupplyRow } from "@/components/features/supply-table/types";
@@ -67,6 +67,7 @@ const ERROR_MAP: Record<string, string> = {
   "chart.name": "Chart name is required",
   "chart.stitchCount": "Enter a stitch count or both width and height",
   "chart.kitColorCount": "Kit color count must be a positive number",
+  "chart.genreIds": TOO_MANY_GENRES,
   "project.status": "Please select a status",
   "project.startDate": "Invalid date format",
   "project.finishDate": "Invalid date format",

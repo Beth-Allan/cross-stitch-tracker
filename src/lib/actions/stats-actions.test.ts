@@ -60,7 +60,10 @@ describe("stats-actions", () => {
       const { fetchCalendarMonth } = await import("./stats-actions");
       const result = await fetchCalendarMonth(5, 2019);
 
-      expect(result.success).toBe(false);
+      expect(result).toEqual({
+        success: false,
+        error: "Number must be greater than or equal to 2020",
+      });
       expect(mockGetCalendarDays).not.toHaveBeenCalled();
     });
 
@@ -68,7 +71,10 @@ describe("stats-actions", () => {
       const { fetchCalendarMonth } = await import("./stats-actions");
       const result = await fetchCalendarMonth(5, 2101);
 
-      expect(result.success).toBe(false);
+      expect(result).toEqual({
+        success: false,
+        error: "Number must be less than or equal to 2100",
+      });
       expect(mockGetCalendarDays).not.toHaveBeenCalled();
     });
   });
@@ -154,6 +160,26 @@ describe("stats-actions", () => {
 
       expect(result.success).toBe(false);
       expect(mockGetMonthlyTotals).not.toHaveBeenCalled();
+    });
+
+    it("keeps Zod 3's wording for a year before 2020, which Previous year can reach", async () => {
+      const { fetchMonthlyTotals } = await import("./stats-actions");
+      const result = await fetchMonthlyTotals(2019);
+
+      expect(result).toEqual({
+        success: false,
+        error: "Number must be greater than or equal to 2020",
+      });
+    });
+
+    it("keeps Zod 3's wording for a year after 2100, which Next year can reach", async () => {
+      const { fetchMonthlyTotals } = await import("./stats-actions");
+      const result = await fetchMonthlyTotals(2101);
+
+      expect(result).toEqual({
+        success: false,
+        error: "Number must be less than or equal to 2100",
+      });
     });
   });
 });

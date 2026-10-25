@@ -6,6 +6,7 @@ import {
   optionalChoice,
   optionalText,
   optionalUrl,
+  wholeNumber,
 } from "@/lib/validations/fields";
 import { updateProjectSettingsSchema } from "@/lib/validations/supply";
 import { parseStorageKey } from "@/lib/validations/upload";
@@ -21,6 +22,14 @@ function storageKeyIn(category: "covers" | "files") {
     .min(1)
     .refine((value) => parseStorageKey(value)?.category === category, "Invalid storage key");
 }
+
+/**
+ * Beth's ceiling (2026-10-25): far above any real tagging, and a bound on how much a
+ * single request makes the parser walk. Exported so the chart form names the
+ * same number the server enforces.
+ */
+export const MAX_GENRES_PER_CHART = 50;
+export const TOO_MANY_GENRES = `A chart can have at most ${MAX_GENRES_PER_CHART} genres`;
 
 export const chartFormSchema = z.object({
   chart: z
@@ -44,7 +53,7 @@ export const chartFormSchema = z.object({
       stitchCountApproximate: z.boolean().default(false),
       stitchesWide: z.number().int().min(0).default(0),
       stitchesHigh: z.number().int().min(0).default(0),
-      genreIds: z.array(z.string()).default([]),
+      genreIds: z.array(z.string()).max(MAX_GENRES_PER_CHART, TOO_MANY_GENRES).default([]),
       isPaperChart: z.boolean().default(false),
       isFormalKit: z.boolean().default(false),
       isSAL: z.boolean().default(false),
@@ -52,7 +61,7 @@ export const chartFormSchema = z.object({
       notes: optionalText(5000, "Notes too long"),
     })
     .refine((data) => data.stitchCount > 0 || (data.stitchesWide > 0 && data.stitchesHigh > 0), {
-      message: "Provide stitch count or dimensions",
+      error: "Provide stitch count or dimensions",
       path: ["stitchCount"],
     }),
   project: z
@@ -93,8 +102,8 @@ export const batchSupplySchema = z.object({
     .array(
       z.object({
         supplyId: z.string().min(1, "Supply ID required"),
-        stitchCount: z.number().int().min(0),
-        need: z.number().int().min(1, NEED_AT_LEAST_ONE),
+        stitchCount: wholeNumber().min(0),
+        need: wholeNumber().min(1, NEED_AT_LEAST_ONE),
         isNeedOverridden: z.boolean(),
       }),
     )
@@ -104,7 +113,7 @@ export const batchSupplySchema = z.object({
     .array(
       z.object({
         supplyId: z.string().min(1, "Supply ID required"),
-        need: z.number().int().min(1, NEED_AT_LEAST_ONE),
+        need: wholeNumber().min(1, NEED_AT_LEAST_ONE),
       }),
     )
     .max(500)
@@ -113,7 +122,7 @@ export const batchSupplySchema = z.object({
     .array(
       z.object({
         supplyId: z.string().min(1, "Supply ID required"),
-        need: z.number().int().min(1, NEED_AT_LEAST_ONE),
+        need: wholeNumber().min(1, NEED_AT_LEAST_ONE),
       }),
     )
     .max(500)
