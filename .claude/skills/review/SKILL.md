@@ -18,7 +18,8 @@ always-loaded tier of CLAUDE.md.
 
 **While the CodeRabbit trial runs (D-33), your first act is asking it for a review** — §5 says
 how, and when to read what it finds. Then check out the branch and run the gate yourself — a
-review that trusts the builder's green is not a review. **Pass:** squash-merge, work-log status `reviewed`, a one-line REVIEW note.
+review that trusts the builder's green is not a review. **Pass:** squash-merge, work-log status
+`reviewed`, a one-line REVIEW note.
 **Findings:** PR comments plus a REVIEW block in the work log; fixes land on the same branch
 (trivial ones the reviewer may fix); re-review only the delta.
 

@@ -14,9 +14,13 @@ reviews:
   # review of every pull request.
   auto_review:
     enabled: false
+  # It is an opinion, never a gate, so it may not approve a pull request.
+  auto_approvals:
+    enabled: false
   # Pull request descriptions are written for Beth and are never rewritten.
   high_level_summary: false
-  review_status: false
+  # The walkthrough keeps the findings and drops the extras, which only lengthen
+  # what the reviewing session reads.
   poem: false
   in_progress_fortune: false
   sequence_diagrams: false
@@ -55,16 +59,26 @@ reviews:
       mode: "off"
     issue_assessment:
       mode: "off"
-  # The gate already runs ESLint and Prettier on every push, and Biome's opinions
-  # differ from both. The Markdown here is written for Beth, not linted.
+  # The gate already runs ESLint and Prettier on every push, and the other
+  # linters' opinions differ from both. Prisma writes the migration SQL, so its
+  # style is not ours to lint. The Markdown here is written for Beth, not
+  # linted. The security scanners stay on.
   tools:
     eslint:
       enabled: false
     biome:
       enabled: false
+    oxc:
+      enabled: false
+    stylelint:
+      enabled: false
+    sqlfluff:
+      enabled: false
     markdownlint:
       enabled: false
     languagetool:
+      enabled: false
+    vale:
       enabled: false
   # History, not authority: never reviewed, never read for instructions.
   path_filters:
@@ -73,8 +87,8 @@ reviews:
     - path: "docs/**"
       instructions: >-
         Process records and domain facts written for the product owner. Do not
-        comment on prose or formatting; flag only a statement that contradicts
-        code changed in this pull request.
+        comment on prose or formatting; flag a statement that contradicts the
+        code, prisma/schema.prisma, or another document in this repository.
     - path: "**/*.test.*"
       instructions: >-
         Never suggest deleting, skipping or loosening an assertion. Flag a test
@@ -97,6 +111,9 @@ chat:
 
 knowledge_base:
   code_guidelines:
+    # CLAUDE.md and .claude/rules/ are defaults too, listed in case a list here
+    # replaces the defaults. docs/domain/ includes its open questions on purpose:
+    # a constant that assumes an answer to one is a stop-and-ask.
     filePatterns:
       - "CLAUDE.md"
       - ".claude/rules/**/*.md"

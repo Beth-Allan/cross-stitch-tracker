@@ -186,9 +186,11 @@ before reading CodeRabbit's, or this column cannot be filled honestly.
 | #   | review | PR  | ran? | its findings | real | real and missed by the others | note |
 | --- | ------ | --- | ---- | ------------ | ---- | ----------------------------- | ---- |
 
-**The third row's session puts the table to Beth** (the drift ruling D-33 sets the rule: no real
-catch the others missed → switch it off; at least one → she rules on keeping it) and records her
-ruling as a new drift row.
+A "did not run" row is kept but does not count toward the three (protocol §5 step 3).
+**The session that tallies the third run puts the table to Beth**, whatever the queue order (the
+queue marks R-2, P9c and F-9 only because they are the next three today). The drift ruling D-33
+sets the rule: no real catch the others missed → switch it off; at least one → she rules on
+keeping it. That session records her ruling as a new drift row.
 
 **Done when:** that ruling is recorded. Then `/cleanup` retires this note, and protocol §5's
 CodeRabbit paragraph is rewritten or removed to match.
