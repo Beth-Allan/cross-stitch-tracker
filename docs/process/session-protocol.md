@@ -186,6 +186,27 @@ the diff ⑦ work log/docs current. **Pass:** squash-merge, status `reviewed`, o
 note. **Findings:** PR comments + a REVIEW block in the work log; fixes land on the same branch
 (trivial ones the reviewer may fix); re-review the delta only.
 
+**CodeRabbit — a trial second opinion inside `/review` (Beth's ruling D-33).** CodeRabbit (free
+open-source plan; settings in `.coderabbit.yaml`) is a different vendor's reviewer, so its blind
+spots differ from ours. It never reviews on its own here — a public repository under 10 stars is
+reviewed only when someone asks — so during the trial each `/review` session asks:
+
+1. **First act, before reading anything:** comment `@coderabbitai review` on the PR. It takes
+   several minutes; wait in the background (its `CodeRabbit` check reads "Review completed"),
+   never with a foreground sleep.
+2. **Finish your own review, then read its findings** — reading them first makes "what would we
+   have missed" unanswerable. Check each against the code like a layer-1 finding: fixed,
+   ledgered, or dismissed with a one-line reply on its thread.
+3. **It never holds a merge.** Rate-limited, errored, or not finished when the review is
+   otherwise done → proceed without it and tally "did not run", with the reason.
+4. **Tally one row** in the trial table in `docs/process/work-log/notes.md`: what it found, how
+   much was real, and how much of the real was in neither layer 1's record nor your own pass.
+
+The trial is **three gated reviews**. The third tallies, then puts the table to Beth: no real
+catch the others missed → it is switched off (the app removed from the repository, which is a
+GitHub setting, `.coderabbit.yaml` deleted, this paragraph retired); at least one → she rules on
+keeping it.
+
 **Layer 4 — `/stage-review <stage>`:** when a stage's items are all `built`/`reviewed`, a fresh
 session — **Fable lane**, never one that built any of the stage's items — reviews the stage as
 one piece, before Beth's walkthrough. Read the stage's briefs, then the full stage diff (every

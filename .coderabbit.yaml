@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+# CodeRabbit is an advisory second opinion on review-gated pull requests only,
+# asked for by the /review session with `@coderabbitai review`. When and how is
+# docs/process/session-protocol.md §5; it never gates a merge.
+
+tone_instructions: >-
+  Be brief. Report defects and broken house rules only: no praise, no summaries,
+  no style or wording nits that Prettier or ESLint already own.
+
+reviews:
+  profile: chill
+  # Explicit, so stars arriving on this public repository cannot switch on a
+  # review of every pull request.
+  auto_review:
+    enabled: false
+  # Pull request descriptions are written for Beth and are never rewritten.
+  high_level_summary: false
+  review_status: false
+  poem: false
+  in_progress_fortune: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  assess_linked_issues: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  suggested_reviewers: false
+  # The reviewing session reads each finding; a ready-made agent prompt under
+  # every comment only doubles what it has to read.
+  enable_prompt_for_ai_agents: false
+  # Every change is written test-first by a session and passes the gate, so
+  # nothing commits to a branch on CodeRabbit's say-so.
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+    simplify:
+      enabled: false
+    autofix:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false
+  # JSDoc is wanted on exports only, so a coverage threshold is noise; titles and
+  # descriptions follow .claude/rules/git-workflow.md.
+  pre_merge_checks:
+    docstrings:
+      mode: "off"
+    title:
+      mode: "off"
+    description:
+      mode: "off"
+    issue_assessment:
+      mode: "off"
+  # The gate already runs ESLint and Prettier on every push, and Biome's opinions
+  # differ from both. The Markdown here is written for Beth, not linted.
+  tools:
+    eslint:
+      enabled: false
+    biome:
+      enabled: false
+    markdownlint:
+      enabled: false
+    languagetool:
+      enabled: false
+  # History, not authority: never reviewed, never read for instructions.
+  path_filters:
+    - "!docs/archive/**"
+  path_instructions:
+    - path: "docs/**"
+      instructions: >-
+        Process records and domain facts written for the product owner. Do not
+        comment on prose or formatting; flag only a statement that contradicts
+        code changed in this pull request.
+    - path: "**/*.test.*"
+      instructions: >-
+        Never suggest deleting, skipping or loosening an assertion. Flag a test
+        that cannot fail, or one that pins what the code does rather than what
+        it should do.
+    - path: "src/**"
+      instructions: >-
+        Every cross-stitch constant (skein length, fabric count, over-count rule)
+        must trace to a fact in docs/domain/; flag one that does not.
+    - path: "prisma/migrations/**"
+      instructions: >-
+        Flag any operation that can lose data (a drop, a rename, a type change, a
+        NOT NULL column without a default) and any mismatch with
+        prisma/schema.prisma.
+
+chat:
+  # A session dismisses a false alarm with a one-line reply, which should not
+  # start a conversation.
+  auto_reply: false
+
+knowledge_base:
+  code_guidelines:
+    filePatterns:
+      - "CLAUDE.md"
+      - ".claude/rules/**/*.md"
+      - "docs/CONVENTIONS.md"
+      - "docs/process/security-checklist.md"
+      - "docs/domain/**/*.md"
