@@ -100,15 +100,24 @@ describe("FabricRequirementsTab", () => {
     ]);
   });
 
-  it("sizes the row summary at over 1 even for an over-two project", () => {
+  it("row summary for an over-one project shows 14, 18 and 25", () => {
+    render(<FabricRequirementsTab rows={[makeRow()]} imageUrls={{}} />);
+
+    const labels = screen.getAllByText(/^\d+ct$/).map((label) => label.textContent);
+    expect(labels).toEqual(["14ct", "18ct", "25ct"]);
+  });
+
+  it("row summary for an over-two project shows 28, 32 and 36 worked over two", () => {
     render(<FabricRequirementsTab rows={[makeRow({ overCount: 2 })]} imageUrls={{}} />);
 
-    // 14ct over 1: 200/14+6 = 20.2857…" x 300/14+6 = 27.4285…"
+    const labels = screen.getAllByText(/^\d+ct$/).map((label) => label.textContent);
+    expect(labels).toEqual(["28ct", "32ct", "36ct"]);
+    // 28ct over two works like 14: 200/14+6 = 20.2857…" x 300/14+6 = 27.4285…"
     expect(screen.getByText('20.3" x 27.5"')).toBeInTheDocument();
-    // 18ct over 1: 200/18+6 = 17.111…" x 300/18+6 = 22.666…"
+    // 32ct over two works like 16: 200/16+6 = 18.5" x 300/16+6 = 24.75"
+    expect(screen.getByText('18.5" x 24.8"')).toBeInTheDocument();
+    // 36ct over two works like 18: 200/18+6 = 17.111…" x 300/18+6 = 22.666…"
     expect(screen.getByText('17.2" x 22.7"')).toBeInTheDocument();
-    // 14ct worked over two would behave like 7ct: 200/7+6 = 34.57…" x 300/7+6 = 48.85…"
-    expect(screen.queryByText('34.6" x 48.9"')).not.toBeInTheDocument();
   });
 
   it("says on the row when a project is stitched over two", () => {

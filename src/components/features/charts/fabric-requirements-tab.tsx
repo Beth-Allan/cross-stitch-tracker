@@ -11,14 +11,17 @@ import {
   FABRIC_MARGIN_INCHES,
   calculateEffectiveCount,
   calculateRequiredFabricEdge,
+  calculateRequiredFabricSize,
   doesFabricFit,
   formatRequiredInches,
 } from "@/lib/utils/fabric-calculator";
 
-// The closed row is a quick look that Beth wants at over 1 whatever the project's over-count
-// (her ruling, 2026-10-24); the size reference beneath applies the project's own.
-const ROW_SUMMARY_COUNTS = [14, 18, 25] as const satisfies readonly FabricCount[];
-const ROW_SUMMARY_OVER_COUNT = 1;
+// The closed row's quick look: the three counts Beth chose for each over-count (her ruling,
+// 2026-10-24), sized at the project's own over-count so they agree with the fit badge.
+const ROW_SUMMARY_COUNTS = {
+  1: [14, 18, 25],
+  2: [28, 32, 36],
+} as const satisfies Record<1 | 2, readonly FabricCount[]>;
 
 function fabricFits(row: FabricRequirementRow): boolean {
   if (!row.assignedFabric || row.requiredWidth === null || row.requiredHeight === null) {
@@ -266,17 +269,14 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                   </div>
 
                   <div className="hidden shrink-0 gap-4 md:flex">
-                    {ROW_SUMMARY_COUNTS.map((ct) => {
-                      const w = calculateRequiredFabricEdge(
-                        row.stitchesWide,
-                        ct,
-                        ROW_SUMMARY_OVER_COUNT,
-                      );
-                      const h = calculateRequiredFabricEdge(
-                        row.stitchesHigh,
-                        ct,
-                        ROW_SUMMARY_OVER_COUNT,
-                      );
+                    {ROW_SUMMARY_COUNTS[row.overCount].map((ct) => {
+                      const { requiredWidthInches: w, requiredHeightInches: h } =
+                        calculateRequiredFabricSize(
+                          row.stitchesWide,
+                          row.stitchesHigh,
+                          ct,
+                          row.overCount,
+                        );
                       return (
                         <div key={ct} className="min-w-[70px] text-center">
                           <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
