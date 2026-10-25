@@ -10,10 +10,10 @@ ruling D-12). The never-assume rule is `docs/process/session-protocol.md` §7; t
 provenance vocabulary, and the domain manifest live in `docs/domain/README.md` — read it before
 writing anything.
 
-Everything in the knowledgebase today was **seeded from `CROSS_STITCH_TRACKER_PLAN.md`, not
-stated by Beth** — so the highest-value thing any `/stitch-fact` session can do, beyond recording
-what she came to say, is take one open question off `docs/domain/open-questions.md` while she is
-here. Q-001 (per-brand skein length) is giving wrong numbers in the app right now.
+Most of the knowledgebase was **seeded from `CROSS_STITCH_TRACKER_PLAN.md`, not stated by
+Beth** (each fact's provenance tag says which) — so the highest-value thing any `/stitch-fact`
+session can do, beyond recording what she came to say, is take one open question off
+`docs/domain/open-questions.md` while she is here, highest tier first.
 
 For each fact Beth states:
 

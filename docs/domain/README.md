@@ -68,14 +68,15 @@ Two different things, kept apart:
 
 ## Topic manifest
 
-| file                     | scope                                                                                                  | status                                                                                            |
-| ------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `vocabulary.md`          | the words themselves — chart vs project, WIP, FFO, SAL, series, BAP, stash, onion skinning, the tools  | seeded 2026-08-16 from the plan's glossary — awaiting Beth's confirmation                         |
-| `threads.md`             | thread brands, floss, skeins and skein length, strand counts, the skein-calculator constants           | seeded 2026-08-16 — **carries the project's worst open question** (per-brand skein length)        |
-| `fabric.md`              | fabric types and counts, over-count, the fabric-size calculation and its margin                        | seeded 2026-08-16 — over-count inference is unsourced and open                                    |
-| `kitting-and-storage.md` | what "kitted" means (the nine conditions), project bags and bins                                       | seeded 2026-08-16 from the plan's glossary — awaiting Beth's confirmation                         |
-| `chart-files.md`         | the digital files a chart arrives as — which formats Beth keeps, and the charting programs behind them | opened 2026-08-19 from Beth's own answer — the first topic here that was not seeded from the plan |
-| `open-questions.md`      | every recorded gap, tiered by what it blocks — the `/stitch-fact` queue                                | live                                                                                              |
+| file                       | scope                                                                                                                     | status                                                                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `vocabulary.md`            | the words themselves — chart vs project, WIP, FFO, SAL, series, BAP, stash, onion skinning, the tools                     | seeded 2026-08-16 from the plan's glossary — awaiting Beth's confirmation                                                     |
+| `threads.md`               | thread brands, floss, skeins and skein length, strand counts, the skein-calculator constants                              | seeded 2026-08-16; **skein lengths answered by Beth 2026-10-25** (THR-007–THR-011) — the app still uses one length until F-16 |
+| `fabric.md`                | fabric types and counts, over-count, the fabric-size calculation and its margin                                           | seeded 2026-08-16 — over-count inference is unsourced and open                                                                |
+| `kitting-and-storage.md`   | what "kitted" means (the nine conditions), project bags and bins                                                          | seeded 2026-08-16; KIT-004–KIT-006 are Beth's — the nine conditions (KIT-001) await her confirmation                          |
+| `chart-files.md`           | the digital files a chart arrives as — which formats Beth keeps, and the charting programs behind them                    | opened 2026-08-19 from Beth's own answer — the first topic here that was not seeded from the plan                             |
+| `sessions-and-progress.md` | stitching sessions and progress — which date a session belongs to, where a week starts, what progress is measured against | opened 2026-10-25 from Beth's answers to three `/cleanup` questions                                                           |
+| `open-questions.md`        | every recorded gap, tiered by what it blocks — the `/stitch-fact` queue                                                   | live                                                                                                                          |
 
 ## Relationship to the other docs
 
