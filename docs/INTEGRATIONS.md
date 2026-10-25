@@ -7,7 +7,7 @@ deliberately absent.
 
 **Image Processing:**
 
-- sharp 0.35.3 - Server-side WebP conversion and thumbnail generation
+- sharp 0.35.5 - Server-side WebP conversion and thumbnail generation
   - Used in: `src/lib/actions/upload-actions.ts` (`processAndStoreImage` — the one image
     pipeline, shared by chart covers and session photos since item P15, 2026-08-17)
   - Not an external API; runs in-process on Vercel serverless functions
@@ -26,7 +26,7 @@ deliberately absent.
   - Connection (pooled app): `DATABASE_URL` env var — pooler hostname (`*-pooler.neon.tech`)
   - Connection (direct CLI): `DIRECT_URL` env var — direct hostname (`*.neon.tech`), supplied to
     the Prisma CLI by `prisma.config.ts`
-  - ORM/client: Prisma 7.9.1 with the `@prisma/adapter-neon` 7.9.1 driver adapter
+  - ORM/client: Prisma 7.10.1 with the `@prisma/adapter-neon` 7.10.1 driver adapter
   - Client singleton: `src/lib/db.ts` (lazy Proxy pattern; the client is not constructed until
     first property access, so module evaluation during build does not require `DATABASE_URL`)
   - Schema: `prisma/schema.prisma` (source of truth)

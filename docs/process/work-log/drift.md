@@ -41,6 +41,25 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-24 · D-28 · Next.js may not stop a build to nudge an upgrade — ruled during M-1
+
+**What happened.** M-1 moved Next.js 16.3.1 → 16.4.3 for its advisories. Reading the 16.4 source
+(hard rule 8) found a new default, `experimental.agentUpgrade: 'security'`: when `next dev` or
+`next build` detects a coding agent and a newer Next carries a security advisory, the first run
+**exits with code 1** and prints upgrade instructions addressed to the agent
+(`node_modules/next/dist/lib/upgrade/nudge.js`). CI and Vercel are unaffected (no agent
+detected), and it was dormant on the day because 16.4.3 had no open advisory. But the build step of
+`npm run gate` runs in the pre-push hook from Claude Code, so the next Next.js advisory would turn
+any unrelated session's push red. It is the same family as the 2026-08-17 `agentRules` ruling (a
+dependency acting on the process), though it writes no file, so that ruling did not cover it.
+
+**Surfaced to Beth** in-session as two options: switch it off, or keep it as an early alarm between
+monthly runs.
+
+**Her ruling:** switch it off. `experimental.agentUpgrade: false` now sits in `next.config.ts`
+beside `agentRules: false`, with the reason in a comment. Catching security fixes stays the
+dependency recurrence's job (Stage M). If the flag is ever lost, restore it.
+
 ### 2026-10-24 · D-27 · the process, tuned for Opus 5.5 and Fable 5.1 — ruled before M-1
 
 **What needed a ruling.** Beth asked whether the workflow, skills, rules and hooks should change

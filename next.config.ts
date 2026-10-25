@@ -10,6 +10,14 @@ const nextConfig: NextConfig = {
   // bleeding-edge APIs before use) is already hard rule 8.
   agentRules: false,
 
+  experimental: {
+    // Next 16.4 stops `next dev`/`next build` once, when it detects a coding agent
+    // and a newer Next carries a security fix — a red pre-push gate in whatever
+    // session happens to be running, for a reason unrelated to its work. Noticing
+    // advisories is the monthly dependency recurrence's job — Beth's ruling, 2026-10-24.
+    agentUpgrade: false,
+  },
+
   async redirects() {
     return canonicalHostRedirects();
   },
