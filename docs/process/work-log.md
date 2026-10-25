@@ -81,7 +81,7 @@ _(The popped-row history that used to sit here — every session's "row popped" 
 2026-08-17 to 2026-10-24 — moved verbatim to `docs/process/work-log-archive.md` at the 2026-10-24
 `/cleanup`. Add a one-line note here when a row pops; `/cleanup` archives them.)_
 
-- 2026-10-24 · Opus 5.5 · popped `/work-item M-1` (dependency maintenance); added `/work-item M-2` + `/review M-2` after F-7 and `/work-item M-3` after F-8, by Beth's rulings in-session.
+- 2026-10-24 · Opus 5.5 · popped `/work-item M-1` (dependency maintenance); added `/work-item M-2` + `/review M-2` after F-7 and `/work-item M-3` after F-8, by Beth's rulings in-session. Beth checked the preview (login, upload, stats) and said "It's looking good. Please merge." — merged as PR #133.
 
 _(**2026-10-24 `/cleanup`** — the order Beth asked for: the design session moved down behind her
 visual bugs, with the dependency check overdue since September at the top. Drift is empty: the
