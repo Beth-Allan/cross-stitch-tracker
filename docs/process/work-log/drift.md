@@ -41,6 +41,22 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-24 · D-29 · one list of fabric counts, the same ten everywhere — ruled during F-7
+
+**What happened.** Checking F-7's preview, Beth opened Pattern Dive → Fabric Requirements and found
+the size reference stops at 28 count. The app holds **two** count lists: `FABRIC_COUNTS` in
+`src/types/fabric.ts` (14, 16, 18, 20, 22, 25, 28, 32, 36, 40 — the fabric picker) and a private
+copy in `fabric-requirements-tab.tsx` that ends at 28, written in phase 08 before over-count
+reached fabric sizing. Neither traces to Beth or `docs/domain/`. Over two is where the gap bites:
+32, 36 and 40 are the counts stitched over two.
+
+**Surfaced to Beth** as: the fabric picker's ten as one shared list (recommended), or a different
+set.
+
+**Her ruling:** "they should be the same everywhere. The same 10 as the fabric picker." The ten are
+now Beth's stated list, not a developer's guess — `/stitch-fact` records them in
+`docs/domain/fabric.md` (queued), and the size reference then reads the one shared list (queued).
+
 ### 2026-10-24 · D-28 · Next.js may not stop a build to nudge an upgrade — ruled during M-1
 
 **What happened.** M-1 moved Next.js 16.3.1 → 16.4.3 for its advisories. Reading the 16.4 source
