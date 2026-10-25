@@ -939,7 +939,8 @@ was never queued and went seven weeks overdue. Each run is one item here, number
   and keep every boundary's behaviour, and every message Beth sees, the same.
 - **Why it waited:** a major bump is Beth's decision (M-1 trap ②). She queued it as its own item
   right after F-7. **Exposure while it waits:** every collection-validating parse runs after
-  `requireAuth()` (`chartFormSchema.genreIds`, `batchSupplySchema`), and the one unauthenticated
+  `requireAuth()` (`chartFormSchema.genreIds`, which has no `.max()` — ledger row 2026-10-24 — and
+  `batchSupplySchema`, capped at 500), and the one unauthenticated
   schema, `loginSchema`, holds no collection. So only a signed-in caller can reach it.
 - **Cited specs:** `.claude/rules/form-patterns.md` (the `fields.ts` builders, `z.input` vs
   `z.infer`, `firstValidationMessage`) · `docs/STACK.md` (says "this is Zod **v3**", which goes stale)
@@ -951,16 +952,18 @@ was never queued and went seven weeks overdue. Each run is one item here, number
   ③ `z.input`/`z.output` semantics around `.default()` changed in v4. Check the action input types
   still accept what the forms send. ④ Exact-pin `zod`; check that `eslint-plugin-react-hooks` and
   `shadcn` still dedupe onto it.
-- **Done-when:** `npm audit --omit=dev` reports zero; gate green; no validation-message test
+- **Done-when:** `npm audit` reports no `zod` advisory anywhere in the tree; gate green; no validation-message test
   weakened; preview demonstrated (create and edit a chart, log a session, add a supply, a rejected
   input shows its message); `docs/STACK.md` updated; fresh `/review` (the auth schema is gated).
 
 ### M-3 Vitest 3 → 4 (created by M-1, Beth's ruling 2026-10-24)
 
-- **Objective:** clear the dev-only advisories M-1 left: `vitest` (GHSA-82fw-gwwq-j7x9, mocker
-  path traversal), `@vitest/mocker`, `tinypool` (two critical prototype-pollution-to-RCE gadgets)
-  and `@vitest/coverage-v8`, which follows `vitest`. Fixed in vitest ≥ 4.1.11. npm offers 5.0.5,
-  but the brief's default is **4.1.x**, the smallest major that clears them, unless 4.x fails to.
+- **Objective:** clear the dev-only advisories M-1 left: `vitest` and `@vitest/mocker`
+  (GHSA-82fw-gwwq-j7x9, mocker path traversal, fixed at 4.1.11; GHSA-qxg6-89mg-rqv8, manual-mock
+  code injection, fixed only at **4.1.12**), `tinypool` (two critical prototype-pollution-to-RCE
+  gadgets) and `@vitest/coverage-v8`, which follows `vitest`. **The floor is vitest 4.1.12.** 4.1.11
+  still ships a vulnerable mocker. npm offers 5.0.5, but the brief's default is **4.1.12 or later
+  4.1.x**, the smallest major that clears them, unless 4.x fails to.
 - **Why it waited:** a major bump is Beth's decision, and the exposure is nil for the live site.
   These packages never deploy, and the gadgets need attacker-controlled test-runner options. She
   queued it low, after the housekeeping batch.
@@ -972,7 +975,8 @@ was never queued and went seven weeks overdue. Each run is one item here, number
   breakage; `MOCK_PATTERNS` in `@/__tests__/mocks/module-mocks.ts` is shared, so fix it there once.
   ③ Exact-pin `vitest` and `@vitest/coverage-v8` together; check `@vitejs/plugin-react` and `vite`
   compatibility.
-- **Done-when:** `npm audit` reports zero (whole graph); gate green with the same test count;
+- **Done-when:** `npm audit` reports nothing in the vitest / `@vitest/*` / `tinypool` family (zod
+  is M-2's, and any newly published advisory is the next M run's); gate green with the same test count;
   `docs/STACK.md` and `docs/TESTING.md` updated. Test-only, so it merges on green after layer 1.
 
 ### M-4 Dependency maintenance — November 2026 (due 2026-11-24)

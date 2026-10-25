@@ -60,7 +60,6 @@
     "dotenv": "17.4.2",
     "eslint": "9.39.4",
     "eslint-config-next": "16.3.1",
-    "eslint-plugin-react-hooks": "7.0.1",
     "husky": "9.1.7",
     "jsdom": "29.0.2",
     "lint-staged": "16.4.0",
@@ -72,6 +71,11 @@
     "tsx": "4.23.12",
     "typescript": "5.9.3",
     "vitest": "3.2.7"
+  },
+  "overrides": {
+    "eslint-config-next": {
+      "eslint-plugin-react-hooks": "7.0.1"
+    }
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs,json,css,md}": "prettier --write",

@@ -49,7 +49,9 @@ into every session.
 
 - `@base-ui/react` 1.4.1 - The headless primitives components are built on (shadcn/ui v4 moved
   from Radix to Base UI)
-- `shadcn` 4.22.1 - The component-generator CLI. `components.json` configures it: style
+- `shadcn` 4.22.1 - The component-generator CLI, **and also a stylesheet the live site ships**: `globals.css` imports
+  `shadcn/tailwind.css`, so a bump can change production CSS (4.22 added only opt-in `shimmer` /
+  `scroll-fade` utilities and their `@property` registrations; nothing in `src/` uses them). `components.json` configures it: style
   `base-nova`, baseColor `neutral`, CSS variables on, `lucide` icon library, aliases for
   `@/components`, `@/lib`, `@/components/ui`, `@/hooks`
 - Generated components are project code and are edited in place under `src/components/ui/`
@@ -70,7 +72,8 @@ into every session.
 
 - @vitejs/plugin-react 4.4.1 - Vite React plugin for Vitest
 - ESLint 9.39.4 + eslint-config-next 16.3.1 - Flat config. **Deliberately one minor behind `next`**, with
-  `eslint-plugin-react-hooks` pinned at 7.0.1 as a direct devDependency: 16.4.x brings the 7.1 React
+  `eslint-plugin-react-hooks` held at 7.0.1 by the one `overrides` entry in `package.json`, scoped
+  to `eslint-config-next`: 16.4.x brings the 7.1 React
   Compiler rules, which raise six errors in existing code (maintenance-ledger row, 2026-10-24, carries
   the removal condition)
 - Prettier 3.8.3 + prettier-plugin-tailwindcss 0.7.2 - Formatting and Tailwind class ordering
