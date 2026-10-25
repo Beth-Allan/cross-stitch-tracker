@@ -8,7 +8,7 @@ globs:
 # Form & Validation Patterns
 
 > Zod validation, form architecture, and common pitfalls.
-> Last updated: 2026-08-19
+> Last updated: 2026-10-25
 
 ## One boundary, one rule — build schemas from `validations/fields.ts`
 
@@ -25,10 +25,21 @@ The shared field builders live in `src/lib/validations/fields.ts` and are the co
 | `optionalUrl(message?)`             | nullable links (website)               | trim; blank → `null`; **then** the URL check     |
 | `optionalChoice()`                  | nullable picker values (ids, seasons)  | trim; blank → `null` — `""` is not a choice      |
 | `optionalDateString(message?)`      | nullable date strings                  | `null` or something `Date.parse` accepts         |
+| `wholeNumber()`                     | a whole number from a box that can send a fraction | `.int()`; a fraction reads Zod 3's "Expected integer, received float" |
 
 Required names keep their inline rule (`z.string().trim().min(1, …).max(200, …)`) — it is already
 one shape everywhere. A **non-nullable** column keeps its own rule and does not use these:
 `SpecialtyItem.description` is `String @default("")`, so blank stays `""`.
+
+## A built-in message a screen can show is spelled out
+
+Zod 4 (since M-2, 2026-10-25) rewords the message it gives a check with no message of its own. So
+wherever a screen can show one — an action's `firstValidationMessage` reaching a toast or an alert,
+as opposed to a form that swaps in its own text — the check passes its words explicitly, and a
+library upgrade cannot change what Beth reads. The ten checks that could show Zod 3's defaults keep
+them through `ZOD3_WORDING` in `fields.ts` (`notWhole`, `tooLong(n)`, `atLeast(n)`, `atMost(n)`,
+`aboveZero`), each pinned by a test. A **new** check a screen can show gets a hand-written message;
+`ZOD3_WORDING` is for siblings of the existing ten, so they read the same.
 
 ## An upload's type comes from the same rule on both sides
 

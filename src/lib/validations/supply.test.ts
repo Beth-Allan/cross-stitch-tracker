@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { z } from "zod";
 import {
   beadSchema,
+  createAndAddThreadSchema,
   projectBeadSchema,
   projectSpecialtySchema,
   projectThreadSchema,
@@ -115,5 +116,20 @@ describe("wording a screen shows, unchanged from Zod 3", () => {
     ],
   ])("%s", (_label, schema, payload, message) => {
     expect(schema.safeParse(payload).error?.issues[0].message).toBe(message);
+  });
+});
+
+describe("createAndAddThreadSchema color family", () => {
+  const payload = { projectId: "p1", name: "Christmas Red", brandId: "brand-1" };
+  const messageFor = (colorFamily: unknown) =>
+    createAndAddThreadSchema.safeParse({ ...payload, colorFamily }).error?.issues[0].message;
+
+  it("says a missing color family is required", () => {
+    expect(messageFor(undefined)).toBe("Color family is required");
+    expect(messageFor(null)).toBe("Color family is required");
+  });
+
+  it("does not call a color family that was sent but is not on the list 'required'", () => {
+    expect(messageFor("PURPLISH")).not.toBe("Color family is required");
   });
 });

@@ -17,6 +17,15 @@ const COLOR_FAMILIES = [
   "NEUTRAL",
 ] as const;
 
+/**
+ * Required, not defaulted: quick-add asks rather than filing silently under NEUTRAL
+ * (Beth's ruling, 2026-08-17). Only a missing or non-text value is "required" — a
+ * value that was sent but is off the list keeps Zod's own message, as it did in Zod 3.
+ */
+const requiredColorFamily = z.enum(COLOR_FAMILIES, {
+  error: (issue) => (typeof issue.input === "string" ? undefined : "Color family is required"),
+});
+
 export const supplyBrandSchema = z.object({
   name: z.string().trim().min(1, "Brand name is required").max(200, "Brand name too long"),
   website: optionalUrl(),
@@ -118,9 +127,7 @@ export const createAndAddThreadSchema = z.object({
     .optional()
     .default(DEFAULT_SUPPLY_HEX),
   brandId: z.string().min(1, "Brand is required"),
-  // Required, not defaulted: quick-add asks rather than filing silently under NEUTRAL
-  // (Beth's ruling, 2026-08-17)
-  colorFamily: z.enum(COLOR_FAMILIES, { error: "Color family is required" }),
+  colorFamily: requiredColorFamily,
 });
 
 export type CreateAndAddThreadInput = z.input<typeof createAndAddThreadSchema>;
@@ -130,7 +137,7 @@ export const createAndAddBeadSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(200),
   code: z.string().trim().max(20).optional().default(""),
   brandId: z.string().min(1, "Brand is required"),
-  colorFamily: z.enum(COLOR_FAMILIES, { error: "Color family is required" }),
+  colorFamily: requiredColorFamily,
 });
 
 export type CreateAndAddBeadInput = z.input<typeof createAndAddBeadSchema>;

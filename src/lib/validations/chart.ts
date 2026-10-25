@@ -23,6 +23,14 @@ function storageKeyIn(category: "covers" | "files") {
     .refine((value) => parseStorageKey(value)?.category === category, "Invalid storage key");
 }
 
+/**
+ * Beth's ceiling (2026-10-25): far above any real tagging, and a bound on how much a
+ * single request makes the parser walk. Exported so the chart form names the
+ * same number the server enforces.
+ */
+export const MAX_GENRES_PER_CHART = 50;
+export const TOO_MANY_GENRES = `A chart can have at most ${MAX_GENRES_PER_CHART} genres`;
+
 export const chartFormSchema = z.object({
   chart: z
     .object({
@@ -45,9 +53,7 @@ export const chartFormSchema = z.object({
       stitchCountApproximate: z.boolean().default(false),
       stitchesWide: z.number().int().min(0).default(0),
       stitchesHigh: z.number().int().min(0).default(0),
-      // Beth's ceiling (2026-10-25): far above any real tagging, and a bound on
-      // how much a single request makes the parser walk.
-      genreIds: z.array(z.string()).max(50, "A chart can have at most 50 genres").default([]),
+      genreIds: z.array(z.string()).max(MAX_GENRES_PER_CHART, TOO_MANY_GENRES).default([]),
       isPaperChart: z.boolean().default(false),
       isFormalKit: z.boolean().default(false),
       isSAL: z.boolean().default(false),

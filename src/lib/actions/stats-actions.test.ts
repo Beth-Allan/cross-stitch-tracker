@@ -60,7 +60,10 @@ describe("stats-actions", () => {
       const { fetchCalendarMonth } = await import("./stats-actions");
       const result = await fetchCalendarMonth(5, 2019);
 
-      expect(result.success).toBe(false);
+      expect(result).toEqual({
+        success: false,
+        error: "Number must be greater than or equal to 2020",
+      });
       expect(mockGetCalendarDays).not.toHaveBeenCalled();
     });
 
@@ -68,7 +71,10 @@ describe("stats-actions", () => {
       const { fetchCalendarMonth } = await import("./stats-actions");
       const result = await fetchCalendarMonth(5, 2101);
 
-      expect(result.success).toBe(false);
+      expect(result).toEqual({
+        success: false,
+        error: "Number must be less than or equal to 2100",
+      });
       expect(mockGetCalendarDays).not.toHaveBeenCalled();
     });
   });

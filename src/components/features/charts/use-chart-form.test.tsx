@@ -10,6 +10,7 @@ import { createStorageLocation } from "@/lib/actions/storage-location-actions";
 import { createStitchingApp } from "@/lib/actions/stitching-app-actions";
 import { createSeries } from "@/lib/actions/series-actions";
 import { createChart, createChartWithSupplies, updateChart } from "@/lib/actions/chart-actions";
+import { toast } from "sonner";
 
 // Mock all server actions the hook imports
 vi.mock("@/lib/actions/chart-actions", () => ({
@@ -455,6 +456,7 @@ describe("useChartForm inline entity creation", () => {
       });
 
       expect(result.current.errors["chart.genreIds"]).toBe("A chart can have at most 50 genres");
+      expect(toast.error).toHaveBeenCalledWith("A chart can have at most 50 genres");
       expect(createChart).not.toHaveBeenCalled();
     });
   });

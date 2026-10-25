@@ -43,9 +43,10 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ### 2026-10-25 · D-32 · a chart carries at most 50 genres — ruled during M-2
 
-**What happened.** The M-1 layer-1 review found `chartFormSchema.genreIds` was the one collection at
-a boundary with no upper limit (maintenance-ledger row 2026-10-24) — the exact shape of the zod
-advisory M-2 clears. The ledger row said the cap "should come from Beth, not a guess" and named M-2
+**What happened.** The M-1 layer-1 review found `chartFormSchema.genreIds` had no upper limit
+(maintenance-ledger row 2026-10-24) — the exact shape of the zod advisory M-2 clears. It called
+`genreIds` the only such collection; M-2's own review found a second, `fileKeys` (ledger row
+2026-10-25, its cap still Beth's to set). The ledger row said the cap "should come from Beth, not a guess" and named M-2
 as the place to ask.
 
 **Surfaced to Beth** as: a limit of 50 (recommended, far above any real tagging); a limit of 20; no

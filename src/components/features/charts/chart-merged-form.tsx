@@ -530,7 +530,7 @@ export function ChartMergedForm({
               />
             </FormField>
 
-            <FormField label="Genres" htmlFor="genres">
+            <FormField label="Genres" htmlFor="genres" error={form.errors["chart.genreIds"]}>
               <GenrePicker
                 genres={form.genres}
                 selectedIds={form.values.genreIds}
