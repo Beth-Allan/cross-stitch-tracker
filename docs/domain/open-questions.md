@@ -71,12 +71,7 @@ cited formula, not Beth. Confirm the default matches her actual experience of ru
 
 **Blocks:** nothing.
 
-### Q-007 — Does she keep `.css` chart files, and what program makes `.saga`/`.oxs`?
+### ~~Q-007 — Does she keep `.css` chart files, and what program makes `.saga`/`.oxs`?~~
 
-Two loose ends from the 2026-08-19 answer that produced CHF-001–CHF-003. **`.css`** is accepted
-by the app with no traceable source (CHF-004) and was never put to Beth, so it stays accepted
-until she says otherwise — one plain question closes it either way. **`.saga`/`.oxs`** she
-confirmed she has (CHF-002) without naming the program; the name is not needed to accept the
-files, only to write a message she recognises.
-
-**Blocks:** nothing. Ask whenever she is here — both are one-line answers.
+**Answered 2026-10-24** — yes, she keeps `.css` files (**CHF-005**), and `.css`, `.saga` and `.oxs`
+are all Cross Stitch Saga files (**CHF-006**).

@@ -34,9 +34,9 @@ export const ALLOWED_CHART_FILE_TYPES = [
 /**
  * The file endings this app accepts, per Beth (domain `chart-files.md`):
  * PDF charts and photos or scans (CHF-001), and the pattern-software formats
- * she keeps — Pattern Maker, PCStitch, plus `.saga` and `.oxs` (CHF-002).
- * **No `.zip`**: she does not keep chart packs zipped (CHF-003). `.css` traces
- * to nobody and stays accepted until she says otherwise (CHF-004, Q-007).
+ * she keeps — Pattern Maker `.xsd`, PCStitch `.pat` (CHF-002), and Cross
+ * Stitch Saga `.css`, `.saga` and `.oxs` (CHF-005, CHF-006).
+ * **No `.zip`**: she does not keep chart packs zipped (CHF-003).
  */
 export const ALLOWED_CHART_FILE_EXTENSIONS = [
   ".jpg",
