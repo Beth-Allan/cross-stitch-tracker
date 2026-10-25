@@ -5,14 +5,15 @@ import { requireAuth } from "@/lib/auth-guard";
 import { getCalendarDays, getDailyBreakdown, getMonthlyTotals } from "@/lib/queries/stats";
 import type { CalendarDayData, DailyBreakdownEntry, MonthlyTotal } from "@/types/stats";
 import { firstValidationMessage } from "@/lib/utils/action-errors";
+import { ZOD3_WORDING } from "@/lib/validations/fields";
 
 const monthYearSchema = z.object({
   month: z.number().int().min(1).max(12),
-  year: z.number().int().min(2020).max(2100),
+  year: z.number().int().min(2020, ZOD3_WORDING.atLeast(2020)).max(2100, ZOD3_WORDING.atMost(2100)),
 });
 
 const yearSchema = z.object({
-  year: z.number().int().min(2020).max(2100),
+  year: z.number().int().min(2020, ZOD3_WORDING.atLeast(2020)).max(2100, ZOD3_WORDING.atMost(2100)),
 });
 
 type StatsResult<T> = { success: true; data: T } | { success: false; error: string };

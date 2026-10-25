@@ -67,6 +67,7 @@ const ERROR_MAP: Record<string, string> = {
   "chart.name": "Chart name is required",
   "chart.stitchCount": "Enter a stitch count or both width and height",
   "chart.kitColorCount": "Kit color count must be a positive number",
+  "chart.genreIds": "A chart can have at most 50 genres",
   "project.status": "Please select a status",
   "project.startDate": "Invalid date format",
   "project.finishDate": "Invalid date format",

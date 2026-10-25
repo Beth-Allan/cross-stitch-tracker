@@ -437,6 +437,26 @@ describe("useChartForm inline entity creation", () => {
       expect(result.current.errors["chart.notes"]).toBe("This field has an error");
       expect(createChart).not.toHaveBeenCalled();
     });
+
+    it("names the genre cap instead of the generic fallback", async () => {
+      const { result } = renderHook(() => useChartForm(defaultProps));
+
+      act(() => {
+        result.current.setField("name", "Autumn Sampler");
+        result.current.setField("stitchCount", 5000);
+        result.current.setField(
+          "genreIds",
+          Array.from({ length: 51 }, (_, i) => `genre-${i}`),
+        );
+      });
+
+      await act(async () => {
+        await result.current.submitForm();
+      });
+
+      expect(result.current.errors["chart.genreIds"]).toBe("A chart can have at most 50 genres");
+      expect(createChart).not.toHaveBeenCalled();
+    });
   });
 });
 

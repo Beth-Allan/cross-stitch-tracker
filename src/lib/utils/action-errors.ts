@@ -15,7 +15,7 @@ import type { z } from "zod";
  * because that is the field the user is looking at.
  */
 export function firstValidationMessage(error: z.ZodError): string {
-  return error.errors[0].message;
+  return error.issues[0].message;
 }
 
 /**

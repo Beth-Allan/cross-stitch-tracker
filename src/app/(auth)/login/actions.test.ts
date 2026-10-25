@@ -41,6 +41,16 @@ describe("loginAction", () => {
     expect(signIn).not.toHaveBeenCalled();
   });
 
+  it("keeps Zod 3's wording for an address longer than 254 characters", async () => {
+    const result = await loginAction(
+      undefined,
+      credentials(`${"a".repeat(250)}@example.com`, "hunter2"),
+    );
+
+    expect(result.error).toBe("String must contain at most 254 character(s)");
+    expect(signIn).not.toHaveBeenCalled();
+  });
+
   it("rejects an empty password without attempting a sign-in", async () => {
     const result = await loginAction(undefined, credentials("beth@example.com", ""));
 

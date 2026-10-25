@@ -41,6 +41,20 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-25 · D-32 · a chart carries at most 50 genres — ruled during M-2
+
+**What happened.** The M-1 layer-1 review found `chartFormSchema.genreIds` was the one collection at
+a boundary with no upper limit (maintenance-ledger row 2026-10-24) — the exact shape of the zod
+advisory M-2 clears. The ledger row said the cap "should come from Beth, not a guess" and named M-2
+as the place to ask.
+
+**Surfaced to Beth** as: a limit of 50 (recommended, far above any real tagging); a limit of 20; no
+limit, recorded as her choice; or decide at the next `/cleanup`.
+
+**Her ruling:** "Limit of 50 (Recommended)". A 51st genre is refused with "A chart can have at most
+50 genres": the schema carries the cap, and the chart form's own message table names it, so the
+form says that rather than its generic "This field has an error". Built test-first in M-2.
+
 ### 2026-10-24 · D-31 · the closed row's quick size look: 14, 18, 25 over 1 · 28, 32, 36 over 2 — ruled during the one-count-list `/tweak`
 
 **What happened.** Making the size reference read the shared ten (D-29) left one more count list

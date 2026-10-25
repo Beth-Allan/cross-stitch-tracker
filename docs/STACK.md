@@ -96,8 +96,12 @@ into every session.
   runtime, never by a `url` field in `schema.prisma`
 - next-auth 5.0.0-beta.32 - Authentication (Auth.js v5 beta); credentials provider + JWT
   strategy; see `src/lib/auth.ts`
-- Zod 3.24.4 - Schema validation at all server action and API boundaries. This is Zod **v3**;
-  v4-only APIs are not available
+- Zod 4.6.7 - Schema validation at all server action and API boundaries. This is Zod **v4**
+  (since M-2, 2026-10-25), imported from `"zod"`: a `ZodError`'s list is `.issues` (`.errors` is
+  gone), a custom message is the string shorthand or `{ error }` (`message` and
+  `required_error`/`invalid_type_error` are retired), and a check with no message of its own
+  speaks Zod 4's built-in wording. `z.email()` checks before `.trim()`, which is why
+  `loginSchema` keeps `.email()`. Read `node_modules/zod` before using an API from memory
 - `@aws-sdk/client-s3` 3.1033.0 + `@aws-sdk/s3-request-presigner` 3.1033.0 - AWS S3 SDK used to
   interact with Cloudflare R2 via its S3-compatible API; see `src/lib/r2.ts`
 

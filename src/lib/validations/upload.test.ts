@@ -90,7 +90,7 @@ describe("storageKeySchema", () => {
     const result = storageKeySchema.safeParse("covers/chart-1/nested/abc.png");
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe("Invalid storage key");
+      expect(result.error.issues[0].message).toBe("Invalid storage key");
     }
   });
 });
@@ -150,6 +150,12 @@ describe("uploadRequestSchema projectId", () => {
   it("rejects a projectId that would add a segment to the object key", () => {
     expect(uploadRequestSchema.safeParse({ ...base, projectId: "a/b" }).success).toBe(false);
     expect(uploadRequestSchema.safeParse({ ...base, projectId: "../covers" }).success).toBe(false);
+  });
+
+  it("keeps Zod 3's wording for an empty file, which the cover and file pickers show", () => {
+    const result = uploadRequestSchema.safeParse({ ...base, fileSize: 0, projectId: "cml0k9x1" });
+
+    expect(result.error?.issues[0].message).toBe("Number must be greater than 0");
   });
 
   it("rejects a projectId long enough to pollute the key namespace", () => {

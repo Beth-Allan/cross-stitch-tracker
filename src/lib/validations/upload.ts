@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { optionalText } from "./fields";
+import { optionalText, ZOD3_WORDING } from "./fields";
 
 export const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
 
@@ -186,7 +186,7 @@ export const uploadRequestSchema = z.object({
   fileSize: z
     .number()
     .int()
-    .positive()
+    .positive(ZOD3_WORDING.aboveZero)
     .max(MAX_FILE_SIZE, `File is too large. Maximum size is ${MAX_FILE_SIZE_LABEL}.`),
   category: z.enum(STORAGE_CATEGORIES),
   projectId: keyOwnerSchema,

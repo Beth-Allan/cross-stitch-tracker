@@ -7,11 +7,12 @@ import { prisma } from "@/lib/db";
 import { mapFocalPoint } from "@/types/focal-point";
 import type { ShoppingCartData } from "@/types/dashboard";
 import { firstValidationMessage } from "@/lib/utils/action-errors";
+import { wholeNumber, ZOD3_WORDING } from "@/lib/validations/fields";
 
 const updateSupplyAcquiredSchema = z.object({
   type: z.enum(["thread", "bead", "specialty"]),
   junctionId: z.string().min(1),
-  acquiredQuantity: z.number().int().min(0),
+  acquiredQuantity: wholeNumber().min(0, ZOD3_WORDING.atLeast(0)),
 });
 
 export async function getShoppingCartData(): Promise<ShoppingCartData> {

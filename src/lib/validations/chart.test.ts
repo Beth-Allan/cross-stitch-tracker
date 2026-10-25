@@ -225,6 +225,27 @@ describe("chartFormSchema", () => {
       expect(result.success).toBe(false);
     });
   });
+
+  describe("genre cap (Beth's ruling, 2026-10-25)", () => {
+    const withGenres = (count: number) => ({
+      chart: {
+        ...validChartBase,
+        genreIds: Array.from({ length: count }, (_, i) => `genre-${i}`),
+      },
+      project: validProject,
+    });
+
+    it("accepts a chart tagged with 50 genres", () => {
+      expect(chartFormSchema.safeParse(withGenres(50)).success).toBe(true);
+    });
+
+    it("refuses a 51st genre in plain words", () => {
+      const result = chartFormSchema.safeParse(withGenres(51));
+      expect(result.success).toBe(false);
+      expect(result.error?.issues[0].message).toBe("A chart can have at most 50 genres");
+      expect(result.error?.issues[0].path).toEqual(["chart", "genreIds"]);
+    });
+  });
 });
 
 describe("chartFormSchema optional-field convention", () => {
@@ -290,6 +311,23 @@ describe("designerSchema", () => {
 });
 
 describe("batchSupplySchema", () => {
+  it.each([
+    [
+      "a thread's stitch count",
+      { threads: [{ supplyId: "t1", stitchCount: 12.5, need: 1, isNeedOverridden: false }] },
+    ],
+    [
+      "a thread's need",
+      { threads: [{ supplyId: "t1", stitchCount: 10, need: 2.5, isNeedOverridden: false }] },
+    ],
+    ["a bead's need", { beads: [{ supplyId: "b1", need: 2.5 }] }],
+    ["a specialty item's need", { specialty: [{ supplyId: "s1", need: 2.5 }] }],
+  ])("keeps Zod 3's wording for a fraction in %s", (_label, payload) => {
+    expect(batchSupplySchema.safeParse(payload).error?.issues[0].message).toBe(
+      "Expected integer, received float",
+    );
+  });
+
   it("says in plain words that a supply needs at least 1", () => {
     const result = batchSupplySchema.safeParse({
       threads: [],
