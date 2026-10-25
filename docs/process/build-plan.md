@@ -969,7 +969,7 @@ was never queued and went seven weeks overdue. Each run is one item here, number
   queued it low, after the housekeeping batch.
 - **Cited specs:** `docs/TESTING.md` · `vitest.config.ts` · `.claude/rules/testing-requirements.md`
   · Vitest 4's migration guide (Context7 / `node_modules/vitest`), never memory.
-- **Traps:** ① The suite is 3008 tests. The count after the upgrade must match, and **no test is
+- **Traps:** ① The suite was 3016 tests at F-7 — count it on the branch before upgrading. The count after the upgrade must match, and **no test is
   skipped, deleted or loosened** to get green (hard rule 2). A test that needs rewriting for a
   changed API keeps its assertion. ② Mock hoisting and `vi.mock` factory semantics are the usual
   breakage; `MOCK_PATTERNS` in `@/__tests__/mocks/module-mocks.ts` is shared, so fix it there once.

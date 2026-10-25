@@ -7,6 +7,7 @@ import {
   optionalText,
   optionalUrl,
 } from "@/lib/validations/fields";
+import { updateProjectSettingsSchema } from "@/lib/validations/supply";
 import { parseStorageKey } from "@/lib/validations/upload";
 
 /**
@@ -54,21 +55,25 @@ export const chartFormSchema = z.object({
       message: "Provide stitch count or dimensions",
       path: ["stitchCount"],
     }),
-  project: z.object({
-    status: z
-      .enum(PROJECT_STATUSES as unknown as [ProjectStatus, ...ProjectStatus[]])
-      .default("UNSTARTED"),
-    storageLocationId: optionalChoice(),
-    stitchingAppId: optionalChoice(),
-    fabricId: optionalChoice(),
-    needsOnionSkinning: z.boolean().default(false),
-    startDate: optionalDateString(),
-    finishDate: optionalDateString(),
-    ffoDate: optionalDateString(),
-    wantToStartNext: z.boolean().default(false),
-    preferredStartSeason: optionalChoice(),
-    startingStitches: z.number().int().min(0).default(0),
-  }),
+  project: z
+    .object({
+      status: z
+        .enum(PROJECT_STATUSES as unknown as [ProjectStatus, ...ProjectStatus[]])
+        .default("UNSTARTED"),
+      storageLocationId: optionalChoice(),
+      stitchingAppId: optionalChoice(),
+      fabricId: optionalChoice(),
+      needsOnionSkinning: z.boolean().default(false),
+      startDate: optionalDateString(),
+      finishDate: optionalDateString(),
+      ffoDate: optionalDateString(),
+      wantToStartNext: z.boolean().default(false),
+      preferredStartSeason: optionalChoice(),
+      startingStitches: z.number().int().min(0).default(0),
+    })
+    // Left out, a setting keeps what the project already holds — the database default on
+    // create, the saved value on edit — so a form that never shows the calculator cannot reset it.
+    .extend(updateProjectSettingsSchema.shape),
 });
 
 export type ChartFormInput = z.input<typeof chartFormSchema>;
