@@ -55,6 +55,7 @@ export const FABRIC_COLOR_TYPES = [
   "Overdyed",
 ] as const;
 
+export type FabricCount = (typeof FABRIC_COUNTS)[number];
 export type FabricType = (typeof FABRIC_TYPES)[number];
 export type FabricColorFamily = (typeof FABRIC_COLOR_FAMILIES)[number];
 export type FabricColorType = (typeof FABRIC_COLOR_TYPES)[number];

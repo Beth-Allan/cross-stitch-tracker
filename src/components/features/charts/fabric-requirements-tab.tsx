@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Check, AlertTriangle, Package, ChevronDown, ChevronRight, Info } from "lucide-react";
 import { toast } from "sonner";
 import type { FabricRequirementCandidate, FabricRequirementRow } from "@/types/session";
+import { FABRIC_COUNTS, type FabricCount } from "@/types/fabric";
 import { assignFabricToProject } from "@/lib/actions/pattern-dive-actions";
 import {
   FABRIC_MARGIN_INCHES,
@@ -14,7 +15,10 @@ import {
   formatRequiredInches,
 } from "@/lib/utils/fabric-calculator";
 
-const FABRIC_COUNTS = [14, 16, 18, 20, 22, 25, 28] as const;
+// The closed row is a quick look that Beth wants at over 1 whatever the project's over-count
+// (her ruling, 2026-10-24); the size reference beneath applies the project's own.
+const ROW_SUMMARY_COUNTS = [14, 18, 25] as const satisfies readonly FabricCount[];
+const ROW_SUMMARY_OVER_COUNT = 1;
 
 function fabricFits(row: FabricRequirementRow): boolean {
   if (!row.assignedFabric || row.requiredWidth === null || row.requiredHeight === null) {
@@ -262,9 +266,17 @@ export function FabricRequirementsTab({ rows, imageUrls }: FabricRequirementsTab
                   </div>
 
                   <div className="hidden shrink-0 gap-4 md:flex">
-                    {([14, 18, 25] as const).map((ct) => {
-                      const w = calculateRequiredFabricEdge(row.stitchesWide, ct, row.overCount);
-                      const h = calculateRequiredFabricEdge(row.stitchesHigh, ct, row.overCount);
+                    {ROW_SUMMARY_COUNTS.map((ct) => {
+                      const w = calculateRequiredFabricEdge(
+                        row.stitchesWide,
+                        ct,
+                        ROW_SUMMARY_OVER_COUNT,
+                      );
+                      const h = calculateRequiredFabricEdge(
+                        row.stitchesHigh,
+                        ct,
+                        ROW_SUMMARY_OVER_COUNT,
+                      );
                       return (
                         <div key={ct} className="min-w-[70px] text-center">
                           <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">

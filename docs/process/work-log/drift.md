@@ -41,6 +41,24 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-24 · D-31 · the closed row's quick size look is always at over 1 — ruled during the one-count-list `/tweak`
+
+**What happened.** Making the size reference read the shared ten (D-29) left one more count list
+in the same screen: a closed project row on Pattern Dive → Fabric Requirements shows a quick size
+look at **14, 18 and 25**, a choice from the original design, never from Beth. Since F-4 (D-17)
+that look applied the project's own over-count, so an over-two project showed 14 count as if it
+were 7.
+
+**Surfaced to Beth** as: keep 14, 18 and 25, tied to the list of ten (recommended); three
+different counts; or remove the quick look.
+
+**Her ruling:** "Keep 14, 18, 25 — but all three should always be over 1." The quick look now
+ignores the project's over-count; the full size reference beneath it still applies it to all
+ten. D-17's fix stands everywhere else — this narrows it for the quick look only, by her word.
+The test that pinned the old behaviour ("sizes an over-two project at the effective count in the
+row summary") was rewritten to the new rule, not deleted: it now asserts the over-1 figures and
+that the over-2 figure is absent. Her ruling is the approval on the record (hard rule 2).
+
 ### 2026-10-24 · D-30 · picking a fabric on the Supplies tab attaches it — ruled during a `/broken`
 
 **What happened.** On F-7's preview Beth picked a fabric in a project's Supplies-tab calculator
@@ -71,7 +89,8 @@ set.
 now Beth's stated list, not a developer's guess — `/stitch-fact` records them in
 `docs/domain/fabric.md` (queued), and the size reference then reads the one shared list (queued).
 
-_Recorded 2026-10-24 as **FAB-008**. The size-reference fix is still queued (`/tweak`)._
+_Recorded 2026-10-24 as **FAB-008**. The size reference reads the shared ten as of the
+one-count-list `/tweak`, 2026-10-24 (`fix/one-count-list`); its quick look is D-31._
 
 ### 2026-10-24 · D-28 · Next.js may not stop a build to nudge an upgrade — ruled during M-1
 

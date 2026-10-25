@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@/__tests__/test-utils";
+import { render, screen, fireEvent, waitFor, within } from "@/__tests__/test-utils";
 import type { FabricRequirementRow } from "@/types/session";
 import { FabricRequirementsTab } from "./fabric-requirements-tab";
 
@@ -79,13 +79,36 @@ describe("FabricRequirementsTab", () => {
     expect(screen.getByText('13.2" x 16.8"')).toBeInTheDocument();
   });
 
-  it("sizes an over-two project at the effective count in the row summary", () => {
+  it("size reference table lists the same ten counts as the fabric picker", () => {
+    render(<FabricRequirementsTab rows={[makeRow()]} imageUrls={{}} />);
+
+    fireEvent.click(screen.getByText("Test Pattern"));
+    fireEvent.click(screen.getByText("Size Reference — All Counts"));
+
+    const countCells = screen.getAllByText(/^\d+ count$/);
+    expect(countCells.map((cell) => cell.textContent)).toEqual([
+      "14 count",
+      "16 count",
+      "18 count",
+      "20 count",
+      "22 count",
+      "25 count",
+      "28 count",
+      "32 count",
+      "36 count",
+      "40 count",
+    ]);
+  });
+
+  it("sizes the row summary at over 1 even for an over-two project", () => {
     render(<FabricRequirementsTab rows={[makeRow({ overCount: 2 })]} imageUrls={{}} />);
 
-    // 14ct worked over two behaves like 7ct: 200/7+6 = 34.57…" x 300/7+6 = 48.85…"
-    expect(screen.getByText('34.6" x 48.9"')).toBeInTheDocument();
-    // 18ct behaves like 9ct: 200/9+6 = 28.22…" x 300/9+6 = 39.33…"
-    expect(screen.getByText('28.3" x 39.4"')).toBeInTheDocument();
+    // 14ct over 1: 200/14+6 = 20.2857…" x 300/14+6 = 27.4285…"
+    expect(screen.getByText('20.3" x 27.5"')).toBeInTheDocument();
+    // 18ct over 1: 200/18+6 = 17.111…" x 300/18+6 = 22.666…"
+    expect(screen.getByText('17.2" x 22.7"')).toBeInTheDocument();
+    // 14ct worked over two would behave like 7ct: 200/7+6 = 34.57…" x 300/7+6 = 48.85…"
+    expect(screen.queryByText('34.6" x 48.9"')).not.toBeInTheDocument();
   });
 
   it("says on the row when a project is stitched over two", () => {
@@ -112,8 +135,9 @@ describe("FabricRequirementsTab", () => {
     // ...and it says what that works out to when stitched over two.
     expect(screen.getByText("works like 14")).toBeInTheDocument();
     // 28ct over two = 14ct: design 200/14 x 300/14, then the same plus the 6" margin
-    expect(screen.getByText('14.3" x 21.4"')).toBeInTheDocument();
-    expect(screen.getByText('20.3" x 27.5"')).toBeInTheDocument();
+    const row28 = within(screen.getByText("28 count").closest("tr")!);
+    expect(row28.getByText('14.3" x 21.4"')).toBeInTheDocument();
+    expect(row28.getByText('20.3" x 27.5"')).toBeInTheDocument();
   });
 
   it("size reference table adds no over-count label for an over-one project", async () => {
