@@ -24,8 +24,9 @@ cross-stitch-tracker/
 ├── prisma/
 │   ├── schema.prisma          # Database schema (source of truth)
 │   ├── seed.ts                # Database seeding script
+│   ├── migrate-deploy.ts      # Last step of every Vercel build — applies migrations (R-2)
 │   ├── fixtures/              # Seed fixture data
-│   └── migrations/            # Migration history
+│   └── migrations/            # Migration history — applied on deploy since R-2
 ├── product-plan/              # DesignOS source material (historical input)
 │   ├── sections/              # Component designs + screenshots per section
 │   └── design-system/         # DesignOS-era tokens, fonts, colour notes
@@ -43,6 +44,7 @@ cross-stitch-tracker/
 ├── proxy.ts                   # Auth.js session gate (Next.js 16's middleware rename)
 ├── next.config.ts             # Security headers, CSP
 ├── prisma.config.ts           # Prisma 7 config (schema, migrations, seed, datasource)
+├── vercel.json                # Vercel build command: build, then migrate (R-2)
 ├── postcss.config.mjs         # Tailwind v4 entry — there is no tailwind.config.ts
 ├── components.json            # shadcn CLI config
 ├── vitest.config.ts           # Vitest test config

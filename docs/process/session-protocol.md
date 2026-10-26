@@ -84,8 +84,11 @@ communication contract and §9's session-wide rules.
    - [ ] Every done-when clause literally demonstrated (state how, one line each)
    - [ ] `npm run gate` green locally
    - [ ] Behavior changes were built test-first; no existing test weakened, skipped, or deleted
-   - [ ] Schema touched? → migration committed in the same PR (`prisma migrate dev`; never a
-         bare `db push` for work that merges)
+   - [ ] Schema touched? → migration committed in the same PR, wrapped in `BEGIN;` … `COMMIT;`
+         (`prisma migrate dev --create-only` against a throwaway local database; never a bare
+         `db push` for work that merges). Deploys apply it since R-2 — the PR's preview to the
+         Neon `preview` branch, the merge to production — so a migration that can fail on data
+         gets `preview` reset from production first (`docs/INTEGRATIONS.md`, Migrations)
    - [ ] Descriptive docs the change makes stale are updated (§6); domain docs untouched
          without Beth's ruling (§7)
    - [ ] Work log updated: status flip, one-line note, date, model
@@ -157,7 +160,10 @@ since merge deploys production instantly.
 **Layer 3 — review-gated cores: fresh `/review` session, Fable lane, never the builder.**
 The cores:
 
-- `prisma/schema.prisma` + `prisma/migrations/`
+- `prisma/schema.prisma` + `prisma/migrations/`, and the deploy step that applies them —
+  `vercel.json`, `prisma/migrate-deploy.ts`, `src/lib/utils/migration-baseline.ts`, plus the
+  `build:deploy` line of `package.json` — since a wrong line there can record a migration as
+  applied on production without running it (Beth's ruling **D-38**, 2026-10-25; item R-2)
 - `proxy.ts`, `src/lib/auth.ts`, `src/lib/auth-guard.ts`, `src/lib/rate-limit.ts`,
   `src/lib/validations/auth.ts`, `src/app/(auth)/**`, `src/app/api/auth/**` — auth, session,
   rate limiting. `proxy.ts` carries the matcher that decides which routes are gated **at all**,

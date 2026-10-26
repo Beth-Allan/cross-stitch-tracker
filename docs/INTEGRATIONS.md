@@ -25,7 +25,8 @@ deliberately absent.
 - PostgreSQL via Neon (serverless)
   - Connection (pooled app): `DATABASE_URL` env var — pooler hostname (`*-pooler.neon.tech`)
   - Connection (direct CLI): `DIRECT_URL` env var — direct hostname (`*.neon.tech`), supplied to
-    the Prisma CLI by `prisma.config.ts`
+    the Prisma CLI by `prisma.config.ts`, and so to the migration step that ends every Vercel
+    build (see Deployment → Migrations)
   - ORM/client: Prisma 7.10.1 with the `@prisma/adapter-neon` 7.10.1 driver adapter
   - Client singleton: `src/lib/db.ts` (lazy Proxy pattern; the client is not constructed until
     first property access, so module evaluation during build does not require `DATABASE_URL`)
@@ -279,6 +280,65 @@ when the Preview environment was populated and verified.
   rule and no orphan sweep — deliberate (a preview's leftovers are worthless), recorded so it is
   not discovered as a surprise (maintenance-ledger row, 2026-08-17).
 
+**Migrations — how a schema change reaches each database** (item R-2, 2026-10-25; Beth's ruling
+D-24, _automatic on deploy_). Before R-2 nothing applied a committed migration: every model after
+March reached Neon by an out-of-band `prisma db push`.
+
+- **The route.** A schema change is a migration committed in its PR. Every Vercel build ends by
+  migrating: `vercel.json` sets the build command to `npm run build:deploy`, which is
+  `npm run build` followed by `prisma/migrate-deploy.ts`, which runs `prisma migrate deploy`
+  against that environment's own `DIRECT_URL`. So a PR's preview build applies the migration to
+  the Neon `preview` branch, and the merge's production build applies it to production. CI and the
+  pre-push hook run plain `npm run build`, which never touches a database.
+- **Build first, then migrate.** A failed `next build` leaves the database alone. A migration still
+  lands moments before Vercel switches traffic, so the outgoing code briefly runs against the new
+  schema: every migration must be safe for the code it replaces — add before anything uses it,
+  remove only once nothing reads it.
+- **Each build names the database it migrates.** The runner's first line is
+  `[migrate] Vercel environment "<env>" → database "<db>" at <host>`, and Prisma repeats the host.
+  Preview's `DIRECT_URL` is the `preview` branch, `ep-jolly-truth-akhoipzg…`, database
+  `cross_stitch_tracker`. Production's is a separate variable (set in April) that Vercel will not
+  reveal once saved, so its host is read off the first production build's log. A `DIRECT_URL`
+  containing `-pooler` is refused before connecting — Prisma Migrate needs Neon's direct
+  connection — and messages name the host, never the password.
+- **The baseline.** The repo's one March migration (`20260328163529_…`, recorded in
+  `_prisma_migrations` since 2026-03-28) describes 5 of the 18 models;
+  `20261026002357_baseline_db_push_era` describes the rest. A database that already holds the app
+  has it **recorded as applied, never executed**: finding tables but no baseline record, the runner
+  asks Prisma whether the database matches `schema.prisma` exactly (`migrate diff --exit-code`),
+  and only on "no difference" runs `migrate resolve --applied` for the baseline and any earlier
+  migration missing from the record. A mismatch stops the build before anything is written — a
+  drift question, never something to force. On an empty database the baseline simply runs.
+  Verified 2026-10-25 against the `preview` branch: the two migrations replay to exactly what it
+  holds, and to exactly `schema.prisma` (both `migrate diff` checks: no difference).
+- **`20261026010000_pipeline_check` is intentionally empty** — the first migration through the
+  route, so preview and production each demonstrably apply and record one.
+- **A failed migration is not rolled back.** Rehearsed 2026-10-25 on a local Postgres 17: the
+  statements before the error stay applied, the migration is recorded as failed, and **every later
+  deploy stops** (`P3009`) until it is resolved. What Beth sees: the deploy fails in Vercel and the
+  commit shows a red Vercel check, while the live site keeps serving the previous deployment —
+  nothing new ships until it is recovered. Two rules follow:
+  1. **Wrap every migration in `BEGIN;` … `COMMIT;`.** Rehearsed: a wrapped migration that fails
+     leaves nothing behind. The exception is a statement Postgres refuses inside a transaction
+     (`CREATE INDEX CONCURRENTLY`), which gets a migration of its own.
+  2. **Recovery needs that database's key**: `prisma migrate resolve --rolled-back <name>`, correct
+     the file (and undo any partial change, if rule 1 was skipped), deploy again. Sessions hold the
+     `preview` branch's key; nobody's session holds production's (D-16, D-37), so a production
+     failure is a stop-and-ask — Beth rules how it is recovered.
+- **Every PR shares the one `preview` branch.** A migration applied by one PR's preview is there for
+  all of them, so a PR whose migration changes after its preview ran, or is abandoned, leaves the
+  branch ahead of `main`. The cure is resetting `preview` from its parent in Neon (Beth's
+  dashboard), which also refreshes its data and brings production's migration record with it. A
+  migration that can fail on **data** — a new uniqueness rule, a check constraint — needs that
+  reset _before_ its preview runs: the branch's data dates from 2026-08-17, and a rehearsal on
+  stale rows proves nothing about production's.
+- **Writing a migration needs a throwaway database**, because no session has one of its own: a
+  local Postgres 17 in OrbStack (`docker run -e POSTGRES_PASSWORD=… -p 55432:5432 postgres:17`),
+  named by a temporary Prisma config as both `datasource.url` and `datasource.shadowDatabaseUrl`.
+  `prisma migrate dev --create-only --name <name>` then writes the file without applying it.
+  Prisma 7 refuses `db push --accept-data-loss` and `migrate reset` from an AI agent without the
+  user's typed consent, even on a scratch database — build scratch state from migration SQL instead.
+
 **CI Pipeline:**
 
 - GitHub Actions — `.github/workflows/ci.yml`
@@ -315,7 +375,8 @@ when the Preview environment was populated and verified.
 **Required:**
 
 - `DATABASE_URL` - Neon pooled connection string
-- `DIRECT_URL` - Neon direct connection string (Prisma CLI, migrations)
+- `DIRECT_URL` - Neon direct connection string (Prisma CLI, migrations) — every Vercel environment
+  that builds needs its own, because the build migrates the database it names
 - `AUTH_SECRET` - Auth.js session encryption secret
 - `AUTH_USER_EMAIL` - Single-user login email
 - `AUTH_USER_PASSWORD_HASH` - Bcrypt hash (escape `$` as `\$`)

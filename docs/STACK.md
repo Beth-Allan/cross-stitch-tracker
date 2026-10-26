@@ -188,6 +188,9 @@ Loaded at build time and self-hosted by Next.js; configured in `src/app/layout.t
 
 - Config: `prisma.config.ts` — schema at `prisma/schema.prisma`, migrations at
   `prisma/migrations/`, seed via `npx tsx prisma/seed.ts`
+- Migrations are applied by every Vercel build (`npm run build:deploy` → `prisma/migrate-deploy.ts`,
+  item R-2); CI and the pre-push hook run `npm run build`, which never touches a database.
+  `docs/INTEGRATIONS.md` (Deployment → Migrations) has the route
 - The CLI datasource URL comes from `DIRECT_URL` (bypasses the connection pooler); the app
   connects through `DATABASE_URL` (pooled) via the Neon adapter in `src/lib/db.ts`
 - `schema.prisma` declares `provider = "prisma-client"` with `output = "../src/generated/prisma"`

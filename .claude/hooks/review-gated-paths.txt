@@ -12,6 +12,14 @@
 # Schema and migrations
 ^prisma/schema\.prisma$
 ^prisma/migrations/
+# The deploy-time migration path (item R-2; Beth's ruling D-38, 2026-10-25): the
+# build command every Vercel environment runs, the step that migrates the database
+# it names, and the logic deciding what is recorded as applied without running.
+# package.json's `build:deploy` script is the one link not gated by path — too broad
+# a file to gate whole — so a diff touching that script line is reviewed as if gated.
+^vercel\.json$
+^prisma/migrate-deploy\.ts$
+^src/lib/utils/migration-baseline\.ts$
 
 # Auth, session, and rate limiting — the mechanisms AND the routes that apply them.
 # The route group and the API segment are gated as directories, per the lesson above:
