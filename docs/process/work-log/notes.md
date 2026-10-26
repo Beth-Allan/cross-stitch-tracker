@@ -206,7 +206,8 @@ The squash-merge of PR #142 is the **first time anything migrates production**. 
 will find the March migration recorded and the baseline not, check the database against
 `schema.prisma`, record `20261026002357_baseline_db_push_era` as applied (never run), then apply
 `20261026010000_pipeline_check`. PR #142's preview did exactly that to the `preview` branch on
-2026-10-25 (00:35 UTC), and the `preview` branch is a copy of production with an unchanged schema
+2026-10-26 (00:35 UTC — the evening of the 25th, Mountain time), and the `preview` branch is a copy
+of production with an unchanged schema
 since May — but production itself is unverified until its own build runs.
 
 **No session can read production's database or Vercel's build log** (D-16, D-37), so after merging:
@@ -235,4 +236,15 @@ status` reads it. The local rehearsal database was an OrbStack container (`r2-re
 `postgres:17`, port 55432), removed at the end of the R-2 session; the INTEGRATIONS "Writing a
 migration" bullet recreates one.
 
-**Done when:** steps 1–3 are recorded in R-2's REVIEW note. Then `/cleanup` retires this note.
+**Where it stands (2026-10-25, Fable 5.1, the `/review R-2` session):** step 1 done, step 3 half
+done, both recorded in the work log's session note — the squash commit `ce8acdb` deployed at
+01:17 UTC on 2026-10-26 (Vercel deployment `7SjDiXPmk6RZXsspqytgiMXwey4w`, "Deployment has
+completed", so the migrate step exited 0), and the live `/login` and `/api/auth/session` answer 200
+(neither reads the database; the signed-in page is Beth's, and the app opening for her as usual
+covers it). **Step 2 waits on Beth's screenshot**, asked for at the end of that session; in Vercel's
+Deployments list it is the `main` deployment from the evening of 25 Oct whose commit message starts
+"feat(R-2): apply migrations on deploy". Whichever session receives it — any door; the next is
+`/work-item F-16` — records the production host's first two words in `docs/INTEGRATIONS.md`
+(Migrations) on its own `docs/` branch, as PR #143 did, and closes this note.
+
+**Done when:** step 2 is recorded too. Then `/cleanup` retires this note.
