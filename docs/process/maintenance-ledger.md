@@ -237,7 +237,9 @@ Every open row was re-verified against main (delegated pass, 2026-10-24). Ruling
 - **M-1** — the `deepmerge-ts` override row (its removal condition) and the pinned-deps row.
 - **`/stitch-fact`** (queue row 3), then a gated item — two definitions of "today" · Sunday vs Monday
   week · the progress-% denominator · the boundary-duplication row's remaining junction arm (what
-  "kitted" means).
+  "kitted" means). _Answered at the 2026-10-25 `/stitch-fact`: SES-001–SES-003 and KIT-005
+  (D-36). The owners are now **F-17** (today · the week · the denominator, gated) and **F-18** (the
+  junction arm, ungated)._
 - **Design track** — the crop guide's page-wide dimming (row 10-14 ①, D-2) · `/charts` pagination
   (D-3) · the shopping-cart junction read (D-5) · the off-ramp font sizes (D-1). Filed in
   `backlog.md`'s design-track inputs where they were not already.

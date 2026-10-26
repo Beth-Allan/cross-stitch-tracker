@@ -835,6 +835,115 @@ not a promise that the diagnosis below is right.
   sweep reaches them, route the PR to `/review`.
 - **Done-when:** row Resolved, gate green, no assertion weakened; merges on green unless ④ applies.
 
+### F-16 Per-brand skein length — **created by Beth's answers at the 2026-10-25 `/stitch-fact` (THR-007–THR-011, D-34, D-36); gated (schema + skein calculator), needs R-2; UI-touching**
+
+- **Objective:** the skein calculator reads each thread's own skein length instead of one 8 m for
+  every brand (THR-005). The length lives on the brand, or on the thread line where a brand's lines
+  differ (Kreinik, THR-010). Beth enters it when she sets up a brand or line, and a thread without
+  one shows its skein count as **unknown** (D-34, THR-011). Today Weeks Dye Works and Gentle Art read
+  roughly 58% of the skeins a project needs (THR-009), so the shopping list runs short.
+- **Cited specs:** `docs/domain/threads.md` THR-004–THR-011 · `open-questions.md` Q-008, Q-009 · drift D-34 · backlog "Per-brand skein
+  length" (old 999.13, planned here) · R-2 (migrations go live on deploy) · `.claude/rules/form-patterns.md`
+  (the brand form's new field) · `.claude/rules/ui-design-reference.md` (where the field goes).
+- **Traps:** ① **The lengths are THR-008–THR-010 and nothing else.** Every other brand starts blank
+  (unknown), never 8 m by default (hard rule 5). The migration backfills only the stated brands; if
+  one is not in the data under a name you can match with certainty, ask Beth rather than guess.
+  ② **"Thread line" does not exist in the schema yet:** `Thread` is `@@unique([brandId, colorCode])`.
+  How a #4 braid is told apart from a #8 braid of the same colour is a schema decision. If it needs a
+  domain fact (how Kreinik numbers colours across lines), stop and ask through `/stitch-fact`.
+  ③ The 255 is an 8 m skein's usable inches, derived as whole 18-inch cuts of 15 usable inches each
+  (THR-006). Proportional scaling and whole cuts disagree (a 5 yd skein: 146.6 vs 150 usable inches),
+  so apply **the cited derivation**, whole cuts, and pin it with a test. If that reading is in doubt,
+  stop and ask. The cut length is the cited source's, not Beth's: Q-008 is open, so cite it.
+  ④ **Used whole** (THR-010): each cut is one working strand, so the strand term must not divide
+  Kreinik into six. Pin that formula shape with a test. **Every other brand's or line's strand
+  structure is unrecorded (Q-009)** — a line Beth adds later must never be divided into six by
+  default; if the build needs to know, stop and ask through `/stitch-fact`. ⑤ "Unknown" must read
+  as unknown on every screen that shows a skein count, never as 0 (P6's honest-failure pattern).
+  ⑤ also has no home today: `quantityRequired` is `Int @default(1)` and the supply-table adapters
+  clamp a calculated need with `Math.max(1, …)`, so a blank length would silently become "1 skein".
+  Representing "unknown" is a schema decision inside this item. ⑥ Add the `THR-` citations to
+  `skein-calculator.ts`'s header (`docs/domain/README.md`). ⑦ Any mutation that moves a stats
+  figure carries its `revalidateTag` test. ⑧ **Kreinik may not be a thread in the app.** The
+  specialty create dialog's example is "Kreinik Braid", and `calculateSkeins` runs only for `THREAD`
+  rows, so the build may need to re-type Kreinik. Check how Beth's own Kreinik is recorded before
+  designing anything. Moving it from specialty to thread changes how she enters it, so that is a
+  question for her, not a migration to decide alone. ⑨ **Stored figures do not move by themselves.**
+  A thread row's calculated need is saved in `quantityRequired` and recalculated only when its
+  stitch count is edited. So existing Weeks Dye Works and Gentle Art rows stay short after the
+  calculator is fixed. Whether to recompute the rows not overridden by hand rewrites numbers she
+  has been using: put it to Beth, and never touch an overridden row.
+- **Done-when:** Beth's answers to traps ⑧ and ⑨ recorded before the branch opens. Then test-first,
+  clause by clause: DMC and Anchor figures unchanged; Weeks Dye Works, Gentle Art and each Kreinik
+  line computed from their own lengths; a blank length reads unknown
+  everywhere; Kreinik is never split; Beth can set a length on a brand or line; the migration ships
+  through R-2's pipeline. Gate green; Beth has seen the preview; fresh `/review`.
+
+### F-17 The stitching calendar and the progress total — **created by Beth's answers at the 2026-10-25 `/stitch-fact` (SES-001–SES-003, D-36); gated (stats queries) — `/review` follows; preview before merge**
+
+- **Objective:** three open ledger rows, each now answered.
+  - **① Weeks start Monday** (SES-001). `startOfCalendarWeek` (`src/lib/utils/calendar-date.ts`)
+    counts from Sunday and feeds the stats page's "this week" (`metrics-bar.tsx`) through gated
+    `src/lib/queries/stats/timezone.ts` and `hero-stats.ts`, while the calendar and the day-of-week
+    chart are Monday-first. Make it one week (ledger row 2026-08-17,
+    two week conventions).
+  - **② A session can carry the date where Beth is** (SES-002). The log-session modal offers the
+    device's date; `createSession` and `updateSession` refuse anything later than Edmonton's today
+    (ledger row 2026-08-17, two definitions of "today"). The server must accept every date the box
+    can offer. The calendar grid's today-highlight is already device-local, which is what SES-002
+    asks for — leave it.
+  - **③ One total** (SES-003). Every place that treats `chart.stitchCount` as a project's total
+    moves to `getEffectiveStitchCount`, as the gallery already does (ledger row 2026-08-19). **Grep
+    for them; this list is where to start, not the whole of it:** `dashboard-actions.ts`,
+    `project-dashboard-actions.ts`, the session picker, `project-detail-page.tsx` (whose comment
+    says it must match the picker and the server, so all three move together), the server's
+    over-log checks in `session-actions.ts` (create and update), and in gated stats
+    `completion-estimates.ts` (its `stitchCount: { gt: 0 }` filter drops these charts before any
+    divisor is reached) and `hero-stats.ts`'s collection total. Moving only some of them splits the
+    over-log warning between the client and the server.
+- **Cited specs:** `docs/domain/sessions-and-progress.md` SES-001–SES-003 · the three ledger rows ·
+  `.claude/rules/testing-requirements.md` (stats invalidation) · `src/lib/utils/progress.ts`'s JSDoc,
+  which names the split until this closes.
+- **Traps:** ① **The server cannot know where Beth is.** Whatever replaces the Edmonton check must
+  accept any date her device can offer and still refuse a date that is genuinely in the future.
+  SES-002 is about a session's own date, not the stats clock: the stats layer's "today"
+  (`STATS_TIMEZONE`) does not move. If the two collide, stop and ask. ② A test that asserts a
+  Sunday week is rewritten to SES-001, citing it. That follows a ruling and is not a weakening; say
+  so in the PR. ③ Check whether any cached stats figure holds a week boundary past a deploy.
+  ④ `timezone.ts` and `completion-estimates.ts` sit in gated `src/lib/queries/stats/`, so this item
+  stops at `built, awaiting review`.
+- **Done-when:** test-first, per clause; the three ledger rows Resolved; `progress.ts`'s JSDoc
+  updated; gate green; Beth has seen the preview (a Sunday's "this week", and a chart with no stitch
+  count on the dashboard); fresh `/review`.
+
+### F-18 Kitting counts each line once — **created by Beth's answer at the 2026-10-25 `/stitch-fact` (KIT-005, D-36); ungated; preview before merge**
+
+- **Objective:** the kitting percentage gives every thread colour, bead, specialty item and the
+  fabric one equal weight, and a part-bought line counts part (KIT-005). Today
+  `getWhatsNextProjects` (`pattern-dive-actions.ts`) sums quantities — skeins and packs, plus the
+  fabric as 1 — through `totalSupplyRollup` (`src/lib/queries/project-supplies.ts`). Put the rule in
+  one place, which also closes the junction arm of the boundary-duplication ledger row (2026-08-17):
+  the "still needed" predicate written ~9 times, and the three-arm dispatch spreading what "kitted"
+  and "still to buy" mean across six files.
+- **Cited specs:** `docs/domain/kitting-and-storage.md` KIT-004, KIT-005, KIT-006 · the ledger row's
+  junction arm.
+- **Traps:** ① "Counts part" is read as **in proportion** (3 of 4 skeins is ¾ of a line), the
+  plain reading of what was put to Beth; if the build needs anything else, ask. ② KIT-004 still
+  governs the empty case: no supply lines is 0%, and fabric alone never makes a project kittable.
+  ③ KIT-006: the percentage never moves the Kitted status. ③b "In proportion" means each line
+  contributes `min(1, acquired / required)`, so over-buying one line never makes up for another; the
+  current rollup already caps that way, and a plain sum of ratios would not. ③c If F-16 has landed,
+  a line whose need is unknown has no proportion: how it counts is a question for Beth, not a
+  default. ④ The rollup's grouped reads are
+  deliberate for scale: a per-line fraction is not a plain `groupBy` sum, so find a bounded way to
+  compute it rather than fetching every junction row. ⑤ The `CalcParams`/`CalculatorSettings` arm of
+  the same ledger row is not this item. ⑥ Confirm every file touched stays off
+  `.claude/hooks/review-gated-paths.txt`.
+- **Done-when:** test-first: a project's percentage weighs lines, not quantities (one thread colour
+  needing 30 skeins plus its fabric, with only the fabric in hand, reads 50%, not 1/31); one predicate
+  in one place; the junction arm Resolved; gate green; Beth has seen the preview (What's Next
+  percentages); merges on her word.
+
 ## Stage R — process-enabling fixes
 
 ### R-1 R2 on preview deployments

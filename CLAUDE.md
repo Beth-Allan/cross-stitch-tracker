@@ -35,10 +35,10 @@ thresholds). Every domain constant — skein lengths, fabric counts, overCount i
 data, what "kitted" means — must trace to Beth or a documented source. The knowledgebase is
 **`docs/domain/`**: per-topic facts, each with a stable ID and a provenance tag, plus
 `open-questions.md` — the `/stitch-fact` queue, tiered by what each gap blocks. Read its
-`README.md` before writing to it, and read only the topics your item touches. **Everything in it
-today was seeded from `CROSS_STITCH_TRACKER_PLAN.md` §3 and not yet said back to Beth.** An
-undocumented constant is a **stop-and-ask, never a guess**, and `/stitch-fact` is the only write
-path in.
+`README.md` before writing to it, and read only the topics your item touches. **Most of it was
+seeded from `CROSS_STITCH_TRACKER_PLAN.md` §3 and not yet said back to Beth** — each fact's
+provenance tag says which. An undocumented constant is a **stop-and-ask, never a guess**, and
+`/stitch-fact` is the only write path in.
 
 ## Where the spec for any work item lives
 

@@ -13,16 +13,14 @@ Opened 2026-08-16 at overhaul step 5.
 
 ## Tier 1 — the app is giving a wrong answer today
 
-### Q-001 — What is a skein's length, per brand?
+### ~~Q-001 — What is a skein's length, per brand?~~
 
-The calculator uses one length (~8 m, a DMC skein) for every brand, so **every skein figure for a
-non-DMC brand is wrong right now** (THR-005). Needed from Beth: which thread brands she actually
-buys, and the skein length for each. The old backlog's figures — Weeks Dye Works and Gentle Art
-at 5 yd, Kreinik at 10–11 m — are candidates to put to her, **not answers**.
-
-**Blocks:** the per-brand skein length build (backlog, old 999.13), which touches
-`src/lib/utils/skein-calculator.ts` and `prisma/schema.prisma` — two review-gated cores.
-**Answering it also changes numbers Beth is already looking at**, so it is worth asking early.
+**Answered 2026-10-25** — the brands she buys (**THR-007**); DMC and Anchor 8 m (**THR-008**);
+Weeks Dye Works and Gentle Art 5 yd (**THR-009**); Kreinik by thread type — #4 braid 11 m, #8 braid
+10 m, blending filament 50 m — and used whole (**THR-010**); every other brand's length entered by
+Beth when she sets the brand up, unknown until then (**THR-011**, ruling D-34). **The wrong figures
+stay on screen until item F-16 ships**, and figures already saved stay wrong until they are
+recomputed (F-16 trap ⑨). That is now a build, not a question.
 
 ## Tier 2 — blocks a planned build
 
@@ -44,6 +42,19 @@ BAP is separately recorded at 50,000+ stitches (VOC-006) and would need to line 
 
 **Blocks:** nothing in flight; surfaces wherever the app groups projects by size.
 
+### Q-009 — Which other threads are used whole, and how many strands do the rest hold?
+
+The skein formula assumes floss that holds six strands and is split (THR-004, THR-006). Beth has
+said that is true of DMC, Anchor, Weeks Dye Works and Gentle Art (THR-008, THR-009), and that
+Kreinik is used whole (THR-010). For every other brand she buys (THR-007) — and any Kreinik line
+beyond the three she named — **how many strands a skein holds, and whether it is split at all, is
+unrecorded**. Needed from Beth: for each brand or line she stitches with, the strand count, or
+"used whole".
+
+**Blocks:** part of item F-16 — a line she adds later must not be divided into six by default.
+F-16 can ship the brands already stated without it, provided an unknown strand structure reads
+"unknown" the same way an unknown length does.
+
 ## Tier 3 — confirmations of migrated material
 
 ### Q-004 — Does the migrated glossary say it right?
@@ -51,10 +62,13 @@ BAP is separately recorded at 50,000+ stitches (VOC-006) and would need to line 
 Every fact in `vocabulary.md`, `kitting-and-storage.md`, and the plan-sourced facts in
 `threads.md` and `fabric.md` came from the planning document, not from a conversation. The app is
 built on them, so they are safe to keep building on — but **none has been said back to Beth**.
-The nine kitting conditions (KIT-001) are the highest-value confirmation: "kitted" is a
-calculated state the whole workflow turns on.
+The nine kitting conditions (KIT-001) are the highest-value confirmation: they are what "kitted"
+means, even though Beth sets the status herself (KIT-006).
 
 **Blocks:** nothing. Worth doing as one pass rather than nine interruptions.
+
+_Narrowed 2026-10-25: KIT-001's "calculated, never stored" is corrected by **KIT-006** (Kitted is a
+status Beth sets). The nine conditions themselves are what remains to confirm._
 
 ### Q-005 — Is a 3-inch margin each side right?
 
@@ -75,3 +89,14 @@ cited formula, not Beth. Confirm the default matches her actual experience of ru
 
 **Answered 2026-10-24** — yes, she keeps `.css` files (**CHF-005**), and `.css`, `.saga` and `.oxs`
 are all Cross Stitch Saga files (**CHF-006**).
+
+### Q-008 — Is an 18-inch cut, about 15 inches usable, how she works?
+
+The skein formula's 255 comes from cutting an 8 m skein into 18-inch lengths, each leaving about 15
+inches to stitch with once started and finished (THR-006). That is the cited source's habit, not
+Beth's. Per-brand lengths (item F-16) lean on it harder: a 5-yard skein's usable thread is worked
+out the same way. Needed from Beth: the length she cuts, and roughly how much each loses to starting
+and finishing.
+
+**Blocks:** nothing. F-16 can build on the cited figure (README provenance rule), but a wrong cut
+length skews every brand's figure the same way.

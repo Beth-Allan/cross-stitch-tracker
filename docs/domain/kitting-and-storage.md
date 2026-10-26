@@ -6,7 +6,11 @@ Seeded 2026-08-16 (overhaul step 5) from `CROSS_STITCH_TRACKER_PLAN.md` §3.
 
 ---
 
-### KIT-001 — "Kitted" is a calculated state with nine conditions
+### KIT-001 — "Kitted" is a calculated state with nine conditions — _corrected, see KIT-006_
+
+_Corrected by Beth 2026-10-25: "calculated, never stored" was never true of the app, and it is not
+what she wants. Kitted is a status she sets, with the kitting percentage as a guide (**KIT-006**).
+The nine conditions below are unchanged and still unconfirmed (Q-004)._
 
 A project is **kitted** when **all** of the following are true:
 
@@ -36,6 +40,28 @@ alternatives (100%, or a "no kit list" label instead of a percentage) at the 202
 `/cleanup`, resolving the drift row of the same date.
 
 [stated by Beth 2026-08-17]
+
+### KIT-005 — The kitting percentage counts each supply line once
+
+Every **thread colour, bead, specialty item, and the fabric** is one item of equal weight, and a
+part-bought line counts part. Chosen over counting quantities — each skein or pack as one and the
+fabric as one — which is what the app does today: a project needing 30 skeins weighs its fabric at
+one thirty-first, the same as a single skein. (The reasoning offered with the recommendation is in
+drift D-36, not here: it was the session's, not hers.)
+
+KIT-004 still governs the empty case: no supplies recorded is 0%, and fabric alone never makes a
+project kittable.
+
+[stated by Beth 2026-10-25]
+
+### KIT-006 — "Kitted" is a status Beth sets; the kitting percentage is a guide
+
+Moving a project to **Kitted** is her call, made by hand. The kitting percentage (KIT-005) informs it
+and never sets it. Chosen over the app moving the status itself when every condition is met, and
+over the app suggesting it for her to confirm. **Corrects KIT-001**, whose "calculated, never stored"
+the app never followed: Kitted has always been one of the statuses picked from a list (drift D-35).
+
+[stated by Beth 2026-10-25]
 
 ### KIT-002 — Project bag
 
