@@ -161,7 +161,9 @@ Pattern Dive (`/charts`).
 ## Review-gated paths
 
 Some paths change the merge path, not just the diff. Anything matching
-`.claude/hooks/review-gated-paths.txt` — `prisma/schema.prisma` and `prisma/migrations/`,
+`.claude/hooks/review-gated-paths.txt` — `prisma/schema.prisma` and `prisma/migrations/`, the
+deploy step that applies them (`vercel.json`, `prisma.config.ts`, `prisma/migrate-deploy.ts`,
+`src/lib/utils/migration-baseline.ts` — Beth's ruling D-38),
 `src/lib/auth.ts` / `auth-guard.ts` / `rate-limit.ts`, the skein and fabric calculators,
 `src/lib/queries/stats/`, and the R2 storage family (the upload and chart-file actions, the
 cover pipeline and its backfill, `r2.ts` — gated as a family, Beth's ruling D-22) — merges

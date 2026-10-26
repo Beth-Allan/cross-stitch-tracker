@@ -1,0 +1,3 @@
+-- Intentionally empty. It exists to prove the deploy pipeline: a committed migration is applied
+-- by the Vercel build and recorded in _prisma_migrations, first on the preview branch, then on
+-- production. It changes nothing in either database.

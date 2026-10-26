@@ -41,6 +41,62 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-25 · D-39 · a check that the migrations add up to the schema — ruled during R-2
+
+**What needed a ruling.** PR #142's layer-1 checklist pass found the gap R-2 opens: once deploys
+apply migrations, nothing checks that `prisma/migrations/` builds exactly what `schema.prisma`
+describes. A schema edit with no migration would pass every gate, merge, and leave production's code
+asking for a column the database does not have. Adding a check is a gate-config change (hard rule 6).
+
+**Surfaced to Beth** in-session: queue it as a small item, placed after F-16 — the first change that
+will add a migration (recommended) · park it for `/cleanup` · no new check (review alone).
+
+**Her ruling: "Queue it as a small item (Recommended)".** New item **R-3** (`build-plan.md`
+Stage R), queued after `/review F-16`.
+
+### 2026-10-25 · D-38 · the deploy-time migration path is review-gated — ruled during R-2
+
+**What needed a ruling.** R-2 added three files that decide what happens to a database on every
+deploy — `vercel.json` (the build command), `prisma/migrate-deploy.ts` (the step that migrates) and
+`src/lib/utils/migration-baseline.ts` (which migrations are recorded as applied **without running**).
+`prisma/migrations/` was gated; these were not, because they were new — the staleness D-22 names.
+A wrong line in them could mark a migration done on production without doing it. Changing the gated
+list is a gate-config change (hard rule 6).
+
+**Surfaced to Beth** in-session: add the three to the list (recommended — one extra review whenever
+one changes, which should be rare) · leave the list as it is.
+
+**Her ruling: "Add them to the list (Recommended)".** `.claude/hooks/review-gated-paths.txt` and
+protocol §5 now name all three, plus the `build:deploy` line of `package.json` — reviewed as if
+gated, since gating `package.json` whole would be too broad.
+
+**Extended the same day.** PR #142's layer-1 review found a fourth file on the path: `prisma.config.ts`
+picks the database every deploy-time Prisma command uses, so an unreviewed edit could point them
+somewhere other than the address the runner checks. Surfaced as its own gate change; **her ruling:
+"Add it too (Recommended)"**. It is on the list and in protocol §5.
+
+### 2026-10-25 · D-37 · a session gets the preview copy's database key, never production's — ruled during R-2
+
+**What needed a ruling.** R-2's brief (trap ③) says reaching Neon needs "a credential from Beth's
+dashboard" without saying which database's; D-16 says Claude never holds credentials to the live
+site. Recording the baseline ("this database is already up to date, start counting here") has to
+happen once on each database, so either a session holds production's key for that one step, or the
+deploy does it.
+
+**Surfaced to Beth** in-session: the preview copy's key only — the session checks and prepares
+everything on the copy, and the first deploy after the merge records the baseline on production
+itself, only if Prisma confirms the database matches exactly, otherwise stopping with the live site
+untouched; the same code runs first on the copy through the PR's own preview (recommended) · the
+real database's key too, this once — the standard by-hand procedure, but production's key would sit
+in the conversation record, and making it useless again means a password reset plus two Vercel
+settings.
+
+**Her ruling: "Preview copy only (Recommended)".** D-16 stands whole. The key is kept on Beth's
+machine in the gitignored `.env.preview-db.local`. **What it changed:** the baseline is recorded by
+`prisma/migrate-deploy.ts`, not by hand; and recovering a migration that fails **on production**
+needs a key no session holds, so that case is a stop-and-ask for Beth (`docs/INTEGRATIONS.md`,
+Migrations).
+
 ### 2026-10-25 · D-36 · today's answers contradict the app in five places — three fix items, placed by Beth — ruled during `/stitch-fact`
 
 **What happened.** Every answer Beth gave this session was checked against the code. Five disagree
