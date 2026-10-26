@@ -235,4 +235,11 @@ status` reads it. The local rehearsal database was an OrbStack container (`r2-re
 `postgres:17`, port 55432), removed at the end of the R-2 session; the INTEGRATIONS "Writing a
 migration" bullet recreates one.
 
-**Done when:** steps 1–3 are recorded in R-2's REVIEW note. Then `/cleanup` retires this note.
+**Where it stands (2026-10-25, Fable 5.1, the `/review R-2` session):** steps 1 and 3 done and recorded
+in the work log's session note — the squash commit `ce8acdb` deployed (Vercel deployment
+`7SjDiXPmk6RZXsspqytgiMXwey4w`, "Deployment has completed", so the migrate step exited 0) and the
+live `/login` and `/api/auth/session` answer 200. **Step 2 waits on Beth's screenshot**, asked for
+at the end of that session. Whichever session receives it records the production host's first two
+words in `docs/INTEGRATIONS.md` (Migrations) and closes this note.
+
+**Done when:** step 2 is recorded too. Then `/cleanup` retires this note.
