@@ -65,10 +65,10 @@ which makers, the order (D-41 said the order comes back to her if a catalogue ha
 and Kreinik does, because a Kreinik colour belongs to a size and the sizes are F-16a's thread
 lines), what a colour shows when its maker publishes no colour value, and whether Mill Hill loads
 whole. The session found and checked the sources first: Kreinik's official chart (names every
-colour, says one number spans its sizes, gives no values and no per-size availability); Wichelt's
+colour, says one number spans its sizes, gives no values; the session read only its first page and missed the per-size availability matrix on page 2 — caught at layer-1 review, see below); Wichelt's
 official Mill Hill inventory sheet (~500 beads, twelve lines, codes and names, dated 2010, no
-values); for Anchor no official list online, and an ISC-licensed dataset reconciled from Anchor's
-colour card with seven doubtful colours flagged. Sources and what each lacks are tabled in
+values); for Anchor no official list online, and a dataset (no licence file; "ISC" in its `package.json`) reconciled from Anchor's
+colour card with eight doubtful colours tagged. Sources and what each lacks are tabled in
 `build-plan.md` §Stage C.
 
 **Surfaced to Beth** in one round; option labels as she saw them.
@@ -92,7 +92,7 @@ chosen. ② **"Kreinik first (Recommended)".** ③ **"No swatch (Recommended)".*
 **What it changed.** **Stage C** in `build-plan.md`: C-1 (the loader + Kreinik; gated), C-2 (Mill
 Hill), C-3 (Anchor), C-4 (hand-dyed, not briefed). The queue: a `/stitch-fact` row heads it (the
 Kreinik lines Beth uses and their names; the cited-source facts the briefs lean on), then F-16a,
-its review, R-3, C-1, its review, C-2, C-3, then **F-16b, which now follows C-3** — the session's
+its review, R-3, C-1, its review, C-1b, C-2, C-3, then **F-16b, which now follows C-3** — the session's
 reading of ruling ②'s option text, which placed the brand form last. **F-16a and F-16b re-briefed**
 (D-41 allowed it; the catalogue plan's version wins): every thread belongs to a line with
 uniqueness per line and code; F-16a creates every Kreinik line Beth names, length unknown where
@@ -102,9 +102,20 @@ maker's value, so Anchor loads without swatches as well; the declined options ar
 as a later `/tweak`. **Ruling ④'s consequence:** "Royal Blue" is seven Mill Hill beads, so a bead
 gets a line (a text column, C-1) shown in its label. **The mechanism was the session's call, not
 hers, recorded here so it is on the record:** a catalogue is a fixture applied at deploy, missing
-rows only, by one gated loader — not a migration per catalogue, which would cost a `/review` each
-and could jam deploys (D-37). The CodeRabbit trial's third review moves from `/review F-17` to
+rows only, by one gated loader that never creates a brand or a line and never fails a build (it
+skips a catalogue it cannot place, with a log line) — not a migration per catalogue, which would
+cost a `/review` each and could jam deploys (D-37). The CodeRabbit trial's third review moves from `/review F-17` to
 `/review C-1` (protocol §5: whichever gated review runs third). One gate-list question is open above.
+**Layer-1 review of PR #146 then corrected the plan in three places:** the deploy step writes rows
+while the outgoing code still serves (`INTEGRATIONS.md`), so the first rows with no swatch must land
+one deploy after the code that shows them — the Kreinik data split off C-1 into **C-1b**, and
+"Kreinik first" means C-1 then C-1b, five sessions from here rather than the four the option text
+said (the order itself is unchanged); the Kreinik chart's second page is a per-size availability
+matrix, so each line loads exactly the colours the chart marks for that size and the over-inclusion
+the session had described to Beth as forced never was; and the Anchor dataset has no licence file
+(a one-word `package.json` field only), so C-3 opens by putting the basis to her. **D-42 ③ departs
+from `CROSS_STITCH_TRACKER_PLAN.md` §4.2**, which gives each thread and bead a swatch ("hex value or
+image"); the plan line stays as written, as D-35 and D-40 left theirs.
 
 ### 2026-10-25 · D-41 · the thread catalogues are planned before F-16 is built — ruled during `/work-item F-16`
 

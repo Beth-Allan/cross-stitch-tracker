@@ -1247,21 +1247,23 @@ Pre-load other makers' colour lists the way DMC's ~500 colours are, so adding "K
 002" or "Mill Hill 42012" is a search-and-select, never a typed entry (`CROSS_STITCH_TRACKER_PLAN.md`
 §4.2's "major UX win", §9 "Additional supply brand pre-seeding", §10 item 4 — the source question,
 answered below). **Beth's rulings (D-42):** ① three catalogues — Kreinik, Mill Hill beads, Anchor —
-and her other hand-dyed brands in a later plan (C-4, not briefed); ② **Kreinik first**, straight
-after F-16a and its review, because a Kreinik colour belongs to a size and the sizes are F-16a's
-thread lines; ③ **no stand-in swatch** — where a maker publishes no colour value the colour shows
-its code and name with a "no published colour" mark; ④ **the whole Mill Hill sheet**, every line.
+and the rest of the brands she buys in a later plan (C-4, not briefed); ② **Kreinik first**,
+straight after F-16a and its review, because a Kreinik colour belongs to a size and the sizes are
+F-16a's thread lines; ③ **no stand-in swatch** — where a maker publishes no colour value the colour
+shows its code and name with a "no published colour" mark; ④ **the whole Mill Hill sheet**, every
+line.
 
 **How a catalogue gets in — the planning session's call, on the record in D-42.** Each list ships
 inside the app as a **self-describing fixture** in `prisma/fixtures/` (the file carries its maker's
-brand name, supply type, website and, for threads, the line each colour belongs to) and is applied
-by the deploy step after `migrate deploy` — **missing rows only; it never updates or deletes
-anything, and never touches a row Beth entered.** The loader discovers fixtures by scanning the
-folder, so adding a catalogue is adding a file, never editing the loader. It **never creates a
-brand or a line** (brands and lines are F-16a's, F-16b's and Beth's to make) and **never fails a
-build**: a fixture whose brand or line it cannot find is skipped with a loud log line, because a
-red production deploy for a catalogue hiccup is worse than a missing catalogue — and every PR's
-preview build runs the loader first, so a "skipped" is seen on the preview before anything merges.
+brand name and supply type and, for threads, the line each colour belongs to) and is applied by the
+deploy step after `migrate deploy` — **missing rows only; it never updates or deletes anything, and
+never touches a row Beth entered.** The loader discovers fixtures by scanning the folder, so adding
+a catalogue is adding a file, never editing the loader. It **never creates a brand or a line**
+(brands and lines are F-16a's, F-16b's and Beth's to make) and **never fails a build**: a fixture
+it cannot place — brand missing, brand of another type, more than one brand matching, a line
+missing, or the file failing its own schema — is skipped with a loud log line, because a red
+production deploy for a catalogue hiccup is worse than a missing catalogue; and every PR's preview
+build runs the loader first, so a "skipped" is seen on the preview before anything merges.
 `prisma/seed.ts` runs the same loader, so a fresh database and a deployed one agree. Not a data
 migration per catalogue: each would need a fresh `/review`, and a migration that fails on
 production jams every later deploy until a key no session holds is used (D-37). So **C-1 is the one
@@ -1276,26 +1278,29 @@ must land in a deploy **after** the code that can show one. C-1 ships the schema
 the null states with zero new rows; C-1b ships the Kreinik fixture.
 
 **The sources, found and checked 2026-10-25** (hard rule 5: a list is a documented source; what it
-does not say is not guessed). The build re-fetches each one and records the retrieval date,
-licence and every derivation rule in `prisma/fixtures/README.md`, which C-1 creates:
+does not say is not guessed). The build re-fetches each one and records the retrieval date, the
+licence basis and every derivation rule in `prisma/fixtures/README.md`, which C-1 creates:
 
-| maker                           | source                                                                                                                                                                                                                                                                                                                               | gives                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | does not give                                                                                                                                                                                                                        |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Kreinik** (Kreinik Mfg.)      | `https://www.kreinik.com/PDF/Metallic_Color_Reference_Chart.pdf` — the official one-page chart, "updated January 2024"                                                                                                                                                                                                               | every colour number with its name ("300+ colors"), grouped by finish family: Basic, Hi Lustre (HL), Vintage (V), Fluorescent (F), Holographic (L); and families that are **their own thread types**, not braid colours — Cord (C), Japan (J), Cable (P), Wired (W), Micro Ice Chenille (MIC), Ombre, Facets, 1/16" ribbon chevrons, Easter grass, 3/8" trim. Its legend: "#number means Braid size, BF means Blending Filament, Ribbons are 1/4, 1/16, or 1/8"; **"Some colors come in more than one size"** — one numbering across sizes                                                       | **which sizes carry which colour** (unpublished anywhere found; the store lists no per-colour products), and **colour values** (photographs only). The F colours are "temporarily discontinued" per kreinik.com's news of 2026-05-29 |
-| **Mill Hill** (Wichelt Imports) | `http://www.millhillbeads.com/images/bead_inventory.pdf` — Wichelt's own "Glass Bead Inventory", "©2003, Mill Hill® update 2010" (the site's certificate is expired; fetch with that in mind)                                                                                                                                        | ~500 beads with code and name in twelve lines as the sheet heads them: glass seed (00xxx, 02xxx), antique seed (03xxx), crayon seed (02058–02069), frosted seed (6xxxx), petite seed (40xxx, 42xxx, 45xxx), pebble (05xxx), size 6 (16xxx), size 8 (18xxx), small/medium/large bugle (7xxxx/8xxxx/9xxxx), magnifica (10xxx). Codes are unique across lines. `×` = also sold as a 1000-pack whose number starts with 2 instead of 0; magnifica 11xxx is the 7 g pack of the same 10xxx bead — **neither is a separate bead**. `•` and `*` are care marks (bleach, friction), not discontinuation | colour values; anything newer than 2010 (**the build's first act is to look for a newer official sheet** — `millhill.com` did not answer on 2026-10-25)                                                                              |
-| **Anchor**                      | `https://github.com/Kate-nc/cross-stitch`, `anchor-data.js` (ISC licence — the build re-reads `LICENSE`): 704 rows `[code, name, R, G, B]`; its header documents reconciliation of "the official Anchor colour card PDF / retailer scans" with three other lists and names seven contested colours (46, 78, 150, 168, 338, 351, 900) | codes and names                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | a maker-published colour: its RGB are "screen approximations" by its own header, so under D-42 ③ they stay out (a later `/tweak` may switch them on — backlog). No official Anchor list was found online on 2026-10-25               |
+| maker                           | source                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | gives                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | does not give                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Kreinik** (Kreinik Mfg.)      | `https://www.kreinik.com/PDF/Metallic_Color_Reference_Chart.pdf` — the official two-page chart, "updated January 2024"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | **Page 1:** every colour number with its name ("300+ colors"), grouped by finish family — Basic, Hi Lustre (HL), Vintage (V), Glow-in-the-dark (F; the legend also says Fluorescent), Holographic (L) — and the families that are their own thread types: Cord (C), Japan (J), Cable (P), Wired (W), Micro Ice Chenille (MIC), Ombre, Facets, 1/16" ribbon chevrons, Easter grass, 3/8" trim. Its legend: "#number means Braid size, BF means Blending Filament, Ribbons are 1/4, 1/16, or 1/8"; "Some colors come in more than one size". **Page 2: an availability matrix** — one row per colour, a star under each size it comes in, columns BF, #4, #8, #12, #16, #24, #32, 1/8", 1/16" (001 has all nine, 556 four, 5765 one); a 1/4" ribbon list; a cord matrix; the Japan colours in a matrix of their own with braid and ribbon columns ("Some Japan colors come in Kreinik Braids and Ribbons"); `disc` cells, "Colors in gray are discontinued", and a "Discontinued colors & suggested substitutions" table | **colour values** (photographs only). The store at kreinik.com stopped taking orders on 2025-09-08 (its homepage notice), so its listings are no evidence of anything; the chart is the source. The F colours are "temporarily discontinued … in all sizes" per the Top News on `https://www.kreinik.com/store/shop-needlework/metallic-threads/color-card/` (2026-05-29) |
+| **Mill Hill** (Wichelt Imports) | `http://www.millhillbeads.com/images/bead_inventory.pdf` — Wichelt's own "Glass Bead Inventory", "©2003, Mill Hill® update 2010". Plain `http://` serves it (68,924 bytes, sha256 `f3c106d89e15d588c458993121d55f985b11837872604a9514fa3a998160ab6e`); `https://` has an expired certificate                                                                                                                                                                                                                                                                                                                        | ~500 beads with code and name in twelve lines as the sheet heads them: glass seed (00xxx, 02xxx), antique seed (03xxx), crayon seed (02058–02069), frosted seed (6xxxx), petite seed (40xxx, 42xxx, 45xxx), pebble (05xxx), size 6 (16xxx), size 8 (18xxx), small/medium/large bugle (7xxxx/8xxxx/9xxxx), magnifica (10xxx). Codes are unique across lines. `×` = also sold as a 1000-pack whose number "begins with a '2' instead of a '0'"; magnifica "7 grams begins with number 11" is the same bead as its 10xxx number — **neither is a separate bead**. `•` and `*` are care marks (bleach, friction), not discontinuation                                                                                                                                                                                                                                                                                                                                                                                      | colour values; anything newer than 2010 (**the build's first act is to look for a newer official sheet** — `millhill.com` did not answer on 2026-10-25)                                                                                                                                                                                                                   |
+| **Anchor**                      | `https://github.com/Kate-nc/cross-stitch`, `anchor-data.js`: 704 rows `[code, name, R, G, B]`; its header documents reconciliation of "the official Anchor colour card PDF / retailer scans" with four other sources and says of itself that its sourcing is "historical repository documentation, not independently verified measurements or licence evidence". **Licence basis: the repository has no LICENSE file** (GitHub reports none); the only statement is `"license": "ISC"` in its `package.json` — whether a one-word field is basis enough to ship 704 names is Beth's call, put to her when C-3 opens | codes and names; the data's `_ANCHOR_CONTESTED_IDS` tag names **eight** doubtful codes (46, 78, 150, 167, 168, 338, 351, 900 — the header lists seven and names two of them differently from the rows)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | a maker-published colour: its RGB are "screen approximations" by its own header, so under D-42 ③ they stay out (a later `/tweak` may switch them on — backlog). No official Anchor list was found online on 2026-10-25                                                                                                                                                    |
 
 **Domain-fact prerequisites — the `/stitch-fact` row that heads the queue** (protocol §7; this plan
 cannot write `docs/domain/`, and `/stitch-fact` records only what Beth herself states — never a
 manufacturer's page). Before F-16a opens, Beth records: **(a)** which Kreinik lines she uses, in her
-words (D-40 named #4 braid, #8 braid, blending filament and ribbon — which ribbon width?), any
-length she knows beyond THR-010, and for each whether it is used whole (Q-009); **(b)** what the
-sources say, **put to her to confirm from her own practice**: that one Kreinik colour number spans
-its sizes (does she own, say, 002 in both #4 and #8?), what she calls Mill Hill's lines (the sheet's
-twelve headings, unless her words differ), and that a 2xxxx economy pack is the same bead as its
-0xxxx number. What she confirms is her fact; **what she cannot confirm stays a cited source in this
-plan, not a domain fact, and no brief below depends on it being recorded** — F-16a's schema allows
-one code in several lines either way; **(c)** if there is time, Q-008 (the 18-inch cut), which F-16a
+words, **named against the chart's own size menu** — BF, #4, #8, #12, #16, #24, #32, 1/8" ribbon,
+1/16" ribbon, 1/4" ribbon (D-40 named #4 braid, #8 braid, blending filament and ribbon — which
+ribbon width?); any length she knows beyond THR-010; for each whether it is used whole (Q-009);
+and **whether she owns or uses colours the chart marks discontinued** (recommended default if she
+has no view: load them, the README listing which — she may own them); **(b)** what the sources say,
+**put to her to confirm from her own practice**: that one Kreinik colour number spans its sizes
+(does she own, say, 002 in both #4 and #8?), what she calls Mill Hill's lines (the sheet's twelve
+headings, unless her words differ), and that a 2xxxx economy pack is the same bead as its 0xxxx
+number. What she confirms is her fact; **what she cannot confirm stays a cited source in this plan,
+not a domain fact, and no brief below depends on it being recorded** — F-16a's schema allows one
+code in several lines either way; **(c)** if there is time, Q-008 (the 18-inch cut), which F-16a
 cites. The Kreinik line names she gives are the ones F-16a creates and C-1b loads into — the same
 strings.
 
@@ -1322,129 +1327,150 @@ passes ~2,000 rows).
   row adds · F-16a's schema (the thread line; uniqueness per line and code) · `docs/INTEGRATIONS.md`
   Deployment → Migrations (the deploy step, the deploy window, the throwaway Postgres) ·
   `.claude/rules/ui-design-reference.md` (the label is a text change on existing surfaces, not a
-  new screen) · `docs/TESTING.md` "fixtures/" (shipped data gets tests) · `docs/domain/README.md`
-  (provenance vocabulary — the fixtures README uses the same tags).
+  new screen) · `.claude/rules/form-patterns.md` (Zod at every boundary — a fixture is one) ·
+  `docs/process/security-checklist.md` · `docs/TESTING.md` "fixtures/" (shipped data gets tests) ·
+  `docs/domain/README.md` (provenance vocabulary — the fixtures README uses the same tags).
 - **Scope:**
   - **The loader** (`prisma/catalogues/…`, called by `prisma/migrate-deploy.ts` after
-    `migrate deploy` succeeds, and by `prisma/seed.ts`): scans `prisma/fixtures/*.json`; for each
-    fixture **resolves everything first** — the brand by exact name (case aside) **and** type, and
-    for a thread fixture every named line under that brand — and only then writes, one transaction
-    per fixture (`createMany` with `skipDuplicates`, chunked). A brand that is missing or exists
-    under another type, or a missing line, **skips that fixture with a loud log line** —
-    `[catalogue] Kreinik: skipped — no line "#4 braid" under brand "Kreinik"` — and the build goes
-    on; the loader never creates a brand or a line. Every run logs
-    `[catalogue] <maker>: <n> added, <m> already present` per fixture. It uses the deploy step's own
-    `DIRECT_URL` connection, never `@/lib/db`. **DMC joins the same path**: `dmc-threads.json` takes
-    the self-describing shape (brand, type, website, one line — DMC's, from F-16a), `seed.ts`
-    becomes "create the brands no migration creates (today: Mill Hill), then run the loader", and
-    a fresh database ends up identical to a deployed one.
+    `migrate deploy` succeeds, and by `prisma/seed.ts`). `migrate-deploy.ts` holds no Prisma
+    Client (it spawns `npx prisma` and opens a `pg` client for its state check), so the loader
+    builds its own — `PrismaClient` + `PrismaNeon` on `prismaConfig.datasource.url`, as `seed.ts`
+    does today — and never imports `@/lib/db`; its messages name counts and names, never the URL.
+    It scans `prisma/fixtures/*.json`; **parses each file with a Zod fixture schema built from the
+    existing brand, thread and bead validations** (codes `.trim()`-normalised, so "002 " cannot land
+    beside "002"); for each fixture **resolves everything first** — exactly one brand by name (case
+    aside) **and** type, and for a thread fixture every named line under that brand — and only then
+    writes, one transaction per fixture (`createMany` with `skipDuplicates`, chunked). A file that
+    fails its schema, a brand that is missing, of another type, or matched more than once, or a
+    missing line, **skips that fixture with a loud log line** — `[catalogue] Kreinik: skipped — no
+line "#4 braid" under brand "Kreinik"` — and the build goes on; the loader never creates a
+    brand or a line. Every run logs `[catalogue] <maker>: <n> added, <m> already present` per
+    fixture. Preview builds from any PR write to the shared `preview` branch, as migrations already
+    do. **DMC joins the same path**: `dmc-threads.json` takes the self-describing shape (brand,
+    type, one line — DMC's, from F-16a); `seed.ts` becomes "create the brands no migration creates
+    (today: Mill Hill), then run the loader" — so the seed stops updating DMC names and colours on
+    re-run, which today's upsert did (trap ③); a fresh database ends up identical to a deployed one.
   - **Schema + one migration** (`BEGIN;` … `COMMIT;`, written with `migrate dev --create-only` on
     the throwaway Postgres carrying F-16a's migrations): `Thread.hexColor`, `Thread.colorFamily`,
     `Bead.hexColor`, `Bead.colorFamily` nullable; `Bead.line` nullable text (a bead's line is a
     label and a filter, never a length — a text column, not F-16a's relation). TypeScript then lists
-    every reader of the four columns; each handles null: `ColorSwatch` renders the "no published
-    colour" state (the existing ring, no fill, an accessible name) — the smallest honest mark, shown
-    to Beth on the preview and logged as a design-track input for DS-5 rather than designed here;
-    the colour-family filter gains "Unclassified"; sorting and `needsBorder` never parse a null.
-    The edit forms keep letting Beth set a colour and a family by hand. **No row is null after
-    this item's deploy** — the first null rows are C-1b's, one deploy later.
+    every reader of the four columns; each handles null. **The session's calls here, not D-42's —
+    Beth's preview word approves them:** `ColorSwatch` renders a "no published colour" state (the
+    existing ring, no fill, an accessible name) — the smallest honest mark, shown to her on the
+    preview and logged as a design-track input for DS-5 rather than designed here; the
+    colour-family filter gains an "Unclassified" choice (the word is hers to change); sorting and
+    `needsBorder` never parse a null. The edit forms keep letting Beth set a colour and a family by
+    hand. **No row is null after this item's deploy** — the first null rows are C-1b's, one deploy
+    later.
   - **The sorter.** `naturalSortByCode` puts every purely numeric code first and every other code
     after, alphabetically — so 002HL and 002V would sort after 5505, at the bottom of every list.
     Extend it to a true natural order (001, 002, 002HL, 002V, 100, 5505, then Blanc, Ecru), with a
     test pinning that DMC's order is unchanged (334 before 500 before 3761; Blanc and Ecru last).
-    It is shared by `getThreads` and the catalogue views; ungated.
+    It is shared by `getThreads` and the catalogue views; ungated; the order is shown to Beth on the
+    preview with a throwaway row, since how suffixed codes sit is her eye's to judge.
   - **The line in the label:** wherever a thread is named with brand and code —
     `supply-catalog.tsx`, `supply-table-view.tsx`, `supply-grid-view.tsx`, `supply-form-modal.tsx`,
     `chart-merged-form.tsx` (the picker results), `project-detail/supplies-tab.tsx` and the shopping
     list — a thread whose brand has more than one line shows the line ("Kreinik · #4 braid · 002
     Gold"); a one-line brand shows nothing new (DMC unchanged). **A bead's line the same way**, from
     `Bead.line`. Both are invisible until C-1b and C-2 load data; tested now with fixtures. **Not**
-    the stats page (`thread-insight-list.tsx`, gated — backlog row "The thread line on the stats
-    page").
+    the stats page: `src/lib/queries/stats/thread-insights.ts` is what names a thread there, and it
+    is gated — backlog row "The thread line on the stats page".
   - **The two stale texts** (F-16 trap ⑧): `inline-create-dialog.tsx`'s "e.g. Kreinik Braid"
     example and `supply-brand-list.tsx`'s "Add other brands like Mill Hill or Kreinik" empty state
     — both wrong once Kreinik is a thread with lines; `supply-catalog.tsx`'s "Add beads from brands
     like Mill Hill" line is C-2's.
-  - **`prisma/fixtures/README.md`:** one entry per fixture — source, retrieval date, licence,
-    derivation rules, the loader's rules (missing rows only; skips, and what a skip means; a rename
-    of a brand or line stops that fixture's later loads until the fixture follows) — using
-    `docs/domain/README.md`'s provenance tags. DMC's entry says "in the app, origin unknown"
+  - **`prisma/fixtures/README.md`:** one entry per fixture — source, retrieval date, licence basis,
+    derivation rules, the loader's rules (missing rows only; what a skip means and every reason for
+    one; a rename of a brand or line stops that fixture's later loads until the fixture follows) —
+    using `docs/domain/README.md`'s provenance tags. DMC's entry says "in the app, origin unknown"
     (maintenance ledger, 2026-10-25).
-  - **Tests:** the loader with the repo's Prisma mock — adds only missing rows, resolves before
-    writing, skips (never throws) on a missing or mistyped brand and on a missing line, logs the
-    counts; the DMC fixture's existing tests updated to the new shape; the sorter; the label on each
-    surface with a fixture thread of a two-line brand and a fixture bead with a line; the swatch's
-    null state; the "Unclassified" filter.
+  - **Tests:** the fixture schema (a bad row, an untrimmed code); the loader with the repo's Prisma
+    mock — adds only missing rows, resolves before writing, skips (never throws) on each reason
+    above, logs the counts, never prints the URL; the DMC fixture's existing tests updated to the
+    new shape and pinning its brand block (name, type, line), so a change there is a visible test
+    change; the sorter; the label on each surface with a fixture thread of a two-line brand and a
+    fixture bead with a line; the swatch's null state; the "Unclassified" filter.
   - **Rehearsal, then preview:** on the throwaway Postgres, F-16a's migrations + this one, then the
-    loader twice — DMC reads `0 added, 495 present` the second time; the skip cases exercised with a
-    throwaway fixture. The PR's preview build then runs the loader against the `preview` branch as
-    F-16a's review left it (no data is written, so no reset is needed): its log line goes in the PR.
+    loader twice — DMC reads `0 added, 495 present` the second time; every skip reason exercised
+    with a throwaway fixture. The PR's preview build then runs the loader against the `preview`
+    branch as F-16a's review left it (no data is written, so no reset is needed): its log line goes
+    in the PR.
 - **Traps:** ① **Hard rule 8:** `createMany` + `skipDuplicates` through `@prisma/adapter-neon` on
   Prisma 7.10.1, interactive transactions on that adapter, and the parameter count of a ~1,000-row
-  insert (chunk at a few hundred) — verify in `node_modules/`, never from memory. ② The loader runs
-  on every deploy; it must be idempotent by construction (the unique indexes do the work) and quick
-  (one insert per fixture, not one per row). ③ **Only inserts.** A corrected name in a fixture
-  never reaches production by itself; the README says so, and a correction is a tiny targeted
-  migration or Beth's own edit in the app. ④ **The deploy window:** this item's migration changes
-  column nullability only, which the outgoing code cannot notice; it must write **no** null row.
-  ⑤ **Renames.** The loader matches brands and lines by name, and F-16b lets Beth rename either; a
-  renamed brand or line makes the loader skip that fixture from then on (logged, harmless to what is
-  already loaded) until the fixture is renamed to match in a data PR. Say so in the README; a stable
-  key on lines and brands is the upgrade if it ever bites, not something to build now. ⑥ The
-  picker's search matches code and name across every brand, so "002" will return one row per
-  Kreinik line once C-1b lands — the label is what tells them apart; a unit test on the picker
-  proves the line is in the rendered text. ⑦ Kreinik's brand and lines are F-16a's rows; this item
-  must not create or rename them. ⑧ **Size:** if the size check fires, the seam is the line-in-the-
-  label — ungated UI that can follow as **C-1a** before C-1b. Say so at the top of the session.
-  ⑨ Every write here is deploy-time, outside the app's cache — no `revalidateTag` applies; the
-  deployment is new.
-- **Done-when:** Beth's gate-list ruling recorded; then test-first, clause by clause: the loader
-  adds only missing rows, a second run adds none, resolves before it writes, and skips with a logged
-  reason — never throws — on a missing or mistyped brand and on a missing line; `seed.ts` and the
-  deploy step run one loader, and DMC's fixture round-trips through it; the four nullable columns
-  and `Bead.line` exist and every reader handles null (the swatch's empty state, the "Unclassified"
-  filter, the sorter); the sorter's new order is pinned and DMC's is unchanged; the line shows in a
-  thread's label and a bead's label on every surface listed, and DMC's labels are unchanged; the two
-  stale texts are gone; the fixtures README exists; the rehearsal counts and the preview build's
-  loader line are in the PR; Beth has seen the preview (the supplies pages unchanged, the swatch's
-  empty state on a throwaway row if she wants to see it); gate green; stops at
-  `built, awaiting review`; fresh `/review C-1`.
+  insert (chunk at a few hundred; name the size) — verify in `node_modules/`, never from memory.
+  ② The loader runs on every deploy; it must be idempotent by construction (the unique indexes do
+  the work) and quick (one insert per fixture, not one per row). ③ **Only inserts.** A corrected
+  name in a fixture never reaches production by itself; the README says so, and a correction is a
+  tiny targeted migration or Beth's own edit in the app. ④ **The deploy window:** this item's
+  migration changes column nullability only, which the outgoing code cannot notice; it must write
+  **no** null row. ⑤ **Renames.** The loader matches brands and lines by name, and F-16b lets Beth
+  rename either; a renamed brand or line makes the loader skip that fixture from then on (logged,
+  harmless to what is already loaded) until the fixture is renamed to match in a data PR. Say so in
+  the README; a stable key on lines and brands is the upgrade if it ever bites, not something to
+  build now. ⑥ The picker's search matches code and name across every brand, so "002" will return
+  one row per Kreinik line once C-1b lands — the label is what tells them apart; a unit test on the
+  picker proves the line is in the rendered text. ⑦ Kreinik's brand and lines are F-16a's rows;
+  this item must not create or rename them. ⑧ `SupplyBrand.name` is unique case-sensitively, so
+  "Kreinik" and "kreinik" can both exist — hence "exactly one match" above. ⑨ **Size:** if the
+  size check fires, the seam is the line-in-the-label — ungated UI that can follow as **C-1a**
+  before C-1b. Say so at the top of the session. ⑩ Every write here is deploy-time, outside the
+  app's cache — no `revalidateTag` applies; the deployment is new.
+- **Done-when:** Beth's gate-list ruling recorded; then test-first, clause by clause: every fixture
+  is parsed before any write; the loader adds only missing rows, a second run adds none, resolves
+  before it writes, and skips with a logged reason — never throws — on a bad file, a missing,
+  mistyped or doubly-matched brand, and a missing line; `seed.ts` and the deploy step run one
+  loader, and DMC's fixture round-trips through it; the four nullable columns and `Bead.line` exist
+  and every reader handles null (the swatch's empty state, the "Unclassified" filter, the sorter);
+  the sorter's new order is pinned and DMC's is unchanged; the line shows in a thread's label and a
+  bead's label on every surface listed, and DMC's labels are unchanged; the two stale texts are
+  gone; the fixtures README exists; the rehearsal counts and the preview build's loader line are in
+  the PR; Beth has seen the preview (the supplies pages unchanged; the swatch's empty state and the
+  sorter's order on a throwaway row); gate green; stops at `built, awaiting review`; fresh
+  `/review C-1`.
 
 ### C-1b The Kreinik catalogue — **ungated (data and tests); UI-touching; preview before merge**
 
-- **Objective:** Kreinik's colours are in each line Beth uses, so a Kreinik thread is a
-  search-and-select with its line in the label.
+- **Objective:** Kreinik's colours are in each line Beth uses — exactly the colours the chart says
+  come in that size — so a Kreinik thread is a search-and-select with its line in the label.
 - **Cited specs:** D-42 ①–③ · the sources table (Kreinik) · the facts the `/stitch-fact` row
-  records (her lines and their names) · F-16a (the lines exist) · C-1's loader and README.
+  records (her lines, named against the chart's size menu; her answer on discontinued colours) ·
+  F-16a (the lines exist) · C-1's loader and README.
 - **Scope:** `prisma/fixtures/kreinik-threads.json`, built by a committed script from the official
-  chart's text (`pypdf` or equivalent — names split across lines in the PDF, e.g. "Mid-night", are
-  rejoined and spot-checked against the rendered page): every colour number and name in the
-  **Basic, HL, V, F and L families**, under **each line Beth named** at `/stitch-fact`; the 1/16"
-  ribbon chevron family only under a 1/16" ribbon line if she uses one; the families that are their
-  own thread types (Cord, Japan, Cable, Wired, MIC, Ombre, Facets, Easter grass, trim) **are not
-  loaded** — none of them is a line she has named. No hex, no family (D-42 ③). **Over-inclusion is
-  accepted and told to Beth:** Kreinik publishes no per-size availability, so a line gets the whole
-  family list and a colour that does not exist in that size simply never gets picked. The README
-  records this rule, the retrieval date, and that the F colours are listed as temporarily
-  discontinued. Fixture tests (`src/__tests__/fixtures/`): shape; no duplicate code within a line;
-  the same code allowed across lines; a count floor; five spot entries read off the chart (001
-  Silver, 002 Gold, 100 White, 002HL Gold High Lustre, 001L Solar Silver — numbers and names as the
-  chart prints them). **This item writes data at deploy**, so before its preview build: ask Beth to
-  reset the Neon `preview` branch from production (show her the dialog first); the preview build's
-  loader line — `Kreinik: <n> added` per line — goes in the PR.
-- **Traps:** ① The fixture's line strings are the `/stitch-fact` strings verbatim — a mismatch
-  makes the loader skip the whole fixture, which the preview log shows and which is a stop before
-  merge. ② Codes are **strings**: "002" keeps its zeros, "002HL" keeps its letters. ③ The chart is
-  an image-heavy PDF: the script extracts text, never pixels (D-42 ③ — no colours are read off
-  swatches). ④ `/supplies` loads the whole catalogue (P9b): check the preview's load with ~1,000
-  new rows and say what you saw. ⑤ Hard rule 4 is already satisfied by C-1 — nothing visual is new
-  here; if the preview shows the label needs more than C-1 built, that is a design-track input, not
-  a fix in this item.
-- **Done-when:** test-first: the fixture passes its tests and holds every Basic/HL/V/F/L colour
-  under each line Beth named; the loader on the throwaway Postgres adds them and a second run adds
-  none; the preview build loaded them into the reset `preview` branch; **Beth named five Kreinik
-  threads she owns (number, name, size) and found each under the right line on the preview**; gate
-  green; merges on her word.
+  chart: **for each line Beth named, every colour whose row in the page-2 matrix has a star in that
+  size's column** — from the main matrix (Basic, HL, V, F and L colours) and from the Japan matrix,
+  whose braid and ribbon columns put Japan colours into braids too; a 1/4" ribbon line from the
+  chart's 1/4" list; the cord matrix only if she named a cord line. Names come from page 1 (names
+  split across lines in the PDF, e.g. "Mid-night", are rejoined and spot-checked against the
+  rendered page). Colours the chart marks discontinued (gray, `disc`, the substitutions table)
+  follow her `/stitch-fact` answer, and the README lists them either way. No hex, no family (D-42
+  ③). The README records the rule, the retrieval date, and the F colours' "temporarily
+  discontinued" notice. Fixture tests (`src/__tests__/fixtures/`): shape; no duplicate code within
+  a line; the same code allowed across lines; a count floor per line; spot entries read off the
+  chart — 001 Silver in every line (all nine sizes), 556 Fly By Night in exactly the four sizes the
+  matrix stars, 5765 in exactly one, 002HL Gold Hi Lustre, 001L Solar Silver, 001J Silver in the
+  braid lines — numbers and names as the chart prints them. **This item writes data at deploy**, so
+  before its preview build: ask Beth to reset the Neon `preview` branch from production (show her
+  the dialog first); the preview build's loader line — `Kreinik: <n> added` per line — goes in the
+  PR.
+- **Traps:** ① **The matrix's columns are positions, not text.** Plain text extraction of page 2
+  yields each row as a code followed by its stars with the column lost (001 shows nine stars, 556
+  four — but not which four). The script must read word coordinates (`pdfplumber` or equivalent)
+  and map each star to its column by x-position, then the rendered page 2 is checked by eye for the
+  spot rows above. A row whose star count disagrees with its mapped columns fails the script. ② The
+  fixture's line strings are the `/stitch-fact` strings verbatim — a mismatch makes the loader skip
+  the whole fixture, which the preview log shows and which is a stop before merge. ③ Codes are
+  **strings**: "002" keeps its zeros, "002HL" keeps its letters. ④ The chart is an image-heavy PDF:
+  the script extracts text and positions, never pixels (D-42 ③ — no colours are read off swatches).
+  ⑤ `/supplies` loads the whole catalogue (P9b): check the preview's load with the new rows and say
+  what you saw. ⑥ Hard rule 4 is already satisfied by C-1 — nothing visual is new here; if the
+  preview shows the label needs more than C-1 built, that is a design-track input, not a fix in
+  this item.
+- **Done-when:** test-first: the fixture passes its tests and holds, under each line Beth named,
+  every colour the chart marks for that size and no other; the loader on the throwaway Postgres
+  adds them and a second run adds none; the preview build loaded them into the reset `preview`
+  branch; **Beth named five Kreinik threads she owns (number, name, size) and found each under the
+  right line on the preview**; gate green; merges on her word.
 
 ### C-2 The Mill Hill bead catalogue — **ungated (data, tests, and the label C-1 built); UI-touching; preview before merge**
 
@@ -1463,52 +1489,62 @@ passes ~2,000 rows).
   creates a brand, so if production lacks it, Beth adds "Mill Hill" as a bead brand in the app
   first (her supplies → brands screen), and the README says the fixture expects it.
   `supply-catalog.tsx`'s "Add beads from brands like Mill Hill" empty-state line is retired. Fixture
-  tests: shape, codes unique across the whole file, leading zeros kept ("00020"), a count floor, one
-  spot entry per line read off the sheet (00020 Royal Blue, 03002 Midnight, 02058 Crayon White,
-  60020 Fr. Royal Blue, 40020 Royal Blue, 05002 Yellow Creme, 16002 Midnight, 18002 Midnight, 70020
-  Royal Blue, 80020 Royal Blue, 90020 Royal Blue, 10001 Ice — as printed). Writes data at deploy:
-  reset `preview` from production before the preview build, as C-1b did.
+  tests: shape, the brand block pinned, codes unique across the whole file, leading zeros kept
+  ("00020"), a count floor, one spot entry per line read off the sheet (00020 Royal Blue, 03002
+  Midnight, 02058 Crayon White, 60020 Fr. Royal Blue, 40020 Royal Blue, 05002 Yellow Creme, 16002
+  Midnight, 18002 Midnight, 70020 Royal Blue, 80020 Royal Blue, 90020 Royal Blue, 10001 Ice — as
+  printed). Writes data at deploy: reset `preview` from production before the preview build, as
+  C-1b did.
 - **Traps:** ① "Royal Blue" is seven different beads — the label C-1 built is what keeps them
   apart; a picker test proves the line is in the rendered text. ② The sheet abbreviates ("Fr.",
   "Mt.", "Bril.", "Opal Sm. Topaz"): keep the sheet's spelling, never expand by guess — the README
   says so. ③ A bead's quantity is typed by hand (no calculator), so nothing in the skein maths is
   touched. ④ `getBeads` orders by `productCode` in SQL and `/supplies` loads all of it (P9b) —
-  check the preview's load with ~500 more rows and say what you saw. ⑤ The sheet is a PDF with an
-  expired certificate on its host; fetch deliberately and keep the file's hash in the README.
+  check the preview's load with the new rows and say what you saw. ⑤ Fetch the sheet over plain
+  `http://` (the `https://` host's certificate is expired) and check its sha256 against the one in
+  the sources table; a different hash means a newer sheet — read it, and record which was used.
 - **Done-when:** test-first: the fixture passes its tests; the loader on the throwaway Postgres
-  adds ~500 beads under Mill Hill and a second run adds none; the preview shows the catalogue with
-  lines in the labels and the empty-state line gone; **Beth named five beads she owns and found each
-  with the right name and line on the preview**; gate green; merges on her word.
+  adds every bead in the fixture (its count, pinned by the test's floor) under Mill Hill and a
+  second run adds none; the preview shows the catalogue with lines in the labels and the
+  empty-state line gone; **Beth named five beads she owns and found each with the right name and
+  line on the preview**; gate green; merges on her word.
 
 ### C-3 The Anchor catalogue — **ungated (data and tests); preview before merge**
 
 - **Objective:** Anchor's stranded-cotton colours are in the app under the Anchor brand F-16a
   created, codes and names only.
+- **Opens with one question for Beth:** the dataset's only licence statement is a one-word field
+  in its `package.json` ("ISC"), with no licence file and a header that calls its own sourcing
+  unverified (the sources table). Whether that is basis enough to ship its names in her app is
+  hers; the alternative is an official Anchor list, if one can be found at build time, or leaving
+  Anchor until one is. Record her answer in the README and the work log before the branch opens.
 - **Cited specs:** D-42 ①, ③ · the sources table (Anchor) · THR-008 (Anchor is 8 m six-strand —
   F-16a's line) · C-1's loader and README.
 - **Scope:** `prisma/fixtures/anchor-threads.json` by a committed script from the dataset's
   `ANCHOR_RAW` rows: code and name, under Anchor's one line; the RGB columns are **not** carried
-  (D-42 ③); the seven contested codes are listed in the README; the dataset's licence text is
-  quoted there. If an official Anchor list is found at build time, it is the source instead and the
-  README says so. Fixture tests: shape, no duplicate codes, a count floor, five spot entries (1
-  White, 2 Ivory White, 6 Very Light Pink, 8 Pink, 9576 Light Salmon — as the dataset prints them).
-  Writes data at deploy: reset `preview` from production before the preview build.
+  (D-42 ③); the eight codes in the data's `_ANCHOR_CONTESTED_IDS` tag are listed in the README, and
+  the licence basis is recorded there in the words of Beth's answer. If an official Anchor list is
+  found at build time, it is the source instead and the README says so. Fixture tests: shape, the
+  brand block pinned, no duplicate codes, a count floor, five spot entries (1 White, 2 Ivory White,
+  6 Very Light Pink, 8 Pink, 9576 Light Salmon — as the dataset prints them). Writes data at deploy:
+  reset `preview` from production before the preview build.
 - **Traps:** ① The dataset's 704 rows may include multicolour and ombre ranges beyond the solid
   stranded cotton; load what its header calls the stranded-cotton catalogue and note any range
   left out. ② Anchor codes are numeric strings ("1", "9576") and sort like DMC's. ③ The brand and
   its line are F-16a's rows, matched by name and type — never created here; a mismatch is a logged
   skip on the preview, and a stop before merge. ④ P9b, as in C-2.
-- **Done-when:** test-first: the fixture passes its tests; the loader adds the colours under
-  Anchor on the throwaway Postgres and a second run adds none; the preview build loaded them;
-  **Beth named five Anchor skeins she owns and found each on the preview**; gate green; merges on
-  her word.
+- **Done-when:** Beth's licence answer recorded; then test-first: the fixture passes its tests; the
+  loader adds every colour in the fixture (its count, pinned by the test's floor) under Anchor on
+  the throwaway Postgres and a second run adds none; the preview build loaded them; **Beth named
+  five Anchor skeins she owns and found each on the preview**; gate green; merges on her word.
 
-### C-4 The hand-dyed brands — **not briefed; Beth's ruling D-42 ① ("Hand-dyed brands later")**
+### C-4 The rest of the brands she buys — **not briefed; Beth's ruling D-42 ① ("Hand-dyed brands later")**
 
-Weeks Dye Works, The Gentle Art, Classic Colorworks, Rainbow Gallery, The Caron Collection,
-Gloriana and Au Ver à Soie (THR-007). Needs its own `/plan-feature`: a source per maker is not yet
-found, and a hand-dyed thread has no single colour to publish, which is one more reason D-42 ③'s
-"no swatch" rule is the right default for them. Queue it when Beth asks.
+The remaining THR-007 brands: Weeks Dye Works, The Gentle Art, Classic Colorworks, Rainbow Gallery,
+The Caron Collection, Gloriana and Au Ver à Soie. Beth's option read "Hand-dyed brands later";
+which of these are hand-dyed, and what a hand-dyed thread's catalogue should show for colour, are
+hers to say — the planning session's guess that several are is not a fact. Needs its own
+`/plan-feature`: no source per maker has been looked for yet. Queue it when Beth asks.
 
 ---
 
