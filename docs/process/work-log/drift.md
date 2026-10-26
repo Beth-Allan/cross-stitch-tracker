@@ -57,27 +57,44 @@ pipeline, so straight after R-2's review (recommended, the only one fixing numbe
 today), after the gated run, or at the end; the two smaller fixes after the skein fix (recommended),
 before her visual bugs, or at the end.
 
-**Her ruling:** "Right after R-2" and "After the skein fix". Items **F-16** (per-brand skein length,
-gated — schema and skein calculator), **F-17** (the stitching calendar and the progress total,
-gated — the stats layer) and **F-18** (kitting counts each line once, ungated) are briefed in
-`docs/process/build-plan.md` and queued in that order after `/review R-2`. The CodeRabbit trial
-(D-33) stays on the three pull requests it names; `/review F-16` and `/review F-17` are not trial
-reviews.
+The kitting question carried the session's recommendation and its reason — "the fabric is usually
+the biggest purchase and shouldn't weigh the same as one skein" — which is the session's reasoning,
+not a fact of Beth's, so it is recorded here rather than in KIT-005.
+
+**Her ruling:** "Right after R-2" and "After the skein fix".
+
+**What it changed.** Items **F-16** (per-brand skein length, gated — schema and skein calculator),
+**F-17** (the stitching calendar and the progress total, gated — the stats layer) and **F-18**
+(kitting counts each line once, ungated) are briefed in `docs/process/build-plan.md` and queued in
+that order after `/review R-2`. **The CodeRabbit trial follows protocol §5** — three gated reviews in
+which it ran, whatever the queue order — so with this order its three are `/review R-2`,
+`/review F-16` and `/review F-17`. The placement question told Beth the trial "stays on the three
+changes it names (R-2, P9c, F-9)"; that was the session's error, not her ruling, caught by this PR's
+layer-1 review and corrected with her told.
 
 ### 2026-10-25 · D-35 · "Kitted" is a status Beth sets — KIT-001 corrected — ruled during `/stitch-fact`
 
 **What happened.** KIT-001, seeded from the plan, says kitted "is calculated, never stored — the app
 derives it … rather than letting anyone tick a 'kitted' box". The app has never done that: Kitted is
 one of the project statuses Beth picks from a list, and the kitting percentage looks only at supplies
-and fabric, not at the other seven conditions. A seeded domain fact contradicting the schema.
+and fabric (conditions 4–7), not at the other five. A seeded domain fact contradicting the schema — and
+the product spec asks for the calculation outright: `CROSS_STITCH_TRACKER_PLAN.md` §Status System
+("the app should be able to determine this automatically based on whether all kitting conditions are
+met") and its feature list ("'Kitted' status auto-calculation based on supply completeness + other
+conditions").
 
 **Surfaced to Beth** as: keep it hers to set, with the percentage as a guide (recommended); the app
 moves the status itself when every condition is met (a bigger build); or the app suggests and she
 confirms.
 
-**Her ruling:** "I set it myself." Recorded as **KIT-006**; KIT-001 keeps its ID with a correction
-note pointing at it, and its nine conditions stay open under Q-004. No code changes: the app already
-works this way. The backlog's auto-status wish carries a pointer.
+**Her ruling:** "I set it myself."
+
+**What it changed.** Recorded as **KIT-006**; KIT-001 keeps its ID with a correction note pointing
+at it, and its nine conditions stay open under Q-004. **It withdraws the plan's two auto-calculation
+lines quoted above** — a later `/plan-feature` must not rebuild Kitted as a calculated status from
+them. The plan's "80% kitted — still needs 3 DMC colors and fabric" feedback is the kitting
+percentage and stands, as the guide KIT-006 names. No code changes: the app already works this way.
+The backlog's auto-status wish carries a pointer.
 
 ### 2026-10-25 · D-34 · a skein length comes from Beth, brand by brand, when she sets a brand up — ruled during `/stitch-fact`
 
@@ -91,8 +108,10 @@ one without a length shows its skein count as unknown, never a guess (recommende
 never needs a developer); or she gives a fixed list in a later `/stitch-fact`, with any brand not on
 it needing another session.
 
-**Her ruling:** "App asks me." Recorded as **THR-011**; built by **F-16**. The migration fills in
-only the lengths she stated.
+**Her ruling:** "App asks me."
+
+**What it changed.** Recorded as **THR-011**; built by **F-16**, whose brief has the migration fill
+in only the lengths she stated (THR-008–THR-010).
 
 ### 2026-10-25 · D-33 · CodeRabbit gets a three-review trial on gated pull requests — ruled in its own session
 

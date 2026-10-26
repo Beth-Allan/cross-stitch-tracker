@@ -14,8 +14,9 @@ Opened 2026-10-25 from Beth's answers to three questions the 2026-10-24 `/cleanu
 Monday to Sunday. Every "this week" figure and every weekly display uses the same week. Chosen over
 Sunday to Saturday.
 
-Today the dashboard's "this week" counts from Sunday while the calendar and the day-of-week chart
-are Monday-first, so on a Sunday they disagree. Fixed by item F-17.
+Today the stats page's "this week" counts from Sunday while the calendar and the day-of-week chart
+are Monday-first, so on a Sunday they disagree. (The question put to her said "the dashboard"; the
+figure is on the stats page. Her answer does not depend on where it is shown.) Fixed by item F-17.
 
 [stated by Beth 2026-10-25]
 

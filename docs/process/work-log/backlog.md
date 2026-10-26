@@ -26,16 +26,13 @@ cannot. They are the project's two documented scars — the reason hard rule 5 a
 this file rather than sitting in the list below. **The fact comes first, through `/stitch-fact`
 into `docs/domain/`; the feature is planned second.** Guessing either constant is the banned move.
 
-- **Per-brand skein length** _(old 999.13 / FEAT-F09)_ — the skein calculator uses a **single
-  hardcoded 8m skein length for every brand**, which is right for DMC and wrong for at least
-  three brands Beth uses: Weeks Dye Works and Gentle Art (5 yd) and Kreinik (10–11 m). So every
-  skein figure for those brands is wrong today. The build is a `skeinLengthMeters` field on the
-  thread brand plus a calculator that reads it — but **the actual lengths are Beth's to state**,
-  per brand, and the 5 yd / 10–11 m figures above came off the old backlog note, not off her, so
-  they are candidates to confirm and not facts to code. Touches `src/lib/utils/skein-calculator.ts`
-  and `prisma/schema.prisma` — **two review-gated cores**, so the eventual item is `/review`-gated
-  and needs a migration. **Planned 2026-10-25 as item F-16**: Beth stated the lengths at that day's
-  `/stitch-fact` (THR-007–THR-011), and ruled that every other brand's length is hers to enter (D-34).
+- **Per-brand skein length** _(old 999.13 / FEAT-F09)_ — **planned 2026-10-25 as item F-16; its
+  brief in `docs/process/build-plan.md` is the spec now.** The skein calculator uses a **single
+  hardcoded 8 m skein length for every brand**. Beth stated the lengths at that day's
+  `/stitch-fact`: right for DMC and Anchor, wrong for Weeks Dye Works and Gentle Art (5 yd) and for
+  Kreinik, whose length depends on the thread type (THR-007–THR-011). Every other brand's length is
+  hers to enter (D-34). Touches `src/lib/utils/skein-calculator.ts` and `prisma/schema.prisma` —
+  **two review-gated cores** — and needs R-2's migration pipeline.
 - **Auto-infer overCount from fabric count** _(old 999.14 / FEAT-F10)_ — when a fabric is linked
   to a project, infer whether stitching is over 1 or over 2 from the fabric count, with Beth able
   to override. The old backlog wrote the thresholds as "≤25 → over 1, ≥28 → over 2", **which were

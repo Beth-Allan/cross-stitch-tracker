@@ -19,7 +19,8 @@ Opened 2026-08-16 at overhaul step 5.
 Weeks Dye Works and Gentle Art 5 yd (**THR-009**); Kreinik by thread type — #4 braid 11 m, #8 braid
 10 m, blending filament 50 m — and used whole (**THR-010**); every other brand's length entered by
 Beth when she sets the brand up, unknown until then (**THR-011**, ruling D-34). **The wrong figures
-stay on screen until item F-16 ships** — that is now a build, not a question.
+stay on screen until item F-16 ships**, and figures already saved stay wrong until they are
+recomputed (F-16 trap ⑨). That is now a build, not a question.
 
 ## Tier 2 — blocks a planned build
 
@@ -41,6 +42,19 @@ BAP is separately recorded at 50,000+ stitches (VOC-006) and would need to line 
 
 **Blocks:** nothing in flight; surfaces wherever the app groups projects by size.
 
+### Q-009 — Which other threads are used whole, and how many strands do the rest hold?
+
+The skein formula assumes floss that holds six strands and is split (THR-004, THR-006). Beth has
+said that is true of DMC, Anchor, Weeks Dye Works and Gentle Art (THR-008, THR-009), and that
+Kreinik is used whole (THR-010). For every other brand she buys (THR-007) — and any Kreinik line
+beyond the three she named — **how many strands a skein holds, and whether it is split at all, is
+unrecorded**. Needed from Beth: for each brand or line she stitches with, the strand count, or
+"used whole".
+
+**Blocks:** part of item F-16 — a line she adds later must not be divided into six by default.
+F-16 can ship the brands already stated without it, provided an unknown strand structure reads
+"unknown" the same way an unknown length does.
+
 ## Tier 3 — confirmations of migrated material
 
 ### Q-004 — Does the migrated glossary say it right?
@@ -48,8 +62,8 @@ BAP is separately recorded at 50,000+ stitches (VOC-006) and would need to line 
 Every fact in `vocabulary.md`, `kitting-and-storage.md`, and the plan-sourced facts in
 `threads.md` and `fabric.md` came from the planning document, not from a conversation. The app is
 built on them, so they are safe to keep building on — but **none has been said back to Beth**.
-The nine kitting conditions (KIT-001) are the highest-value confirmation: "kitted" is a
-calculated state the whole workflow turns on.
+The nine kitting conditions (KIT-001) are the highest-value confirmation: they are what "kitted"
+means, even though Beth sets the status herself (KIT-006).
 
 **Blocks:** nothing. Worth doing as one pass rather than nine interruptions.
 

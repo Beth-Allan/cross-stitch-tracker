@@ -46,8 +46,8 @@ alternatives (100%, or a "no kit list" label instead of a percentage) at the 202
 Every **thread colour, bead, specialty item, and the fabric** is one item of equal weight, and a
 part-bought line counts part. Chosen over counting quantities — each skein or pack as one and the
 fabric as one — which is what the app does today: a project needing 30 skeins weighs its fabric at
-one thirty-first, the same as a single skein. The reason given with the recommendation she chose:
-the fabric is usually the biggest purchase and should not weigh the same as one skein.
+one thirty-first, the same as a single skein. (The reasoning offered with the recommendation is in
+drift D-36, not here: it was the session's, not hers.)
 
 KIT-004 still governs the empty case: no supplies recorded is 0%, and fabric alone never makes a
 project kittable.
