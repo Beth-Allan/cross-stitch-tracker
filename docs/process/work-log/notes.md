@@ -221,7 +221,7 @@ since May — but production itself is unverified until its own build runs.
    then `Migration 20261026002357_baseline_db_push_era marked as applied.`, then
    `Applying migration 20261026010000_pipeline_check`. Record the first two words of the host
    (`ep-word-word…`, as the preview's is recorded — never the whole endpoint, the repo is public) in
-   `docs/INTEGRATIONS.md` (Migrations) — it is not known today; Vercel will not reveal the variable.
+   `docs/INTEGRATIONS.md` (Migrations) — it was not known until then; Vercel will not reveal the variable.
 3. Load `https://cross-stitch-tracker-adolwyn.vercel.app/login` and one signed-in page.
 
 **If the production deployment fails:** the live site keeps serving the previous deployment. A
@@ -236,15 +236,20 @@ status` reads it. The local rehearsal database was an OrbStack container (`r2-re
 `postgres:17`, port 55432), removed at the end of the R-2 session; the INTEGRATIONS "Writing a
 migration" bullet recreates one.
 
-**Where it stands (2026-10-25, Fable 5.1, the `/review R-2` session):** step 1 done, step 3 half
+**Where it stands (2026-10-25, Fable 5.1 — the `/review R-2` session, completed by its follow-up the
+same evening):** step 1 done, step 3 half
 done, both recorded in the work log's session note — the squash commit `ce8acdb` deployed at
 01:17 UTC on 2026-10-26 (Vercel deployment `7SjDiXPmk6RZXsspqytgiMXwey4w`, "Deployment has
 completed", so the migrate step exited 0), and the live `/login` and `/api/auth/session` answer 200
 (neither reads the database; the signed-in page is Beth's, and the app opening for her as usual
-covers it). **Step 2 waits on Beth's screenshot**, asked for at the end of that session; in Vercel's
-Deployments list it is the `main` deployment from the evening of 25 Oct whose commit message starts
-"feat(R-2): apply migrations on deploy". Whichever session receives it — any door; the next is
-`/work-item F-16` — records the production host's first two words in `docs/INTEGRATIONS.md`
-(Migrations) on its own `docs/` branch, as PR #143 did, and closes this note.
+covers it). **2026-10-25, later the same evening (Fable 5.1, PR #144) — step 2 received:** Beth's screenshot of that build's log (19:16
+Mountain time): `[migrate] Vercel environment "production" → database "cross_stitch_tracker" at
+ep-hidden-star…` (the direct host, no `-pooler`), then `This database was built before migrations
+were tracked. Checking it matches schema.prisma before recording: 20261026002357_baseline_db_push_era`.
+The crop ends there — the next line is npm's own `cache-dir` warning, printed by the `npx prisma`
+the runner spawns and caused by Vercel's build environment's npm settings, not this repo — and the
+deployment's exit 0 is what says the check passed, the
+baseline was recorded and `pipeline_check` applied: from that line the runner has no other way to
+exit 0. The host's first two words are in `docs/INTEGRATIONS.md` (Migrations).
 
-**Done when:** step 2 is recorded too. Then `/cleanup` retires this note.
+**Done** (2026-10-25): steps 1 and 2 done, step 3 as recorded above. `/cleanup` retires this note.
