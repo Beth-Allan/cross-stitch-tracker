@@ -206,7 +206,8 @@ The squash-merge of PR #142 is the **first time anything migrates production**. 
 will find the March migration recorded and the baseline not, check the database against
 `schema.prisma`, record `20261026002357_baseline_db_push_era` as applied (never run), then apply
 `20261026010000_pipeline_check`. PR #142's preview did exactly that to the `preview` branch on
-2026-10-25 (00:35 UTC), and the `preview` branch is a copy of production with an unchanged schema
+2026-10-26 (00:35 UTC — the evening of the 25th, Mountain time), and the `preview` branch is a copy
+of production with an unchanged schema
 since May — but production itself is unverified until its own build runs.
 
 **No session can read production's database or Vercel's build log** (D-16, D-37), so after merging:

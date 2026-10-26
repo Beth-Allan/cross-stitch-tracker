@@ -217,3 +217,12 @@ Improvements to how sessions run — nothing contradicts, it could just be bette
   warts-to-the-ledger, the context budget. Every copy costs context each session and the copies can
   drift apart. A tidy-up would keep each rule in one home and point to it from the others. It
   touches CLAUDE.md and the always-loaded rule files, so it is Beth's to schedule.
+- **Seeing a production migration run without a screenshot** _(noticed 2026-10-25, the `/review R-2`
+  session; raised by its layer-1 review)_: since R-2, every merge that carries a migration runs it on
+  production inside the Vercel build, and the build log is the only place that shows what happened.
+  No session can read that log or production's database (D-16, D-37), so today the proof is a
+  screenshot from Beth after each such merge — R-2's is the first, and F-16, P9c and every schema
+  change after them will ask the same. Two ways to stop asking, both Beth's to weigh: a read-only
+  Vercel token scoped to logs, kept the way the preview key is (D-37), or a line the runner leaves
+  where a signed-in page can show it. Until she rules, the ask stays a step in the reviewing
+  session, recorded in the work log — not a rule written into protocol by a reviewer.
