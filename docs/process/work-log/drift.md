@@ -41,6 +41,92 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-25 · D-41 · the thread catalogues are planned before F-16 is built — ruled during `/work-item F-16`
+
+**What needed a ruling.** Answering D-40's Kreinik question (round 1), Beth asked: "Should the first
+step in this be populating the database with the kreinik stock first? We wanted to bulk add these
+large thread/specialty thread catalogues, right?" They are in her plan, but only as a future idea:
+`CROSS_STITCH_TRACKER_PLAN.md` §9 ("Additional supply brand pre-seeding: Mill Hill bead catalog,
+Kreinik catalog, Anchor thread catalog — pre-seeded like DMC if catalog data is available") and the
+source question in §10 item 4. Neither the build plan nor the backlog carried them.
+
+**Surfaced to Beth** (round 2, alongside D-40 ⑤), with three reasons for building F-16 first: a
+Kreinik catalogue needs F-16's lines to load into ("today the app would refuse 'Kreinik 001' twice,
+so #4 braid 001 and #8 braid 001 can't both exist yet" — **that example assumed Kreinik reuses colour
+numbers across lines, which is not a recorded fact**; trap ② of F-16 sends it to `/stitch-fact` if
+the build needs it); a catalogue needs a trustworthy source for codes, names and swatch colours,
+which §10 left open; and F-16 fixes figures that go wrong the day she adds a non-DMC thread. Options:
+"Plan it right after F-16 (Recommended)" · "Plan it after the current queue" · "Catalogue first,
+before F-16" ("Plan it now and build F-16 after. The catalogue would have to wait for, or include,
+the thread-line change anyway.").
+
+**Her ruling: "Catalogue first, before F-16".**
+
+**What it changed.** A `/plan-feature` session for the catalogues (Fable lane) is the queue's top
+row, ahead of F-16a — superseding D-36's "Right after R-2" for F-16. **The build order is still
+hers:** she voted for the catalogue first, so if planning finds the catalogue build has to follow
+F-16a (it needs the thread lines), that session puts the order back to her rather than leaving
+F-16a where this session queued it. It may re-brief F-16a and F-16b; its version wins. The wish is
+in `backlog.md` (Feature wishes) in Beth's words.
+
+### 2026-10-25 · D-40 · F-16's opening answers — split in two, Kreinik as one brand with lines, only changed lengths recomputed, "unknown" never counts as in hand — ruled during `/work-item F-16`
+
+**What needed a ruling.** F-16's done-when opens with Beth's answers to traps ⑧ (Kreinik may not be
+a thread in the app) and ⑨ (stored figures do not move by themselves), and the session's size check
+fired. Before asking, the session read the Neon `preview` branch (a copy of production's data as of
+2026-08-17, plus whatever preview deployments have written since), read-only: **every thread is
+DMC** — the brands are DMC (496 colours), "Custom (Thread)" (none) and Mill Hill (no beads), and
+all 643 project thread lines are DMC, 5 of them overridden by hand. There is no Kreinik anywhere, as
+thread or specialty, so trap ⑧'s move has nothing to move. Production since August was not visible.
+
+**Surfaced to Beth** in two rounds; option labels as she saw them.
+
+Round 1:
+
+1. **Split** F-16 into F-16a, "the right numbers" (the database change, the calculator using each
+   brand's own length, "unknown" wherever a skein count appears; gated, fresh review), and F-16b,
+   "the brand form" ("a box on each thread brand where you type its skein length and whether it's
+   split into strands or used whole"; preview, live on her word): "Split in two (Recommended)" ·
+   "Keep it as one item".
+2. **Kreinik**: "One brand per line (Recommended)" (three brands, simplest to build) · "One Kreinik
+   brand with lines inside" ("noticeably more to build and review") · "Keep it a specialty item".
+3. **Saved needs** not typed by hand: "Recompute them (Recommended)" — described as every saved need
+   not typed by hand worked out again from its brand's own length, a brand with no length showing
+   "unknown", and "DMC numbers come out identical" · "Leave them alone".
+4. **An unknown need** in the shopping list and the kitting percentage: "As not yet in hand
+   (Recommended)" — it stays on the shopping list marked unknown, and the project cannot read 100%
+   kitted until the length is set or the need typed · "Left out until known".
+
+Round 2 (with D-41's question): 5. **Set-up** — add Anchor (8 m), Weeks Dye Works (5 yd), The
+Gentle Art (5 yd) and Kreinik with its #4 braid (11 m), #8 braid (10 m) and blending filament (50 m)
+lines, none of them in the app yet: "Add them, lengths filled in (Recommended)" · "Only fill in DMC".
+
+**Her rulings:** ① "Split in two (Recommended)". ② **One Kreinik brand with lines inside**, against
+the recommendation: "I think option 2 is the best option - not being able to tease out Kreinik (the
+brand) from its properties (#4, #8, blending filament, ribbon, etc) seems like a problem?" ③
+"Recompute them (Recommended)". ④ "As not yet in hand (Recommended)". ⑤ "Add them, lengths filled
+in (Recommended)".
+
+**Correction to ③, the same session.** PR #145's layer-1 review found the premise false: a saved
+need was worked out with the project's settings at the time, and before F-7 (2026-10-24) the chart
+form saved none of them, so recomputing from today's settings could move DMC figures — or, where the
+stored setting is the wrong one, make them wrong. Put back to her: "Only lines whose length changed
+(Recommended)" · "Every line, DMC included" · "Count first, then decide". **Her ruling: "Only lines
+whose length changed (Recommended)"** — recompute only threads whose line is not an 8 m six-strand
+skein, or has no length or strand structure; DMC and Anchor rows stay exactly as saved. The stale
+settings themselves are a maintenance-ledger row (2026-10-25).
+
+**What it changed.** F-16 is re-briefed as **F-16a** and **F-16b** in `build-plan.md`. Kreinik is
+a thread, so `calculateSkeins` reaches it, and a **thread line** joins the schema, carrying a length
+and a strand structure. This **withdraws the product spec's "Kreinik is most common"** under
+Specialty Item Database (`CROSS_STITCH_TRACKER_PLAN.md` §4.2) as the place Kreinik
+goes — the plan line stays as written, as D-35 left its lines. Her "ribbon" names a Kreinik line
+THR-010 does not give a length for: under THR-011 it reads unknown until she enters one (F-16b), and
+it is not a domain fact until `/stitch-fact` records it. Ruling ④ also bears on F-18's trap ③c: a
+line whose need is unknown is not in hand; how much of a line it counts for is F-18's to put to her.
+R-3 sits after `/review F-16a`, the session's reading of D-39 ("after F-16 — the first change that
+will add a migration"), since F-16a carries that migration.
+
 ### 2026-10-25 · D-39 · a check that the migrations add up to the schema — ruled during R-2
 
 **What needed a ruling.** PR #142's layer-1 checklist pass found the gap R-2 opens: once deploys
