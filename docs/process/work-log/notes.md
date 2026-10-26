@@ -176,7 +176,7 @@ awk '/^\| -+ \|/ { h=prev; gsub(/\\\|/,"",h); gsub(/[^|]/,"",h); d=$0; gsub(/[^|
 
 ## The CodeRabbit trial — the tally (D-33)
 
-**Tags:** `/review` · R-2 · P9c · F-9 · CodeRabbit · review layers
+**Tags:** `/review` · R-2 · F-16a · F-17 · CodeRabbit · review layers
 
 Each gated `/review` during the trial adds one row here, following protocol §5's CodeRabbit steps.
 **"Missed by the others"** counts a real CodeRabbit finding that appears in neither the PR's
