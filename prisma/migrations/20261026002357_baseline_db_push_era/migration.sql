@@ -1,6 +1,6 @@
 /*
   Baseline: everything that reached the database by `prisma db push` between the March
-  migration and October 2026 — thirteen models, two enums, and the column changes below.
+  migration and October 2026 — fourteen models, two enums, and the column changes below.
 
   It never runs against a database that already holds the app. Production and the preview
   branch were built by those pushes, so `prisma/migrate-deploy.ts` records this migration as

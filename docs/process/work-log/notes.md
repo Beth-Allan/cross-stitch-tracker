@@ -183,8 +183,9 @@ Each gated `/review` during the trial adds one row here, following protocol §5'
 layer-1 record nor the reviewing session's own findings — the reviewer finishes its own pass
 before reading CodeRabbit's, or this column cannot be filled honestly.
 
-| #   | review | PR  | ran? | its findings | real | real and missed by the others | note |
-| --- | ------ | --- | ---- | ------------ | ---- | ----------------------------- | ---- |
+| #   | review                                | PR   | ran?                                  | its findings | real | real and missed by the others | note                                                                                                                                                                                                                                                                                                             |
+| --- | ------------------------------------- | ---- | ------------------------------------- | ------------ | ---- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `/review R-2` (Fable 5.1, 2026-10-25) | #142 | yes — one review, on the final commit | 1            | 1    | 1                             | The baseline's header said "thirteen models" (it creates fourteen) and the docs said the March migration covers 5 of 18 models (4, plus the `_ChartToGenre` join table). Comment and doc accuracy, nothing in the code or SQL — fixed on the branch. Neither layer 1's record nor this review's own pass had it. |
 
 A "did not run" row is kept but does not count toward the three (protocol §5 step 3).
 **The session that tallies the third run puts the table to Beth**, whatever the queue order (the
@@ -217,7 +218,8 @@ since May — but production itself is unverified until its own build runs.
    production deployment → Build Logs, searched for `[migrate]`. Expect
    `Vercel environment "production" → database "…" at <host>` with **no `-pooler`** in the host,
    then `Migration 20261026002357_baseline_db_push_era marked as applied.`, then
-   `Applying migration 20261026010000_pipeline_check`. Record the host's first segment in
+   `Applying migration 20261026010000_pipeline_check`. Record the first two words of the host
+   (`ep-word-word…`, as the preview's is recorded — never the whole endpoint, the repo is public) in
    `docs/INTEGRATIONS.md` (Migrations) — it is not known today; Vercel will not reveal the variable.
 3. Load `https://cross-stitch-tracker-adolwyn.vercel.app/login` and one signed-in page.
 

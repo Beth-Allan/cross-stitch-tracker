@@ -998,7 +998,7 @@ not a promise that the diagnosis below is right.
   verify every `migrate` command and the baseline procedure in Context7 / `node_modules/`
   (hard rule 8), never from memory.
 - **Traps:** ① **The baseline is the dangerous step.** The one existing migration
-  (`20260328163529_…`) describes 5 of 18 models; whether Neon's `_prisma_migrations` table even
+  (`20260328163529_…`) describes 4 of 18 models plus the `_ChartToGenre` join table; whether Neon's `_prisma_migrations` table even
   records it is unknown. Find out what the live database holds before writing anything, and baseline
   so that `migrate deploy` applies **nothing** to an already-current database — a baseline that
   tries to re-create existing tables fails the production build at best. ② **Previews must never
