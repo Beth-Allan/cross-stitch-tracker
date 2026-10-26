@@ -297,9 +297,10 @@ March reached Neon by an out-of-band `prisma db push`.
 - **Each build names the database it migrates.** The runner's first line is
   `[migrate] Vercel environment "<env>" → database "<db>" at <host>`, and Prisma repeats the host.
   Preview's `DIRECT_URL` is the `preview` branch, `ep-jolly-truth…`, database
-  `cross_stitch_tracker`. Production's is `ep-hidden-star…`, database `cross_stitch_tracker` — a
-  separate variable (set in April) that Vercel will not reveal once saved, so it was read off the
-  first production build's log (2026-10-25, Beth's screenshot). A `DIRECT_URL`
+  `cross_stitch_tracker`. Production's is the `main` branch, `ep-hidden-star…`, database
+  `cross_stitch_tracker` — a separate variable (set in April) that Vercel will not reveal once
+  saved, so it was read off the first production build's log (2026-10-25, Beth's screenshot). A
+  `DIRECT_URL`
   containing `-pooler` is refused before connecting — Prisma Migrate needs Neon's direct
   connection — and messages name the host, never the password. **And it must name the same
   database the app reads:** the runner refuses unless `DIRECT_URL` is the direct twin of
