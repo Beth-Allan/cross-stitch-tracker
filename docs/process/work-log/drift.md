@@ -41,6 +41,66 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-25 · D-41 · the thread catalogues are planned before F-16 is built — ruled during `/work-item F-16`
+
+**What needed a ruling.** Answering D-40's Kreinik question, Beth asked: "Should the first step in
+this be populating the database with the kreinik stock first? We wanted to bulk add these large
+thread/specialty thread catalogues, right?" They are in her plan, but only as a future idea:
+`CROSS_STITCH_TRACKER_PLAN.md` §9 ("Additional supply brand pre-seeding: Mill Hill bead catalog,
+Kreinik catalog, Anchor thread catalog — pre-seeded like DMC if catalog data is available") and the
+source question in §10 item 4. Neither the build plan nor the backlog carried them.
+
+**Surfaced to Beth**, with three reasons for building F-16 first: a Kreinik catalogue needs F-16's
+lines to load into (today #4 braid 001 and #8 braid 001 cannot both exist); a catalogue needs a
+trustworthy source for codes, names and swatch colours, which §10 left open; and F-16 fixes figures
+that go wrong the day she adds a non-DMC thread. Options: plan it right after F-16 (recommended) ·
+after the current queue · catalogue first, before F-16 ("the catalogue would have to wait for, or
+include, the thread-line change anyway").
+
+**Her ruling: "Catalogue first, before F-16".**
+
+**What it changed.** A `/plan-feature` session for the catalogues (Fable lane) is the queue's top
+row, ahead of F-16a. It decides how the catalogue work and F-16a's thread lines are sequenced, and
+may re-brief F-16a and F-16b; its version wins. The wish is in `backlog.md` (Feature wishes) in
+Beth's words.
+
+### 2026-10-25 · D-40 · F-16's opening answers — split in two, Kreinik as one brand with lines, saved needs recomputed, "unknown" never counts as in hand — ruled during `/work-item F-16`
+
+**What needed a ruling.** F-16's done-when opens with Beth's answers to traps ⑧ (Kreinik may not be
+a thread in the app) and ⑨ (stored figures do not move by themselves), and the session's size check
+fired. Before asking, the session read the Neon `preview` branch (a copy of production's data as of
+2026-08-17, plus whatever preview deployments have written since), read-only: **every thread is
+DMC** — the brands are DMC (496 colours), "Custom (Thread)" (none) and Mill Hill (no beads), and
+all 643 project thread lines are DMC, 5 of them overridden by hand. There is no Kreinik anywhere, as
+thread or specialty, so trap ⑧'s move has nothing to move. Production since August was not visible.
+
+**Surfaced to Beth**, five questions:
+
+1. **Split** F-16 into F-16a, the numbers (database, calculator, "unknown" wherever a skein count
+   shows; gated), and F-16b, the form where she types a line's length and whether it is split into
+   strands or used whole (preview, merges on her word) — recommended — or keep one item.
+2. **Kreinik**: one brand per line ("Kreinik #4 Braid" and so on — recommended, the simplest
+   build) · one Kreinik brand with lines inside it · keep it a specialty item, counted by hand.
+3. **Saved needs** not typed by hand: recompute them on deploy from their own lengths, DMC coming
+   out identical (recommended) · leave them alone.
+4. **An unknown need** in the shopping list and the kitting percentage: as not yet in hand, so a
+   project cannot read 100% while one is there (recommended) · left out until known.
+5. **Set-up**: add Anchor (8 m), Weeks Dye Works (5 yd), The Gentle Art (5 yd) and Kreinik with
+   its #4 braid (11 m), #8 braid (10 m) and blending filament (50 m) lines, lengths filled in, none
+   of them in the app yet (recommended) · fill in DMC only.
+
+**Her rulings:** ① "Split in two". ② **One Kreinik brand with lines inside**, against the
+recommendation, in her words: "not being able to tease out Kreinik (the brand) from its properties
+(#4, #8, blending filament, ribbon, etc) seems like a problem". ③ "Recompute them". ④ "As not yet
+in hand". ⑤ "Add them, lengths filled in".
+
+**What it changed.** F-16 is re-briefed as **F-16a** and **F-16b** in `build-plan.md`. Kreinik is
+a thread, so `calculateSkeins` reaches it; a **thread line** joins the schema, and a length and a
+strand structure live on the line. Her "ribbon" names a Kreinik line THR-010 does not give a length
+for: under THR-011 it reads unknown until she enters one (F-16b), and it is not a domain fact until
+`/stitch-fact` records it. Ruling ④ also answers F-18's trap ③c in advance: a line whose need is
+unknown counts as not yet in hand.
+
 ### 2026-10-25 · D-39 · a check that the migrations add up to the schema — ruled during R-2
 
 **What needed a ruling.** PR #142's layer-1 checklist pass found the gap R-2 opens: once deploys
