@@ -15,9 +15,12 @@
 # The deploy-time migration path (item R-2; Beth's ruling D-38, 2026-10-25): the
 # build command every Vercel environment runs, the step that migrates the database
 # it names, and the logic deciding what is recorded as applied without running.
+# prisma.config.ts picks the database every deploy-time Prisma command uses, so it
+# is part of the same path (Beth extended D-38 to it the same day, at layer-1 review).
 # package.json's `build:deploy` script is the one link not gated by path — too broad
 # a file to gate whole — so a diff touching that script line is reviewed as if gated.
 ^vercel\.json$
+^prisma\.config\.ts$
 ^prisma/migrate-deploy\.ts$
 ^src/lib/utils/migration-baseline\.ts$
 

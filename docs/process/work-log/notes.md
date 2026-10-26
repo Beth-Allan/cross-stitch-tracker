@@ -196,3 +196,41 @@ word as a new drift row.
 
 **Done when:** that ruling is recorded. Then `/cleanup` retires this note, and protocol §5's
 CodeRabbit paragraph is rewritten or removed to match.
+
+## R-2 at merge — production's first migration, and how to see it happened
+
+**Tags:** `/review` · R-2 · P9c · F-16 · migrations · Neon · Vercel
+
+The squash-merge of PR #142 is the **first time anything migrates production**. Production's build
+will find the March migration recorded and the baseline not, check the database against
+`schema.prisma`, record `20261026002357_baseline_db_push_era` as applied (never run), then apply
+`20261026010000_pipeline_check`. PR #142's preview did exactly that to the `preview` branch on
+2026-10-25 (00:35 UTC), and the `preview` branch is a copy of production with an unchanged schema
+since May — but production itself is unverified until its own build runs.
+
+**No session can read production's database or Vercel's build log** (D-16, D-37), so after merging:
+
+1. Wait for the production deployment of the squash commit to finish
+   (`gh api repos/Beth-Allan/cross-stitch-tracker/commits/<sha>/status` — the `Vercel` context).
+   A refusal or failed migration fails the deployment; success means the step exited 0.
+2. Ask Beth for one screenshot (protocol §8 — dashboards are hers): Vercel → Deployments → that
+   production deployment → Build Logs, searched for `[migrate]`. Expect
+   `Vercel environment "production" → database "…" at <host>` with **no `-pooler`** in the host,
+   then `Migration 20261026002357_baseline_db_push_era marked as applied.`, then
+   `Applying migration 20261026010000_pipeline_check`. Record the host's first segment in
+   `docs/INTEGRATIONS.md` (Migrations) — it is not known today; Vercel will not reveal the variable.
+3. Load `https://cross-stitch-tracker-adolwyn.vercel.app/login` and one signed-in page.
+
+**If the production deployment fails:** the live site keeps serving the previous deployment. A
+`[migrate]` refusal (pooled host, missing `DIRECT_URL`, schema mismatch) wrote nothing — fix the
+cause and redeploy; a mismatch is a drift row for Beth, never forced. A failure inside
+`migrate deploy` itself needs production's key to recover, which no session holds — stop and ask
+Beth (`docs/INTEGRATIONS.md`, Migrations).
+
+**Handy for the reviewer:** the `preview` branch's direct key is in `.env.preview-db.local` on
+Beth's machine (gitignored; D-37) — `set -a; . ./.env.preview-db.local; set +a; npx prisma migrate
+status` reads it. The local rehearsal database was an OrbStack container (`r2-rehearsal`,
+`postgres:17`, port 55432), removed at the end of the R-2 session; the INTEGRATIONS "Writing a
+migration" bullet recreates one.
+
+**Done when:** steps 1–3 are recorded in R-2's REVIEW note. Then `/cleanup` retires this note.

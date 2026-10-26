@@ -161,8 +161,8 @@ since merge deploys production instantly.
 The cores:
 
 - `prisma/schema.prisma` + `prisma/migrations/`, and the deploy step that applies them —
-  `vercel.json`, `prisma/migrate-deploy.ts`, `src/lib/utils/migration-baseline.ts`, plus the
-  `build:deploy` line of `package.json` — since a wrong line there can record a migration as
+  `vercel.json`, `prisma.config.ts`, `prisma/migrate-deploy.ts`,
+  `src/lib/utils/migration-baseline.ts`, plus the `build:deploy` line of `package.json` — since a wrong line there can record a migration as
   applied on production without running it (Beth's ruling **D-38**, 2026-10-25; item R-2)
 - `proxy.ts`, `src/lib/auth.ts`, `src/lib/auth-guard.ts`, `src/lib/rate-limit.ts`,
   `src/lib/validations/auth.ts`, `src/app/(auth)/**`, `src/app/api/auth/**` — auth, session,
@@ -408,7 +408,10 @@ drive everything without reading logs, editing files, or opening GitHub.
   1. _Git first, debugging second._ Broken working tree → reset to the branch's last good
      commit. Branches are disposable; main is never touched. **A bad merge on main is a
      production incident** — main auto-deploys, so `git revert` the squash commit immediately,
-     work-log entry, fix-forward on `fix/<slug>`.
+     work-log entry, fix-forward on `fix/<slug>`. **A revert does not undo a migration:** the
+     database keeps it and the old code runs against the new schema — survivable only because
+     every migration is safe for the code it replaces (`docs/INTEGRATIONS.md`, Migrations).
+     Undoing a schema change is a new migration, forward.
   2. _Bounded debugging._ Three distinct falsifiable hypotheses or ~45 minutes, whichever ends
      first. Then stop and write the failure note in the work log: symptom, exact repro,
      hypotheses eliminated, current suspicion. The next session reads it first — that's why it

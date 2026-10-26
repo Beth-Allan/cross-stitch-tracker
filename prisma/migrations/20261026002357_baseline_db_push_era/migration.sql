@@ -1,9 +1,9 @@
 /*
-  Baseline (item R-2): everything that reached the database by `prisma db push` between the
-  March migration and October 2026 — thirteen models, two enums, and the column changes below.
+  Baseline: everything that reached the database by `prisma db push` between the March
+  migration and October 2026 — thirteen models, two enums, and the column changes below.
 
   It never runs against a database that already holds the app. Production and the preview
-  branch were built by those pushes, so `scripts/migrate-deploy.mjs` records this migration as
+  branch were built by those pushes, so `prisma/migrate-deploy.ts` records this migration as
   applied there instead of executing it. Its SQL only runs on a new, empty database, where the
   March migration has just created the four columns dropped below and they hold nothing.
 */

@@ -57,6 +57,11 @@ one changes, which should be rare) · leave the list as it is.
 protocol §5 now name all three, plus the `build:deploy` line of `package.json` — reviewed as if
 gated, since gating `package.json` whole would be too broad.
 
+**Extended the same day.** PR #142's layer-1 review found a fourth file on the path: `prisma.config.ts`
+picks the database every deploy-time Prisma command uses, so an unreviewed edit could point them
+somewhere other than the address the runner checks. Surfaced as its own gate change; **her ruling:
+"Add it too (Recommended)"**. It is on the list and in protocol §5.
+
 ### 2026-10-25 · D-37 · a session gets the preview copy's database key, never production's — ruled during R-2
 
 **What needed a ruling.** R-2's brief (trap ③) says reaching Neon needs "a credential from Beth's

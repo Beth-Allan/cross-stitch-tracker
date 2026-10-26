@@ -300,7 +300,12 @@ March reached Neon by an out-of-band `prisma db push`.
   `cross_stitch_tracker`. Production's is a separate variable (set in April) that Vercel will not
   reveal once saved, so its host is read off the first production build's log. A `DIRECT_URL`
   containing `-pooler` is refused before connecting — Prisma Migrate needs Neon's direct
-  connection — and messages name the host, never the password.
+  connection — and messages name the host, never the password. **And it must name the same
+  database the app reads:** the runner refuses unless `DIRECT_URL` is the direct twin of
+  `DATABASE_URL` (same Neon endpoint once `-pooler` is dropped, same database name). Both are
+  scoped per environment, so a variable saved for the wrong environment — the way a preview would
+  come to migrate production — stops the build instead. The URL checked is `prisma.config.ts`'s
+  own datasource, imported, so the check and the Prisma commands cannot disagree.
 - **The baseline.** The repo's one March migration (`20260328163529_…`, recorded in
   `_prisma_migrations` since 2026-03-28) describes 5 of the 18 models;
   `20261026002357_baseline_db_push_era` describes the rest. A database that already holds the app

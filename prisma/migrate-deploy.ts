@@ -1,27 +1,26 @@
 /**
  * Applies pending migrations as the last step of a Vercel build (`npm run build:deploy`, named by
- * `vercel.json`). Each Vercel environment migrates the database its own `DIRECT_URL` names —
- * Preview its Neon branch, Production the main branch — and the first line printed says which.
+ * `vercel.json`). Each Vercel environment migrates the database its own variables name — Preview
+ * its Neon branch, Production the main branch — and the first line printed says which.
  *
- * Before `migrate deploy`, a database built by `db push` has the baseline recorded as applied
- * (see `migrationsToRecord`), but only once Prisma confirms it matches `schema.prisma` exactly.
- * Any refusal here exits before a single row is written, so the deploy fails and the site keeps
- * serving the previous deployment.
+ * The URL checked here is the one every Prisma command below uses: `prisma.config.ts`'s datasource,
+ * imported rather than re-read from the environment, so the check and the migration cannot
+ * disagree. The decisions live in `deployMigrations`, where they are tested; this file is I/O.
  */
 import { spawnSync } from "node:child_process";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import { Client } from "pg";
+import prismaConfig from "../prisma.config";
 import {
-  migrationsToRecord,
+  deployMigrations,
   readDeployTarget,
   withVerifiedTls,
   type DatabaseState,
 } from "../src/lib/utils/migration-baseline";
 
-function stop(message: string): never {
-  console.error(`[migrate] ${message}`);
-  process.exit(1);
+function log(message: string) {
+  console.log(`[migrate] ${message}`);
 }
 
 function prisma(args: string[]): number {
@@ -52,50 +51,31 @@ async function readState(directUrl: string): Promise<DatabaseState> {
   }
 }
 
-async function main() {
-  const directUrl = process.env.DIRECT_URL;
-  const result = readDeployTarget(directUrl);
-  if (!result.ok) stop(result.message);
+async function main(): Promise<number> {
+  const directUrl = prismaConfig.datasource?.url;
+  const result = readDeployTarget(directUrl, process.env.DATABASE_URL);
+  if (!result.ok) {
+    log(result.message);
+    return 1;
+  }
 
   const { host, database } = result.target;
-  console.log(
-    `[migrate] Vercel environment "${process.env.VERCEL_ENV ?? "none"}" → database "${database}" at ${host}`,
+  log(
+    `Vercel environment "${process.env.VERCEL_ENV ?? "none"}" → database "${database}" at ${host}`,
   );
 
   const folder = readdirSync(join(process.cwd(), "prisma/migrations"), { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name);
-  const toRecord = migrationsToRecord(folder, await readState(directUrl!));
-
-  if (toRecord.length > 0) {
-    console.log(
-      `[migrate] This database was built before migrations were tracked. Checking it matches schema.prisma before recording: ${toRecord.join(", ")}`,
-    );
-    const diff = prisma([
-      "migrate",
-      "diff",
-      "--from-config-datasource",
-      "--to-schema",
-      "prisma/schema.prisma",
-      "--exit-code",
-    ]);
-    if (diff !== 0) {
-      stop(
-        "The database does not match schema.prisma (differences above), so nothing was recorded or changed. This is a drift question for Beth, not something to force.",
-      );
-    }
-    for (const name of toRecord) {
-      if (prisma(["migrate", "resolve", "--applied", name]) !== 0) {
-        stop(`Recording ${name} as applied failed; nothing after it was attempted.`);
-      }
-    }
-  }
-
-  process.exit(prisma(["migrate", "deploy"]));
+  return deployMigrations(folder, { readState: () => readState(directUrl!), prisma, log });
 }
 
-main().catch((error: unknown) => {
-  stop(
-    `Could not read the database's migration state: ${error instanceof Error ? error.message : String(error)}`,
-  );
-});
+main().then(
+  (code) => process.exit(code),
+  (error: unknown) => {
+    log(
+      `Stopped before migrating anything: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  },
+);
