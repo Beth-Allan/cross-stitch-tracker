@@ -1015,6 +1015,31 @@ not a promise that the diagnosis below is right.
   demonstrated reaching a preview database; `docs/INTEGRATIONS.md` and protocol §2 describe the real
   route; fresh `/review`. **Unblocks P9c.**
 
+### R-3 A check that the migrations add up to the schema — **created by Beth's ruling D-39 (2026-10-25, during R-2); a gate addition, ruled**
+
+- **Objective:** a pull request whose `prisma/schema.prisma` differs from what `prisma/migrations/`
+  builds fails its checks. Since R-2, deploys apply migrations; a schema edit with no matching
+  migration would pass every gate today, merge, and leave production's code querying a column the
+  database does not have. The check is
+  `prisma migrate diff --from-migrations prisma/migrations --to-schema prisma/schema.prisma --exit-code`
+  (exit 0 = identical, 2 = different, 1 = error), which replays the migrations into a **shadow
+  database** — so the check needs a throwaway Postgres wherever it runs.
+- **Cited specs:** drift D-39 · `docs/INTEGRATIONS.md` (Deployment → Migrations; "Writing a migration"
+  shows the shadow-database config) · `.claude/rules/quality-gates.md` and CLAUDE.md "Quality gates"
+  (what the gate runs) · `.github/workflows/ci.yml` · Prisma 7 — verify `shadowDatabaseUrl` and the
+  flags in `node_modules/` / `--help`, never memory (hard rule 8).
+- **Traps:** ① **CI and pre-push run one invocation, `npm run gate`, by design (P14)** — and the
+  pre-push hook runs on a machine with no database. Decide how the check fits that rule (e.g. a
+  Postgres service container in CI plus a gate step that needs one) **without** quietly making CI
+  and pre-push differ; if it cannot, that is a question for Beth, not an implementer's choice.
+  ② `prisma.config.ts` is review-gated (D-38): a shadow URL added there makes this item gated —
+  prefer a separate config passed with `--config`, or route the item to `/review`. ③ Prove it by
+  breaking it: a throwaway commit that edits `schema.prisma` without a migration must fail the
+  check, and main must pass. ④ Every doc that lists the gate's steps names the new one.
+- **Done-when:** the check runs on every PR and fails on a schema/migration mismatch (demonstrated
+  with a throwaway commit, then dropped) and passes on main; the gate's documentation (CLAUDE.md,
+  `quality-gates.md`, `INTEGRATIONS.md` CI section) describes it; work log updated.
+
 ---
 
 ## Stage M — maintenance recurrences (created at the 2026-10-24 `/cleanup`)

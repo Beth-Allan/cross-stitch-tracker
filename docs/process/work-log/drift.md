@@ -41,6 +41,19 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-25 · D-39 · a check that the migrations add up to the schema — ruled during R-2
+
+**What needed a ruling.** PR #142's layer-1 checklist pass found the gap R-2 opens: once deploys
+apply migrations, nothing checks that `prisma/migrations/` builds exactly what `schema.prisma`
+describes. A schema edit with no migration would pass every gate, merge, and leave production's code
+asking for a column the database does not have. Adding a check is a gate-config change (hard rule 6).
+
+**Surfaced to Beth** in-session: queue it as a small item, placed after F-16 — the first change that
+will add a migration (recommended) · park it for `/cleanup` · no new check (review alone).
+
+**Her ruling: "Queue it as a small item (Recommended)".** New item **R-3** (`build-plan.md`
+Stage R), queued after `/review F-16`.
+
 ### 2026-10-25 · D-38 · the deploy-time migration path is review-gated — ruled during R-2
 
 **What needed a ruling.** R-2 added three files that decide what happens to a database on every
