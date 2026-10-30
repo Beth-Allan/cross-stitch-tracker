@@ -42,7 +42,7 @@ BAP is separately recorded at 50,000+ stitches (VOC-006) and would need to line 
 
 **Blocks:** nothing in flight; surfaces wherever the app groups projects by size.
 
-### Q-009 — Which other threads are used whole, and how many strands do the rest hold?
+### Q-009 — Which other threads are used whole, how many strands do the rest hold, and how long does she cut them?
 
 The skein formula assumes floss that holds six strands and is split (THR-004, THR-006). Beth has
 said that is true of DMC, Anchor, Weeks Dye Works and Gentle Art (THR-008, THR-009), and that
@@ -50,12 +50,15 @@ every Kreinik line is used whole (THR-010, **THR-013** — the Kreinik half of t
 answered 2026-10-29). For every other brand she buys (THR-007) — Rainbow Gallery, Classic
 Colorworks, The Caron Collection, Gloriana, Au Ver à Soie and any others — **how many strands a
 skein holds, and whether it is split at all, is unrecorded**. Needed from Beth: for each brand or
-line she stitches with, the strand count, or "used whole" — and, since THR-016 gave floss and
-Kreinik different cut lengths, the length she cuts it.
+line she stitches with, the strand count, or "used whole" — and the length she cuts it. Her own
+answer on cutting was about 24 inches "usually", with Kreinik the exception she named (THR-016);
+whether that holds for these brands was not asked.
 
-**Blocks:** part of item F-16 — a line she adds later must not be divided into six by default.
-F-16 can ship the brands already stated without it, provided an unknown strand structure reads
-"unknown" the same way an unknown length does.
+**Blocks:** part of F-16a and F-16b — a line she adds later must not be divided into six by
+default. F-16a can ship the brands already stated without it, provided an unknown strand structure reads
+"unknown" the same way an unknown length does. **Since D-44 it also bears on F-19:** which cut a
+line she gives a length to later should take is hers to say, and F-19 stops and asks rather than
+pick one.
 
 ## Tier 3 — confirmations of migrated material
 

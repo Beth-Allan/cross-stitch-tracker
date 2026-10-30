@@ -156,12 +156,15 @@ shows its skein count as **unknown**, never a figure worked out from a guessed l
 ### THR-012 — The Kreinik lines Beth uses, and what she calls them
 
 In her words: "I mainly use blending filament and braid #4. However, a few projects also need more
-of the specialty items - some of the ribbons, some braid #8, etc." She names them the way Kreinik
-does — "Kreinik Very Fine #4 Braid", "Kreinik Fine #8 Braid" — and chose those full names for the
+of the specialty items - some of the ribbons, some braid #8, etc." She wrote them as Kreinik names
+them — "Kreinik Very Fine #4 Braid", "Kreinik Fine #8 Braid" — and chose those full names for the
 app: **Blending Filament**, **Very Fine #4 Braid**, **Fine #8 Braid**.
 
 Her figure for Fine #8 Braid is "10 metres (11 yards)", agreeing with THR-010. She does not know
-the length of any other Kreinik line, and named no ribbon width.
+the length of any Kreinik line beyond the three in THR-010, and named no ribbon width. Asked next
+which other sizes her projects have needed (1/16″, 1/8″, 1/4″ ribbon), she chose "None of these" —
+a question put as an add-on to which threads get colour lists, so it records no more colour lists,
+not that she never uses ribbon.
 
 [stated by Beth 2026-10-29]
 
@@ -184,8 +187,9 @@ answered "Yes, same colour".
 ### THR-015 — A Kreinik finish letter is part of the colour number
 
 The chart prints some colours with letters after the number — 002HL Gold Hi Lustre, 001L Solar
-Silver, 001J Silver Japan. The letter is part of the number as she reads it off the spool: 002 and
-002HL are two different colours, searched for separately.
+Silver, 001J Silver Japan. Put to her as "Is the letter part of the colour number, the way you'd
+read it off the spool? In other words, are 002 and 002HL two different colours you'd search for
+separately?"; she answered "Yes, part of the number".
 
 [stated by Beth 2026-10-29]
 
@@ -201,15 +205,17 @@ This replaces the cited source's 18-inch cut with 15 usable inches (THR-006) as 
 describes her stitching. The app keeps the old figure until item F-19, by her ruling D-44.
 
 _The session's arithmetic, not Beth's words_ (whole cuts, as F-16a reads THR-006): an 8 m skein
-gives 13 cuts → **273** usable inches (the app: 255); a 5 yd skein 7 cuts → **147** (150); Very
-Fine #4 Braid, 11 m, 28 cuts → **336** (360); Fine #8 Braid, 10 m, 26 cuts → **312** (315);
-Blending Filament, 50 m, 131 cuts → **1572** (1635).
+gives 13 cuts → **273** usable inches (at 18-inch cuts: 255); a 5 yd skein 7 cuts → **147**
+(150); Very Fine #4 Braid, 11 m, 28 cuts → **336** (360); Fine #8 Braid, 10 m, 26 cuts → **312**
+(315); Blending Filament, 50 m, 131 cuts → **1572** (1635). The bracketed figures are F-16a's; the
+app today uses 255 for every brand.
 
 [stated by Beth 2026-10-29]
 
 ### THR-017 — Beth goes by number for Anchor
 
 Asked whether she goes by number or name when she buys or stitches with Anchor, she chose "Number
-only": she finds Anchor colours by number, and names are a nice extra at most.
+only", which the option described as "I find Anchor colours by number. Names are a nice extra at
+most."
 
 [stated by Beth 2026-10-29]
