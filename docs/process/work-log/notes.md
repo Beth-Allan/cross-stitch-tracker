@@ -176,7 +176,7 @@ awk '/^\| -+ \|/ { h=prev; gsub(/\\\|/,"",h); gsub(/[^|]/,"",h); d=$0; gsub(/[^|
 
 ## The CodeRabbit trial — the tally (D-33)
 
-**Tags:** `/review` · R-2 · F-16a · C-1 · CodeRabbit · review layers
+**Tags:** `/review` · R-2 · F-16a · F-19 · CodeRabbit · review layers
 
 Each gated `/review` during the trial adds one row here, following protocol §5's CodeRabbit steps.
 **"Missed by the others"** counts a real CodeRabbit finding that appears in neither the PR's
@@ -189,8 +189,8 @@ before reading CodeRabbit's, or this column cannot be filled honestly.
 
 A "did not run" row is kept but does not count toward the three (protocol §5 step 3).
 **The session that tallies the third run puts the table to Beth**, whatever the queue order (the
-queue marks R-2, F-16a and C-1 only because they are the next three today — D-36 moved them from
-R-2, P9c and F-9; D-40 split F-16, so its gated half, F-16a, carries the marker; D-42 (2026-10-25) put `/review C-1` third, ahead of F-17). The drift ruling D-33
+queue marks R-2, F-16a and F-19 only because they are the next three today — D-36 moved them from
+R-2, P9c and F-9; D-40 split F-16, so its gated half, F-16a, carries the marker; D-42 (2026-10-25) put `/review C-1` third, ahead of F-17; D-44 (2026-10-29) put `/review F-19` third, ahead of C-1). The drift ruling D-33
 sets the rule: no real catch the others missed → switch it off, and her OK to remove the app is
 what gets recorded; at least one → she rules on keeping it. Either way that session records her
 word as a new drift row.

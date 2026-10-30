@@ -46,10 +46,12 @@ BAP is separately recorded at 50,000+ stitches (VOC-006) and would need to line 
 
 The skein formula assumes floss that holds six strands and is split (THR-004, THR-006). Beth has
 said that is true of DMC, Anchor, Weeks Dye Works and Gentle Art (THR-008, THR-009), and that
-Kreinik is used whole (THR-010). For every other brand she buys (THR-007) — and any Kreinik line
-beyond the three she named — **how many strands a skein holds, and whether it is split at all, is
-unrecorded**. Needed from Beth: for each brand or line she stitches with, the strand count, or
-"used whole".
+every Kreinik line is used whole (THR-010, **THR-013** — the Kreinik half of this question,
+answered 2026-10-29). For every other brand she buys (THR-007) — Rainbow Gallery, Classic
+Colorworks, The Caron Collection, Gloriana, Au Ver à Soie and any others — **how many strands a
+skein holds, and whether it is split at all, is unrecorded**. Needed from Beth: for each brand or
+line she stitches with, the strand count, or "used whole" — and, since THR-016 gave floss and
+Kreinik different cut lengths, the length she cuts it.
 
 **Blocks:** part of item F-16 — a line she adds later must not be divided into six by default.
 F-16 can ship the brands already stated without it, provided an unknown strand structure reads
@@ -90,13 +92,8 @@ cited formula, not Beth. Confirm the default matches her actual experience of ru
 **Answered 2026-10-24** — yes, she keeps `.css` files (**CHF-005**), and `.css`, `.saga` and `.oxs`
 are all Cross Stitch Saga files (**CHF-006**).
 
-### Q-008 — Is an 18-inch cut, about 15 inches usable, how she works?
+### ~~Q-008 — Is an 18-inch cut, about 15 inches usable, how she works?~~
 
-The skein formula's 255 comes from cutting an 8 m skein into 18-inch lengths, each leaving about 15
-inches to stitch with once started and finished (THR-006). That is the cited source's habit, not
-Beth's. Per-brand lengths (item F-16) lean on it harder: a 5-yard skein's usable thread is worked
-out the same way. Needed from Beth: the length she cuts, and roughly how much each loses to starting
-and finishing.
-
-**Blocks:** nothing. F-16 can build on the cited figure (README provenance rule), but a wrong cut
-length skews every brand's figure the same way.
+**Answered 2026-10-29 — no** (**THR-016**): she cuts about 24 inches of floss and 15 of Kreinik,
+losing about 3 from each. That contradicts the app's 255 (THR-006), so it is drift **D-44** plus
+fix item **F-19**, which she placed straight after F-16a's review.

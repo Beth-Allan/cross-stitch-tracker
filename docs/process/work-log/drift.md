@@ -44,7 +44,7 @@ a data file and tests, stay ungated and merge on her word after a preview). The 
 gate neither and rely on C-1's review alone. A gate-list change is hers (hard rule 6).
 **Recommendation:** gate the folder, not the data.
 
-**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-43 or later) before
+**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-45 or later) before
 its branch opens; the path file and protocol §5 change in C-1's PR if she says yes.
 
 ## Also open — the question known to be coming
@@ -55,6 +55,82 @@ no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is r
 on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
 
 ## Ruled
+
+### 2026-10-29 · D-44 · Beth's cut length contradicts the skein formula's 18-inch cut — fixed in its own item after F-16a — ruled during `/stitch-fact`
+
+**What contradicts what.** THR-006's 255, and every figure F-16a's trap ⑪ pins, rests on the cited
+source's 18-inch cut with 15 inches stitched. Asked Q-008, Beth said she cuts about 24 inches of
+floss and loses about 3 ("reasonable, if generous"), and cuts Kreinik "much shorter - 12-18"", also
+losing about 3 (THR-016). A domain fact that contradicts a calculator constant is drift plus a fix
+item (protocol §7).
+
+**Surfaced to Beth**, with the effect in plain figures: switching makes a DMC or Anchor skein about
+7% more useful (the app tells her to buy slightly more than she needs), a Weeks Dye Works or Gentle
+Art skein about 2% less, and Kreinik about 5% more. **That Kreinik figure was wrong.** It was put
+to her before she said she cuts Kreinik shorter, and with her cut the app's Kreinik figures are up
+to about 10% short. She was told so in-session, before the two Kreinik questions below. Options:
+"Small item after F-16a (Recommended)" — F-16a keeps 18 inches, so "DMC numbers unchanged" still
+proves its rebuild broke nothing; a follow-up then switches, seen before and after on a preview ·
+"Inside F-16a" · "Leave it at 18 inches". Then, for that item, Kreinik's figure from her 12–18 inch
+range: "15 inches, the middle (Recommended)" · "12 inches, the short end" · "18 inches, the long
+end"; and Kreinik's loss: "About 3 inches too" · "Less than 3" · "More than 3" · "Not sure".
+
+**Her rulings:** ① **"Small item after F-16a (Recommended)"**. ② **"15 inches, the middle
+(Recommended)"**. ③ **"About 3 inches too"**.
+
+**What it changed.** New item **F-19** in `build-plan.md` Stage F (gated: the skein calculator),
+queued straight after `/review F-16a` with its own review, then R-3. **F-16a is unchanged in
+substance:** it builds on 18/15 on purpose and cites THR-016 as the figure F-19 adopts; the figures
+its trap ⑪ pins are F-19's to change, by this ruling. Q-008 struck. F-19 opens by putting the
+saved-needs question to her, since D-40 ③'s correction reasons about a cut change as it did about
+a length change. Whether a thread line beyond floss and Kreinik takes either cut is not recorded;
+that joins Q-009. `/review F-19` is now the third gated review, so the CodeRabbit trial's third
+run and its tally move there from `/review C-1` (protocol §5: whichever gated review runs third).
+
+### 2026-10-29 · D-43 · the catalogue facts: two Kreinik lines get colour lists, Kreinik's full names, discontinued colours loaded and marked, the mark planned before the loader — ruled during `/stitch-fact`
+
+**What needed a ruling.** Stage C's `/stitch-fact` row (D-42) asked which Kreinik lines Beth uses,
+what she calls them, and what happens to the colours Kreinik's chart marks discontinued. Her answers
+about Kreinik itself are facts (THR-012–THR-015); what she decided for the app is recorded here.
+She raised one of them herself: "I don't know if those should be added manually? Or if all the
+lines should be added in preparation for maybe eventually opening things up to multiple users?"
+
+**Surfaced to Beth**, option labels as she saw them. The multi-user point was answered inside the
+first question: the app is built for her alone, opening it to others would be its own project, and
+adding Kreinik sizes then is a small job.
+
+1. **Which Kreinik threads get a colour list:** "The ones I use (Recommended)" — Blending Filament,
+   Very Fine #4 and Fine #8 braid, plus any ticked next · "Every size on the chart" — all ten, with
+   001 Silver showing up to nine times in a search · "Only filament and #4" — #8, ribbons and the
+   rest typed in by hand when a project needs them.
+2. **Other sizes her projects have needed** (pick any): 1/16″, 1/8″, 1/4″ ribbon · "None of these".
+3. **Names:** "Kreinik's full names (Recommended)" — Very Fine #4 Braid, Fine #8 Braid, Blending
+   Filament · "Short names" — #4 Braid, #8 Braid.
+4. **Discontinued colours:** "Load them (Recommended)" — a list kept with the catalogue, no mark on
+   screen · "Leave them out".
+5. **On her answer to 4, where the mark is planned:** "Plan it before the loader (Recommended)" — a
+   short `/plan-feature` (the mark, Kreinik's suggested substitutes, DMC's discontinued colours)
+   before C-1, so the mark's field joins C-1's database change rather than needing its own review ·
+   "Plan it after Kreinik loads" · "Load them unmarked for now".
+
+**Her rulings:** ① **"Only filament and #4"**, against the recommendation. ② "None of these". ③
+"Kreinik's full names (Recommended)". ④ In her own words, neither option: "Load them, but we should
+find a way to visually identify them so I know they'll be hard to find and can find a substitute.
+By the way, we didn't load the DMC discontinued/hard to find threads and we should probably queue
+that at some point too." ⑤ "Plan it before the loader (Recommended)".
+
+**What it changed.** **F-16a** still creates the three Kreinik lines D-40 ⑤ set up, now named
+**"Blending Filament"**, **"Very Fine #4 Braid"** and **"Fine #8 Braid"** (THR-012). Those exact
+strings are what C-1b's fixture must match. It creates **no other Kreinik line**: the ribbon D-40
+mentioned is hers to add when a project needs one (F-16b), length unknown (THR-011). **C-1b** loads
+colours into Blending Filament and Very Fine #4 Braid only. Fine #8 Braid exists with its length
+but no catalogue, so she types its colours. **Discontinued colours load, marked.** The plan had no
+field or screen for that, so a new queue row, `/plan-feature discontinued colours`, sits before C-1.
+It plans the mark, whether Kreinik's "Discontinued colors & suggested substitutions" table is
+shown, and her DMC wish (no source for DMC's discontinued colours has been looked for yet). It
+re-briefs C-1 if the mark needs a column in C-1's migration. Until it lands, C-1b's rule for
+discontinued colours is "loaded and marked, as that plan says". The DMC wish sits in `backlog.md`
+until that session takes it.
 
 ### 2026-10-25 · D-42 · the supply catalogues: three makers, Kreinik first after F-16a, no stand-in swatches, the whole Mill Hill sheet — ruled during `/plan-feature thread catalogues`
 

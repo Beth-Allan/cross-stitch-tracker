@@ -864,8 +864,8 @@ answers. F-16a and F-16b each add their own scope and done-when.
   is trap ②'s schema call. Beth enters it when she sets up a brand or line, and a thread without one
   shows its skein count as **unknown** (D-34, THR-011). Today Weeks Dye Works and Gentle Art would
   read roughly 58% of the skeins a project needs (THR-009), so the shopping list would run short.
-- **Cited specs:** `docs/domain/threads.md` THR-004–THR-011 · `open-questions.md` Q-008, Q-009 ·
-  drift D-34, D-40, D-41 · backlog "Per-brand skein length" (old 999.13, planned here) · R-2
+- **Cited specs:** `docs/domain/threads.md` THR-004–THR-016 · `open-questions.md` Q-009 ·
+  drift D-34, D-40, D-41, D-43, D-44 · backlog "Per-brand skein length" (old 999.13, planned here) · R-2
   (migrations go live on deploy) · `.claude/rules/form-patterns.md` (the brand form's new field) ·
   `.claude/rules/ui-design-reference.md` (where the field goes).
 - **Traps:** ① **The lengths are THR-008–THR-010 and nothing else.** Every other brand starts blank
@@ -898,10 +898,19 @@ answers. F-16a and F-16b each add their own scope and done-when.
   The catalogue loader (C-1) finds a line by brand name + line name and never creates one, so line
   names are unique within a brand, case aside, and are exactly the names Beth gives at that
   `/stitch-fact`; the Kreinik colours themselves land in C-1b._
+  _**Answered at that `/stitch-fact`, 2026-10-29 (D-43):** the three lines are named
+  **"Blending Filament"**, **"Very Fine #4 Braid"** and **"Fine #8 Braid"** (THR-012) — those
+  exact strings; one colour number is one colour in every size (THR-014); a finish letter is part
+  of the code, so 002 and 002HL are two colours (THR-015); every Kreinik line is used whole
+  (THR-013)._
   ③ The 255 is an 8 m skein's usable inches, derived as whole 18-inch cuts of 15 usable inches each
   (THR-006). Proportional scaling and whole cuts disagree (a 5 yd skein: 146.6 vs 150 usable inches),
   so apply **the cited derivation**, whole cuts, and pin it with a test. If that reading is in doubt,
-  stop and ask. The cut length is the cited source's, not Beth's: Q-008 is open, so cite it.
+  stop and ask. The cut length is the cited source's, not Beth's. _Q-008 was answered 2026-10-29:
+  she cuts about 24 inches of floss and 15 of Kreinik, about 3 lost from each (THR-016). **This
+  item still builds on 18/15, by her ruling D-44**, so "DMC unchanged" stays its proof that the
+  rebuild broke nothing; F-19 switches to her figures straight after this item's review. Cite
+  THR-006 and THR-016._
   ④ **Used whole** (THR-010): each cut is one working strand, so the strand term must not divide
   Kreinik into six. Pin that formula shape with a test. **Every other brand's or line's strand
   structure is unrecorded (Q-009)** — a line Beth adds later must never be divided into six by
@@ -961,12 +970,14 @@ answers. F-16a and F-16b each add their own scope and done-when.
     unknown case — TypeScript lists them once the column is nullable.
   - **The data the migration writes** (D-40 ⑤): DMC gets 8 m, six-strand (THR-008); Anchor (8 m,
     six-strand), Weeks Dye Works and The Gentle Art (5 yd, six-strand — THR-009) and Kreinik with
-    lines #4 braid (11 m), #8 braid (10 m) and blending filament (50 m), all used whole (THR-010),
+    lines **Very Fine #4 Braid** (11 m), **Fine #8 Braid** (10 m) and **Blending Filament** (50 m)
+    — her names, THR-012 — all used whole (THR-010, THR-013),
     are **created** where no brand of that name exists and **filled in** where a `THREAD` brand of
-    exactly that name does (trap ①) — names as THR-007 spells them. **Every other Kreinik line
-    Beth names at the `/stitch-fact` row before this item** (ribbon, D-40 — its width is hers to
-    say) **is created too, length unknown** (THR-011): the catalogue loader (C-1) loads colours into
-    a line but never creates one, so a line she uses must exist before her Kreinik colours can.
+    exactly that name does (trap ①) — names as THR-007 spells them. **No other Kreinik line is
+    created:** at the 2026-10-29 `/stitch-fact` Beth named none to set up (D-43 ②); the ribbon D-40
+    mentioned is hers to add when a project needs one (F-16b), length unknown until she gives it
+    (THR-011). The catalogue loader (C-1) loads colours into a line but never creates one, so the
+    lines C-1b loads into (Blending Filament, Very Fine #4 Braid) must exist first — they do.
     "Custom (Thread)" and any other brand keep unknown. `prisma/seed.ts` builds the same DMC data, so a fresh database and a migrated
     one agree.
   - **The recompute** (D-40 ③ as corrected, trap ⑨): in the same migration, every `ProjectThread`
@@ -1030,7 +1041,7 @@ answers. F-16a and F-16b each add their own scope and done-when.
   surface listed above; an unknown line counts as still to buy and keeps a project short of fully
   kitted; recomputed needs match `calculateSkeins` in the rehearsal (trap ⑩), and overridden rows
   are untouched; the migration ships through R-2's pipeline; `skein-calculator.ts` cites THR-006,
-  THR-008–THR-011 and Q-008 (trap ⑥). Gate green; Beth has seen the preview (a DMC project's
+  THR-008–THR-011, THR-013 and THR-016 — the last as the cut F-19 adopts, D-44 (trap ⑥). Gate green; Beth has seen the preview (a DMC project's
   supplies, unchanged; an unknown line on the shopping list; a quick-added thread reading unknown);
   stops at `built, awaiting review`; fresh `/review F-16a`.
 
@@ -1042,10 +1053,13 @@ answers. F-16a and F-16b each add their own scope and done-when.
   quick-added thread lands in "Custom (Thread)" and reads unknown (F-16a); and whether saving a
   length should recompute that line's saved needs (trap ④ below — the `/work-item F-16` session's
   reading of D-40 ③, not yet her word).
-- **Scope:** on a thread brand, add and rename lines (Kreinik ribbon is the first she has named —
-  D-40, not yet a domain fact); on each line, a length she can type in metres or yards (she gave
-  both, THR-008–THR-010) and its strand structure — six-strand floss she splits, or used whole —
-  either of which may stay unknown; adding a thread picks its line when the brand has more than one.
+- **Scope:** on a thread brand, add and rename lines (Kreinik ribbon is the first she expects to
+  add — D-40; at the 2026-10-29 `/stitch-fact` she chose to add it when a project needs one, so
+  F-16a does not create it, D-43); on each line, a length she can type in metres or yards (she gave
+  both, THR-008–THR-010, THR-012) and its strand structure — six-strand floss she splits, or used
+  whole — either of which may stay unknown; adding a thread picks its line when the brand has more
+  than one. **If F-19 made the cut length a property of the line, the cut joins this form too** —
+  F-19's PR says which.
   _Moved to C-1 by the catalogue plan (D-42, 2026-10-25), which lands before this item: the line in
   a thread's label wherever a thread of a several-line brand is named, and the two stale Kreinik
   texts from trap ⑧. One colour code does appear in more than one line — Kreinik's own chart says
@@ -1065,7 +1079,7 @@ answers. F-16a and F-16b each add their own scope and done-when.
   rule (never an overridden row) and carries the `revalidateTag` test (trap ⑦). If it has to touch
   `skein-calculator.ts`, this item is gated after all — confirm every touched file against
   `.claude/hooks/review-gated-paths.txt`, and if any is gated, add a `/review F-16b` row to the queue
-  (the CodeRabbit trial ends at `/review C-1`, its third review — no marker moves). ⑤ **Renaming a
+  (the CodeRabbit trial ends at `/review F-19`, its third review since D-44 — no marker moves). ⑤ **Renaming a
   brand or a line that a shipped catalogue is keyed to** (D-42; C-1 trap ⑤): the catalogue loader
   matches both by name, so after a rename it skips that fixture on later deploys — harmless to what
   is already loaded, logged, and put right by renaming the fixture in a small data PR. The form need
@@ -1142,6 +1156,49 @@ answers. F-16a and F-16b each add their own scope and done-when.
   needing 30 skeins plus its fabric, with only the fabric in hand, reads 50%, not 1/31); one predicate
   in one place; the junction arm Resolved; gate green; Beth has seen the preview (What's Next
   percentages); merges on her word.
+
+### F-19 The length Beth cuts — **created by Beth's answer at the 2026-10-29 `/stitch-fact` (THR-016, D-44); gated (the skein calculator, possibly schema + migration) — `/review` follows; preview before merge**
+
+- **Objective:** the skein maths uses the length Beth actually cuts — **about 24 inches of floss
+  and 15 of Kreinik, about 3 lost from each** (THR-016) — in place of the cited source's 18-inch
+  cut with 15 stitched (THR-006). Today every figure assumes 18/15: a DMC or Anchor skein is
+  credited with 255 usable inches where her cut gives 273, so the app has her buy slightly more
+  than she needs; a Kreinik spool is credited with more than her shorter cut gives, so its figure
+  runs up to about 10% short.
+- **Opens with one question for Beth:** whether saved needs are recomputed. D-40 ③ as corrected
+  kept DMC and Anchor rows exactly as saved, because a saved need was worked out with the project's
+  settings at the time. A cut change moves every line's figure, so the same reasoning applies to
+  every row. Put the options in her terms ("only newly worked-out figures change" against
+  "recompute every saved figure from today's settings"), with the counts from the reset `preview`
+  copy, and record her ruling before the branch opens.
+- **Cited specs:** `docs/domain/threads.md` THR-006, THR-008–THR-013, THR-016 · `open-questions.md`
+  Q-009 · drift D-40 ③ (as corrected), D-44 · F-16a's calculator and its traps ③, ④ and ⑪ (whole
+  cuts; the used-whole strand term; the pinned figures) · `docs/INTEGRATIONS.md` Deployment →
+  Migrations, if a column is added.
+- **Scope:** the calculator's usable inches from each line's length by **whole cuts of Beth's cut,
+  less 3 inches each**: floss lines 24 → 21, Kreinik lines 15 → 12. **Where the cut lives is this
+  item's schema call.** Beth gave it for floss and for Kreinik, not for "used whole" as a class, so
+  which cut a line she adds later should take is not recorded, and this item must not pick one by
+  default (hard rule 5). Lines without a length already read unknown, so this only bites a line she
+  gives a length to later (F-16b). If the shape needs to know a cut for a line she has not
+  described, stop and ask through `/stitch-fact` (Q-009 carries it). The figures F-16a's tests pin
+  change on purpose: name each changed assertion in the PR as D-44's consequence, never as a
+  loosened test (hard rule 2).
+- **Traps:** ① **Whole cuts, as F-16a reads THR-006** — the session's arithmetic from THR-016,
+  not Beth's words, for the tests: 8 m = 314.96 in → 13 cuts → **273**; 5 yd = 180 in → 7 cuts →
+  **147**; Very Fine #4 Braid 11 m = 433.07 in → 28 cuts → **336**; Fine #8 Braid 10 m = 393.70 in →
+  26 cuts → **312**; Blending Filament 50 m = 1968.50 in → 131 cuts → **1572**. ② Her figures are
+  approximate — "I don't really measure", "3" lost is reasonable, if generous". Use them as given;
+  no per-project cut setting, no extra precision. ③ The used-whole strand term (F-16a trap ④) is
+  unchanged: one cut is one working strand. ④ Any mutation that moves a stats figure carries its
+  `revalidateTag` test. ⑤ If a column is added, the migration is `BEGIN;` … `COMMIT;` (protocol §2),
+  rehearsed on the throwaway Postgres, and the reset `preview` copy is used for the counts.
+- **Done-when:** Beth's saved-needs ruling recorded; then test-first: the calculator gives each line
+  the usable inches in trap ① for the same inputs, a floss line at 24/21 and a Kreinik line at 15/12;
+  no line takes a cut Beth did not give for it by default; saved needs follow
+  her ruling; `skein-calculator.ts` cites THR-016; gate green; Beth has seen the preview (one DMC and
+  one Kreinik project's figures, before and after); stops at `built, awaiting review`; fresh
+  `/review F-19`.
 
 ## Stage R — process-enabling fixes
 
@@ -1304,8 +1361,20 @@ code in several lines either way; **(c)** if there is time, Q-008 (the 18-inch c
 cites. The Kreinik line names she gives are the ones F-16a creates and C-1b loads into — the same
 strings.
 
-**Order (D-42 ②):** `/stitch-fact` → F-16a → `/review F-16a` → R-3 → **C-1** → `/review C-1` →
-**C-1b** → **C-2** → **C-3** → F-16b. Kreinik colours are usable after C-1b merges. **P9b**
+_**Done 2026-10-29** (D-43, D-44). (a) Colour lists for **Blending Filament** and **Very Fine #4
+Braid** only; **Fine #8 Braid** is created by F-16a but gets no catalogue; no ribbon line; Kreinik's
+full names, exactly as quoted (THR-012); every Kreinik line used whole (THR-013); discontinued
+colours **loaded and marked** so she knows to look for a substitute — a mark the plan did not have,
+so `/plan-feature discontinued colours` now precedes C-1 (D-43 ④⑤). (b) One Kreinik number is one
+colour in every size (THR-014), and a finish letter is part of the code (THR-015); Mill Hill's
+twelve headings are her names (BEAD-001); a pack size is not a different bead (BEAD-002); she goes
+by number for Anchor (THR-017). (c) Q-008 answered — about 24 inches of floss and 15 of Kreinik,
+about 3 lost from each (THR-016) — which contradicts the 255, so F-19 follows F-16a's review
+(D-44)._
+
+**Order (D-42 ②, D-43, D-44):** `/stitch-fact` → F-16a → `/review F-16a` → F-19 → `/review F-19`
+→ R-3 → `/plan-feature discontinued colours` → **C-1** → `/review C-1` → **C-1b** → **C-2** →
+**C-3** → F-16b. Kreinik colours are usable after C-1b merges. **P9b**
 (`/supplies` and the pickers load the whole catalogue — `getThreads()` unbounded, sorted and
 filtered in the browser) is not moved by this plan; each catalogue item checks the preview's load
 and says so, and Beth can move P9b up (the session recommended it be before C-2, when the catalogue
@@ -1317,6 +1386,10 @@ passes ~2,000 rows).
   database can hold a colour with no published value and a bead's line, and every screen shows
   both honestly; a thread of a several-line brand shows its line wherever it is named. **No new
   catalogue ships here** (the deploy window above) — DMC round-trips through the loader to prove it.
+- **May be re-briefed before it opens (D-43 ⑤):** `/plan-feature discontinued colours` runs just
+  before this item and decides how a discontinued colour is marked. If the mark needs a column, it
+  joins this item's migration, and that session re-briefs this item to say so. If this brief has
+  no such note when the item opens, check the work log for that session's outcome before building.
 - **Opens with one question for Beth:** the loader's code is deploy-time code that writes
   production data on every build, so it belongs with D-38's gated deploy step — propose gating its
   directory (e.g. `^prisma/catalogues/`) **and not** `prisma/fixtures/`, so C-1b, C-2 and C-3 stay
@@ -1343,7 +1416,7 @@ passes ~2,000 rows).
     writes, one transaction per fixture (`createMany` with `skipDuplicates`, chunked). A file that
     fails its schema, a brand that is missing, of another type, or matched more than once, or a
     missing line, **skips that fixture with a loud log line** — `[catalogue] Kreinik: skipped — no
-line "#4 braid" under brand "Kreinik"` — and the build goes on; the loader never creates a
+line "Very Fine #4 Braid" under brand "Kreinik"` — and the build goes on; the loader never creates a
     brand or a line. Every run logs `[catalogue] <maker>: <n> added, <m> already present` per
     fixture. Preview builds from any PR write to the shared `preview` branch, as migrations already
     do. **DMC joins the same path**: `dmc-threads.json` takes the self-describing shape (brand,
@@ -1371,7 +1444,7 @@ line "#4 braid" under brand "Kreinik"` — and the build goes on; the loader nev
   - **The line in the label:** wherever a thread is named with brand and code —
     `supply-catalog.tsx`, `supply-table-view.tsx`, `supply-grid-view.tsx`, `supply-form-modal.tsx`,
     `chart-merged-form.tsx` (the picker results), `project-detail/supplies-tab.tsx` and the shopping
-    list — a thread whose brand has more than one line shows the line ("Kreinik · #4 braid · 002
+    list — a thread whose brand has more than one line shows the line ("Kreinik · Very Fine #4 Braid · 002
     Gold"); a one-line brand shows nothing new (DMC unchanged). **A bead's line the same way**, from
     `Bead.line`. Both are invisible until C-1b and C-2 load data; tested now with fixtures. **Not**
     the stats page: `src/lib/queries/stats/thread-insights.ts` is what names a thread there, and it
@@ -1431,25 +1504,28 @@ line "#4 braid" under brand "Kreinik"` — and the build goes on; the loader nev
 
 ### C-1b The Kreinik catalogue — **ungated (data and tests); UI-touching; preview before merge**
 
-- **Objective:** Kreinik's colours are in each line Beth uses — exactly the colours the chart says
-  come in that size — so a Kreinik thread is a search-and-select with its line in the label.
-- **Cited specs:** D-42 ①–③ · the sources table (Kreinik) · the facts the `/stitch-fact` row
-  records (her lines, named against the chart's size menu; her answer on discontinued colours) ·
-  F-16a (the lines exist) · C-1's loader and README.
+- **Objective:** Kreinik's colours are in the two lines Beth chose — Blending Filament and Very
+  Fine #4 Braid (D-43 ①) — exactly the colours the chart says come in each size, so a Kreinik
+  thread in either is a search-and-select with its line in the label. Fine #8 Braid gets no
+  catalogue; she types its colours.
+- **Cited specs:** D-42 ①–③ · D-43 · the sources table (Kreinik) · THR-012 (the line names, those
+  exact strings), THR-014 (one number, one colour across sizes), THR-015 (a finish letter is part of
+  the code) · the outcome of `/plan-feature discontinued colours` (how a discontinued colour is
+  marked) · F-16a (the lines exist) · C-1's loader and README.
 - **Scope:** `prisma/fixtures/kreinik-threads.json`, built by a committed script from the official
-  chart: **for each line Beth named, every colour whose row in the page-2 matrix has a star in that
-  size's column** — from the main matrix (Basic, HL, V, F and L colours) and from the Japan matrix,
-  whose braid and ribbon columns put Japan colours into braids too; a 1/4" ribbon line from the
-  chart's 1/4" list; the cord matrix only if she named a cord line. Names come from page 1 (names
-  split across lines in the PDF, e.g. "Mid-night", are rejoined and spot-checked against the
-  rendered page). Colours the chart marks discontinued (gray, `disc`, the substitutions table)
-  follow her `/stitch-fact` answer, and the README lists them either way. No hex, no family (D-42
-  ③). The README records the rule, the retrieval date, and the F colours' "temporarily
-  discontinued" notice. Fixture tests (`src/__tests__/fixtures/`): shape; no duplicate code within
-  a line; the same code allowed across lines; a count floor per line; spot entries read off the
-  chart — 001 Silver in every line (all nine sizes), 556 Fly By Night in exactly the four sizes the
-  matrix stars, 5765 in exactly one, 002HL Gold Hi Lustre, 001L Solar Silver, 001J Silver in the
-  braid lines — numbers and names as the chart prints them. **This item writes data at deploy**, so
+  chart: **for "Blending Filament" and "Very Fine #4 Braid", every colour whose row in the page-2
+  matrix has a star in that size's column** (BF, #4) — from the main matrix (Basic, HL, V, F and L
+  colours) and from the Japan matrix, whose braid columns put Japan colours into #4 too. Names come
+  from page 1 (names split across lines in the PDF, e.g. "Mid-night", are rejoined and
+  spot-checked against the rendered page). Colours the chart marks discontinued (gray, `disc`, the
+  substitutions table) are **loaded and marked** (D-43 ④), by whatever the discontinued-colours
+  plan built; the README lists them either way. No hex, no family (D-42 ③). The README records the
+  rule, the retrieval date, and the F colours' "temporarily discontinued" notice. Fixture tests
+  (`src/__tests__/fixtures/`): shape; no duplicate code within a line; the same code allowed across
+  lines; a count floor per line; spot entries read off the chart — 001 Silver in both lines (the
+  matrix stars all nine sizes), 556 Fly By Night and 5765 in exactly those of the two lines the
+  matrix stars for them, 002HL Gold Hi Lustre, 001L Solar Silver, 001J Silver wherever the Japan
+  matrix stars BF or #4 — numbers and names as the chart prints them. **This item writes data at deploy**, so
   before its preview build: ask Beth to reset the Neon `preview` branch from production (show her
   the dialog first); the preview build's loader line — `Kreinik: <n> added` per line — goes in the
   PR.
@@ -1466,24 +1542,27 @@ line "#4 braid" under brand "Kreinik"` — and the build goes on; the loader nev
   what you saw. ⑥ Hard rule 4 is already satisfied by C-1 — nothing visual is new here; if the
   preview shows the label needs more than C-1 built, that is a design-track input, not a fix in
   this item.
-- **Done-when:** test-first: the fixture passes its tests and holds, under each line Beth named,
-  every colour the chart marks for that size and no other; the loader on the throwaway Postgres
-  adds them and a second run adds none; the preview build loaded them into the reset `preview`
-  branch; **Beth named five Kreinik threads she owns (number, name, size) and found each under the
-  right line on the preview**; gate green; merges on her word.
+- **Done-when:** test-first: the fixture passes its tests and holds, under each of the two lines,
+  every colour the chart marks for that size and no other, discontinued ones marked; the loader on
+  the throwaway Postgres adds them and a second run adds none; the preview build loaded them into
+  the reset `preview` branch; **Beth named five Blending Filament or Very Fine #4 Braid threads she
+  owns (number, name, size) and found each under the right line on the preview**, and saw a
+  discontinued colour's mark; gate green; merges on her word.
 
 ### C-2 The Mill Hill bead catalogue — **ungated (data, tests, and the label C-1 built); UI-touching; preview before merge**
 
 - **Objective:** every bead on Wichelt's inventory sheet is in the app under Mill Hill, with its
   line, so a bead a chart calls for is a search-and-select.
-- **Cited specs:** D-42 ①, ④ · the sources table (Mill Hill) · the facts the `/stitch-fact` row
-  records for the twelve lines · C-1's loader and README · `prisma/schema.prisma` `Bead`
+- **Cited specs:** D-42 ①, ④ · the sources table (Mill Hill) · `docs/domain/beads.md` BEAD-001
+  (the twelve line names are hers) and BEAD-002 (a pack size is not a different bead) · C-1's
+  loader and README · `prisma/schema.prisma` `Bead`
   (`@@unique([brandId, productCode])`).
 - **Scope:** first, look for an official sheet newer than 2010 (`millhill.com`, `wichelt.com`) and
   record in the README which one was used and why; then `prisma/fixtures/mill-hill-beads.json` by a
-  committed script from the sheet's text: code, name, line (the sheet's twelve headings, or Beth's
-  names for them from `/stitch-fact`), no hex, no family; the 2xxxx economy numbers and the 11xxx
-  magnifica packs are **not** rows; the `•`/`*`/`×`/`≈`/`+` marks are dropped, not carried into
+  committed script from the sheet's text: code, name, line (BEAD-001's twelve names, which Beth
+  confirmed as hers; a sheet heading that reads differently from BEAD-001 is a stop-and-ask), no
+  hex, no family; the 2xxxx economy numbers and the 11xxx magnifica packs are **not** rows
+  (BEAD-002); the `•`/`*`/`×`/`≈`/`+` marks are dropped, not carried into
   names. A `BEAD` brand named "Mill Hill" with no beads was on the `preview` copy of August's data
   on 2026-10-25 — **confirm it on the reset `preview` before the preview build**; the loader never
   creates a brand, so if production lacks it, Beth adds "Mill Hill" as a bead brand in the app
@@ -1518,8 +1597,11 @@ line "#4 braid" under brand "Kreinik"` — and the build goes on; the loader nev
   unverified (the sources table). Whether that is basis enough to ship its names in her app is
   hers; the alternative is an official Anchor list, if one can be found at build time, or leaving
   Anchor until one is. Record her answer in the README and the work log before the branch opens.
+  _Since 2026-10-29: Beth goes by number for Anchor; names are a nice extra at most (THR-017). So
+  put a third option beside those two: **codes only, no names**. It still serves how she shops,
+  and it leaves the dataset's names, which are what the licence question is about, out of the app._
 - **Cited specs:** D-42 ①, ③ · the sources table (Anchor) · THR-008 (Anchor is 8 m six-strand —
-  F-16a's line) · C-1's loader and README.
+  F-16a's line) · THR-017 (she goes by number) · C-1's loader and README.
 - **Scope:** `prisma/fixtures/anchor-threads.json` by a committed script from the dataset's
   `ANCHOR_RAW` rows: code and name, under Anchor's one line; the RGB columns are **not** carried
   (D-42 ③); the eight codes in the data's `_ANCHOR_CONTESTED_IDS` tag are listed in the README, and
