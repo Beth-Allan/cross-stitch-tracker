@@ -263,7 +263,7 @@ carries the scars this rule prevents: 999.13 (a hardcoded 8m skein length that i
 Weeks Dye Works, Gentle Art, and Kreinik) and 999.14 (overCount inference thresholds).
 
 - **Knowledgebase:** `docs/domain/` — per-topic files with provenance tags (`vocabulary`,
-  `threads`, `fabric`, `kitting-and-storage`, `chart-files`, `sessions-and-progress`), plus
+  `threads`, `beads`, `fabric`, `kitting-and-storage`, `chart-files`, `sessions-and-progress`), plus
   `open-questions.md`, the `/stitch-fact` queue tiered by what each gap blocks. `README.md`
   carries the ID scheme and the provenance vocabulary; read only the topics your item touches.
   **Most of it was seeded from `CROSS_STITCH_TRACKER_PLAN.md` §3 at overhaul step 5 and has not
