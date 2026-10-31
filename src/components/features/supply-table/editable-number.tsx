@@ -85,6 +85,7 @@ export function EditableNumber({
     if (saveId !== latestSaveRef.current) return;
     setOptimistic(null);
     setDraft(toDraft(value));
+    openedWithRef.current = value;
     triggerRejection();
   }
 

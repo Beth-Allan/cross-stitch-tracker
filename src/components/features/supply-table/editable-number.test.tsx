@@ -391,6 +391,26 @@ describe("EditableNumber — a figure left as it was", () => {
     expect(onSave).toHaveBeenCalledWith(500);
   });
 
+  it("leaving a cell whose number was rolled back while open saves nothing more", async () => {
+    let settle!: (saved: boolean) => void;
+    const onSave = vi.fn().mockReturnValue(new Promise<boolean>((resolve) => (settle = resolve)));
+    render(<EditableNumber value={5} onSave={onSave} ariaLabel="Need" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Need" }), {
+      target: { value: "12" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Need" }));
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+
+    await act(async () => settle(false));
+    expect(screen.getByRole("spinbutton", { name: "Need" })).toHaveValue(5);
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Need" }));
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "Need" })).toHaveTextContent("5");
+  });
+
   it("compares against the number on screen while a save is in flight", async () => {
     const onSave = vi.fn().mockReturnValue(new Promise<boolean>(() => {}));
     render(<EditableNumber value={5} onSave={onSave} ariaLabel="Need" />);
