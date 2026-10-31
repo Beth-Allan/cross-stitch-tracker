@@ -311,6 +311,76 @@ describe("EditableNumber — optimistic save that fails", () => {
   });
 });
 
+describe("EditableNumber — a figure left as it was", () => {
+  it("clicking into the cell and away saves nothing", () => {
+    const onSave = vi.fn();
+    render(<EditableNumber value={30} onSave={onSave} ariaLabel="Need" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Need" }));
+
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Need" })).toHaveTextContent("30");
+  });
+
+  it("pressing Enter on an unchanged number saves nothing", () => {
+    const onSave = vi.fn();
+    render(<EditableNumber value={30} onSave={onSave} ariaLabel="Need" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+    fireEvent.keyDown(screen.getByRole("spinbutton", { name: "Need" }), { key: "Enter" });
+
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it("typing the same number back in saves nothing", () => {
+    const onSave = vi.fn();
+    render(<EditableNumber value={30} onSave={onSave} ariaLabel="Need" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+    const input = screen.getByRole("spinbutton", { name: "Need" });
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.change(input, { target: { value: "30" } });
+    fireEvent.blur(input);
+
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it("leaving a figure already below min alone is no edit, not a refused one", () => {
+    const onSave = vi.fn();
+    render(<EditableNumber value={0} onSave={onSave} ariaLabel="Need" min={1} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Need" }));
+
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.queryByText("Value not saved")).not.toBeInTheDocument();
+  });
+
+  it("compares against the number on screen while a save is in flight", async () => {
+    const onSave = vi.fn().mockReturnValue(new Promise<boolean>(() => {}));
+    render(<EditableNumber value={5} onSave={onSave} ariaLabel="Need" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Need" }), {
+      target: { value: "12" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Need" }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith(12));
+
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Need" }));
+    expect(onSave).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Need" }), {
+      target: { value: "5" },
+    });
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Need" }));
+    expect(onSave).toHaveBeenLastCalledWith(5);
+  });
+});
+
 describe("EditableNumber — overlapping saves", () => {
   it("ignores a stale failure so it cannot clobber a newer accepted edit", async () => {
     let rejectFirst: (value: boolean) => void = () => {};

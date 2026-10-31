@@ -14,10 +14,13 @@ import { useRejectionFlash } from "@/components/hooks/use-rejection-flash";
  * Keyboard:
  * - Enter: saves value
  * - Escape: reverts to original value
- * - Blur: saves if valid, reverts if invalid (NaN or below `min`)
+ * - Blur: saves if changed and valid, reverts if invalid (NaN or below `min`)
  *
  * Validates parseInt result is at least `min` (default 0) before calling onSave;
  * reverts on invalid input.
+ *
+ * A number left as it was never reaches onSave: a save is what marks a thread's need as typed by
+ * hand, so merely opening the cell must not count as one.
  *
  * The optimistic value is provisional: when onSave reports failure (resolves false or throws) it
  * is rolled back, so the cell never shows a number the server refused. Only the newest save may
@@ -91,8 +94,9 @@ export function EditableNumber({
           onChange={(e) => setDraft(e.target.value)}
           onBlur={() => {
             const num = parseInt(draft);
-            if (displayValue === null && draft.trim() === "") {
-              // Nothing typed into an unknown figure is no edit, not a refused one
+            const unchanged = displayValue === null ? draft.trim() === "" : num === displayValue;
+            if (unchanged) {
+              // A figure left as it was is no edit, not a refused one
             } else if (!isNaN(num) && num >= min) {
               commit(num);
             } else {
