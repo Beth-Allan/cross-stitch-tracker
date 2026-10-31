@@ -143,7 +143,7 @@ describe("computeKittingDots", () => {
     expect(result.threadStatus).toBe("partial");
   });
 
-  it("never reads threads as fulfilled while a line's need is unknown (D-40 ④)", () => {
+  it("never reads threads as fulfilled while a line's need is unknown — it is still to buy", () => {
     const unknownNeed = { quantityRequired: null, quantityAcquired: 0 };
     const result = computeKittingDots({
       fabric: null,

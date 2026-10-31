@@ -287,7 +287,7 @@ describe("usableInchesPerSkein — whole 18-inch cuts of 15 usable inches (THR-0
   });
 });
 
-describe("calculateSkeins — each line's own length and structure (F-16a)", () => {
+describe("calculateSkeins — each line's own length and structure (THR-010, THR-011)", () => {
   const base = { stitchCount: 5000, fabricCount: 14, overCount: 1 as const, wastePercent: 20 };
   const ANCHOR: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
   const WEEKS: SkeinLine = { skeinLengthMm: 4572, strandStructure: "SIX_STRAND" };
@@ -313,7 +313,7 @@ describe("calculateSkeins — each line's own length and structure (F-16a)", () 
     expect(calculateSkeins({ ...base, strandCount: 2, line: WEEKS })).toBe(6);
   });
 
-  it("gives Fine #8 Braid 9 spools — a used-whole cut is one working length (trap ④)", () => {
+  it("gives Fine #8 Braid 9 spools — a used-whole cut is one working length, not one strand (THR-013)", () => {
     // 5000 × 6 × 1.2 / (14 × 315) = 8.16 → 9; treated as one strand it would be 2
     expect(calculateSkeins({ ...base, strandCount: 2, line: FINE_8_BRAID })).toBe(9);
   });

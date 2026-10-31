@@ -32,7 +32,7 @@ interface AggregatedSupply {
   /** The sum of the known needs only — an unknown one has no figure to add. */
   totalRequired: number;
   totalAcquired: number;
-  /** Lines whose need is unknown (D-34): while any exists the supply is still to buy. */
+  /** Lines whose need is unknown (THR-011): while any exists the supply is still to buy. */
   unknownCount: number;
   items: [ShoppingSupplyNeed, ...ShoppingSupplyNeed[]];
 }
@@ -199,7 +199,7 @@ function SupplySection({
   pendingIds: Set<string>;
   failedIds: Set<string>;
 }) {
-  // An unknown line keeps its supply still needed, whatever the known totals say (D-40 ④).
+  // An unknown line keeps its supply still needed, whatever the known totals say.
   const unfulfilled = aggregated.filter(
     (s) => s.unknownCount > 0 || s.totalAcquired < s.totalRequired,
   );

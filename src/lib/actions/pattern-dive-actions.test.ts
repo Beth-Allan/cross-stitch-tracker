@@ -351,7 +351,7 @@ describe("pattern-dive-actions", () => {
       expect(withFabric.kittingPercent).toBe(100);
     });
 
-    it("caps at 99%, never 100%, while a thread line's need is unknown (D-40 ④)", async () => {
+    it("caps at 99%, never 100%, while a thread line's need is unknown — it is still to buy", async () => {
       mockWhatsNextCharts([
         {
           id: "c1",

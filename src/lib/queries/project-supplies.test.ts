@@ -145,7 +145,7 @@ describe("summariseProjectSupplies", () => {
     });
   });
 
-  describe("a thread line whose need is unknown (D-34)", () => {
+  describe("a thread line whose need is unknown (THR-011)", () => {
     it("counts it as unknown and still to buy when every known row is fully acquired", async () => {
       const threads: Row[] = [
         { projectId: "p1", quantityRequired: 3, quantityAcquired: 3 },

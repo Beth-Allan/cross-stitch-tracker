@@ -190,7 +190,8 @@ model SupplyBrand {
 /// A kind of thread within a brand, carrying what the skein calculator needs (THR-010, THR-011).
 /// Every thread belongs to one. A brand with one kind of thread has one line, whose `name` is
 /// blank and never shown; a brand whose lines differ (Kreinik) names each line.
-/// A null length or structure is unknown — the calculator gives no figure for it (D-34).
+/// A null length or structure is unknown — the calculator gives no figure for it rather than
+/// work one out from a guessed length (THR-011).
 model ThreadLine {
   id              String           @id @default(cuid())
   brand           SupplyBrand      @relation(fields: [brandId], references: [id], onDelete: Cascade)
@@ -265,7 +266,7 @@ model ProjectThread {
   threadId         String
   stitchCount      Int      @default(0)
   /// Null when the calculator cannot work it out: the thread's line has no known length or
-  /// strand structure. Unknown is still to buy, never in hand (D-40 ④).
+  /// strand structure. An unknown need is still to buy, never in hand.
   quantityRequired Int?     @default(1)
   quantityAcquired Int      @default(0)
   isNeedOverridden Boolean  @default(false) // true when user manually edited Need

@@ -45,7 +45,7 @@ type ShortfallGroup = {
  * whatever the other rows hold, which a sum only reproduces while every quantity is non-negative
  * — a rule the write boundary enforces and the database does not.
  *
- * A row whose need is unknown (`quantityRequired` null, D-34) drops out of both sums on its own —
+ * A row whose need is unknown (`quantityRequired` null, THR-011) drops out of both sums on its own —
  * SQL skips a null in a sum and no comparison with one is true, so it is never in the shortfall
  * group either. That silence is exactly the trap: left alone it would read as fulfilled. So the
  * totals read also counts the column, which `COUNT(column)` does skipping nulls: the gap between

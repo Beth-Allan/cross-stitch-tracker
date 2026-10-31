@@ -34,6 +34,7 @@ import type {
   UpdateQuantityInput,
 } from "@/lib/validations/supply";
 import { firstValidationMessage, isDuplicateKeyError } from "@/lib/utils/action-errors";
+import type { SkeinLine } from "@/types/supply";
 
 /**
  * Resolve a brandId for inline supply creation. When the client sends
@@ -88,12 +89,19 @@ async function resolveThreadLine(
     const { brand: _brand, ...line } = lines[0];
     return { line };
   }
-  const line = await tx.threadLine.create({
-    data: { brandId, skeinLengthMm: null, strandStructure: null },
+  // An upsert on the blank-name key, so two threads filed at once on a brand with no line meet
+  // on one line instead of the second failing on the unique index.
+  const line = await tx.threadLine.upsert({
+    where: { brandId_name: { brandId, name: "" } },
+    create: { brandId, name: "", skeinLengthMm: null, strandStructure: null },
+    update: {},
     select: THREAD_LINE_FIELDS,
   });
   return { line };
 }
+
+const sameSkeinLine = (a: SkeinLine, b: SkeinLine) =>
+  a.skeinLengthMm === b.skeinLengthMm && a.strandStructure === b.strandStructure;
 
 export async function createThread(formData: ThreadInput) {
   await requireAuth();
@@ -134,7 +142,10 @@ export async function updateThread(id: string, formData: ThreadInput) {
   try {
     const validated = threadSchema.parse(formData);
     const updated = await prisma.$transaction(async (tx) => {
-      const current = await tx.thread.findUnique({ where: { id }, select: { brandId: true } });
+      const current = await tx.thread.findUnique({
+        where: { id },
+        select: { brandId: true, line: { select: { skeinLengthMm: true, strandStructure: true } } },
+      });
       // A line belongs to one brand, so a thread changing brand must change line with it
       if (current && current.brandId !== validated.brandId) {
         const resolved = await resolveThreadLine(tx, validated.brandId);
@@ -143,6 +154,16 @@ export async function updateThread(id: string, formData: ThreadInput) {
           where: { id },
           data: { ...validated, lineId: resolved.line.id },
         });
+        // A calculated need was worked out from the old line's length and structure, so on a line
+        // that differs the calculator can no longer stand behind it: it becomes unknown, and
+        // re-entering the stitch count works it out from the new line. A need typed by hand, or
+        // one with no stitch count behind it, was never the calculator's and stays.
+        if (!sameSkeinLine(current.line, resolved.line)) {
+          await tx.projectThread.updateMany({
+            where: { threadId: id, stitchCount: { gt: 0 }, isNeedOverridden: false },
+            data: { quantityRequired: null },
+          });
+        }
         return { thread };
       }
       const thread = await tx.thread.update({ where: { id }, data: validated });

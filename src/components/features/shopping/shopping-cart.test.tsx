@@ -410,7 +410,7 @@ describe("ShoppingCart", () => {
     });
   });
 
-  describe("a thread line whose need is unknown (D-34)", () => {
+  describe("a thread line whose need is unknown (THR-011)", () => {
     const unknownData: ShoppingCartData = {
       projects: [
         {

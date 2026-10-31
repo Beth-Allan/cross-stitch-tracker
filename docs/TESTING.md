@@ -120,8 +120,8 @@ object; every one takes `Partial<T>` overrides and returns a fully typed `T`.
   `createMockStitchingAppWithStats`, `createMockDesignerChart`, `createMockSeriesChart`,
   `createMockGenreChart`, `createMockGalleryCard`
 - **Relation-loaded** — `createMockProjectWithRelations`, `createMockChartWithRelations`
-- **Supplies and fabric** — `createMockSupplyBrand`, `createMockThread`, `createMockBead`,
-  `createMockSpecialtyItem`, `createMockProjectThread`, `createMockProjectBead`,
+- **Supplies and fabric** — `createMockSupplyBrand`, `createMockThreadLine`, `createMockThread`,
+  `createMockBead`, `createMockSpecialtyItem`, `createMockProjectThread`, `createMockProjectBead`,
   `createMockProjectSpecialty`, `createMockFabricBrand`, `createMockFabric`
 - **Storage and apps** — `createMockStorageLocation`, `createMockStitchingApp`
 - **Harness** — `createMockPrisma()` (every method a `vi.fn()`, with a `$transaction` default

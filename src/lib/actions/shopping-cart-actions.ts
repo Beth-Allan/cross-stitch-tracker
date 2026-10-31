@@ -175,7 +175,7 @@ export async function updateSupplyAcquired(
       return { success: false, error: "Unauthorized" };
     }
 
-    // A thread line whose need is unknown (D-34) has no ceiling: `Math.min(n, null)` is 0, so it
+    // A thread line whose need is unknown (THR-011) has no ceiling: `Math.min(n, null)` is 0, so it
     // would silently throw away what was bought. The floor of 0 is the schema's, above.
     const clamped =
       record.quantityRequired === null

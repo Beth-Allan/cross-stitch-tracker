@@ -128,7 +128,7 @@ describe("QuantityControl", () => {
     expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
   });
 
-  describe("a need that is unknown (D-34)", () => {
+  describe("a need that is unknown (THR-011)", () => {
     const unknownProps = { ...defaultProps, required: null };
 
     it("shows the need as the word Unknown, never as a number", () => {

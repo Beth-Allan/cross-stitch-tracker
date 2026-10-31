@@ -479,7 +479,7 @@ export function createMockGalleryCard(
   };
 }
 
-/** `quantityRequired: null` is a thread line whose need cannot be worked out (D-34). */
+/** `quantityRequired: null` is a thread line whose need cannot be worked out (THR-011). */
 type SupplyRow = { quantityRequired: number | null; quantityAcquired: number };
 type KnownSupplyRow = { quantityRequired: number; quantityAcquired: number };
 
@@ -491,7 +491,7 @@ const hasKnownNeed = (r: SupplyRow): r is KnownSupplyRow => r.quantityRequired !
  * said about them — independently of the query that now produces the same figures.
  *
  * An unknown need has no figure to add to `required` or `acquired`, so it shows only in
- * `unknown` — and, being still to buy, it is never fulfilled (D-40 ④).
+ * `unknown` — and, being still to buy, it is never fulfilled.
  */
 export function createSupplyRollup(rows: SupplyRow[]): SupplyRollup {
   const known = rows.filter(hasKnownNeed);
@@ -669,6 +669,7 @@ export function createMockPrisma() {
     threadLine: {
       create: vi.fn(),
       findMany: vi.fn(),
+      upsert: vi.fn(),
     },
     thread: {
       create: vi.fn(),
@@ -700,6 +701,7 @@ export function createMockPrisma() {
       findMany: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),
+      updateMany: vi.fn(),
       delete: vi.fn(),
       upsert: vi.fn(),
       groupBy: vi.fn(),

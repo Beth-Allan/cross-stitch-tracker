@@ -48,7 +48,7 @@ describe("ShoppingListTab", () => {
     expect(screen.getByText("2 skeins")).toBeInTheDocument();
   });
 
-  describe("a thread line whose need is unknown (D-34)", () => {
+  describe("a thread line whose need is unknown (THR-011)", () => {
     it("is on the list, with Unknown as its quantity", () => {
       render(<ShoppingListTab threads={[unknownLine]} beads={[]} specialty={[]} fabrics={[]} />);
 

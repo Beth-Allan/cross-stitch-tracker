@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 interface QuantityControlProps {
   acquired: number;
-  /** `null` when no figure is known at all — a thread line whose need is unknown (D-34). */
+  /** `null` when no figure is known at all — a thread line whose need is unknown (THR-011). */
   required: number | null;
   /** The known `required` total also covers lines whose need is unknown: shown "N + unknown". */
   plusUnknown?: boolean;
@@ -24,7 +24,7 @@ export function QuantityControl({
   onChange,
 }: QuantityControlProps) {
   // An unknown need is still to buy and has no ceiling, so it is never fulfilled and never
-  // clamped (D-40 ④). The null check comes first because JS calls `acquired >= null` true.
+  // clamped. The null check comes first because JS calls `acquired >= null` true.
   const ceiling = required === null || plusUnknown ? null : required;
   const isFulfilled = ceiling !== null && acquired >= ceiling;
   const needLabel =

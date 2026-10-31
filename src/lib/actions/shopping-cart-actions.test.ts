@@ -550,7 +550,7 @@ describe("shopping-cart-actions", () => {
     });
 
     it("accepts any quantity of 0 or more on a thread line whose need is unknown", async () => {
-      // No need to clamp to: Math.min(7, null) would silently store 0 (D-34).
+      // No need to clamp to: Math.min(7, null) would silently store 0.
       mockPrisma.projectThread.findUnique.mockResolvedValue({
         id: "junction-u",
         projectId: "project-1",

@@ -61,8 +61,8 @@ export async function getWhatsNextProjects(): Promise<WhatsNextProject[]> {
       const hasSupplyItems = supplyTotals.count > 0;
       const knownPercent = !hasSupplyItems ? 0 : Math.round((totalAcquired / totalRequired) * 100);
       // A line whose need is unknown is still to buy, so the kit can never read complete while
-      // one exists (D-40 ④). Those lines add nothing to either sum — how much of the percentage
-      // they should weigh is F-18's question for Beth — so for now the figure stops at 99.
+      // one exists. Those lines add nothing to either sum — how much of the percentage they
+      // should weigh is not yet decided — so for now the figure stops at 99.
       const kittingPercent = supplyTotals.unknown > 0 ? Math.min(knownPercent, 99) : knownPercent;
 
       return {

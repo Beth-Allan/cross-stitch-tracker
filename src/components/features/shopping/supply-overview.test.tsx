@@ -452,7 +452,7 @@ describe("SupplyOverview", () => {
     });
   });
 
-  describe("a thread line whose need is unknown (D-34)", () => {
+  describe("a thread line whose need is unknown (THR-011)", () => {
     const unknownProps = {
       beads: [] as ShoppingSupplyNeed[],
       specialty: [] as ShoppingSupplyNeed[],

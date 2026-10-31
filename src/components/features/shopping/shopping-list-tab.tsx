@@ -23,8 +23,8 @@ interface ListItem {
 }
 
 /**
- * A need of `null` (D-34) is still to buy and has no figure, so it is listed as "Unknown" — the
- * null check comes first in every loop because JS calls `acquired >= null` true (D-40 ④).
+ * A need of `null` (THR-011) is still to buy and has no figure, so it is listed as "Unknown" —
+ * the null check comes first in every loop because JS calls `acquired >= null` true.
  */
 function buildListItems(
   threads: ShoppingSupplyNeed[],

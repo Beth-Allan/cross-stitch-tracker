@@ -1,17 +1,24 @@
 import type { ChartFormValues } from "./use-chart-form";
 import type { SupplyRow, CalcParams } from "@/components/features/supply-table/types";
 import { DEFAULT_CALC_PARAMS } from "@/components/features/supply-table/types";
+import type { SkeinLine, StrandStructure } from "@/types/supply";
 
 export const DRAFT_KEY = "chart-draft";
 
 const SUPPLY_TYPES = new Set(["THREAD", "BEAD", "SPECIALTY"]);
 
+/** Keyed by the enum, so a strand structure added to the schema fails the type check here. */
+const STRAND_STRUCTURES: Record<StrandStructure, true> = { SIX_STRAND: true, USED_WHOLE: true };
+
+const isStrandStructure = (v: unknown): v is StrandStructure =>
+  typeof v === "string" && Object.hasOwn(STRAND_STRUCTURES, v);
+
 /**
  * Lightweight runtime guard — rejects malformed supply rows from localStorage. Only a thread's
- * need may be null (unknown). A row saved before rows carried their thread's line has none;
- * `restoreSupplyRow` reads that as unknown.
+ * need may be null (unknown). The row's line is not checked here: `restoreSupplyRow` reads a
+ * missing or malformed one as unknown.
  */
-function isValidSupplyRow(s: unknown): s is Omit<SupplyRow, "line"> & Partial<SupplyRow> {
+function isValidSupplyRow(s: unknown): s is Omit<SupplyRow, "line"> & { line?: unknown } {
   if (typeof s !== "object" || s === null) return false;
   const r = s as Record<string, unknown>;
   return (
@@ -26,13 +33,25 @@ function isValidSupplyRow(s: unknown): s is Omit<SupplyRow, "line"> & Partial<Su
     typeof r.stitchCount === "number" &&
     (typeof r.need === "number" || (r.need === null && r.type === "THREAD")) &&
     typeof r.have === "number" &&
-    typeof r.isNeedOverridden === "boolean" &&
-    (r.line === undefined || typeof r.line === "object")
+    typeof r.isNeedOverridden === "boolean"
   );
 }
 
-function restoreSupplyRow(row: Omit<SupplyRow, "line"> & Partial<SupplyRow>): SupplyRow {
-  return { ...row, line: row.line ?? null };
+/**
+ * A stored line only when both fields are ones the calculator can read; anything else is unknown.
+ * A row saved before rows carried their thread's line has none, and a field that is missing
+ * would reach the calculator as `undefined`, pass its `=== null` check, and come out as NaN.
+ */
+function restoreLine(line: unknown): SkeinLine | null {
+  if (typeof line !== "object" || line === null) return null;
+  const { skeinLengthMm, strandStructure } = line as Record<string, unknown>;
+  if (skeinLengthMm !== null && typeof skeinLengthMm !== "number") return null;
+  if (strandStructure !== null && !isStrandStructure(strandStructure)) return null;
+  return { skeinLengthMm, strandStructure };
+}
+
+function restoreSupplyRow(row: Omit<SupplyRow, "line"> & { line?: unknown }): SupplyRow {
+  return { ...row, line: restoreLine(row.line) };
 }
 
 /**

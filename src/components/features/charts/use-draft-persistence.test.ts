@@ -365,6 +365,44 @@ describe("use-draft-persistence", () => {
       expect(result!.supplies[1]).toEqual(expect.objectContaining({ need: 3, line: null }));
     });
 
+    it("reads a stored line that is empty, missing a field, or carrying a strange value as line unknown", async () => {
+      const { loadDraftV2 } = await import("./use-draft-persistence");
+      const row = {
+        supplyId: "t1",
+        type: "THREAD",
+        code: "310",
+        name: "Black",
+        brandName: "DMC",
+        hexColor: "#000000",
+        stitchCount: 5000,
+        need: 4,
+        have: 0,
+        isNeedOverridden: false,
+      };
+      const knownLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
+      const supplies = [
+        { ...row, id: "row-empty", line: {} },
+        { ...row, id: "row-no-structure", line: { skeinLengthMm: 8000 } },
+        { ...row, id: "row-text-length", line: { skeinLengthMm: "8000", strandStructure: null } },
+        { ...row, id: "row-odd-structure", line: { skeinLengthMm: 8000, strandStructure: "TWO" } },
+        { ...row, id: "row-known", line: knownLine },
+      ];
+      localStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify({ version: 2, form: createDraftValues(), supplies, calcParams: {} }),
+      );
+
+      const result = loadDraftV2(createDefaultValues(), ["designer-1"], ["storage-1"], ["app-1"]);
+
+      expect(result!.supplies.map((s) => [s.id, s.line])).toEqual([
+        ["row-empty", null],
+        ["row-no-structure", null],
+        ["row-text-length", null],
+        ["row-odd-structure", null],
+        ["row-known", knownLine],
+      ]);
+    });
+
     it("drops a bead row whose need is null: only a thread's need can be unknown", async () => {
       const { loadDraftV2 } = await import("./use-draft-persistence");
       const bead = {
