@@ -44,7 +44,7 @@ a data file and tests, stay ungated and merge on her word after a preview). The 
 gate neither and rely on C-1's review alone. A gate-list change is hers (hard rule 6).
 **Recommendation:** gate the folder, not the data.
 
-**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-45 or later) before
+**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-46 or later — D-45 went to F-16a on 2026-10-31) before
 its branch opens; the path file and protocol §5 change in C-1's PR if she says yes.
 
 ## Also open — the question known to be coming
@@ -64,12 +64,12 @@ branch from production on 2026-10-31 (the "Reset data" dialog shown to the sessi
 databases and roles on `preview` will be replaced with the latest data from `production`"), and the
 session read it, read-only (`BEGIN READ ONLY`): **migrations** — the March one, the baseline and
 `pipeline_check`, all finished; **brands** — DMC (`THREAD`, 496 colours), "Custom (Thread)"
-(`THREAD`, **one** colour: 3887 "Very Dark Lavender", quick-added 2026-10-26) and Mill Hill (`BEAD`,
+(`THREAD`, **one** colour: 3887 "Very Dark Lavender", added 2026-10-26) and Mill Hill (`BEAD`,
 no beads); **no brand named or near-named** Kreinik, Weeks, Gentle Art or Anchor, of any type, and
 **no specialty items at all**, so trap ①'s stop-and-asks do not fire; **project thread lines** —
 2,116 across 129 projects: DMC 2,114 (1,457 with a stitch count, 6 overridden, 1,455 calculated),
 "Custom (Thread)" 2 (both 3887, stitch counts 16 and 131, need 1, calculated); every project with
-thread lines has its strands within 1–6, over-count 1 and no fabric linked. **So the only saved
+thread lines has its strands within 1–6, none over two and no fabric linked. **So the only saved
 figures F-16a's recompute would reach are the two 3887 lines — and only by making them unknown.**
 No saved figure sits on a line whose length changes (Weeks Dye Works, The Gentle Art and Kreinik do
 not exist until the migration creates them), so the formula half of the recompute — the skein maths
@@ -98,11 +98,16 @@ with a stitch count, `isNeedOverridden = false`, on a line that is not 8 m six-s
 re-entering the stitch count works it out from the line. Trap ⑩'s SQL-against-TypeScript rehearsal
 is retired with it; the migration is still rehearsed on a local Postgres 17. The migration also
 **moves 3887 from "Custom (Thread)" to DMC**, only where DMC has no 3887 of its own, so its two lines
-keep their saved needs. That 3887 is a discontinued DMC colour is Beth's statement about her own
-thread, recorded here as a data ruling — not a domain fact (`/stitch-fact` owns those). **For
-`/plan-feature discontinued colours`:** 3887 is already a DMC colour, unmarked, so a catalogue that
-adds missing rows only will skip it — the mark has to reach colours that already exist. F-19's own
-recompute question is unchanged; its reference to F-16a trap ⑩ is annotated.
+keep their saved needs. F-16a relies only on "it's DMC" — Beth's correction of her own entry, a
+data ruling. That 3887 is _discontinued_ is a claim about DMC's range, not a domain fact here
+(`/stitch-fact` owns those): **`/plan-feature discontinued colours`** takes it from its documented
+source or a `/stitch-fact` before relying on it. For that plan too: 3887 is already a DMC colour,
+unmarked, so a catalogue that adds missing rows only will skip it — the mark has to reach colours
+that already exist. F-19's own recompute question is unchanged; its references to F-16a trap ⑩
+are annotated. The layer-1 review of PR #149 then made the build's pre-push check firm: Beth resets
+`preview` once more before the push (a re-read without a reset sees nothing new), any other "Custom
+(Thread)" thread goes to her, a failed check is a stop-and-ask, and `/review F-16a` asks again
+before merging (F-16a trap ⑬).
 
 ### 2026-10-29 · D-44 · Beth's cut length contradicts the skein formula's 18-inch cut — fixed in its own item after F-16a — ruled during `/stitch-fact`
 
