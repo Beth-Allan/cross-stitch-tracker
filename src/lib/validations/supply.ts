@@ -72,11 +72,15 @@ export const specialtyItemSchema = z.object({
 
 export type SpecialtyItemInput = z.input<typeof specialtyItemSchema>;
 
+/**
+ * A thread's need is null when its line has no known length or strand structure (THR-011) —
+ * unknown, still to buy. Beads and specialty items always need a number.
+ */
 export const projectThreadSchema = z.object({
   projectId: z.string().min(1),
   threadId: z.string().min(1),
   stitchCount: wholeNumber().min(0).default(0),
-  quantityRequired: wholeNumber().min(1).default(1),
+  quantityRequired: wholeNumber().min(1).nullable().default(1),
   quantityAcquired: z.number().int().min(0).default(0),
 });
 
@@ -100,8 +104,9 @@ export const projectSpecialtySchema = z.object({
 
 export type ProjectSpecialtyInput = z.input<typeof projectSpecialtySchema>;
 
+/** Shared by the three junction types; only a thread may send a null (unknown) need. */
 export const updateQuantitySchema = z.object({
-  quantityRequired: z.number().int().min(1).optional(),
+  quantityRequired: z.number().int().min(1).nullable().optional(),
   quantityAcquired: z.number().int().min(0).optional(),
   stitchCount: z.number().int().min(0).optional(),
   isNeedOverridden: z.boolean().optional(),

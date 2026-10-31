@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import type { Prisma } from "@/generated/prisma/client";
 import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 import { naturalSortByCode } from "@/lib/utils/natural-sort";
 import {
@@ -33,6 +34,7 @@ import type {
   UpdateQuantityInput,
 } from "@/lib/validations/supply";
 import { firstValidationMessage, isDuplicateKeyError } from "@/lib/utils/action-errors";
+import type { SkeinLine } from "@/types/supply";
 
 /**
  * Resolve a brandId for inline supply creation. When the client sends
@@ -42,13 +44,14 @@ import { firstValidationMessage, isDuplicateKeyError } from "@/lib/utils/action-
 async function resolveDefaultBrandId(
   brandId: string,
   supplyType: "THREAD" | "BEAD" | "SPECIALTY",
+  db: Prisma.TransactionClient = prisma,
 ): Promise<string> {
   if (brandId !== "default") return brandId;
 
   // Use distinct brand names per supply type so each type gets its own
   // "Custom" brand record with the correct supplyType field.
   const brandName = `Custom (${supplyType.charAt(0) + supplyType.slice(1).toLowerCase()})`;
-  const brand = await prisma.supplyBrand.upsert({
+  const brand = await db.supplyBrand.upsert({
     where: { name: brandName },
     create: { name: brandName, supplyType },
     update: {},
@@ -56,18 +59,68 @@ async function resolveDefaultBrandId(
   return brand.id;
 }
 
+const THREAD_LINE_FIELDS = { id: true, skeinLengthMm: true, strandStructure: true } as const;
+
+type ResolvedThreadLine =
+  | { line: Prisma.ThreadLineGetPayload<{ select: typeof THREAD_LINE_FIELDS }> }
+  | { refusal: string };
+
+/**
+ * The line a new or re-branded thread is filed on. A brand's only line is the answer; a brand
+ * with none gets its one blank line, length and strand structure unknown. A brand with several
+ * (Kreinik) is refused, never guessed: which line a thread belongs to changes its skein count,
+ * and no form can ask yet.
+ */
+async function resolveThreadLine(
+  tx: Prisma.TransactionClient,
+  brandId: string,
+): Promise<ResolvedThreadLine> {
+  const lines = await tx.threadLine.findMany({
+    where: { brandId },
+    select: { ...THREAD_LINE_FIELDS, brand: { select: { name: true } } },
+    take: 2,
+  });
+  if (lines.length > 1) {
+    return {
+      refusal: `${lines[0].brand.name} has several thread lines, and picking one arrives with the brand form — this thread can't be added yet.`,
+    };
+  }
+  if (lines.length === 1) {
+    const { brand: _brand, ...line } = lines[0];
+    return { line };
+  }
+  // An upsert on the blank-name key, so two threads filed at once on a brand with no line meet
+  // on one line instead of the second failing on the unique index.
+  const line = await tx.threadLine.upsert({
+    where: { brandId_name: { brandId, name: "" } },
+    create: { brandId, name: "", skeinLengthMm: null, strandStructure: null },
+    update: {},
+    select: THREAD_LINE_FIELDS,
+  });
+  return { line };
+}
+
+const sameSkeinLine = (a: SkeinLine, b: SkeinLine) =>
+  a.skeinLengthMm === b.skeinLengthMm && a.strandStructure === b.strandStructure;
+
 export async function createThread(formData: ThreadInput) {
   await requireAuth();
 
   try {
     const validated = threadSchema.parse(formData);
-    const resolvedBrandId = await resolveDefaultBrandId(validated.brandId, "THREAD");
-    const thread = await prisma.thread.create({
-      data: { ...validated, brandId: resolvedBrandId },
+    const created = await prisma.$transaction(async (tx) => {
+      const brandId = await resolveDefaultBrandId(validated.brandId, "THREAD", tx);
+      const resolved = await resolveThreadLine(tx, brandId);
+      if ("refusal" in resolved) return resolved;
+      const thread = await tx.thread.create({
+        data: { ...validated, brandId, lineId: resolved.line.id },
+      });
+      return { thread: { ...thread, line: resolved.line } };
     });
+    if ("refusal" in created) return { success: false as const, error: created.refusal };
     revalidatePath("/supplies");
     revalidateTag("stats", { expire: 0 });
-    return { success: true as const, thread };
+    return { success: true as const, thread: created.thread };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: firstValidationMessage(error) };
@@ -88,13 +141,44 @@ export async function updateThread(id: string, formData: ThreadInput) {
 
   try {
     const validated = threadSchema.parse(formData);
-    const thread = await prisma.thread.update({
-      where: { id },
-      data: validated,
+    const updated = await prisma.$transaction(async (tx) => {
+      const current = await tx.thread.findUnique({
+        where: { id },
+        select: { brandId: true, line: { select: { skeinLengthMm: true, strandStructure: true } } },
+      });
+      // A line belongs to one brand, so a thread changing brand must change line with it
+      if (current && current.brandId !== validated.brandId) {
+        const resolved = await resolveThreadLine(tx, validated.brandId);
+        if ("refusal" in resolved) return resolved;
+        const thread = await tx.thread.update({
+          where: { id },
+          data: { ...validated, lineId: resolved.line.id },
+        });
+        // A calculated need was worked out from the old line's length and structure, so on a line
+        // that differs the calculator can no longer stand behind it: it becomes unknown, and
+        // re-entering the stitch count works it out from the new line. A need typed by hand, or
+        // one with no stitch count behind it, was never the calculator's and stays.
+        if (!sameSkeinLine(current.line, resolved.line)) {
+          await tx.projectThread.updateMany({
+            where: { threadId: id, stitchCount: { gt: 0 }, isNeedOverridden: false },
+            data: { quantityRequired: null },
+          });
+          return { thread, needsChanged: true };
+        }
+        return { thread, needsChanged: false };
+      }
+      const thread = await tx.thread.update({ where: { id }, data: validated });
+      return { thread, needsChanged: false };
     });
+    if ("refusal" in updated) return { success: false as const, error: updated.refusal };
     revalidatePath("/supplies");
+    if (updated.needsChanged) {
+      // The needs that just became unknown show on project pages and the shopping list
+      revalidatePath("/charts");
+      revalidatePath("/shopping");
+    }
     revalidateTag("stats", { expire: 0 });
-    return { success: true as const, thread };
+    return { success: true as const, thread: updated.thread };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: firstValidationMessage(error) };
@@ -139,7 +223,7 @@ export async function getThreads(brandId?: string, colorFamily?: string, search?
 
   const threads = await prisma.thread.findMany({
     where,
-    include: { brand: true },
+    include: { brand: true, line: true },
   });
   return threads.sort((a, b) => naturalSortByCode(a.colorCode, b.colorCode));
 }
@@ -330,7 +414,15 @@ export async function createSupplyBrand(formData: SupplyBrandInput) {
 
   try {
     const validated = supplyBrandSchema.parse(formData);
-    const brand = await prisma.supplyBrand.create({ data: validated });
+    const brand = await prisma.supplyBrand.create({
+      data:
+        validated.supplyType === "THREAD"
+          ? {
+              ...validated,
+              threadLines: { create: { skeinLengthMm: null, strandStructure: null } },
+            }
+          : validated,
+    });
     revalidatePath("/supplies");
     revalidatePath("/supplies/brands");
     revalidateTag("stats", { expire: 0 });
@@ -526,7 +618,7 @@ export async function updateProjectSupplyQuantity(
   const user = await requireAuth();
 
   try {
-    const validated = updateQuantitySchema.parse(formData);
+    const { quantityRequired, ...rest } = updateQuantitySchema.parse(formData);
 
     // Verify ownership before updating
     if (type === "thread") {
@@ -539,32 +631,36 @@ export async function updateProjectSupplyQuantity(
       }
       await prisma.projectThread.update({
         where: { id },
-        data: validated,
-      });
-    } else if (type === "bead") {
-      const record = await prisma.projectBead.findUnique({
-        where: { id },
-        select: { project: { select: { userId: true } } },
-      });
-      if (!record || record.project.userId !== user.id) {
-        return { success: false as const, error: "Supply not found" };
-      }
-      await prisma.projectBead.update({
-        where: { id },
-        data: validated,
+        data: { ...rest, quantityRequired },
       });
     } else {
-      const record = await prisma.projectSpecialty.findUnique({
-        where: { id },
-        select: { project: { select: { userId: true } } },
-      });
-      if (!record || record.project.userId !== user.id) {
-        return { success: false as const, error: "Supply not found" };
+      // A bead or specialty item has no line to be unknown about: its need is always a number
+      if (quantityRequired === null) {
+        return {
+          success: false as const,
+          error: "Only a thread's need can be unknown — enter how many you need.",
+        };
       }
-      await prisma.projectSpecialty.update({
-        where: { id },
-        data: validated,
-      });
+      const data = { ...rest, quantityRequired };
+      if (type === "bead") {
+        const record = await prisma.projectBead.findUnique({
+          where: { id },
+          select: { project: { select: { userId: true } } },
+        });
+        if (!record || record.project.userId !== user.id) {
+          return { success: false as const, error: "Supply not found" };
+        }
+        await prisma.projectBead.update({ where: { id }, data });
+      } else {
+        const record = await prisma.projectSpecialty.findUnique({
+          where: { id },
+          select: { project: { select: { userId: true } } },
+        });
+        if (!record || record.project.userId !== user.id) {
+          return { success: false as const, error: "Supply not found" };
+        }
+        await prisma.projectSpecialty.update({ where: { id }, data });
+      }
     }
 
     revalidatePath("/charts");
@@ -676,7 +772,7 @@ export async function getProjectSupplies(projectId: string) {
   const [threads, beads, specialty] = await Promise.all([
     prisma.projectThread.findMany({
       where: { projectId },
-      include: { thread: { include: { brand: true } } },
+      include: { thread: { include: { brand: true, line: true } } },
       orderBy: { createdAt: "asc" },
     }),
     prisma.projectBead.findMany({
@@ -709,19 +805,22 @@ export async function createAndAddThread(formData: CreateAndAddThreadInput) {
       return { success: false as const, error: "Project not found" };
     }
 
-    const resolvedBrandId = await resolveDefaultBrandId(validated.brandId, "THREAD");
-
     const result = await prisma.$transaction(async (tx) => {
+      const brandId = await resolveDefaultBrandId(validated.brandId, "THREAD", tx);
+      const resolved = await resolveThreadLine(tx, brandId);
+      if ("refusal" in resolved) return resolved;
       const thread = await tx.thread.create({
         data: {
           colorCode: validated.colorCode || "CUSTOM",
           colorName: validated.name,
           hexColor: validated.hexColor,
-          brandId: resolvedBrandId,
+          brandId,
+          lineId: resolved.line.id,
           colorFamily: validated.colorFamily,
         },
         include: { brand: true },
       });
+      // No stitch count yet, so the need starts at 1 on every line, known or not
       const link = await tx.projectThread.create({
         data: {
           projectId: validated.projectId,
@@ -731,13 +830,14 @@ export async function createAndAddThread(formData: CreateAndAddThreadInput) {
           quantityAcquired: 0,
         },
       });
-      return { thread, link };
+      return { record: { thread: { ...thread, line: resolved.line }, link } };
     });
+    if ("refusal" in result) return { success: false as const, error: result.refusal };
 
     revalidatePath("/charts");
     revalidatePath("/shopping");
     revalidateTag("stats", { expire: 0 });
-    return { success: true as const, record: result };
+    return { success: true as const, record: result.record };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false as const, error: firstValidationMessage(error) };

@@ -9,7 +9,7 @@ import type {
   CalcParams,
   Result,
 } from "./types";
-import { calculateSkeins } from "@/lib/utils/skein-calculator";
+import { skeinLineOf, threadNeed } from "./thread-need";
 import {
   addThreadToProject,
   addBeadToProject,
@@ -60,7 +60,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
     this.rows = rows;
   }
 
-  async addThread(threadId: string, stitchCount: number, need: number): Promise<Result> {
+  async addThread(threadId: string, stitchCount: number, need: number | null): Promise<Result> {
     const result = await addThreadToProject({
       projectId: this.projectId,
       threadId,
@@ -118,19 +118,9 @@ export class ServerActionAdapter implements SupplyTableAdapter {
     switch (field) {
       case "stitchCount": {
         mappedData = { stitchCount: value };
-        // Recalculate need if this is a non-overridden thread row with calcParams available
         const row = this.rows.find((r) => r.id === junctionId);
         if (row && row.type === "THREAD" && !row.isNeedOverridden && this.calcParams) {
-          const recalculated = calculateSkeins({
-            stitchCount: value,
-            strandCount: this.calcParams.strandCount,
-            fabricCount: this.calcParams.fabricCount,
-            overCount: this.calcParams.overCount,
-            wastePercent: this.calcParams.wastePercent,
-          });
-          // A supply always needs at least 1: the calculator says 0 for an empty stitch count,
-          // which the server would refuse.
-          mappedData.quantityRequired = Math.max(1, recalculated);
+          mappedData.quantityRequired = threadNeed(value, this.calcParams, row.line);
         }
         break;
       }
@@ -185,6 +175,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
           brandName: t.brand.name,
           brandId: t.brandId,
           hexColor: t.hexColor ?? "",
+          line: skeinLineOf(t.line),
         }));
       }
       case "BEAD": {
@@ -197,6 +188,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
           brandName: b.brand.name,
           brandId: b.brandId,
           hexColor: b.hexColor ?? "",
+          line: null,
         }));
       }
       case "SPECIALTY": {
@@ -209,6 +201,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
           brandName: s.brand.name,
           brandId: s.brandId,
           hexColor: s.hexColor ?? "",
+          line: null,
         }));
       }
     }
@@ -238,6 +231,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
           brandName: result.record.thread.brand.name,
           brandId: result.record.thread.brandId,
           hexColor: result.record.thread.hexColor ?? "",
+          line: skeinLineOf(result.record.thread.line),
         };
       }
       case "BEAD": {
@@ -261,6 +255,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
           brandName: result.record.bead.brand.name,
           brandId: result.record.bead.brandId,
           hexColor: result.record.bead.hexColor ?? "",
+          line: null,
         };
       }
       case "SPECIALTY": {
@@ -282,6 +277,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
           brandName: result.record.item.brand.name,
           brandId: result.record.item.brandId,
           hexColor: result.record.item.hexColor ?? "",
+          line: null,
         };
       }
     }

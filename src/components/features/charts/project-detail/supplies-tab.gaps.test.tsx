@@ -21,6 +21,7 @@ import type { ProjectDetailProps } from "./types";
 import {
   createMockSupplyBrand,
   createMockThread,
+  createMockThreadLine,
   createMockProjectThread,
 } from "@/__tests__/mocks/factories";
 import type { ProjectThreadWithThread } from "@/types/supply";
@@ -104,6 +105,7 @@ function makeThread(overrides?: Partial<ProjectThreadWithThread>): ProjectThread
       isNeedOverridden: false,
     }),
     thread: {
+      line: createMockThreadLine(),
       ...createMockThread({
         id: "thread-1",
         colorCode: "310",

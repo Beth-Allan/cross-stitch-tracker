@@ -227,6 +227,46 @@ describe("shopping-cart-actions", () => {
       });
     });
 
+    it("passes a thread line's unknown need through as null, never as a number", async () => {
+      mockPrisma.project.findMany.mockResolvedValue([
+        {
+          id: "p1",
+          chartId: "c1",
+          userId: "user-1",
+          status: "KITTING",
+          chart: {
+            name: "Unknown Chart",
+            stitchesWide: 100,
+            stitchesHigh: 100,
+            coverThumbnailUrl: null,
+            designer: null,
+          },
+          projectThreads: [
+            {
+              id: "pt-u",
+              threadId: "t-u",
+              quantityRequired: null,
+              quantityAcquired: 0,
+              thread: {
+                colorCode: "001",
+                colorName: "Silver",
+                hexColor: "#c0c0c0",
+                brand: { name: "Kreinik" },
+              },
+            },
+          ],
+          projectBeads: [],
+          projectSpecialty: [],
+          fabric: null,
+        },
+      ]);
+
+      const { getShoppingCartData } = await import("./shopping-cart-actions");
+      const result = await getShoppingCartData();
+
+      expect(result.threads[0].quantityRequired).toBeNull();
+    });
+
     it("maps bead junction records to ShoppingSupplyNeed", async () => {
       mockPrisma.project.findMany.mockResolvedValue([
         {
@@ -487,6 +527,63 @@ describe("shopping-cart-actions", () => {
         data: { quantityAcquired: 2 },
       });
       expect(revalidatePath).toHaveBeenCalledWith("/shopping");
+    });
+
+    it("clamps a known need's acquired quantity at what it requires", async () => {
+      mockPrisma.projectThread.findUnique.mockResolvedValue({
+        id: "junction-1",
+        projectId: "project-1",
+        quantityRequired: 3,
+        quantityAcquired: 0,
+        project: { userId: "user-1" },
+      });
+      mockPrisma.projectThread.update.mockResolvedValue({});
+
+      const { updateSupplyAcquired } = await import("./shopping-cart-actions");
+      const result = await updateSupplyAcquired("thread", "junction-1", 5);
+
+      expect(result).toEqual({ success: true });
+      expect(mockPrisma.projectThread.update).toHaveBeenCalledWith({
+        where: { id: "junction-1" },
+        data: { quantityAcquired: 3 },
+      });
+    });
+
+    it("accepts any quantity of 0 or more on a thread line whose need is unknown", async () => {
+      // No need to clamp to: Math.min(7, null) would silently store 0.
+      mockPrisma.projectThread.findUnique.mockResolvedValue({
+        id: "junction-u",
+        projectId: "project-1",
+        quantityRequired: null,
+        quantityAcquired: 0,
+        project: { userId: "user-1" },
+      });
+      mockPrisma.projectThread.update.mockResolvedValue({});
+
+      const { updateSupplyAcquired } = await import("./shopping-cart-actions");
+      const result = await updateSupplyAcquired("thread", "junction-u", 7);
+
+      expect(result).toEqual({ success: true });
+      expect(mockPrisma.projectThread.update).toHaveBeenCalledWith({
+        where: { id: "junction-u" },
+        data: { quantityAcquired: 7 },
+      });
+    });
+
+    it("still refuses a negative quantity on a thread line whose need is unknown", async () => {
+      mockPrisma.projectThread.findUnique.mockResolvedValue({
+        id: "junction-u",
+        projectId: "project-1",
+        quantityRequired: null,
+        quantityAcquired: 2,
+        project: { userId: "user-1" },
+      });
+
+      const { updateSupplyAcquired } = await import("./shopping-cart-actions");
+      const result = await updateSupplyAcquired("thread", "junction-u", -1);
+
+      assertFailure(result);
+      expect(mockPrisma.projectThread.update).not.toHaveBeenCalled();
     });
 
     it("updates quantityAcquired for bead type", async () => {

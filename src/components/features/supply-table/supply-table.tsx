@@ -163,8 +163,9 @@ export function SupplyTable({
     [adapter],
   );
 
-  const totalSkeinsNeeded = threads.reduce((sum, t) => sum + t.need, 0);
-  const totalItemsNeeded = [...threads, ...beads, ...specialty].reduce((sum, s) => sum + s.need, 0);
+  const totalSkeinsNeeded = threads.reduce((sum, t) => sum + (t.need ?? 0), 0);
+  const totalItemsNeeded = allRows.reduce((sum, s) => sum + (s.need ?? 0), 0);
+  const unknownNeedCount = threads.filter((t) => t.need === null).length;
 
   return (
     <div className="border-border bg-card overflow-hidden rounded-lg border">
@@ -282,6 +283,7 @@ export function SupplyTable({
         specialtyCount={specialty.length}
         totalSkeinsNeeded={totalSkeinsNeeded}
         totalItemsNeeded={totalItemsNeeded}
+        unknownNeedCount={unknownNeedCount}
       />
     </div>
   );

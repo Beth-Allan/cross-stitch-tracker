@@ -80,16 +80,18 @@ vi.mock("./supply-table-footer", () => ({
     specialtyCount,
     totalSkeinsNeeded,
     totalItemsNeeded,
+    unknownNeedCount,
   }: {
     threadCount: number;
     beadCount: number;
     specialtyCount: number;
     totalSkeinsNeeded: number;
     totalItemsNeeded: number;
+    unknownNeedCount: number;
   }) => (
     <div data-testid="supply-table-footer">
       threads={threadCount} beads={beadCount} specialty={specialtyCount} skeins=
-      {totalSkeinsNeeded} items={totalItemsNeeded}
+      {totalSkeinsNeeded} items={totalItemsNeeded} unknown={unknownNeedCount}
     </div>
   ),
 }));
@@ -123,6 +125,7 @@ function makeThread(overrides: Partial<SupplyRow> = {}): SupplyRow {
     need: 3,
     have: 1,
     isNeedOverridden: false,
+    line: { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" },
     ...overrides,
   };
 }
@@ -140,6 +143,7 @@ function makeBead(overrides: Partial<SupplyRow> = {}): SupplyRow {
     need: 2,
     have: 0,
     isNeedOverridden: false,
+    line: null,
     ...overrides,
   };
 }
@@ -157,6 +161,7 @@ function makeSpecialty(overrides: Partial<SupplyRow> = {}): SupplyRow {
     need: 1,
     have: 1,
     isNeedOverridden: false,
+    line: null,
     ...overrides,
   };
 }
@@ -177,6 +182,7 @@ function createMockAdapter(): SupplyTableAdapter {
       brandName: "Custom",
       brandId: "b1",
       hexColor: DEFAULT_SUPPLY_HEX,
+      line: { skeinLengthMm: null, strandStructure: null },
     }),
   };
 }
@@ -269,6 +275,16 @@ describe("SupplyTable", () => {
     expect(footer).toHaveTextContent("skeins=8");
     // totalItemsNeeded = 3 + 5 + 2 = 10
     expect(footer).toHaveTextContent("items=10");
+  });
+
+  it("leaves an unknown need out of the totals and counts it on its own", () => {
+    const threads = [makeThread({ need: 3 }), makeThread({ id: "t2", need: null })];
+    const beads = [makeBead({ need: 2 })];
+    render(<SupplyTable threads={threads} beads={beads} specialty={[]} adapter={adapter} />);
+    const footer = screen.getByTestId("supply-table-footer");
+    expect(footer).toHaveTextContent("skeins=3");
+    expect(footer).toHaveTextContent("items=5");
+    expect(footer).toHaveTextContent("unknown=1");
   });
 
   it("renders empty state when no supplies of any type exist", () => {

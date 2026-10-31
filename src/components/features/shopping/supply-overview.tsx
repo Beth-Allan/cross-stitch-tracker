@@ -29,8 +29,11 @@ interface AggregatedSupply {
   colorName: string;
   hexColor: string | null;
   unit: string;
+  /** The sum of the known needs only — an unknown one has no figure to add. */
   totalRequired: number;
   totalAcquired: number;
+  /** Lines whose need is unknown (THR-011): while any exists the supply is still to buy. */
+  unknownCount: number;
   items: [ShoppingSupplyNeed, ...ShoppingSupplyNeed[]];
 }
 
@@ -39,9 +42,11 @@ function aggregateSupplies(supplies: ShoppingSupplyNeed[]): AggregatedSupply[] {
 
   for (const supply of supplies) {
     const existing = map.get(supply.supplyId);
+    const unknown = supply.quantityRequired === null ? 1 : 0;
     if (existing) {
-      existing.totalRequired += supply.quantityRequired;
+      existing.totalRequired += supply.quantityRequired ?? 0;
       existing.totalAcquired += supply.quantityAcquired;
+      existing.unknownCount += unknown;
       existing.items.push(supply);
     } else {
       map.set(supply.supplyId, {
@@ -51,8 +56,9 @@ function aggregateSupplies(supplies: ShoppingSupplyNeed[]): AggregatedSupply[] {
         colorName: supply.colorName,
         hexColor: supply.hexColor,
         unit: supply.unit,
-        totalRequired: supply.quantityRequired,
+        totalRequired: supply.quantityRequired ?? 0,
         totalAcquired: supply.quantityAcquired,
+        unknownCount: unknown,
         items: [supply],
       });
     }
@@ -193,8 +199,13 @@ function SupplySection({
   pendingIds: Set<string>;
   failedIds: Set<string>;
 }) {
-  const unfulfilled = aggregated.filter((s) => s.totalAcquired < s.totalRequired);
-  const fulfilled = aggregated.filter((s) => s.totalAcquired >= s.totalRequired);
+  // An unknown line keeps its supply still needed, whatever the known totals say.
+  const unfulfilled = aggregated.filter(
+    (s) => s.unknownCount > 0 || s.totalAcquired < s.totalRequired,
+  );
+  const fulfilled = aggregated.filter(
+    (s) => s.unknownCount === 0 && s.totalAcquired >= s.totalRequired,
+  );
 
   return (
     <div>
@@ -244,7 +255,8 @@ function AggregatedSupplyRow({
   pendingIds: Set<string>;
   failedIds: Set<string>;
 }) {
-  const isFulfilled = supply.totalAcquired >= supply.totalRequired;
+  const isFulfilled = supply.unknownCount === 0 && supply.totalAcquired >= supply.totalRequired;
+  const allUnknown = supply.unknownCount === supply.items.length;
   const projectNames = supply.items.map((i) => i.projectName).join(", ");
 
   return (
@@ -265,7 +277,8 @@ function AggregatedSupplyRow({
       </div>
       <QuantityControl
         acquired={supply.totalAcquired}
-        required={supply.totalRequired}
+        required={allUnknown ? null : supply.totalRequired}
+        plusUnknown={supply.unknownCount > 0}
         isPending={supply.items.some((i) => pendingIds.has(i.junctionId))}
         hasError={supply.items.some((i) => failedIds.has(i.junctionId))}
         onChange={(newValue) => {
@@ -274,9 +287,17 @@ function AggregatedSupplyRow({
           } else {
             let remaining = newValue - supply.totalAcquired;
             if (remaining > 0) {
-              for (const item of supply.items) {
+              // Known needs fill first: an unknown one has no ceiling, so wherever it sat in the
+              // list it would take every skein and leave a known need short.
+              const knownFirst = [...supply.items].sort(
+                (a, b) => Number(a.quantityRequired === null) - Number(b.quantityRequired === null),
+              );
+              for (const item of knownFirst) {
                 if (remaining <= 0) break;
-                const capacity = item.quantityRequired - item.quantityAcquired;
+                const capacity =
+                  item.quantityRequired === null
+                    ? remaining
+                    : item.quantityRequired - item.quantityAcquired;
                 if (capacity <= 0) continue;
                 const allocated = Math.min(capacity, remaining);
                 onUpdateAcquired(type, item.junctionId, item.quantityAcquired + allocated);

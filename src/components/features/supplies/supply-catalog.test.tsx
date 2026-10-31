@@ -5,6 +5,7 @@ import { SupplyCatalog } from "./supply-catalog";
 import {
   createMockSupplyBrand,
   createMockThread,
+  createMockThreadLine,
   createMockBead,
   createMockSpecialtyItem,
 } from "@/__tests__/mocks";
@@ -74,6 +75,7 @@ const mockThreads: ThreadWithBrand[] = [
       brandId: "brand-dmc",
     }),
     brand: dmcBrand,
+    line: createMockThreadLine({ brandId: "brand-dmc" }),
   },
   {
     ...createMockThread({
@@ -85,6 +87,7 @@ const mockThreads: ThreadWithBrand[] = [
       brandId: "brand-dmc",
     }),
     brand: dmcBrand,
+    line: createMockThreadLine({ brandId: "brand-dmc" }),
   },
   {
     ...createMockThread({
@@ -96,6 +99,7 @@ const mockThreads: ThreadWithBrand[] = [
       brandId: "brand-dmc",
     }),
     brand: dmcBrand,
+    line: createMockThreadLine({ brandId: "brand-dmc" }),
   },
 ];
 

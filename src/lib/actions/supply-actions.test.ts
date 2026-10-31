@@ -29,12 +29,29 @@ vi.mock("next/cache", () => ({
   revalidateTag: vi.fn(),
 }));
 
+/** A brand's line as the line lookup selects it: DMC's one 8 m six-strand line. */
+const ONE_LINE = {
+  id: "line-1",
+  skeinLengthMm: 8000,
+  strandStructure: "SIX_STRAND" as const,
+  brand: { name: "DMC" },
+};
+/** The length and structure a thread's current line carries, as `updateThread` reads them. */
+const DMC_LINE = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" as const };
+const KREINIK_LINES = [
+  { id: "line-bf", skeinLengthMm: 50000, strandStructure: "USED_WHOLE" as const },
+  { id: "line-4", skeinLengthMm: 11000, strandStructure: "USED_WHOLE" as const },
+].map((line) => ({ ...line, brand: { name: "Kreinik" } }));
+const SEVERAL_LINES_REFUSAL =
+  "Kreinik has several thread lines, and picking one arrives with the brand form — this thread can't be added yet.";
+
 describe("supply-actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAuth.mockResolvedValue({
       user: { id: "user-1", name: "Test", email: "test@test.com" },
     });
+    mockPrisma.threadLine.findMany.mockResolvedValue([ONE_LINE]);
   });
 
   describe("auth guard", () => {
@@ -147,6 +164,7 @@ describe("supply-actions", () => {
       expect(mockPrisma.thread.create).toHaveBeenCalledWith({
         data: {
           brandId: "brand-1",
+          lineId: "line-1",
           colorCode: "310",
           colorName: "Black",
           hexColor: "#000000",
@@ -1153,6 +1171,7 @@ describe("supply-actions", () => {
       const mockLink = createMockProjectThread({ id: "new-pt", threadId: "new-thread" });
       mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
         return cb({
+          threadLine: { findMany: vi.fn().mockResolvedValue([ONE_LINE]) },
           thread: { create: vi.fn().mockResolvedValue(mockThread) },
           projectThread: { create: vi.fn().mockResolvedValue(mockLink) },
         });
@@ -1179,6 +1198,7 @@ describe("supply-actions", () => {
       const mockLink = createMockProjectThread({ id: "new-pt", threadId: "new-thread" });
       mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) => {
         return cb({
+          threadLine: { findMany: vi.fn().mockResolvedValue([ONE_LINE]) },
           thread: { create: vi.fn().mockResolvedValue(mockThread) },
           projectThread: { create: vi.fn().mockResolvedValue(mockLink) },
         });
@@ -1297,6 +1317,7 @@ describe("supply-actions", () => {
       const threadCreate = vi.fn().mockResolvedValue(createMockThread({ id: "new-thread" }));
       mockPrisma.$transaction.mockImplementationOnce(async (cb: (tx: unknown) => unknown) =>
         cb({
+          threadLine: { findMany: vi.fn().mockResolvedValue([ONE_LINE]) },
           thread: { create: threadCreate },
           projectThread: { create: vi.fn().mockResolvedValue(createMockProjectThread()) },
         }),
@@ -1527,6 +1548,393 @@ describe("supply-actions", () => {
         where: { name: "Custom (Bead)" },
         create: { name: "Custom (Bead)", supplyType: "BEAD" },
         update: {},
+      });
+    });
+  });
+
+  describe("thread lines", () => {
+    const threadInput = {
+      brandId: "brand-1",
+      colorCode: "002",
+      colorName: "Gold",
+      hexColor: "#FFD700",
+      colorFamily: "YELLOW" as const,
+    };
+
+    describe("createThread", () => {
+      it("creates the brand's one blank line, length unknown, when it has none, and files the thread on it", async () => {
+        mockPrisma.threadLine.findMany.mockResolvedValueOnce([]);
+        mockPrisma.threadLine.upsert.mockResolvedValueOnce({
+          id: "line-new",
+          skeinLengthMm: null,
+          strandStructure: null,
+        });
+        mockPrisma.thread.create.mockResolvedValueOnce(createMockThread({ lineId: "line-new" }));
+        const { createThread } = await import("./supply-actions");
+
+        const result = await createThread(threadInput);
+
+        assertSuccess(result);
+        expect(mockPrisma.threadLine.upsert).toHaveBeenCalledWith(
+          expect.objectContaining({
+            create: { brandId: "brand-1", name: "", skeinLengthMm: null, strandStructure: null },
+          }),
+        );
+        expect(mockPrisma.thread.create).toHaveBeenCalledWith({
+          data: expect.objectContaining({ brandId: "brand-1", lineId: "line-new" }),
+        });
+        expect(result.thread.line).toEqual(
+          expect.objectContaining({ skeinLengthMm: null, strandStructure: null }),
+        );
+      });
+
+      it("creates the blank line by upsert on its brand and blank name, so two at once cannot collide", async () => {
+        mockPrisma.threadLine.findMany.mockResolvedValueOnce([]);
+        mockPrisma.threadLine.upsert.mockResolvedValueOnce({
+          id: "line-new",
+          skeinLengthMm: null,
+          strandStructure: null,
+        });
+        mockPrisma.thread.create.mockResolvedValueOnce(createMockThread({ lineId: "line-new" }));
+        const { createThread } = await import("./supply-actions");
+
+        const result = await createThread(threadInput);
+
+        assertSuccess(result);
+        expect(mockPrisma.threadLine.upsert).toHaveBeenCalledWith({
+          where: { brandId_name: { brandId: "brand-1", name: "" } },
+          create: { brandId: "brand-1", name: "", skeinLengthMm: null, strandStructure: null },
+          update: {},
+          select: { id: true, skeinLengthMm: true, strandStructure: true },
+        });
+        expect(mockPrisma.threadLine.create).not.toHaveBeenCalled();
+        expect(mockPrisma.thread.create).toHaveBeenCalledWith({
+          data: expect.objectContaining({ lineId: "line-new" }),
+        });
+      });
+
+      it("files the thread on the brand's only line, creating none", async () => {
+        mockPrisma.thread.create.mockResolvedValueOnce(createMockThread());
+        const { createThread } = await import("./supply-actions");
+
+        const result = await createThread(threadInput);
+
+        assertSuccess(result);
+        expect(mockPrisma.threadLine.findMany).toHaveBeenCalledWith(
+          expect.objectContaining({ where: { brandId: "brand-1" } }),
+        );
+        expect(mockPrisma.threadLine.upsert).not.toHaveBeenCalled();
+        expect(mockPrisma.thread.create).toHaveBeenCalledWith({
+          data: expect.objectContaining({ lineId: "line-1" }),
+        });
+        expect(result.thread.line).toEqual(
+          expect.objectContaining({ skeinLengthMm: 8000, strandStructure: "SIX_STRAND" }),
+        );
+      });
+
+      it("refuses a brand with several lines, naming it, and creates nothing", async () => {
+        mockPrisma.threadLine.findMany.mockResolvedValueOnce(KREINIK_LINES);
+        const { createThread } = await import("./supply-actions");
+        const { revalidateTag } = await import("next/cache");
+
+        const result = await createThread(threadInput);
+
+        expect(result).toEqual({ success: false, error: SEVERAL_LINES_REFUSAL });
+        expect(mockPrisma.thread.create).not.toHaveBeenCalled();
+        expect(mockPrisma.threadLine.upsert).not.toHaveBeenCalled();
+        expect(vi.mocked(revalidateTag)).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("createAndAddThread", () => {
+      it("lands a quick-added thread on Custom (Thread)'s one line, creating it if missing", async () => {
+        mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+        mockPrisma.supplyBrand.upsert.mockResolvedValueOnce({
+          id: "brand-custom",
+          name: "Custom (Thread)",
+          supplyType: "THREAD",
+        });
+        mockPrisma.threadLine.findMany.mockResolvedValueOnce([]);
+        mockPrisma.threadLine.upsert.mockResolvedValueOnce({
+          id: "line-custom",
+          skeinLengthMm: null,
+          strandStructure: null,
+        });
+        mockPrisma.thread.create.mockResolvedValueOnce(
+          createMockThread({ id: "t-new", brandId: "brand-custom", lineId: "line-custom" }),
+        );
+        mockPrisma.projectThread.create.mockResolvedValueOnce(createMockProjectThread());
+        const { createAndAddThread } = await import("./supply-actions");
+
+        const result = await createAndAddThread({
+          projectId: "p1",
+          name: "Very Dark Lavender",
+          brandId: "default",
+          colorFamily: "PURPLE",
+        });
+
+        assertSuccess(result);
+        expect(mockPrisma.threadLine.findMany).toHaveBeenCalledWith(
+          expect.objectContaining({ where: { brandId: "brand-custom" } }),
+        );
+        expect(mockPrisma.thread.create).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: expect.objectContaining({ brandId: "brand-custom", lineId: "line-custom" }),
+          }),
+        );
+        expect(result.record.thread.line).toEqual(
+          expect.objectContaining({ skeinLengthMm: null, strandStructure: null }),
+        );
+      });
+
+      it("refuses a brand with several lines and links nothing to the project", async () => {
+        mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+        mockPrisma.threadLine.findMany.mockResolvedValueOnce(KREINIK_LINES);
+        const { createAndAddThread } = await import("./supply-actions");
+        const { revalidateTag } = await import("next/cache");
+
+        const result = await createAndAddThread({
+          projectId: "p1",
+          name: "Gold",
+          brandId: "brand-kreinik",
+          colorFamily: "YELLOW",
+        });
+
+        expect(result).toEqual({ success: false, error: SEVERAL_LINES_REFUSAL });
+        expect(mockPrisma.thread.create).not.toHaveBeenCalled();
+        expect(mockPrisma.projectThread.create).not.toHaveBeenCalled();
+        expect(vi.mocked(revalidateTag)).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("updateThread", () => {
+      it("moves the thread to a line of its new brand when the brand changes", async () => {
+        mockPrisma.thread.findUnique.mockResolvedValueOnce({
+          brandId: "brand-old",
+          line: DMC_LINE,
+        });
+        mockPrisma.threadLine.findMany.mockResolvedValueOnce([
+          { ...ONE_LINE, id: "line-anchor", brand: { name: "Anchor" } },
+        ]);
+        mockPrisma.thread.update.mockResolvedValueOnce(createMockThread({ id: "t1" }));
+        const { updateThread } = await import("./supply-actions");
+
+        const result = await updateThread("t1", { ...threadInput, brandId: "brand-anchor" });
+
+        assertSuccess(result);
+        expect(mockPrisma.threadLine.findMany).toHaveBeenCalledWith(
+          expect.objectContaining({ where: { brandId: "brand-anchor" } }),
+        );
+        expect(mockPrisma.thread.update).toHaveBeenCalledWith({
+          where: { id: "t1" },
+          data: expect.objectContaining({ brandId: "brand-anchor", lineId: "line-anchor" }),
+        });
+      });
+
+      it("keeps the thread's line when its brand is unchanged", async () => {
+        mockPrisma.thread.findUnique.mockResolvedValueOnce({ brandId: "brand-1" });
+        mockPrisma.thread.update.mockResolvedValueOnce(createMockThread({ id: "t1" }));
+        const { updateThread } = await import("./supply-actions");
+
+        const result = await updateThread("t1", threadInput);
+
+        assertSuccess(result);
+        expect(mockPrisma.threadLine.findMany).not.toHaveBeenCalled();
+        expect(mockPrisma.thread.update).toHaveBeenCalledWith({
+          where: { id: "t1" },
+          data: expect.not.objectContaining({ lineId: expect.anything() }),
+        });
+      });
+
+      it("refuses a move to a brand with several lines and leaves the thread as it was", async () => {
+        mockPrisma.thread.findUnique.mockResolvedValueOnce({ brandId: "brand-1" });
+        mockPrisma.threadLine.findMany.mockResolvedValueOnce(KREINIK_LINES);
+        const { updateThread } = await import("./supply-actions");
+        const { revalidateTag } = await import("next/cache");
+
+        const result = await updateThread("t1", { ...threadInput, brandId: "brand-kreinik" });
+
+        expect(result).toEqual({ success: false, error: SEVERAL_LINES_REFUSAL });
+        expect(mockPrisma.thread.update).not.toHaveBeenCalled();
+        expect(vi.mocked(revalidateTag)).not.toHaveBeenCalled();
+      });
+
+      describe("the needs saved against the thread", () => {
+        const movingTo = (line: {
+          skeinLengthMm: number | null;
+          strandStructure: string | null;
+        }) => {
+          mockPrisma.thread.findUnique.mockResolvedValueOnce({
+            brandId: "brand-dmc",
+            line: DMC_LINE,
+          });
+          mockPrisma.threadLine.findMany.mockResolvedValueOnce([
+            { id: "line-new", ...line, brand: { name: "New" } },
+          ]);
+          mockPrisma.thread.update.mockResolvedValueOnce(createMockThread({ id: "t1" }));
+        };
+
+        it.each([
+          ["a different skein length", { skeinLengthMm: 4572, strandStructure: "SIX_STRAND" }],
+          ["a different strand structure", { skeinLengthMm: 8000, strandStructure: "USED_WHOLE" }],
+          ["no known length or structure", { skeinLengthMm: null, strandStructure: null }],
+        ])(
+          "makes only its calculated needs unknown when it moves to a line with %s",
+          async (_label, line) => {
+            movingTo(line);
+            const { updateThread } = await import("./supply-actions");
+
+            const result = await updateThread("t1", { ...threadInput, brandId: "brand-new" });
+
+            assertSuccess(result);
+            expect(mockPrisma.projectThread.updateMany).toHaveBeenCalledWith({
+              where: { threadId: "t1", stitchCount: { gt: 0 }, isNeedOverridden: false },
+              data: { quantityRequired: null },
+            });
+          },
+        );
+
+        it("leaves its needs alone when it moves to a line of the same length and structure", async () => {
+          movingTo({ skeinLengthMm: 8000, strandStructure: "SIX_STRAND" });
+          const { updateThread } = await import("./supply-actions");
+
+          const result = await updateThread("t1", { ...threadInput, brandId: "brand-anchor" });
+
+          assertSuccess(result);
+          expect(mockPrisma.projectThread.updateMany).not.toHaveBeenCalled();
+        });
+
+        it("refreshes the project pages and the shopping list when the move makes needs unknown", async () => {
+          movingTo({ skeinLengthMm: null, strandStructure: null });
+          const { updateThread } = await import("./supply-actions");
+          const { revalidatePath } = await import("next/cache");
+
+          const result = await updateThread("t1", { ...threadInput, brandId: "brand-new" });
+
+          assertSuccess(result);
+          expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith("/charts");
+          expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith("/shopping");
+        });
+
+        it("refreshes only the catalogue when the move leaves every need as it was", async () => {
+          movingTo({ skeinLengthMm: 8000, strandStructure: "SIX_STRAND" });
+          const { updateThread } = await import("./supply-actions");
+          const { revalidatePath } = await import("next/cache");
+
+          const result = await updateThread("t1", { ...threadInput, brandId: "brand-anchor" });
+
+          assertSuccess(result);
+          expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith("/supplies");
+          expect(vi.mocked(revalidatePath)).not.toHaveBeenCalledWith("/charts");
+          expect(vi.mocked(revalidatePath)).not.toHaveBeenCalledWith("/shopping");
+        });
+
+        it("leaves its needs alone when its brand is unchanged", async () => {
+          mockPrisma.thread.findUnique.mockResolvedValueOnce({
+            brandId: "brand-1",
+            line: DMC_LINE,
+          });
+          mockPrisma.thread.update.mockResolvedValueOnce(createMockThread({ id: "t1" }));
+          const { updateThread } = await import("./supply-actions");
+
+          const result = await updateThread("t1", threadInput);
+
+          assertSuccess(result);
+          expect(mockPrisma.projectThread.updateMany).not.toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe("createSupplyBrand", () => {
+      it("gives a new thread brand its one blank line, length unknown, in the same write", async () => {
+        mockPrisma.supplyBrand.create.mockResolvedValueOnce(
+          createMockSupplyBrand({ name: "Weeks Dye Works" }),
+        );
+        const { createSupplyBrand } = await import("./supply-actions");
+
+        const result = await createSupplyBrand({ name: "Weeks Dye Works", supplyType: "THREAD" });
+
+        assertSuccess(result);
+        expect(mockPrisma.supplyBrand.create).toHaveBeenCalledWith({
+          data: expect.objectContaining({
+            name: "Weeks Dye Works",
+            supplyType: "THREAD",
+            threadLines: { create: { skeinLengthMm: null, strandStructure: null } },
+          }),
+        });
+      });
+
+      it("gives a bead brand no thread line", async () => {
+        mockPrisma.supplyBrand.create.mockResolvedValueOnce(
+          createMockSupplyBrand({ name: "Mill Hill", supplyType: "BEAD" }),
+        );
+        const { createSupplyBrand } = await import("./supply-actions");
+
+        await createSupplyBrand({ name: "Mill Hill", supplyType: "BEAD" });
+
+        expect(mockPrisma.supplyBrand.create).toHaveBeenCalledWith({
+          data: expect.not.objectContaining({ threadLines: expect.anything() }),
+        });
+      });
+    });
+
+    describe("an unknown need", () => {
+      it("addThreadToProject saves a thread's need as unknown (null)", async () => {
+        mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+        mockPrisma.projectThread.create.mockResolvedValueOnce(
+          createMockProjectThread({ quantityRequired: null }),
+        );
+        const { addThreadToProject } = await import("./supply-actions");
+
+        const result = await addThreadToProject({
+          projectId: "p1",
+          threadId: "t1",
+          stitchCount: 5000,
+          quantityRequired: null,
+        });
+
+        assertSuccess(result);
+        expect(mockPrisma.projectThread.create).toHaveBeenCalledWith({
+          data: expect.objectContaining({ stitchCount: 5000, quantityRequired: null }),
+        });
+      });
+
+      it("updateProjectSupplyQuantity accepts an unknown need for a thread", async () => {
+        mockPrisma.projectThread.findUnique.mockResolvedValueOnce({
+          project: { userId: "user-1" },
+        });
+        mockPrisma.projectThread.update.mockResolvedValueOnce(createMockProjectThread());
+        const { updateProjectSupplyQuantity } = await import("./supply-actions");
+
+        const result = await updateProjectSupplyQuantity("pt1", "thread", {
+          stitchCount: 5000,
+          quantityRequired: null,
+        });
+
+        assertSuccess(result);
+        expect(mockPrisma.projectThread.update).toHaveBeenCalledWith({
+          where: { id: "pt1" },
+          data: { stitchCount: 5000, quantityRequired: null },
+        });
+      });
+
+      it("updateProjectSupplyQuantity refuses an unknown need for a bead or specialty item", async () => {
+        const { updateProjectSupplyQuantity } = await import("./supply-actions");
+        const { revalidateTag } = await import("next/cache");
+
+        const bead = await updateProjectSupplyQuantity("pb1", "bead", { quantityRequired: null });
+        const specialty = await updateProjectSupplyQuantity("ps1", "specialty", {
+          quantityRequired: null,
+        });
+
+        expect(bead).toEqual({
+          success: false,
+          error: "Only a thread's need can be unknown — enter how many you need.",
+        });
+        expect(specialty).toEqual(bead);
+        expect(mockPrisma.projectBead.update).not.toHaveBeenCalled();
+        expect(mockPrisma.projectSpecialty.update).not.toHaveBeenCalled();
+        expect(vi.mocked(revalidateTag)).not.toHaveBeenCalled();
       });
     });
   });

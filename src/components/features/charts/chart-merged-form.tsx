@@ -39,6 +39,7 @@ import {
   SupplyTable,
   CreationFlowAdapter,
   DEFAULT_CALC_PARAMS,
+  skeinLineOf,
 } from "@/components/features/supply-table";
 import type {
   SupplyRow,
@@ -83,6 +84,7 @@ export function buildCreateFn() {
         brandName: "",
         brandId: data.brandId,
         hexColor: result.thread.hexColor ?? "#000000",
+        line: skeinLineOf(result.thread.line),
       };
     }
     if (type === "BEAD") {
@@ -103,6 +105,7 @@ export function buildCreateFn() {
         brandName: "",
         brandId: data.brandId,
         hexColor: result.bead.hexColor ?? "#000000",
+        line: null,
       };
     }
     const result = await createSpecialtyItem({
@@ -120,6 +123,7 @@ export function buildCreateFn() {
       brandName: "",
       brandId: data.brandId,
       hexColor: result.specialtyItem.hexColor ?? "#000000",
+      line: null,
     };
   };
 }
@@ -187,6 +191,7 @@ export function ChartMergedForm({
           brandName: t.brand.name,
           brandId: t.brandId,
           hexColor: t.hexColor ?? "",
+          line: skeinLineOf(t.line),
         }));
       }
       if (type === "BEAD") {
@@ -199,6 +204,7 @@ export function ChartMergedForm({
           brandName: b.brand.name,
           brandId: b.brandId,
           hexColor: b.hexColor ?? "",
+          line: null,
         }));
       }
       const items = await getSpecialtyItems(query);
@@ -210,6 +216,7 @@ export function ChartMergedForm({
         brandName: s.brand.name,
         brandId: s.brandId,
         hexColor: s.hexColor ?? "",
+        line: null,
       }));
     };
     adapterRef.current = new CreationFlowAdapter(setSupplyRows, searchFn, buildCreateFn());

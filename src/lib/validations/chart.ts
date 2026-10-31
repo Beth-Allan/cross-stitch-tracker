@@ -103,7 +103,8 @@ export const batchSupplySchema = z.object({
       z.object({
         supplyId: z.string().min(1, "Supply ID required"),
         stitchCount: wholeNumber().min(0),
-        need: wholeNumber().min(1, NEED_AT_LEAST_ONE),
+        /** Null when the thread's line has no known length: unknown, never a guessed 1. */
+        need: wholeNumber().min(1, NEED_AT_LEAST_ONE).nullable(),
         isNeedOverridden: z.boolean(),
       }),
     )

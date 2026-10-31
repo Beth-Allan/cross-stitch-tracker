@@ -2,6 +2,10 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@/__tests__/test-utils";
 import { SupplyTableDataRow } from "./supply-table-data-row";
 import type { SupplyRow } from "./types";
+import type { SkeinLine } from "@/types/supply";
+
+const DMC_LINE: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
+const UNKNOWN_LINE: SkeinLine = { skeinLengthMm: null, strandStructure: null };
 
 // Mock the tooltip portal to avoid portaling issues in tests
 vi.mock("@/components/ui/tooltip", () => ({
@@ -26,6 +30,7 @@ function makeRow(overrides: Partial<SupplyRow> = {}): SupplyRow {
     need: 3,
     have: 1,
     isNeedOverridden: false,
+    line: DMC_LINE,
     ...overrides,
   };
 }
@@ -198,6 +203,38 @@ describe("SupplyTableDataRow", () => {
     fireEvent.keyDown(input, { key: "Enter" });
 
     expect(onUpdateQuantity).toHaveBeenCalledWith("THREAD", "junc-1", "have", 5);
+  });
+
+  describe("a need it cannot work out", () => {
+    const unknownRow = () =>
+      makeRow({ code: "002", need: null, have: 1, stitchCount: 5000, line: UNKNOWN_LINE });
+
+    it("shows the need as Unknown, never 0 or 1", () => {
+      renderRow(unknownRow());
+
+      const needBtn = screen.getByRole("button", { name: "Need for 002" });
+      expect(needBtn).toHaveTextContent("Unknown");
+      expect(needBtn).not.toHaveTextContent(/\d/);
+    });
+
+    it("says Unknown in the status too", () => {
+      renderRow(unknownRow());
+
+      expect(screen.getByTitle("1 of Unknown")).toBeInTheDocument();
+      expect(screen.getByTestId("tooltip-content")).toHaveTextContent("1 of Unknown");
+    });
+
+    it("still takes a need typed by hand", () => {
+      const onUpdateQuantity = vi.fn();
+      renderRow(unknownRow(), { onUpdateQuantity });
+
+      fireEvent.click(screen.getByRole("button", { name: "Need for 002" }));
+      const input = screen.getByRole("spinbutton", { name: "Need for 002" });
+      fireEvent.change(input, { target: { value: "3" } });
+      fireEvent.keyDown(input, { key: "Enter" });
+
+      expect(onUpdateQuantity).toHaveBeenCalledWith("THREAD", "junction-1", "need", 3);
+    });
   });
 
   it("does not render Sparkles for BEAD type regardless of isNeedOverridden", () => {

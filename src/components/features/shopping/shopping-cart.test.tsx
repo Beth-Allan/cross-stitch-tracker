@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@/__tests__/test-utils";
+import { render, screen, waitFor, within } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { ShoppingCart } from "./shopping-cart";
 import { updateSupplyAcquired } from "@/lib/actions/shopping-cart-actions";
@@ -407,6 +407,77 @@ describe("ShoppingCart", () => {
       expect(pill).toBeTruthy();
       expect(pill?.className).toContain("border");
       expect(pill?.className).toContain("border-selected-border");
+    });
+  });
+
+  describe("a thread line whose need is unknown (THR-011)", () => {
+    const unknownData: ShoppingCartData = {
+      projects: [
+        {
+          projectId: "pu",
+          chartId: "cu",
+          projectName: "Gilded Sampler",
+          designerName: null,
+          coverThumbnailUrl: null,
+          focalPointX: null,
+          focalPointY: null,
+          status: "KITTING",
+          threadCount: 2,
+          beadCount: 0,
+          specialtyCount: 0,
+          fabricNeeded: false,
+        },
+      ],
+      threads: [
+        {
+          junctionId: "jt-known",
+          supplyId: "s-known",
+          brandName: "DMC",
+          code: "310",
+          colorName: "Black",
+          hexColor: "#000000",
+          quantityRequired: 2,
+          quantityAcquired: 2,
+          unit: "skeins",
+          projectId: "pu",
+          projectName: "Gilded Sampler",
+        },
+        {
+          junctionId: "jt-unknown",
+          supplyId: "s-unknown",
+          brandName: "Kreinik",
+          code: "002",
+          colorName: "Gold",
+          hexColor: "#d4af37",
+          quantityRequired: null,
+          quantityAcquired: 2,
+          unit: "skeins",
+          projectId: "pu",
+          projectName: "Gilded Sampler",
+        },
+      ],
+      beads: [],
+      specialty: [],
+      fabrics: [],
+    };
+
+    it("counts it in the Shopping List badge as still to buy", () => {
+      localStore["shopping-cart-selected-projects"] = JSON.stringify(["pu"]);
+      render(<ShoppingCart data={unknownData} imageUrls={{}} />);
+
+      const listTab = screen.getByText(/Shopping List/).closest("button")!;
+      expect(within(listTab).getByText("1")).toBeInTheDocument();
+    });
+
+    it("shows it as Unknown on the shopping list", async () => {
+      localStore["shopping-cart-selected-projects"] = JSON.stringify(["pu"]);
+      const user = userEvent.setup();
+      render(<ShoppingCart data={unknownData} imageUrls={{}} />);
+
+      await user.click(screen.getByText(/Shopping List/));
+
+      expect(screen.getByText("Kreinik 002 Gold")).toBeInTheDocument();
+      expect(screen.getByText("Unknown")).toBeInTheDocument();
     });
   });
 

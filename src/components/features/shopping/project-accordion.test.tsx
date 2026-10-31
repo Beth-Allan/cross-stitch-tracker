@@ -329,6 +329,47 @@ describe("ProjectAccordion", () => {
       expect(screen.getByText("DMC 310")).toBeInTheDocument();
     });
 
+    it("shows a thread line whose need is unknown as Unknown, still to buy", async () => {
+      const user = userEvent.setup();
+      const project = makeProject({ projectId: "p1", status: "KITTING", threadCount: 1 });
+      const threads = [
+        {
+          junctionId: "jt-u",
+          supplyId: "s-u",
+          brandName: "Kreinik",
+          code: "001",
+          colorName: "Silver",
+          hexColor: "#c0c0c0",
+          quantityRequired: null,
+          quantityAcquired: 4,
+          unit: "skeins",
+          projectId: "p1",
+          projectName: "Test Project",
+        },
+      ];
+      const { container } = render(
+        <ProjectAccordion
+          {...defaultProps}
+          projects={[project]}
+          imageUrls={{}}
+          selectedIds={new Set(["p1"])}
+          threads={threads}
+          totalCount={1}
+          visibleCount={1}
+          selectedCount={1}
+          visibleSelectedCount={1}
+        />,
+      );
+
+      await user.click(screen.getByRole("button", { name: /Expand Test Project supplies/ }));
+
+      expect(screen.getByRole("button", { name: /click to edit/ })).toHaveTextContent("4/Unknown");
+      // Skeins bought against an unknown need never make the line read as in hand.
+      expect(container.querySelector(".bg-selected")).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Increment quantity" })).toBeEnabled();
+      expect(screen.getByText(/1 item needed/)).toBeInTheDocument();
+    });
+
     it("shows empty supply message when expanded and selected with no supplies", async () => {
       const user = userEvent.setup();
       const project = makeProject({

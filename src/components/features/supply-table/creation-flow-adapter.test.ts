@@ -1,16 +1,23 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { CreationFlowAdapter } from "./creation-flow-adapter";
 import type { SupplyRow, SupplySearchResult, CreateSupplyData } from "./types";
+import type { SkeinLine } from "@/types/supply";
+
+const DMC_LINE: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
+const UNKNOWN_LINE: SkeinLine = { skeinLengthMm: null, strandStructure: null };
+const USED_WHOLE_10M_LINE: SkeinLine = { skeinLengthMm: 10000, strandStructure: "USED_WHOLE" };
 
 function makeSearchResult(overrides: Partial<SupplySearchResult> = {}): SupplySearchResult {
+  const type = overrides.type ?? "THREAD";
   return {
     id: "sr-1",
-    type: "THREAD",
+    type,
     code: "310",
     name: "Black",
     brandName: "DMC",
     brandId: "brand-1",
     hexColor: "#000000",
+    line: type === "THREAD" ? DMC_LINE : null,
     ...overrides,
   };
 }
@@ -55,6 +62,16 @@ describe("CreationFlowAdapter", () => {
       expect(rows[0].isNeedOverridden).toBe(false);
       expect(rows[0].code).toBe("310");
       expect(rows[0].name).toBe("Black");
+      expect(rows[0].line).toEqual(DMC_LINE);
+    });
+
+    it("buffers an unknown need as null", async () => {
+      searchFn.mockResolvedValueOnce([makeSearchResult({ id: "t1", line: UNKNOWN_LINE })]);
+      await adapter.searchSupplies("THREAD", "310");
+
+      await adapter.addThread("t1", 5000, null);
+
+      expect(adapter.getRows()[0].need).toBeNull();
     });
   });
 
@@ -251,6 +268,7 @@ describe("CreationFlowAdapter", () => {
           need: 2,
           have: 0,
           isNeedOverridden: false,
+          line: DMC_LINE,
         },
         {
           id: "row-2",
@@ -264,6 +282,7 @@ describe("CreationFlowAdapter", () => {
           need: 1,
           have: 0,
           isNeedOverridden: false,
+          line: null,
         },
       ];
 
@@ -297,6 +316,7 @@ describe("CreationFlowAdapter", () => {
           need: 1,
           have: 0,
           isNeedOverridden: false,
+          line: DMC_LINE,
         },
       ];
 
@@ -397,6 +417,7 @@ describe("CreationFlowAdapter", () => {
           need: 10,
           have: 0,
           isNeedOverridden: true,
+          line: DMC_LINE,
         },
       ]);
 
@@ -424,6 +445,64 @@ describe("CreationFlowAdapter", () => {
       const updated = adapter.getRows().find((r) => r.id === rowId);
       expect(updated?.stitchCount).toBe(0);
       expect(updated?.need).toBe(1);
+    });
+
+    describe("the row's own line", () => {
+      async function addThreadOn(line: SkeinLine) {
+        searchFn.mockResolvedValueOnce([makeSearchResult({ id: "t1", line })]);
+        await adapter.searchSupplies("THREAD", "002");
+        const addResult = await adapter.addThread("t1", 0, 1);
+        adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
+        return (addResult as { success: true; id: string }).id;
+      }
+
+      it("makes the need unknown (null, never 1) when a stitch count lands on a line whose length is unknown", async () => {
+        const rowId = await addThreadOn(UNKNOWN_LINE);
+
+        await adapter.updateQuantity("THREAD", rowId, "stitchCount", 5000);
+
+        const updated = adapter.getRows().find((r) => r.id === rowId);
+        expect(updated?.stitchCount).toBe(5000);
+        expect(updated?.need).toBeNull();
+      });
+
+      it("works the need out from a DMC line's 8 m six-strand skein", async () => {
+        const rowId = await addThreadOn(DMC_LINE);
+
+        await adapter.updateQuantity("THREAD", rowId, "stitchCount", 5000);
+
+        // ceil(5000 * 2 * 1.2 / (14 * 255)) = ceil(3.36) = 4
+        expect(adapter.getRows().find((r) => r.id === rowId)?.need).toBe(4);
+      });
+
+      it("ignores the strand count on a line used whole: 5000 stitches on a 10 m spool need 9", async () => {
+        const rowId = await addThreadOn(USED_WHOLE_10M_LINE);
+
+        await adapter.updateQuantity("THREAD", rowId, "stitchCount", 5000);
+
+        // ceil(5000 * 6 * 1.2 / (14 * 315)) = ceil(8.16) = 9 -- two strands would have said 3
+        expect(adapter.getRows().find((r) => r.id === rowId)?.need).toBe(9);
+      });
+
+      it("keeps need 1 for a stitch count of 0, even on a line whose length is unknown", async () => {
+        const rowId = await addThreadOn(UNKNOWN_LINE);
+        await adapter.updateQuantity("THREAD", rowId, "stitchCount", 5000);
+
+        await adapter.updateQuantity("THREAD", rowId, "stitchCount", 0);
+
+        expect(adapter.getRows().find((r) => r.id === rowId)?.need).toBe(1);
+      });
+
+      it("lets a need typed by hand replace an unknown one", async () => {
+        const rowId = await addThreadOn(UNKNOWN_LINE);
+        await adapter.updateQuantity("THREAD", rowId, "stitchCount", 5000);
+
+        await adapter.updateQuantity("THREAD", rowId, "need", 3);
+
+        const updated = adapter.getRows().find((r) => r.id === rowId);
+        expect(updated?.need).toBe(3);
+        expect(updated?.isNeedOverridden).toBe(true);
+      });
     });
 
     it("does NOT recalculate need when field is 'need' or 'have' (unchanged behavior)", async () => {

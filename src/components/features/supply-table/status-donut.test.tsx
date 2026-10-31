@@ -19,6 +19,12 @@ describe("StatusDonut", () => {
     expect(screen.getByTitle("1 of 3")).toBeInTheDocument();
   });
 
+  it("never reads an unknown need as complete, and its title says Unknown", () => {
+    const { container } = render(<StatusDonut have={4} need={null} />);
+    expect(screen.getByTitle("4 of Unknown")).toBeInTheDocument();
+    expect(container.querySelector("circle.stroke-primary")).toBeNull();
+  });
+
   it("renders only background ring when have=0 (empty state)", () => {
     const { container } = render(<StatusDonut have={0} need={2} />);
     const circles = container.querySelectorAll("circle");

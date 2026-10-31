@@ -309,7 +309,7 @@ March reached Neon by an out-of-band `prisma db push`.
   come to migrate production — stops the build instead. The URL checked is `prisma.config.ts`'s
   own datasource, imported, so the check and the Prisma commands cannot disagree.
 - **The baseline.** The repo's one March migration (`20260328163529_…`, recorded in
-  `_prisma_migrations` since 2026-03-28) describes 4 of the 18 models plus the `_ChartToGenre` join
+  `_prisma_migrations` since 2026-03-28) describes 4 of the 18 models the schema had then plus the `_ChartToGenre` join
   table; `20261026002357_baseline_db_push_era` describes the other 14. A database that already holds the app
   has it **recorded as applied, never executed**: finding tables but no baseline record, the runner
   asks Prisma whether the database matches `schema.prisma` exactly (`migrate diff --exit-code`),

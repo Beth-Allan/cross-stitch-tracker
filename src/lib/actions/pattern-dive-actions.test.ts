@@ -16,7 +16,7 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
-type SupplyRow = { quantityRequired: number; quantityAcquired: number };
+type SupplyRow = { quantityRequired: number | null; quantityAcquired: number };
 
 type WhatsNextFixture = {
   project: {
@@ -349,6 +349,95 @@ describe("pattern-dive-actions", () => {
       // With fabric: required=2+1=3, acquired=2+1=3, % = 100
       const withFabric = result.find((r) => r.chartName === "With Fabric")!;
       expect(withFabric.kittingPercent).toBe(100);
+    });
+
+    it("caps at 99%, never 100%, while a thread line's need is unknown — it is still to buy", async () => {
+      mockWhatsNextCharts([
+        {
+          id: "c1",
+          name: "Unknown Line",
+          coverThumbnailUrl: null,
+          stitchCount: 5000,
+          dateAdded: new Date("2026-01-01"),
+          designer: null,
+          project: {
+            id: "p1",
+            status: "KITTED",
+            wantToStartNext: false,
+            fabric: { id: "f1" },
+            projectThreads: [
+              { quantityRequired: 2, quantityAcquired: 2 },
+              { quantityRequired: null, quantityAcquired: 0 },
+            ],
+            projectBeads: [{ quantityRequired: 1, quantityAcquired: 1 }],
+            projectSpecialty: [],
+          },
+        },
+      ]);
+
+      const { getWhatsNextProjects } = await import("./pattern-dive-actions");
+      const result = await getWhatsNextProjects();
+
+      // Every known figure is in hand (2 + 1 + fabric), which alone would read 100%.
+      expect(result[0].kittingPercent).toBe(99);
+    });
+
+    it("caps at 99% even when skeins were bought against the only, unknown, line", async () => {
+      mockWhatsNextCharts([
+        {
+          id: "c1",
+          name: "Only Unknown",
+          coverThumbnailUrl: null,
+          stitchCount: 5000,
+          dateAdded: new Date("2026-01-01"),
+          designer: null,
+          project: {
+            id: "p1",
+            status: "UNSTARTED",
+            wantToStartNext: false,
+            fabric: { id: "f1" },
+            projectThreads: [{ quantityRequired: null, quantityAcquired: 3 }],
+            projectBeads: [],
+            projectSpecialty: [],
+          },
+        },
+      ]);
+
+      const { getWhatsNextProjects } = await import("./pattern-dive-actions");
+      const result = await getWhatsNextProjects();
+
+      expect(result[0].kittingPercent).toBe(99);
+    });
+
+    it("leaves a percentage below the cap untouched when a line's need is unknown", async () => {
+      mockWhatsNextCharts([
+        {
+          id: "c1",
+          name: "Part Gathered",
+          coverThumbnailUrl: null,
+          stitchCount: 5000,
+          dateAdded: new Date("2026-01-01"),
+          designer: null,
+          project: {
+            id: "p1",
+            status: "UNSTARTED",
+            wantToStartNext: false,
+            fabric: null,
+            projectThreads: [
+              { quantityRequired: 3, quantityAcquired: 1 },
+              { quantityRequired: null, quantityAcquired: 0 },
+            ],
+            projectBeads: [],
+            projectSpecialty: [],
+          },
+        },
+      ]);
+
+      const { getWhatsNextProjects } = await import("./pattern-dive-actions");
+      const result = await getWhatsNextProjects();
+
+      // The unknown line adds nothing to either side: round(1 / (3 + 1 fabric) * 100) = 25.
+      expect(result[0].kittingPercent).toBe(25);
     });
 
     it("KIT-004: a project with no supplies recorded reads 0% kitted, not 100%", async () => {

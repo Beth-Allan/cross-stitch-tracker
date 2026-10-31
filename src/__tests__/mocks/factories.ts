@@ -6,6 +6,7 @@ import type {
   Series,
   SupplyBrand,
   Thread,
+  ThreadLine,
   Bead,
   SpecialtyItem,
   ProjectThread,
@@ -262,10 +263,25 @@ export function createMockSupplyBrand(overrides?: Partial<SupplyBrand>): SupplyB
   };
 }
 
+/** DMC's one line by default: 8 m of six-strand floss (THR-008), its name blank. */
+export function createMockThreadLine(overrides?: Partial<ThreadLine>): ThreadLine {
+  return {
+    id: "line-1",
+    brandId: "brand-1",
+    name: "",
+    skeinLengthMm: 8000,
+    strandStructure: "SIX_STRAND",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
 export function createMockThread(overrides?: Partial<Thread>): Thread {
   return {
     id: "thread-1",
     brandId: "brand-1",
+    lineId: "line-1",
     colorCode: "310",
     colorName: "Black",
     hexColor: "#000000",
@@ -463,19 +479,29 @@ export function createMockGalleryCard(
   };
 }
 
-type SupplyRow = { quantityRequired: number; quantityAcquired: number };
+/** `quantityRequired: null` is a thread line whose need cannot be worked out (THR-011). */
+type SupplyRow = { quantityRequired: number | null; quantityAcquired: number };
+type KnownSupplyRow = { quantityRequired: number; quantityAcquired: number };
+
+const hasKnownNeed = (r: SupplyRow): r is KnownSupplyRow => r.quantityRequired !== null;
 
 /**
  * The rollup a list of junction rows stands for, stated the way the JS pass stated it before the
  * arithmetic moved into SQL. Tests name the rows they mean and this names what the kitting rule
  * said about them — independently of the query that now produces the same figures.
+ *
+ * An unknown need has no figure to add to `required` or `acquired`, so it shows only in
+ * `unknown` — and, being still to buy, it is never fulfilled.
  */
 export function createSupplyRollup(rows: SupplyRow[]): SupplyRollup {
+  const known = rows.filter(hasKnownNeed);
+
   return {
     count: rows.length,
-    required: rows.reduce((sum, r) => sum + r.quantityRequired, 0),
-    acquired: rows.reduce((sum, r) => sum + Math.min(r.quantityAcquired, r.quantityRequired), 0),
-    allFulfilled: rows.every((r) => r.quantityAcquired >= r.quantityRequired),
+    required: known.reduce((sum, r) => sum + r.quantityRequired, 0),
+    acquired: known.reduce((sum, r) => sum + Math.min(r.quantityAcquired, r.quantityRequired), 0),
+    unknown: rows.length - known.length,
+    allFulfilled: rows.every((r) => hasKnownNeed(r) && r.quantityAcquired >= r.quantityRequired),
     anyAcquired: rows.some((r) => r.quantityAcquired > 0),
   };
 }
@@ -500,20 +526,25 @@ type SupplyRowsByProject = Array<{
 type SupplyGroupRow =
   | {
       projectId: string;
-      _count: { _all: number };
-      _sum: { quantityRequired: number };
+      _count: { _all: number; quantityRequired?: number };
+      _sum: { quantityRequired: number | null };
       _max: { quantityAcquired: number };
     }
-  | { projectId: string; _sum: { quantityRequired: number; quantityAcquired: number } };
+  | { projectId: string; _sum: { quantityRequired: number | null; quantityAcquired: number } };
 
 /**
- * Answers the six group reads `summariseProjectSupplies` makes, from plain junction rows: a test
+ * Answers the group reads `summariseProjectSupplies` makes, from plain junction rows: a test
  * states the rows it means and the aggregates are derived, rather than hand-typed from the code
  * they are meant to check.
  *
  * Each read is answered with the aggregate shape that read actually asks for — the shortfall read
- * gets its two sums and nothing else — so production code that reads a field it never selected
- * fails here instead of passing on a too-generous mock.
+ * gets its two sums and nothing else, and a column count only when it is asked for — so
+ * production code that reads a field it never selected fails here instead of passing on a
+ * too-generous mock.
+ *
+ * A null need is answered the way Postgres answers it: no comparison with it is true, so it is
+ * never in the shortfall group; a sum skips it (a sum of nothing but nulls is null); and
+ * `COUNT(quantityRequired)` skips it, which is how the totals read finds the unknown lines.
  */
 export function mockProjectSupplyGroups(
   mockPrisma: MockPrisma,
@@ -521,34 +552,38 @@ export function mockProjectSupplyGroups(
 ): void {
   const answer =
     (pick: (project: SupplyRowsByProject[number]) => SupplyRow[] | undefined) =>
-    (args: { where?: { quantityAcquired?: unknown } }) => {
+    (args: { where?: { quantityAcquired?: unknown }; _count?: { quantityRequired?: boolean } }) => {
       const shortfallRead = args?.where?.quantityAcquired !== undefined;
+      const countsNeedColumn = args?._count?.quantityRequired === true;
 
       return Promise.resolve(
         projects.flatMap((project): SupplyGroupRow[] => {
           const all = pick(project) ?? [];
           const group = shortfallRead
-            ? all.filter((r) => r.quantityAcquired < r.quantityRequired)
+            ? all.filter((r) => hasKnownNeed(r) && r.quantityAcquired < r.quantityRequired)
             : all;
           if (group.length === 0) return [];
 
-          const sum = (field: keyof SupplyRow) => group.reduce((total, r) => total + r[field], 0);
+          const known = group.filter(hasKnownNeed);
+          const requiredSum =
+            known.length === 0 ? null : known.reduce((total, r) => total + r.quantityRequired, 0);
+          const acquiredSum = group.reduce((total, r) => total + r.quantityAcquired, 0);
 
           return shortfallRead
             ? [
                 {
                   projectId: project.projectId,
-                  _sum: {
-                    quantityRequired: sum("quantityRequired"),
-                    quantityAcquired: sum("quantityAcquired"),
-                  },
+                  _sum: { quantityRequired: requiredSum, quantityAcquired: acquiredSum },
                 },
               ]
             : [
                 {
                   projectId: project.projectId,
-                  _count: { _all: group.length },
-                  _sum: { quantityRequired: sum("quantityRequired") },
+                  _count: {
+                    _all: group.length,
+                    ...(countsNeedColumn ? { quantityRequired: known.length } : {}),
+                  },
+                  _sum: { quantityRequired: requiredSum },
                   _max: { quantityAcquired: Math.max(...group.map((r) => r.quantityAcquired)) },
                 },
               ];
@@ -631,6 +666,11 @@ export function createMockPrisma() {
       delete: vi.fn(),
       upsert: vi.fn(),
     },
+    threadLine: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      upsert: vi.fn(),
+    },
     thread: {
       create: vi.fn(),
       findMany: vi.fn(),
@@ -661,6 +701,7 @@ export function createMockPrisma() {
       findMany: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),
+      updateMany: vi.fn(),
       delete: vi.fn(),
       upsert: vi.fn(),
       groupBy: vi.fn(),

@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useTransition, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { SupplyTable } from "@/components/features/supply-table";
+import { SupplyTable, skeinLineOf } from "@/components/features/supply-table";
 import type { SupplyRow, CalcParams, FabricOption } from "@/components/features/supply-table";
 import { DEFAULT_CALC_PARAMS } from "@/components/features/supply-table/types";
 import { ServerActionAdapter } from "@/components/features/supply-table/server-action-adapter";
@@ -40,6 +40,7 @@ function threadToSupplyRow(pt: ProjectThreadWithThread): SupplyRow {
     need: pt.quantityRequired,
     have: pt.quantityAcquired,
     isNeedOverridden: pt.isNeedOverridden,
+    line: skeinLineOf(pt.thread.line),
   };
 }
 
@@ -56,6 +57,7 @@ function beadToSupplyRow(pb: ProjectBeadWithBead): SupplyRow {
     need: pb.quantityRequired,
     have: pb.quantityAcquired,
     isNeedOverridden: false,
+    line: null,
   };
 }
 
@@ -74,6 +76,7 @@ function specialtyToSupplyRow(ps: ProjectSpecialtyWithItem): SupplyRow {
     need: ps.quantityRequired,
     have: ps.quantityAcquired,
     isNeedOverridden: false,
+    line: null,
   };
 }
 

@@ -44,7 +44,7 @@ a data file and tests, stay ungated and merge on her word after a preview). The 
 gate neither and rely on C-1's review alone. A gate-list change is hers (hard rule 6).
 **Recommendation:** gate the folder, not the data.
 
-**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-46 or later — D-45 went to F-16a on 2026-10-31) before
+**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-47 or later — D-45 and D-46 went to F-16a on 2026-10-31) before
 its branch opens; the path file and protocol §5 change in C-1's PR if she says yes.
 
 ## Also open — the question known to be coming
@@ -55,6 +55,34 @@ no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is r
 on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
 
 ## Ruled
+
+### 2026-10-31 · D-46 · F-16a's migration is not safe for the code it replaces — fix forward only, a one-off exception — ruled during `/work-item F-16a`
+
+**What contradicts what.** `docs/INTEGRATIONS.md` (Migrations) and protocol §9's recovery step
+hold that every migration is safe for the code it replaces, which is what makes `git revert` of a
+bad merge survivable. PR #150's layer-1 review found F-16a's migration is not: `Thread.lineId`
+becomes required with no default, so the previous code cannot create any thread (catalogue form,
+quick-add, chart form); and `ProjectThread.quantityRequired` becomes nullable, so a need made
+unknown after deploy reaches previous code that compares it as a number — the old shopping list and
+cart read `acquired >= null` as in hand, and the old `updateSupplyAcquired` clamps with
+`Math.min(n, null)`, storing 0 acquired. Neither can be made safe without giving up the feature:
+an unknown need is the point of the item. On deploy itself the exposure is the seconds between the
+migration and the traffic switch, and production holds no unknown need at deploy (the trap ⑬
+re-read and the preview build's read-back, 2026-10-31).
+
+**Surfaced to Beth** as one question; option labels as she saw them: "Fix forward only
+(Recommended)" — if F-16a ever has to be undone, the cure is a quick fix rather than a plain
+switch-back; recorded as a one-off exception, checked again at review · "Add a partial safety net"
+— a database trigger so the old version could still add threads, which still cannot stop the old
+shopping list reading unknown lines as bought · "Park it for /cleanup".
+
+**Her ruling: "Fix forward only (Recommended)".**
+
+**What it changed.** Nothing in the code. PR #150 states that F-16a is fix-forward only: a
+production problem after its merge is cured by a `fix/` branch, not by reverting the squash commit
+(a revert would leave thread creation failing until a fix ships). `/review F-16a` checks the
+exposure again before merging. The rule itself stands for every other migration — this is not a
+change to it.
 
 ### 2026-10-31 · D-45 · production's data seen: F-16a writes no skein maths in the database, and DMC 3887 moves under DMC — ruled during `/work-item F-16a`
 

@@ -125,7 +125,7 @@ Caching: `unstable_cache` keyed per user, tagged `"stats"`, invalidated by `reva
 
 ### Layer 7: Database
 
-- `prisma/schema.prisma` — PostgreSQL via Neon, source of truth. 18 models and 3 enums, including `Series` (unique `name`, optional `totalCount`, optional `Designer` relation) with `Chart.seriesId` as the FK.
+- `prisma/schema.prisma` — PostgreSQL via Neon, source of truth. 19 models and 4 enums, including `Series` (unique `name`, optional `totalCount`, optional `Designer` relation) with `Chart.seriesId` as the FK.
 - `prisma.config.ts` — Prisma 7 config: schema path, migrations path, seed command, and the `DIRECT_URL` datasource
 - `src/lib/db.ts` — Lazy singleton Prisma client via `Proxy` + `globalThis` (survives hot-reload)
 - `src/generated/prisma/` — Generated client (auto-generated, never edit)
@@ -208,7 +208,7 @@ showing yesterday):
 
 1. `requireAuth()` — throws if no session
 2. `schema.parse(input)` — Zod validation
-3. Ownership check — **direct where the model carries a `userId`, transitive where it does not.** Three models carry one: `Project`, `StitchingApp`, `StorageLocation`; those get `prisma.X.findUnique({ where: { id }, select: { userId: true } })` before the write. Models that hang off a project are checked **through** it — `chart-actions.ts` selects `{ project: { select: { userId: true } } }` before deleting a chart or changing its status, `chart-file-actions.ts` checks `file.chart.project?.userId` on every mutation, and `fabric-actions.ts` verifies a linked fabric's project. Genuinely global, because this is a single-user app with one collection: designers, genres, series, threads, beads, specialty items and brands. **Fabric is the boundary case** — `linkedProjectId` is nullable, so an unlinked fabric has no ownership path at all and is queried as `OR: [{ linkedProjectId: null }, { linkedProject: { userId } }]`.
+3. Ownership check — **direct where the model carries a `userId`, transitive where it does not.** Three models carry one: `Project`, `StitchingApp`, `StorageLocation`; those get `prisma.X.findUnique({ where: { id }, select: { userId: true } })` before the write. Models that hang off a project are checked **through** it — `chart-actions.ts` selects `{ project: { select: { userId: true } } }` before deleting a chart or changing its status, `chart-file-actions.ts` checks `file.chart.project?.userId` on every mutation, and `fabric-actions.ts` verifies a linked fabric's project. Genuinely global, because this is a single-user app with one collection: designers, genres, series, threads, thread lines, beads, specialty items and brands. **Fabric is the boundary case** — `linkedProjectId` is nullable, so an unlinked fabric has no ownership path at all and is queried as `OR: [{ linkedProjectId: null }, { linkedProject: { userId } }]`.
 4. Prisma write (often inside `$transaction`)
 5. `revalidatePath()` / `revalidateTag("stats", { expire: 0 })` — the Next 16 two-argument form
 6. Return `{ success: true, ... }` or `{ success: false, error: string }`

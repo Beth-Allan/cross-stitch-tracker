@@ -52,31 +52,31 @@ model Genre {
 }
 
 model Chart {
-  id                     String    @id @default(cuid())
+  id                     String      @id @default(cuid())
   name                   String
-  designer               Designer? @relation(fields: [designerId], references: [id])
+  designer               Designer?   @relation(fields: [designerId], references: [id])
   designerId             String?
   coverImageUrl          String?
   coverThumbnailUrl      String?
   focalPointX            Float?
   focalPointY            Float?
-  stitchCount            Int       @default(0)
-  stitchCountApproximate Boolean   @default(false)
-  stitchesWide           Int       @default(0)
-  stitchesHigh           Int       @default(0)
+  stitchCount            Int         @default(0)
+  stitchCountApproximate Boolean     @default(false)
+  stitchesWide           Int         @default(0)
+  stitchesHigh           Int         @default(0)
   genres                 Genre[]
-  isPaperChart           Boolean   @default(false)
-  isFormalKit            Boolean   @default(false)
-  isSAL                  Boolean   @default(false)
+  isPaperChart           Boolean     @default(false)
+  isFormalKit            Boolean     @default(false)
+  isSAL                  Boolean     @default(false)
   kitColorCount          Int?
-  dateAdded              DateTime  @default(now())
+  dateAdded              DateTime    @default(now())
   project                Project?
   files                  ChartFile[]
   notes                  String?
-  series                 Series?   @relation(fields: [seriesId], references: [id])
+  series                 Series?     @relation(fields: [seriesId], references: [id])
   seriesId               String?
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
 }
 
 model ChartFile {
@@ -114,9 +114,9 @@ model Project {
   wantToStartNext      Boolean            @default(false)
   preferredStartSeason String?
   // Calculator settings (Phase 7)
-  strandCount          Int                @default(2)    // 1-6, default 2
-  overCount            Int                @default(1)    // 1 or 2, default 1 (Aida is most common)
-  wastePercent         Int                @default(20)   // 0-50, default 20%
+  strandCount          Int                @default(2) // 1-6, default 2
+  overCount            Int                @default(1) // 1 or 2, default 1 (Aida is most common)
+  wastePercent         Int                @default(20) // 0-50, default 20%
   projectThreads       ProjectThread[]
   projectBeads         ProjectBead[]
   projectSpecialty     ProjectSpecialty[]
@@ -135,7 +135,7 @@ model StitchSession {
   date             DateTime
   stitchCount      Int
   timeSpentMinutes Int?
-  photoKey         String?  // R2 storage key, resolved to presigned URL at display time
+  photoKey         String? // R2 storage key, resolved to presigned URL at display time
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -165,6 +165,13 @@ enum ColorFamily {
   NEUTRAL
 }
 
+/// How a thread line is stitched (THR-008–THR-010, THR-013): six-strand floss is separated and
+/// worked in the project's strand count; a line used whole is one strand at its full length.
+enum StrandStructure {
+  SIX_STRAND
+  USED_WHOLE
+}
+
 // ─── Supply Models ──────────────────────────────────────────────────────────
 
 model SupplyBrand {
@@ -172,6 +179,7 @@ model SupplyBrand {
   name           String          @unique
   website        String?
   supplyType     SupplyType
+  threadLines    ThreadLine[]
   threads        Thread[]
   beads          Bead[]
   specialtyItems SpecialtyItem[]
@@ -179,10 +187,34 @@ model SupplyBrand {
   updatedAt      DateTime        @updatedAt
 }
 
+/// A kind of thread within a brand, carrying what the skein calculator needs (THR-010, THR-011).
+/// Every thread belongs to one. A brand with one kind of thread has one line, whose `name` is
+/// blank and never shown; a brand whose lines differ (Kreinik) names each line.
+/// A null length or structure is unknown — the calculator gives no figure for it rather than
+/// work one out from a guessed length (THR-011).
+model ThreadLine {
+  id              String           @id @default(cuid())
+  brand           SupplyBrand      @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brandId         String
+  name            String           @default("")
+  /// Whole millimetres, so a 5-yard skein (4572 mm) stays exact.
+  skeinLengthMm   Int?
+  strandStructure StrandStructure?
+  threads         Thread[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([brandId, name])
+  @@unique([id, brandId])
+}
+
 model Thread {
   id             String          @id @default(cuid())
   brand          SupplyBrand     @relation(fields: [brandId], references: [id])
   brandId        String
+  /// Shares `brandId` with `brand`, so a thread's line always belongs to its own brand.
+  line           ThreadLine      @relation(fields: [lineId, brandId], references: [id, brandId])
+  lineId         String
   colorCode      String
   colorName      String
   hexColor       String
@@ -191,7 +223,7 @@ model Thread {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
-  @@unique([brandId, colorCode])
+  @@unique([lineId, colorCode])
 }
 
 model Bead {
@@ -233,11 +265,13 @@ model ProjectThread {
   thread           Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
   threadId         String
   stitchCount      Int      @default(0)
-  quantityRequired  Int      @default(1)
-  quantityAcquired  Int      @default(0)
-  isNeedOverridden  Boolean  @default(false)  // true when user manually edited Need
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  /// Null when the calculator cannot work it out: the thread's line has no known length or
+  /// strand structure. An unknown need is still to buy, never in hand.
+  quantityRequired Int?     @default(1)
+  quantityAcquired Int      @default(0)
+  isNeedOverridden Boolean  @default(false) // true when user manually edited Need
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@unique([projectId, threadId])
 }

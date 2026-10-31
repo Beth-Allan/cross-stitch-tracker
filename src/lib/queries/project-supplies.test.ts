@@ -6,7 +6,7 @@ vi.mock("@/lib/db", () => ({
   prisma: mockPrisma,
 }));
 
-type Row = { projectId: string; quantityRequired: number; quantityAcquired: number };
+type Row = { projectId: string; quantityRequired: number | null; quantityAcquired: number };
 
 /**
  * Every expectation here is derived from `createSupplyRollup`, which states the rule as the JS
@@ -145,6 +145,79 @@ describe("summariseProjectSupplies", () => {
     });
   });
 
+  describe("a thread line whose need is unknown (THR-011)", () => {
+    it("counts it as unknown and still to buy when every known row is fully acquired", async () => {
+      const threads: Row[] = [
+        { projectId: "p1", quantityRequired: 3, quantityAcquired: 3 },
+        { projectId: "p1", quantityRequired: null, quantityAcquired: 0 },
+      ];
+      mockJunctions({ threads });
+
+      const { summariseProjectSupplies } = await import("./project-supplies");
+      const result = await summariseProjectSupplies({ userId: "user-1" });
+
+      expect(result.get("p1")?.threads).toEqual({
+        count: 2,
+        required: 3,
+        acquired: 3,
+        unknown: 1,
+        allFulfilled: false,
+        anyAcquired: true,
+      });
+      expect(result.get("p1")?.threads).toEqual(referenceRollup(threads));
+    });
+
+    it("stays unfulfilled even when skeins have been bought against it", async () => {
+      // `acquired >= null` is true in JS — the trap that would read this line as in hand.
+      const threads: Row[] = [{ projectId: "p1", quantityRequired: null, quantityAcquired: 4 }];
+      mockJunctions({ threads });
+
+      const { summariseProjectSupplies } = await import("./project-supplies");
+      const result = await summariseProjectSupplies({ userId: "user-1" });
+
+      expect(result.get("p1")?.threads).toEqual({
+        count: 1,
+        required: 0,
+        acquired: 0,
+        unknown: 1,
+        allFulfilled: false,
+        anyAcquired: true,
+      });
+      expect(result.get("p1")?.threads).toEqual(referenceRollup(threads));
+    });
+
+    it("reports no unknown lines for beads and specialty", async () => {
+      const beads: Row[] = [{ projectId: "p1", quantityRequired: 2, quantityAcquired: 2 }];
+      const specialty: Row[] = [{ projectId: "p1", quantityRequired: 1, quantityAcquired: 0 }];
+      mockJunctions({ beads, specialty });
+
+      const { summariseProjectSupplies } = await import("./project-supplies");
+      const result = await summariseProjectSupplies({ userId: "user-1" });
+
+      expect(result.get("p1")?.beads.unknown).toBe(0);
+      expect(result.get("p1")?.specialty.unknown).toBe(0);
+      expect(result.get("p1")?.threads).toEqual(referenceRollup([]));
+    });
+
+    it("finds them by counting the need column beside every row on each totals read", async () => {
+      mockJunctions({});
+
+      const { summariseProjectSupplies } = await import("./project-supplies");
+      await summariseProjectSupplies({ userId: "user-1" });
+
+      // COUNT(column) skips nulls, so the gap between the two counts is the unknown lines. All
+      // three junctions ask it, so there is one code path, not a thread-only special case.
+      for (const junction of [
+        mockPrisma.projectThread,
+        mockPrisma.projectBead,
+        mockPrisma.projectSpecialty,
+      ]) {
+        const [totalsCall] = junction.groupBy.mock.calls;
+        expect(totalsCall[0]._count).toEqual({ _all: true, quantityRequired: true });
+      }
+    });
+  });
+
   it("leaves a project with no supply rows out of the map entirely", async () => {
     mockJunctions({ threads: [{ projectId: "p1", quantityRequired: 1, quantityAcquired: 0 }] });
 
@@ -227,6 +300,25 @@ describe("totalSupplyRollup", () => {
     });
 
     expect(combined).toEqual(referenceRollup([...threads, ...beads, ...specialty]));
+  });
+
+  it("carries the unknown lines through, so the whole kit is not fulfilled", async () => {
+    const threads: Row[] = [
+      { projectId: "p1", quantityRequired: 2, quantityAcquired: 2 },
+      { projectId: "p1", quantityRequired: null, quantityAcquired: 0 },
+    ];
+    const beads: Row[] = [{ projectId: "p1", quantityRequired: 1, quantityAcquired: 1 }];
+
+    const { totalSupplyRollup } = await import("./project-supplies");
+    const combined = totalSupplyRollup({
+      threads: referenceRollup(threads),
+      beads: referenceRollup(beads),
+      specialty: referenceRollup([]),
+    });
+
+    expect(combined.unknown).toBe(1);
+    expect(combined.allFulfilled).toBe(false);
+    expect(combined).toEqual(referenceRollup([...threads, ...beads]));
   });
 
   it("is empty for a project with nothing recorded", async () => {

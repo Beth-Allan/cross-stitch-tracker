@@ -8,6 +8,9 @@ import { render, screen, fireEvent, act } from "@/__tests__/test-utils";
 import { SupplyTableAddRow } from "./supply-table-add-row";
 import type { SupplyTableAdapter, CalcParams, SupplySearchResult } from "./types";
 import { DEFAULT_CALC_PARAMS } from "./types";
+import type { SkeinLine } from "@/types/supply";
+
+const DMC_LINE: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
 
 // Mirror the mocks from the main test file so these tests run in isolation
 vi.mock("./segmented-type-toggle", () => ({
@@ -84,6 +87,7 @@ function makeSearchResult(overrides: Partial<SupplySearchResult> = {}): SupplySe
     brandName: "DMC",
     brandId: "brand-1",
     hexColor: "#000000",
+    line: (overrides.type ?? "THREAD") === "THREAD" ? DMC_LINE : null,
     ...overrides,
   };
 }

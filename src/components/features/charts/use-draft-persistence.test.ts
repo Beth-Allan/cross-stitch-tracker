@@ -273,6 +273,7 @@ describe("use-draft-persistence", () => {
           need: 2,
           have: 0,
           isNeedOverridden: false,
+          line: { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" as const },
         },
       ];
       const calcParams = {
@@ -330,6 +331,102 @@ describe("use-draft-persistence", () => {
       expect(result!.supplies).toHaveLength(1);
       expect(result!.supplies[0].code).toBe("310");
       expect(result!.calcParams.fabricCount).toBe(16);
+    });
+
+    it("restores a thread whose need is unknown, with its line, and reads a row saved before rows carried a line as line unknown", async () => {
+      const { loadDraftV2 } = await import("./use-draft-persistence");
+      const row = {
+        supplyId: "t1",
+        type: "THREAD",
+        code: "002",
+        name: "Gold",
+        brandName: "Kreinik",
+        hexColor: "#FFD700",
+        stitchCount: 5000,
+        have: 0,
+        isNeedOverridden: false,
+      };
+      const unknownLine = { skeinLengthMm: null, strandStructure: null };
+      const supplies = [
+        { ...row, id: "row-unknown", need: null, line: unknownLine },
+        { ...row, id: "row-old", need: 3 },
+      ];
+      localStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify({ version: 2, form: createDraftValues(), supplies, calcParams: {} }),
+      );
+
+      const result = loadDraftV2(createDefaultValues(), ["designer-1"], ["storage-1"], ["app-1"]);
+
+      expect(result!.supplies).toHaveLength(2);
+      expect(result!.supplies[0]).toEqual(
+        expect.objectContaining({ need: null, line: unknownLine }),
+      );
+      expect(result!.supplies[1]).toEqual(expect.objectContaining({ need: 3, line: null }));
+    });
+
+    it("reads a stored line that is empty, missing a field, or carrying a strange value as line unknown", async () => {
+      const { loadDraftV2 } = await import("./use-draft-persistence");
+      const row = {
+        supplyId: "t1",
+        type: "THREAD",
+        code: "310",
+        name: "Black",
+        brandName: "DMC",
+        hexColor: "#000000",
+        stitchCount: 5000,
+        need: 4,
+        have: 0,
+        isNeedOverridden: false,
+      };
+      const knownLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
+      const supplies = [
+        { ...row, id: "row-empty", line: {} },
+        { ...row, id: "row-no-structure", line: { skeinLengthMm: 8000 } },
+        { ...row, id: "row-text-length", line: { skeinLengthMm: "8000", strandStructure: null } },
+        { ...row, id: "row-odd-structure", line: { skeinLengthMm: 8000, strandStructure: "TWO" } },
+        { ...row, id: "row-known", line: knownLine },
+      ];
+      localStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify({ version: 2, form: createDraftValues(), supplies, calcParams: {} }),
+      );
+
+      const result = loadDraftV2(createDefaultValues(), ["designer-1"], ["storage-1"], ["app-1"]);
+
+      expect(result!.supplies.map((s) => [s.id, s.line])).toEqual([
+        ["row-empty", null],
+        ["row-no-structure", null],
+        ["row-text-length", null],
+        ["row-odd-structure", null],
+        ["row-known", knownLine],
+      ]);
+    });
+
+    it("drops a bead row whose need is null: only a thread's need can be unknown", async () => {
+      const { loadDraftV2 } = await import("./use-draft-persistence");
+      const bead = {
+        id: "row-bead",
+        supplyId: "b1",
+        type: "BEAD",
+        code: "00123",
+        name: "Red",
+        brandName: "Mill Hill",
+        hexColor: "#FF0000",
+        stitchCount: 0,
+        need: null,
+        have: 0,
+        isNeedOverridden: false,
+        line: null,
+      };
+      localStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify({ version: 2, form: createDraftValues(), supplies: [bead], calcParams: {} }),
+      );
+
+      const result = loadDraftV2(createDefaultValues(), ["designer-1"], ["storage-1"], ["app-1"]);
+
+      expect(result!.supplies).toEqual([]);
     });
 
     it("handles v1 format (no version field) by wrapping in v2 shape with empty supplies", async () => {
