@@ -8,6 +8,8 @@ import type {
   ProjectSpecialty,
   ColorFamily,
   SupplyType,
+  ThreadLine,
+  StrandStructure,
 } from "@/generated/prisma/client";
 
 export type {
@@ -20,9 +22,17 @@ export type {
   ProjectSpecialty,
   ColorFamily,
   SupplyType,
+  ThreadLine,
+  StrandStructure,
 };
 
-export type ThreadWithBrand = Thread & { brand: SupplyBrand };
+/**
+ * What the skein calculator reads from a thread's line. Either field null is unknown, and an
+ * unknown line has no calculated need (D-34, THR-011).
+ */
+export type SkeinLine = Pick<ThreadLine, "skeinLengthMm" | "strandStructure">;
+
+export type ThreadWithBrand = Thread & { brand: SupplyBrand; line: ThreadLine };
 export type BeadWithBrand = Bead & { brand: SupplyBrand };
 export type SpecialtyItemWithBrand = SpecialtyItem & { brand: SupplyBrand };
 
