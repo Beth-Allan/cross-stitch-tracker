@@ -357,6 +357,40 @@ describe("EditableNumber — a figure left as it was", () => {
     expect(screen.queryByText("Value not saved")).not.toBeInTheDocument();
   });
 
+  it("does not write back the number it opened with when the figure moved meanwhile", () => {
+    const onSave = vi.fn();
+    const { rerender } = render(<EditableNumber value={5} onSave={onSave} ariaLabel="Need" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+    rerender(<EditableNumber value={8} onSave={onSave} ariaLabel="Need" />);
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Need" }));
+
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Need" })).toHaveTextContent("8");
+  });
+
+  it("leaving a figure that became known while open saves and refuses nothing", () => {
+    const onSave = vi.fn();
+    const { rerender } = render(<EditableNumber value={null} onSave={onSave} ariaLabel="Need" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+    rerender(<EditableNumber value={3} onSave={onSave} ariaLabel="Need" />);
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Need" }));
+
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.queryByText("Value not saved")).not.toBeInTheDocument();
+  });
+
+  it("saves an unchanged number when saveUnchanged is set", () => {
+    const onSave = vi.fn();
+    render(<EditableNumber value={500} onSave={onSave} ariaLabel="Stitches" saveUnchanged />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Stitches" }));
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Stitches" }));
+
+    expect(onSave).toHaveBeenCalledWith(500);
+  });
+
   it("compares against the number on screen while a save is in flight", async () => {
     const onSave = vi.fn().mockReturnValue(new Promise<boolean>(() => {}));
     render(<EditableNumber value={5} onSave={onSave} ariaLabel="Need" />);

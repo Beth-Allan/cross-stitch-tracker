@@ -20,7 +20,8 @@ import { useRejectionFlash } from "@/components/hooks/use-rejection-flash";
  * reverts on invalid input.
  *
  * A number left as it was never reaches onSave: a save is what marks a thread's need as typed by
- * hand, so merely opening the cell must not count as one.
+ * hand, so merely opening the cell must not count as one. "As it was" means the number the cell
+ * opened with, not the live figure, or a figure that moved meanwhile would be written back.
  *
  * The optimistic value is provisional: when onSave reports failure (resolves false or throws) it
  * is rolled back, so the cell never shows a number the server refused. Only the newest save may
@@ -32,6 +33,7 @@ export function EditableNumber({
   ariaLabel,
   className,
   min = 0,
+  saveUnchanged = false,
 }: {
   value: number | null;
   /** Resolving false (or throwing) rolls the optimistic value back */
@@ -39,6 +41,8 @@ export function EditableNumber({
   ariaLabel: string;
   className?: string;
   min?: number;
+  /** For a cell where re-entering the same number is itself the request */
+  saveUnchanged?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(toDraft(value));
@@ -46,6 +50,7 @@ export function EditableNumber({
   const { showRejection, triggerRejection } = useRejectionFlash();
   const inputRef = useRef<HTMLInputElement>(null);
   const latestSaveRef = useRef(0);
+  const openedWithRef = useRef<number | null>(null);
 
   // Clear optimistic value once the prop catches up
   useEffect(() => {
@@ -94,8 +99,9 @@ export function EditableNumber({
           onChange={(e) => setDraft(e.target.value)}
           onBlur={() => {
             const num = parseInt(draft);
-            const unchanged = displayValue === null ? draft.trim() === "" : num === displayValue;
-            if (unchanged) {
+            const openedWith = openedWithRef.current;
+            const unchanged = openedWith === null ? draft.trim() === "" : num === openedWith;
+            if (unchanged && !saveUnchanged) {
               // A figure left as it was is no edit, not a refused one
             } else if (!isNaN(num) && num >= min) {
               commit(num);
@@ -126,6 +132,7 @@ export function EditableNumber({
     <>
       <button
         onClick={() => {
+          openedWithRef.current = displayValue;
           setDraft(toDraft(displayValue));
           setEditing(true);
         }}
