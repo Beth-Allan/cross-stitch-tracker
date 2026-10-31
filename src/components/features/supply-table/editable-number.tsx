@@ -7,7 +7,8 @@ import { useRejectionFlash } from "@/components/hooks/use-rejection-flash";
 /**
  * Click-to-edit number cell component for the supply table.
  *
- * Read mode: displays value as a button with hover indicator.
+ * Read mode: displays value as a button with hover indicator. A null value is a figure nobody
+ * can work out yet and reads "Unknown", never a 0 that would pass for a real one.
  * Edit mode: transforms to a compact number input with keyboard support.
  *
  * Keyboard:
@@ -29,7 +30,7 @@ export function EditableNumber({
   className,
   min = 0,
 }: {
-  value: number;
+  value: number | null;
   /** Resolving false (or throwing) rolls the optimistic value back */
   onSave: (value: number) => void | Promise<boolean>;
   ariaLabel: string;
@@ -37,7 +38,7 @@ export function EditableNumber({
   min?: number;
 }) {
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(String(value));
+  const [draft, setDraft] = useState(toDraft(value));
   const [optimistic, setOptimistic] = useState<number | null>(null);
   const { showRejection, triggerRejection } = useRejectionFlash();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -75,7 +76,7 @@ export function EditableNumber({
   function rollback(saveId: number) {
     if (saveId !== latestSaveRef.current) return;
     setOptimistic(null);
-    setDraft(String(value));
+    setDraft(toDraft(value));
     triggerRejection();
   }
 
@@ -90,10 +91,12 @@ export function EditableNumber({
           onChange={(e) => setDraft(e.target.value)}
           onBlur={() => {
             const num = parseInt(draft);
-            if (!isNaN(num) && num >= min) {
+            if (displayValue === null && draft.trim() === "") {
+              // Nothing typed into an unknown figure is no edit, not a refused one
+            } else if (!isNaN(num) && num >= min) {
               commit(num);
             } else {
-              setDraft(String(displayValue));
+              setDraft(toDraft(displayValue));
               triggerRejection();
             }
             setEditing(false);
@@ -101,7 +104,7 @@ export function EditableNumber({
           onKeyDown={(e) => {
             if (e.key === "Enter") (e.target as HTMLInputElement).blur();
             if (e.key === "Escape") {
-              setDraft(String(displayValue));
+              setDraft(toDraft(displayValue));
               setEditing(false);
             }
           }}
@@ -119,7 +122,7 @@ export function EditableNumber({
     <>
       <button
         onClick={() => {
-          setDraft(String(displayValue));
+          setDraft(toDraft(displayValue));
           setEditing(true);
         }}
         className={cn(
@@ -130,11 +133,15 @@ export function EditableNumber({
         title="Click to edit"
         aria-label={ariaLabel}
       >
-        {displayValue}
+        {displayValue ?? <span className="text-muted-foreground">Unknown</span>}
       </button>
       <span role="status" aria-live="polite" className="sr-only">
         {showRejection ? "Value not saved" : ""}
       </span>
     </>
   );
+}
+
+function toDraft(value: number | null): string {
+  return value === null ? "" : String(value);
 }

@@ -1001,8 +1001,10 @@ describe("ChartMergedForm", () => {
           hexColor: "#800080",
           colorFamily: "PURPLE",
           brandId: "brand-1",
+          lineId: "line-1",
           createdAt: new Date(),
           updatedAt: new Date(),
+          line: { id: "line-1", skeinLengthMm: 8000, strandStructure: "SIX_STRAND" },
         },
       });
 
@@ -1029,6 +1031,34 @@ describe("ChartMergedForm", () => {
       // Must NOT have a 'name' field (wrong field name)
       const callArg = mockCreateThread.mock.calls[0][0] as Record<string, unknown>;
       expect(callArg).not.toHaveProperty("name");
+    });
+
+    it("createFn for THREAD carries the new thread's line, so its need is worked out from it", async () => {
+      const { createThread: mockCreateThreadFn } = await import("@/lib/actions/supply-actions");
+      vi.mocked(mockCreateThreadFn).mockResolvedValue({
+        success: true as const,
+        thread: {
+          id: "new-t-2",
+          colorCode: "CUSTOM",
+          colorName: "Very Dark Lavender",
+          hexColor: "#6B5B95",
+          colorFamily: "PURPLE",
+          brandId: "brand-custom",
+          lineId: "line-custom",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          line: { id: "line-custom", skeinLengthMm: null, strandStructure: null },
+        },
+      });
+
+      const { buildCreateFn } = await import("./chart-merged-form");
+      const created = await buildCreateFn()("THREAD", {
+        name: "Very Dark Lavender",
+        brandId: "default",
+        colorFamily: "PURPLE",
+      });
+
+      expect(created.line).toEqual({ skeinLengthMm: null, strandStructure: null });
     });
 
     it("createFn for BEAD passes colorName, productCode, hexColor, colorFamily, and brandId to createBead", async () => {

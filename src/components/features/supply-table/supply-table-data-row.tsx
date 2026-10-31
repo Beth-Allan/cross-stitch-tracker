@@ -103,7 +103,7 @@ export function SupplyTableDataRow({
               </span>
             </TooltipTrigger>
             <TooltipContent>
-              {row.have} of {row.need}
+              {row.have} of {row.need ?? "Unknown"}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

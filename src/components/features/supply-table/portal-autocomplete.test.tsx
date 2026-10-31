@@ -23,6 +23,7 @@ function makeItem(overrides: Partial<SupplySearchResult> = {}): SupplySearchResu
     brandName: "DMC",
     brandId: "brand-dmc",
     hexColor: "#000000",
+    line: { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" },
     ...overrides,
   };
 }

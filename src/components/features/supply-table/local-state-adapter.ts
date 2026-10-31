@@ -55,7 +55,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
       .slice(0, MAX_SEARCH_RESULTS);
   }
 
-  async addThread(threadId: string, stitchCount: number, need: number): Promise<Result> {
+  async addThread(threadId: string, stitchCount: number, need: number | null): Promise<Result> {
     const supply = this.searchPool.threads.find((t) => t.id === threadId);
     const id = crypto.randomUUID();
     const row: SupplyRow = {
@@ -70,6 +70,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
       need,
       have: 0,
       isNeedOverridden: false,
+      line: supply?.line ?? null,
     };
     this.rows.threads.set(id, row);
     return { success: true };
@@ -90,6 +91,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
       need,
       have: 0,
       isNeedOverridden: false,
+      line: null,
     };
     this.rows.beads.set(id, row);
     return { success: true };
@@ -110,6 +112,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
       need,
       have: 0,
       isNeedOverridden: false,
+      line: null,
     };
     this.rows.specialty.set(id, row);
     return { success: true };
@@ -148,6 +151,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
       brandName: "Custom",
       brandId: data.brandId,
       hexColor: data.hexColor ?? DEFAULT_SUPPLY_HEX,
+      line: type === "THREAD" ? { skeinLengthMm: null, strandStructure: null } : null,
     };
     this.getPool(type).push(result);
     return result;

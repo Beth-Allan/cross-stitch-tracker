@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useTransition } from "react";
 import { toast } from "sonner";
-import { calculateSkeins } from "@/lib/utils/skein-calculator";
+import { threadNeed } from "./thread-need";
 import type {
   SupplyType,
   SupplyTableAdapter,
@@ -17,7 +17,7 @@ export const MAX_DISPLAY_ITEMS = 8;
  * Custom hook managing the add-row state machine for the supply table.
  *
  * Handles: type selection, debounced search, item selection with focus hints,
- * auto-calculation via calculateSkeins, commit with correct adapter call,
+ * auto-calculation from the selected thread's own line, commit with correct adapter call,
  * and reset with sticky type toggle.
  */
 export function useSupplyTable(
@@ -32,7 +32,7 @@ export function useSupplyTable(
   const [isSearching, setIsSearching] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SupplySearchResult | null>(null);
   const [stitchCount, setStitchCountRaw] = useState(0);
-  const [need, setNeed] = useState(1);
+  const [need, setNeed] = useState<number | null>(1);
   const [isAutoCalc, setIsAutoCalc] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [createSearchText, setCreateSearchText] = useState("");
@@ -138,18 +138,16 @@ export function useSupplyTable(
       const safeValue = Math.max(0, value);
       setStitchCountRaw(safeValue);
 
-      if (supplyType === "THREAD" && isAutoCalc && safeValue > 0) {
-        const calculated = calculateSkeins({
-          stitchCount: safeValue,
-          strandCount: calcParams.strandCount,
-          fabricCount: calcParams.fabricCount,
-          overCount: calcParams.overCount,
-          wastePercent: calcParams.wastePercent,
-        });
-        setNeed(Math.max(1, calculated));
+      if (supplyType === "THREAD" && isAutoCalc) {
+        if (safeValue > 0) {
+          setNeed(threadNeed(safeValue, calcParams, selectedItem?.line ?? null));
+        } else {
+          // With no stitch count there is nothing for the need to be unknown about
+          setNeed((current) => current ?? 1);
+        }
       }
     },
-    [supplyType, isAutoCalc, calcParams],
+    [supplyType, isAutoCalc, calcParams, selectedItem],
   );
 
   // --- Manual need override ---
@@ -182,13 +180,18 @@ export function useSupplyTable(
 
     // Validate inputs before adapter calls
     const safeStitchCount = Math.max(0, stitchCount);
-    const effectiveNeed = need > 0 ? need : 1;
+    // Only a thread's need can be unknown; a bead or specialty item always needs a number
+    const effectiveNeed = need !== null && need > 0 ? need : 1;
 
     let result: Result;
 
     switch (supplyType) {
       case "THREAD":
-        result = await adapter.addThread(selectedItem.id, safeStitchCount, effectiveNeed);
+        result = await adapter.addThread(
+          selectedItem.id,
+          safeStitchCount,
+          need === null ? null : effectiveNeed,
+        );
         break;
       case "BEAD":
         result = await adapter.addBead(selectedItem.id, safeStitchCount, effectiveNeed);

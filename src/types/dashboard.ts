@@ -171,7 +171,12 @@ export interface ShoppingSupplyNeed {
   code: string;
   colorName: string;
   hexColor: string | null;
-  quantityRequired: number;
+  /**
+   * `null` only on a thread line with no known skein length or strand structure, so no need can
+   * be worked out (D-34). Such a line is still to buy and never in hand (D-40 ④), and shows as
+   * "Unknown" — never 0.
+   */
+  quantityRequired: number | null;
   quantityAcquired: number;
   unit: string;
   projectId: string;

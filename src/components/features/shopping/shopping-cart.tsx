@@ -283,12 +283,16 @@ export function ShoppingCart({ data, imageUrls }: ShoppingCartProps) {
     [filteredProjects, selectedIds],
   );
   const listBadge = useMemo(() => {
+    // A need of `null` (D-34) is still to buy, and `acquired < null` is false in JS — so the null
+    // check has to be said out loud, or an unknown line silently drops off the count (D-40 ④).
     const threadNeeds = filteredThreads.filter(
-      (t) => t.quantityAcquired < t.quantityRequired,
+      (t) => t.quantityRequired === null || t.quantityAcquired < t.quantityRequired,
     ).length;
-    const beadNeeds = filteredBeads.filter((b) => b.quantityAcquired < b.quantityRequired).length;
+    const beadNeeds = filteredBeads.filter(
+      (b) => b.quantityRequired === null || b.quantityAcquired < b.quantityRequired,
+    ).length;
     const specialtyNeeds = filteredSpecialty.filter(
-      (s) => s.quantityAcquired < s.quantityRequired,
+      (s) => s.quantityRequired === null || s.quantityAcquired < s.quantityRequired,
     ).length;
     const fabricNeeds = filteredFabrics.filter((f) => !f.hasFabric).length;
     return threadNeeds + beadNeeds + specialtyNeeds + fabricNeeds;

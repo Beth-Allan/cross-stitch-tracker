@@ -143,7 +143,11 @@ export async function updateSupplyAcquired(
 
   try {
     // Look up junction record with project ownership check
-    let record: { id: string; quantityRequired: number; project: { userId: string } } | null = null;
+    let record: {
+      id: string;
+      quantityRequired: number | null;
+      project: { userId: string };
+    } | null = null;
 
     if (type === "thread") {
       record = await prisma.projectThread.findUnique({
@@ -171,8 +175,12 @@ export async function updateSupplyAcquired(
       return { success: false, error: "Unauthorized" };
     }
 
-    // Clamp to [0, quantityRequired]
-    const clamped = Math.min(acquiredQuantity, record.quantityRequired);
+    // A thread line whose need is unknown (D-34) has no ceiling: `Math.min(n, null)` is 0, so it
+    // would silently throw away what was bought. The floor of 0 is the schema's, above.
+    const clamped =
+      record.quantityRequired === null
+        ? acquiredQuantity
+        : Math.min(acquiredQuantity, record.quantityRequired);
 
     // Update quantity
     if (type === "thread") {

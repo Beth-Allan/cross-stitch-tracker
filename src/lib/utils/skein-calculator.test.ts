@@ -99,7 +99,7 @@ describe("calculateSkeins", () => {
       wastePercent: 20,
       line: DMC,
     });
-    expect(noWaste).toBeLessThan(withWaste);
+    expect(noWaste).toBeLessThan(withWaste!);
   });
 
   it("returns fewer skeins with strandCount 1 than strandCount 2", () => {
@@ -119,7 +119,7 @@ describe("calculateSkeins", () => {
       wastePercent: 20,
       line: DMC,
     });
-    expect(oneStrand).toBeLessThan(twoStrands);
+    expect(oneStrand).toBeLessThan(twoStrands!);
   });
 
   it("always returns a whole number (Math.ceil)", () => {
