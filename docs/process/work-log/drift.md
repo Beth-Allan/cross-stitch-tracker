@@ -56,6 +56,54 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 
 ## Ruled
 
+### 2026-10-31 · D-45 · production's data seen: F-16a writes no skein maths in the database, and DMC 3887 moves under DMC — ruled during `/work-item F-16a`
+
+**What needed a ruling.** F-16a opens by seeing production (its first scope bullet, trap ⑫), and
+its size check fired again (trap ⑭ names the seam: the recompute). Beth reset the Neon `preview`
+branch from production on 2026-10-31 (the "Reset data" dialog shown to the session first — "All
+databases and roles on `preview` will be replaced with the latest data from `production`"), and the
+session read it, read-only (`BEGIN READ ONLY`): **migrations** — the March one, the baseline and
+`pipeline_check`, all finished; **brands** — DMC (`THREAD`, 496 colours), "Custom (Thread)"
+(`THREAD`, **one** colour: 3887 "Very Dark Lavender", quick-added 2026-10-26) and Mill Hill (`BEAD`,
+no beads); **no brand named or near-named** Kreinik, Weeks, Gentle Art or Anchor, of any type, and
+**no specialty items at all**, so trap ①'s stop-and-asks do not fire; **project thread lines** —
+2,116 across 129 projects: DMC 2,114 (1,457 with a stitch count, 6 overridden, 1,455 calculated),
+"Custom (Thread)" 2 (both 3887, stitch counts 16 and 131, need 1, calculated); every project with
+thread lines has its strands within 1–6, over-count 1 and no fabric linked. **So the only saved
+figures F-16a's recompute would reach are the two 3887 lines — and only by making them unknown.**
+No saved figure sits on a line whose length changes (Weeks Dye Works, The Gentle Art and Kreinik do
+not exist until the migration creates them), so the formula half of the recompute — the skein maths
+written a second time in SQL, and trap ⑩'s rehearsal proving the two agree — has nothing to work on.
+
+**Surfaced to Beth** in two questions, then one follow-up; option labels as she saw them.
+
+1. **The recompute:** "Drop it (Recommended)" — any figure on a line whose length is unknown or
+   changed reads "unknown" instead (today only the two 3887 lines), re-typing the stitch count gives
+   the right number, the build re-checks before the preview runs that there are still none, "on your
+   data the result is the same as the full plan" · "Build it anyway, later" — the database maths as
+   insurance, split off into its own reviewed follow-up.
+2. **3887:** "Yes, it's DMC (Recommended)" — moved under DMC, its two lines keep their figures ·
+   "No, it's another brand" · "Leave it as is".
+3. **Follow-up** to her answer on 2: "Move it now (Recommended)" — F-16a moves 3887 under DMC, and
+   the discontinued-colours plan gets a note that it is already there and needs the mark · "Wait for
+   that work" — it reads unknown on two projects until then.
+
+**Her rulings:** ① **"Drop it (Recommended)".** ② "It's DMC - but one of the discontinued colours
+that we have planned to add at some point." ③ **"Move it now (Recommended)".**
+
+**What it changed.** F-16a is re-briefed in `build-plan.md`, and is **one fresh session — no split,
+no follow-up item** (trap ⑭ resolved). Its migration does **no skein maths**: every `ProjectThread`
+with a stitch count, `isNeedOverridden = false`, on a line that is not 8 m six-strand gets an
+**unknown** need — the same rule as D-40 ③, as corrected, with "recomputed" replaced by "unknown";
+re-entering the stitch count works it out from the line. Trap ⑩'s SQL-against-TypeScript rehearsal
+is retired with it; the migration is still rehearsed on a local Postgres 17. The migration also
+**moves 3887 from "Custom (Thread)" to DMC**, only where DMC has no 3887 of its own, so its two lines
+keep their saved needs. That 3887 is a discontinued DMC colour is Beth's statement about her own
+thread, recorded here as a data ruling — not a domain fact (`/stitch-fact` owns those). **For
+`/plan-feature discontinued colours`:** 3887 is already a DMC colour, unmarked, so a catalogue that
+adds missing rows only will skip it — the mark has to reach colours that already exist. F-19's own
+recompute question is unchanged; its reference to F-16a trap ⑩ is annotated.
+
 ### 2026-10-29 · D-44 · Beth's cut length contradicts the skein formula's 18-inch cut — fixed in its own item after F-16a — ruled during `/stitch-fact`
 
 **What contradicts what.** THR-006's 255, and every figure F-16a's trap ⑪ pins, rests on the cited
