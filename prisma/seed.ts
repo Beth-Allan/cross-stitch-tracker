@@ -25,12 +25,20 @@ async function main() {
     },
   });
 
+  // DMC's one line, as migration 20261031120000_thread_lines fills it in: an 8 m skein of
+  // six-strand floss (THR-008). A brand's only line carries no name.
+  const dmcLine = await prisma.threadLine.upsert({
+    where: { brandId_name: { brandId: dmcBrand.id, name: "" } },
+    update: {},
+    create: { brandId: dmcBrand.id, skeinLengthMm: 8000, strandStructure: "SIX_STRAND" },
+  });
+
   let count = 0;
   for (const thread of dmcThreads) {
     await prisma.thread.upsert({
       where: {
-        brandId_colorCode: {
-          brandId: dmcBrand.id,
+        lineId_colorCode: {
+          lineId: dmcLine.id,
           colorCode: thread.colorCode,
         },
       },
@@ -52,6 +60,7 @@ async function main() {
       },
       create: {
         brandId: dmcBrand.id,
+        lineId: dmcLine.id,
         colorCode: thread.colorCode,
         colorName: thread.colorName,
         hexColor: thread.hexColor,

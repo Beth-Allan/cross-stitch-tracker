@@ -6,6 +6,7 @@ import type {
   Series,
   SupplyBrand,
   Thread,
+  ThreadLine,
   Bead,
   SpecialtyItem,
   ProjectThread,
@@ -262,10 +263,25 @@ export function createMockSupplyBrand(overrides?: Partial<SupplyBrand>): SupplyB
   };
 }
 
+/** DMC's one line by default: 8 m of six-strand floss (THR-008), its name blank. */
+export function createMockThreadLine(overrides?: Partial<ThreadLine>): ThreadLine {
+  return {
+    id: "line-1",
+    brandId: "brand-1",
+    name: "",
+    skeinLengthMm: 8000,
+    strandStructure: "SIX_STRAND",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
 export function createMockThread(overrides?: Partial<Thread>): Thread {
   return {
     id: "thread-1",
     brandId: "brand-1",
+    lineId: "line-1",
     colorCode: "310",
     colorName: "Black",
     hexColor: "#000000",
