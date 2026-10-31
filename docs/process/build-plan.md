@@ -842,7 +842,9 @@ before a branch opens, and the size check fired: database, calculator, recompute
 every skein-count screen are one session; the form that sets a length is another. **Beth's rulings
 (D-40):** split in two; **Kreinik is a thread — one Kreinik brand with lines inside it**, not one
 brand per line; saved needs not typed by hand are **recomputed on deploy, but only on lines whose
-length changed** (her correction, after layer-1 review showed DMC figures could move); a line whose
+length changed** (her correction, after layer-1 review showed DMC figures could move — _narrowed by
+D-45, 2026-10-31: no saved figure sits on such a line, so F-16a's migration makes them unknown
+instead of recomputing_); a line whose
 need is unknown counts as **not yet in hand**; and the brands and lines she has given lengths for are
 **added, lengths filled in**. Then she asked for the thread catalogues to be planned first (D-41),
 so a `/plan-feature` session precedes F-16a and may re-brief both halves — where it has, its
@@ -852,7 +854,8 @@ version wins.
 copy of production's data as of 2026-08-17, plus whatever preview deployments have written since):
 every thread is DMC (496 colours); the other brands are "Custom (Thread)" (no threads) and Mill Hill
 (no beads); all 643 project thread lines are DMC, 5 overridden by hand; **no Kreinik anywhere**, as
-thread or specialty. Production since August was not visible — F-16a opens by making it visible
+thread or specialty. Production since August was not visible — F-16a opens by making it visible (_done 2026-10-31,
+D-45 — see F-16a's first scope bullet_)
 (its first scope bullet).
 
 The objective, cited specs and traps below are shared by both halves; traps ⑧ and ⑨ carry Beth's
@@ -865,7 +868,7 @@ answers. F-16a and F-16b each add their own scope and done-when.
   shows its skein count as **unknown** (D-34, THR-011). Today Weeks Dye Works and Gentle Art would
   read roughly 58% of the skeins a project needs (THR-009), so the shopping list would run short.
 - **Cited specs:** `docs/domain/threads.md` THR-004–THR-016 · `open-questions.md` Q-009 ·
-  drift D-34, D-40, D-41, D-43, D-44 · backlog "Per-brand skein length" (old 999.13, planned here) · R-2
+  drift D-34, D-40, D-41, D-43, D-44, D-45 · backlog "Per-brand skein length" (old 999.13, planned here) · R-2
   (migrations go live on deploy) · `.claude/rules/form-patterns.md` (the brand form's new field) ·
   `.claude/rules/ui-design-reference.md` (where the field goes).
 - **Traps:** ① **The lengths are THR-008–THR-010 and nothing else.** Every other brand starts blank
@@ -945,9 +948,11 @@ answers. F-16a and F-16b each add their own scope and done-when.
   DMC and Anchor rows stay exactly as saved, and overridden rows are never touched. A saved need can
   disagree with its project's current settings (before F-7 the chart form saved none of them), which
   is why the recompute does not reach DMC — that drift is a maintenance-ledger row (2026-10-25), not
-  this item._
+  this item._ _**Narrowed by D-45 (2026-10-31):** production holds no saved figure on a line whose
+  length changes, so F-16a's migration does no skein maths — those rows get an **unknown** need
+  instead of a recomputed one (F-16a's "Unknown" bullet). F-19 asks its own recompute question._
 
-#### F-16a The right numbers — **gated (schema, migration, skein calculator); UI-touching; preview, then `/review`**
+#### F-16a The right numbers — **gated (schema, migration, skein calculator); UI-touching; preview, then `/review`; re-briefed 2026-10-31 by production's data (D-45): no skein maths in the migration, 3887 moves under DMC, one session**
 
 - **Objective:** thread lines exist in the database, each with a skein length and a strand
   structure that may be unknown; the calculator works from the line; every saved need on a changed
@@ -964,6 +969,14 @@ answers. F-16a and F-16b each add their own scope and done-when.
     of SQL is written. The Kreinik line names are already hers (THR-012, trap ②) — never ask them
     again; in the same breath, ask Beth for any other line name the schema needs (a one-line brand's
     line, if it must carry one).
+    _**Done 2026-10-31 (D-45).** Beth reset `preview` from production; read-only, it holds DMC
+    (`THREAD`, 496 colours), "Custom (Thread)" (`THREAD`, one colour — 3887 "Very Dark Lavender")
+    and Mill Hill (`BEAD`, empty); no brand named or near-named Kreinik, Weeks, Gentle Art or Anchor,
+    of any type; no specialty items at all — trap ① does not fire. 2,116 project thread lines on 129
+    projects: DMC 2,114 (1,457 with a stitch count; 6 overridden, 4 of them with no stitch count;
+    1,455 calculated), 3887 two (both calculated, need 1). Every
+    project with thread lines has strands 1–6, none over two and no fabric. Not yet asked: a line name
+    for a brand's only line — trap ② says it need not show one, so ask only if the schema needs it._
   - **Schema + one migration** (wrapped in `BEGIN;` … `COMMIT;`, written with
     `migrate dev --create-only` against a throwaway database — protocol §2, `docs/INTEGRATIONS.md`
     Migrations): the thread line (trap ②), with uniqueness per line and colour code (D-42); a
@@ -982,13 +995,30 @@ answers. F-16a and F-16b each add their own scope and done-when.
     so the three lines C-1b loads into must exist first — they do.
     "Custom (Thread)" and any other brand keep unknown. `prisma/seed.ts` builds the same DMC data, so a fresh database and a migrated
     one agree.
-  - **The recompute** (D-40 ③ as corrected, trap ⑨): in the same migration, every `ProjectThread`
-    with a stitch count, `isNeedOverridden = false`, and a line that is not 8 m six-strand is
-    recomputed from its line, with exactly the inputs the supplies tab uses (`supplies-tab.tsx`: the
-    project's strands — falling back to 2 when the stored value is not 1–6 — over-count and waste,
-    and its fabric's count, else `DEFAULT_CALC_PARAMS.fabricCount`), so a recomputed figure equals
-    what re-entering the stitch count would produce; a line with no length or no strand structure
-    makes the need unknown.
+    **3887 moves under DMC** (D-45 ②③): the migration moves the thread "Custom (Thread)" 3887 to
+    DMC (and DMC's line) **only where DMC has no 3887 of its own** — `Thread`'s uniqueness
+    (`@@unique([brandId, colorCode])` today, per line and code once this migration replaces it;
+    guard against whichever is in force at the move) would otherwise abort the deploy, and a
+    production failure jams every later deploy (D-37). Where the move is skipped, the "Custom
+    (Thread)" 3887 stays and its two calculated needs become unknown by the rule below — honest,
+    and the re-read would have put it to Beth first. Its `ProjectThread` rows keep their `threadId`,
+    so both keep their saved needs. Nothing
+    else about it changes (trap ⑮); it is a discontinued DMC colour, and marking it is the
+    discontinued-colours plan's, not this item's. It is Beth's own entry, not catalogue data, so
+    `prisma/seed.ts` does not gain it — the seed and the migration agree on DMC's catalogue, line and
+    length, not on her additions. **Only 3887 moves:** a general rule ("move every Custom code DMC
+    lacks") would assume every quick-added thread is DMC, and Beth ruled on 3887 alone — any other
+    "Custom (Thread)" thread found at the trap ⑬ re-read goes to her the same way.
+  - **"Unknown" instead of a recompute** (D-40 ③ as corrected, **narrowed by D-45 ①**, trap ⑨):
+    in the same migration, every `ProjectThread` with a stitch count, `isNeedOverridden = false`,
+    and a line that is not 8 m six-strand gets an **unknown** need. **The migration does no skein
+    maths** — production holds no saved figure on a line whose length changes, so Beth dropped the
+    SQL twin of the calculator; re-entering the stitch count works it out from the line. On the
+    2026-10-31 data this reaches **nothing**: the 3887 move runs first, leaving "Custom (Thread)"
+    with no threads. DMC and Anchor rows are never touched, and overridden rows never are. **The
+    order inside the migration is fixed:** every line created and its length and structure filled
+    in → the 3887 move → this rule. Run before DMC's line has its 8 m six-strand, the rule would
+    catch every DMC row.
   - **The calculator** (`skein-calculator.ts`, gated): usable inches from the line's own length
     by whole 18-inch cuts of 15 usable inches (trap ③); the strand term from the line's structure
     (trap ④); unknown in, unknown out — never a number from a default.
@@ -1015,12 +1045,12 @@ answers. F-16a and F-16b each add their own scope and done-when.
     after F-16a a quick-added thread's need reads unknown where today it gets 8 m. That is honest
     (D-34) but visible: tell Beth in the preview note. Whether quick-add gets a brand picker is
     F-16b's question for her.
-- **Traps (in addition to ①–⑨):** ⑩ **Two writers of one formula.** The recompute is SQL and the
-  calculator is TypeScript. Prove they agree: the rehearsal seeds rows across every stated length,
-  strand counts 1–6 and an out-of-range stored value, both over-counts and fabric and no-fabric
-  projects, runs the migration on a local Postgres 17, and compares each recomputed need against
-  `calculateSkeins` on the same inputs — that comparison goes in the PR. Any `Math.max(1, …)` the
-  adapters apply has to agree with it as well. ⑪ **The whole-cut figures, for the tests** (the
+- **Traps (in addition to ①–⑨):** ⑩ ~~**Two writers of one formula.**~~ _Retired by D-45: the
+  migration does no skein maths, so there is no SQL twin of the calculator to prove._ What remains:
+  the adapters' `Math.max(1, …)` must pass an unknown need through, never clamp it to 1; and the
+  migration is rehearsed on a local Postgres 17 seeded in the 2026-10-31 data's shape — DMC rows
+  calculated and overridden, a "Custom (Thread)" 3887 on two projects, a case where DMC already has
+  a 3887, and a calculated row on an unknown line — with what each row became stated in the PR. ⑪ **The whole-cut figures, for the tests** (the
   session's arithmetic from THR-006's derivation, not Beth's): 8 m = 314.96 in → 17 cuts → **255**
   (unchanged, so every DMC figure holds); 5 yd = 180 in → 10 cuts → **150**; 11 m = 433.07 in →
   24 cuts → **360**; 10 m = 393.70 in → 21 cuts → **315**; 50 m = 1968.50 in → 109 cuts → **1635**.
@@ -1028,9 +1058,20 @@ answers. F-16a and F-16b each add their own scope and done-when.
   write a data migration blind: stop and ask Beth. A failed production migration blocks every later
   deploy until it is recovered, and recovering needs a key no session holds (D-37). ⑬ The reset in
   the first scope bullet is also what INTEGRATIONS requires of a migration that changes data — do it
-  before the PR's preview runs. ⑭ **Size:** if the size check fires again, the seam is the
-  recompute — a second gated migration after this one, briefed by then. Say so at the top of the
-  session rather than mid-build. ⑮ **Leave `hexColor` and `colorFamily` alone.** C-1 makes both
+  before the PR's preview runs. _Done 2026-10-31. **Before pushing, Beth resets once more** (the
+  same "Reset data" dialog, shown to the session first) — a re-read without a fresh reset sees
+  nothing new — and the build re-reads `preview` for four things: trap ①'s checks again (a brand
+  named or near-named Kreinik, Weeks, Gentle Art or Anchor, of any type; a Kreinik-like specialty
+  item); still no saved figure on a line the migration fills in; every "Custom (Thread)" thread, so
+  one beyond 3887 goes to Beth rather than silently reading unknown; and DMC still has no 3887. **A
+  failed check is a stop-and-ask**, never a migration adjusted to fit. Production can change between
+  the push and the merge, so **`/review F-16a` asks Beth whether she has added a brand or a thread
+  since that reset** and, if she has, has her reset again and repeats the re-read before merging.
+  Whatever the checks miss, the migration's SQL never aborts on a brand it did not expect — it
+  creates a brand only where no brand of that name exists, of any type, case aside, and moves 3887
+  only where DMC has none._ ⑭ ~~**Size:** if the size check fires again, the seam is the
+  recompute — a second gated migration after this one, briefed by then.~~ _Resolved by D-45: with
+  no skein maths in the migration, F-16a is one session, no split._ ⑮ **Leave `hexColor` and `colorFamily` alone.** C-1 makes both
   nullable on `Thread` and `Bead` and adds a bead line (D-42 ③); this item's migration must not
   touch them, so the two migrations stay independent and C-1 can follow this one's review without
   a rebase of intent. The same goes for `prisma/seed.ts`: keep it in step with this migration
@@ -1041,8 +1082,10 @@ answers. F-16a and F-16b each add their own scope and done-when.
   figure among the tests); Kreinik figures do not move with the project's strand count; an unknown
   length or strand structure gives an unknown need, shown as unknown — never 0, never 1 — on every
   surface listed above; an unknown line counts as still to buy and keeps a project short of fully
-  kitted; recomputed needs match `calculateSkeins` in the rehearsal (trap ⑩), and overridden rows
-  are untouched; the migration ships through R-2's pipeline; `skein-calculator.ts` cites THR-006,
+  kitted; the rehearsal (trap ⑩ as narrowed) shows 3887 moved under DMC with both its lines' needs as
+  saved, the move skipped where DMC already has a 3887 (the "Custom (Thread)" 3887's needs then
+  unknown), a calculated need on an unknown line made
+  unknown, and overridden rows untouched; the migration ships through R-2's pipeline; `skein-calculator.ts` cites THR-006,
   THR-008–THR-011 and THR-013 (trap ⑥) — not THR-016, which this item deliberately does not
   implement; F-19 cites it. Gate green; Beth has seen the preview (a DMC project's
   supplies, unchanged; an unknown line on the shopping list; a quick-added thread reading unknown);
@@ -1177,7 +1220,7 @@ answers. F-16a and F-16b each add their own scope and done-when.
   counts from the reset `preview` copy, and record her ruling before the branch opens. An overridden
   row is never touched either way (F-16a trap ⑨).
 - **Cited specs:** `docs/domain/threads.md` THR-006, THR-008–THR-013, THR-016 · `open-questions.md`
-  Q-009 · drift D-40 ③ (as corrected), D-44 · F-16a's calculator and its traps ③, ④, ⑨, ⑩ and ⑪
+  Q-009 · drift D-40 ③ (as corrected), D-44, D-45 · F-16a's calculator and its traps ③, ④, ⑨, ⑩ (retired by D-45 — see trap ⑤) and ⑪
   (whole cuts; the used-whole strand term; overridden rows untouched; the recompute checked against
   the calculator; the pinned figures) · `docs/INTEGRATIONS.md` Deployment →
   Migrations, if a column is added.
@@ -1202,8 +1245,9 @@ answers. F-16a and F-16b each add their own scope and done-when.
   `revalidateTag` test. ⑤ If a column is added **or saved needs are recomputed** (her ruling may
   make this a data-only migration), the migration is `BEGIN;` … `COMMIT;` (protocol §2), rehearsed
   on the throwaway Postgres against the reset `preview` copy, and every recomputed need is compared
-  against `calculateSkeins` on the same inputs, as F-16a trap ⑩ does — that comparison goes in the
-  PR.
+  against `calculateSkeins` on the same inputs — that comparison goes in the PR. _F-16a's trap ⑩ was
+  retired by D-45 (its migration does no skein maths), so if this item recomputes in SQL, the proof
+  is built here for the first time._
 - **Done-when:** Beth's saved-needs ruling recorded; then test-first: the calculator gives each line
   the usable inches in trap ① for the same inputs, a floss line at 24/21 and a Kreinik line at 15/12;
   no line takes a cut Beth did not give for it by default; saved needs follow
