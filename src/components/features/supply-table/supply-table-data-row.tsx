@@ -33,6 +33,8 @@ export function SupplyTableDataRow({
 }: SupplyTableDataRowProps) {
   const showStitches = row.type === "THREAD" || row.type === "BEAD";
   const showAutoCalc = row.type === "THREAD" && !row.isNeedOverridden;
+  // An unknown need is worked out by re-entering the stitch count, even the same number
+  const stitchReentryRecalculates = row.need === null;
 
   return (
     <tr className={`group ${isNew ? "animate-slide-in" : ""}`}>
@@ -53,6 +55,7 @@ export function SupplyTableDataRow({
             value={row.stitchCount}
             onSave={(v) => onUpdateQuantity(row.type, row.id, "stitchCount", v)}
             ariaLabel={`Stitches for ${row.code}`}
+            saveUnchanged={stitchReentryRecalculates}
           />
         )}
         {row.type === "BEAD" && (

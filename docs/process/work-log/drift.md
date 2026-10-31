@@ -44,7 +44,7 @@ a data file and tests, stay ungated and merge on her word after a preview). The 
 gate neither and rely on C-1's review alone. A gate-list change is hers (hard rule 6).
 **Recommendation:** gate the folder, not the data.
 
-**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-47 or later — D-45 and D-46 went to F-16a on 2026-10-31) before
+**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-48 or later — D-45 and D-46 went to F-16a on 2026-10-31, D-47 to `/broken need marked as typed`) before
 its branch opens; the path file and protocol §5 change in C-1's PR if she says yes.
 
 ## Also open — the question known to be coming
@@ -55,6 +55,29 @@ no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is r
 on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
 
 ## Ruled
+
+### 2026-10-31 · D-47 · the six marked needs: a way back, and a cleanup — ruled during `/broken need marked as typed`
+
+**What happened.** Opening a thread's Need cell and leaving it marked the need as typed by hand, so
+it stopped following the calculator for good, with nothing on screen to undo it. PR #151 fixes the
+cell. Six lines on the reset `preview` copy already carried the mark, out of 2,183, and only Arctic
+Owl 3's DMC 310 read a wrong figure (30, where today's calculator gives 23). The options put to Beth
+were a "back to calculated" button, a one-time cleanup, or leaving them.
+
+**Her answer.** Both, against the recommendation of the button alone: "Build the button but also
+clean up the ones that are already like this. I didn't manually change any of the estimated skeins
+on purpose."
+
+**What it changed.** ① The button is queued as `/tweak back to calculated`, the next session; the
+backlog row carries it. ② **All six marks clear**, so the question of which ones she typed is closed.
+③ **Only Arctic Owl 3's DMC 310 changes number.** Censored Eggplant's DMC 327 already matches. The
+four with no stitch count keep theirs (Pink Clouds' 2, 2 and 3, Violet Tulip's 1): the calculator
+has nothing to put in their place, and clearing the mark loses nothing, because a stitch count
+entered later now works the need out. That is Claude's call on the data, told to Beth. ④ **The
+cleanup goes in F-19's migration, not its own.** Changing production's data is a migration, which is
+gated, and F-19 is the next gated item, so this adds no review session. It also has to land by then
+regardless: F-19's recompute would skip these lines, and Arctic Owl's figure would otherwise change
+twice. It takes F-19's figure, not 23. The six row ids are in F-19's brief.
 
 ### 2026-10-31 · D-46 · F-16a's migration is not safe for the code it replaces — fix forward only, a one-off exception — ruled during `/work-item F-16a`
 

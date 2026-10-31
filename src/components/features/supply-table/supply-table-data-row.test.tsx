@@ -187,6 +187,53 @@ describe("SupplyTableDataRow", () => {
     expect(onUpdateQuantity).not.toHaveBeenCalled();
   });
 
+  it("opening a Need cell and leaving it unchanged does not save, so it is not marked as typed", () => {
+    const onUpdateQuantity = vi.fn();
+    renderRow(makeRow({ code: "310", need: 3 }), { onUpdateQuantity });
+
+    fireEvent.click(screen.getByRole("button", { name: "Need for 310" }));
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Need for 310" }));
+
+    expect(onUpdateQuantity).not.toHaveBeenCalled();
+    expect(screen.getByTestId("auto-calc-indicator")).toBeInTheDocument();
+  });
+
+  it("re-entering the stitch count of an Unknown need saves, so the calculator works it out", () => {
+    const onUpdateQuantity = vi.fn();
+    renderRow(makeRow({ id: "junc-1", code: "310", stitchCount: 500, need: null }), {
+      onUpdateQuantity,
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Stitches for 310" }));
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Stitches for 310" }));
+
+    expect(onUpdateQuantity).toHaveBeenCalledWith("THREAD", "junc-1", "stitchCount", 500);
+  });
+
+  it("leaving the stitch count of a known need unchanged does not save", () => {
+    const onUpdateQuantity = vi.fn();
+    renderRow(makeRow({ code: "310", stitchCount: 500, need: 3 }), { onUpdateQuantity });
+
+    fireEvent.click(screen.getByRole("button", { name: "Stitches for 310" }));
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Stitches for 310" }));
+
+    expect(onUpdateQuantity).not.toHaveBeenCalled();
+  });
+
+  it("a need changed by hand still saves", () => {
+    const onUpdateQuantity = vi.fn();
+    renderRow(makeRow({ type: "THREAD", id: "junc-1", code: "310", need: 3 }), {
+      onUpdateQuantity,
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Need for 310" }));
+    const input = screen.getByRole("spinbutton", { name: "Need for 310" });
+    fireEvent.change(input, { target: { value: "5" } });
+    fireEvent.blur(input);
+
+    expect(onUpdateQuantity).toHaveBeenCalledWith("THREAD", "junc-1", "need", 5);
+  });
+
   it("onUpdateQuantity is called with correct args when EditableNumber saves", () => {
     const onUpdateQuantity = vi.fn();
     renderRow(makeRow({ type: "THREAD", id: "junc-1", code: "310", have: 1 }), {
