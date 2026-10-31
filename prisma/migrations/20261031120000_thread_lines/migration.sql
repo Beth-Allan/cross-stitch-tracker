@@ -1,15 +1,15 @@
 /*
-  Thread lines (item F-16a): every thread belongs to a line, and the skein calculator reads the
+  Thread lines: every thread belongs to a line, and the skein calculator reads the
   line's own length and strand structure instead of one 8 m for every brand.
 
-  The order is fixed (build-plan F-16a): every line created with its length and structure → the
+  The order is fixed: every line created with its length and structure → the
   3887 move → the unknown rule. Run before DMC's line has its 8 m six-strand, the unknown rule
   would catch every DMC row.
 
   Nothing here can abort on a brand it did not expect: a brand is created only where no brand of
   that name exists, of any type, case aside, and filled in only where a THREAD brand of that name
-  does (trap ①). The lengths are Beth's (THR-008–THR-010, THR-012, THR-013; D-40 ⑤) and nothing
-  else — every other line's length and structure stay unknown (THR-011, D-34).
+  does. The lengths are Beth's (THR-008–THR-010, THR-012, THR-013) and nothing else — every
+  other line's length and structure stay unknown (THR-011).
 */
 
 BEGIN;
@@ -44,7 +44,9 @@ WHERE NOT EXISTS (
 
 -- 2. Their lines, filled in on every THREAD brand of exactly that name, case aside. A brand with
 --    one kind of thread has one line with a blank name; Kreinik's three are named as Beth named
---    them (THR-012) and used whole (THR-013). No other Kreinik line is created (D-43 ②).
+--    them (THR-012) and used whole (THR-013). No other Kreinik line gets a length: Beth gave no
+--    ribbon width, so a ribbon line is hers to add when a project needs one. (Step 3 still gives
+--    Kreinik a blank, unknown line if it already holds threads, so none is left without one.)
 INSERT INTO "ThreadLine" ("id", "brandId", "name", "skeinLengthMm", "strandStructure", "updatedAt")
 SELECT gen_random_uuid()::text, b."id", spec."line", spec."mm", spec."structure"::"StrandStructure", CURRENT_TIMESTAMP
 FROM (VALUES
@@ -74,7 +76,7 @@ WHERE NOT EXISTS (SELECT 1 FROM "ThreadLine" l WHERE l."brandId" = b."id" AND l.
   );
 
 -- 4. Every thread joins its brand's blank line; uniqueness moves from brand and code to line and
---    code (D-42).
+--    code, so one colour number can exist in several of a brand's lines (THR-014).
 ALTER TABLE "Thread" ADD COLUMN "lineId" TEXT;
 
 UPDATE "Thread" t
@@ -88,7 +90,7 @@ DROP INDEX "Thread_brandId_colorCode_key";
 CREATE UNIQUE INDEX "Thread_lineId_colorCode_key" ON "Thread"("lineId", "colorCode");
 ALTER TABLE "Thread" ADD CONSTRAINT "Thread_lineId_brandId_fkey" FOREIGN KEY ("lineId", "brandId") REFERENCES "ThreadLine"("id", "brandId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- 5. Beth's 3887 is DMC (D-45 ②③): it moves from "Custom (Thread)" to DMC's line, keeping its id,
+-- 5. Beth's 3887 is DMC (her word, 2026-10-31): it moves from "Custom (Thread)" to DMC's line, keeping its id,
 --    so its project lines keep their saved needs. Only where exactly one DMC thread brand exists
 --    and DMC has no 3887 of its own, in any line — otherwise it stays, and step 6 makes its
 --    calculated needs unknown. Only 3887 moves: Beth ruled on that thread alone.
@@ -110,8 +112,8 @@ WHERE custom."name" = 'Custom (Thread)'
     SELECT 1 FROM "Thread" d WHERE d."brandId" = dmc."brandId" AND d."colorCode" = '3887'
   );
 
--- 6. A saved need the calculator can no longer stand behind becomes unknown (D-40 ③ as narrowed
---    by D-45 ①): worked out from a stitch count, not typed by hand, on a line that is not an 8 m
+-- 6. A saved need the calculator can no longer stand behind becomes unknown (Beth's ruling,
+--    2026-10-31): worked out from a stitch count, not typed by hand, on a line that is not an 8 m
 --    six-strand skein. No skein maths here — re-entering the stitch count works it out from the
 --    line. DMC and Anchor rows, and every overridden row, are never touched.
 ALTER TABLE "ProjectThread" ALTER COLUMN "quantityRequired" DROP NOT NULL;

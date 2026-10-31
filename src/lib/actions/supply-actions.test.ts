@@ -1804,6 +1804,31 @@ describe("supply-actions", () => {
           expect(mockPrisma.projectThread.updateMany).not.toHaveBeenCalled();
         });
 
+        it("refreshes the project pages and the shopping list when the move makes needs unknown", async () => {
+          movingTo({ skeinLengthMm: null, strandStructure: null });
+          const { updateThread } = await import("./supply-actions");
+          const { revalidatePath } = await import("next/cache");
+
+          const result = await updateThread("t1", { ...threadInput, brandId: "brand-new" });
+
+          assertSuccess(result);
+          expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith("/charts");
+          expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith("/shopping");
+        });
+
+        it("refreshes only the catalogue when the move leaves every need as it was", async () => {
+          movingTo({ skeinLengthMm: 8000, strandStructure: "SIX_STRAND" });
+          const { updateThread } = await import("./supply-actions");
+          const { revalidatePath } = await import("next/cache");
+
+          const result = await updateThread("t1", { ...threadInput, brandId: "brand-anchor" });
+
+          assertSuccess(result);
+          expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith("/supplies");
+          expect(vi.mocked(revalidatePath)).not.toHaveBeenCalledWith("/charts");
+          expect(vi.mocked(revalidatePath)).not.toHaveBeenCalledWith("/shopping");
+        });
+
         it("leaves its needs alone when its brand is unchanged", async () => {
           mockPrisma.thread.findUnique.mockResolvedValueOnce({
             brandId: "brand-1",

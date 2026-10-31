@@ -163,14 +163,20 @@ export async function updateThread(id: string, formData: ThreadInput) {
             where: { threadId: id, stitchCount: { gt: 0 }, isNeedOverridden: false },
             data: { quantityRequired: null },
           });
+          return { thread, needsChanged: true };
         }
-        return { thread };
+        return { thread, needsChanged: false };
       }
       const thread = await tx.thread.update({ where: { id }, data: validated });
-      return { thread };
+      return { thread, needsChanged: false };
     });
     if ("refusal" in updated) return { success: false as const, error: updated.refusal };
     revalidatePath("/supplies");
+    if (updated.needsChanged) {
+      // The needs that just became unknown show on project pages and the shopping list
+      revalidatePath("/charts");
+      revalidatePath("/shopping");
+    }
     revalidateTag("stats", { expire: 0 });
     return { success: true as const, thread: updated.thread };
   } catch (error) {
