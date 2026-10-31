@@ -6,7 +6,7 @@
  * creation-flow adapters).
  */
 
-import type { ColorFamily, StrandCount } from "@/types/supply";
+import type { ColorFamily, SkeinLine, StrandCount } from "@/types/supply";
 
 export type SupplyType = "THREAD" | "BEAD" | "SPECIALTY";
 
@@ -43,9 +43,15 @@ export interface SupplyRow {
   brandName: string;
   hexColor: string;
   stitchCount: number; // only meaningful for threads
-  need: number; // quantityRequired
+  /**
+   * quantityRequired. Null only for a thread whose line has no known length or strand
+   * structure: the need is unknown, never a figure from a default (THR-011).
+   */
+  need: number | null;
   have: number; // quantityAcquired
   isNeedOverridden: boolean; // only meaningful for threads
+  /** The thread's line, which the skein calculator reads; null for beads and specialty. */
+  line: SkeinLine | null;
 }
 
 /**
@@ -60,6 +66,8 @@ export interface SupplySearchResult {
   brandName: string;
   brandId: string;
   hexColor: string;
+  /** The thread's line, which the skein calculator reads; null for beads and specialty. */
+  line: SkeinLine | null;
 }
 
 /**
@@ -89,7 +97,7 @@ export type Result = { success: true; id?: string } | { success: false; error: s
  * CreationFlowAdapter (buffers until two-phase save)
  */
 export interface SupplyTableAdapter {
-  addThread(threadId: string, stitchCount: number, need: number): Promise<Result>;
+  addThread(threadId: string, stitchCount: number, need: number | null): Promise<Result>;
   addBead(beadId: string, quantity: number, need: number): Promise<Result>;
   addSpecialty(itemId: string, need: number): Promise<Result>;
   updateQuantity(

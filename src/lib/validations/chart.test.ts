@@ -338,6 +338,23 @@ describe("batchSupplySchema", () => {
     expect(result.error?.issues[0].message).toBe("Every supply needs at least 1");
   });
 
+  it("lets a thread's need be unknown, as null", () => {
+    const result = batchSupplySchema.safeParse({
+      threads: [{ supplyId: "t1", stitchCount: 5000, need: null, isNeedOverridden: false }],
+    });
+    expect(result.success).toBe(true);
+    expect(result.data?.threads[0].need).toBeNull();
+  });
+
+  it("refuses an unknown need on a bead or specialty item", () => {
+    expect(batchSupplySchema.safeParse({ beads: [{ supplyId: "b1", need: null }] }).success).toBe(
+      false,
+    );
+    expect(
+      batchSupplySchema.safeParse({ specialty: [{ supplyId: "s1", need: null }] }).success,
+    ).toBe(false);
+  });
+
   it("validates correct input with threads, beads, and specialty arrays", () => {
     const result = batchSupplySchema.safeParse({
       threads: [

@@ -164,6 +164,34 @@ describe("createChartWithSupplies", () => {
     });
   });
 
+  it("saves a thread's unknown need as null, never 1", async () => {
+    mockPrisma.$transaction.mockImplementationOnce(
+      async (fn: (tx: unknown) => Promise<unknown>) => {
+        mockPrisma.chart.create.mockResolvedValueOnce({
+          id: "chart-new",
+          project: { id: "proj-new" },
+          designer: null,
+          genres: [],
+        });
+        mockPrisma.projectThread.createMany.mockResolvedValueOnce({ count: 1 });
+        return fn(mockPrisma);
+      },
+    );
+
+    const { createChartWithSupplies } = await import("./chart-actions");
+    const result = await createChartWithSupplies(validChartInput, {
+      threads: [
+        { supplyId: "kreinik-002", stitchCount: 5000, need: null, isNeedOverridden: false },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+    expect(mockPrisma.projectThread.createMany).toHaveBeenCalledWith({
+      data: [expect.objectContaining({ threadId: "kreinik-002", quantityRequired: null })],
+      skipDuplicates: true,
+    });
+  });
+
   it("with mixed supplies creates all three junction types", async () => {
     const createdChart = {
       id: "chart-new",

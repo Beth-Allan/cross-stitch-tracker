@@ -3,6 +3,9 @@ import { render, screen, fireEvent, act } from "@/__tests__/test-utils";
 import { SupplyTableAddRow } from "./supply-table-add-row";
 import type { SupplyTableAdapter, CalcParams, SupplySearchResult } from "./types";
 import { DEFAULT_CALC_PARAMS } from "./types";
+import type { SkeinLine } from "@/types/supply";
+
+const DMC_LINE: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
 
 // Mock child components to isolate add-row behavior
 vi.mock("./segmented-type-toggle", () => ({
@@ -80,6 +83,7 @@ function makeSearchResult(overrides: Partial<SupplySearchResult> = {}): SupplySe
     brandName: "DMC",
     brandId: "brand-1",
     hexColor: "#000000",
+    line: (overrides.type ?? "THREAD") === "THREAD" ? DMC_LINE : null,
     ...overrides,
   };
 }
@@ -290,6 +294,32 @@ describe("SupplyTableAddRow", () => {
 
     expect(adapter.addThread).toHaveBeenCalled();
     expect(onRowAdded).toHaveBeenCalled();
+  });
+
+  it("shows Unknown in the need box when a stitch count lands on a line whose length is unknown", async () => {
+    const unknownLine: SkeinLine = { skeinLengthMm: null, strandStructure: null };
+    const results = [makeSearchResult({ id: "t1", code: "002", line: unknownLine })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    renderAddRow();
+
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "002" } });
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("autocomplete-item-t1"));
+    });
+    await act(async () => {
+      fireEvent.change(screen.getByPlaceholderText("Stitches"), { target: { value: "5000" } });
+    });
+
+    const needInput = screen.getByLabelText("Need");
+    expect(needInput).toHaveValue(null);
+    expect(needInput).toHaveAttribute("placeholder", "Unknown");
   });
 
   it("Tab in stitches field advances focus to need field", async () => {

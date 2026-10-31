@@ -371,6 +371,7 @@ describe("useChartForm inline entity creation", () => {
           need: 0,
           have: 0,
           isNeedOverridden: false,
+          line: null,
         },
       ];
       const { result } = renderHook(() => useChartForm({ ...defaultProps, getSupplyRows }));
@@ -390,6 +391,47 @@ describe("useChartForm inline entity creation", () => {
       expect(createChartWithSupplies).not.toHaveBeenCalled();
     });
 
+    it("sends a thread whose need is unknown as null, rather than refusing it", async () => {
+      vi.mocked(createChartWithSupplies).mockResolvedValueOnce({
+        success: true,
+        chartId: "chart-1",
+      } as never);
+      const getSupplyRows = () => [
+        {
+          id: "row-1",
+          supplyId: "t-002",
+          type: "THREAD" as const,
+          code: "002",
+          name: "Gold",
+          brandName: "Kreinik",
+          hexColor: "#FFD700",
+          stitchCount: 5000,
+          need: null,
+          have: 0,
+          isNeedOverridden: false,
+          line: { skeinLengthMm: null, strandStructure: null },
+        },
+      ];
+      const { result } = renderHook(() => useChartForm({ ...defaultProps, getSupplyRows }));
+
+      act(() => {
+        result.current.setField("name", "Autumn Sampler");
+        result.current.setField("stitchCount", 5000);
+      });
+
+      await act(async () => {
+        await result.current.submitForm();
+      });
+
+      expect(result.current.errors._form).toBeUndefined();
+      expect(createChartWithSupplies).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          threads: [{ supplyId: "t-002", stitchCount: 5000, need: null, isNeedOverridden: false }],
+        }),
+      );
+    });
+
     it("falls back to the supply's name when it has no brand or code", async () => {
       const getSupplyRows = () => [
         {
@@ -404,6 +446,7 @@ describe("useChartForm inline entity creation", () => {
           need: 0,
           have: 0,
           isNeedOverridden: false,
+          line: null,
         },
       ];
       const { result } = renderHook(() => useChartForm({ ...defaultProps, getSupplyRows }));

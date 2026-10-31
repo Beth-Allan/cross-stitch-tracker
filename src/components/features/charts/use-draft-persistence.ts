@@ -6,8 +6,12 @@ export const DRAFT_KEY = "chart-draft";
 
 const SUPPLY_TYPES = new Set(["THREAD", "BEAD", "SPECIALTY"]);
 
-/** Lightweight runtime guard — rejects malformed supply rows from localStorage. */
-function isValidSupplyRow(s: unknown): s is SupplyRow {
+/**
+ * Lightweight runtime guard — rejects malformed supply rows from localStorage. Only a thread's
+ * need may be null (unknown). A row saved before rows carried their thread's line has none;
+ * `restoreSupplyRow` reads that as unknown.
+ */
+function isValidSupplyRow(s: unknown): s is Omit<SupplyRow, "line"> & Partial<SupplyRow> {
   if (typeof s !== "object" || s === null) return false;
   const r = s as Record<string, unknown>;
   return (
@@ -20,10 +24,15 @@ function isValidSupplyRow(s: unknown): s is SupplyRow {
     typeof r.brandName === "string" &&
     typeof r.hexColor === "string" &&
     typeof r.stitchCount === "number" &&
-    typeof r.need === "number" &&
+    (typeof r.need === "number" || (r.need === null && r.type === "THREAD")) &&
     typeof r.have === "number" &&
-    typeof r.isNeedOverridden === "boolean"
+    typeof r.isNeedOverridden === "boolean" &&
+    (r.line === undefined || typeof r.line === "object")
   );
+}
+
+function restoreSupplyRow(row: Omit<SupplyRow, "line"> & Partial<SupplyRow>): SupplyRow {
+  return { ...row, line: row.line ?? null };
 }
 
 /**
@@ -172,7 +181,7 @@ export function loadDraftV2(
       merged.fabricId = null;
     }
 
-    const validSupplies = (draft.supplies ?? []).filter(isValidSupplyRow);
+    const validSupplies = (draft.supplies ?? []).filter(isValidSupplyRow).map(restoreSupplyRow);
 
     return {
       form: merged,

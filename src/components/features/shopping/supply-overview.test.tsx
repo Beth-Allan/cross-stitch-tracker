@@ -452,6 +452,128 @@ describe("SupplyOverview", () => {
     });
   });
 
+  describe("a thread line whose need is unknown (D-34)", () => {
+    const unknownProps = {
+      beads: [] as ShoppingSupplyNeed[],
+      specialty: [] as ShoppingSupplyNeed[],
+      fabrics: [],
+      pendingIds: new Set<string>(),
+      failedIds: new Set<string>(),
+      supplySearchQuery: "",
+      onSupplySearchChange: vi.fn(),
+    };
+
+    it("shows it as Unknown and counts it as still needed", () => {
+      const threads = [createMockSupplyNeed({ quantityRequired: null, quantityAcquired: 0 })];
+      render(<SupplyOverview {...unknownProps} threads={threads} onUpdateAcquired={vi.fn()} />);
+
+      expect(screen.getByRole("button", { name: /click to edit/ })).toHaveTextContent("0/Unknown");
+      expect(screen.getByText(/1 still needed/)).toBeInTheDocument();
+    });
+
+    it("keeps it still needed, never fulfilled, after skeins were bought against it", () => {
+      const threads = [createMockSupplyNeed({ quantityRequired: null, quantityAcquired: 5 })];
+      const { container } = render(
+        <SupplyOverview {...unknownProps} threads={threads} onUpdateAcquired={vi.fn()} />,
+      );
+
+      expect(screen.getByText(/1 still needed/)).toBeInTheDocument();
+      expect(container.querySelector(".bg-selected")).not.toBeInTheDocument();
+    });
+
+    it("totals a known need with an unknown one as 'N + unknown'", () => {
+      const threads = [
+        createMockSupplyNeed({
+          supplyId: "shared-1",
+          junctionId: "j-a",
+          projectName: "Project A",
+          quantityRequired: 3,
+          quantityAcquired: 3,
+        }),
+        createMockSupplyNeed({
+          supplyId: "shared-1",
+          junctionId: "j-b",
+          projectName: "Project B",
+          quantityRequired: null,
+          quantityAcquired: 0,
+        }),
+      ];
+      const { container } = render(
+        <SupplyOverview {...unknownProps} threads={threads} onUpdateAcquired={vi.fn()} />,
+      );
+
+      expect(screen.getByRole("button", { name: /click to edit/ })).toHaveTextContent(
+        "3/3 + unknown",
+      );
+      expect(screen.getByText(/1 still needed/)).toBeInTheDocument();
+      expect(container.querySelector(".bg-selected")).not.toBeInTheDocument();
+    });
+
+    it("totals lines that are all unknown as Unknown", () => {
+      const threads = [
+        createMockSupplyNeed({ supplyId: "shared-1", junctionId: "j-a", quantityRequired: null }),
+        createMockSupplyNeed({ supplyId: "shared-1", junctionId: "j-b", quantityRequired: null }),
+      ];
+      render(<SupplyOverview {...unknownProps} threads={threads} onUpdateAcquired={vi.fn()} />);
+
+      expect(screen.getByRole("button", { name: /click to edit/ })).toHaveTextContent("2/Unknown");
+    });
+
+    it("gives an increment to the unknown line once every known need is in hand", async () => {
+      const onUpdateAcquired = vi.fn();
+      const user = userEvent.setup();
+      const threads = [
+        createMockSupplyNeed({
+          supplyId: "shared-1",
+          junctionId: "j-a",
+          quantityRequired: 3,
+          quantityAcquired: 3,
+        }),
+        createMockSupplyNeed({
+          supplyId: "shared-1",
+          junctionId: "j-b",
+          quantityRequired: null,
+          quantityAcquired: 0,
+        }),
+      ];
+      render(
+        <SupplyOverview {...unknownProps} threads={threads} onUpdateAcquired={onUpdateAcquired} />,
+      );
+
+      await user.click(screen.getByRole("button", { name: "Increment quantity" }));
+
+      expect(onUpdateAcquired).toHaveBeenCalledTimes(1);
+      expect(onUpdateAcquired).toHaveBeenCalledWith("thread", "j-b", 1);
+    });
+
+    it("fills a known need before an unknown one, whatever order they arrive in", async () => {
+      const onUpdateAcquired = vi.fn();
+      const user = userEvent.setup();
+      const threads = [
+        createMockSupplyNeed({
+          supplyId: "shared-1",
+          junctionId: "j-unknown",
+          quantityRequired: null,
+          quantityAcquired: 0,
+        }),
+        createMockSupplyNeed({
+          supplyId: "shared-1",
+          junctionId: "j-known",
+          quantityRequired: 2,
+          quantityAcquired: 0,
+        }),
+      ];
+      render(
+        <SupplyOverview {...unknownProps} threads={threads} onUpdateAcquired={onUpdateAcquired} />,
+      );
+
+      await user.click(screen.getByRole("button", { name: "Increment quantity" }));
+
+      expect(onUpdateAcquired).toHaveBeenCalledTimes(1);
+      expect(onUpdateAcquired).toHaveBeenCalledWith("thread", "j-known", 1);
+    });
+  });
+
   describe("Memoization", () => {
     const baseProps = {
       beads: [] as ShoppingSupplyNeed[],

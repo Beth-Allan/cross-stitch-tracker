@@ -9,6 +9,7 @@ import {
   specialtyItemSchema,
   supplyBrandSchema,
   threadSchema,
+  updateQuantitySchema,
 } from "./supply";
 
 describe("supplyBrandSchema", () => {
@@ -116,6 +117,40 @@ describe("wording a screen shows, unchanged from Zod 3", () => {
     ],
   ])("%s", (_label, schema, payload, message) => {
     expect(schema.safeParse(payload).error?.issues[0].message).toBe(message);
+  });
+});
+
+describe("an unknown need", () => {
+  it("is allowed on a project thread, as null", () => {
+    const parsed = projectThreadSchema.parse({
+      projectId: "p1",
+      threadId: "t1",
+      stitchCount: 5000,
+      quantityRequired: null,
+    });
+    expect(parsed.quantityRequired).toBeNull();
+  });
+
+  it("is never what a project thread with no need sent gets: that still starts at 1", () => {
+    expect(projectThreadSchema.parse({ projectId: "p1", threadId: "t1" }).quantityRequired).toBe(1);
+  });
+
+  it("is allowed in a quantity update, as null", () => {
+    expect(updateQuantitySchema.parse({ quantityRequired: null }).quantityRequired).toBeNull();
+  });
+
+  it("is refused on a project bead or specialty item", () => {
+    expect(
+      projectBeadSchema.safeParse({ projectId: "p1", beadId: "b1", quantityRequired: null })
+        .success,
+    ).toBe(false);
+    expect(
+      projectSpecialtySchema.safeParse({
+        projectId: "p1",
+        specialtyItemId: "s1",
+        quantityRequired: null,
+      }).success,
+    ).toBe(false);
   });
 });
 

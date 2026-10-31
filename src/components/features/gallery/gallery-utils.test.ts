@@ -142,6 +142,26 @@ describe("computeKittingDots", () => {
     });
     expect(result.threadStatus).toBe("partial");
   });
+
+  it("never reads threads as fulfilled while a line's need is unknown (D-40 ④)", () => {
+    const unknownNeed = { quantityRequired: null, quantityAcquired: 0 };
+    const result = computeKittingDots({
+      fabric: null,
+      supplies: createProjectSupplies({ threads: [acquired, unknownNeed] }),
+    });
+    expect(result.threadStatus).not.toBe("fulfilled");
+    expect(result.threadStatus).toBe("partial");
+  });
+
+  it("does not count skeins bought against an unknown need as fulfilling it", () => {
+    const result = computeKittingDots({
+      fabric: null,
+      supplies: createProjectSupplies({
+        threads: [{ quantityRequired: null, quantityAcquired: 3 }],
+      }),
+    });
+    expect(result.threadStatus).toBe("partial");
+  });
 });
 
 describe("transformToGalleryCard", () => {

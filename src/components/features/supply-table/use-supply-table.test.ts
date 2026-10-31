@@ -4,16 +4,23 @@ import { useSupplyTable } from "./use-supply-table";
 import type { SupplyTableAdapter, SupplySearchResult, CalcParams, CreateSupplyData } from "./types";
 import { DEFAULT_CALC_PARAMS } from "./types";
 import { calculateSkeins } from "@/lib/utils/skein-calculator";
+import type { SkeinLine } from "@/types/supply";
+
+const DMC_LINE: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
+const UNKNOWN_LINE: SkeinLine = { skeinLengthMm: null, strandStructure: null };
+const USED_WHOLE_10M_LINE: SkeinLine = { skeinLengthMm: 10000, strandStructure: "USED_WHOLE" };
 
 function makeSearchResult(overrides: Partial<SupplySearchResult> = {}): SupplySearchResult {
+  const type = overrides.type ?? "THREAD";
   return {
     id: "sr-1",
-    type: "THREAD",
+    type,
     code: "310",
     name: "Black",
     brandName: "DMC",
     brandId: "brand-1",
     hexColor: "#000000",
+    line: type === "THREAD" ? DMC_LINE : null,
     ...overrides,
   };
 }
@@ -173,10 +180,98 @@ describe("useSupplyTable", () => {
       fabricCount: calcParams.fabricCount,
       overCount: calcParams.overCount,
       wastePercent: calcParams.wastePercent,
+      line: DMC_LINE,
     });
 
     expect(result.current.need).toBe(expectedNeed);
     expect(result.current.isAutoCalc).toBe(true);
+  });
+
+  describe("the selected thread's own line", () => {
+    function selectThreadOn(line: SkeinLine) {
+      const rendered = renderSupplyTableHook();
+      act(() => {
+        rendered.result.current.selectItem(makeSearchResult({ id: "t1", line }));
+      });
+      return rendered;
+    }
+
+    it("makes the need unknown (null, never 1) when a stitch count lands on a line whose length is unknown", () => {
+      const { result } = selectThreadOn(UNKNOWN_LINE);
+
+      act(() => {
+        result.current.setStitchCount(5000);
+      });
+
+      expect(result.current.need).toBeNull();
+    });
+
+    it("ignores the strand count on a line used whole: 5000 stitches on a 10 m spool need 9", () => {
+      const { result } = selectThreadOn(USED_WHOLE_10M_LINE);
+
+      act(() => {
+        result.current.setStitchCount(5000);
+      });
+
+      // ceil(5000 * 6 * 1.2 / (14 * 315)) = ceil(8.16) = 9 -- two strands would have said 3
+      expect(result.current.need).toBe(9);
+    });
+
+    it("puts an unknown need back to 1 when the stitch count is cleared to 0", () => {
+      const { result } = selectThreadOn(UNKNOWN_LINE);
+      act(() => {
+        result.current.setStitchCount(5000);
+      });
+
+      act(() => {
+        result.current.setStitchCount(0);
+      });
+
+      expect(result.current.need).toBe(1);
+    });
+
+    it("commitRow sends an unknown need to adapter.addThread as null", async () => {
+      const { result } = selectThreadOn(UNKNOWN_LINE);
+      act(() => {
+        result.current.setStitchCount(5000);
+      });
+
+      await act(async () => {
+        await result.current.commitRow();
+      });
+
+      expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, null);
+    });
+
+    it("commitRow sends the figure worked out from a DMC line", async () => {
+      const { result } = selectThreadOn(DMC_LINE);
+      act(() => {
+        result.current.setStitchCount(5000);
+      });
+
+      await act(async () => {
+        await result.current.commitRow();
+      });
+
+      // ceil(5000 * 2 * 1.2 / (14 * 255)) = ceil(3.36) = 4
+      expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, 4);
+    });
+
+    it("lets a need typed by hand replace an unknown one", async () => {
+      const { result } = selectThreadOn(UNKNOWN_LINE);
+      act(() => {
+        result.current.setStitchCount(5000);
+      });
+      act(() => {
+        result.current.setNeedManual(3);
+      });
+
+      await act(async () => {
+        await result.current.commitRow();
+      });
+
+      expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, 3);
+    });
   });
 
   it("setStitchCount keeps need at 1 when the calculation comes out 0 (no fabric count)", () => {

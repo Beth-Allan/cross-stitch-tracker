@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 import { ServerActionAdapter } from "./server-action-adapter";
 import type { SupplySearchResult } from "./types";
+import type { SkeinLine } from "@/types/supply";
+import { createMockThreadLine } from "@/__tests__/mocks";
 
 vi.mock("@/lib/actions/supply-actions", () => ({
   addThreadToProject: vi.fn(),
@@ -48,6 +50,10 @@ const mockGetSpecialtyItems = vi.mocked(getSpecialtyItems);
 const mockCreateAndAddThread = vi.mocked(createAndAddThread);
 const mockCreateAndAddBead = vi.mocked(createAndAddBead);
 const mockCreateAndAddSpecialty = vi.mocked(createAndAddSpecialty);
+
+const DMC_LINE: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
+const UNKNOWN_LINE: SkeinLine = { skeinLengthMm: null, strandStructure: null };
+const USED_WHOLE_10M_LINE: SkeinLine = { skeinLengthMm: 10000, strandStructure: "USED_WHOLE" };
 
 describe("ServerActionAdapter", () => {
   const projectId = "proj-1";
@@ -111,6 +117,20 @@ describe("ServerActionAdapter", () => {
       await adapter.addThread("thread-1", 500, 2);
 
       expect(refreshFn).not.toHaveBeenCalled();
+    });
+
+    it("sends an unknown need as quantityRequired null", async () => {
+      mockAddThread.mockResolvedValue({ success: true, record: { id: "pt-1" } } as never);
+
+      await adapter.addThread("thread-1", 5000, null);
+
+      expect(mockAddThread).toHaveBeenCalledWith({
+        projectId: "proj-1",
+        threadId: "thread-1",
+        stitchCount: 5000,
+        quantityRequired: null,
+        quantityAcquired: 0,
+      });
     });
   });
 
@@ -266,6 +286,7 @@ describe("ServerActionAdapter", () => {
           need: 2,
           have: 0,
           isNeedOverridden: false,
+          line: DMC_LINE,
         },
       ]);
 
@@ -296,6 +317,7 @@ describe("ServerActionAdapter", () => {
           need: 2,
           have: 0,
           isNeedOverridden: false,
+          line: DMC_LINE,
         },
       ]);
       adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
@@ -324,6 +346,7 @@ describe("ServerActionAdapter", () => {
           need: 10,
           have: 0,
           isNeedOverridden: true,
+          line: DMC_LINE,
         },
       ]);
 
@@ -334,6 +357,87 @@ describe("ServerActionAdapter", () => {
       // Should send just stitchCount, no quantityRequired
       expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
         stitchCount: 1000,
+      });
+    });
+
+    describe("the row's own line", () => {
+      function threadRow(line: SkeinLine | null) {
+        return {
+          id: "jt-1",
+          supplyId: "supply-1",
+          type: "THREAD" as const,
+          code: "002",
+          name: "Gold",
+          brandName: "Kreinik",
+          hexColor: "#FFD700",
+          stitchCount: 0,
+          need: 1,
+          have: 0,
+          isNeedOverridden: false,
+          line,
+        };
+      }
+
+      beforeEach(() => {
+        mockUpdateQuantity.mockResolvedValue({ success: true });
+        adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
+      });
+
+      it("sends quantityRequired null, never 1, when a stitch count lands on a line whose length is unknown", async () => {
+        adapter.setRows([threadRow(UNKNOWN_LINE)]);
+
+        await adapter.updateQuantity("THREAD", "jt-1", "stitchCount", 5000);
+
+        expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
+          stitchCount: 5000,
+          quantityRequired: null,
+        });
+      });
+
+      it("works the need out from a DMC line's 8 m six-strand skein", async () => {
+        adapter.setRows([threadRow(DMC_LINE)]);
+
+        await adapter.updateQuantity("THREAD", "jt-1", "stitchCount", 5000);
+
+        // ceil(5000 * 2 * 1.2 / (14 * 255)) = ceil(3.36) = 4
+        expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
+          stitchCount: 5000,
+          quantityRequired: 4,
+        });
+      });
+
+      it("ignores the strand count on a line used whole: 5000 stitches on a 10 m spool need 9", async () => {
+        adapter.setRows([threadRow(USED_WHOLE_10M_LINE)]);
+
+        await adapter.updateQuantity("THREAD", "jt-1", "stitchCount", 5000);
+
+        // ceil(5000 * 6 * 1.2 / (14 * 315)) = ceil(8.16) = 9 -- two strands would have said 3
+        expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
+          stitchCount: 5000,
+          quantityRequired: 9,
+        });
+      });
+
+      it("keeps quantityRequired 1 for a stitch count of 0, even on a line whose length is unknown", async () => {
+        adapter.setRows([threadRow(UNKNOWN_LINE)]);
+
+        await adapter.updateQuantity("THREAD", "jt-1", "stitchCount", 0);
+
+        expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
+          stitchCount: 0,
+          quantityRequired: 1,
+        });
+      });
+
+      it("still lets a need be typed by hand on a line whose length is unknown", async () => {
+        adapter.setRows([threadRow(UNKNOWN_LINE)]);
+
+        await adapter.updateQuantity("THREAD", "jt-1", "need", 3);
+
+        expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
+          quantityRequired: 3,
+          isNeedOverridden: true,
+        });
       });
     });
   });
@@ -414,6 +518,7 @@ describe("ServerActionAdapter", () => {
           hexColor: "#000000",
           brandId: "brand-1",
           brand: { id: "brand-1", name: "DMC" },
+          line: createMockThreadLine(),
         },
       ] as never);
 
@@ -428,6 +533,7 @@ describe("ServerActionAdapter", () => {
           brandName: "DMC",
           brandId: "brand-1",
           hexColor: "#000000",
+          line: DMC_LINE,
         },
       ]);
     });
@@ -455,6 +561,7 @@ describe("ServerActionAdapter", () => {
           brandName: "Mill Hill",
           brandId: "brand-2",
           hexColor: "#FF0000",
+          line: null,
         },
       ]);
     });
@@ -482,6 +589,7 @@ describe("ServerActionAdapter", () => {
           brandName: "Kreinik",
           brandId: "brand-3",
           hexColor: "#FFD700",
+          line: null,
         },
       ]);
     });
@@ -507,6 +615,7 @@ describe("ServerActionAdapter", () => {
             hexColor: "#FF00FF",
             brandId: "brand-1",
             brand: { id: "brand-1", name: "DMC" },
+            line: createMockThreadLine(),
           },
           link: { id: "pt-new" },
         },
@@ -603,6 +712,7 @@ describe("ServerActionAdapter", () => {
             hexColor: "#FF00FF",
             brandId: "brand-1",
             brand: { id: "brand-1", name: "DMC" },
+            line: createMockThreadLine({ skeinLengthMm: null, strandStructure: null }),
           },
           link: { id: "pt-new" },
         },
@@ -624,6 +734,7 @@ describe("ServerActionAdapter", () => {
         brandName: "DMC",
         brandId: "brand-1",
         hexColor: "#FF00FF",
+        line: UNKNOWN_LINE,
       });
     });
 
@@ -638,6 +749,7 @@ describe("ServerActionAdapter", () => {
             hexColor: "#FF00FF",
             brandId: "brand-1",
             brand: { id: "brand-1", name: "DMC" },
+            line: createMockThreadLine(),
           },
           link: { id: "pt-new" },
         },

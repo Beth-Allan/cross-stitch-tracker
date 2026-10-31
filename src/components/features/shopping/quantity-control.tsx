@@ -6,7 +6,10 @@ import { cn } from "@/lib/utils";
 
 interface QuantityControlProps {
   acquired: number;
-  required: number;
+  /** `null` when no figure is known at all — a thread line whose need is unknown (D-34). */
+  required: number | null;
+  /** The known `required` total also covers lines whose need is unknown: shown "N + unknown". */
+  plusUnknown?: boolean;
   isPending: boolean;
   hasError?: boolean;
   onChange: (newValue: number) => void;
@@ -15,11 +18,17 @@ interface QuantityControlProps {
 export function QuantityControl({
   acquired,
   required,
+  plusUnknown = false,
   isPending,
   hasError = false,
   onChange,
 }: QuantityControlProps) {
-  const isFulfilled = acquired >= required;
+  // An unknown need is still to buy and has no ceiling, so it is never fulfilled and never
+  // clamped (D-40 ④). The null check comes first because JS calls `acquired >= null` true.
+  const ceiling = required === null || plusUnknown ? null : required;
+  const isFulfilled = ceiling !== null && acquired >= ceiling;
+  const needLabel =
+    required === null ? "unknown" : plusUnknown ? `${required} + unknown` : String(required);
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState("");
   const [shaking, setShaking] = useState(false);
@@ -53,7 +62,7 @@ export function QuantityControl({
     setIsEditing(false);
     const n = parseInt(editValue, 10);
     if (!isNaN(n) && n >= 0) {
-      onChange(Math.min(required, Math.max(0, n)));
+      onChange(ceiling === null ? n : Math.min(ceiling, n));
     }
   }
 
@@ -91,7 +100,7 @@ export function QuantityControl({
           ref={inputRef}
           type="number"
           min={0}
-          max={required}
+          max={ceiling ?? undefined}
           value={editValue}
           onChange={(e) => setEditValue(e.target.value)}
           onBlur={commitEdit}
@@ -104,7 +113,7 @@ export function QuantityControl({
             "focus:border-ring focus:ring-ring/30 focus:ring-1",
             "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
           )}
-          aria-label={`Acquired quantity out of ${required}`}
+          aria-label={`Acquired quantity out of ${needLabel}`}
         />
       ) : (
         <button
@@ -117,16 +126,20 @@ export function QuantityControl({
               ? "text-selected-foreground hover:border-selected-border"
               : "text-foreground hover:border-border hover:bg-muted",
           )}
-          aria-label={`${acquired} of ${required} acquired, click to edit`}
+          aria-label={`${acquired} of ${needLabel} acquired, click to edit`}
         >
-          {acquired}/{required}
+          {acquired}/
+          {required === null ? <span className="text-muted-foreground">Unknown</span> : required}
+          {required !== null && plusUnknown && (
+            <span className="text-muted-foreground"> + unknown</span>
+          )}
         </button>
       )}
 
       <button
         type="button"
         onClick={() => onChange(acquired + 1)}
-        disabled={acquired >= required || isPending}
+        disabled={isFulfilled || isPending}
         aria-label="Increment quantity"
         className={cn(
           "flex h-7 min-h-[44px] w-7 min-w-[44px] items-center justify-center rounded transition-colors outline-none",

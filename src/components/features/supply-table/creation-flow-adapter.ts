@@ -7,7 +7,7 @@ import type {
   CalcParams,
   Result,
 } from "./types";
-import { calculateSkeins } from "@/lib/utils/skein-calculator";
+import { threadNeed } from "./thread-need";
 
 /**
  * Adapter for the chart creation flow that buffers supply rows in memory.
@@ -38,7 +38,7 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
     this.calcParams = params;
   }
 
-  async addThread(threadId: string, stitchCount: number, need: number): Promise<Result> {
+  async addThread(threadId: string, stitchCount: number, need: number | null): Promise<Result> {
     const duplicate = this.findDuplicate(threadId, "THREAD");
     if (duplicate) return { success: false, error: "Supply already added" };
 
@@ -56,6 +56,7 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
       need,
       have: 0,
       isNeedOverridden: false,
+      line: meta?.line ?? null,
     };
     this.rows.set(id, row);
     this.onRowsChange(this.getRows());
@@ -80,6 +81,7 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
       need,
       have: 0,
       isNeedOverridden: false,
+      line: null,
     };
     this.rows.set(id, row);
     this.onRowsChange(this.getRows());
@@ -104,6 +106,7 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
       need,
       have: 0,
       isNeedOverridden: false,
+      line: null,
     };
     this.rows.set(id, row);
     this.onRowsChange(this.getRows());
@@ -128,16 +131,11 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
       !row.isNeedOverridden &&
       this.calcParams
     ) {
-      const recalculated = calculateSkeins({
+      updated = {
+        ...row,
         stitchCount: value,
-        strandCount: this.calcParams.strandCount,
-        fabricCount: this.calcParams.fabricCount,
-        overCount: this.calcParams.overCount,
-        wastePercent: this.calcParams.wastePercent,
-      });
-      // A supply always needs at least 1: the calculator says 0 for an empty stitch count,
-      // which the save would refuse.
-      updated = { ...row, stitchCount: value, need: Math.max(1, recalculated) };
+        need: threadNeed(value, this.calcParams, row.line),
+      };
     } else if (field === "need" && row.type === "THREAD") {
       updated = { ...row, need: value, isNeedOverridden: true };
     } else {

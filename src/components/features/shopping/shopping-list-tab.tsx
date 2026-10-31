@@ -22,6 +22,10 @@ interface ListItem {
   hexColor: string | null;
 }
 
+/**
+ * A need of `null` (D-34) is still to buy and has no figure, so it is listed as "Unknown" — the
+ * null check comes first in every loop because JS calls `acquired >= null` true (D-40 ④).
+ */
 function buildListItems(
   threads: ShoppingSupplyNeed[],
   beads: ShoppingSupplyNeed[],
@@ -31,40 +35,46 @@ function buildListItems(
   const items: ListItem[] = [];
 
   for (const t of threads) {
-    if (t.quantityAcquired >= t.quantityRequired) continue;
-    const remaining = t.quantityRequired - t.quantityAcquired;
+    if (t.quantityRequired !== null && t.quantityAcquired >= t.quantityRequired) continue;
     items.push({
       key: `thread-${t.junctionId}`,
       type: "thread",
       label: `${t.brandName} ${t.code} ${t.colorName}`,
       detail: t.projectName,
-      quantity: `${remaining} ${t.unit}`,
+      quantity:
+        t.quantityRequired === null
+          ? "Unknown"
+          : `${t.quantityRequired - t.quantityAcquired} ${t.unit}`,
       hexColor: t.hexColor,
     });
   }
 
   for (const b of beads) {
-    if (b.quantityAcquired >= b.quantityRequired) continue;
-    const remaining = b.quantityRequired - b.quantityAcquired;
+    if (b.quantityRequired !== null && b.quantityAcquired >= b.quantityRequired) continue;
     items.push({
       key: `bead-${b.junctionId}`,
       type: "bead",
       label: `${b.brandName} ${b.code} ${b.colorName}`,
       detail: b.projectName,
-      quantity: `${remaining} ${b.unit}`,
+      quantity:
+        b.quantityRequired === null
+          ? "Unknown"
+          : `${b.quantityRequired - b.quantityAcquired} ${b.unit}`,
       hexColor: b.hexColor,
     });
   }
 
   for (const s of specialty) {
-    if (s.quantityAcquired >= s.quantityRequired) continue;
-    const remaining = s.quantityRequired - s.quantityAcquired;
+    if (s.quantityRequired !== null && s.quantityAcquired >= s.quantityRequired) continue;
     items.push({
       key: `specialty-${s.junctionId}`,
       type: "specialty",
       label: `${s.brandName} ${s.code} ${s.colorName}`,
       detail: s.projectName,
-      quantity: `${remaining} ${s.unit}`,
+      quantity:
+        s.quantityRequired === null
+          ? "Unknown"
+          : `${s.quantityRequired - s.quantityAcquired} ${s.unit}`,
       hexColor: s.hexColor,
     });
   }

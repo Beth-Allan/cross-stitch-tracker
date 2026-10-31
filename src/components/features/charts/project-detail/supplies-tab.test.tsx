@@ -11,6 +11,7 @@ import type {
 import {
   createMockSupplyBrand,
   createMockThread,
+  createMockThreadLine,
   createMockBead,
   createMockSpecialtyItem,
   createMockProjectThread,
@@ -100,6 +101,7 @@ function makeThread(overrides?: Partial<ProjectThreadWithThread>): ProjectThread
       isNeedOverridden: overrides?.isNeedOverridden ?? false,
     }),
     thread: {
+      line: createMockThreadLine(),
       ...createMockThread({
         id: "thread-1",
         colorCode: "310",
@@ -258,6 +260,46 @@ describe("SuppliesTab", () => {
       expect(screen.getByText("Black")).toBeInTheDocument();
     });
 
+    it("shows a thread's unknown need as Unknown, never 0 or 1", () => {
+      render(
+        <SuppliesTab
+          project={defaultProject}
+          supplies={{ threads: [makeThread({ quantityRequired: null })], beads: [], specialty: [] }}
+        />,
+      );
+
+      expect(screen.getByRole("button", { name: "Need for 310" })).toHaveTextContent("Unknown");
+    });
+
+    it("works a new stitch count out from the thread's own line", async () => {
+      const user = userEvent.setup();
+      const { updateProjectSupplyQuantity } = await import("@/lib/actions/supply-actions");
+      const usedWhole10m = makeThread({
+        thread: {
+          ...createMockThread({ id: "thread-1", colorCode: "310", colorName: "Gold" }),
+          brand: mockBrand,
+          line: createMockThreadLine({ skeinLengthMm: 10000, strandStructure: "USED_WHOLE" }),
+        },
+      });
+      render(
+        <SuppliesTab
+          project={{ ...defaultProject, overCount: 1 }}
+          supplies={{ threads: [usedWhole10m], beads: [], specialty: [] }}
+        />,
+      );
+
+      await user.click(screen.getByRole("button", { name: "Stitches for 310" }));
+      const input = screen.getByRole("spinbutton", { name: "Stitches for 310" });
+      await user.clear(input);
+      await user.type(input, "5000{Enter}");
+
+      // ceil(5000 * 6 * 1.2 / (14 * 315)) = 9 -- the project's 2 strands would have said 3
+      expect(vi.mocked(updateProjectSupplyQuantity)).toHaveBeenCalledWith("pt-1", "thread", {
+        stitchCount: 5000,
+        quantityRequired: 9,
+      });
+    });
+
     it("transforms ProjectBeadWithBead to SupplyRow (productCode -> code)", () => {
       render(
         <SuppliesTab
@@ -303,6 +345,7 @@ describe("SuppliesTab", () => {
         makeThread({
           id: "pt-z",
           thread: {
+            line: createMockThreadLine(),
             ...createMockThread({
               id: "t-z",
               colorCode: "Zzz",
@@ -315,6 +358,7 @@ describe("SuppliesTab", () => {
         makeThread({
           id: "pt-a",
           thread: {
+            line: createMockThreadLine(),
             ...createMockThread({
               id: "t-a",
               colorCode: "111",
@@ -349,6 +393,7 @@ describe("SuppliesTab", () => {
         makeThread({
           id: "pt-z",
           thread: {
+            line: createMockThreadLine(),
             ...createMockThread({
               id: "t-z",
               colorCode: "Zzz",
@@ -361,6 +406,7 @@ describe("SuppliesTab", () => {
         makeThread({
           id: "pt-a",
           thread: {
+            line: createMockThreadLine(),
             ...createMockThread({
               id: "t-a",
               colorCode: "111",

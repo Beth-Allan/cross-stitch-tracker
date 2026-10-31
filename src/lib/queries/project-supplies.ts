@@ -9,6 +9,7 @@ const EMPTY_ROLLUP: SupplyRollup = {
   count: 0,
   required: 0,
   acquired: 0,
+  unknown: 0,
   // Vacuously true, exactly as `[].every(...)` was: a junction with no rows is "not applicable"
   // at every surface that reads it, and the count is what decides that.
   allFulfilled: true,
@@ -23,7 +24,7 @@ export const EMPTY_PROJECT_SUPPLIES: ProjectSupplies = {
 
 type TotalsGroup = {
   projectId: string;
-  _count: { _all: number };
+  _count: { _all: number; quantityRequired: number };
   _sum: { quantityRequired: number | null };
   _max: { quantityAcquired: number | null };
 };
@@ -34,7 +35,7 @@ type ShortfallGroup = {
 };
 
 /**
- * Folds one junction's two group reads into a rollup per project.
+ * Folds one junction's group reads into a rollup per project.
  *
  * The capped total comes out of the two sums by identity rather than by row inspection:
  * `Σ min(a, r) = Σ r − Σ_{a < r} (r − a)`, so the rows that are already fulfilled need no
@@ -43,6 +44,13 @@ type ShortfallGroup = {
  * `anyAcquired` reads `_max`, not `_sum`: a maximum above zero means some row has been started
  * whatever the other rows hold, which a sum only reproduces while every quantity is non-negative
  * — a rule the write boundary enforces and the database does not.
+ *
+ * A row whose need is unknown (`quantityRequired` null, D-34) drops out of both sums on its own —
+ * SQL skips a null in a sum and no comparison with one is true, so it is never in the shortfall
+ * group either. That silence is exactly the trap: left alone it would read as fulfilled. So the
+ * totals read also counts the column, which `COUNT(column)` does skipping nulls: the gap between
+ * that and the row count is the unknown lines, and any one of them keeps the junction unfulfilled.
+ * Beads and specialty cannot hold a null need, so for them the gap is always 0 — one code path.
  */
 function foldJunction(
   totals: TotalsGroup[],
@@ -57,6 +65,7 @@ function foldJunction(
       const outstanding = shortfall
         ? (shortfall._sum.quantityRequired ?? 0) - (shortfall._sum.quantityAcquired ?? 0)
         : 0;
+      const unknown = group._count._all - group._count.quantityRequired;
 
       return [
         group.projectId,
@@ -64,7 +73,8 @@ function foldJunction(
           count: group._count._all,
           required,
           acquired: required - outstanding,
-          allFulfilled: shortfall === undefined,
+          unknown,
+          allFulfilled: shortfall === undefined && unknown === 0,
           anyAcquired: (group._max.quantityAcquired ?? 0) > 0,
         },
       ];
@@ -95,7 +105,7 @@ export async function summariseProjectSupplies(
     prisma.projectThread.groupBy({
       by: ["projectId"],
       where: { project },
-      _count: { _all: true },
+      _count: { _all: true, quantityRequired: true },
       _sum: { quantityRequired: true },
       _max: { quantityAcquired: true },
     }),
@@ -107,7 +117,7 @@ export async function summariseProjectSupplies(
     prisma.projectBead.groupBy({
       by: ["projectId"],
       where: { project },
-      _count: { _all: true },
+      _count: { _all: true, quantityRequired: true },
       _sum: { quantityRequired: true },
       _max: { quantityAcquired: true },
     }),
@@ -119,7 +129,7 @@ export async function summariseProjectSupplies(
     prisma.projectSpecialty.groupBy({
       by: ["projectId"],
       where: { project },
-      _count: { _all: true },
+      _count: { _all: true, quantityRequired: true },
       _sum: { quantityRequired: true },
       _max: { quantityAcquired: true },
     }),
@@ -156,6 +166,7 @@ export function totalSupplyRollup(supplies: ProjectSupplies): SupplyRollup {
     count: parts.reduce((sum, p) => sum + p.count, 0),
     required: parts.reduce((sum, p) => sum + p.required, 0),
     acquired: parts.reduce((sum, p) => sum + p.acquired, 0),
+    unknown: parts.reduce((sum, p) => sum + p.unknown, 0),
     allFulfilled: parts.every((p) => p.allFulfilled),
     anyAcquired: parts.some((p) => p.anyAcquired),
   };

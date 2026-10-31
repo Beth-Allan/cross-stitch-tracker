@@ -127,4 +127,54 @@ describe("QuantityControl", () => {
     expect(onChange).not.toHaveBeenCalled();
     expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
   });
+
+  describe("a need that is unknown (D-34)", () => {
+    const unknownProps = { ...defaultProps, required: null };
+
+    it("shows the need as the word Unknown, never as a number", () => {
+      render(<QuantityControl {...unknownProps} acquired={2} />);
+      const display = screen.getByRole("button", { name: /click to edit/ });
+      expect(display).toHaveTextContent("2/Unknown");
+      expect(screen.getByText("Unknown")).toHaveClass("text-muted-foreground");
+    });
+
+    it("never reads as fulfilled, however much has been bought", () => {
+      const { container } = render(<QuantityControl {...unknownProps} acquired={5} />);
+      const wrapper = container.firstElementChild as HTMLElement;
+      expect(wrapper.className).not.toContain("bg-selected");
+    });
+
+    it("keeps the plus button open, because there is no need to stop at", async () => {
+      const onChange = vi.fn();
+      const user = userEvent.setup();
+      render(<QuantityControl {...unknownProps} acquired={5} onChange={onChange} />);
+      const plusButton = screen.getByRole("button", { name: /plus|increment/i });
+      expect(plusButton).toBeEnabled();
+      await user.click(plusButton);
+      expect(onChange).toHaveBeenCalledWith(6);
+    });
+
+    it("commits an edited value without clamping it to a need", async () => {
+      const onChange = vi.fn();
+      const user = userEvent.setup();
+      render(<QuantityControl {...unknownProps} acquired={2} onChange={onChange} />);
+      await user.click(screen.getByRole("button", { name: /click to edit/ }));
+      const input = screen.getByRole("spinbutton");
+      await user.clear(input);
+      await user.type(input, "9");
+      await user.keyboard("{Enter}");
+      expect(onChange).toHaveBeenCalledWith(9);
+    });
+
+    it("shows a known total that also covers unknown lines as 'N + unknown'", () => {
+      const { container } = render(
+        <QuantityControl {...defaultProps} acquired={3} required={3} plusUnknown />,
+      );
+      const display = screen.getByRole("button", { name: /click to edit/ });
+      expect(display).toHaveTextContent("3/3 + unknown");
+      const wrapper = container.firstElementChild as HTMLElement;
+      expect(wrapper.className).not.toContain("bg-selected");
+      expect(screen.getByRole("button", { name: /plus|increment/i })).toBeEnabled();
+    });
+  });
 });

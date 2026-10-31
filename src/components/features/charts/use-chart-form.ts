@@ -266,7 +266,11 @@ export function useChartForm({
     try {
       if (mode === "create") {
         const supplyRows = getSupplyRows?.() ?? [];
-        const zeroNeed = supplyRows.find((r) => r.need < 1);
+        // A thread's need may be unknown (null) and is sent as unknown; anything else needs a
+        // number of at least 1
+        const zeroNeed = supplyRows.find((r) =>
+          r.need === null ? r.type !== "THREAD" : r.need < 1,
+        );
         if (zeroNeed) {
           const label =
             [zeroNeed.brandName, zeroNeed.code].filter(Boolean).join(" ") || zeroNeed.name;
@@ -287,12 +291,14 @@ export function useChartForm({
               })),
             beads: supplyRows
               .filter((r) => r.type === "BEAD")
+              .filter(hasKnownNeed)
               .map((r) => ({
                 supplyId: r.supplyId,
                 need: r.need,
               })),
             specialty: supplyRows
               .filter((r) => r.type === "SPECIALTY")
+              .filter(hasKnownNeed)
               .map((r) => ({
                 supplyId: r.supplyId,
                 need: r.need,
@@ -484,4 +490,9 @@ export function useChartForm({
     handleAddStitchingApp,
     handleAddSeries,
   };
+}
+
+/** Narrows rather than drops: a bead or specialty row with no need was refused before the payload. */
+function hasKnownNeed(row: SupplyRow): row is SupplyRow & { need: number } {
+  return row.need !== null;
 }

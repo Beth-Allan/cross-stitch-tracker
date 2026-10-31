@@ -10,6 +10,28 @@ describe("EditableNumber", () => {
     expect(button).toHaveTextContent("42");
   });
 
+  it("shows a null value as Unknown and opens an empty box to type into", () => {
+    render(<EditableNumber value={null} onSave={vi.fn()} ariaLabel="Need" />);
+    const button = screen.getByRole("button", { name: "Need" });
+    expect(button).toHaveTextContent("Unknown");
+
+    fireEvent.click(button);
+
+    expect(screen.getByRole("spinbutton", { name: "Need" })).toHaveValue(null);
+  });
+
+  it("leaving an Unknown cell without typing keeps it Unknown, saving and flagging nothing", () => {
+    const onSave = vi.fn();
+    render(<EditableNumber value={null} onSave={onSave} ariaLabel="Need" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Need" }));
+    fireEvent.blur(screen.getByRole("spinbutton", { name: "Need" }));
+
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Need" })).toHaveTextContent("Unknown");
+    expect(screen.queryByText("Value not saved")).not.toBeInTheDocument();
+  });
+
   it("clicking the button enters edit mode (shows input)", () => {
     render(<EditableNumber value={10} onSave={vi.fn()} ariaLabel="Need" />);
     const button = screen.getByRole("button", { name: "Need" });

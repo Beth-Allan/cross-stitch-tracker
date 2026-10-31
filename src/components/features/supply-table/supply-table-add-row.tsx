@@ -255,7 +255,8 @@ export function SupplyTableAddRow({
                 ref={needRef}
                 type="number"
                 min={1}
-                value={need}
+                value={need ?? ""}
+                placeholder={need === null ? "Unknown" : undefined}
                 onChange={(e) => setNeedManual(Number(e.target.value) || 1)}
                 onKeyDown={handleFieldKeyDown}
                 className={inputClassName}
