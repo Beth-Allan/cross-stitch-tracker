@@ -253,3 +253,37 @@ baseline was recorded and `pipeline_check` applied: from that line the runner ha
 exit 0. The host's first two words are in `docs/INTEGRATIONS.md` (Migrations).
 
 **Done** (2026-10-25): steps 1 and 2 done, step 3 as recorded above. `/cleanup` retires this note.
+
+## The thread line as F-16a built it — what F-16b, C-1, C-1b and F-19 inherit
+
+**Tags:** F-16b · C-1 · C-1b · F-19 · F-18 · schema · thread line
+
+F-16a (2026-10-31) added `ThreadLine` (`prisma/schema.prisma`). What the later items need to know
+without re-deriving it:
+
+- **A brand with one kind of thread has one line whose `name` is `""`** — never shown. DMC,
+  Anchor, Weeks Dye Works, The Gentle Art and "Custom (Thread)" each have one. Kreinik has exactly
+  three, named as THR-012 spells them. So C-1's DMC fixture names DMC's line as `""` (or the loader
+  treats "the brand's only line" as that line) — C-1's call, but the line it loads into exists.
+- **Line names are unique per brand by exact text only** (`@@unique([brandId, name])`). "Case
+  aside" (D-42) is not enforced by the database — Prisma 7.10.1 cannot express a `lower()` index
+  without drift. F-16a creates no line from user input, so nothing can collide yet; **F-16b's form
+  must refuse a line name that matches another in the same brand, case aside**, and test it.
+- **A thread's line always belongs to its own brand** — `Thread` keeps `brandId` and a composite
+  foreign key `[lineId, brandId]` → `ThreadLine[id, brandId]` enforces the match. Moving a thread
+  to another brand must move its line in the same write (`updateThread` does).
+- **Thread uniqueness is `@@unique([lineId, colorCode])`**; the old `brandId_colorCode` key is gone.
+- **Length is `skeinLengthMm Int?`** (whole millimetres; 5 yd = 4572) and **structure is
+  `strandStructure StrandStructure?`** (`SIX_STRAND` · `USED_WHOLE`). Either null is unknown, and
+  `calculateSkeins` returns `null`. F-16b's form writes these two fields; metres and yards both
+  convert to whole millimetres.
+- **`ProjectThread.quantityRequired` is `Int?`**; null is "unknown" — shown as "Unknown", still
+  to buy, never in hand. Beads and specialty needs stay non-null.
+- **The kitting percentage is capped at 99 while a project has an unknown line** — F-16a's
+  stand-in so it can never read 100% (D-40 ④). How much an unknown line weighs is F-18's question
+  for Beth; F-18 replaces the cap.
+- **F-19** changes only `skein-calculator.ts`'s cut constants (`CUT_LENGTH_TENTH_MM`,
+  `USABLE_INCHES_PER_CUT`) and, for Kreinik, the per-structure cut — the line already carries what
+  it needs.
+
+Consumed when F-16b, C-1 and F-18 have all landed.
