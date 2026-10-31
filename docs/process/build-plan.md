@@ -1203,7 +1203,7 @@ answers. F-16a and F-16b each add their own scope and done-when.
   in one place; the junction arm Resolved; gate green; Beth has seen the preview (What's Next
   percentages); merges on her word.
 
-### F-19 The length Beth cuts — **created by Beth's answer at the 2026-10-29 `/stitch-fact` (THR-016, D-44); gated (the skein calculator, possibly schema + migration) — `/review` follows; preview before merge**
+### F-19 The length Beth cuts — **created by Beth's answer at the 2026-10-29 `/stitch-fact` (THR-016, D-44); gated (the skein calculator, a migration for D-47, possibly schema) — `/review` follows; preview before merge**
 
 - **Objective:** the skein maths uses the length Beth actually cuts — **about 24 inches of floss
   and 15 of Kreinik, about 3 lost from each** (THR-016) — in place of the cited source's 18-inch
@@ -1218,9 +1218,22 @@ answers. F-16a and F-16b each add their own scope and done-when.
   every row. Put the options in her terms ("only newly worked-out figures change" against
   "recompute every saved figure from today's settings — never one you typed in yourself"), with the
   counts from the reset `preview` copy, and record her ruling before the branch opens. An overridden
-  row is never touched either way (F-16a trap ⑨).
+  row is never touched either way (F-16a trap ⑨). "Never one you typed in yourself" cannot be
+  promised for a need typed into the add-a-supply row, which saves unmarked (maintenance ledger,
+  2026-10-31); say so in the option if the recompute is on the table.
+- **Clears the six wrongly marked needs, whichever way her answer goes (D-47).** Beth typed none of
+  them on purpose, so this item's migration, needed for this even if no column is added, sets
+  `isNeedOverridden = false` on these `ProjectThread` ids, each guarded by `"isNeedOverridden" = true`:
+  `cmogdb777000004l4a7l2lbd0` (Arctic Owl 3, DMC 310) · `cmp0fggbc000204laiy8z8iiw` (Censored
+  Eggplant, DMC 327) · `cmr2tv2kr000d04jx3aeta7fp`, `cmr2tv2ks000m04jx1eetyoa0` and
+  `cmr2tv2ks000h04jxpfm5pdq6` (Pink Clouds, DMC 807, 3766 and B5200) · `cmvmz5vrr000c07jmfrq5ctg8`
+  (Violet Tulip, DMC 310). **Only Arctic Owl 3's 310 changes number:** it takes the figure this
+  item's calculator gives at its settings (33,678 stitches, 2 strands, 14 count over 1, 20% waste),
+  not 30 and not today's 23. The clear runs before any recompute, so these lines join it. Re-read the
+  marked rows on a freshly reset `preview` copy first: a marked row that is not one of the six goes
+  to Beth, never into the migration.
 - **Cited specs:** `docs/domain/threads.md` THR-006, THR-008–THR-013, THR-016 · `open-questions.md`
-  Q-009 · drift D-40 ③ (as corrected), D-44, D-45 · F-16a's calculator and its traps ③, ④, ⑨, ⑩ (retired by D-45 — see trap ⑤) and ⑪
+  Q-009 · drift D-40 ③ (as corrected), D-44, D-45, D-47 · F-16a's calculator and its traps ③, ④, ⑨, ⑩ (retired by D-45 — see trap ⑤) and ⑪
   (whole cuts; the used-whole strand term; overridden rows untouched; the recompute checked against
   the calculator; the pinned figures) · `docs/INTEGRATIONS.md` Deployment →
   Migrations, if a column is added.
