@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@/__tests__/test-utils";
+import { act, render, screen, waitFor } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { calculateSkeins } from "@/lib/utils/skein-calculator";
 import { DEFAULT_CALC_PARAMS } from "@/components/features/supply-table/types";
@@ -531,6 +531,12 @@ describe("SuppliesTab", () => {
 
       const backButton = () => screen.getByRole("button", { name: "Back to calculated for 310" });
 
+      function deferredSave() {
+        let resolve!: (result: { success: true } | { success: false; error: string }) => void;
+        const promise = new Promise<Parameters<typeof resolve>[0]>((r) => (resolve = r));
+        return { promise, resolve };
+      }
+
       it("works the figure out from a stitch count typed just before the click", async () => {
         const user = userEvent.setup();
         const save = await savedAction();
@@ -567,6 +573,49 @@ describe("SuppliesTab", () => {
         );
       });
 
+      it("holds on to a count still saving when the rows change around it", async () => {
+        const user = userEvent.setup();
+        const save = await savedAction();
+        const answer = deferredSave();
+        save.mockReturnValueOnce(answer.promise);
+        const { rerender } = render(<SuppliesTab project={project} supplies={supplies(5000)} />);
+
+        await typeStitches(user, "33678");
+        await user.tab();
+        rerender(<SuppliesTab project={project} supplies={supplies(5000)} />);
+        await user.click(backButton());
+        answer.resolve({ success: true });
+
+        await waitFor(() =>
+          expect(save).toHaveBeenLastCalledWith("pt-1", "thread", {
+            quantityRequired: figureFor(33678),
+            isNeedOverridden: false,
+          }),
+        );
+      });
+
+      it("waits for the stitch save's answer, so a refusal can't leave a figure behind", async () => {
+        const user = userEvent.setup();
+        const save = await savedAction();
+        const answer = deferredSave();
+        save.mockReturnValueOnce(answer.promise);
+        render(<SuppliesTab project={project} supplies={supplies(5000)} />);
+
+        await typeStitches(user, "33678");
+        await user.click(backButton());
+        await act(async () => {});
+        expect(save).toHaveBeenCalledTimes(1);
+
+        answer.resolve({ success: false, error: "Supply not found" });
+
+        await waitFor(() =>
+          expect(save).toHaveBeenLastCalledWith("pt-1", "thread", {
+            quantityRequired: figureFor(5000),
+            isNeedOverridden: false,
+          }),
+        );
+      });
+
       it("trusts the row once a refresh has brought it new figures", async () => {
         const user = userEvent.setup();
         const save = await savedAction();
@@ -574,7 +623,7 @@ describe("SuppliesTab", () => {
 
         await typeStitches(user, "33678");
         await user.tab();
-        await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
+        await act(async () => {});
         rerender(<SuppliesTab project={project} supplies={supplies(12000)} />);
         await user.click(backButton());
 

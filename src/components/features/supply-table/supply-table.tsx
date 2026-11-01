@@ -16,6 +16,12 @@ interface SupplyTableInternalProps extends SupplyTableProps {
   isLoading?: boolean;
 }
 
+interface SentStitchCount {
+  count: number;
+  saved: Promise<boolean>;
+  settled: boolean;
+}
+
 const HEADER_CLASS =
   "text-left px-3 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.04em] border-b-2 border-border whitespace-nowrap bg-card";
 
@@ -95,10 +101,13 @@ export function SupplyTable({
 
   // A stitch count reaches the row's props only with the refresh after its save, so leaving the
   // Stitches cell by clicking "back to calculated" would otherwise work the figure out from the
-  // old count
-  const unsettledStitchCounts = useRef(new Map<string, number>());
+  // old count. Kept until the rows change after its save has answered: rows can change sooner
+  // than that, for a sort or another row's refresh.
+  const sentStitchCounts = useRef(new Map<string, SentStitchCount>());
   useEffect(() => {
-    unsettledStitchCounts.current.clear();
+    for (const [junctionId, sent] of sentStitchCounts.current) {
+      if (sent.settled) sentStitchCounts.current.delete(junctionId);
+    }
   }, [threads]);
 
   // Derive existing supply IDs from all sections for add-row disabled items
@@ -134,39 +143,47 @@ export function SupplyTable({
       junctionId: string,
       field: "stitchCount" | "need" | "have",
       value: number,
-    ): Promise<boolean> =>
-      new Promise((resolve) => {
-        const unsettled = field === "stitchCount" ? unsettledStitchCounts.current : null;
-        unsettled?.set(junctionId, value);
+    ): Promise<boolean> => {
+      const saved = new Promise<boolean>((resolve) => {
         startTransition(async () => {
           try {
             const result = await adapter.updateQuantity(type, junctionId, field, value);
             if (!result.success) {
-              unsettled?.delete(junctionId);
               toast.error(result.error ?? "Couldn't update value. Try again.");
               resolve(false);
               return;
             }
             resolve(true);
           } catch (error) {
-            unsettled?.delete(junctionId);
             console.error("Update supply quantity failed:", error);
             toast.error("Couldn't update value. Try again.");
             resolve(false);
           }
         });
-      }),
+      });
+
+      if (field === "stitchCount") {
+        const sent: SentStitchCount = { count: value, saved, settled: false };
+        sentStitchCounts.current.set(junctionId, sent);
+        void saved.then(() => {
+          sent.settled = true;
+        });
+      }
+      return saved;
+    },
     [adapter],
   );
 
   const handleBackToCalculated = useCallback(
     (row: SupplyRow) => {
-      const stitchCount = unsettledStitchCounts.current.get(row.id) ?? row.stitchCount;
-      const need = calculatedNeedFor({ ...row, stitchCount }, mergedCalcParams);
-      if (need === null) return;
-
       startTransition(async () => {
         try {
+          // Waiting means a refused count never gives a figure the stitches don't match
+          const sent = sentStitchCounts.current.get(row.id);
+          const stitchCount = sent && (await sent.saved) ? sent.count : row.stitchCount;
+          const need = calculatedNeedFor({ ...row, stitchCount }, mergedCalcParams);
+          if (need === null) return;
+
           const result = await adapter.backToCalculated(row.id, need);
           if (!result.success) {
             toast.error(result.error ?? "Couldn't update value. Try again.");
