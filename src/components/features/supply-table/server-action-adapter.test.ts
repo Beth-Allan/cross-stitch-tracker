@@ -442,6 +442,38 @@ describe("ServerActionAdapter", () => {
     });
   });
 
+  describe("backToCalculated", () => {
+    it("saves the calculator's figure and clears the mark in one write", async () => {
+      mockUpdateQuantity.mockResolvedValue({ success: true });
+
+      const result = await adapter.backToCalculated("jt-1", 23);
+
+      expect(result).toEqual({ success: true });
+      expect(mockUpdateQuantity).toHaveBeenCalledTimes(1);
+      expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
+        quantityRequired: 23,
+        isNeedOverridden: false,
+      });
+    });
+
+    it("calls refreshFn on success", async () => {
+      mockUpdateQuantity.mockResolvedValue({ success: true });
+
+      await adapter.backToCalculated("jt-1", 23);
+
+      expect(refreshFn).toHaveBeenCalledOnce();
+    });
+
+    it("returns the error and does NOT call refreshFn on failure", async () => {
+      mockUpdateQuantity.mockResolvedValue({ success: false, error: "Supply not found" });
+
+      const result = await adapter.backToCalculated("jt-1", 23);
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+      expect(refreshFn).not.toHaveBeenCalled();
+    });
+  });
+
   describe("remove", () => {
     it("calls removeProjectThread for THREAD type", async () => {
       mockRemoveThread.mockResolvedValue({ success: true });

@@ -150,6 +150,56 @@ describe("CreationFlowAdapter", () => {
     });
   });
 
+  describe("backToCalculated", () => {
+    const CALC_PARAMS = {
+      fabricCount: 14,
+      strandCount: 2,
+      overCount: 1,
+      wastePercent: 20,
+    } as const;
+
+    async function addTypedRow() {
+      const threadResult = makeSearchResult({ id: "t1", type: "THREAD" });
+      searchFn.mockResolvedValueOnce([threadResult]);
+      await adapter.searchSupplies("THREAD", "310");
+      const addResult = await adapter.addThread("t1", 500, 2);
+      const rowId = (addResult as { success: true; id: string }).id;
+      adapter.setCalcParams(CALC_PARAMS);
+      await adapter.updateQuantity("THREAD", rowId, "need", 10);
+      return rowId;
+    }
+
+    it("gives a typed row the figure and clears the mark", async () => {
+      const rowId = await addTypedRow();
+      onRowsChange.mockClear();
+
+      const result = await adapter.backToCalculated(rowId, 1);
+
+      expect(result).toEqual({ success: true });
+      const updated = adapter.getRows().find((r) => r.id === rowId);
+      expect(updated?.need).toBe(1);
+      expect(updated?.isNeedOverridden).toBe(false);
+      expect(onRowsChange).toHaveBeenCalledOnce();
+    });
+
+    it("leaves the row following its stitch count again", async () => {
+      const rowId = await addTypedRow();
+
+      await adapter.backToCalculated(rowId, 1);
+      await adapter.updateQuantity("THREAD", rowId, "stitchCount", 33678);
+
+      const updated = adapter.getRows().find((r) => r.id === rowId);
+      expect(updated?.need).not.toBe(1);
+      expect(updated?.isNeedOverridden).toBe(false);
+    });
+
+    it("returns failure for a row it does not hold", async () => {
+      const result = await adapter.backToCalculated("nonexistent", 1);
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+    });
+  });
+
   describe("remove", () => {
     it("deletes row from buffer and calls onRowsChange", async () => {
       const threadResult = makeSearchResult({ id: "t1", type: "THREAD" });

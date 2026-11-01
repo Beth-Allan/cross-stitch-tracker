@@ -11,7 +11,9 @@ const UNKNOWN_LINE: SkeinLine = { skeinLengthMm: null, strandStructure: null };
 vi.mock("@/components/ui/tooltip", () => ({
   TooltipProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  TooltipTrigger: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  TooltipTrigger: ({ children, ...props }: React.ComponentProps<"button">) => (
+    <button {...props}>{children}</button>
+  ),
   TooltipContent: ({ children }: { children: React.ReactNode }) => (
     <span data-testid="tooltip-content">{children}</span>
   ),
@@ -41,6 +43,8 @@ function renderRow(
     onUpdateQuantity: ReturnType<typeof vi.fn>;
     onDelete: ReturnType<typeof vi.fn>;
     isNew: boolean;
+    calculatedNeed: number | null;
+    onBackToCalculated: ReturnType<typeof vi.fn>;
   }> = {},
 ) {
   const onUpdateQuantity = props.onUpdateQuantity ?? vi.fn();
@@ -53,6 +57,8 @@ function renderRow(
           onUpdateQuantity={onUpdateQuantity}
           onDelete={onDelete}
           isNew={props.isNew}
+          calculatedNeed={props.calculatedNeed}
+          onBackToCalculated={props.onBackToCalculated}
         />
       </tbody>
     </table>,
@@ -250,6 +256,52 @@ describe("SupplyTableDataRow", () => {
     fireEvent.keyDown(input, { key: "Enter" });
 
     expect(onUpdateQuantity).toHaveBeenCalledWith("THREAD", "junc-1", "have", 5);
+  });
+
+  describe("back to calculated", () => {
+    const markedRow = () => makeRow({ code: "310", need: 30, isNeedOverridden: true });
+    const backButton = () => screen.queryByRole("button", { name: "Back to calculated for 310" });
+
+    it("offers the button on a marked line, naming the figure it would give", () => {
+      renderRow(markedRow(), { calculatedNeed: 23, onBackToCalculated: vi.fn() });
+
+      expect(backButton()).toBeInTheDocument();
+      expect(screen.getByText("Back to calculated: 23 sk")).toBeInTheDocument();
+    });
+
+    it("hands the row and its figure back on one click, without opening the Need cell", () => {
+      const onBackToCalculated = vi.fn();
+      renderRow(markedRow(), { calculatedNeed: 23, onBackToCalculated });
+
+      fireEvent.click(backButton()!);
+
+      expect(onBackToCalculated).toHaveBeenCalledExactlyOnceWith("junction-1", 23);
+      expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
+    });
+
+    it("is a plain button, so it can never submit a form around it", () => {
+      renderRow(markedRow(), { calculatedNeed: 23, onBackToCalculated: vi.fn() });
+
+      expect(backButton()).toHaveAttribute("type", "button");
+    });
+
+    it("offers nothing when there is no figure to give", () => {
+      renderRow(markedRow(), { calculatedNeed: null, onBackToCalculated: vi.fn() });
+
+      expect(backButton()).not.toBeInTheDocument();
+    });
+
+    it("offers nothing to a row rendered without the handler", () => {
+      renderRow(markedRow());
+
+      expect(backButton()).not.toBeInTheDocument();
+    });
+
+    it("sits where the sparkle would, which a marked line does not show", () => {
+      renderRow(markedRow(), { calculatedNeed: 23, onBackToCalculated: vi.fn() });
+
+      expect(document.querySelector('[data-testid="auto-calc-indicator"]')).not.toBeInTheDocument();
+    });
   });
 
   describe("a need it cannot work out", () => {

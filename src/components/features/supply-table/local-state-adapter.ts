@@ -133,6 +133,16 @@ export class LocalStateAdapter implements SupplyTableAdapter {
     return { success: true };
   }
 
+  async backToCalculated(junctionId: string, need: number): Promise<Result> {
+    const row = this.rows.threads.get(junctionId);
+    if (!row) {
+      return { success: false, error: "Supply not found" };
+    }
+    row.need = need;
+    row.isNeedOverridden = false;
+    return { success: true };
+  }
+
   async remove(type: SupplyType, junctionId: string): Promise<Result> {
     const map = this.getMap(type);
     if (!map.has(junctionId)) {

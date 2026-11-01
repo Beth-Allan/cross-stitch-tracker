@@ -141,6 +141,19 @@ export class ServerActionAdapter implements SupplyTableAdapter {
     return { success: false, error: result.error };
   }
 
+  async backToCalculated(junctionId: string, need: number): Promise<Result> {
+    const result = await updateProjectSupplyQuantity(junctionId, "thread", {
+      quantityRequired: need,
+      isNeedOverridden: false,
+    });
+
+    if (result.success) {
+      this.refreshFn();
+      return { success: true };
+    }
+    return { success: false, error: result.error };
+  }
+
   async remove(type: SupplyType, junctionId: string): Promise<Result> {
     let result: { success: true } | { success: false; error: string };
 

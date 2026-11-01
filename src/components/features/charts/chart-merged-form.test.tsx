@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
 import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
+import { calculateSkeins } from "@/lib/utils/skein-calculator";
 import { ChartMergedForm } from "./chart-merged-form";
 import {
   createMockDesigner,
@@ -649,6 +650,84 @@ describe("ChartMergedForm", () => {
     const supplyPayload = mockCreateChartWithSupplies.mock.calls[0][1];
     expect(supplyPayload.threads).toHaveLength(1);
     expect(supplyPayload.threads[0].supplyId).toBe("thread-1");
+  });
+
+  it("back to calculated on a new chart reaches the saved supplies, unmarked", async () => {
+    const line = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" } as const;
+    const calcParams = { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 } as const;
+    const v2Draft = {
+      version: 2,
+      form: {
+        name: "Typed Need",
+        designerId: null,
+        coverImageUrl: null,
+        coverThumbnailUrl: null,
+        digitalFileUrl: null,
+        stitchesWide: 0,
+        stitchesHigh: 0,
+        stitchCount: 33678,
+        stitchCountApproximate: false,
+        genreIds: [],
+        isPaperChart: false,
+        isFormalKit: false,
+        kitColorCount: null,
+        isSAL: false,
+        notes: "",
+        status: "KITTING",
+        storageLocationId: null,
+        stitchingAppId: null,
+        fabricId: null,
+        needsOnionSkinning: false,
+        startDate: "",
+        finishDate: "",
+        ffoDate: "",
+        wantToStartNext: false,
+        preferredStartSeason: null,
+        startingStitches: 0,
+      },
+      supplies: [
+        {
+          id: "row-1",
+          supplyId: "thread-1",
+          type: "THREAD",
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 33678,
+          need: 30,
+          have: 0,
+          isNeedOverridden: true,
+          line,
+        },
+      ],
+      calcParams,
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(v2Draft));
+    mockCreateChartWithSupplies.mockResolvedValue({ success: true, chartId: "new-chart-id" });
+
+    const user = userEvent.setup();
+    render(<ChartMergedForm {...defaultFormProps} />);
+    await waitFor(() => {
+      expect(screen.getByLabelText(/chart name/i)).toHaveValue("Typed Need");
+    });
+
+    await user.click(screen.getByRole("button", { name: /add supplies/i }));
+    await user.click(await screen.findByRole("button", { name: "Back to calculated for 310" }));
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("button", { name: "Back to calculated for 310" }),
+      ).not.toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: "Create" }));
+    await waitFor(() => {
+      expect(mockCreateChartWithSupplies).toHaveBeenCalledTimes(1);
+    });
+
+    const [thread] = mockCreateChartWithSupplies.mock.calls[0][1].threads;
+    expect(thread.need).toBe(calculateSkeins({ stitchCount: 33678, ...calcParams, line }));
+    expect(thread.isNeedOverridden).toBe(false);
   });
 
   // Regression test: Create button works from supply mode (form hidden in Activity)

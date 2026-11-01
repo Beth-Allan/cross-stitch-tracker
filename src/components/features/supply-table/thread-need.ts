@@ -1,6 +1,6 @@
 import { calculateSkeins } from "@/lib/utils/skein-calculator";
 import type { SkeinLine } from "@/types/supply";
-import type { CalcParams } from "./types";
+import type { CalcParams, SupplyRow } from "./types";
 
 /** Only what the calculator reads, so a row carries no more of the line than it needs. */
 export function skeinLineOf(line: SkeinLine): SkeinLine {
@@ -25,4 +25,14 @@ export function threadNeed(
   if (!line) return null;
   const skeins = calculateSkeins({ stitchCount, ...calcParams, line });
   return skeins === null ? null : Math.max(1, skeins);
+}
+
+/**
+ * The figure "back to calculated" would give a row, or `null` when it has none to give: only a
+ * thread marked as typed, with a stitch count, on a line the calculator can read. A typed need
+ * is never swapped for Unknown, nor for the 1 a line with no stitch count starts at.
+ */
+export function calculatedNeedFor(row: SupplyRow, calcParams: CalcParams): number | null {
+  if (row.type !== "THREAD" || !row.isNeedOverridden || row.stitchCount <= 0) return null;
+  return threadNeed(row.stitchCount, calcParams, row.line);
 }

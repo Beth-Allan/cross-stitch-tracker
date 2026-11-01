@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@/__tests__/test-utils";
+import { render, screen, waitFor } from "@/__tests__/test-utils";
 import userEvent from "@testing-library/user-event";
+import { calculateSkeins } from "@/lib/utils/skein-calculator";
+import { DEFAULT_CALC_PARAMS } from "@/components/features/supply-table/types";
 import { SuppliesTab } from "./supplies-tab";
 import type { ProjectDetailProps } from "./types";
 import type {
@@ -458,6 +460,56 @@ describe("SuppliesTab", () => {
       );
       // Renders the add row (proves adapter was created and passed)
       expect(screen.getByTestId("supply-table-add-row")).toBeInTheDocument();
+    });
+  });
+
+  describe("back to calculated", () => {
+    it("clears the mark and saves the figure from the real table and adapter", async () => {
+      const user = userEvent.setup();
+      const { updateProjectSupplyQuantity } = await import("@/lib/actions/supply-actions");
+      const project = { ...defaultProject, overCount: 1 as const };
+      const expected = calculateSkeins({
+        stitchCount: 33678,
+        fabricCount: DEFAULT_CALC_PARAMS.fabricCount,
+        strandCount: 2,
+        overCount: 1,
+        wastePercent: 20,
+        line: createMockThreadLine(),
+      });
+
+      render(
+        <SuppliesTab
+          project={project}
+          supplies={{
+            threads: [
+              makeThread({ stitchCount: 33678, quantityRequired: 30, isNeedOverridden: true }),
+            ],
+            beads: [],
+            specialty: [],
+          }}
+        />,
+      );
+      await user.click(screen.getByRole("button", { name: "Back to calculated for 310" }));
+
+      await waitFor(() =>
+        expect(updateProjectSupplyQuantity).toHaveBeenCalledWith("pt-1", "thread", {
+          quantityRequired: expected,
+          isNeedOverridden: false,
+        }),
+      );
+    });
+
+    it("is not offered on a line still following the calculator", () => {
+      render(
+        <SuppliesTab
+          project={defaultProject}
+          supplies={{ threads: [makeThread()], beads: [], specialty: [] }}
+        />,
+      );
+
+      expect(
+        screen.queryByRole("button", { name: "Back to calculated for 310" }),
+      ).not.toBeInTheDocument();
     });
   });
 

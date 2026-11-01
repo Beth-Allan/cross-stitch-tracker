@@ -155,6 +155,27 @@ describe("LocalStateAdapter", () => {
     });
   });
 
+  describe("backToCalculated", () => {
+    it("gives the row the figure and clears the mark", async () => {
+      await adapter.addThread("t1", 500, 2);
+      const row = adapter.getRows()[0];
+      row.isNeedOverridden = true;
+
+      const result = await adapter.backToCalculated(row.id, 7);
+
+      expect(result).toEqual({ success: true });
+      const updated = adapter.getRows()[0];
+      expect(updated.need).toBe(7);
+      expect(updated.isNeedOverridden).toBe(false);
+    });
+
+    it("returns failure for invalid junctionId", async () => {
+      const result = await adapter.backToCalculated("nonexistent", 7);
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+    });
+  });
+
   describe("remove", () => {
     it("removes item and returns success", async () => {
       await adapter.addThread("t1", 500, 2);

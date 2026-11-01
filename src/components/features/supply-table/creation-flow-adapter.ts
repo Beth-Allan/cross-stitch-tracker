@@ -147,6 +147,17 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
     return { success: true };
   }
 
+  async backToCalculated(junctionId: string, need: number): Promise<Result> {
+    const row = this.rows.get(junctionId);
+    if (!row) {
+      return { success: false, error: "Supply not found" };
+    }
+
+    this.rows.set(junctionId, { ...row, need, isNeedOverridden: false });
+    this.onRowsChange(this.getRows());
+    return { success: true };
+  }
+
   async remove(_type: SupplyType, junctionId: string): Promise<Result> {
     if (!this.rows.has(junctionId)) {
       return { success: false, error: "Supply not found" };

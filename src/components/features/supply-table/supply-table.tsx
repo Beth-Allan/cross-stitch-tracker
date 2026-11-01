@@ -7,6 +7,7 @@ import { SupplyTableAddRow } from "./supply-table-add-row";
 import { SupplyTableDataRow } from "./supply-table-data-row";
 import { SupplyTableSectionDivider } from "./supply-table-section-divider";
 import { SupplyTableFooter } from "./supply-table-footer";
+import { calculatedNeedFor } from "./thread-need";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { SupplyTableProps, SupplyType } from "./types";
 import { DEFAULT_CALC_PARAMS } from "./types";
@@ -146,6 +147,23 @@ export function SupplyTable({
     [adapter],
   );
 
+  const handleBackToCalculated = useCallback(
+    (junctionId: string, need: number) => {
+      startTransition(async () => {
+        try {
+          const result = await adapter.backToCalculated(junctionId, need);
+          if (!result.success) {
+            toast.error(result.error ?? "Couldn't update value. Try again.");
+          }
+        } catch (error) {
+          console.error("Back to calculated failed:", error);
+          toast.error("Couldn't update value. Try again.");
+        }
+      });
+    },
+    [adapter],
+  );
+
   const handleDelete = useCallback(
     async (type: SupplyType, junctionId: string) => {
       startTransition(async () => {
@@ -208,6 +226,8 @@ export function SupplyTable({
                 onUpdateQuantity={handleUpdateQuantity}
                 onDelete={handleDelete}
                 isNew={newRowIds.has(row.id)}
+                calculatedNeed={calculatedNeedFor(row, mergedCalcParams)}
+                onBackToCalculated={handleBackToCalculated}
               />
             ))}
 
