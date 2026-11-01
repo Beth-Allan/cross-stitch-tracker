@@ -296,9 +296,13 @@ describe("usableInchesPerSkein — whole cuts of the line's own cut, less 3 inch
   );
 });
 
-describe("calculateSkeins — each line's own length and structure (THR-010, THR-011)", () => {
+describe("calculateSkeins — each line's own length, structure and cut (THR-010, THR-011, THR-016)", () => {
   const base = { stitchCount: 5000, fabricCount: 14, overCount: 1 as const, wastePercent: 20 };
-  const ANCHOR: SkeinLine = { ...DMC };
+  const ANCHOR: SkeinLine = {
+    skeinLengthMm: 8000,
+    strandStructure: "SIX_STRAND",
+    cutLengthInches: 24,
+  };
   const WEEKS: SkeinLine = { ...DMC, skeinLengthMm: 4572 };
   const KREINIK = { strandStructure: "USED_WHOLE", cutLengthInches: 15 } as const;
   const FINE_8_BRAID: SkeinLine = { ...KREINIK, skeinLengthMm: 10000 };
@@ -362,6 +366,13 @@ describe("calculateSkeins — each line's own length and structure (THR-010, THR
   it("gives an unknown need for a known length too short to yield one cut", () => {
     expect(
       calculateSkeins({ ...base, strandCount: 2, line: { ...DMC, skeinLengthMm: 400 } }),
+    ).toBeNull();
+  });
+
+  it("gives an unknown need, never NaN, for a line whose cut did not arrive", () => {
+    const { cutLengthInches: _, ...lineWithoutCut } = DMC;
+    expect(
+      calculateSkeins({ ...base, strandCount: 2, line: lineWithoutCut as SkeinLine }),
     ).toBeNull();
   });
 

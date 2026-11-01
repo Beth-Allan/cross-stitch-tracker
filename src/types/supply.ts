@@ -27,8 +27,8 @@ export type {
 };
 
 /**
- * What the skein calculator reads from a thread's line. Either field null is unknown, and an
- * unknown line has no calculated need (THR-011).
+ * What the skein calculator reads from a thread's line. Any field null is unknown, and an
+ * unknown line has no calculated need (THR-011, Q-009).
  */
 export type SkeinLine = Pick<ThreadLine, "skeinLengthMm" | "strandStructure" | "cutLengthInches">;
 

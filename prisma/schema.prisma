@@ -267,8 +267,8 @@ model ProjectThread {
   thread           Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
   threadId         String
   stitchCount      Int      @default(0)
-  /// Null when the calculator cannot work it out: the thread's line has no known length or
-  /// strand structure. An unknown need is still to buy, never in hand.
+  /// Null when the calculator cannot work it out: the thread's line has no known length, strand
+  /// structure or cut. An unknown need is still to buy, never in hand.
   quantityRequired Int?     @default(1)
   quantityAcquired Int      @default(0)
   isNeedOverridden Boolean  @default(false) // true when user manually edited Need

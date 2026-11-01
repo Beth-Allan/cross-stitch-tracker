@@ -44,8 +44,8 @@ export interface SupplyRow {
   hexColor: string;
   stitchCount: number; // only meaningful for threads
   /**
-   * quantityRequired. Null only for a thread whose line has no known length or strand
-   * structure: the need is unknown, never a figure from a default (THR-011).
+   * quantityRequired. Null only for a thread whose line has no known length, strand structure
+   * or cut: the need is unknown, never a figure from a default (THR-011, Q-009).
    */
   need: number | null;
   have: number; // quantityAcquired

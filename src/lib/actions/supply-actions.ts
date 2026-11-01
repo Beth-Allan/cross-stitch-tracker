@@ -157,10 +157,7 @@ export async function updateThread(id: string, formData: ThreadInput) {
     const updated = await prisma.$transaction(async (tx) => {
       const current = await tx.thread.findUnique({
         where: { id },
-        select: {
-          brandId: true,
-          line: { select: { skeinLengthMm: true, strandStructure: true, cutLengthInches: true } },
-        },
+        select: { brandId: true, line: { select: THREAD_LINE_FIELDS } },
       });
       // A line belongs to one brand, so a thread changing brand must change line with it
       if (current && current.brandId !== validated.brandId) {

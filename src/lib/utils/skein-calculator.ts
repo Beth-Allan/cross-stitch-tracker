@@ -27,7 +27,7 @@
 import type { SkeinLine, StrandCount } from "@/types/supply";
 
 const TENTH_MM_PER_INCH = 254;
-/** THR-016: what each length loses, whichever length she cuts. */
+/** THR-016: what each length of floss or Kreinik loses, the two she has described. */
 const INCHES_LOST_PER_CUT = 3;
 const SIX_STRANDS = 6;
 
@@ -63,7 +63,8 @@ export function calculateSkeins(params: {
   }
 
   const usableInches = usableInchesPerSkein(line.skeinLengthMm, line.cutLengthInches);
-  if (usableInches <= 0) return null;
+  // Negated so that a field missing at runtime, which comes out as NaN, reads unknown as well
+  if (!(usableInches > 0)) return null;
   if (stitchCount <= 0 || fabricCount <= 0 || strandCount <= 0) return 0;
 
   const strandTerm = line.strandStructure === "USED_WHOLE" ? SIX_STRANDS : strandCount;

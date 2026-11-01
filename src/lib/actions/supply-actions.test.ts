@@ -1928,7 +1928,7 @@ describe("supply-actions", () => {
           },
         );
 
-        it("leaves its needs alone when it moves to a line of the same length and structure", async () => {
+        it("leaves its needs alone when it moves to a line of the same length, structure and cut", async () => {
           movingTo({ skeinLengthMm: 8000, strandStructure: "SIX_STRAND", cutLengthInches: 24 });
           const { updateThread } = await import("./supply-actions");
 

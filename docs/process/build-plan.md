@@ -1097,7 +1097,7 @@ answers. F-16a and F-16b each add their own scope and done-when.
   (D-34, D-40 ①), so no new brand ever needs a developer.
 - **Opens with three questions for Beth (the third is in Scope, from F-19):** whether quick-add gets a brand (and line) picker, now that a
   quick-added thread lands in "Custom (Thread)" and reads unknown (F-16a); and whether saving a
-  length should recompute that line's saved needs (trap ④ below — the `/work-item F-16` session's
+  length or a cut should recompute that line's saved needs (trap ④ below — the `/work-item F-16` session's
   reading of D-40 ③, not yet her word).
 - **Scope:** on a thread brand, add and rename lines (Kreinik ribbon is the first she expects to
   add — D-40; at the 2026-10-29 `/stitch-fact` she chose to add it when a project needs one, so
@@ -1124,8 +1124,10 @@ answers. F-16a and F-16b each add their own scope and done-when.
   stays unknown. Strand counts other than six are not modelled until she says a thread of hers has
   one — if the form seems to need that, ask through `/stitch-fact`. ③ Zod builders from
   `validations/fields.ts`, and hand-written messages on any check a screen can show
-  (`.claude/rules/form-patterns.md`). ④ A length change moves every unknown or calculated need on
-  that line, which moves stats figures. If Beth confirms the recompute on save, it follows F-16a's
+  (`.claude/rules/form-patterns.md`). ④ A length or cut change moves every unknown or calculated need
+  on that line, which moves stats figures. _F-19's recompute was a one-off in its migration, so
+  there is no shared way to rework a line's needs yet: if Beth wants this, it is built here, from
+  `threadNeed` and never a second copy of the sum._ If Beth confirms the recompute on save, it follows F-16a's
   rule (never an overridden row) and carries the `revalidateTag` test (trap ⑦). If it has to touch
   `skein-calculator.ts`, this item is gated after all — confirm every touched file against
   `.claude/hooks/review-gated-paths.txt`, and if any is gated, add a `/review F-16b` row to the queue
