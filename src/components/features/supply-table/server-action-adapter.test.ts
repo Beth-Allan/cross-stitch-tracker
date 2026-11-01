@@ -52,9 +52,21 @@ const mockCreateAndAddThread = vi.mocked(createAndAddThread);
 const mockCreateAndAddBead = vi.mocked(createAndAddBead);
 const mockCreateAndAddSpecialty = vi.mocked(createAndAddSpecialty);
 
-const DMC_LINE: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
-const UNKNOWN_LINE: SkeinLine = { skeinLengthMm: null, strandStructure: null };
-const USED_WHOLE_10M_LINE: SkeinLine = { skeinLengthMm: 10000, strandStructure: "USED_WHOLE" };
+const DMC_LINE: SkeinLine = {
+  skeinLengthMm: 8000,
+  strandStructure: "SIX_STRAND",
+  cutLengthInches: 24,
+};
+const UNKNOWN_LINE: SkeinLine = {
+  skeinLengthMm: null,
+  strandStructure: null,
+  cutLengthInches: null,
+};
+const USED_WHOLE_10M_LINE: SkeinLine = {
+  skeinLengthMm: 10000,
+  strandStructure: "USED_WHOLE",
+  cutLengthInches: 15,
+};
 
 describe("ServerActionAdapter", () => {
   const projectId = "proj-1";
@@ -303,7 +315,7 @@ describe("ServerActionAdapter", () => {
       await adapter.updateQuantity("THREAD", "jt-1", "stitchCount", 1000);
 
       // calculateSkeins({ stitchCount: 1000, strandCount: 2, fabricCount: 14, overCount: 1, wastePercent: 20 })
-      // = ceil(1000 * 2 * 1.2 / (14 * 255)) = ceil(2400 / 3570) = ceil(0.672) = 1
+      // = ceil(1000 * 2 * 1.2 / (14 * 273)) = ceil(2400 / 3822) = ceil(0.628) = 1
       expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
         stitchCount: 1000,
         quantityRequired: 1,
@@ -407,7 +419,7 @@ describe("ServerActionAdapter", () => {
 
         await adapter.updateQuantity("THREAD", "jt-1", "stitchCount", 5000);
 
-        // ceil(5000 * 2 * 1.2 / (14 * 255)) = ceil(3.36) = 4
+        // ceil(5000 * 2 * 1.2 / (14 * 273)) = ceil(3.14) = 4
         expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
           stitchCount: 5000,
           quantityRequired: 4,
@@ -785,7 +797,11 @@ describe("ServerActionAdapter", () => {
             hexColor: "#FF00FF",
             brandId: "brand-1",
             brand: { id: "brand-1", name: "DMC" },
-            line: createMockThreadLine({ skeinLengthMm: null, strandStructure: null }),
+            line: createMockThreadLine({
+              skeinLengthMm: null,
+              strandStructure: null,
+              cutLengthInches: null,
+            }),
           },
           link: { id: "pt-new" },
         },

@@ -263,7 +263,7 @@ export function createMockSupplyBrand(overrides?: Partial<SupplyBrand>): SupplyB
   };
 }
 
-/** DMC's one line by default: 8 m of six-strand floss (THR-008), its name blank. */
+/** DMC's one line by default: 8 m of six-strand floss cut at 24 inches (THR-008, THR-016), its name blank. */
 export function createMockThreadLine(overrides?: Partial<ThreadLine>): ThreadLine {
   return {
     id: "line-1",
@@ -271,6 +271,7 @@ export function createMockThreadLine(overrides?: Partial<ThreadLine>): ThreadLin
     name: "",
     skeinLengthMm: 8000,
     strandStructure: "SIX_STRAND",
+    cutLengthInches: 24,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,

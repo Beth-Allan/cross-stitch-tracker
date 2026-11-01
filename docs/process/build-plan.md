@@ -1095,17 +1095,21 @@ answers. F-16a and F-16b each add their own scope and done-when.
 
 - **Objective:** Beth sets up a brand's lines and each line's length and strand structure herself
   (D-34, D-40 ①), so no new brand ever needs a developer.
-- **Opens with two questions for Beth:** whether quick-add gets a brand (and line) picker, now that a
+- **Opens with three questions for Beth (the third is in Scope, from F-19):** whether quick-add gets a brand (and line) picker, now that a
   quick-added thread lands in "Custom (Thread)" and reads unknown (F-16a); and whether saving a
-  length should recompute that line's saved needs (trap ④ below — the `/work-item F-16` session's
+  length or a cut should recompute that line's saved needs (trap ④ below — the `/work-item F-16` session's
   reading of D-40 ③, not yet her word).
 - **Scope:** on a thread brand, add and rename lines (Kreinik ribbon is the first she expects to
   add — D-40; at the 2026-10-29 `/stitch-fact` she chose to add it when a project needs one, so
   F-16a does not create it, D-43); on each line, a length she can type in metres or yards (she gave
   both, THR-008–THR-010, THR-012) and its strand structure — six-strand floss she splits, or used
   whole — either of which may stay unknown; adding a thread picks its line when the brand has more
-  than one. **If F-19 made the cut length a property of the line, whether this form shows it is a
-  third opening question for Beth** — F-19's PR says whether it did.
+  than one. **F-19 made the cut length a property of the line (`cutLengthInches`), so whether this
+  form shows it is a third opening question for Beth.** A line with a length and a structure but no
+  cut reads unknown, so a form that sets the first two and leaves the cut blank saves a line that
+  still gives no figure. Any new Kreinik line takes 15 inches (D-44); any other line's cut is hers
+  to give (Q-009). The 3 inches lost is one constant in `skein-calculator.ts`, said of floss and
+  Kreinik only (THR-016), so a cut she gives for another brand is a chance to ask.
   _Moved to C-1 by the catalogue plan (D-42, 2026-10-25), which lands before this item: the line in
   a thread's label wherever a thread of a several-line brand is named, and the two stale Kreinik
   texts from trap ⑧. One colour code does appear in more than one line — Kreinik's own chart says
@@ -1120,8 +1124,10 @@ answers. F-16a and F-16b each add their own scope and done-when.
   stays unknown. Strand counts other than six are not modelled until she says a thread of hers has
   one — if the form seems to need that, ask through `/stitch-fact`. ③ Zod builders from
   `validations/fields.ts`, and hand-written messages on any check a screen can show
-  (`.claude/rules/form-patterns.md`). ④ A length change moves every unknown or calculated need on
-  that line, which moves stats figures. If Beth confirms the recompute on save, it follows F-16a's
+  (`.claude/rules/form-patterns.md`). ④ A length or cut change moves every unknown or calculated need
+  on that line, which moves stats figures. _F-19's recompute was a one-off in its migration, so
+  there is no shared way to rework a line's needs yet: if Beth wants this, it is built here, from
+  `threadNeed` and never a second copy of the sum._ If Beth confirms the recompute on save, it follows F-16a's
   rule (never an overridden row) and carries the `revalidateTag` test (trap ⑦). If it has to touch
   `skein-calculator.ts`, this item is gated after all — confirm every touched file against
   `.claude/hooks/review-gated-paths.txt`, and if any is gated, add a `/review F-16b` row to the queue
@@ -1131,7 +1137,7 @@ answers. F-16a and F-16b each add their own scope and done-when.
   is already loaded, logged, and put right by renaming the fixture in a small data PR. The form need
   not stop a rename; it is enough that the README says what a rename costs and this item tells Beth
   on the preview note. A stable key is the upgrade if it ever bites.
-- **Done-when:** Beth's two opening answers recorded; then test-first: Beth can add a line, set its
+- **Done-when:** Beth's three opening answers recorded; then test-first: Beth can add a line, set its
   length in metres or yards and its structure, and leave either blank; a thread in a several-line
   brand cannot be added without its line; saving a length does what she ruled; gate green; Beth has seen the preview (set up Kreinik ribbon with a
   length, add a ribbon colour to a project); merges on her word.
@@ -1221,6 +1227,9 @@ answers. F-16a and F-16b each add their own scope and done-when.
   row is never touched either way (F-16a trap ⑨). "Never one you typed in yourself" cannot be
   promised for a need typed into the add-a-supply row, which saves unmarked (maintenance ledger,
   2026-10-31); say so in the option if the recompute is on the table.
+  _**Answered (D-49, 2026-11-01): recompute every calculated need from today's settings** — the
+  rows with a stitch count, not marked, on a line the calculator can read: 35 figures on the reset
+  copy, Arctic Owl 3's DMC 310 among them (30 to 22)._
 - **Clears the six wrongly marked needs, whichever way her answer goes (D-47).** Beth typed none of
   them on purpose, so this item's migration, needed for this even if no column is added, sets
   `isNeedOverridden = false` on these `ProjectThread` ids, each guarded by `"isNeedOverridden" = true`:
@@ -1247,7 +1256,8 @@ answers. F-16a and F-16b each add their own scope and done-when.
   Kreinik line, since she said it of Kreinik, not of particular lines; **no cut** for any other
   brand's line until she gives one (Q-009) — her general "about 24 inches usually" was not put to
   her for those brands. **Where the cut lives is this item's schema call**, and it must not give a
-  line a cut she did not (hard rule 5). Lines without a length already read unknown, so this only bites a line she
+  line a cut she did not (hard rule 5). _**Settled: on the line, `ThreadLine.cutLengthInches Int?`**,
+  null until she gives one, so such a line reads unknown (D-49 ④)._ Lines without a length already read unknown, so this only bites a line she
   gives a length to later (F-16b). If the shape needs to know a cut for a line she has not
   described, stop and ask through `/stitch-fact` (Q-009 carries it). The figures F-16a's tests pin
   change on purpose: name each changed assertion in the PR as D-44's consequence, never as a

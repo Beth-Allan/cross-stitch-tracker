@@ -409,7 +409,7 @@ describe("useChartForm inline entity creation", () => {
           need: null,
           have: 0,
           isNeedOverridden: false,
-          line: { skeinLengthMm: null, strandStructure: null },
+          line: { skeinLengthMm: null, strandStructure: null, cutLengthInches: null },
         },
       ];
       const { result } = renderHook(() => useChartForm({ ...defaultProps, getSupplyRows }));

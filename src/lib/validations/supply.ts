@@ -73,8 +73,8 @@ export const specialtyItemSchema = z.object({
 export type SpecialtyItemInput = z.input<typeof specialtyItemSchema>;
 
 /**
- * A thread's need is null when its line has no known length or strand structure (THR-011) —
- * unknown, still to buy. Beads and specialty items always need a number.
+ * A thread's need is null when its line has no known length, strand structure or cut (THR-011)
+ * — unknown, still to buy. Beads and specialty items always need a number.
  */
 export const projectThreadSchema = z.object({
   projectId: z.string().min(1),

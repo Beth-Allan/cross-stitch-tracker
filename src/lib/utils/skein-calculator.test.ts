@@ -2,12 +2,12 @@ import { describe, it, expect } from "vitest";
 import type { SkeinLine } from "@/types/supply";
 import { calculateSkeins, usableInchesPerSkein } from "./skein-calculator";
 
-/** THR-008: the line every figure above was written against. */
-const DMC: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
+/** THR-008, THR-016: the line every figure below is written against, 273 usable inches. */
+const DMC: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND", cutLengthInches: 24 };
 
 describe("calculateSkeins", () => {
   it("calculates ~1 skein for 1000 stitches on 14ct Aida over 1 with 2 strands, 20% waste", () => {
-    // rawSkeins = 1000 * 2 * 1.2 / (14 * 255) = 0.672 → ceil = 1
+    // rawSkeins = 1000 * 2 * 1.2 / (14 * 273) = 0.628 → ceil = 1
     const result = calculateSkeins({
       stitchCount: 1000,
       strandCount: 2,
@@ -20,7 +20,7 @@ describe("calculateSkeins", () => {
   });
 
   it("calculates ~2 skeins for 1000 stitches on 14ct over 2 with 2 strands, 20% waste", () => {
-    // rawSkeins = 1000 * 2 * 1.2 / (7 * 255) = 1.345 → ceil = 2
+    // rawSkeins = 1000 * 2 * 1.2 / (7 * 273) = 1.256 → ceil = 2
     const result = calculateSkeins({
       stitchCount: 1000,
       strandCount: 2,
@@ -32,8 +32,8 @@ describe("calculateSkeins", () => {
     expect(result).toBe(2);
   });
 
-  it("calculates ~14 skeins for 10000 stitches on 14ct over 2 with 2 strands, 20% waste", () => {
-    // rawSkeins = 10000 * 2 * 1.2 / (7 * 255) = 13.445 → ceil = 14
+  it("calculates ~13 skeins for 10000 stitches on 14ct over 2 with 2 strands, 20% waste", () => {
+    // rawSkeins = 10000 * 2 * 1.2 / (7 * 273) = 12.559 → ceil = 13
     const result = calculateSkeins({
       stitchCount: 10000,
       strandCount: 2,
@@ -42,11 +42,11 @@ describe("calculateSkeins", () => {
       wastePercent: 20,
       line: DMC,
     });
-    expect(result).toBe(14);
+    expect(result).toBe(13);
   });
 
   it("calculates ~7 skeins for 10000 stitches on 14ct over 1 with 2 strands, 20% waste", () => {
-    // rawSkeins = 10000 * 2 * 1.2 / (14 * 255) = 6.723 → ceil = 7
+    // rawSkeins = 10000 * 2 * 1.2 / (14 * 273) = 6.279 → ceil = 7
     const result = calculateSkeins({
       stitchCount: 10000,
       strandCount: 2,
@@ -136,7 +136,7 @@ describe("calculateSkeins", () => {
     expect(result).toBeGreaterThan(0);
   });
 
-  it("matches mismatch.co.uk formula: 33678 stitches on 14ct over 1, 2 strands, 0% waste = 19", () => {
+  it("33678 stitches on 14ct over 1, 2 strands, 0% waste = 18 at Beth's cut, not the cited source's 19", () => {
     const result = calculateSkeins({
       stitchCount: 33678,
       strandCount: 2,
@@ -145,14 +145,14 @@ describe("calculateSkeins", () => {
       wastePercent: 0,
       line: DMC,
     });
-    expect(result).toBe(19);
+    expect(result).toBe(18);
   });
 
-  it("22ct over 1, 2 strands, 0% waste: stitches_per_skein = 2805", () => {
-    // 255 * 22 / 2 = 2805 stitches per skein → 1 skein for 2805 stitches
+  it("22ct over 1, 2 strands, 0% waste: stitches_per_skein = 3003", () => {
+    // 273 * 22 / 2 = 3003 stitches per skein → 1 skein for 3003 stitches
     expect(
       calculateSkeins({
-        stitchCount: 2805,
+        stitchCount: 3003,
         strandCount: 2,
         fabricCount: 22,
         overCount: 1,
@@ -162,7 +162,7 @@ describe("calculateSkeins", () => {
     ).toBe(1);
     expect(
       calculateSkeins({
-        stitchCount: 2806,
+        stitchCount: 3004,
         strandCount: 2,
         fabricCount: 22,
         overCount: 1,
@@ -214,7 +214,7 @@ describe("calculateSkeins", () => {
   });
 
   it("calculates correct exact value at wastePercent 50", () => {
-    // rawSkeins = 10000 * 2 * 1.5 / (14 * 255) = 8.403 → ceil = 9
+    // rawSkeins = 10000 * 2 * 1.5 / (14 * 273) = 7.849 → ceil = 8
     expect(
       calculateSkeins({
         stitchCount: 10000,
@@ -224,11 +224,11 @@ describe("calculateSkeins", () => {
         wastePercent: 50,
         line: DMC,
       }),
-    ).toBe(9);
+    ).toBe(8);
   });
 
   it("scales correctly with 6 strands", () => {
-    // rawSkeins = 10000 * 6 * 1.2 / (14 * 255) = 20.168 → ceil = 21
+    // rawSkeins = 10000 * 6 * 1.2 / (14 * 273) = 18.838 → ceil = 19
     expect(
       calculateSkeins({
         stitchCount: 10000,
@@ -238,7 +238,7 @@ describe("calculateSkeins", () => {
         wastePercent: 20,
         line: DMC,
       }),
-    ).toBe(21);
+    ).toBe(19);
   });
 
   it("over 2 uses exactly twice the thread per stitch as over 1", () => {
@@ -258,45 +258,59 @@ describe("calculateSkeins", () => {
       wastePercent: 0,
       line: DMC,
     });
-    // over 1 raw = 10000 * 2 / (14 * 255) = 5.602 → 6
-    // over 2 raw = 10000 * 2 / (7 * 255) = 11.204 → 12
+    // over 1 raw = 10000 * 2 / (14 * 273) = 5.233 → 6
+    // over 2 raw = 10000 * 2 / (7 * 273) = 10.467 → 11
     expect(over1).toBe(6);
-    expect(over2).toBe(12);
+    expect(over2).toBe(11);
   });
 });
 
-describe("usableInchesPerSkein — whole 18-inch cuts of 15 usable inches (THR-006)", () => {
+describe("usableInchesPerSkein — whole cuts of the line's own cut, less 3 inches each (THR-016)", () => {
   it.each([
-    ["DMC or Anchor, 8 m (THR-008)", 8000, 255],
-    ["Weeks Dye Works or The Gentle Art, 5 yd (THR-009)", 4572, 150],
-    ["Very Fine #4 Braid, 11 m (THR-010)", 11000, 360],
-    ["Fine #8 Braid, 10 m (THR-010)", 10000, 315],
-    ["Blending Filament, 50 m (THR-010)", 50000, 1635],
-  ])("%s → %i usable inches", (_label, skeinLengthMm, usable) => {
-    expect(usableInchesPerSkein(skeinLengthMm)).toBe(usable);
+    ["DMC or Anchor, 8 m (THR-008)", 8000, 24, 273],
+    ["Weeks Dye Works or The Gentle Art, 5 yd (THR-009)", 4572, 24, 147],
+    ["Very Fine #4 Braid, 11 m (THR-010)", 11000, 15, 336],
+    ["Fine #8 Braid, 10 m (THR-010)", 10000, 15, 312],
+    ["Blending Filament, 50 m (THR-010)", 50000, 15, 1572],
+  ])("%s → %i mm at a %i-inch cut gives %i usable inches", (_label, mm, cut, usable) => {
+    expect(usableInchesPerSkein(mm, cut)).toBe(usable);
   });
 
-  it("counts only whole cuts, never a proportional share of the 255", () => {
-    // 5 yd scaled from 8 m would be 146.6; ten whole 18-inch cuts are 150.
-    expect(usableInchesPerSkein(4572)).not.toBeCloseTo(146.6, 0);
-    expect(usableInchesPerSkein(4572)).toBe(150);
+  it("counts only whole cuts, never a proportional share of the 273", () => {
+    // 5 yd scaled from 8 m would be 156.0; seven whole 24-inch cuts are 147.
+    expect(usableInchesPerSkein(4572, 24)).not.toBeCloseTo(156, 0);
+    expect(usableInchesPerSkein(4572, 24)).toBe(147);
   });
 
   it("gives nothing usable from a length shorter than one cut", () => {
-    expect(usableInchesPerSkein(457)).toBe(0);
+    expect(usableInchesPerSkein(609, 24)).toBe(0);
+    expect(usableInchesPerSkein(610, 24)).toBe(21);
   });
+
+  it.each([3, 2, 0])(
+    "gives nothing usable from a %i-inch cut, which loses all of itself",
+    (cut) => {
+      expect(usableInchesPerSkein(8000, cut)).toBe(0);
+      expect(usableInchesPerSkein(0, cut)).toBe(0);
+    },
+  );
 });
 
-describe("calculateSkeins — each line's own length and structure (THR-010, THR-011)", () => {
+describe("calculateSkeins — each line's own length, structure and cut (THR-010, THR-011, THR-016)", () => {
   const base = { stitchCount: 5000, fabricCount: 14, overCount: 1 as const, wastePercent: 20 };
-  const ANCHOR: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
-  const WEEKS: SkeinLine = { skeinLengthMm: 4572, strandStructure: "SIX_STRAND" };
-  const FINE_8_BRAID: SkeinLine = { skeinLengthMm: 10000, strandStructure: "USED_WHOLE" };
-  const VERY_FINE_4_BRAID: SkeinLine = { skeinLengthMm: 11000, strandStructure: "USED_WHOLE" };
-  const BLENDING_FILAMENT: SkeinLine = { skeinLengthMm: 50000, strandStructure: "USED_WHOLE" };
+  const ANCHOR: SkeinLine = {
+    skeinLengthMm: 8000,
+    strandStructure: "SIX_STRAND",
+    cutLengthInches: 24,
+  };
+  const WEEKS: SkeinLine = { ...DMC, skeinLengthMm: 4572 };
+  const KREINIK = { strandStructure: "USED_WHOLE", cutLengthInches: 15 } as const;
+  const FINE_8_BRAID: SkeinLine = { ...KREINIK, skeinLengthMm: 10000 };
+  const VERY_FINE_4_BRAID: SkeinLine = { ...KREINIK, skeinLengthMm: 11000 };
+  const BLENDING_FILAMENT: SkeinLine = { ...KREINIK, skeinLengthMm: 50000 };
 
   it("gives DMC 4 skeins for 5000 stitches at 2 strands", () => {
-    // 5000 × 2 × 1.2 / (14 × 255) = 3.36 → 4
+    // 5000 × 2 × 1.2 / (14 × 273) = 3.14 → 4
     expect(calculateSkeins({ ...base, strandCount: 2, line: DMC })).toBe(4);
   });
 
@@ -308,18 +322,18 @@ describe("calculateSkeins — each line's own length and structure (THR-010, THR
     }
   });
 
-  it("gives Weeks Dye Works 6 skeins where DMC needs 4 (5 yd, 150 usable inches)", () => {
-    // 5000 × 2 × 1.2 / (14 × 150) = 5.71 → 6
+  it("gives Weeks Dye Works 6 skeins where DMC needs 4 (5 yd, 147 usable inches)", () => {
+    // 5000 × 2 × 1.2 / (14 × 147) = 5.83 → 6
     expect(calculateSkeins({ ...base, strandCount: 2, line: WEEKS })).toBe(6);
   });
 
   it("gives Fine #8 Braid 9 spools — a used-whole cut is one working length, not one strand (THR-013)", () => {
-    // 5000 × 6 × 1.2 / (14 × 315) = 8.16 → 9; treated as one strand it would be 2
+    // 5000 × 6 × 1.2 / (14 × 312) = 8.24 → 9; treated as one strand it would be 2
     expect(calculateSkeins({ ...base, strandCount: 2, line: FINE_8_BRAID })).toBe(9);
   });
 
   it("works Very Fine #4 Braid and Blending Filament from their own lengths", () => {
-    // 5000 × 6 × 1.2 / (14 × 360) = 7.14 → 8;  / (14 × 1635) = 1.57 → 2
+    // 5000 × 6 × 1.2 / (14 × 336) = 7.65 → 8;  / (14 × 1572) = 1.64 → 2
     expect(calculateSkeins({ ...base, strandCount: 2, line: VERY_FINE_4_BRAID })).toBe(8);
     expect(calculateSkeins({ ...base, strandCount: 2, line: BLENDING_FILAMENT })).toBe(2);
   });
@@ -331,16 +345,40 @@ describe("calculateSkeins — each line's own length and structure (THR-010, THR
     expect(new Set(figures)).toEqual(new Set([9]));
   });
 
+  it("gives a Kreinik line the shorter cut's figure, one spool more than 18/15 gave here", () => {
+    // 5040 × 6 / (14 × 336) = 6.43 → 7; the cited source's 360 usable inches gave exactly 6
+    const inputs = { stitchCount: 5040, fabricCount: 14, overCount: 1, wastePercent: 0 } as const;
+    expect(calculateSkeins({ ...inputs, strandCount: 2, line: VERY_FINE_4_BRAID })).toBe(7);
+  });
+
   it.each([
-    ["no length", { skeinLengthMm: null, strandStructure: "SIX_STRAND" }],
-    ["no strand structure", { skeinLengthMm: 8000, strandStructure: null }],
-    ["neither", { skeinLengthMm: null, strandStructure: null }],
+    ["no length", { ...DMC, skeinLengthMm: null }],
+    ["no strand structure", { ...DMC, strandStructure: null }],
+    [
+      "no cut — it takes no default, even at a length she knows (Q-009)",
+      { ...DMC, cutLengthInches: null },
+    ],
+    ["none of them", { skeinLengthMm: null, strandStructure: null, cutLengthInches: null }],
   ] as const)("gives an unknown need — not 0, not 1 — for a line with %s", (_label, line) => {
     expect(calculateSkeins({ ...base, strandCount: 2, line })).toBeNull();
   });
 
   it("gives an unknown need for a known length too short to yield one cut", () => {
-    const line: SkeinLine = { skeinLengthMm: 400, strandStructure: "SIX_STRAND" };
-    expect(calculateSkeins({ ...base, strandCount: 2, line })).toBeNull();
+    expect(
+      calculateSkeins({ ...base, strandCount: 2, line: { ...DMC, skeinLengthMm: 400 } }),
+    ).toBeNull();
+  });
+
+  it("gives an unknown need, never NaN, for a line whose cut did not arrive", () => {
+    const { cutLengthInches: _, ...lineWithoutCut } = DMC;
+    expect(
+      calculateSkeins({ ...base, strandCount: 2, line: lineWithoutCut as SkeinLine }),
+    ).toBeNull();
+  });
+
+  it("gives an unknown need for a cut that loses all of itself", () => {
+    expect(
+      calculateSkeins({ ...base, strandCount: 2, line: { ...DMC, cutLengthInches: 3 } }),
+    ).toBeNull();
   });
 });

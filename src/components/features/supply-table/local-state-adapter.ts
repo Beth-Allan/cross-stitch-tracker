@@ -161,7 +161,10 @@ export class LocalStateAdapter implements SupplyTableAdapter {
       brandName: "Custom",
       brandId: data.brandId,
       hexColor: data.hexColor ?? DEFAULT_SUPPLY_HEX,
-      line: type === "THREAD" ? { skeinLengthMm: null, strandStructure: null } : null,
+      line:
+        type === "THREAD"
+          ? { skeinLengthMm: null, strandStructure: null, cutLengthInches: null }
+          : null,
     };
     this.getPool(type).push(result);
     return result;

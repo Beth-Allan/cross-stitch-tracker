@@ -138,7 +138,7 @@ function makeThread(overrides: Partial<SupplyRow> = {}): SupplyRow {
     need: 3,
     have: 1,
     isNeedOverridden: false,
-    line: { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" },
+    line: { skeinLengthMm: 8000, strandStructure: "SIX_STRAND", cutLengthInches: 24 },
     ...overrides,
   };
 }
@@ -196,7 +196,7 @@ function createMockAdapter(): SupplyTableAdapter {
       brandName: "Custom",
       brandId: "b1",
       hexColor: DEFAULT_SUPPLY_HEX,
-      line: { skeinLengthMm: null, strandStructure: null },
+      line: { skeinLengthMm: null, strandStructure: null, cutLengthInches: null },
     }),
   };
 }
@@ -626,7 +626,10 @@ describe("SupplyTable — back to calculated", () => {
         threads={[
           markedThread({ id: "unmarked", isNeedOverridden: false }),
           markedThread({ id: "no-stitches", stitchCount: 0 }),
-          markedThread({ id: "unknown", line: { skeinLengthMm: null, strandStructure: null } }),
+          markedThread({
+            id: "unknown",
+            line: { skeinLengthMm: null, strandStructure: null, cutLengthInches: null },
+          }),
         ]}
         beads={[makeBead()]}
         specialty={[makeSpecialty()]}

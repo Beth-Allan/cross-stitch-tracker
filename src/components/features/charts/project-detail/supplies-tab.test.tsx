@@ -280,7 +280,11 @@ describe("SuppliesTab", () => {
         thread: {
           ...createMockThread({ id: "thread-1", colorCode: "310", colorName: "Gold" }),
           brand: mockBrand,
-          line: createMockThreadLine({ skeinLengthMm: 10000, strandStructure: "USED_WHOLE" }),
+          line: createMockThreadLine({
+            skeinLengthMm: 10000,
+            strandStructure: "USED_WHOLE",
+            cutLengthInches: 15,
+          }),
         },
       });
       render(
