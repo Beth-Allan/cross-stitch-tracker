@@ -44,7 +44,7 @@ a data file and tests, stay ungated and merge on her word after a preview). The 
 gate neither and rely on C-1's review alone. A gate-list change is hers (hard rule 6).
 **Recommendation:** gate the folder, not the data.
 
-**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-50 or later — D-45 and D-46 went to F-16a on 2026-10-31, D-47 to `/broken need marked as typed`, D-48 to `/broken bead need not saving`, D-49 to F-19) before
+**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-51 or later — D-45 and D-46 went to F-16a on 2026-10-31, D-47 to `/broken need marked as typed`, D-48 to `/broken bead need not saving`, D-49 to F-19, D-50 to `/review F-19`) before
 its branch opens; the path file and protocol §5 change in C-1's PR if she says yes.
 
 ## Also open — the question known to be coming
@@ -55,6 +55,31 @@ no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is r
 on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
 
 ## Ruled
+
+### 2026-11-01 · D-50 · the CodeRabbit trial ends: switched off — ruled during `/review F-19`
+
+**What needed a ruling.** D-33 set a trial of three gated reviews with CodeRabbit asked for a
+second opinion, and its rule: no real catch the others missed → switch it off; at least one → Beth
+rules on keeping it. `/review F-19` was the third run, so the tally in `notes.md` went to her.
+
+**What was put to her.** The three-review record: R-2 — 1 finding, real, in neither layer 1's
+record nor the review's own pass, a wrong number in a comment and a doc, not code; F-16a — 2
+findings, both real, both already in our own record (one widened a known case); F-19 — 2 findings,
+one not real (it read `calculateSkeins` where the migration mirrors `threadNeed`), one real but
+already on the backlog from the F-16a review, where it corrected the builder's dismissal reason. In
+three reviews it found no code or data defect our own layers missed; each run costs a request, a
+wait of several minutes and a tally step. Options: "Switch it off (Recommended)" · "Keep it".
+
+**Her answer.** "Switch it off."
+
+**What it changed.** CodeRabbit leaves the review layers. Switching off is removing the app from the
+repository — a GitHub setting, done in Beth's browser with her OK, the dialog shown to her first —
+and only once it is confirmed gone are `.coderabbit.yaml` deleted and the trial wording retired:
+protocol §5's CodeRabbit paragraph, the `/review` skill's line, the tally note in `notes.md`, and
+the trial mentions in `build-plan.md` and the work log's status table. Deleting the file first
+would leave the app running on its defaults (every PR reviewed once the repository has 10 stars,
+descriptions rewritten). Queued as `Switch off CodeRabbit` (`chore/coderabbit-off`): a review's
+branch carries one concern, so none of it happens on F-19's.
 
 ### 2026-11-01 · D-49 · saved figures follow the length Beth cuts: every calculated need recomputed from today's settings — ruled during `/work-item F-19`
 
