@@ -1,7 +1,8 @@
 "use client";
 
-import { ArrowRight, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { ArrowRight, RotateCcw, Trash2 } from "lucide-react";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
+import { AutoCalcSparkle } from "./auto-calc-sparkle";
 import { EditableNumber } from "./editable-number";
 import { StatusDonut } from "./status-donut";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -88,9 +89,7 @@ export function SupplyTableDataRow({
             min={1}
           />
           <span className="text-muted-foreground text-xs">{UNIT_LABELS[row.type]}</span>
-          {showAutoCalc && (
-            <Sparkles className="text-primary inline h-3 w-3" data-testid="auto-calc-indicator" />
-          )}
+          {showAutoCalc && <AutoCalcSparkle stitchCount={row.stitchCount} need={row.need} />}
           {calculatedNeed != null && onBackToCalculated && (
             <TooltipProvider>
               <Tooltip>

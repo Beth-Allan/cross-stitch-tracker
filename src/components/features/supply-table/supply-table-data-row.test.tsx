@@ -11,7 +11,11 @@ const UNKNOWN_LINE: SkeinLine = { skeinLengthMm: null, strandStructure: null };
 vi.mock("@/components/ui/tooltip", () => ({
   TooltipProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  TooltipTrigger: ({ children, ...props }: React.ComponentProps<"button">) => (
+  TooltipTrigger: ({
+    children,
+    render: _render,
+    ...props
+  }: React.ComponentProps<"button"> & { render?: React.ReactElement }) => (
     <button {...props}>{children}</button>
   ),
   TooltipContent: ({ children }: { children: React.ReactNode }) => (
@@ -135,6 +139,14 @@ describe("SupplyTableDataRow", () => {
   it("renders auto-calc Sparkles indicator when type is THREAD and isNeedOverridden is false", () => {
     renderRow(makeRow({ type: "THREAD", isNeedOverridden: false }));
     expect(document.querySelector('[data-testid="auto-calc-indicator"]')).toBeInTheDocument();
+  });
+
+  it("the Sparkles indicator reads the row's own figures, so a line with no stitches says so", () => {
+    renderRow(makeRow({ stitchCount: 0, need: 1 }));
+    expect(screen.getByTestId("auto-calc-indicator")).toHaveAttribute(
+      "aria-label",
+      "No stitch count yet, so this starts at 1",
+    );
   });
 
   it("does NOT render Sparkles when isNeedOverridden is true", () => {
@@ -315,7 +327,9 @@ describe("SupplyTableDataRow", () => {
       renderRow(unknownRow());
 
       expect(screen.getByTitle("1 of Unknown")).toBeInTheDocument();
-      expect(screen.getByTestId("tooltip-content")).toHaveTextContent("1 of Unknown");
+      expect(
+        screen.getByText("1 of Unknown", { selector: '[data-testid="tooltip-content"]' }),
+      ).toBeInTheDocument();
     });
 
     it("still takes a need typed by hand", () => {
