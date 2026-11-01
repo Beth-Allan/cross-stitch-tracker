@@ -139,7 +139,7 @@ describe("ServerActionAdapter", () => {
     it("calls addBeadToProject with correct arguments", async () => {
       mockAddBead.mockResolvedValue({ success: true, record: { id: "pb-1" } } as never);
 
-      await adapter.addBead("bead-1", 100, 3);
+      await adapter.addBead("bead-1", 3);
 
       expect(mockAddBead).toHaveBeenCalledWith({
         projectId: "proj-1",
@@ -152,7 +152,7 @@ describe("ServerActionAdapter", () => {
     it("returns { success: true, id: record.id } on success", async () => {
       mockAddBead.mockResolvedValue({ success: true, record: { id: "pb-1" } } as never);
 
-      const result = await adapter.addBead("bead-1", 100, 3);
+      const result = await adapter.addBead("bead-1", 3);
 
       expect(result).toEqual({ success: true, id: "pb-1" });
     });
@@ -160,7 +160,7 @@ describe("ServerActionAdapter", () => {
     it("calls refreshFn on success", async () => {
       mockAddBead.mockResolvedValue({ success: true, record: { id: "pb-1" } } as never);
 
-      await adapter.addBead("bead-1", 100, 3);
+      await adapter.addBead("bead-1", 3);
 
       expect(refreshFn).toHaveBeenCalledTimes(1);
     });
@@ -221,8 +221,15 @@ describe("ServerActionAdapter", () => {
 
       expect(mockUpdateQuantity).toHaveBeenCalledWith("js-1", "specialty", {
         quantityRequired: 2,
-        isNeedOverridden: true,
       });
+    });
+
+    it("sends a bead's need with no typed mark, which only a thread line can hold", async () => {
+      mockUpdateQuantity.mockResolvedValue({ success: true });
+
+      await adapter.updateQuantity("BEAD", "jb-1", "need", 4);
+
+      expect(mockUpdateQuantity).toHaveBeenCalledWith("jb-1", "bead", { quantityRequired: 4 });
     });
 
     it("maps field 'stitchCount' to { stitchCount: value }", async () => {

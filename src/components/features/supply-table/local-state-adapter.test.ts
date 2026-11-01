@@ -123,7 +123,7 @@ describe("LocalStateAdapter", () => {
 
   describe("addBead", () => {
     it("adds bead to internal state and returns success", async () => {
-      const result = await adapter.addBead("b1", 100, 1);
+      const result = await adapter.addBead("b1", 1);
       expect(result).toEqual({ success: true });
     });
   });

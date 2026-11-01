@@ -63,7 +63,7 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
     return { success: true, id };
   }
 
-  async addBead(beadId: string, _quantity: number, need: number): Promise<Result> {
+  async addBead(beadId: string, need: number): Promise<Result> {
     const duplicate = this.findDuplicate(beadId, "BEAD");
     if (duplicate) return { success: false, error: "Supply already added" };
 

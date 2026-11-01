@@ -652,6 +652,78 @@ describe("ChartMergedForm", () => {
     expect(supplyPayload.threads[0].supplyId).toBe("thread-1");
   });
 
+  it("counts only thread stitches in the supply total, whatever an older draft holds", async () => {
+    const v2Draft = {
+      version: 2,
+      form: {
+        name: "Chart With Beads",
+        designerId: null,
+        coverImageUrl: null,
+        coverThumbnailUrl: null,
+        digitalFileUrl: null,
+        stitchesWide: 0,
+        stitchesHigh: 0,
+        stitchCount: 10000,
+        stitchCountApproximate: false,
+        genreIds: [],
+        isPaperChart: false,
+        isFormalKit: false,
+        kitColorCount: null,
+        isSAL: false,
+        notes: "",
+        status: "KITTING",
+        storageLocationId: null,
+        stitchingAppId: null,
+        fabricId: null,
+        needsOnionSkinning: false,
+        startDate: "",
+        finishDate: "",
+        ffoDate: "",
+        wantToStartNext: false,
+        preferredStartSeason: null,
+        startingStitches: 0,
+      },
+      supplies: [
+        {
+          id: "row-1",
+          supplyId: "thread-1",
+          type: "THREAD",
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 500,
+          need: 2,
+          have: 0,
+          isNeedOverridden: false,
+        },
+        {
+          id: "row-2",
+          supplyId: "bead-1",
+          type: "BEAD",
+          code: "00123",
+          name: "Red",
+          brandName: "Mill Hill",
+          hexColor: "#ff0000",
+          stitchCount: 250,
+          need: 1,
+          have: 0,
+          isNeedOverridden: false,
+        },
+      ],
+      calcParams: { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 },
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(v2Draft));
+
+    render(<ChartMergedForm {...defaultFormProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/chart name/i)).toHaveValue("Chart With Beads");
+    });
+
+    expect(await screen.findByText("Supply total: 500 stitches")).toBeInTheDocument();
+  });
+
   it("back to calculated on a new chart reaches the saved supplies, unmarked", async () => {
     const line = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" } as const;
     const calcParams = { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 } as const;

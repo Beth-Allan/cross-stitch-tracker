@@ -199,9 +199,10 @@ describe("SupplyTableAddRow", () => {
     const stitchesInput = screen.getByPlaceholderText("Stitches");
     expect(stitchesInput).toBeInTheDocument();
     expect(stitchesInput).toHaveAttribute("type", "number");
+    expect(screen.getByTestId("arrow-icon")).toBeInTheDocument();
   });
 
-  it("renders quantity input for BEAD type after item selection", async () => {
+  it("renders need input directly for BEAD type (no count field)", async () => {
     const results = [
       makeSearchResult({
         id: "b1",
@@ -230,7 +231,39 @@ describe("SupplyTableAddRow", () => {
       fireEvent.click(screen.getByTestId("autocomplete-item-b1"));
     });
 
-    expect(screen.getByPlaceholderText("Bead count")).toBeInTheDocument();
+    expect(screen.getAllByRole("spinbutton")).toEqual([screen.getByLabelText("Need")]);
+    expect(screen.getByText("--")).toBeInTheDocument();
+    expect(screen.queryByTestId("arrow-icon")).not.toBeInTheDocument();
+  });
+
+  it("selects the pre-filled Need on landing there, so typing replaces the 1", async () => {
+    const select = vi.spyOn(HTMLInputElement.prototype, "select");
+    const results = [makeSearchResult({ id: "b1", type: "BEAD", code: "00123", name: "Red Bead" })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    renderAddRow();
+
+    await act(async () => {
+      fireEvent.click(screen.getByText("Beads"));
+    });
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "00123" } });
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("autocomplete-item-b1"));
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(16);
+    });
+
+    const needInput = screen.getByLabelText("Need");
+    expect(needInput).toHaveFocus();
+    expect(select.mock.contexts).toContain(needInput);
+    select.mockRestore();
   });
 
   it("renders need input directly for SPECIALTY type (no stitches field)", async () => {

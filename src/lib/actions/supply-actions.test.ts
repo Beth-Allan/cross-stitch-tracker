@@ -832,6 +832,30 @@ describe("supply-actions", () => {
       });
     });
 
+    it("writes all four of a thread line's fields", async () => {
+      mockPrisma.projectThread.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
+      mockPrisma.projectThread.update.mockResolvedValueOnce(createMockProjectThread({ id: "pt1" }));
+      const { updateProjectSupplyQuantity } = await import("./supply-actions");
+
+      const result = await updateProjectSupplyQuantity("pt1", "thread", {
+        quantityRequired: 3,
+        quantityAcquired: 2,
+        stitchCount: 1200,
+        isNeedOverridden: true,
+      });
+
+      assertSuccess(result);
+      expect(mockPrisma.projectThread.update).toHaveBeenCalledWith({
+        where: { id: "pt1" },
+        data: {
+          quantityRequired: 3,
+          quantityAcquired: 2,
+          stitchCount: 1200,
+          isNeedOverridden: true,
+        },
+      });
+    });
+
     it("clears the typed mark on a thread when told to, in the same write as the need", async () => {
       mockPrisma.projectThread.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
       mockPrisma.projectThread.update.mockResolvedValueOnce(createMockProjectThread({ id: "pt1" }));
@@ -928,6 +952,43 @@ describe("supply-actions", () => {
 
       expect(result).toEqual({ success: false, error: "Supply not found" });
       expect(mockPrisma.projectSpecialty.update).not.toHaveBeenCalled();
+    });
+
+    it("saves a bead's need and have together", async () => {
+      mockPrisma.projectBead.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
+      mockPrisma.projectBead.update.mockResolvedValueOnce(createMockProjectBead({ id: "pb1" }));
+      const { updateProjectSupplyQuantity } = await import("./supply-actions");
+
+      const result = await updateProjectSupplyQuantity("pb1", "bead", {
+        quantityRequired: 3,
+        quantityAcquired: 2,
+      });
+
+      assertSuccess(result);
+      expect(mockPrisma.projectBead.update).toHaveBeenCalledWith({
+        where: { id: "pb1" },
+        data: { quantityRequired: 3, quantityAcquired: 2 },
+      });
+    });
+
+    it.each([
+      ["bead", "a stitch count", { stitchCount: 50 }],
+      ["bead", "a typed mark", { quantityRequired: 3, isNeedOverridden: true }],
+      ["specialty", "a stitch count", { stitchCount: 50 }],
+      ["specialty", "a typed mark", { quantityRequired: 3, isNeedOverridden: true }],
+    ] as const)("refuses %s line %s, which only a thread line can hold", async (type, _, input) => {
+      const { updateProjectSupplyQuantity } = await import("./supply-actions");
+      const { revalidateTag } = await import("next/cache");
+
+      const result = await updateProjectSupplyQuantity("line-1", type, input);
+
+      expect(result).toEqual({
+        success: false,
+        error: "Only a thread line has a stitch count or a typed need.",
+      });
+      expect(mockPrisma.projectBead.update).not.toHaveBeenCalled();
+      expect(mockPrisma.projectSpecialty.update).not.toHaveBeenCalled();
+      expect(vi.mocked(revalidateTag)).not.toHaveBeenCalled();
     });
   });
 

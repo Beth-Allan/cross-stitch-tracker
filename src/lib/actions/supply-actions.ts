@@ -618,7 +618,9 @@ export async function updateProjectSupplyQuantity(
   const user = await requireAuth();
 
   try {
-    const { quantityRequired, ...rest } = updateQuantitySchema.parse(formData);
+    // Each write below names its fields: a spread hides a thread-only field from the type check
+    const { quantityRequired, quantityAcquired, stitchCount, isNeedOverridden } =
+      updateQuantitySchema.parse(formData);
 
     // Verify ownership before updating
     if (type === "thread") {
@@ -631,7 +633,7 @@ export async function updateProjectSupplyQuantity(
       }
       await prisma.projectThread.update({
         where: { id },
-        data: { ...rest, quantityRequired },
+        data: { quantityRequired, quantityAcquired, stitchCount, isNeedOverridden },
       });
     } else {
       // A bead or specialty item has no line to be unknown about: its need is always a number
@@ -641,7 +643,12 @@ export async function updateProjectSupplyQuantity(
           error: "Only a thread's need can be unknown — enter how many you need.",
         };
       }
-      const data = { ...rest, quantityRequired };
+      if (stitchCount !== undefined || isNeedOverridden !== undefined) {
+        return {
+          success: false as const,
+          error: "Only a thread line has a stitch count or a typed need.",
+        };
+      }
       if (type === "bead") {
         const record = await prisma.projectBead.findUnique({
           where: { id },
@@ -650,7 +657,10 @@ export async function updateProjectSupplyQuantity(
         if (!record || record.project.userId !== user.id) {
           return { success: false as const, error: "Supply not found" };
         }
-        await prisma.projectBead.update({ where: { id }, data });
+        await prisma.projectBead.update({
+          where: { id },
+          data: { quantityRequired, quantityAcquired },
+        });
       } else {
         const record = await prisma.projectSpecialty.findUnique({
           where: { id },
@@ -659,7 +669,10 @@ export async function updateProjectSupplyQuantity(
         if (!record || record.project.userId !== user.id) {
           return { success: false as const, error: "Supply not found" };
         }
-        await prisma.projectSpecialty.update({ where: { id }, data });
+        await prisma.projectSpecialty.update({
+          where: { id },
+          data: { quantityRequired, quantityAcquired },
+        });
       }
     }
 

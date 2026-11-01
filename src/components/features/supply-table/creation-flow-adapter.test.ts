@@ -88,7 +88,7 @@ describe("CreationFlowAdapter", () => {
       searchFn.mockResolvedValueOnce([beadResult]);
       await adapter.searchSupplies("BEAD", "Red");
 
-      const result = await adapter.addBead("b1", 100, 1);
+      const result = await adapter.addBead("b1", 1);
 
       expect(result).toEqual({ success: true, id: expect.any(String) });
       expect(onRowsChange).toHaveBeenCalledTimes(1);
@@ -284,7 +284,7 @@ describe("CreationFlowAdapter", () => {
       const beadResult = makeSearchResult({ id: "b1", type: "BEAD", code: "00123", name: "Red" });
       searchFn.mockResolvedValueOnce([beadResult]);
       await adapter.searchSupplies("BEAD", "Red");
-      await adapter.addBead("b1", 100, 1);
+      await adapter.addBead("b1", 1);
 
       const specialtyResult = makeSearchResult({
         id: "s1",
@@ -407,7 +407,7 @@ describe("CreationFlowAdapter", () => {
       const first = await adapter.addThread("shared-1", 500, 2);
       expect(first.success).toBe(true);
 
-      const second = await adapter.addBead("shared-1", 100, 1);
+      const second = await adapter.addBead("shared-1", 1);
       expect(second.success).toBe(true);
 
       expect(adapter.getRows()).toHaveLength(2);

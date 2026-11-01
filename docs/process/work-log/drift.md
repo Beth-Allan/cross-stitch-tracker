@@ -44,7 +44,7 @@ a data file and tests, stay ungated and merge on her word after a preview). The 
 gate neither and rely on C-1's review alone. A gate-list change is hers (hard rule 6).
 **Recommendation:** gate the folder, not the data.
 
-**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-48 or later — D-45 and D-46 went to F-16a on 2026-10-31, D-47 to `/broken need marked as typed`) before
+**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-49 or later — D-45 and D-46 went to F-16a on 2026-10-31, D-47 to `/broken need marked as typed`, D-48 to `/broken bead need not saving`) before
 its branch opens; the path file and protocol §5 change in C-1's PR if she says yes.
 
 ## Also open — the question known to be coming
@@ -55,6 +55,40 @@ no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is r
 on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
 
 ## Ruled
+
+### 2026-11-01 · D-48 · a bead line keeps no count — ruled during `/broken bead need not saving`
+
+**What happened.** A bead's or specialty item's Need would not save on a project page, because every
+Need save carried the typed mark and only thread lines have a place for it. That half was a plain
+defect. The "Bead count" box was the contradiction: `CROSS_STITCH_TRACKER_PLAN.md` §4.2 and §5 give
+every supply link a stitch count "if known", and DesignOS's README says the same, but DesignOS's own
+bead rows and `types.ts` show none, and `ProjectBead` has no such column. The box had been live since
+the table was built: changing it on a saved bead failed, the add row threw the number away, and a
+bead row always read 0. Nothing was worked out from it, since a bead's Need in packs is always typed.
+
+**Put to Beth.** Remove the box (recommended), or keep it and save it as a note, which needs a
+database change, its own build and a separate review. Her choice of removal was worded to approve
+changing the tests that expected the box.
+
+**Her answer.** "Remove the box (Recommended)".
+
+**What it changed.** ① A bead line shows Need and Have, like a specialty item: `--` where the count
+was, no arrow, and the add row goes straight to Need with its 1 selected, so typing replaces it.
+The new-chart form's supply total counts threads only, as the edit page always did, so a count left
+in an older draft stays out of it. ② `addBead` takes no count on any adapter.
+③ `updateProjectSupplyQuantity` refuses a stitch count or typed mark on a bead or specialty line, so
+it cannot report a save it did not make. ④ **The plan's wording stands as written, and this ruling
+supersedes it for beads**, as D-35 does for "Kitted". A bead count coming back is a planned feature,
+and working packs out from one would need a pack-size fact from Beth first.
+
+**Tests, on the record (hard rule 2).** None deleted or skipped. Five were rewritten to expect the
+opposite, under her approval: in `supply-table-data-row.test.tsx`, "renders stitches EditableNumber
+for BEAD type (shows bead count)" and "renders arrow icon for THREAD and BEAD types, hidden for
+SPECIALTY"; in `supply-table-add-row.test.tsx`, "renders quantity input for BEAD type after item
+selection"; in `use-supply-table.test.ts`, "selecting a BEAD item returns focusTarget 'stitches'" and
+"commitRow calls adapter.addBead with (beadId, quantity, need) for BEAD". One pinned the defect and
+now expects the right payload: "maps SPECIALTY to lowercase 'specialty'" in
+`server-action-adapter.test.ts`. The adapter tests' `addBead` calls lost the count argument.
 
 ### 2026-10-31 · D-47 · the six marked needs: a way back, and a cleanup — ruled during `/broken need marked as typed`
 

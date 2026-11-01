@@ -104,7 +104,10 @@ export const projectSpecialtySchema = z.object({
 
 export type ProjectSpecialtyInput = z.input<typeof projectSpecialtySchema>;
 
-/** Shared by the three junction types; only a thread may send a null (unknown) need. */
+/**
+ * Shared by the three junction types. Only a thread line has a stitch count or a typed mark, and
+ * only a thread may send a null (unknown) need; `updateProjectSupplyQuantity` refuses the rest.
+ */
 export const updateQuantitySchema = z.object({
   quantityRequired: z.number().int().min(1).nullable().optional(),
   quantityAcquired: z.number().int().min(0).optional(),

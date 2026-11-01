@@ -194,7 +194,7 @@ export function useSupplyTable(
         );
         break;
       case "BEAD":
-        result = await adapter.addBead(selectedItem.id, safeStitchCount, effectiveNeed);
+        result = await adapter.addBead(selectedItem.id, effectiveNeed);
         break;
       case "SPECIALTY":
         result = await adapter.addSpecialty(selectedItem.id, effectiveNeed);
@@ -241,8 +241,7 @@ export function useSupplyTable(
   // --- Focus target hint for the add-row component ---
   const getFocusTarget = useCallback((): "search" | "stitches" | "need" => {
     if (!selectedItem) return "search";
-    if (supplyType === "SPECIALTY") return "need";
-    return "stitches";
+    return supplyType === "THREAD" ? "stitches" : "need";
   }, [selectedItem, supplyType]);
 
   return {
