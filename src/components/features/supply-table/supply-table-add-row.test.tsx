@@ -94,6 +94,7 @@ function createMockAdapter(): SupplyTableAdapter {
     addBead: vi.fn().mockResolvedValue({ success: true }),
     addSpecialty: vi.fn().mockResolvedValue({ success: true }),
     updateQuantity: vi.fn().mockResolvedValue({ success: true }),
+    backToCalculated: vi.fn().mockResolvedValue({ success: true }),
     remove: vi.fn().mockResolvedValue({ success: true }),
     searchSupplies: vi.fn().mockResolvedValue([]),
     createSupply: vi.fn().mockResolvedValue(makeSearchResult({ id: "new-1", code: "999" })),
@@ -475,8 +476,67 @@ describe("SupplyTableAddRow", () => {
       fireEvent.click(screen.getByTestId("autocomplete-item-t1"));
     });
 
-    // Auto-calc sparkle should be present for THREAD
-    expect(screen.getByTestId("auto-calc-sparkle")).toBeInTheDocument();
+    // Auto-calc sparkle should be present for THREAD, and no stitches have been typed yet
+    expect(screen.getByTestId("auto-calc-indicator")).toHaveAttribute(
+      "aria-label",
+      "No stitch count to calculate from yet",
+    );
+  });
+
+  it("the sparkle says auto-calculated once a stitch count has worked out the need", async () => {
+    const results = [makeSearchResult({ id: "t1", code: "310", name: "Black" })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    renderAddRow();
+
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "310" } });
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("autocomplete-item-t1"));
+    });
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText("Stitch count for thread"), {
+        target: { value: "1200" },
+      });
+    });
+
+    expect(screen.getByTestId("auto-calc-indicator")).toHaveAttribute(
+      "aria-label",
+      "Auto-calculated from the stitch count",
+    );
+  });
+
+  it("the sparkle says not calculated when a stitch count meets a line of unknown length", async () => {
+    const results = [makeSearchResult({ id: "t1", code: "310", name: "Black", line: null })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    renderAddRow();
+
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "310" } });
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("autocomplete-item-t1"));
+    });
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText("Stitch count for thread"), {
+        target: { value: "1200" },
+      });
+    });
+
+    expect(screen.getByTestId("auto-calc-indicator")).toHaveAttribute(
+      "aria-label",
+      "Not calculated yet",
+    );
   });
 
   // --- ARIA combobox tests ---

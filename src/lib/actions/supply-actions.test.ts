@@ -832,6 +832,23 @@ describe("supply-actions", () => {
       });
     });
 
+    it("clears the typed mark on a thread when told to, in the same write as the need", async () => {
+      mockPrisma.projectThread.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
+      mockPrisma.projectThread.update.mockResolvedValueOnce(createMockProjectThread({ id: "pt1" }));
+      const { updateProjectSupplyQuantity } = await import("./supply-actions");
+
+      const result = await updateProjectSupplyQuantity("pt1", "thread", {
+        quantityRequired: 23,
+        isNeedOverridden: false,
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockPrisma.projectThread.update).toHaveBeenCalledWith({
+        where: { id: "pt1" },
+        data: { quantityRequired: 23, isNeedOverridden: false },
+      });
+    });
+
     it("updates bead junction record quantities", async () => {
       mockPrisma.projectBead.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
       const updated = createMockProjectBead({ id: "pb1", quantityRequired: 5 });

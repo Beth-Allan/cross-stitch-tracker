@@ -2,11 +2,12 @@
 
 import { useRef, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { ArrowRight, Check, Sparkles as SparklesIcon, X } from "lucide-react";
+import { ArrowRight, Check, X } from "lucide-react";
 import { SegmentedTypeToggle } from "./segmented-type-toggle";
 import { PortalAutocomplete } from "./portal-autocomplete";
 import { InlineCreateDialog } from "./inline-create-dialog";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
+import { AutoCalcSparkle } from "./auto-calc-sparkle";
 import { useSupplyTable, MAX_DISPLAY_ITEMS } from "./use-supply-table";
 import type { SupplyTableAdapter, CalcParams } from "./types";
 
@@ -266,10 +267,7 @@ export function SupplyTableAddRow({
                 {UNIT_LABELS[supplyType]}
               </span>
               {isAutoCalc && supplyType === "THREAD" && (
-                <SparklesIcon
-                  className="text-primary h-3 w-3 shrink-0"
-                  data-testid="auto-calc-sparkle"
-                />
+                <AutoCalcSparkle stitchCount={stitchCount} need={need} />
               )}
             </div>
           ) : null}

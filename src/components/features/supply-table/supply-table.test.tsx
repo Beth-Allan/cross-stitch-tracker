@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor, act } from "@/__tests__/test-utils";
 import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
+import { calculateSkeins } from "@/lib/utils/skein-calculator";
 import { SupplyTable } from "./supply-table";
 import type { SupplyRow, SupplyTableAdapter } from "./types";
 
@@ -25,6 +26,8 @@ vi.mock("./supply-table-data-row", () => ({
     onUpdateQuantity,
     onDelete,
     isNew,
+    calculatedNeed,
+    onBackToCalculated,
   }: {
     row: SupplyRow;
     onUpdateQuantity: (
@@ -35,6 +38,8 @@ vi.mock("./supply-table-data-row", () => ({
     ) => void | Promise<boolean>;
     onDelete: (type: string, id: string) => void;
     isNew?: boolean;
+    calculatedNeed?: number | null;
+    onBackToCalculated?: (row: SupplyRow) => void;
   }) => (
     <tr data-testid={`data-row-${row.id}`} data-is-new={isNew ? "true" : "false"}>
       <td>{row.code}</td>
@@ -57,6 +62,14 @@ vi.mock("./supply-table-data-row", () => ({
         <button data-testid={`delete-${row.id}`} onClick={() => onDelete(row.type, row.id)}>
           Delete
         </button>
+        {calculatedNeed != null && (
+          <button
+            data-testid={`back-to-calculated-${row.id}`}
+            onClick={() => onBackToCalculated?.(row)}
+          >
+            Back to calculated
+          </button>
+        )}
       </td>
     </tr>
   ),
@@ -172,6 +185,7 @@ function createMockAdapter(): SupplyTableAdapter {
     addBead: vi.fn().mockResolvedValue({ success: true }),
     addSpecialty: vi.fn().mockResolvedValue({ success: true }),
     updateQuantity: vi.fn().mockResolvedValue({ success: true }),
+    backToCalculated: vi.fn().mockResolvedValue({ success: true }),
     remove: vi.fn().mockResolvedValue({ success: true }),
     searchSupplies: vi.fn().mockResolvedValue([]),
     createSupply: vi.fn().mockResolvedValue({
@@ -570,6 +584,86 @@ describe("SupplyTable", () => {
         expect(stitchCountCalls.map((c: unknown[]) => c[1])).not.toContain("t3");
       });
     });
+  });
+});
+
+describe("SupplyTable — back to calculated", () => {
+  const SETTINGS = { fabricCount: 18, strandCount: 2, overCount: 1, wastePercent: 20 } as const;
+  const markedThread = (overrides: Partial<SupplyRow> = {}) =>
+    makeThread({ stitchCount: 33678, need: 30, isNeedOverridden: true, ...overrides });
+  const figureFor = (row: SupplyRow) =>
+    calculateSkeins({ stitchCount: row.stitchCount, ...SETTINGS, line: row.line! });
+
+  let adapter: SupplyTableAdapter;
+
+  beforeEach(() => {
+    adapter = createMockAdapter();
+    vi.clearAllMocks();
+  });
+
+  it("hands a marked line back with the figure this project's settings give", async () => {
+    const row = markedThread();
+    render(
+      <SupplyTable
+        threads={[row]}
+        beads={[]}
+        specialty={[]}
+        adapter={adapter}
+        calcParams={SETTINGS}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("back-to-calculated-t1"));
+    });
+
+    expect(adapter.backToCalculated).toHaveBeenCalledExactlyOnceWith("t1", figureFor(row));
+  });
+
+  it("does not offer it on a line the calculator cannot give a figure for", () => {
+    render(
+      <SupplyTable
+        threads={[
+          markedThread({ id: "unmarked", isNeedOverridden: false }),
+          markedThread({ id: "no-stitches", stitchCount: 0 }),
+          markedThread({ id: "unknown", line: { skeinLengthMm: null, strandStructure: null } }),
+        ]}
+        beads={[makeBead()]}
+        specialty={[makeSpecialty()]}
+        adapter={adapter}
+      />,
+    );
+
+    expect(screen.queryByTestId(/^back-to-calculated-/)).not.toBeInTheDocument();
+  });
+
+  it("shows the toast with the adapter's words when the save is refused", async () => {
+    (adapter.backToCalculated as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      success: false,
+      error: "Supply not found",
+    });
+    const { toast } = await import("sonner");
+
+    render(<SupplyTable threads={[markedThread()]} beads={[]} specialty={[]} adapter={adapter} />);
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("back-to-calculated-t1"));
+    });
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith("Supply not found"));
+  });
+
+  it("shows a toast when the adapter throws", async () => {
+    (adapter.backToCalculated as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error("network down"),
+    );
+    const { toast } = await import("sonner");
+
+    render(<SupplyTable threads={[markedThread()]} beads={[]} specialty={[]} adapter={adapter} />);
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("back-to-calculated-t1"));
+    });
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalledTimes(1));
   });
 });
 

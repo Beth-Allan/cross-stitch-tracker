@@ -1231,7 +1231,11 @@ answers. F-16a and F-16b each add their own scope and done-when.
   item's calculator gives at its settings (33,678 stitches, 2 strands, 14 count over 1, 20% waste),
   not 30 and not today's 23. The clear runs before any recompute, so these lines join it. Re-read the
   marked rows on a freshly reset `preview` copy first: a marked row that is not one of the six goes
-  to Beth, never into the migration.
+  to Beth, never into the migration. **The button can get there first:** `/tweak back to calculated`
+  is live before this item, so the re-read may find fewer than six, and the guard skips a row Beth
+  has already handed back. If that row is Arctic Owl 3's 310, it sits unmarked at the figure the
+  button gave, and it takes this item's figure only if her ruling recomputes it — say so when
+  putting the question.
 - **Cited specs:** `docs/domain/threads.md` THR-006, THR-008–THR-013, THR-016 · `open-questions.md`
   Q-009 · drift D-40 ③ (as corrected), D-44, D-45, D-47 · F-16a's calculator and its traps ③, ④, ⑨, ⑩ (retired by D-45 — see trap ⑤) and ⑪
   (whole cuts; the used-whole strand term; overridden rows untouched; the recompute checked against

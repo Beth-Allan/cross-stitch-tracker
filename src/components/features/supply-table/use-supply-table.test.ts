@@ -31,6 +31,7 @@ function createMockAdapter(): SupplyTableAdapter {
     addBead: vi.fn().mockResolvedValue({ success: true }),
     addSpecialty: vi.fn().mockResolvedValue({ success: true }),
     updateQuantity: vi.fn().mockResolvedValue({ success: true }),
+    backToCalculated: vi.fn().mockResolvedValue({ success: true }),
     remove: vi.fn().mockResolvedValue({ success: true }),
     searchSupplies: vi.fn().mockResolvedValue([]),
     createSupply: vi.fn().mockResolvedValue(makeSearchResult()),

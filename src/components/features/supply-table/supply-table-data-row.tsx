@@ -1,7 +1,8 @@
 "use client";
 
-import { ArrowRight, Sparkles, Trash2 } from "lucide-react";
+import { ArrowRight, RotateCcw, Trash2 } from "lucide-react";
 import { ColorSwatch } from "@/components/features/supplies/color-swatch";
+import { AutoCalcSparkle } from "./auto-calc-sparkle";
 import { EditableNumber } from "./editable-number";
 import { StatusDonut } from "./status-donut";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +24,9 @@ interface SupplyTableDataRowProps {
   ) => void | Promise<boolean>;
   onDelete: (type: SupplyType, junctionId: string) => void;
   isNew?: boolean;
+  /** What "back to calculated" would give this row; null when it has nothing to give. */
+  calculatedNeed?: number | null;
+  onBackToCalculated?: (row: SupplyRow) => void;
 }
 
 export function SupplyTableDataRow({
@@ -30,6 +34,8 @@ export function SupplyTableDataRow({
   onUpdateQuantity,
   onDelete,
   isNew,
+  calculatedNeed,
+  onBackToCalculated,
 }: SupplyTableDataRowProps) {
   const showStitches = row.type === "THREAD" || row.type === "BEAD";
   const showAutoCalc = row.type === "THREAD" && !row.isNeedOverridden;
@@ -83,8 +89,23 @@ export function SupplyTableDataRow({
             min={1}
           />
           <span className="text-muted-foreground text-xs">{UNIT_LABELS[row.type]}</span>
-          {showAutoCalc && (
-            <Sparkles className="text-primary inline h-3 w-3" data-testid="auto-calc-indicator" />
+          {showAutoCalc && <AutoCalcSparkle stitchCount={row.stitchCount} need={row.need} />}
+          {calculatedNeed != null && onBackToCalculated && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger
+                  type="button"
+                  onClick={() => onBackToCalculated(row)}
+                  className="text-muted-foreground hover:text-primary hover:bg-primary/5 rounded p-0.5 transition-colors"
+                  aria-label={`Back to calculated for ${row.code}`}
+                >
+                  <RotateCcw className="h-3 w-3" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  Back to calculated: {calculatedNeed} {UNIT_LABELS[row.type]}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
       </td>

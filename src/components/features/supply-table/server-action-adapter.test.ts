@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { DEFAULT_SUPPLY_HEX } from "@/lib/constants";
 import { ServerActionAdapter } from "./server-action-adapter";
+import { threadNeed } from "./thread-need";
 import type { SupplySearchResult } from "./types";
 import type { SkeinLine } from "@/types/supply";
 import { createMockThreadLine } from "@/__tests__/mocks";
@@ -439,6 +440,71 @@ describe("ServerActionAdapter", () => {
           isNeedOverridden: true,
         });
       });
+    });
+  });
+
+  describe("backToCalculated", () => {
+    it("saves the calculator's figure and clears the mark in one write", async () => {
+      mockUpdateQuantity.mockResolvedValue({ success: true });
+
+      const result = await adapter.backToCalculated("jt-1", 23);
+
+      expect(result).toEqual({ success: true });
+      expect(mockUpdateQuantity).toHaveBeenCalledTimes(1);
+      expect(mockUpdateQuantity).toHaveBeenCalledWith("jt-1", "thread", {
+        quantityRequired: 23,
+        isNeedOverridden: false,
+      });
+    });
+
+    it("works a stitch count saved straight afterwards out, before any refresh", async () => {
+      mockUpdateQuantity.mockResolvedValue({ success: true });
+      adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
+      adapter.setRows([
+        {
+          id: "jt-1",
+          supplyId: "supply-1",
+          type: "THREAD",
+          code: "310",
+          name: "Black",
+          brandName: "DMC",
+          hexColor: "#000000",
+          stitchCount: 500,
+          need: 10,
+          have: 0,
+          isNeedOverridden: true,
+          line: DMC_LINE,
+        },
+      ]);
+
+      await adapter.backToCalculated("jt-1", 1);
+      await adapter.updateQuantity("THREAD", "jt-1", "stitchCount", 33678);
+
+      expect(mockUpdateQuantity).toHaveBeenLastCalledWith("jt-1", "thread", {
+        stitchCount: 33678,
+        quantityRequired: threadNeed(
+          33678,
+          { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 },
+          DMC_LINE,
+        ),
+      });
+    });
+
+    it("calls refreshFn on success", async () => {
+      mockUpdateQuantity.mockResolvedValue({ success: true });
+
+      await adapter.backToCalculated("jt-1", 23);
+
+      expect(refreshFn).toHaveBeenCalledOnce();
+    });
+
+    it("returns the error and does NOT call refreshFn on failure", async () => {
+      mockUpdateQuantity.mockResolvedValue({ success: false, error: "Supply not found" });
+
+      const result = await adapter.backToCalculated("jt-1", 23);
+
+      expect(result).toEqual({ success: false, error: "Supply not found" });
+      expect(refreshFn).not.toHaveBeenCalled();
     });
   });
 

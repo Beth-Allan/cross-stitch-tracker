@@ -7,12 +7,19 @@ import { SupplyTableAddRow } from "./supply-table-add-row";
 import { SupplyTableDataRow } from "./supply-table-data-row";
 import { SupplyTableSectionDivider } from "./supply-table-section-divider";
 import { SupplyTableFooter } from "./supply-table-footer";
+import { calculatedNeedFor } from "./thread-need";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { SupplyTableProps, SupplyType } from "./types";
+import type { SupplyRow, SupplyTableProps, SupplyType } from "./types";
 import { DEFAULT_CALC_PARAMS } from "./types";
 
 interface SupplyTableInternalProps extends SupplyTableProps {
   isLoading?: boolean;
+}
+
+interface SentStitchCount {
+  count: number;
+  saved: Promise<boolean>;
+  settled: boolean;
 }
 
 const HEADER_CLASS =
@@ -92,6 +99,17 @@ export function SupplyTable({
     }
   }, [mergedCalcParams, threads, adapter]);
 
+  // A stitch count reaches the row's props only with the refresh after its save, so leaving the
+  // Stitches cell by clicking "back to calculated" would otherwise work the figure out from the
+  // old count. Kept until the rows change after its save has answered: rows can change sooner
+  // than that, for a sort or another row's refresh.
+  const sentStitchCounts = useRef(new Map<string, SentStitchCount>());
+  useEffect(() => {
+    for (const [junctionId, sent] of sentStitchCounts.current) {
+      if (sent.settled) sentStitchCounts.current.delete(junctionId);
+    }
+  }, [threads]);
+
   // Derive existing supply IDs from all sections for add-row disabled items
   const existingIds = useMemo(() => {
     if (existingSupplyIds) return existingSupplyIds;
@@ -125,8 +143,8 @@ export function SupplyTable({
       junctionId: string,
       field: "stitchCount" | "need" | "have",
       value: number,
-    ): Promise<boolean> =>
-      new Promise((resolve) => {
+    ): Promise<boolean> => {
+      const saved = new Promise<boolean>((resolve) => {
         startTransition(async () => {
           try {
             const result = await adapter.updateQuantity(type, junctionId, field, value);
@@ -142,8 +160,41 @@ export function SupplyTable({
             resolve(false);
           }
         });
-      }),
+      });
+
+      if (field === "stitchCount") {
+        const sent: SentStitchCount = { count: value, saved, settled: false };
+        sentStitchCounts.current.set(junctionId, sent);
+        void saved.then(() => {
+          sent.settled = true;
+        });
+      }
+      return saved;
+    },
     [adapter],
+  );
+
+  const handleBackToCalculated = useCallback(
+    (row: SupplyRow) => {
+      startTransition(async () => {
+        try {
+          // Waiting means a refused count never gives a figure the stitches don't match
+          const sent = sentStitchCounts.current.get(row.id);
+          const stitchCount = sent && (await sent.saved) ? sent.count : row.stitchCount;
+          const need = calculatedNeedFor({ ...row, stitchCount }, mergedCalcParams);
+          if (need === null) return;
+
+          const result = await adapter.backToCalculated(row.id, need);
+          if (!result.success) {
+            toast.error(result.error ?? "Couldn't update value. Try again.");
+          }
+        } catch (error) {
+          console.error("Back to calculated failed:", error);
+          toast.error("Couldn't update value. Try again.");
+        }
+      });
+    },
+    [adapter, mergedCalcParams],
   );
 
   const handleDelete = useCallback(
@@ -208,6 +259,8 @@ export function SupplyTable({
                 onUpdateQuantity={handleUpdateQuantity}
                 onDelete={handleDelete}
                 isNew={newRowIds.has(row.id)}
+                calculatedNeed={calculatedNeedFor(row, mergedCalcParams)}
+                onBackToCalculated={handleBackToCalculated}
               />
             ))}
 

@@ -11,7 +11,13 @@ const UNKNOWN_LINE: SkeinLine = { skeinLengthMm: null, strandStructure: null };
 vi.mock("@/components/ui/tooltip", () => ({
   TooltipProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  TooltipTrigger: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  TooltipTrigger: ({
+    children,
+    render: _render,
+    ...props
+  }: React.ComponentProps<"button"> & { render?: React.ReactElement }) => (
+    <button {...props}>{children}</button>
+  ),
   TooltipContent: ({ children }: { children: React.ReactNode }) => (
     <span data-testid="tooltip-content">{children}</span>
   ),
@@ -41,6 +47,8 @@ function renderRow(
     onUpdateQuantity: ReturnType<typeof vi.fn>;
     onDelete: ReturnType<typeof vi.fn>;
     isNew: boolean;
+    calculatedNeed: number | null;
+    onBackToCalculated: ReturnType<typeof vi.fn>;
   }> = {},
 ) {
   const onUpdateQuantity = props.onUpdateQuantity ?? vi.fn();
@@ -53,6 +61,8 @@ function renderRow(
           onUpdateQuantity={onUpdateQuantity}
           onDelete={onDelete}
           isNew={props.isNew}
+          calculatedNeed={props.calculatedNeed}
+          onBackToCalculated={props.onBackToCalculated}
         />
       </tbody>
     </table>,
@@ -129,6 +139,15 @@ describe("SupplyTableDataRow", () => {
   it("renders auto-calc Sparkles indicator when type is THREAD and isNeedOverridden is false", () => {
     renderRow(makeRow({ type: "THREAD", isNeedOverridden: false }));
     expect(document.querySelector('[data-testid="auto-calc-indicator"]')).toBeInTheDocument();
+  });
+
+  it.each([
+    { stitchCount: 0, need: 1, hint: "No stitch count to calculate from yet" },
+    { stitchCount: 500, need: null, hint: "Not calculated yet" },
+    { stitchCount: 1200, need: 3, hint: "Auto-calculated from the stitch count" },
+  ])("the Sparkles indicator reads the row's own figures: $hint", ({ stitchCount, need, hint }) => {
+    renderRow(makeRow({ stitchCount, need }));
+    expect(screen.getByTestId("auto-calc-indicator")).toHaveAttribute("aria-label", hint);
   });
 
   it("does NOT render Sparkles when isNeedOverridden is true", () => {
@@ -252,6 +271,47 @@ describe("SupplyTableDataRow", () => {
     expect(onUpdateQuantity).toHaveBeenCalledWith("THREAD", "junc-1", "have", 5);
   });
 
+  describe("back to calculated", () => {
+    const markedRow = () => makeRow({ code: "310", need: 30, isNeedOverridden: true });
+    const backButton = () => screen.queryByRole("button", { name: "Back to calculated for 310" });
+
+    it("offers the button on a marked line, naming the figure it would give", () => {
+      renderRow(markedRow(), { calculatedNeed: 23, onBackToCalculated: vi.fn() });
+
+      expect(backButton()).toBeInTheDocument();
+      expect(screen.getByText("Back to calculated: 23 sk")).toBeInTheDocument();
+    });
+
+    it("hands the row back on one click, without opening the Need cell", () => {
+      const onBackToCalculated = vi.fn();
+      const row = markedRow();
+      renderRow(row, { calculatedNeed: 23, onBackToCalculated });
+
+      fireEvent.click(backButton()!);
+
+      expect(onBackToCalculated).toHaveBeenCalledExactlyOnceWith(row);
+      expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
+    });
+
+    it("is a plain button, so it can never submit a form around it", () => {
+      renderRow(markedRow(), { calculatedNeed: 23, onBackToCalculated: vi.fn() });
+
+      expect(backButton()).toHaveAttribute("type", "button");
+    });
+
+    it("offers nothing when there is no figure to give", () => {
+      renderRow(markedRow(), { calculatedNeed: null, onBackToCalculated: vi.fn() });
+
+      expect(backButton()).not.toBeInTheDocument();
+    });
+
+    it("offers nothing to a row rendered without the handler", () => {
+      renderRow(markedRow());
+
+      expect(backButton()).not.toBeInTheDocument();
+    });
+  });
+
   describe("a need it cannot work out", () => {
     const unknownRow = () =>
       makeRow({ code: "002", need: null, have: 1, stitchCount: 5000, line: UNKNOWN_LINE });
@@ -268,7 +328,9 @@ describe("SupplyTableDataRow", () => {
       renderRow(unknownRow());
 
       expect(screen.getByTitle("1 of Unknown")).toBeInTheDocument();
-      expect(screen.getByTestId("tooltip-content")).toHaveTextContent("1 of Unknown");
+      expect(
+        screen.getByText("1 of Unknown", { selector: '[data-testid="tooltip-content"]' }),
+      ).toBeInTheDocument();
     });
 
     it("still takes a need typed by hand", () => {

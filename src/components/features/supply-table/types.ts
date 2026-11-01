@@ -106,6 +106,8 @@ export interface SupplyTableAdapter {
     field: "stitchCount" | "need" | "have",
     value: number,
   ): Promise<Result>;
+  /** Hands a thread's need back to the calculator: saves `need` and clears the typed mark. */
+  backToCalculated(junctionId: string, need: number): Promise<Result>;
   remove(type: SupplyType, junctionId: string): Promise<Result>;
   searchSupplies(type: SupplyType, query: string): Promise<SupplySearchResult[]>;
   createSupply(type: SupplyType, data: CreateSupplyData): Promise<SupplySearchResult>;
