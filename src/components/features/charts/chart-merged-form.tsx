@@ -274,7 +274,10 @@ export function ChartMergedForm({
   }, [form.values.designerId, form.designers]);
 
   const supplyStitchTotal = useMemo(
-    () => supplyRows.reduce((sum, row) => sum + row.stitchCount, 0),
+    () =>
+      supplyRows
+        .filter((row) => row.type === "THREAD")
+        .reduce((sum, row) => sum + row.stitchCount, 0),
     [supplyRows],
   );
 

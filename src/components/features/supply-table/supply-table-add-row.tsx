@@ -72,6 +72,8 @@ export function SupplyTableAddRow({
         stitchesRef.current?.focus();
       } else if (target === "need") {
         needRef.current?.focus();
+        // A script's focus leaves the pre-filled 1 unselected, so typing would join it, not replace it
+        needRef.current?.select();
       }
     });
   }, [selectedItem, getFocusTarget]);
@@ -245,7 +247,7 @@ export function SupplyTableAddRow({
 
         <td className="px-1 py-1.5" style={{ width: "24px" }}>
           {selectedItem && supplyType === "THREAD" ? (
-            <ArrowRight className="text-muted-foreground h-3 w-3" />
+            <ArrowRight className="text-muted-foreground h-3 w-3" data-testid="arrow-icon" />
           ) : null}
         </td>
 

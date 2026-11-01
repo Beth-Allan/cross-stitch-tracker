@@ -10,6 +10,7 @@ import type {
   Result,
 } from "./types";
 import { skeinLineOf, threadNeed } from "./thread-need";
+import type { UpdateQuantityInput } from "@/lib/validations/supply";
 import {
   addThreadToProject,
   addBeadToProject,
@@ -114,7 +115,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
   ): Promise<Result> {
     const lowercaseType = type.toLowerCase() as "thread" | "bead" | "specialty";
 
-    let mappedData: Record<string, unknown>;
+    let mappedData: UpdateQuantityInput;
     switch (field) {
       case "stitchCount": {
         mappedData = { stitchCount: value };

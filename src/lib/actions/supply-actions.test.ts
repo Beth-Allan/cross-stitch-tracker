@@ -832,6 +832,30 @@ describe("supply-actions", () => {
       });
     });
 
+    it("writes all four of a thread line's fields", async () => {
+      mockPrisma.projectThread.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
+      mockPrisma.projectThread.update.mockResolvedValueOnce(createMockProjectThread({ id: "pt1" }));
+      const { updateProjectSupplyQuantity } = await import("./supply-actions");
+
+      const result = await updateProjectSupplyQuantity("pt1", "thread", {
+        quantityRequired: 3,
+        quantityAcquired: 2,
+        stitchCount: 1200,
+        isNeedOverridden: true,
+      });
+
+      assertSuccess(result);
+      expect(mockPrisma.projectThread.update).toHaveBeenCalledWith({
+        where: { id: "pt1" },
+        data: {
+          quantityRequired: 3,
+          quantityAcquired: 2,
+          stitchCount: 1200,
+          isNeedOverridden: true,
+        },
+      });
+    });
+
     it("clears the typed mark on a thread when told to, in the same write as the need", async () => {
       mockPrisma.projectThread.findUnique.mockResolvedValueOnce({ project: { userId: "user-1" } });
       mockPrisma.projectThread.update.mockResolvedValueOnce(createMockProjectThread({ id: "pt1" }));
