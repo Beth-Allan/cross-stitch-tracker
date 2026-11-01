@@ -3,6 +3,9 @@ import {
   createMockPrisma,
   createMockProject,
   createMockProjectForNeeds,
+  createNeedsReworkTx,
+  expectReworkAfter,
+  mockTransaction,
   assertFailure,
   unvalidatedPayload,
 } from "@/__tests__/mocks";
@@ -114,6 +117,20 @@ describe("updateProjectSettings", () => {
       where: { chartId: "chart-1" },
       data: { strandCount: 4 },
     });
+  });
+
+  it("saves the settings first, then reworks inside the same transaction", async () => {
+    mockPrisma.project.findUnique.mockResolvedValueOnce(
+      createMockProject({ id: "proj-1", userId: "user-1", chartId: "chart-1" }),
+    );
+    const tx = createNeedsReworkTx(createMockProjectForNeeds({ strandCount: 1 }));
+    const update = vi.fn().mockResolvedValue({});
+    mockTransaction(mockPrisma, { ...tx, project: { ...tx.project, update } });
+    const { updateProjectSettings } = await import("./chart-actions");
+
+    await updateProjectSettings("chart-1", { strandCount: 1 });
+
+    expectReworkAfter(update, tx);
   });
 
   it("reworks the project's calculated needs from the saved settings", async () => {

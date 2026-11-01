@@ -97,7 +97,18 @@ describe("ServerActionAdapter", () => {
         stitchCount: 500,
         quantityRequired: 2,
         quantityAcquired: 0,
+        isNeedOverridden: false,
       });
+    });
+
+    it("saves the mark on a need typed into the add row", async () => {
+      mockAddThread.mockResolvedValue({ success: true, record: { id: "pt-1" } } as never);
+
+      await adapter.addThread("thread-1", 500, 15, true);
+
+      expect(mockAddThread).toHaveBeenCalledWith(
+        expect.objectContaining({ quantityRequired: 15, isNeedOverridden: true }),
+      );
     });
 
     it("returns { success: true, id: record.id } on success", async () => {
@@ -143,6 +154,7 @@ describe("ServerActionAdapter", () => {
         stitchCount: 5000,
         quantityRequired: null,
         quantityAcquired: 0,
+        isNeedOverridden: false,
       });
     });
   });

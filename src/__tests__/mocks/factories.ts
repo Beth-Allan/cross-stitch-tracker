@@ -371,6 +371,29 @@ export function createMockProjectForNeeds(
   };
 }
 
+/**
+ * A transaction client of its own for a write that reworks needs, so a test can tell a read made
+ * inside the transaction from one made outside it. `tx` is passed to `mockTransaction`.
+ */
+export function createNeedsReworkTx(project = createMockProjectForNeeds()) {
+  return {
+    project: { findUnique: vi.fn().mockResolvedValue(project) },
+    projectThread: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
+  };
+}
+
+/** Fails unless `write` ran first, and the rework then read the project through its own client. */
+export function expectReworkAfter(
+  write: { mock: { invocationCallOrder: number[] } },
+  tx: ReturnType<typeof createNeedsReworkTx>,
+) {
+  const [written] = write.mock.invocationCallOrder;
+  const [read] = tx.project.findUnique.mock.invocationCallOrder;
+  expect(written).toBeDefined();
+  expect(read).toBeDefined();
+  expect(written).toBeLessThan(read);
+}
+
 export function createMockProjectBead(overrides?: Partial<ProjectBead>): ProjectBead {
   return {
     id: "pb-1",

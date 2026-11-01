@@ -61,13 +61,19 @@ export class ServerActionAdapter implements SupplyTableAdapter {
     this.rows = rows;
   }
 
-  async addThread(threadId: string, stitchCount: number, need: number | null): Promise<Result> {
+  async addThread(
+    threadId: string,
+    stitchCount: number,
+    need: number | null,
+    isNeedOverridden = false,
+  ): Promise<Result> {
     const result = await addThreadToProject({
       projectId: this.projectId,
       threadId,
       stitchCount,
       quantityRequired: need,
       quantityAcquired: 0,
+      isNeedOverridden,
     });
 
     if (result.success) {

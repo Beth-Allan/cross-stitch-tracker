@@ -95,7 +95,7 @@ Shadcn/Base UI component wrappers. No business logic. Key files:
 
 ### Layer 5: Server Actions (`src/lib/actions/`)
 
-Nineteen files, one per domain. All but one start with `"use server"` — `cover-optimization.ts` deliberately does not, because its one export re-points a chart's row at keys it is handed and belongs to its two callers, not to a POST endpoint. Pattern: `requireAuth()` → Zod validation → Prisma mutation → `revalidatePath()` / `revalidateTag("stats", { expire: 0 })` — the Next 16 two-argument form.
+Twenty files, one per domain. All but two start with `"use server"` — `cover-optimization.ts` and `thread-need-rework.ts` deliberately do not: the first's one export re-points a chart's row at keys it is handed, the second's takes a transaction client, and both belong to their callers, not to a POST endpoint. Pattern: `requireAuth()` → Zod validation → Prisma mutation → `revalidatePath()` / `revalidateTag("stats", { expire: 0 })` — the Next 16 two-argument form.
 
 Key files:
 
@@ -103,6 +103,7 @@ Key files:
 - `series-actions.ts` — Series CRUD plus `getSeriesWithStats()` and `getSeriesDetail()`
 - `upload-actions.ts` — Presigned URL generation, image processing, R2 delete
 - `cover-optimization.ts` — `optimizeCoverImage`, the cover pipeline step shared by the save path and the backfill (not `"use server"`, see above)
+- `thread-need-rework.ts` — `reworkCalculatedNeeds`, called inside the transaction of every write that changes a project's fabric or settings (not `"use server"`, see above)
 - `cover-backfill-actions.ts` — The one-off conversion of covers saved before the pipeline existed: the work list derived from the rows, one chart per call, run from Settings
 - `session-actions.ts` — StitchSession CRUD, progress recalculation
 - `supply-actions.ts` — Thread/bead/specialty supply mutations

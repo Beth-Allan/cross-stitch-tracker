@@ -2,7 +2,10 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import {
   createMockPrisma,
   createMockProjectForNeeds,
+  createNeedsReworkTx,
+  expectReworkAfter,
   mockProjectSupplyGroups,
+  mockTransaction,
   unvalidatedPayload,
 } from "@/__tests__/mocks";
 
@@ -2111,6 +2114,23 @@ describe("pattern-dive-actions", () => {
       expect(revalidatePath).toHaveBeenCalledWith("/shopping");
     });
 
+    it("links the fabric first, then reworks inside the same transaction", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "user-1",
+        chartId: "c1",
+        fabric: null,
+      });
+      const txMock = txLinkingFabric();
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
+      );
+
+      const { assignFabricToProject } = await import("./pattern-dive-actions");
+      await assignFabricToProject("fabric-1", "project-1");
+
+      expectReworkAfter(txMock.fabric.update, txMock);
+    });
+
     it("leaves the needs alone when the project already holds that fabric", async () => {
       mockPrisma.project.findUnique.mockResolvedValue({
         userId: "user-1",
@@ -2297,6 +2317,22 @@ describe("pattern-dive-actions", () => {
       mockPrisma.fabric.update.mockResolvedValue({});
       mockPrisma.projectThread.updateMany.mockResolvedValue({ count: 1 });
     }
+
+    it("unlinks the fabric first, then reworks inside the same transaction", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        userId: "user-1",
+        chartId: "c1",
+        fabric: { id: "fabric-1" },
+      });
+      const tx = createNeedsReworkTx();
+      const fabric = { update: vi.fn().mockResolvedValue({}) };
+      mockTransaction(mockPrisma, { ...tx, fabric });
+
+      const { unassignFabricFromProject } = await import("./pattern-dive-actions");
+      await unassignFabricFromProject("project-1");
+
+      expectReworkAfter(fabric.update, tx);
+    });
 
     it("reworks the project's calculated needs at the no-fabric default", async () => {
       mockProjectLosingFabric(10);

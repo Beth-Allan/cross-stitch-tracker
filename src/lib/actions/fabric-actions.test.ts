@@ -4,6 +4,9 @@ import {
   createMockFabricBrand,
   createMockFabric,
   createMockProjectForNeeds,
+  createNeedsReworkTx,
+  expectReworkAfter,
+  mockTransaction,
   assertSuccess,
   assertFailure,
   unvalidatedPayload,
@@ -357,6 +360,21 @@ describe("fabric-actions", () => {
       expect(revalidatePath).toHaveBeenCalledWith("/charts");
     });
 
+    it("creates the fabric first, then reworks inside the same transaction", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        userId: "user-1",
+        chartId: "chart-1",
+      });
+      const tx = createNeedsReworkTx(createMockProjectForNeeds({ fabric: { count: 18 } }));
+      const fabric = { create: vi.fn().mockResolvedValue(createMockFabric()) };
+      mockTransaction(mockPrisma, { ...tx, fabric });
+      const { createFabric } = await import("./fabric-actions");
+
+      await createFabric({ ...validFabricData, linkedProjectId: "proj-1" });
+
+      expectReworkAfter(fabric.create, tx);
+    });
+
     it("createFabric calls revalidateTag('stats') when created on a project", async () => {
       mockPrisma.project.findUnique
         .mockResolvedValueOnce({ userId: "user-1", chartId: "chart-1" })
@@ -607,6 +625,64 @@ describe("fabric-actions", () => {
       expect(revalidatePath).toHaveBeenCalledWith("/charts/chart-new");
     });
 
+    it("reworks both projects when a fabric moves from one to the other", async () => {
+      mockFabricHeldBy("proj-old", 18);
+      const figureAt14 = createMockProjectForNeeds({
+        projectThreads: [
+          { ...createMockProjectForNeeds().projectThreads[0], id: "old-1", quantityRequired: 10 },
+        ],
+      });
+      const figureAt18 = createMockProjectForNeeds({
+        fabric: { count: 18 },
+        projectThreads: [{ ...createMockProjectForNeeds().projectThreads[0], id: "new-1" }],
+      });
+      mockPrisma.project.findUnique
+        .mockResolvedValueOnce({ userId: "user-1", chartId: "chart-new" })
+        .mockResolvedValueOnce(figureAt14)
+        .mockResolvedValueOnce(figureAt18);
+      mockPrisma.fabric.update.mockResolvedValueOnce(createMockFabric({ id: "fabric-1" }));
+      mockPrisma.projectThread.updateMany.mockResolvedValue({ count: 1 });
+      const { revalidatePath } = await import("next/cache");
+      const { updateFabric } = await import("./fabric-actions");
+
+      await updateFabric("fabric-1", {
+        ...validUpdateData,
+        count: 18,
+        linkedProjectId: "proj-new",
+      });
+
+      expect(mockPrisma.projectThread.updateMany).toHaveBeenCalledWith({
+        where: { id: { in: ["old-1"] } },
+        data: { quantityRequired: 13 },
+      });
+      expect(mockPrisma.projectThread.updateMany).toHaveBeenCalledWith({
+        where: { id: { in: ["new-1"] } },
+        data: { quantityRequired: 10 },
+      });
+      expect(revalidatePath).toHaveBeenCalledWith("/charts/chart-old");
+      expect(revalidatePath).toHaveBeenCalledWith("/charts/chart-new");
+    });
+
+    it("updates the fabric first, then reworks inside the same transaction", async () => {
+      mockFabricHeldBy("proj-1", 14);
+      mockPrisma.project.findUnique.mockResolvedValueOnce({
+        userId: "user-1",
+        chartId: "chart-old",
+      });
+      const tx = createNeedsReworkTx(createMockProjectForNeeds({ fabric: { count: 18 } }));
+      const fabric = { update: vi.fn().mockResolvedValue(createMockFabric({ id: "fabric-1" })) };
+      mockTransaction(mockPrisma, { ...tx, fabric });
+      const { updateFabric } = await import("./fabric-actions");
+
+      await updateFabric("fabric-1", {
+        ...validUpdateData,
+        count: 18,
+        linkedProjectId: "proj-1",
+      });
+
+      expectReworkAfter(fabric.update, tx);
+    });
+
     it("reworks the needs of the project a fabric is taken off", async () => {
       mockFabricHeldBy("proj-old", 18);
       mockPrisma.project.findUnique.mockResolvedValueOnce(
@@ -762,6 +838,21 @@ describe("fabric-actions", () => {
         data: { quantityRequired: 13 },
       });
       expect(revalidatePath).toHaveBeenCalledWith("/charts/chart-1");
+    });
+
+    it("deletes the fabric first, then reworks inside the same transaction", async () => {
+      mockPrisma.fabric.findUnique.mockResolvedValueOnce({
+        linkedProjectId: "proj-1",
+        linkedProject: { userId: "user-1", chartId: "chart-1" },
+      });
+      const tx = createNeedsReworkTx();
+      const fabric = { delete: vi.fn().mockResolvedValue(createMockFabric({ id: "fabric-1" })) };
+      mockTransaction(mockPrisma, { ...tx, fabric });
+      const { deleteFabric } = await import("./fabric-actions");
+
+      await deleteFabric("fabric-1");
+
+      expectReworkAfter(fabric.delete, tx);
     });
 
     it("deleteFabric calls revalidateTag('stats') for a fabric on a project", async () => {

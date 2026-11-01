@@ -3,6 +3,9 @@ import type { ChartFormInput } from "@/lib/validations/chart";
 import {
   createMockPrisma,
   createMockProjectForNeeds,
+  createNeedsReworkTx,
+  expectReworkAfter,
+  mockTransaction,
   assertFailure,
   unvalidatedPayload,
 } from "@/__tests__/mocks";
@@ -305,6 +308,31 @@ describe("updateChart fabric link/unlink", () => {
       data: { quantityRequired: 10 },
     });
     expect(revalidatePath).toHaveBeenCalledWith("/shopping");
+  });
+
+  it("links the fabric first, then reworks inside the same transaction", async () => {
+    const { updateChart } = await import("./chart-actions");
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({
+      coverImageUrl: null,
+      project: { id: "proj-1", userId: "user-1" },
+    });
+    const tx = createNeedsReworkTx(createMockProjectForNeeds({ fabric: { count: 18 } }));
+    const fabric = {
+      findUnique: vi
+        .fn()
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({ linkedProject: null }),
+      update: vi.fn().mockResolvedValue({}),
+    };
+    const chart = { update: vi.fn().mockResolvedValue({ id: "chart-1" }) };
+    mockTransaction(mockPrisma, { ...tx, fabric, chart });
+
+    await updateChart("chart-1", {
+      ...validFormData,
+      project: { ...validFormData.project, fabricId: "fabric-new" },
+    });
+
+    expectReworkAfter(fabric.update, tx);
   });
 
   it("reworks the project's calculated needs when the fabric is taken off", async () => {
