@@ -10,7 +10,11 @@ import type { SupplyTableAdapter, CalcParams, SupplySearchResult } from "./types
 import { DEFAULT_CALC_PARAMS } from "./types";
 import type { SkeinLine } from "@/types/supply";
 
-const DMC_LINE: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
+const DMC_LINE: SkeinLine = {
+  skeinLengthMm: 8000,
+  strandStructure: "SIX_STRAND",
+  cutLengthInches: 24,
+};
 
 // Mirror the mocks from the main test file so these tests run in isolation
 vi.mock("./segmented-type-toggle", () => ({

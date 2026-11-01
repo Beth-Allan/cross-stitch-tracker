@@ -257,7 +257,7 @@ exit 0. The host's first two words are in `docs/INTEGRATIONS.md` (Migrations).
 
 ## The thread line as F-16a built it — what F-16b, C-1, C-1b and F-19 inherit
 
-**Tags:** F-16b · C-1 · C-1b · F-19 · F-18 · schema · thread line
+**Tags:** F-16b · C-1 · C-1b · F-19 · F-18 · schema · thread line · cut length
 
 F-16a (2026-10-31) added `ThreadLine` (`prisma/schema.prisma`). What the later items need to know
 without re-deriving it:
@@ -288,13 +288,14 @@ without re-deriving it:
   90%-known project in What's Next. It needs every thread unknown, so a quick-added thread beside
   DMC rows cannot produce it, and production holds no unknown line at deploy. F-18's brief names it.
 - **F-16b's length form refuses a length shorter than one cut.** `calculateSkeins` returns `null`
-  for a recorded length that yields no whole cut (today 18 in = 457.2 mm; F-19 changes the cut), so
-  such a line would read "Unknown" exactly like a line with no length — the bad value invisible.
-  The form is the place to refuse it, reading the cut from the calculator's constant, never
-  retyped. Related: **the server trusts the client about which thread rows may hold a null need**
+  for a recorded length that yields no whole cut (24 in = 609.6 mm on a floss line, 15 in = 381 mm
+  on Kreinik), so such a line would read "Unknown" exactly like a line with no length — the bad
+  value invisible. The form is the place to refuse it, reading the line's own cut, never retyped. Related: **the server trusts the client about which thread rows may hold a null need**
   (maintenance ledger, 2026-10-31) — F-16b's form is where that trust first matters.
-- **F-19** changes only `skein-calculator.ts`'s cut constants (`CUT_LENGTH_TENTH_MM`,
-  `USABLE_INCHES_PER_CUT`) and, for Kreinik, the per-structure cut — the line already carries what
-  it needs.
+- **The cut is on the line too** (F-19, D-49 ④): `cutLengthInches Int?`, whole inches, 24 on the
+  floss lines Beth has described and 15 on every Kreinik line. Null is unknown and `calculateSkeins`
+  returns `null`, so any line built for F-16b needs all three fields before it gives a figure. A cut
+  by strand structure was this note's first guess; it would hand 24 inches to a six-strand line she
+  has not described. The 3 inches lost stays a constant, `INCHES_LOST_PER_CUT`.
 
 Consumed when F-16b, C-1 and F-18 have all landed.

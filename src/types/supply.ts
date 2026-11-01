@@ -30,7 +30,7 @@ export type {
  * What the skein calculator reads from a thread's line. Either field null is unknown, and an
  * unknown line has no calculated need (THR-011).
  */
-export type SkeinLine = Pick<ThreadLine, "skeinLengthMm" | "strandStructure">;
+export type SkeinLine = Pick<ThreadLine, "skeinLengthMm" | "strandStructure" | "cutLengthInches">;
 
 export type ThreadWithBrand = Thread & { brand: SupplyBrand; line: ThreadLine };
 export type BeadWithBrand = Bead & { brand: SupplyBrand };

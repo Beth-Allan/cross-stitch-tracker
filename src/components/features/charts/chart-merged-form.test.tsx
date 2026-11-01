@@ -725,7 +725,11 @@ describe("ChartMergedForm", () => {
   });
 
   it("back to calculated on a new chart reaches the saved supplies, unmarked", async () => {
-    const line = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" } as const;
+    const line = {
+      skeinLengthMm: 8000,
+      strandStructure: "SIX_STRAND",
+      cutLengthInches: 24,
+    } as const;
     const calcParams = { fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 } as const;
     const v2Draft = {
       version: 2,
@@ -1155,7 +1159,12 @@ describe("ChartMergedForm", () => {
           lineId: "line-1",
           createdAt: new Date(),
           updatedAt: new Date(),
-          line: { id: "line-1", skeinLengthMm: 8000, strandStructure: "SIX_STRAND" },
+          line: {
+            id: "line-1",
+            skeinLengthMm: 8000,
+            strandStructure: "SIX_STRAND",
+            cutLengthInches: 24,
+          },
         },
       });
 
@@ -1198,7 +1207,12 @@ describe("ChartMergedForm", () => {
           lineId: "line-custom",
           createdAt: new Date(),
           updatedAt: new Date(),
-          line: { id: "line-custom", skeinLengthMm: null, strandStructure: null },
+          line: {
+            id: "line-custom",
+            skeinLengthMm: null,
+            strandStructure: null,
+            cutLengthInches: null,
+          },
         },
       });
 
@@ -1209,7 +1223,11 @@ describe("ChartMergedForm", () => {
         colorFamily: "PURPLE",
       });
 
-      expect(created.line).toEqual({ skeinLengthMm: null, strandStructure: null });
+      expect(created.line).toEqual({
+        skeinLengthMm: null,
+        strandStructure: null,
+        cutLengthInches: null,
+      });
     });
 
     it("createFn for BEAD passes colorName, productCode, hexColor, colorFamily, and brandId to createBead", async () => {

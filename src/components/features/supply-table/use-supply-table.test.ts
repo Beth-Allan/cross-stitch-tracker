@@ -6,9 +6,21 @@ import { DEFAULT_CALC_PARAMS } from "./types";
 import { calculateSkeins } from "@/lib/utils/skein-calculator";
 import type { SkeinLine } from "@/types/supply";
 
-const DMC_LINE: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
-const UNKNOWN_LINE: SkeinLine = { skeinLengthMm: null, strandStructure: null };
-const USED_WHOLE_10M_LINE: SkeinLine = { skeinLengthMm: 10000, strandStructure: "USED_WHOLE" };
+const DMC_LINE: SkeinLine = {
+  skeinLengthMm: 8000,
+  strandStructure: "SIX_STRAND",
+  cutLengthInches: 24,
+};
+const UNKNOWN_LINE: SkeinLine = {
+  skeinLengthMm: null,
+  strandStructure: null,
+  cutLengthInches: null,
+};
+const USED_WHOLE_10M_LINE: SkeinLine = {
+  skeinLengthMm: 10000,
+  strandStructure: "USED_WHOLE",
+  cutLengthInches: 15,
+};
 
 function makeSearchResult(overrides: Partial<SupplySearchResult> = {}): SupplySearchResult {
   const type = overrides.type ?? "THREAD";
@@ -254,7 +266,7 @@ describe("useSupplyTable", () => {
         await result.current.commitRow();
       });
 
-      // ceil(5000 * 2 * 1.2 / (14 * 255)) = ceil(3.36) = 4
+      // ceil(5000 * 2 * 1.2 / (14 * 273)) = ceil(3.14) = 4
       expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, 4);
     });
 

@@ -4,8 +4,16 @@ import { SupplyTableDataRow } from "./supply-table-data-row";
 import type { SupplyRow } from "./types";
 import type { SkeinLine } from "@/types/supply";
 
-const DMC_LINE: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
-const UNKNOWN_LINE: SkeinLine = { skeinLengthMm: null, strandStructure: null };
+const DMC_LINE: SkeinLine = {
+  skeinLengthMm: 8000,
+  strandStructure: "SIX_STRAND",
+  cutLengthInches: 24,
+};
+const UNKNOWN_LINE: SkeinLine = {
+  skeinLengthMm: null,
+  strandStructure: null,
+  cutLengthInches: null,
+};
 
 // Mock the tooltip portal to avoid portaling issues in tests
 vi.mock("@/components/ui/tooltip", () => ({

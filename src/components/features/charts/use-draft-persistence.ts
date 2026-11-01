@@ -38,16 +38,17 @@ function isValidSupplyRow(s: unknown): s is Omit<SupplyRow, "line"> & { line?: u
 }
 
 /**
- * A stored line only when both fields are ones the calculator can read; anything else is unknown.
+ * A stored line only when every field is one the calculator can read; anything else is unknown.
  * A row saved before rows carried their thread's line has none, and a field that is missing
  * would reach the calculator as `undefined`, pass its `=== null` check, and come out as NaN.
  */
 function restoreLine(line: unknown): SkeinLine | null {
   if (typeof line !== "object" || line === null) return null;
-  const { skeinLengthMm, strandStructure } = line as Record<string, unknown>;
+  const { skeinLengthMm, strandStructure, cutLengthInches } = line as Record<string, unknown>;
   if (skeinLengthMm !== null && typeof skeinLengthMm !== "number") return null;
   if (strandStructure !== null && !isStrandStructure(strandStructure)) return null;
-  return { skeinLengthMm, strandStructure };
+  if (cutLengthInches !== null && typeof cutLengthInches !== "number") return null;
+  return { skeinLengthMm, strandStructure, cutLengthInches };
 }
 
 function restoreSupplyRow(row: Omit<SupplyRow, "line"> & { line?: unknown }): SupplyRow {

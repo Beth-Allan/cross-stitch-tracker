@@ -5,7 +5,11 @@ import type { SupplyTableAdapter, CalcParams, SupplySearchResult } from "./types
 import { DEFAULT_CALC_PARAMS } from "./types";
 import type { SkeinLine } from "@/types/supply";
 
-const DMC_LINE: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
+const DMC_LINE: SkeinLine = {
+  skeinLengthMm: 8000,
+  strandStructure: "SIX_STRAND",
+  cutLengthInches: 24,
+};
 
 // Mock child components to isolate add-row behavior
 vi.mock("./segmented-type-toggle", () => ({
@@ -331,7 +335,11 @@ describe("SupplyTableAddRow", () => {
   });
 
   it("shows Unknown in the need box when a stitch count lands on a line whose length is unknown", async () => {
-    const unknownLine: SkeinLine = { skeinLengthMm: null, strandStructure: null };
+    const unknownLine: SkeinLine = {
+      skeinLengthMm: null,
+      strandStructure: null,
+      cutLengthInches: null,
+    };
     const results = [makeSearchResult({ id: "t1", code: "002", line: unknownLine })];
     vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
 

@@ -25,12 +25,18 @@ async function main() {
     },
   });
 
-  // DMC's one line, as migration 20261031120000_thread_lines fills it in: an 8 m skein of
-  // six-strand floss (THR-008). A brand's only line carries no name.
+  // DMC's one line, as migrations 20261031120000_thread_lines and
+  // 20261101185151_the_length_beth_cuts fill it in: an 8 m skein of six-strand floss, cut at 24
+  // inches (THR-008, THR-016). A brand's only line carries no name.
   const dmcLine = await prisma.threadLine.upsert({
     where: { brandId_name: { brandId: dmcBrand.id, name: "" } },
     update: {},
-    create: { brandId: dmcBrand.id, skeinLengthMm: 8000, strandStructure: "SIX_STRAND" },
+    create: {
+      brandId: dmcBrand.id,
+      skeinLengthMm: 8000,
+      strandStructure: "SIX_STRAND",
+      cutLengthInches: 24,
+    },
   });
 
   let count = 0;

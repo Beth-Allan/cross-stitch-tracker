@@ -44,7 +44,7 @@ a data file and tests, stay ungated and merge on her word after a preview). The 
 gate neither and rely on C-1's review alone. A gate-list change is hers (hard rule 6).
 **Recommendation:** gate the folder, not the data.
 
-**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-49 or later — D-45 and D-46 went to F-16a on 2026-10-31, D-47 to `/broken need marked as typed`, D-48 to `/broken bead need not saving`) before
+**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-50 or later — D-45 and D-46 went to F-16a on 2026-10-31, D-47 to `/broken need marked as typed`, D-48 to `/broken bead need not saving`, D-49 to F-19) before
 its branch opens; the path file and protocol §5 change in C-1's PR if she says yes.
 
 ## Also open — the question known to be coming
@@ -55,6 +55,45 @@ no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is r
 on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
 
 ## Ruled
+
+### 2026-11-01 · D-49 · saved figures follow the length Beth cuts: every calculated need recomputed from today's settings — ruled during `/work-item F-19`
+
+**What needed a ruling.** F-19's opening question. A cut change moves a figure only when it is
+worked out again, so did the saved figures follow? D-40 ③, as corrected, had kept DMC rows as saved
+because a saved need could disagree with its project's settings, and the open 2026-10-25 ledger row
+said fixing that needs her ruling on which value is right.
+
+**What was put to her,** read from the `preview` copy she reset from production that day: 2,183
+thread lines on 132 projects; 1,457 calculated figures on 91 of them (a stitch count, not marked);
+**1,440 match today's maths**, and 23 of those, on 15 projects, drop by one skein at her cut, none
+with thread in hand against it; **17 do not match**, on Nara Forest with Deer (13), Mini Mountain (3)
+and Fairy Forest (1). All 17 match the maths at 18-count. That is the session's arithmetic, not a
+fact, and they were put to her as "look worked out for 18-count". No project has a fabric linked and
+all 132 sit on the default settings, so a recompute reads them at the 14-count default. Options:
+"Move only the 23 (Recommended)" · "Leave every saved figure" · "Recompute everything", which said
+34 figures change, 23 down by one and 11 up by 1 or 2, mostly Nara Forest with Deer (52 to 61 skeins
+in total), that those rises come from the 14-count default rather than her cut, and that a number
+typed into the add-a-supply row saves without its mark, so it cannot be protected.
+
+**Her answer.** "I'd like to recompute everything so it matches the fabric. So if the three that
+would have worked at 18 count aren't actually saved as 18 count, then they should be recalculated
+for the 14 count default. Nothing in the app right now is actively being stitched or kitted while we
+work through these so none of them are assigned fabric, etc. Is there a way to recalculate everything
+if they ARE assigned to 18 count fabric without clicking recalculate on each line?"
+
+**What it changed.** ① F-19's migration recomputes every `ProjectThread` with a stitch count, not
+marked, on a line the calculator can read, from its project's settings today: the rows the supply
+table reworks when a setting changes. On the reset copy that is **35 figures**: the 34 put to her
+plus Arctic Owl 3's DMC 310, 30 to 22 (D-47). ② **It answers the ledger row's question:** where a
+stored setting and a saved need disagree, the stored setting wins. ③ **Her question, answered in
+session:** choosing a fabric on a project's Supplies tab reworks every calculated line on that
+project, no clicking per line; a marked line stays. Choosing one anywhere else does not, which is
+the rest of that ledger row, queued as `/broken fabric link keeps old figures`. She was told about
+the Fabric page and Pattern Dive; **the chart edit form has the same gap (the row names
+`updateChart`)**, found after she was told, and her close says so. ④ **Claude's call, within the
+brief:** the cut lives on the line, `ThreadLine.cutLengthInches Int?`. A cut chosen by strand
+structure, which the F-16a note expected, would give any six-strand line of a brand she has not
+described 24 inches (D-44, hard rule 5). So F-16b's third opening question fires.
 
 ### 2026-11-01 · D-48 · a bead line keeps no count — ruled during `/broken bead need not saving`
 

@@ -59,7 +59,12 @@ async function resolveDefaultBrandId(
   return brand.id;
 }
 
-const THREAD_LINE_FIELDS = { id: true, skeinLengthMm: true, strandStructure: true } as const;
+const THREAD_LINE_FIELDS = {
+  id: true,
+  skeinLengthMm: true,
+  strandStructure: true,
+  cutLengthInches: true,
+} as const;
 
 type ResolvedThreadLine =
   | { line: Prisma.ThreadLineGetPayload<{ select: typeof THREAD_LINE_FIELDS }> }
@@ -67,7 +72,7 @@ type ResolvedThreadLine =
 
 /**
  * The line a new or re-branded thread is filed on. A brand's only line is the answer; a brand
- * with none gets its one blank line, length and strand structure unknown. A brand with several
+ * with none gets its one blank line, length, strand structure and cut unknown. A brand with several
  * (Kreinik) is refused, never guessed: which line a thread belongs to changes its skein count,
  * and no form can ask yet.
  */
@@ -93,7 +98,13 @@ async function resolveThreadLine(
   // on one line instead of the second failing on the unique index.
   const line = await tx.threadLine.upsert({
     where: { brandId_name: { brandId, name: "" } },
-    create: { brandId, name: "", skeinLengthMm: null, strandStructure: null },
+    create: {
+      brandId,
+      name: "",
+      skeinLengthMm: null,
+      strandStructure: null,
+      cutLengthInches: null,
+    },
     update: {},
     select: THREAD_LINE_FIELDS,
   });
@@ -101,7 +112,9 @@ async function resolveThreadLine(
 }
 
 const sameSkeinLine = (a: SkeinLine, b: SkeinLine) =>
-  a.skeinLengthMm === b.skeinLengthMm && a.strandStructure === b.strandStructure;
+  a.skeinLengthMm === b.skeinLengthMm &&
+  a.strandStructure === b.strandStructure &&
+  a.cutLengthInches === b.cutLengthInches;
 
 export async function createThread(formData: ThreadInput) {
   await requireAuth();
@@ -144,7 +157,10 @@ export async function updateThread(id: string, formData: ThreadInput) {
     const updated = await prisma.$transaction(async (tx) => {
       const current = await tx.thread.findUnique({
         where: { id },
-        select: { brandId: true, line: { select: { skeinLengthMm: true, strandStructure: true } } },
+        select: {
+          brandId: true,
+          line: { select: { skeinLengthMm: true, strandStructure: true, cutLengthInches: true } },
+        },
       });
       // A line belongs to one brand, so a thread changing brand must change line with it
       if (current && current.brandId !== validated.brandId) {
@@ -154,7 +170,7 @@ export async function updateThread(id: string, formData: ThreadInput) {
           where: { id },
           data: { ...validated, lineId: resolved.line.id },
         });
-        // A calculated need was worked out from the old line's length and structure, so on a line
+        // A calculated need was worked out from the old line's length, structure and cut, so on a line
         // that differs the calculator can no longer stand behind it: it becomes unknown, and
         // re-entering the stitch count works it out from the new line. A need typed by hand, or
         // one with no stitch count behind it, was never the calculator's and stays.
@@ -419,7 +435,9 @@ export async function createSupplyBrand(formData: SupplyBrandInput) {
         validated.supplyType === "THREAD"
           ? {
               ...validated,
-              threadLines: { create: { skeinLengthMm: null, strandStructure: null } },
+              threadLines: {
+                create: { skeinLengthMm: null, strandStructure: null, cutLengthInches: null },
+              },
             }
           : validated,
     });

@@ -5,8 +5,16 @@ import { DEFAULT_CALC_PARAMS } from "./types";
 import type { CalcParams, SupplyRow } from "./types";
 import type { SkeinLine } from "@/types/supply";
 
-const DMC_LINE: SkeinLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
-const UNKNOWN_LINE: SkeinLine = { skeinLengthMm: null, strandStructure: null };
+const DMC_LINE: SkeinLine = {
+  skeinLengthMm: 8000,
+  strandStructure: "SIX_STRAND",
+  cutLengthInches: 24,
+};
+const UNKNOWN_LINE: SkeinLine = {
+  skeinLengthMm: null,
+  strandStructure: null,
+  cutLengthInches: null,
+};
 
 function makeRow(overrides: Partial<SupplyRow> = {}): SupplyRow {
   return {

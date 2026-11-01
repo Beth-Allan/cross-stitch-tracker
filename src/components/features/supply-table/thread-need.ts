@@ -4,13 +4,17 @@ import type { CalcParams, SupplyRow } from "./types";
 
 /** Only what the calculator reads, so a row carries no more of the line than it needs. */
 export function skeinLineOf(line: SkeinLine): SkeinLine {
-  return { skeinLengthMm: line.skeinLengthMm, strandStructure: line.strandStructure };
+  return {
+    skeinLengthMm: line.skeinLengthMm,
+    strandStructure: line.strandStructure,
+    cutLengthInches: line.cutLengthInches,
+  };
 }
 
 /**
  * The need a thread row's stitch count works out to, or `null` when the thread's line has no
- * known length or strand structure (THR-011) — which is never clamped to 1, because a guessed
- * figure would read as a real one.
+ * known length, strand structure or cut (THR-011, Q-009) — which is never clamped to 1, because a
+ * guessed figure would read as a real one.
  *
  * A stitch count of 0 gives 1 on every line: that need was never worked out from a length, so
  * it starts at 1 for her to type. A figure that does come out (even 0, with no fabric count) is

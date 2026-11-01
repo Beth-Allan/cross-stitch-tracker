@@ -34,13 +34,28 @@ const ONE_LINE = {
   id: "line-1",
   skeinLengthMm: 8000,
   strandStructure: "SIX_STRAND" as const,
+  cutLengthInches: 24,
   brand: { name: "DMC" },
 };
-/** The length and structure a thread's current line carries, as `updateThread` reads them. */
-const DMC_LINE = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" as const };
+/** The length, structure and cut a thread's current line carries, as `updateThread` reads them. */
+const DMC_LINE = {
+  skeinLengthMm: 8000,
+  strandStructure: "SIX_STRAND" as const,
+  cutLengthInches: 24,
+};
 const KREINIK_LINES = [
-  { id: "line-bf", skeinLengthMm: 50000, strandStructure: "USED_WHOLE" as const },
-  { id: "line-4", skeinLengthMm: 11000, strandStructure: "USED_WHOLE" as const },
+  {
+    id: "line-bf",
+    skeinLengthMm: 50000,
+    strandStructure: "USED_WHOLE" as const,
+    cutLengthInches: 15,
+  },
+  {
+    id: "line-4",
+    skeinLengthMm: 11000,
+    strandStructure: "USED_WHOLE" as const,
+    cutLengthInches: 15,
+  },
 ].map((line) => ({ ...line, brand: { name: "Kreinik" } }));
 const SEVERAL_LINES_REFUSAL =
   "Kreinik has several thread lines, and picking one arrives with the brand form — this thread can't be added yet.";
@@ -1646,6 +1661,7 @@ describe("supply-actions", () => {
           id: "line-new",
           skeinLengthMm: null,
           strandStructure: null,
+          cutLengthInches: null,
         });
         mockPrisma.thread.create.mockResolvedValueOnce(createMockThread({ lineId: "line-new" }));
         const { createThread } = await import("./supply-actions");
@@ -1655,14 +1671,24 @@ describe("supply-actions", () => {
         assertSuccess(result);
         expect(mockPrisma.threadLine.upsert).toHaveBeenCalledWith(
           expect.objectContaining({
-            create: { brandId: "brand-1", name: "", skeinLengthMm: null, strandStructure: null },
+            create: {
+              brandId: "brand-1",
+              name: "",
+              skeinLengthMm: null,
+              strandStructure: null,
+              cutLengthInches: null,
+            },
           }),
         );
         expect(mockPrisma.thread.create).toHaveBeenCalledWith({
           data: expect.objectContaining({ brandId: "brand-1", lineId: "line-new" }),
         });
         expect(result.thread.line).toEqual(
-          expect.objectContaining({ skeinLengthMm: null, strandStructure: null }),
+          expect.objectContaining({
+            skeinLengthMm: null,
+            strandStructure: null,
+            cutLengthInches: null,
+          }),
         );
       });
 
@@ -1672,6 +1698,7 @@ describe("supply-actions", () => {
           id: "line-new",
           skeinLengthMm: null,
           strandStructure: null,
+          cutLengthInches: null,
         });
         mockPrisma.thread.create.mockResolvedValueOnce(createMockThread({ lineId: "line-new" }));
         const { createThread } = await import("./supply-actions");
@@ -1681,9 +1708,15 @@ describe("supply-actions", () => {
         assertSuccess(result);
         expect(mockPrisma.threadLine.upsert).toHaveBeenCalledWith({
           where: { brandId_name: { brandId: "brand-1", name: "" } },
-          create: { brandId: "brand-1", name: "", skeinLengthMm: null, strandStructure: null },
+          create: {
+            brandId: "brand-1",
+            name: "",
+            skeinLengthMm: null,
+            strandStructure: null,
+            cutLengthInches: null,
+          },
           update: {},
-          select: { id: true, skeinLengthMm: true, strandStructure: true },
+          select: { id: true, skeinLengthMm: true, strandStructure: true, cutLengthInches: true },
         });
         expect(mockPrisma.threadLine.create).not.toHaveBeenCalled();
         expect(mockPrisma.thread.create).toHaveBeenCalledWith({
@@ -1706,7 +1739,11 @@ describe("supply-actions", () => {
           data: expect.objectContaining({ lineId: "line-1" }),
         });
         expect(result.thread.line).toEqual(
-          expect.objectContaining({ skeinLengthMm: 8000, strandStructure: "SIX_STRAND" }),
+          expect.objectContaining({
+            skeinLengthMm: 8000,
+            strandStructure: "SIX_STRAND",
+            cutLengthInches: 24,
+          }),
         );
       });
 
@@ -1737,6 +1774,7 @@ describe("supply-actions", () => {
           id: "line-custom",
           skeinLengthMm: null,
           strandStructure: null,
+          cutLengthInches: null,
         });
         mockPrisma.thread.create.mockResolvedValueOnce(
           createMockThread({ id: "t-new", brandId: "brand-custom", lineId: "line-custom" }),
@@ -1761,7 +1799,11 @@ describe("supply-actions", () => {
           }),
         );
         expect(result.record.thread.line).toEqual(
-          expect.objectContaining({ skeinLengthMm: null, strandStructure: null }),
+          expect.objectContaining({
+            skeinLengthMm: null,
+            strandStructure: null,
+            cutLengthInches: null,
+          }),
         );
       });
 
@@ -1841,6 +1883,7 @@ describe("supply-actions", () => {
         const movingTo = (line: {
           skeinLengthMm: number | null;
           strandStructure: string | null;
+          cutLengthInches: number | null;
         }) => {
           mockPrisma.thread.findUnique.mockResolvedValueOnce({
             brandId: "brand-dmc",
@@ -1853,9 +1896,22 @@ describe("supply-actions", () => {
         };
 
         it.each([
-          ["a different skein length", { skeinLengthMm: 4572, strandStructure: "SIX_STRAND" }],
-          ["a different strand structure", { skeinLengthMm: 8000, strandStructure: "USED_WHOLE" }],
-          ["no known length or structure", { skeinLengthMm: null, strandStructure: null }],
+          [
+            "a different skein length",
+            { skeinLengthMm: 4572, strandStructure: "SIX_STRAND", cutLengthInches: 24 },
+          ],
+          [
+            "a different strand structure",
+            { skeinLengthMm: 8000, strandStructure: "USED_WHOLE", cutLengthInches: 24 },
+          ],
+          [
+            "a different cut",
+            { skeinLengthMm: 8000, strandStructure: "SIX_STRAND", cutLengthInches: 15 },
+          ],
+          [
+            "no known length, structure or cut",
+            { skeinLengthMm: null, strandStructure: null, cutLengthInches: null },
+          ],
         ])(
           "makes only its calculated needs unknown when it moves to a line with %s",
           async (_label, line) => {
@@ -1873,7 +1929,7 @@ describe("supply-actions", () => {
         );
 
         it("leaves its needs alone when it moves to a line of the same length and structure", async () => {
-          movingTo({ skeinLengthMm: 8000, strandStructure: "SIX_STRAND" });
+          movingTo({ skeinLengthMm: 8000, strandStructure: "SIX_STRAND", cutLengthInches: 24 });
           const { updateThread } = await import("./supply-actions");
 
           const result = await updateThread("t1", { ...threadInput, brandId: "brand-anchor" });
@@ -1883,7 +1939,7 @@ describe("supply-actions", () => {
         });
 
         it("refreshes the project pages and the shopping list when the move makes needs unknown", async () => {
-          movingTo({ skeinLengthMm: null, strandStructure: null });
+          movingTo({ skeinLengthMm: null, strandStructure: null, cutLengthInches: null });
           const { updateThread } = await import("./supply-actions");
           const { revalidatePath } = await import("next/cache");
 
@@ -1895,7 +1951,7 @@ describe("supply-actions", () => {
         });
 
         it("refreshes only the catalogue when the move leaves every need as it was", async () => {
-          movingTo({ skeinLengthMm: 8000, strandStructure: "SIX_STRAND" });
+          movingTo({ skeinLengthMm: 8000, strandStructure: "SIX_STRAND", cutLengthInches: 24 });
           const { updateThread } = await import("./supply-actions");
           const { revalidatePath } = await import("next/cache");
 
@@ -1937,7 +1993,9 @@ describe("supply-actions", () => {
           data: expect.objectContaining({
             name: "Weeks Dye Works",
             supplyType: "THREAD",
-            threadLines: { create: { skeinLengthMm: null, strandStructure: null } },
+            threadLines: {
+              create: { skeinLengthMm: null, strandStructure: null, cutLengthInches: null },
+            },
           }),
         });
       });

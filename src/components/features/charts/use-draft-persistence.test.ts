@@ -273,7 +273,11 @@ describe("use-draft-persistence", () => {
           need: 2,
           have: 0,
           isNeedOverridden: false,
-          line: { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" as const },
+          line: {
+            skeinLengthMm: 8000,
+            strandStructure: "SIX_STRAND" as const,
+            cutLengthInches: 24,
+          },
         },
       ];
       const calcParams = {
@@ -346,7 +350,7 @@ describe("use-draft-persistence", () => {
         have: 0,
         isNeedOverridden: false,
       };
-      const unknownLine = { skeinLengthMm: null, strandStructure: null };
+      const unknownLine = { skeinLengthMm: null, strandStructure: null, cutLengthInches: null };
       const supplies = [
         { ...row, id: "row-unknown", need: null, line: unknownLine },
         { ...row, id: "row-old", need: 3 },
@@ -379,10 +383,20 @@ describe("use-draft-persistence", () => {
         have: 0,
         isNeedOverridden: false,
       };
-      const knownLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" };
+      const knownLine = { skeinLengthMm: 8000, strandStructure: "SIX_STRAND", cutLengthInches: 24 };
       const supplies = [
         { ...row, id: "row-empty", line: {} },
         { ...row, id: "row-no-structure", line: { skeinLengthMm: 8000 } },
+        {
+          ...row,
+          id: "row-saved-before-cuts",
+          line: { skeinLengthMm: 8000, strandStructure: "SIX_STRAND" },
+        },
+        {
+          ...row,
+          id: "row-text-cut",
+          line: { skeinLengthMm: 8000, strandStructure: "SIX_STRAND", cutLengthInches: "24" },
+        },
         { ...row, id: "row-text-length", line: { skeinLengthMm: "8000", strandStructure: null } },
         { ...row, id: "row-odd-structure", line: { skeinLengthMm: 8000, strandStructure: "TWO" } },
         { ...row, id: "row-known", line: knownLine },
@@ -397,6 +411,8 @@ describe("use-draft-persistence", () => {
       expect(result!.supplies.map((s) => [s.id, s.line])).toEqual([
         ["row-empty", null],
         ["row-no-structure", null],
+        ["row-saved-before-cuts", null],
+        ["row-text-cut", null],
         ["row-text-length", null],
         ["row-odd-structure", null],
         ["row-known", knownLine],
