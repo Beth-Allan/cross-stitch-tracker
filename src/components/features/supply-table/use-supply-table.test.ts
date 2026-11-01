@@ -139,7 +139,7 @@ describe("useSupplyTable", () => {
     expect(result.current.getFocusTarget()).toBe("stitches");
   });
 
-  it("selecting a BEAD item returns focusTarget 'stitches'", () => {
+  it("selecting a BEAD item returns focusTarget 'need'", () => {
     const item = makeSearchResult({ type: "BEAD" });
     const { result } = renderSupplyTableHook();
 
@@ -148,7 +148,7 @@ describe("useSupplyTable", () => {
       result.current.selectItem(item);
     });
 
-    expect(result.current.getFocusTarget()).toBe("stitches");
+    expect(result.current.getFocusTarget()).toBe("need");
   });
 
   it("selecting a SPECIALTY item returns focusTarget 'need'", () => {
@@ -326,16 +326,13 @@ describe("useSupplyTable", () => {
     expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, expectedNeed);
   });
 
-  it("commitRow calls adapter.addBead with (beadId, quantity, need) for BEAD", async () => {
+  it("commitRow calls adapter.addBead with (beadId, need) for BEAD", async () => {
     const item = makeSearchResult({ id: "b1", type: "BEAD" });
     const { result } = renderSupplyTableHook();
 
     act(() => {
       result.current.setSupplyType("BEAD");
       result.current.selectItem(item);
-    });
-    act(() => {
-      result.current.setStitchCount(100);
     });
     act(() => {
       result.current.setNeedManual(3);
@@ -345,7 +342,7 @@ describe("useSupplyTable", () => {
       await result.current.commitRow();
     });
 
-    expect(adapter.addBead).toHaveBeenCalledWith("b1", 100, 3);
+    expect(adapter.addBead).toHaveBeenCalledWith("b1", 3);
   });
 
   it("commitRow calls adapter.addSpecialty with (itemId, need) for SPECIALTY", async () => {

@@ -76,7 +76,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
     return { success: true };
   }
 
-  async addBead(beadId: string, quantity: number, need: number): Promise<Result> {
+  async addBead(beadId: string, need: number): Promise<Result> {
     const supply = this.searchPool.beads.find((b) => b.id === beadId);
     const id = crypto.randomUUID();
     const row: SupplyRow = {
@@ -87,7 +87,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
       name: supply?.name ?? "",
       brandName: supply?.brandName ?? "",
       hexColor: supply?.hexColor ?? "#000000",
-      stitchCount: quantity,
+      stitchCount: 0,
       need,
       have: 0,
       isNeedOverridden: false,

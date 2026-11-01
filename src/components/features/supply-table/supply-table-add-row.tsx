@@ -226,7 +226,7 @@ export function SupplyTableAddRow({
         </td>
 
         <td className="px-2 py-1.5" style={{ width: "14%" }}>
-          {selectedItem && supplyType !== "SPECIALTY" ? (
+          {selectedItem && supplyType === "THREAD" ? (
             <input
               ref={stitchesRef}
               type="number"
@@ -234,17 +234,17 @@ export function SupplyTableAddRow({
               value={stitchCount || ""}
               onChange={(e) => setStitchCount(Number(e.target.value) || 0)}
               onKeyDown={handleFieldKeyDown}
-              placeholder={supplyType === "BEAD" ? "Bead count" : "Stitches"}
-              aria-label={supplyType === "BEAD" ? "Bead count" : "Stitch count for thread"}
+              placeholder="Stitches"
+              aria-label="Stitch count for thread"
               className={inputClassName}
             />
-          ) : selectedItem && supplyType === "SPECIALTY" ? (
+          ) : selectedItem ? (
             <span className="text-muted-foreground text-sm">--</span>
           ) : null}
         </td>
 
         <td className="px-1 py-1.5" style={{ width: "24px" }}>
-          {selectedItem && supplyType !== "SPECIALTY" ? (
+          {selectedItem && supplyType === "THREAD" ? (
             <ArrowRight className="text-muted-foreground h-3 w-3" />
           ) : null}
         </td>

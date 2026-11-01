@@ -37,7 +37,7 @@ export function SupplyTableDataRow({
   calculatedNeed,
   onBackToCalculated,
 }: SupplyTableDataRowProps) {
-  const showStitches = row.type === "THREAD" || row.type === "BEAD";
+  const showStitches = row.type === "THREAD";
   const showAutoCalc = row.type === "THREAD" && !row.isNeedOverridden;
   // An unknown need is worked out by re-entering the stitch count, even the same number
   const stitchReentryRecalculates = row.need === null;
@@ -56,22 +56,16 @@ export function SupplyTableDataRow({
       </td>
 
       <td className="border-muted border-b px-3 py-[5px] [font-variant-numeric:tabular-nums]">
-        {row.type === "THREAD" && (
+        {showStitches ? (
           <EditableNumber
             value={row.stitchCount}
             onSave={(v) => onUpdateQuantity(row.type, row.id, "stitchCount", v)}
             ariaLabel={`Stitches for ${row.code}`}
             saveUnchanged={stitchReentryRecalculates}
           />
+        ) : (
+          <span className="text-muted-foreground">--</span>
         )}
-        {row.type === "BEAD" && (
-          <EditableNumber
-            value={row.stitchCount}
-            onSave={(v) => onUpdateQuantity(row.type, row.id, "stitchCount", v)}
-            ariaLabel={`Bead count for ${row.code}`}
-          />
-        )}
-        {row.type === "SPECIALTY" && <span className="text-muted-foreground">--</span>}
       </td>
 
       <td className="border-muted w-6 border-b py-[5px]">

@@ -201,7 +201,7 @@ describe("SupplyTableAddRow", () => {
     expect(stitchesInput).toHaveAttribute("type", "number");
   });
 
-  it("renders quantity input for BEAD type after item selection", async () => {
+  it("renders need input directly for BEAD type (no count field)", async () => {
     const results = [
       makeSearchResult({
         id: "b1",
@@ -230,7 +230,8 @@ describe("SupplyTableAddRow", () => {
       fireEvent.click(screen.getByTestId("autocomplete-item-b1"));
     });
 
-    expect(screen.getByPlaceholderText("Bead count")).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText("Bead count")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Need")).toBeInTheDocument();
   });
 
   it("renders need input directly for SPECIALTY type (no stitches field)", async () => {

@@ -98,7 +98,7 @@ export type Result = { success: true; id?: string } | { success: false; error: s
  */
 export interface SupplyTableAdapter {
   addThread(threadId: string, stitchCount: number, need: number | null): Promise<Result>;
-  addBead(beadId: string, quantity: number, need: number): Promise<Result>;
+  addBead(beadId: string, need: number): Promise<Result>;
   addSpecialty(itemId: string, need: number): Promise<Result>;
   updateQuantity(
     type: SupplyType,

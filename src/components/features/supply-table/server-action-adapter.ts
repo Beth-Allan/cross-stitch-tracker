@@ -76,7 +76,7 @@ export class ServerActionAdapter implements SupplyTableAdapter {
     return { success: false, error: result.error };
   }
 
-  async addBead(beadId: string, _quantity: number, need: number): Promise<Result> {
+  async addBead(beadId: string, need: number): Promise<Result> {
     const result = await addBeadToProject({
       projectId: this.projectId,
       beadId,
@@ -125,7 +125,8 @@ export class ServerActionAdapter implements SupplyTableAdapter {
         break;
       }
       case "need":
-        mappedData = { quantityRequired: value, isNeedOverridden: true };
+        mappedData = { quantityRequired: value };
+        if (type === "THREAD") mappedData.isNeedOverridden = true;
         break;
       case "have":
         mappedData = { quantityAcquired: value };

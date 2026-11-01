@@ -95,11 +95,10 @@ describe("SupplyTableDataRow", () => {
     expect(stitchBtn).toHaveTextContent("1200");
   });
 
-  it("renders stitches EditableNumber for BEAD type (shows bead count)", () => {
-    renderRow(makeRow({ type: "BEAD", stitchCount: 50, code: "BEA-01" }));
-    const beadBtn = screen.getByRole("button", { name: "Bead count for BEA-01" });
-    expect(beadBtn).toBeInTheDocument();
-    expect(beadBtn).toHaveTextContent("50");
+  it("renders dash in stitches column for BEAD type, which keeps no count", () => {
+    renderRow(makeRow({ type: "BEAD", code: "BEA-01" }));
+    expect(screen.getByText("--")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /count for BEA-01/i })).not.toBeInTheDocument();
   });
 
   it("renders dash in stitches column for SPECIALTY type", () => {
@@ -107,13 +106,13 @@ describe("SupplyTableDataRow", () => {
     expect(screen.getByText("--")).toBeInTheDocument();
   });
 
-  it("renders arrow icon for THREAD and BEAD types, hidden for SPECIALTY", () => {
+  it("renders arrow icon for THREAD type, hidden for BEAD and SPECIALTY", () => {
     const { unmount } = renderRow(makeRow({ type: "THREAD" }));
     expect(document.querySelector('[data-testid="arrow-icon"]')).toBeInTheDocument();
     unmount();
 
     const { unmount: unmount2 } = renderRow(makeRow({ type: "BEAD" }));
-    expect(document.querySelector('[data-testid="arrow-icon"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-testid="arrow-icon"]')).not.toBeInTheDocument();
     unmount2();
 
     renderRow(makeRow({ type: "SPECIALTY" }));
