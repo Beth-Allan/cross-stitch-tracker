@@ -479,7 +479,7 @@ describe("SupplyTableAddRow", () => {
     // Auto-calc sparkle should be present for THREAD, and no stitches have been typed yet
     expect(screen.getByTestId("auto-calc-indicator")).toHaveAttribute(
       "aria-label",
-      "No stitch count yet, so this starts at 1",
+      "No stitch count to calculate from yet",
     );
   });
 
@@ -508,6 +508,34 @@ describe("SupplyTableAddRow", () => {
     expect(screen.getByTestId("auto-calc-indicator")).toHaveAttribute(
       "aria-label",
       "Auto-calculated from the stitch count",
+    );
+  });
+
+  it("the sparkle says not calculated when a stitch count meets a line of unknown length", async () => {
+    const results = [makeSearchResult({ id: "t1", code: "310", name: "Black", line: null })];
+    vi.mocked(adapter.searchSupplies).mockResolvedValue(results);
+
+    renderAddRow();
+
+    const searchInput = screen.getByPlaceholderText("Search by code or name...");
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "310" } });
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("autocomplete-item-t1"));
+    });
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText("Stitch count for thread"), {
+        target: { value: "1200" },
+      });
+    });
+
+    expect(screen.getByTestId("auto-calc-indicator")).toHaveAttribute(
+      "aria-label",
+      "Not calculated yet",
     );
   });
 

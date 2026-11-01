@@ -4,13 +4,13 @@ import { Sparkles } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 
 /**
- * Words true of the line the sparkle sits on. It marks every need not typed by hand, which
- * includes a line with no stitch count, whose 1 is only where it starts, and an Unknown need,
- * which was never worked out: saying "calculated" on either would pass them off as real figures.
+ * Words true of every line the sparkle can sit on. It marks each need not typed by hand, so it
+ * also sits beside an Unknown need and beside a number with no stitch count behind it, which can
+ * be more than the 1 a line starts at. Only a known need with a stitch count is called calculated.
  */
 function autoCalcHint(stitchCount: number, need: number | null): string {
-  if (need === null) return "Can't be calculated: this thread's skein details aren't known yet";
-  if (stitchCount <= 0) return "No stitch count yet, so this starts at 1";
+  if (need === null) return "Not calculated yet";
+  if (stitchCount <= 0) return "No stitch count to calculate from yet";
   return "Auto-calculated from the stitch count";
 }
 

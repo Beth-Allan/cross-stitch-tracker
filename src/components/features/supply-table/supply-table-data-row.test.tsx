@@ -141,12 +141,13 @@ describe("SupplyTableDataRow", () => {
     expect(document.querySelector('[data-testid="auto-calc-indicator"]')).toBeInTheDocument();
   });
 
-  it("the Sparkles indicator reads the row's own figures, so a line with no stitches says so", () => {
-    renderRow(makeRow({ stitchCount: 0, need: 1 }));
-    expect(screen.getByTestId("auto-calc-indicator")).toHaveAttribute(
-      "aria-label",
-      "No stitch count yet, so this starts at 1",
-    );
+  it.each([
+    { stitchCount: 0, need: 1, hint: "No stitch count to calculate from yet" },
+    { stitchCount: 500, need: null, hint: "Not calculated yet" },
+    { stitchCount: 1200, need: 3, hint: "Auto-calculated from the stitch count" },
+  ])("the Sparkles indicator reads the row's own figures: $hint", ({ stitchCount, need, hint }) => {
+    renderRow(makeRow({ stitchCount, need }));
+    expect(screen.getByTestId("auto-calc-indicator")).toHaveAttribute("aria-label", hint);
   });
 
   it("does NOT render Sparkles when isNeedOverridden is true", () => {

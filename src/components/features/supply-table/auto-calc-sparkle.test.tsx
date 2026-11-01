@@ -13,22 +13,25 @@ describe("AutoCalcSparkle", () => {
     expect(await screen.findByText("Auto-calculated from the stitch count")).toBeInTheDocument();
   });
 
-  it("never calls a line with no stitch count calculated: its 1 is only where it starts", () => {
-    render(<AutoCalcSparkle stitchCount={0} need={1} />);
+  it.each([
+    { need: 1, why: "the 1 a line starts at" },
+    { need: 14, why: "a figure left behind when the stitch count was cleared" },
+    { need: 5, why: "a number typed into the add row with no stitches" },
+  ])("never calls $why calculated", ({ need }) => {
+    render(<AutoCalcSparkle stitchCount={0} need={need} />);
 
     expect(
-      screen.getByRole("img", { name: "No stitch count yet, so this starts at 1" }),
+      screen.getByRole("img", { name: "No stitch count to calculate from yet" }),
     ).toBeInTheDocument();
   });
 
-  it("never calls an Unknown need calculated, with or without a stitch count", () => {
-    render(<AutoCalcSparkle stitchCount={500} need={null} />);
+  it.each([
+    { stitchCount: 500, why: "with a stitch count" },
+    { stitchCount: 0, why: "with no stitch count" },
+  ])("never calls an Unknown need calculated, $why", ({ stitchCount }) => {
+    render(<AutoCalcSparkle stitchCount={stitchCount} need={null} />);
 
-    expect(
-      screen.getByRole("img", {
-        name: "Can't be calculated: this thread's skein details aren't known yet",
-      }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Not calculated yet" })).toBeInTheDocument();
   });
 
   it("is not a stop for Tab between the fields around it", async () => {
