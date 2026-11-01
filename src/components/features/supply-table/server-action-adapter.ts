@@ -148,6 +148,10 @@ export class ServerActionAdapter implements SupplyTableAdapter {
     });
 
     if (result.success) {
+      // A stitch count saved before the refresh lands must follow the calculator too
+      this.rows = this.rows.map((r) =>
+        r.id === junctionId ? { ...r, need, isNeedOverridden: false } : r,
+      );
       this.refreshFn();
       return { success: true };
     }

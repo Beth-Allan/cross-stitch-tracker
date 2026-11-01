@@ -9,7 +9,7 @@ import { SupplyTableSectionDivider } from "./supply-table-section-divider";
 import { SupplyTableFooter } from "./supply-table-footer";
 import { calculatedNeedFor } from "./thread-need";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { SupplyTableProps, SupplyType } from "./types";
+import type { SupplyRow, SupplyTableProps, SupplyType } from "./types";
 import { DEFAULT_CALC_PARAMS } from "./types";
 
 interface SupplyTableInternalProps extends SupplyTableProps {
@@ -93,6 +93,14 @@ export function SupplyTable({
     }
   }, [mergedCalcParams, threads, adapter]);
 
+  // A stitch count reaches the row's props only with the refresh after its save, so leaving the
+  // Stitches cell by clicking "back to calculated" would otherwise work the figure out from the
+  // old count
+  const unsettledStitchCounts = useRef(new Map<string, number>());
+  useEffect(() => {
+    unsettledStitchCounts.current.clear();
+  }, [threads]);
+
   // Derive existing supply IDs from all sections for add-row disabled items
   const existingIds = useMemo(() => {
     if (existingSupplyIds) return existingSupplyIds;
@@ -128,16 +136,20 @@ export function SupplyTable({
       value: number,
     ): Promise<boolean> =>
       new Promise((resolve) => {
+        const unsettled = field === "stitchCount" ? unsettledStitchCounts.current : null;
+        unsettled?.set(junctionId, value);
         startTransition(async () => {
           try {
             const result = await adapter.updateQuantity(type, junctionId, field, value);
             if (!result.success) {
+              unsettled?.delete(junctionId);
               toast.error(result.error ?? "Couldn't update value. Try again.");
               resolve(false);
               return;
             }
             resolve(true);
           } catch (error) {
+            unsettled?.delete(junctionId);
             console.error("Update supply quantity failed:", error);
             toast.error("Couldn't update value. Try again.");
             resolve(false);
@@ -148,10 +160,14 @@ export function SupplyTable({
   );
 
   const handleBackToCalculated = useCallback(
-    (junctionId: string, need: number) => {
+    (row: SupplyRow) => {
+      const stitchCount = unsettledStitchCounts.current.get(row.id) ?? row.stitchCount;
+      const need = calculatedNeedFor({ ...row, stitchCount }, mergedCalcParams);
+      if (need === null) return;
+
       startTransition(async () => {
         try {
-          const result = await adapter.backToCalculated(junctionId, need);
+          const result = await adapter.backToCalculated(row.id, need);
           if (!result.success) {
             toast.error(result.error ?? "Couldn't update value. Try again.");
           }
@@ -161,7 +177,7 @@ export function SupplyTable({
         }
       });
     },
-    [adapter],
+    [adapter, mergedCalcParams],
   );
 
   const handleDelete = useCallback(

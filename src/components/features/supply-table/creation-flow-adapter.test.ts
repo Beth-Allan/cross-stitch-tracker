@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { calculateSkeins } from "@/lib/utils/skein-calculator";
 import { CreationFlowAdapter } from "./creation-flow-adapter";
 import type { SupplyRow, SupplySearchResult, CreateSupplyData } from "./types";
 import type { SkeinLine } from "@/types/supply";
@@ -189,7 +190,9 @@ describe("CreationFlowAdapter", () => {
       await adapter.updateQuantity("THREAD", rowId, "stitchCount", 33678);
 
       const updated = adapter.getRows().find((r) => r.id === rowId);
-      expect(updated?.need).not.toBe(1);
+      expect(updated?.need).toBe(
+        calculateSkeins({ stitchCount: 33678, ...CALC_PARAMS, line: DMC_LINE }),
+      );
       expect(updated?.isNeedOverridden).toBe(false);
     });
 

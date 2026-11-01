@@ -25,7 +25,7 @@ interface SupplyTableDataRowProps {
   isNew?: boolean;
   /** What "back to calculated" would give this row; null when it has nothing to give. */
   calculatedNeed?: number | null;
-  onBackToCalculated?: (junctionId: string, need: number) => void;
+  onBackToCalculated?: (row: SupplyRow) => void;
 }
 
 export function SupplyTableDataRow({
@@ -96,7 +96,7 @@ export function SupplyTableDataRow({
               <Tooltip>
                 <TooltipTrigger
                   type="button"
-                  onClick={() => onBackToCalculated(row.id, calculatedNeed)}
+                  onClick={() => onBackToCalculated(row)}
                   className="text-muted-foreground hover:text-primary hover:bg-primary/5 rounded p-0.5 transition-colors"
                   aria-label={`Back to calculated for ${row.code}`}
                 >

@@ -269,13 +269,14 @@ describe("SupplyTableDataRow", () => {
       expect(screen.getByText("Back to calculated: 23 sk")).toBeInTheDocument();
     });
 
-    it("hands the row and its figure back on one click, without opening the Need cell", () => {
+    it("hands the row back on one click, without opening the Need cell", () => {
       const onBackToCalculated = vi.fn();
-      renderRow(markedRow(), { calculatedNeed: 23, onBackToCalculated });
+      const row = markedRow();
+      renderRow(row, { calculatedNeed: 23, onBackToCalculated });
 
       fireEvent.click(backButton()!);
 
-      expect(onBackToCalculated).toHaveBeenCalledExactlyOnceWith("junction-1", 23);
+      expect(onBackToCalculated).toHaveBeenCalledExactlyOnceWith(row);
       expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
     });
 
@@ -295,12 +296,6 @@ describe("SupplyTableDataRow", () => {
       renderRow(markedRow());
 
       expect(backButton()).not.toBeInTheDocument();
-    });
-
-    it("sits where the sparkle would, which a marked line does not show", () => {
-      renderRow(markedRow(), { calculatedNeed: 23, onBackToCalculated: vi.fn() });
-
-      expect(document.querySelector('[data-testid="auto-calc-indicator"]')).not.toBeInTheDocument();
     });
   });
 

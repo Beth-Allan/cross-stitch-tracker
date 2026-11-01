@@ -39,7 +39,7 @@ vi.mock("./supply-table-data-row", () => ({
     onDelete: (type: string, id: string) => void;
     isNew?: boolean;
     calculatedNeed?: number | null;
-    onBackToCalculated?: (id: string, need: number) => void;
+    onBackToCalculated?: (row: SupplyRow) => void;
   }) => (
     <tr data-testid={`data-row-${row.id}`} data-is-new={isNew ? "true" : "false"}>
       <td>{row.code}</td>
@@ -65,7 +65,7 @@ vi.mock("./supply-table-data-row", () => ({
         {calculatedNeed != null && (
           <button
             data-testid={`back-to-calculated-${row.id}`}
-            onClick={() => onBackToCalculated?.(row.id, calculatedNeed)}
+            onClick={() => onBackToCalculated?.(row)}
           >
             Back to calculated
           </button>
