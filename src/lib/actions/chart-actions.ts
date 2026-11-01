@@ -9,6 +9,7 @@ import { EMPTY_PROJECT_SUPPLIES, summariseProjectSupplies } from "@/lib/queries/
 import { firstValidationMessage } from "@/lib/utils/action-errors";
 import { discardStoredObjects } from "@/lib/r2";
 import { COVER_WARNING, optimizeCoverImage } from "@/lib/actions/cover-optimization";
+import { reworkCalculatedNeeds } from "@/lib/actions/thread-need-rework";
 import { chartFormSchema, batchSupplySchema } from "@/lib/validations/chart";
 import { parseStorageKey } from "@/lib/validations/upload";
 import type { BatchSupplyInput, ChartFormInput, ChartFormValidated } from "@/lib/validations/chart";
@@ -423,6 +424,14 @@ export async function updateChart(chartId: string, formData: ChartFormInput) {
           data: { linkedProjectId: existingProjectId },
         });
       }
+
+      const fabricChanged = (currentFabric?.id ?? null) !== project.fabricId;
+      const settingSent = [project.strandCount, project.overCount, project.wastePercent].some(
+        (setting) => setting !== undefined,
+      );
+      if (fabricChanged || settingSent) {
+        await reworkCalculatedNeeds(tx, existingProjectId);
+      }
     });
 
     // Optimize and clean up when the cover changed — replaced with a new image, or
@@ -439,6 +448,7 @@ export async function updateChart(chartId: string, formData: ChartFormInput) {
     revalidatePath(`/charts/${chartId}`);
     revalidatePath("/series");
     revalidatePath("/fabric");
+    revalidatePath("/shopping");
     revalidateTag("stats", { expire: 0 });
     return { success: true as const, warning: coverWarning };
   } catch (error) {
@@ -647,18 +657,23 @@ export async function updateProjectSettings(chartId: string, formData: UpdatePro
 
     const project = await prisma.project.findUnique({
       where: { chartId },
-      select: { userId: true },
+      select: { id: true, userId: true },
     });
     if (!project || project.userId !== user.id) {
       return { success: false as const, error: "Project not found" };
     }
 
-    await prisma.project.update({
-      where: { chartId },
-      data: validated,
+    await prisma.$transaction(async (tx) => {
+      await tx.project.update({
+        where: { chartId },
+        data: validated,
+      });
+      await reworkCalculatedNeeds(tx, project.id);
     });
 
+    revalidatePath("/charts");
     revalidatePath(`/charts/${chartId}`);
+    revalidatePath("/shopping");
     revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {

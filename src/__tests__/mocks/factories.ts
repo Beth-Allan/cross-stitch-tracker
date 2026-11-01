@@ -336,6 +336,41 @@ export function createMockProjectThread(overrides?: Partial<ProjectThread>): Pro
   };
 }
 
+/**
+ * What reworking a project's calculated needs reads: the default settings, no fabric, and one
+ * 20,000-stitch line of DMC on its saved figure, which is 13 skeins at 14-count and 10 at 18.
+ */
+export function createMockProjectForNeeds(
+  overrides?: Partial<{
+    strandCount: number;
+    overCount: number;
+    wastePercent: number;
+    fabric: { count: number } | null;
+    projectThreads: {
+      id: string;
+      stitchCount: number;
+      quantityRequired: number | null;
+      thread: { line: ReturnType<typeof createMockThreadLine> };
+    }[];
+  }>,
+) {
+  return {
+    strandCount: 2,
+    overCount: 1,
+    wastePercent: 20,
+    fabric: null,
+    projectThreads: [
+      {
+        id: "pt-1",
+        stitchCount: 20000,
+        quantityRequired: 13,
+        thread: { line: createMockThreadLine() },
+      },
+    ],
+    ...overrides,
+  };
+}
+
 export function createMockProjectBead(overrides?: Partial<ProjectBead>): ProjectBead {
   return {
     id: "pb-1",

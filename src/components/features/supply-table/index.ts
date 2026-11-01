@@ -24,7 +24,7 @@ export type {
   Result,
 } from "./types";
 export { DEFAULT_CALC_PARAMS } from "./types";
-export { skeinLineOf } from "./thread-need";
+export { projectCalcParams, skeinLineOf } from "./thread-need";
 
 // Adapters
 export { LocalStateAdapter } from "./local-state-adapter";

@@ -2,6 +2,7 @@
 
 import type { Prisma } from "@/generated/prisma/client";
 import { requireAuth } from "@/lib/auth-guard";
+import { reworkCalculatedNeeds } from "@/lib/actions/thread-need-rework";
 import { prisma } from "@/lib/db";
 import {
   EMPTY_PROJECT_SUPPLIES,
@@ -9,7 +10,7 @@ import {
   totalSupplyRollup,
 } from "@/lib/queries/project-supplies";
 import { calculateRequiredFabricSize, classifyFabricFit } from "@/lib/utils/fabric-calculator";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import type { WhatsNextProject, FabricRequirementRow, StorageGroup } from "@/types/session";
 
@@ -384,6 +385,10 @@ export async function assignFabricToProject(fabricId: string, projectId: string)
         where: { id: fabricId },
         data: { linkedProjectId: projectId },
       });
+
+      if (project.fabric?.id !== fabricId) {
+        await reworkCalculatedNeeds(tx, projectId);
+      }
     });
   } catch (error) {
     if (error instanceof Error && error.message === "FABRIC_ALREADY_LINKED") {
@@ -395,6 +400,8 @@ export async function assignFabricToProject(fabricId: string, projectId: string)
 
   revalidatePath(`/charts/${project.chartId}`);
   revalidatePath("/charts");
+  revalidatePath("/shopping");
+  revalidateTag("stats", { expire: 0 });
   return { success: true as const };
 }
 
@@ -419,15 +426,21 @@ export async function unassignFabricFromProject(projectId: string) {
       return { success: false as const, error: "Project not found" };
     }
 
-    if (project.fabric) {
-      await prisma.fabric.update({
-        where: { id: project.fabric.id },
-        data: { linkedProjectId: null },
+    const linkedFabric = project.fabric;
+    if (linkedFabric) {
+      await prisma.$transaction(async (tx) => {
+        await tx.fabric.update({
+          where: { id: linkedFabric.id },
+          data: { linkedProjectId: null },
+        });
+        await reworkCalculatedNeeds(tx, parsed.data);
       });
     }
 
     revalidatePath(`/charts/${project.chartId}`);
     revalidatePath("/charts");
+    revalidatePath("/shopping");
+    revalidateTag("stats", { expire: 0 });
     return { success: true as const };
   } catch (error) {
     console.error("unassignFabricFromProject error:", error);

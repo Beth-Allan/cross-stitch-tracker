@@ -1,6 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import type { ChartFormInput } from "@/lib/validations/chart";
-import { createMockPrisma, assertFailure, unvalidatedPayload } from "@/__tests__/mocks";
+import {
+  createMockPrisma,
+  createMockProjectForNeeds,
+  assertFailure,
+  unvalidatedPayload,
+} from "@/__tests__/mocks";
 
 // Mock auth to return authenticated session
 vi.mock("@/lib/auth", () => ({
@@ -267,6 +272,95 @@ describe("updateChart fabric link/unlink", () => {
         return (fnOrArray as (tx: typeof mockPrisma) => unknown)(mockPrisma);
       return fnOrArray;
     });
+  });
+
+  function mockChartWithProject() {
+    mockPrisma.chart.findUnique.mockResolvedValueOnce({
+      coverImageUrl: null,
+      project: { id: "proj-1", userId: "user-1" },
+    });
+    mockPrisma.chart.update.mockResolvedValueOnce({ id: "chart-1" });
+  }
+
+  it("reworks the project's calculated needs when a fabric is linked", async () => {
+    const { updateChart } = await import("./chart-actions");
+    mockChartWithProject();
+    mockPrisma.fabric.findUnique.mockResolvedValueOnce(null);
+    mockPrisma.fabric.findUnique.mockResolvedValueOnce({ linkedProject: null });
+    mockPrisma.fabric.update.mockResolvedValueOnce({});
+    mockPrisma.project.findUnique.mockResolvedValueOnce(
+      createMockProjectForNeeds({ fabric: { count: 18 } }),
+    );
+    mockPrisma.projectThread.updateMany.mockResolvedValueOnce({ count: 1 });
+
+    const { revalidatePath } = await import("next/cache");
+    const result = await updateChart("chart-1", {
+      ...validFormData,
+      project: { ...validFormData.project, fabricId: "fabric-new" },
+    });
+
+    expect(result.success).toBe(true);
+    expect(mockPrisma.projectThread.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ["pt-1"] } },
+      data: { quantityRequired: 10 },
+    });
+    expect(revalidatePath).toHaveBeenCalledWith("/shopping");
+  });
+
+  it("reworks the project's calculated needs when the fabric is taken off", async () => {
+    const { updateChart } = await import("./chart-actions");
+    mockChartWithProject();
+    mockPrisma.fabric.findUnique.mockResolvedValueOnce({ id: "fabric-old" });
+    mockPrisma.fabric.update.mockResolvedValueOnce({});
+    mockPrisma.project.findUnique.mockResolvedValueOnce(
+      createMockProjectForNeeds({
+        projectThreads: [
+          { ...createMockProjectForNeeds().projectThreads[0], quantityRequired: 10 },
+        ],
+      }),
+    );
+    mockPrisma.projectThread.updateMany.mockResolvedValueOnce({ count: 1 });
+
+    await updateChart("chart-1", validFormData);
+
+    expect(mockPrisma.projectThread.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ["pt-1"] } },
+      data: { quantityRequired: 13 },
+    });
+  });
+
+  it("reworks the needs when the form sends a setting", async () => {
+    const { updateChart } = await import("./chart-actions");
+    mockChartWithProject();
+    mockPrisma.fabric.findUnique.mockResolvedValueOnce(null);
+    mockPrisma.project.findUnique.mockResolvedValueOnce(
+      createMockProjectForNeeds({ wastePercent: 0 }),
+    );
+    mockPrisma.projectThread.updateMany.mockResolvedValueOnce({ count: 1 });
+
+    await updateChart("chart-1", {
+      ...validFormData,
+      project: { ...validFormData.project, wastePercent: 0 },
+    });
+
+    expect(mockPrisma.projectThread.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ["pt-1"] } },
+      data: { quantityRequired: 11 },
+    });
+  });
+
+  it("leaves the needs alone on a save that changes neither fabric nor settings", async () => {
+    const { updateChart } = await import("./chart-actions");
+    mockChartWithProject();
+    mockPrisma.fabric.findUnique.mockResolvedValueOnce({ id: "fabric-kept" });
+
+    await updateChart("chart-1", {
+      ...validFormData,
+      project: { ...validFormData.project, fabricId: "fabric-kept" },
+    });
+
+    expect(mockPrisma.projectThread.updateMany).not.toHaveBeenCalled();
+    expect(mockPrisma.project.findUnique).not.toHaveBeenCalled();
   });
 
   it("links a new fabric when no previous fabric exists", async () => {

@@ -1,5 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { createMockPrisma, mockProjectSupplyGroups, unvalidatedPayload } from "@/__tests__/mocks";
+import {
+  createMockPrisma,
+  createMockProjectForNeeds,
+  mockProjectSupplyGroups,
+  unvalidatedPayload,
+} from "@/__tests__/mocks";
 
 // Mock auth - default to authenticated
 const mockAuth = vi.fn();
@@ -14,6 +19,7 @@ vi.mock("@/lib/db", () => ({
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
 }));
 
 type SupplyRow = { quantityRequired: number | null; quantityAcquired: number };
@@ -1928,6 +1934,7 @@ describe("pattern-dive-actions", () => {
           findUnique: vi.fn().mockResolvedValue({ linkedProjectId: null }),
           update: vi.fn().mockResolvedValue({}),
         },
+        project: { findUnique: vi.fn() },
       };
       mockPrisma.$transaction.mockImplementation(
         async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
@@ -1954,6 +1961,7 @@ describe("pattern-dive-actions", () => {
           findUnique: vi.fn().mockResolvedValue({ linkedProjectId: null }),
           update: vi.fn().mockResolvedValue({}),
         },
+        project: { findUnique: vi.fn() },
       };
       mockPrisma.$transaction.mockImplementation(
         async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
@@ -1984,6 +1992,7 @@ describe("pattern-dive-actions", () => {
           findUnique: vi.fn().mockResolvedValue({ linkedProjectId: null }),
           update: vi.fn().mockResolvedValue({}),
         },
+        project: { findUnique: vi.fn() },
       };
       mockPrisma.project.findUnique.mockResolvedValue({
         userId: "user-1",
@@ -2050,6 +2059,7 @@ describe("pattern-dive-actions", () => {
           findUnique: vi.fn().mockResolvedValue({ linkedProjectId: null }),
           update: vi.fn().mockResolvedValue({}),
         },
+        project: { findUnique: vi.fn() },
       };
       mockPrisma.$transaction.mockImplementation(
         async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
@@ -2062,9 +2072,127 @@ describe("pattern-dive-actions", () => {
       expect(revalidatePath).toHaveBeenCalledWith("/charts/c1");
       expect(revalidatePath).toHaveBeenCalledWith("/charts");
     });
+
+    function txLinkingFabric(linkedProjectId: string | null = null) {
+      return {
+        fabric: {
+          findUnique: vi.fn().mockResolvedValue({ linkedProjectId }),
+          update: vi.fn().mockResolvedValue({}),
+        },
+        project: {
+          findUnique: vi
+            .fn()
+            .mockResolvedValue(createMockProjectForNeeds({ fabric: { count: 18 } })),
+        },
+        projectThread: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
+      };
+    }
+
+    it("reworks the project's calculated needs at the fabric's count", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "user-1",
+        chartId: "c1",
+        fabric: null,
+      });
+      const txMock = txLinkingFabric();
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
+      );
+
+      const { revalidatePath } = await import("next/cache");
+      const { assignFabricToProject } = await import("./pattern-dive-actions");
+      const result = await assignFabricToProject("fabric-1", "project-1");
+
+      expect(result).toEqual({ success: true });
+      expect(txMock.projectThread.updateMany).toHaveBeenCalledWith({
+        where: { id: { in: ["pt-1"] } },
+        data: { quantityRequired: 10 },
+      });
+      expect(revalidatePath).toHaveBeenCalledWith("/shopping");
+    });
+
+    it("leaves the needs alone when the project already holds that fabric", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "user-1",
+        chartId: "c1",
+        fabric: { id: "fabric-1" },
+      });
+      const txMock = txLinkingFabric("project-1");
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
+      );
+
+      const { assignFabricToProject } = await import("./pattern-dive-actions");
+      const result = await assignFabricToProject("fabric-1", "project-1");
+
+      expect(result).toEqual({ success: true });
+      expect(txMock.project.findUnique).not.toHaveBeenCalled();
+    });
+
+    it("assignFabricToProject calls revalidateTag('stats') after linking", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "user-1",
+        chartId: "c1",
+        fabric: null,
+      });
+      const txMock = txLinkingFabric();
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
+      );
+
+      const { revalidateTag } = await import("next/cache");
+      const { assignFabricToProject } = await import("./pattern-dive-actions");
+      await assignFabricToProject("fabric-1", "project-1");
+
+      expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+    });
+
+    it("assignFabricToProject does not invalidate stats when the fabric is taken", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "user-1",
+        chartId: "c1",
+        fabric: null,
+      });
+      const txMock = txLinkingFabric("other-project");
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
+      );
+
+      const { revalidateTag } = await import("next/cache");
+      const { assignFabricToProject } = await import("./pattern-dive-actions");
+      const result = await assignFabricToProject("fabric-1", "project-1");
+
+      expect(result.success).toBe(false);
+      expect(vi.mocked(revalidateTag)).not.toHaveBeenCalled();
+    });
+
+    it("fails the whole assignment when the rework fails", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "user-1",
+        chartId: "c1",
+        fabric: null,
+      });
+      const txMock = txLinkingFabric();
+      txMock.projectThread.updateMany.mockRejectedValueOnce(new Error("DB down"));
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock),
+      );
+      vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const { assignFabricToProject } = await import("./pattern-dive-actions");
+      const result = await assignFabricToProject("fabric-1", "project-1");
+
+      expect(result).toEqual({ success: false, error: "Failed to assign fabric" });
+    });
   });
 
   describe("unassignFabricFromProject", () => {
+    beforeEach(() => {
+      mockPrisma.$transaction.mockImplementation((fn: (tx: typeof mockPrisma) => unknown) =>
+        fn(mockPrisma),
+      );
+    });
+
     it("rejects unauthenticated calls", async () => {
       mockAuth.mockResolvedValueOnce(null);
       const { unassignFabricFromProject } = await import("./pattern-dive-actions");
@@ -2107,6 +2235,7 @@ describe("pattern-dive-actions", () => {
         userId: "user-1",
         chartId: "c1",
         fabric: { id: "fabric-1" },
+        projectThreads: [],
       });
       mockPrisma.fabric.update.mockResolvedValue({});
 
@@ -2150,6 +2279,62 @@ describe("pattern-dive-actions", () => {
       const result = await unassignFabricFromProject("project-1");
 
       expect(result).toEqual({ success: false, error: "Failed to remove fabric" });
+    });
+
+    function mockProjectLosingFabric(saved: number) {
+      mockPrisma.project.findUnique
+        .mockResolvedValueOnce({ userId: "user-1", chartId: "c1", fabric: { id: "fabric-1" } })
+        .mockResolvedValueOnce(
+          createMockProjectForNeeds({
+            projectThreads: [
+              {
+                ...createMockProjectForNeeds().projectThreads[0],
+                quantityRequired: saved,
+              },
+            ],
+          }),
+        );
+      mockPrisma.fabric.update.mockResolvedValue({});
+      mockPrisma.projectThread.updateMany.mockResolvedValue({ count: 1 });
+    }
+
+    it("reworks the project's calculated needs at the no-fabric default", async () => {
+      mockProjectLosingFabric(10);
+
+      const { revalidatePath } = await import("next/cache");
+      const { unassignFabricFromProject } = await import("./pattern-dive-actions");
+      const result = await unassignFabricFromProject("project-1");
+
+      expect(result).toEqual({ success: true });
+      expect(mockPrisma.projectThread.updateMany).toHaveBeenCalledWith({
+        where: { id: { in: ["pt-1"] } },
+        data: { quantityRequired: 13 },
+      });
+      expect(revalidatePath).toHaveBeenCalledWith("/shopping");
+    });
+
+    it("unassignFabricFromProject calls revalidateTag('stats') after unlinking", async () => {
+      mockProjectLosingFabric(10);
+
+      const { revalidateTag } = await import("next/cache");
+      const { unassignFabricFromProject } = await import("./pattern-dive-actions");
+      await unassignFabricFromProject("project-1");
+
+      expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith("stats", { expire: 0 });
+    });
+
+    it("unassignFabricFromProject does not invalidate stats for another user's project", async () => {
+      mockPrisma.project.findUnique.mockResolvedValue({
+        userId: "other-user",
+        chartId: "c1",
+        fabric: { id: "fabric-1" },
+      });
+
+      const { revalidateTag } = await import("next/cache");
+      const { unassignFabricFromProject } = await import("./pattern-dive-actions");
+      await unassignFabricFromProject("project-1");
+
+      expect(vi.mocked(revalidateTag)).not.toHaveBeenCalled();
     });
   });
 });

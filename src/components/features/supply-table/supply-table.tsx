@@ -80,7 +80,9 @@ export function SupplyTable({
     }
   }, [adapter, allRows]);
 
-  // Bulk recalculation when calcParams change (not on initial mount)
+  // Bulk recalculation when calcParams change (not on initial mount). A saved project's fabric and
+  // settings rework its figures on the server; this is for what saves neither: the creation
+  // flow's unsaved rows, and the COUNT box
   useEffect(() => {
     const key = JSON.stringify(mergedCalcParams);
     if (prevCalcParamsRef.current === null) {

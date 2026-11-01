@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { calculateSkeins } from "@/lib/utils/skein-calculator";
-import { calculatedNeedFor } from "./thread-need";
+import { calculatedNeedFor, projectCalcParams } from "./thread-need";
 import { DEFAULT_CALC_PARAMS } from "./types";
 import type { CalcParams, SupplyRow } from "./types";
 import type { SkeinLine } from "@/types/supply";
@@ -81,5 +81,30 @@ describe("calculatedNeedFor", () => {
   it("gives nothing to a bead or specialty line, which the calculator does not cover", () => {
     expect(calculatedNeedFor(makeRow({ type: "BEAD" }), DEFAULT_CALC_PARAMS)).toBeNull();
     expect(calculatedNeedFor(makeRow({ type: "SPECIALTY" }), DEFAULT_CALC_PARAMS)).toBeNull();
+  });
+});
+
+describe("projectCalcParams", () => {
+  const SAVED = { strandCount: 3, overCount: 2, wastePercent: 25 };
+
+  it("reads the linked fabric's count and the project's own settings", () => {
+    expect(projectCalcParams({ ...SAVED, fabricCount: 28 })).toEqual({
+      fabricCount: 28,
+      strandCount: 3,
+      overCount: 2,
+      wastePercent: 25,
+    });
+  });
+
+  it("falls back to the default count when no fabric is linked", () => {
+    expect(projectCalcParams({ ...SAVED, fabricCount: undefined }).fabricCount).toBe(
+      DEFAULT_CALC_PARAMS.fabricCount,
+    );
+  });
+
+  it("falls back to the default strands for a stored count the calculator cannot use", () => {
+    expect(
+      projectCalcParams({ ...SAVED, strandCount: 9, fabricCount: undefined }).strandCount,
+    ).toBe(DEFAULT_CALC_PARAMS.strandCount);
   });
 });

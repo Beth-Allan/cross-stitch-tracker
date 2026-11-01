@@ -1,6 +1,6 @@
 import { calculateSkeins } from "@/lib/utils/skein-calculator";
-import type { SkeinLine } from "@/types/supply";
-import type { CalcParams, SupplyRow } from "./types";
+import { isStrandCount, type SkeinLine } from "@/types/supply";
+import { DEFAULT_CALC_PARAMS, type CalcParams, type SupplyRow } from "./types";
 
 /** Only what the calculator reads, so a row carries no more of the line than it needs. */
 export function skeinLineOf(line: SkeinLine): SkeinLine {
@@ -8,6 +8,23 @@ export function skeinLineOf(line: SkeinLine): SkeinLine {
     skeinLengthMm: line.skeinLengthMm,
     strandStructure: line.strandStructure,
     cutLengthInches: line.cutLengthInches,
+  };
+}
+
+/** What a saved project's needs are worked out from: no fabric linked means the default count. */
+export function projectCalcParams(project: {
+  fabricCount: number | undefined;
+  strandCount: number;
+  overCount: number;
+  wastePercent: number;
+}): CalcParams {
+  return {
+    fabricCount: project.fabricCount ?? DEFAULT_CALC_PARAMS.fabricCount,
+    strandCount: isStrandCount(project.strandCount)
+      ? project.strandCount
+      : DEFAULT_CALC_PARAMS.strandCount,
+    overCount: project.overCount as 1 | 2,
+    wastePercent: project.wastePercent,
   };
 }
 
