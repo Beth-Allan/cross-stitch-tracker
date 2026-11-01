@@ -114,6 +114,14 @@ describe("LocalStateAdapter", () => {
     });
   });
 
+  describe("a need typed into the add row", () => {
+    it("carries its mark into the row", async () => {
+      await adapter.addThread("t1", 500, 15, true);
+
+      expect(adapter.getRows()[0].isNeedOverridden).toBe(true);
+    });
+  });
+
   describe("addThread", () => {
     it("adds thread to internal state and returns success", async () => {
       const result = await adapter.addThread("t1", 500, 2);

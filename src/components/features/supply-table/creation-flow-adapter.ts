@@ -38,7 +38,12 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
     this.calcParams = params;
   }
 
-  async addThread(threadId: string, stitchCount: number, need: number | null): Promise<Result> {
+  async addThread(
+    threadId: string,
+    stitchCount: number,
+    need: number | null,
+    isNeedOverridden = false,
+  ): Promise<Result> {
     const duplicate = this.findDuplicate(threadId, "THREAD");
     if (duplicate) return { success: false, error: "Supply already added" };
 
@@ -55,7 +60,7 @@ export class CreationFlowAdapter implements SupplyTableAdapter {
       stitchCount,
       need,
       have: 0,
-      isNeedOverridden: false,
+      isNeedOverridden,
       line: meta?.line ?? null,
     };
     this.rows.set(id, row);

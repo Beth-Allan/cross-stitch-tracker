@@ -253,7 +253,7 @@ describe("useSupplyTable", () => {
         await result.current.commitRow();
       });
 
-      expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, null);
+      expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, null, false);
     });
 
     it("commitRow sends the figure worked out from a DMC line", async () => {
@@ -267,7 +267,7 @@ describe("useSupplyTable", () => {
       });
 
       // ceil(5000 * 2 * 1.2 / (14 * 273)) = ceil(3.14) = 4
-      expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, 4);
+      expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, 4, false);
     });
 
     it("lets a need typed by hand replace an unknown one", async () => {
@@ -283,7 +283,7 @@ describe("useSupplyTable", () => {
         await result.current.commitRow();
       });
 
-      expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, 3);
+      expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, 3, true);
     });
   });
 
@@ -335,7 +335,7 @@ describe("useSupplyTable", () => {
       await result.current.commitRow();
     });
 
-    expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, expectedNeed);
+    expect(adapter.addThread).toHaveBeenCalledWith("t1", 5000, expectedNeed, false);
   });
 
   it("commitRow calls adapter.addBead with (beadId, need) for BEAD", async () => {
@@ -504,6 +504,43 @@ describe("useSupplyTable", () => {
     expect(result.current.need).toBe(1);
   });
 
+  describe("marking a typed need", () => {
+    it("commitRow marks a need typed into the add row", async () => {
+      const { result } = renderHook(() => useSupplyTable(adapter, calcParams, existingIds));
+
+      act(() => {
+        result.current.selectItem(makeSearchResult({ id: "t-1" }));
+      });
+      act(() => {
+        result.current.setStitchCount(20000);
+      });
+      act(() => {
+        result.current.setNeedManual(15);
+      });
+      await act(async () => {
+        await result.current.commitRow();
+      });
+
+      expect(adapter.addThread).toHaveBeenCalledWith("t-1", 20000, 15, true);
+    });
+
+    it("commitRow leaves a worked-out need unmarked", async () => {
+      const { result } = renderHook(() => useSupplyTable(adapter, calcParams, existingIds));
+
+      act(() => {
+        result.current.selectItem(makeSearchResult({ id: "t-1" }));
+      });
+      act(() => {
+        result.current.setStitchCount(20000);
+      });
+      await act(async () => {
+        await result.current.commitRow();
+      });
+
+      expect(adapter.addThread).toHaveBeenCalledWith("t-1", 20000, 13, false);
+    });
+  });
+
   it("setNeedManual disables auto-calc", () => {
     const item = makeSearchResult({ type: "THREAD" });
     const { result } = renderSupplyTableHook();
@@ -533,7 +570,7 @@ describe("useSupplyTable", () => {
     });
 
     // Need should be at least 1 (effectiveNeed)
-    expect(adapter.addThread).toHaveBeenCalledWith("t1", 0, 1);
+    expect(adapter.addThread).toHaveBeenCalledWith("t1", 0, 1, false);
   });
 
   it("uses correct supplyType for search after type change", async () => {

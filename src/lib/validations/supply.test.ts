@@ -120,6 +120,23 @@ describe("wording a screen shows, unchanged from Zod 3", () => {
   });
 });
 
+describe("a need typed into the add row", () => {
+  it("keeps its mark on a project thread", () => {
+    const parsed = projectThreadSchema.parse({
+      projectId: "p1",
+      threadId: "t1",
+      isNeedOverridden: true,
+    });
+    expect(parsed.isNeedOverridden).toBe(true);
+  });
+
+  it("is not assumed: a project thread sent no mark is calculated", () => {
+    expect(projectThreadSchema.parse({ projectId: "p1", threadId: "t1" }).isNeedOverridden).toBe(
+      false,
+    );
+  });
+});
+
 describe("an unknown need", () => {
   it("is allowed on a project thread, as null", () => {
     const parsed = projectThreadSchema.parse({

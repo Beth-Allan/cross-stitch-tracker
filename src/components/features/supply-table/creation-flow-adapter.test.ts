@@ -48,6 +48,22 @@ describe("CreationFlowAdapter", () => {
     adapter = new CreationFlowAdapter(onRowsChange, searchFn, createFn);
   });
 
+  describe("a need typed into the add row", () => {
+    it("carries its mark into the buffered row, so a later rework leaves it", async () => {
+      searchFn.mockResolvedValueOnce([makeSearchResult({ id: "t1", type: "THREAD" })]);
+      await adapter.searchSupplies("THREAD", "310");
+      adapter.setCalcParams({ fabricCount: 14, strandCount: 2, overCount: 1, wastePercent: 20 });
+
+      const addResult = await adapter.addThread("t1", 20000, 15, true);
+      const rowId = (addResult as { success: true; id: string }).id;
+      await adapter.updateQuantity("THREAD", rowId, "stitchCount", 20000);
+
+      const row = adapter.getRows().find((r) => r.id === rowId);
+      expect(row?.isNeedOverridden).toBe(true);
+      expect(row?.need).toBe(15);
+    });
+  });
+
   describe("addThread", () => {
     it("stores row in buffer with client-generated UUID and calls onRowsChange", async () => {
       // Pre-populate cache via searchSupplies

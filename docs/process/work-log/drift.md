@@ -47,6 +47,28 @@ gate neither and rely on C-1's review alone. A gate-list change is hers (hard ru
 **Until ruled:** C-1 records her answer here (moving this row to Ruled as D-51 or later — D-45 and D-46 went to F-16a on 2026-10-31, D-47 to `/broken need marked as typed`, D-48 to `/broken bead need not saving`, D-49 to F-19, D-50 to `/review F-19`) before
 its branch opens; the path file and protocol §5 change in C-1's PR if she says yes.
 
+### 2026-11-01 · the COUNT box on a project's Supplies tab moves the figures but saves nothing — raised by `/broken fabric link keeps old figures`; parked for `/cleanup`
+
+**What needs a ruling.** The Skein Calculator card has a COUNT box beside Strands, Over and Waste.
+On a project's Supplies tab those three save to the project. COUNT does not: a project has nowhere to
+keep a count, because its count is the linked fabric's, or 14 with none. Typing in the box still
+reworks every calculated line at the typed number and saves those figures (the effect in
+`supply-table.tsx`), and the box returns to the fabric's count or 14 on a reload. So it leaves
+figures that disagree with the stored settings, the state D-49 ruled the stored setting wins over,
+and the next fabric or setting change now moves them back. The creation flow has the same box. It may
+be how Nara Forest with Deer's 17 figures came to look worked out for 18-count (D-49), which is not
+proved. Found reading the code for this fix, not reported by Beth.
+
+**The question.** ① Save the box as the project's own count, used until a fabric is linked (a new
+database field, so gated). ② Make it a display of the count in use, changed by choosing a fabric.
+③ Keep it as a try-out that shows what the figures would be and saves none. **What decides it:**
+whether Beth ever settles a project's count before she has chosen the piece of fabric. If she does,
+① is the one that matches her practice; if not, ②.
+
+**Until ruled:** the box behaves as it does today, and the effect stays for it and for the creation
+flow. Once ruled, a saved project may not need the effect at all, which would end the second round of
+writes it adds on the Supplies tab beside the server's rework (harmless: both reach the same figure).
+
 ## Also open — the question known to be coming
 
 _(This section is empty. The question that used to sit here — fabric matching for a project with

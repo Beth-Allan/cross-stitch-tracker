@@ -97,7 +97,13 @@ export type Result = { success: true; id?: string } | { success: false; error: s
  * CreationFlowAdapter (buffers until two-phase save)
  */
 export interface SupplyTableAdapter {
-  addThread(threadId: string, stitchCount: number, need: number | null): Promise<Result>;
+  /** `isNeedOverridden` says `need` was typed rather than worked out, so a rework leaves it. */
+  addThread(
+    threadId: string,
+    stitchCount: number,
+    need: number | null,
+    isNeedOverridden?: boolean,
+  ): Promise<Result>;
   addBead(beadId: string, need: number): Promise<Result>;
   addSpecialty(itemId: string, need: number): Promise<Result>;
   updateQuantity(

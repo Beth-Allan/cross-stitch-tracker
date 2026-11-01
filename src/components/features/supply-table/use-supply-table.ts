@@ -191,6 +191,7 @@ export function useSupplyTable(
           selectedItem.id,
           safeStitchCount,
           need === null ? null : effectiveNeed,
+          !isAutoCalc,
         );
         break;
       case "BEAD":
@@ -212,7 +213,7 @@ export function useSupplyTable(
     }
 
     return { success: false, focusTarget: "search", error: result.error };
-  }, [selectedItem, stitchCount, need, supplyType, adapter]);
+  }, [selectedItem, stitchCount, need, isAutoCalc, supplyType, adapter]);
 
   // --- Reset all add-row state ---
   const resetAddRow = useCallback(() => {

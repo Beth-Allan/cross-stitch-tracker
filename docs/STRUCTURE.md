@@ -152,7 +152,7 @@ src/
 │   └── prisma/                # Auto-generated Prisma client (never edit)
 │
 ├── lib/
-│   ├── actions/               # Server actions — 19 files, one per domain (cover-optimization.ts is the one without "use server")
+│   ├── actions/               # Server actions — 20 files, one per domain (cover-optimization.ts and thread-need-rework.ts are the two without "use server")
 │   ├── queries/
 │   │   └── stats/             # 19 query files + index.ts barrel + utils.ts helpers
 │   ├── utils/                 # Pure utility functions

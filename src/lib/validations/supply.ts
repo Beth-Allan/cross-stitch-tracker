@@ -82,6 +82,7 @@ export const projectThreadSchema = z.object({
   stitchCount: wholeNumber().min(0).default(0),
   quantityRequired: wholeNumber().min(1).nullable().default(1),
   quantityAcquired: z.number().int().min(0).default(0),
+  isNeedOverridden: z.boolean().default(false),
 });
 
 export type ProjectThreadInput = z.input<typeof projectThreadSchema>;

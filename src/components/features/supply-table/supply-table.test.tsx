@@ -584,6 +584,38 @@ describe("SupplyTable", () => {
         expect(stitchCountCalls.map((c: unknown[]) => c[1])).not.toContain("t3");
       });
     });
+
+    it("leaves a line the calculator cannot read as it is when calcParams change", async () => {
+      const adapterWithCalc = {
+        ...createMockAdapter(),
+        setCalcParams: vi.fn(),
+        setRows: vi.fn(),
+      };
+      const threads = [
+        makeThread({
+          id: "t1",
+          stitchCount: 500,
+          need: 3,
+          line: { skeinLengthMm: null, strandStructure: null, cutLengthInches: null },
+        }),
+      ];
+      const table = (fabricCount: number) => (
+        <SupplyTable
+          threads={threads}
+          beads={[]}
+          specialty={[]}
+          adapter={adapterWithCalc}
+          calcParams={{ fabricCount, strandCount: 2, overCount: 1, wastePercent: 20 }}
+        />
+      );
+
+      const { rerender } = render(table(14));
+      await act(async () => {
+        rerender(table(18));
+      });
+
+      expect(adapterWithCalc.updateQuantity).not.toHaveBeenCalled();
+    });
   });
 });
 

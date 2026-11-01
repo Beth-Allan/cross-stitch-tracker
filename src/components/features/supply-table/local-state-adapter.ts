@@ -55,7 +55,12 @@ export class LocalStateAdapter implements SupplyTableAdapter {
       .slice(0, MAX_SEARCH_RESULTS);
   }
 
-  async addThread(threadId: string, stitchCount: number, need: number | null): Promise<Result> {
+  async addThread(
+    threadId: string,
+    stitchCount: number,
+    need: number | null,
+    isNeedOverridden = false,
+  ): Promise<Result> {
     const supply = this.searchPool.threads.find((t) => t.id === threadId);
     const id = crypto.randomUUID();
     const row: SupplyRow = {
@@ -69,7 +74,7 @@ export class LocalStateAdapter implements SupplyTableAdapter {
       stitchCount,
       need,
       have: 0,
-      isNeedOverridden: false,
+      isNeedOverridden,
       line: supply?.line ?? null,
     };
     this.rows.threads.set(id, row);

@@ -2,6 +2,10 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import {
   createMockPrisma,
   createMockProject,
+  createMockProjectForNeeds,
+  createNeedsReworkTx,
+  expectReworkAfter,
+  mockTransaction,
   assertFailure,
   unvalidatedPayload,
 } from "@/__tests__/mocks";
@@ -113,5 +117,44 @@ describe("updateProjectSettings", () => {
       where: { chartId: "chart-1" },
       data: { strandCount: 4 },
     });
+  });
+
+  it("saves the settings first, then reworks inside the same transaction", async () => {
+    mockPrisma.project.findUnique.mockResolvedValueOnce(
+      createMockProject({ id: "proj-1", userId: "user-1", chartId: "chart-1" }),
+    );
+    const tx = createNeedsReworkTx(createMockProjectForNeeds({ strandCount: 1 }));
+    const update = vi.fn().mockResolvedValue({});
+    mockTransaction(mockPrisma, { ...tx, project: { ...tx.project, update } });
+    const { updateProjectSettings } = await import("./chart-actions");
+
+    await updateProjectSettings("chart-1", { strandCount: 1 });
+
+    expectReworkAfter(update, tx);
+  });
+
+  it("reworks the project's calculated needs from the saved settings", async () => {
+    mockPrisma.project.findUnique
+      .mockResolvedValueOnce(
+        createMockProject({ id: "proj-1", userId: "user-1", chartId: "chart-1" }),
+      )
+      .mockResolvedValueOnce(createMockProjectForNeeds({ strandCount: 1 }));
+    mockPrisma.project.update.mockResolvedValueOnce({});
+    mockPrisma.projectThread.updateMany.mockResolvedValueOnce({ count: 1 });
+    const { revalidatePath } = await import("next/cache");
+    const { updateProjectSettings } = await import("./chart-actions");
+
+    const result = await updateProjectSettings("chart-1", { strandCount: 1 });
+
+    expect(result.success).toBe(true);
+    expect(mockPrisma.project.findUnique).toHaveBeenLastCalledWith(
+      expect.objectContaining({ where: { id: "proj-1" } }),
+    );
+    expect(mockPrisma.projectThread.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ["pt-1"] } },
+      data: { quantityRequired: 7 },
+    });
+    expect(revalidatePath).toHaveBeenCalledWith("/charts");
+    expect(revalidatePath).toHaveBeenCalledWith("/shopping");
   });
 });

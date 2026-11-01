@@ -3,9 +3,8 @@
 import { useState, useMemo, useCallback, useTransition, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { SupplyTable, skeinLineOf } from "@/components/features/supply-table";
+import { SupplyTable, projectCalcParams, skeinLineOf } from "@/components/features/supply-table";
 import type { SupplyRow, CalcParams, FabricOption } from "@/components/features/supply-table";
-import { DEFAULT_CALC_PARAMS } from "@/components/features/supply-table/types";
 import { ServerActionAdapter } from "@/components/features/supply-table/server-action-adapter";
 import { CalculatorCard } from "@/components/features/charts/form-primitives/calculator-card";
 import { updateProjectSettings } from "@/lib/actions/chart-actions";
@@ -13,7 +12,6 @@ import {
   assignFabricToProject,
   unassignFabricFromProject,
 } from "@/lib/actions/pattern-dive-actions";
-import { isStrandCount } from "@/types/supply";
 import type { ProjectDetailProps, SupplySortOption } from "./types";
 import type {
   ProjectThreadWithThread,
@@ -103,12 +101,13 @@ export function SuppliesTab({ project, supplies, calculator }: SuppliesTabProps)
 
   // Server-authoritative calc params (source of truth for rollback)
   const serverCalcParams: CalcParams = useMemo(
-    () => ({
-      fabricCount: project.fabric?.count ?? DEFAULT_CALC_PARAMS.fabricCount,
-      strandCount: isStrandCount(project.strandCount) ? project.strandCount : 2,
-      overCount: project.overCount,
-      wastePercent: project.wastePercent,
-    }),
+    () =>
+      projectCalcParams({
+        fabricCount: project.fabric?.count,
+        strandCount: project.strandCount,
+        overCount: project.overCount,
+        wastePercent: project.wastePercent,
+      }),
     [project.fabric?.count, project.strandCount, project.overCount, project.wastePercent],
   );
 

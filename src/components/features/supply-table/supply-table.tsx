@@ -7,7 +7,7 @@ import { SupplyTableAddRow } from "./supply-table-add-row";
 import { SupplyTableDataRow } from "./supply-table-data-row";
 import { SupplyTableSectionDivider } from "./supply-table-section-divider";
 import { SupplyTableFooter } from "./supply-table-footer";
-import { calculatedNeedFor } from "./thread-need";
+import { calculatedNeedFor, threadNeed } from "./thread-need";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { SupplyRow, SupplyTableProps, SupplyType } from "./types";
 import { DEFAULT_CALC_PARAMS } from "./types";
@@ -80,7 +80,9 @@ export function SupplyTable({
     }
   }, [adapter, allRows]);
 
-  // Bulk recalculation when calcParams change (not on initial mount)
+  // Bulk recalculation when calcParams change (not on initial mount). A saved project's fabric and
+  // settings rework its figures on the server; this is for what saves neither: the creation
+  // flow's unsaved rows, and the COUNT box
   useEffect(() => {
     const key = JSON.stringify(mergedCalcParams);
     if (prevCalcParamsRef.current === null) {
@@ -91,11 +93,12 @@ export function SupplyTable({
     if (prevCalcParamsRef.current === key) return;
     prevCalcParamsRef.current = key;
 
-    // Recalculate all non-overridden thread rows with stitchCount > 0
+    // Recalculate all non-overridden thread rows with stitchCount > 0. A line the calculator
+    // cannot read keeps its figure, as it does on the server: a setting says nothing about it.
     for (const row of threads) {
-      if (!row.isNeedOverridden && row.stitchCount > 0) {
-        adapter.updateQuantity("THREAD", row.id, "stitchCount", row.stitchCount);
-      }
+      if (row.isNeedOverridden || row.stitchCount <= 0) continue;
+      if (threadNeed(row.stitchCount, mergedCalcParams, row.line) === null) continue;
+      adapter.updateQuantity("THREAD", row.id, "stitchCount", row.stitchCount);
     }
   }, [mergedCalcParams, threads, adapter]);
 

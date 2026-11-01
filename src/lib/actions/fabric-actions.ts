@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth-guard";
+import { reworkCalculatedNeeds } from "@/lib/actions/thread-need-rework";
 import { prisma } from "@/lib/db";
 import { firstValidationMessage, isDuplicateKeyError } from "@/lib/utils/action-errors";
 import { fabricBrandSchema, fabricSchema } from "@/lib/validations/fabric";
@@ -83,21 +84,30 @@ export async function createFabric(formData: FabricInput) {
 
   try {
     const validated = fabricSchema.parse(formData);
+    const { linkedProjectId } = validated;
 
-    if (validated.linkedProjectId) {
+    let linkedChartId: string | null = null;
+    if (linkedProjectId) {
       const project = await prisma.project.findUnique({
-        where: { id: validated.linkedProjectId },
-        select: { userId: true },
+        where: { id: linkedProjectId },
+        select: { userId: true, chartId: true },
       });
       if (!project || project.userId !== user.id) {
         return { success: false as const, error: "Project not found" };
       }
+      linkedChartId = project.chartId;
     }
 
-    const fabric = await prisma.fabric.create({ data: validated });
+    const fabric = await prisma.$transaction(async (tx) => {
+      const created = await tx.fabric.create({ data: validated });
+      if (linkedProjectId) await reworkCalculatedNeeds(tx, linkedProjectId);
+      return created;
+    });
     revalidatePath("/fabric");
-    if (validated.linkedProjectId) {
-      revalidatePath(`/charts/${validated.linkedProjectId}`);
+    if (linkedChartId) {
+      revalidatePath("/charts");
+      revalidatePath(`/charts/${linkedChartId}`);
+      revalidateTag("stats", { expire: 0 });
     }
     revalidatePath("/shopping");
     return { success: true as const, fabric };
@@ -122,7 +132,11 @@ export async function updateFabric(id: string, formData: FabricInput) {
   try {
     const existing = await prisma.fabric.findUnique({
       where: { id },
-      select: { linkedProject: { select: { userId: true } } },
+      select: {
+        count: true,
+        linkedProjectId: true,
+        linkedProject: { select: { userId: true, chartId: true } },
+      },
     });
     if (existing?.linkedProject && existing.linkedProject.userId !== user.id) {
       return { success: false as const, error: "Fabric not found" };
@@ -130,24 +144,44 @@ export async function updateFabric(id: string, formData: FabricInput) {
 
     const validated = fabricSchema.parse(formData);
 
+    let incomingChartId: string | null = null;
     if (validated.linkedProjectId) {
       const project = await prisma.project.findUnique({
         where: { id: validated.linkedProjectId },
-        select: { userId: true },
+        select: { userId: true, chartId: true },
       });
       if (!project || project.userId !== user.id) {
         return { success: false as const, error: "Project not found" };
       }
+      incomingChartId = project.chartId;
     }
 
-    const fabric = await prisma.fabric.update({
-      where: { id },
-      data: validated,
+    // A project this fabric leaves goes back to the default count, so it is reworked too
+    const needsCanMove =
+      existing?.linkedProjectId !== validated.linkedProjectId ||
+      existing?.count !== validated.count;
+    const projectIds = needsCanMove
+      ? new Set([existing?.linkedProjectId, validated.linkedProjectId].filter((id) => id != null))
+      : new Set<string>();
+
+    const fabric = await prisma.$transaction(async (tx) => {
+      const updated = await tx.fabric.update({
+        where: { id },
+        data: validated,
+      });
+      for (const projectId of projectIds) {
+        await reworkCalculatedNeeds(tx, projectId);
+      }
+      return updated;
     });
     revalidatePath("/fabric");
     revalidatePath(`/fabric/${id}`);
-    if (validated.linkedProjectId) {
-      revalidatePath(`/charts/${validated.linkedProjectId}`);
+    for (const chartId of new Set([existing?.linkedProject?.chartId, incomingChartId])) {
+      if (chartId) revalidatePath(`/charts/${chartId}`);
+    }
+    if (projectIds.size > 0) {
+      revalidatePath("/charts");
+      revalidateTag("stats", { expire: 0 });
     }
     revalidatePath("/shopping");
     return { success: true as const, fabric };
@@ -172,14 +206,25 @@ export async function deleteFabric(id: string) {
   try {
     const existing = await prisma.fabric.findUnique({
       where: { id },
-      select: { linkedProject: { select: { userId: true } } },
+      select: {
+        linkedProjectId: true,
+        linkedProject: { select: { userId: true, chartId: true } },
+      },
     });
     if (existing?.linkedProject && existing.linkedProject.userId !== user.id) {
       return { success: false as const, error: "Fabric not found" };
     }
 
-    await prisma.fabric.delete({ where: { id } });
+    await prisma.$transaction(async (tx) => {
+      await tx.fabric.delete({ where: { id } });
+      if (existing?.linkedProjectId) await reworkCalculatedNeeds(tx, existing.linkedProjectId);
+    });
     revalidatePath("/fabric");
+    if (existing?.linkedProject) {
+      revalidatePath("/charts");
+      revalidatePath(`/charts/${existing.linkedProject.chartId}`);
+      revalidateTag("stats", { expire: 0 });
+    }
     revalidatePath("/shopping");
     return { success: true as const };
   } catch (error) {

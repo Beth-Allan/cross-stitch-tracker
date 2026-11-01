@@ -682,6 +682,24 @@ describe("supply-actions", () => {
       });
     });
 
+    it("saves the mark on a need typed into the add row", async () => {
+      mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "user-1" });
+      mockPrisma.projectThread.create.mockResolvedValueOnce(createMockProjectThread());
+      const { addThreadToProject } = await import("./supply-actions");
+
+      await addThreadToProject({
+        projectId: "p1",
+        threadId: "t1",
+        stitchCount: 20000,
+        quantityRequired: 15,
+        isNeedOverridden: true,
+      });
+
+      expect(mockPrisma.projectThread.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({ quantityRequired: 15, isNeedOverridden: true }),
+      });
+    });
+
     it("rejects when project belongs to different user", async () => {
       mockPrisma.project.findUnique.mockResolvedValueOnce({ userId: "other-user" });
       const { addThreadToProject } = await import("./supply-actions");
