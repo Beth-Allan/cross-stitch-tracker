@@ -103,6 +103,15 @@ would leave the app running on its defaults (every PR reviewed once the reposito
 descriptions rewritten). Queued as `Switch off CodeRabbit` (`chore/coderabbit-off`): a review's
 branch carries one concern, so none of it happens on F-19's.
 
+**Carried out 2026-11-02.** The app's access was "All repositories", which also covered
+`ffh-horse-database`, and this ruling covers only the tracker, so it was narrowed rather than
+uninstalled: "Only select repositories", with `ffh-horse-database` the one selected. Beth saved it
+herself in Safari, her choice, because the Claude extension was not connected; her screenshot was
+checked before she pressed Save, and GitHub then reported the installation as `selected`. GitHub's
+page says an app keeps read-only access to public repositories, which is no more than anyone has.
+The app's pending request for updated permissions was left unanswered. Whether it stays on the
+horse database is outside this ruling.
+
 ### 2026-11-01 · D-49 · saved figures follow the length Beth cuts: every calculated need recomputed from today's settings — ruled during `/work-item F-19`
 
 **What needed a ruling.** F-19's opening question. A cut change moves a figure only when it is

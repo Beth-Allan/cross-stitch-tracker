@@ -267,3 +267,37 @@ a preview errors on a PR that touched `prisma/`.
 log in, confirm a chart cover renders, upload a new cover, and confirm the new object appears in the
 scratch bucket while the real bucket is unchanged. State the PR number and which image in the work
 log.
+
+## Retired notes — from `work-log/notes.md`, 2026-11-02 `Switch off CodeRabbit`
+
+Consumed: the app is off this repository and the trial wording is retired (D-50). Kept because the
+table is the evidence the ruling rests on.
+
+### The CodeRabbit trial — the tally (D-33)
+
+**Tags:** `/review` · R-2 · F-16a · F-19 · CodeRabbit · review layers
+
+Each gated `/review` during the trial adds one row here, following protocol §5's CodeRabbit steps.
+**"Missed by the others"** counts a real CodeRabbit finding that appears in neither the PR's
+layer-1 record nor the reviewing session's own findings — the reviewer finishes its own pass
+before reading CodeRabbit's, or this column cannot be filled honestly.
+
+| #   | review                                  | PR   | ran?                                                                          | its findings | real | real and missed by the others | note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --- | --------------------------------------- | ---- | ----------------------------------------------------------------------------- | ------------ | ---- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `/review R-2` (Fable 5.1, 2026-10-25)   | #142 | yes — one review, on the final commit                                         | 1            | 1    | 1                             | The baseline's header said "thirteen models" (it creates fourteen) and the docs said the March migration covers 5 of 18 models (4, plus the `_ChartToGenre` join table). Comment and doc accuracy, nothing in the code or SQL — fixed on the branch. Neither layer 1's record nor this review's own pass had it.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| 2   | `/review F-16a` (Fable 5.1, 2026-10-31) | #150 | yes — one review, on commit 74b8428 (the fix pushed after it was not re-sent) | 2            | 2    | 0, one widened                | ① Planning ids in the migration's SQL comments — layer 1 had stripped them from `src/` but not the SQL. Real; this review's own checklist pass had found it minutes earlier; reworded on the branch. ② A chart draft restored after its thread's line changed keeps the old calculated need. Real, low. The PR and this review's checklist pass had the pre-deploy case (rows saved with no line); CodeRabbit widened it to any later line change (a thread re-branded in the catalogue). Not fixed — a draft is browser-local and short-lived, and production holds only DMC — backlog wish. Counted as a half-catch for the ruling session to weigh.                                                                                                                                                                                  |
+| 3   | `/review F-19` (Fable 5.1, 2026-11-01)  | #154 | yes — one review, on the final commit d8ed23f                                 | 2            | 1    | 0, one reason corrected       | ① The migration's `fabricCount <= 0 → 1` arm "should be 0 to match `calculateSkeins`". Not real: the migration mirrors `threadNeed`, which the supply table saves and which holds a worked-out 0 at 1, and the rehearsal compared against it; `Fabric.count` is validated positive and no production project has a fabric. Dismissed on its thread. ② A draft saved before this deploy restores each thread row with the need worked out at the old cut: `loadDraftV2` reads the row's line as unknown but keeps its `need` (test "row-old"). Real, low — the same case the F-16a review tallied and sent to the backlog, and layer 1 had it in its record, dismissed as "reads unknown rather than wrong"; the reason is what CodeRabbit corrected (the line reads unknown, the need does not). Backlog row annotated, not fixed here. |
+
+A "did not run" row is kept but does not count toward the three (protocol §5 step 3).
+**The session that tallies the third run puts the table to Beth**, whatever the queue order (the
+queue marks R-2, F-16a and F-19 only because they are the next three today — D-36 moved them from
+R-2, P9c and F-9; D-40 split F-16, so its gated half, F-16a, carries the marker; D-42 (2026-10-25) put `/review C-1` third, ahead of F-17; D-44 (2026-10-29) put `/review F-19` third, ahead of C-1). The drift ruling D-33
+sets the rule: no real catch the others missed → switch it off, and her OK to remove the app is
+what gets recorded; at least one → she rules on keeping it. Either way that session records her
+word as a new drift row.
+
+**Ruled 2026-11-01 — D-50: switched off.** The tally over three runs: 5 findings, 4 real, 1 in
+neither record (R-2's comment and doc accuracy), two corrections of a known case's scope or reason,
+no code or data defect the others missed. The removal is queued as `Switch off CodeRabbit`
+(`chore/coderabbit-off`), which retires this note once the app is confirmed gone from the
+repository — the app first, the file and the wording after, never the other way round.
