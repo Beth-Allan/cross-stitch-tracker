@@ -27,6 +27,11 @@ jobs:
 
       - run: npm ci
 
+      - name: Break the schema on purpose (R-3 proof, never merged)
+        run: |
+          sed -i 's/^model Chart {$/model Chart {\n  r3Proof String?/' prisma/schema.prisma
+          grep -c r3Proof prisma/schema.prisma
+
       # One invocation, so CI and the pre-push hook cannot drift apart: `npm run gate`
       # is prisma generate → check:migrations → format:check → lint → tsc --noEmit → test → build.
       - name: Gate
