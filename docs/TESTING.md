@@ -26,7 +26,7 @@ Supporting libraries: `@testing-library/react` 16, `@testing-library/user-event`
 | `npm run test:watch`    | the same, watching                         |
 | `npm run test:coverage` | `vitest run --coverage`                    |
 
-Tests are **step five of `npm run gate`**, which the pre-push hook runs in full. The suite itself
+Tests are **step six of `npm run gate`**, which the pre-push hook runs in full. The suite itself
 takes ~16s — the reason a full gate on every push is tolerable at all, and the reason there is no
 excuse for pushing red.
 

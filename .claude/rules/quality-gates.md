@@ -6,7 +6,7 @@
 ## `npm run gate` — exactly what CI runs
 
 ```
-prisma generate → format:check → lint → tsc --noEmit → test → build
+prisma generate → check:migrations → format:check → lint → tsc --noEmit → test → build
 ```
 
 ~2.5 min end to end; the 3016-test suite itself is ~16s. **`prisma generate` runs first, always**
@@ -23,6 +23,21 @@ enforced for admins too.
 A failing hook is a problem to fix, never to bypass. Bypass flags and force-pushes are refused by
 `.claude/hooks/guard-git.sh` (see `git-workflow.md`), and weakening a gate to get green converts a
 visible failure into an invisible one.
+
+## What `check:migrations` enforces
+
+**`prisma/migrations/` must build exactly what `schema.prisma` describes** (item R-3, Beth's ruling
+D-39). Deploys apply migrations, so a schema edit with no migration would otherwise pass every step,
+merge, and leave production's code asking for a column the database does not have. It fails on any
+difference in either direction, a migration with no schema change included, and on a migration that
+cannot run on an empty database.
+
+`prisma migrate diff` needs a real Postgres to replay into, and neither machine has one to spare, so
+`prisma/check-migrations.ts` starts `@prisma/dev`'s embedded Postgres in-process. That is what keeps
+the check inside the one invocation, with no Docker and no service container, and CI and pre-push
+identical. It has its own config, `prisma/check-migrations.config.ts`, which names only that
+throwaway database: Prisma wipes what it replays into, so `prisma.config.ts` must never take part.
+A real migration file is still written against a throwaway Postgres (`docs/INTEGRATIONS.md`).
 
 ## What lint mechanically enforces
 

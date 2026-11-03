@@ -77,7 +77,11 @@ into every session.
   Compiler rules, which raise six errors in existing code (maintenance-ledger row, 2026-10-24, carries
   the removal condition)
 - Prettier 3.8.3 + prettier-plugin-tailwindcss 0.7.2 - Formatting and Tailwind class ordering
-- tsx 4.23.12 - TypeScript execution, used by the Prisma seed script
+- tsx 4.23.12 - TypeScript execution, used by the Prisma seed script and the two runners beside it
+  (`prisma/migrate-deploy.ts`, `prisma/check-migrations.ts`)
+- `@prisma/dev` 0.24.17 - The embedded Postgres `check:migrations` replays migrations into; also a
+  dependency of `prisma`, declared here because the check imports it directly. Keep it on the
+  version `prisma` itself pins
 - Husky 9.1.7 - Git hooks (`pre-commit`: `lint-staged`; `pre-push`: `npm run gate`)
 - lint-staged 16.4.0 - Prettier on staged `ts,tsx,js,mjs,json,css,md`; `eslint --fix` on staged
   `ts,tsx`
@@ -142,17 +146,18 @@ Loaded at build time and self-hosted by Next.js; configured in `src/app/layout.t
 
 ## Scripts
 
-| Script                            | Runs                                                                                       |
-| --------------------------------- | ------------------------------------------------------------------------------------------ |
-| `npm run dev`                     | `next dev`                                                                                 |
-| `npm run build`                   | `prisma generate && next build` — the generate step keeps the client fresh                 |
-| `npm start`                       | `next start`                                                                               |
-| `npm run lint`                    | `eslint`                                                                                   |
-| `npm run format` / `format:check` | `prettier --write .` / `prettier --check .`                                                |
-| `npm run typecheck`               | `tsc --noEmit`                                                                             |
-| `npm test` / `test:watch`         | `vitest run --reporter=verbose` / watch mode                                               |
-| `npm run test:coverage`           | `vitest run --coverage`                                                                    |
-| `npm run gate`                    | `prisma generate → format:check → lint → typecheck → test → build` — the full quality gate |
+| Script                            | Runs                                                                                                          |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`                     | `next dev`                                                                                                    |
+| `npm run build`                   | `prisma generate && next build` — the generate step keeps the client fresh                                    |
+| `npm start`                       | `next start`                                                                                                  |
+| `npm run lint`                    | `eslint --max-warnings 0`                                                                                     |
+| `npm run format` / `format:check` | `prettier --write .` / `prettier --check .`                                                                   |
+| `npm run typecheck`               | `tsc --noEmit`                                                                                                |
+| `npm test` / `test:watch`         | `vitest run --reporter=verbose` / watch mode                                                                  |
+| `npm run test:coverage`           | `vitest run --coverage`                                                                                       |
+| `npm run check:migrations`        | `tsx prisma/check-migrations.ts` — fails when the migrations do not build `schema.prisma`                     |
+| `npm run gate`                    | `prisma generate → check:migrations → format:check → lint → typecheck → test → build` — the full quality gate |
 
 `npm run gate` is what CI runs and what the `pre-push` hook runs. Mechanics and policy are in
 `.claude/rules/quality-gates.md`; do not duplicate them here.
@@ -189,7 +194,8 @@ Loaded at build time and self-hosted by Next.js; configured in `src/app/layout.t
 - Config: `prisma.config.ts` — schema at `prisma/schema.prisma`, migrations at
   `prisma/migrations/`, seed via `npx tsx prisma/seed.ts`
 - Migrations are applied by every Vercel build (`npm run build:deploy` → `prisma/migrate-deploy.ts`,
-  item R-2); CI and the pre-push hook run `npm run build`, which never touches a database.
+  item R-2); CI and the pre-push hook run `npm run build`, which never touches a database, and
+  `check:migrations`, which only touches its own embedded one.
   `docs/INTEGRATIONS.md` (Deployment → Migrations) has the route
 - The CLI datasource URL comes from `DIRECT_URL` (bypasses the connection pooler); the app
   connects through `DATABASE_URL` (pooled) via the Neon adapter in `src/lib/db.ts`

@@ -339,6 +339,16 @@ March reached Neon by an out-of-band `prisma db push`.
   migration that can fail on **data** — a new uniqueness rule, a check constraint — needs that
   reset _before_ its preview runs: the branch's data dates from 2026-08-17, and a rehearsal on
   stale rows proves nothing about production's.
+- **A schema change with no migration cannot leave a machine** (item R-3, Beth's ruling D-39).
+  `check:migrations`, a step of `npm run gate`, replays `prisma/migrations/` from empty and
+  compares the result with `schema.prisma` using `migrate diff --exit-code`. Any difference fails
+  it, in either direction, and so does a migration that cannot run on an empty database. It replays
+  into `@prisma/dev`'s embedded Postgres, started in-process by `prisma/check-migrations.ts`, so it
+  needs no Docker, no service container and no credentials, and reaches no database outside that
+  process. Its config, `prisma/check-migrations.config.ts`, names only that throwaway database:
+  Prisma wipes what it replays into, so `prisma.config.ts` takes no part. What it cannot see is
+  data: it replays onto empty tables, so a migration that fails on real rows is still the `preview`
+  reset's job, above.
 - **Writing a migration needs a throwaway database**, because no session has one of its own: a
   local Postgres 17 in OrbStack (`docker run -e POSTGRES_PASSWORD=… -p 55432:5432 postgres:17`),
   named by a temporary Prisma config as both `datasource.url` and `datasource.shadowDatabaseUrl`.
@@ -354,8 +364,11 @@ March reached Neon by an out-of-band `prisma db push`.
     caching
   - Job env: `DATABASE_URL` is set to a dummy local Postgres string — the build needs the
     variable present, and no CI step reaches a real database
-  - Steps: `npm ci` → `npm run gate`. Since P14 (2026-08-20) CI invokes the gate script rather
-    than re-listing its steps, so CI and the `pre-push` hook cannot drift apart
+  - Steps: `npm ci` → `npm run gate` (`prisma generate` → `check:migrations` → `format:check` →
+    `lint` → `tsc --noEmit` → `test` → `build`). Since P14 (2026-08-20) CI invokes the gate script
+    rather than re-listing its steps, so CI and the `pre-push` hook cannot drift apart. The
+    workflow has no database service on purpose: `check:migrations` brings its own embedded
+    Postgres (see Migrations, above), which is what lets the hook run the same step
   - Concurrency: cancels in-progress runs on the same ref
 - Dependabot (`.github/dependabot.yml`): weekly, Mondays, for both npm and github-actions. npm
   minor and patch bumps are grouped into one PR and major bumps are ignored for `next`, `prisma`,

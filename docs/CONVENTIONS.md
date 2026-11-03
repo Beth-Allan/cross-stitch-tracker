@@ -55,7 +55,7 @@ and CI do.
 `npm run gate` is exactly what CI runs:
 
 ```
-prisma generate → format:check → lint → tsc --noEmit → test → build
+prisma generate → check:migrations → format:check → lint → tsc --noEmit → test → build
 ```
 
 **`prisma generate` runs first, always** — without it `tsc` validates against a stale client after
