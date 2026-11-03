@@ -211,6 +211,18 @@ Not wishes, not warts — hardening Beth has explicitly deferred, recorded so it
   app-wide (A-1 report §4). The cheap wins (dropping `'unsafe-eval'` in production,
   `frame-ancestors`/`base-uri`/`form-action`/`object-src`) land via build item P11; this
   remainder waits until the trade is worth it.
+- **Refusing an edit to a migration that has already run** _(found 2026-11-02, R-3's layer-1 review;
+  not yet put to Beth)_: `check:migrations` replays from empty, so a column added to an existing
+  migration file passes it, and production never reruns that file. The fresh `/review` that any
+  change to `prisma/migrations/` needs is the only thing that catches this today. A check comparing
+  `migration.sql` files with `main` would catch it mechanically, but it is a new gate step, so it
+  needs her ruling, and it must allow a comment edit (`/review R-2` made one, harmlessly).
+- **Proving `check:migrations` can still fail** _(found 2026-11-02, R-3's layer-1 review)_: the
+  failure path was demonstrated once, on PRs #158 and #159. Its tests stub Prisma, so if an upgrade
+  changed what `migrate diff --exit-code` returns, the check could pass everything with every test
+  green. An upgrade session can re-run the demonstration by hand; a control inside the runner
+  (`--from-empty --to-schema … --exit-code` must exit 2) would make it permanent for about a second
+  per gate.
 
 ## Process wishes
 
@@ -222,6 +234,12 @@ Improvements to how sessions run — nothing contradicts, it could just be bette
   warts-to-the-ledger, the context budget. Every copy costs context each session and the copies can
   drift apart. A tidy-up would keep each rule in one home and point to it from the others. It
   touches CLAUDE.md and the always-loaded rule files, so it is Beth's to schedule.
+- **Writing a migration without OrbStack** _(noticed 2026-11-02, R-3)_: `prisma migrate dev
+--create-only` needs a throwaway Postgres, and every migration session starts OrbStack, runs a
+  container and stops it again (`docs/INTEGRATIONS.md`, Writing a migration). R-3's
+  `check:migrations` showed `@prisma/dev`'s embedded Postgres replays all of this project's
+  migrations in about two seconds with no Docker. A small helper on the same footing could replace
+  the routine case. Rehearsing against a copy of real data would still want a real Postgres.
 - **Seeing a production migration run without a screenshot** _(noticed 2026-10-25, the `/review R-2`
   session; raised by its layer-1 review)_: since R-2, every merge that carries a migration runs it on
   production inside the Vercel build, and the build log is the only place that shows what happened.

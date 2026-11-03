@@ -116,9 +116,11 @@ visible in the loaded copy. The always-true core:
 
 ## Quality gates
 
-- `npm run gate` = `prisma generate` → `format:check` → `lint` → `tsc --noEmit` → `test` →
-  `build` — **the literal invocation CI runs** since P14 (~2.5 min; the 3016-test suite itself is
-  ~16s). `prisma generate` runs first, always — `tsc` otherwise validates a stale client.
+- `npm run gate` = `prisma generate` → `check:migrations` → `format:check` → `lint` →
+  `tsc --noEmit` → `test` → `build` — **the literal invocation CI runs** since P14 (~2.5 min; the
+  test suite itself is ~16s). `prisma generate` runs first, always — `tsc` otherwise validates
+  a stale client. **`check:migrations` fails when replaying `prisma/migrations/` from empty does
+  not build what `schema.prisma` describes** (R-3, D-39).
   **`lint` is `--max-warnings 0`:** there is no passing tier below "error", so a new warning is a
   red gate (at pre-push and CI — `lint-staged` still lets a commit through). Two rule configs
   carry their reasoning in `eslint.config.mjs` — an `_` prefix means deliberately unused, and

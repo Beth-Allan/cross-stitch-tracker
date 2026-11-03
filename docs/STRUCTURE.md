@@ -25,6 +25,8 @@ cross-stitch-tracker/
 │   ├── schema.prisma          # Database schema (source of truth)
 │   ├── seed.ts                # Database seeding script
 │   ├── migrate-deploy.ts      # Last step of every Vercel build — applies migrations (R-2)
+│   ├── check-migrations.ts    # Gate step — fails when the migrations do not build the schema (R-3)
+│   ├── check-migrations.config.ts # Its Prisma config — names only the throwaway database
 │   ├── fixtures/              # Seed fixture data
 │   └── migrations/            # Migration history — applied on deploy since R-2
 ├── product-plan/              # DesignOS source material (historical input)
