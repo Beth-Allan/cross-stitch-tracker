@@ -271,7 +271,8 @@ log.
 ## Retired notes — from `work-log/notes.md`, 2026-11-02 `Switch off CodeRabbit`
 
 Consumed: the app is off this repository and the trial wording is retired (D-50). Kept because the
-table is the evidence the ruling rests on.
+table is the evidence the ruling rests on. The protocol §5 steps it cites were retired with it; read
+them at commit `1d61192`.
 
 ### The CodeRabbit trial — the tally (D-33)
 

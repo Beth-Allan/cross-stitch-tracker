@@ -110,7 +110,7 @@ herself in Safari, her choice, because the Claude extension was not connected; h
 checked before she pressed Save, and GitHub then reported the installation as `selected`. GitHub's
 page says an app keeps read-only access to public repositories, which is no more than anyone has.
 The app's pending request for updated permissions was left unanswered. Whether it stays on the
-horse database is outside this ruling.
+horse database is outside this ruling. The tally moved to `docs/process/work-log-archive.md`.
 
 ### 2026-11-01 · D-49 · saved figures follow the length Beth cuts: every calculated need recomputed from today's settings — ruled during `/work-item F-19`
 

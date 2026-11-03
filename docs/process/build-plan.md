@@ -1130,8 +1130,7 @@ answers. F-16a and F-16b each add their own scope and done-when.
   `threadNeed` and never a second copy of the sum._ If Beth confirms the recompute on save, it follows F-16a's
   rule (never an overridden row) and carries the `revalidateTag` test (trap ⑦). If it has to touch
   `skein-calculator.ts`, this item is gated after all — confirm every touched file against
-  `.claude/hooks/review-gated-paths.txt`, and if any is gated, add a `/review F-16b` row to the queue.
-  ⑤ **Renaming a
+  `.claude/hooks/review-gated-paths.txt`, and if any is gated, add a `/review F-16b` row to the queue. ⑤ **Renaming a
   brand or a line that a shipped catalogue is keyed to** (D-42; C-1 trap ⑤): the catalogue loader
   matches both by name, so after a rename it skips that fixture on later deploys — harmless to what
   is already loaded, logged, and put right by renaming the fixture in a small data PR. The form need
