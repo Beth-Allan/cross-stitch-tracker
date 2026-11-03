@@ -84,12 +84,13 @@ on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; s
 session to plan the mark, Kreinik's substitutions table and Beth's DMC wish. Reading the sources
 turned up two problems the plan did not know about. **Kreinik:** its size matrix has no row for a
 discontinued colour, so "exactly the colours the chart marks for each size, discontinued ones
-marked" could not be built for 33 of the 36 colours of the kinds she uses
+marked" could not be built for 33 of the 36 colours of the kinds she uses (32 after layer-1 review)
 (`build-plan.md` §Stage C, the paragraph under the sources table). The plan's "greys out
-discontinued colours" was wrong too: page 1's grey is on cords and 9132 only. **DMC:** it publishes
-no list. Three stitchers' lists agree on the sixteen colours of 2013 (3880–3895, her 3887 among
-them) and on seven older colours, but those seven are already in the catalogue and the evidence on
-them is mixed. An eighth, 868, may never have been a DMC number, and the fixture gives it 869's name.
+discontinued colours" was wrong too: page 1's grey is on cords and 9132 only. **DMC:** nothing
+checkable comes from DMC. Stitchers' lists name the sixteen colours of 2013 (3880–3895, her 3887
+among them) and seven older colours, which are already in the catalogue. An eighth, 868, may never
+have been a DMC number, and the fixture gives it 869's name. (Two things the session first told her
+here were wrong; see the corrections below.)
 
 **Surfaced to Beth** in four questions, option labels as she saw them. On the preview copy of her
 data, 504 is on one project and 3887 on two, all unstarted; the other seven are on none.
@@ -123,11 +124,33 @@ and the lists. Order: C-1 → `/review C-1` → C-1m → C-1b → C-1d → `/pla
 → C-2 → C-3 → F-16b. 868 went to the maintenance ledger.
 
 **The session's calls, not hers, open to her on the previews.** Threads only. The substitute is free
-text, not a link to another thread, because Kreinik's entries are often sentences. A separate DMC
-fixture file, so no test loosens. 3887 keeps her name, "Very Dark Lavender". She was told the names
+text, not a link to another thread, because Kreinik's entries are often sentences. 3887 keeps her name, "Very Dark Lavender". She was told the names
 would come from a 2013 review; **that review leaves 3890 and 3891 unnamed**, so those two are Lord
 Libidan's. **None of this is a domain fact:** the lists stay cited sources in `build-plan.md` and the
 fixtures README, as D-42 set up, and nothing goes into `docs/domain/`.
+
+**Corrections the same session, after layer-1 review of PR #161.** Two statements put to Beth were
+wrong, and each went back to her:
+
+- **⑤ The replacements.** She was told the lists agree on one usual swap for each of the sixteen
+  (3887 → 208) and that the swaps come from stitchers, not DMC. Lord Libidan says DMC gave out the
+  lists itself, and that a newer one (about 2023) differs from the older on 11 of the 16 (3887 →
+  3837). Put to her: "Show both (Recommended)" — newer first, "Usual swap: 3837 or 208" · "Newer list
+  only" · "Older list only". **Her ruling: "Show both (Recommended)".** The mark's mock she chose in ①
+  showed the older swap alone.
+- **⑥ The eight.** She was told one site calls them "never actually discontinued". That quote is
+  about a 1990s test set; the same article says the eight were officially discontinued in 2015, and
+  DMC told stitchers 868 "does not, and has never existed". Put to her: "Yes, seven, not 868
+  (Recommended)" · "Change it". **Her ruling: "Yes, seven, not 868 (Recommended)".**
+
+**The review's other finds, as the session's calls, open to her on the C-1b preview.** 9132 Lemon
+Grass is starred on the 2021 chart (Blending Filament and #8), so it goes there under ②'s own rule,
+and "Size not listed" holds **32**, not the 33 she was told. 033L and 042L left Kreinik's matrix
+with no entry in its discontinued table; they load, marked, in the three lines the archived charts
+star, with a note saying only that. DMC's sixteen go into the existing DMC fixture rather than a
+file of their own: the reason given for a second file (a test that would loosen) was wrong. The
+mock in ① showed "Very Fine #4 Braid · 5525 Lemon"; 5525 has no size, so it lands under "Size not
+listed".
 
 ### 2026-11-01 · D-50 · the CodeRabbit trial ends: switched off — ruled during `/review F-19`
 
