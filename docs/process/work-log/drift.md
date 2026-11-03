@@ -44,7 +44,7 @@ a data file and tests, stay ungated and merge on her word after a preview). The 
 gate neither and rely on C-1's review alone. A gate-list change is hers (hard rule 6).
 **Recommendation:** gate the folder, not the data.
 
-**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-51 or later — D-45 and D-46 went to F-16a on 2026-10-31, D-47 to `/broken need marked as typed`, D-48 to `/broken bead need not saving`, D-49 to F-19, D-50 to `/review F-19`) before
+**Until ruled:** C-1 records her answer here (moving this row to Ruled as D-52 or later — D-45 and D-46 went to F-16a on 2026-10-31, D-47 to `/broken need marked as typed`, D-48 to `/broken bead need not saving`, D-49 to F-19, D-50 to `/review F-19`, D-51 to `/plan-feature discontinued colours`) before
 its branch opens; the path file and protocol §5 change in C-1's PR if she says yes.
 
 ### 2026-11-01 · the COUNT box on a project's Supplies tab moves the figures but saves nothing — raised by `/broken fabric link keeps old figures`; parked for `/cleanup`
@@ -77,6 +77,80 @@ no assigned fabric — was **answered by Beth on 2026-08-17 inside P7** and is r
 on over-logging — was ruled **warn but allow** at the 2026-08-17 `/cleanup`; see Ruled below.)_
 
 ## Ruled
+
+### 2026-11-02 · D-51 · discontinued colours: the mark and its substitute, Kreinik's missing sizes, which DMC colours, and the rest of DMC's list — ruled during `/plan-feature discontinued colours`
+
+**What needed a ruling.** D-43 ④ said discontinued colours load, visibly marked, and asked this
+session to plan the mark, Kreinik's substitutions table and Beth's DMC wish. Reading the sources
+turned up two problems the plan did not know about. **Kreinik:** its size matrix has no row for a
+discontinued colour, so "exactly the colours the chart marks for each size, discontinued ones
+marked" could not be built for 33 of the 36 colours of the kinds she uses (32 after layer-1 review)
+(`build-plan.md` §Stage C, the paragraph under the sources table). The plan's "greys out
+discontinued colours" was wrong too: page 1's grey is on cords and 9132 only. **DMC:** nothing
+checkable comes from DMC. Stitchers' lists name the sixteen colours of 2013 (3880–3895, her 3887
+among them) and seven older colours, which are already in the catalogue. An eighth, 868, may never
+have been a DMC number, and the fixture gives it 869's name. (Two things the session first told her
+here were wrong; see the corrections below.)
+
+**Surfaced to Beth** in four questions, option labels as she saw them. On the preview copy of her
+data, 504 is on one project and 3887 on two, all unstarted; the other seven are on none.
+
+1. **The mark:** "Beside the mark (Recommended)" — the word "Discontinued" with the substitute under
+   the name, shown to her as a mock ("DMC 3887 Very Dark Lavender [Discontinued] / Usual swap: 208"
+   and "Kreinik · Very Fine #4 Braid · 5525 Lemon [Discontinued] / Kreinik suggests 5725 Lollipop
+   Lemon") · "Only in the edit form". Both options assumed a tick box and a note box on the edit
+   form, threads only, and left out the stats page.
+2. **The 33 Kreinik colours with no size:** ""Size not listed" group (Recommended)" — a fourth
+   Kreinik group holding each once, the skein figure typed by hand if she uses one · "Put them in
+   all three sizes" — 99 entries, some of them sizes Kreinik never made · "Leave the 33 out".
+3. **DMC's eight:** "Seven, not 868 (Recommended)" · "All eight" · "None of them".
+4. **How much of DMC's list:** "The 16 only (Recommended)" — the variegated, Variations and Light
+   Effects threads to the wish list · "The 16, then the rest" — those get their own planning session
+   straight after, ahead of Mill Hill, because facts from her are needed first.
+
+**Her rulings:** ① **"Beside the mark (Recommended)".** ② **""Size not listed" group
+(Recommended)".** ③ **"Seven, not 868 (Recommended)".** ④ **"The 16, then the rest"**, against the
+recommendation.
+
+**What it changed.** **C-1** is re-briefed: `Thread.discontinued` and `Thread.substituteNote`, the
+"Size not listed" line (length unknown, THR-011; used whole, THR-013), and the marks on 3887 and the
+seven, all in its migration, because the loader only inserts. **C-1m** is a new ungated item for the
+screens and the tick box, so C-1 stays one session. **C-1b** loads 026L, 027L and 029L into her three
+lines on an archived Kreinik chart's stars, the other 33 once each under "Size not listed", and marks
+051F–055F as temporary. **C-1d** is a new data item for DMC's sixteen. A new queue row,
+`/plan-feature DMC's other threads`, sits ahead of C-2. This also closes D-45's note: 3887's mark
+reaches the row that already exists, and its discontinued status rests on Beth's own word (D-45 ②)
+and the lists. Order: C-1 → `/review C-1` → C-1m → C-1b → C-1d → `/plan-feature DMC's other threads`
+→ C-2 → C-3 → F-16b. 868 went to the maintenance ledger.
+
+**The session's calls, not hers, open to her on the previews.** Threads only. The substitute is free
+text, not a link to another thread, because Kreinik's entries are often sentences. 3887 keeps her name, "Very Dark Lavender". She was told the names
+would come from a 2013 review; **that review leaves 3890 and 3891 unnamed**, so those two are Lord
+Libidan's. **None of this is a domain fact:** the lists stay cited sources in `build-plan.md` and the
+fixtures README, as D-42 set up, and nothing goes into `docs/domain/`.
+
+**Corrections the same session, after layer-1 review of PR #161.** Two statements put to Beth were
+wrong, and each went back to her:
+
+- **⑤ The replacements.** She was told the lists agree on one usual swap for each of the sixteen
+  (3887 → 208) and that the swaps come from stitchers, not DMC. Lord Libidan says DMC gave out the
+  lists itself, and that a newer one (about 2023) differs from the older on 11 of the 16 (3887 →
+  3837). Put to her: "Show both (Recommended)" — newer first, "Usual swap: 3837 or 208" · "Newer list
+  only" · "Older list only". **Her ruling: "Show both (Recommended)".** The mark's mock she chose in ①
+  showed the older swap alone.
+- **⑥ The eight.** She was told one site calls them "never actually discontinued". That quote is
+  about a 1990s test set; the same article says the eight were officially discontinued in 2015, and
+  DMC told stitchers 868 "does not, and has never existed". Put to her: "Yes, seven, not 868
+  (Recommended)" · "Change it". **Her ruling: "Yes, seven, not 868 (Recommended)".**
+
+**The review's other finds, as the session's calls, open to her on the C-1b preview.** 9132 Lemon
+Grass is starred on the 2021 chart (Blending Filament and #8), so it goes there under ②'s own rule,
+and "Size not listed" holds **32**, not the 33 she was told. 033L and 042L left Kreinik's matrix
+with no entry in its discontinued table; they load, marked, in the three lines the archived charts
+star, with a note saying only that. DMC's sixteen go into the existing DMC fixture rather than a
+file of their own: the reason given for a second file (a test that would loosen) was wrong. The
+mock in ① showed "Very Fine #4 Braid · 5525 Lemon"; 5525 has no size, so it lands under "Size not
+listed".
 
 ### 2026-11-01 · D-50 · the CodeRabbit trial ends: switched off — ruled during `/review F-19`
 
