@@ -80,8 +80,8 @@ into every session.
 - tsx 4.23.12 - TypeScript execution, used by the Prisma seed script and the two runners beside it
   (`prisma/migrate-deploy.ts`, `prisma/check-migrations.ts`)
 - `@prisma/dev` 0.24.17 - The embedded Postgres `check:migrations` replays migrations into; also a
-  dependency of `prisma`, declared here because the check imports it directly. Keep it on the
-  version `prisma` itself pins
+  dependency of `prisma`, declared here because the check imports it directly. The two versions
+  need not match: the check reaches it over a connection string
 - Husky 9.1.7 - Git hooks (`pre-commit`: `lint-staged`; `pre-push`: `npm run gate`)
 - lint-staged 16.4.0 - Prettier on staged `ts,tsx,js,mjs,json,css,md`; `eslint --fix` on staged
   `ts,tsx`

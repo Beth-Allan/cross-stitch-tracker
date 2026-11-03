@@ -75,6 +75,20 @@ describe("checkMigrations", () => {
     expect(failed.close).toHaveBeenCalledOnce();
   });
 
+  it.each([
+    [0, 0],
+    [2, 1],
+  ])(
+    "keeps the verdict when the database will not close, and says so (prisma exits %i)",
+    async (prismaExit, verdict) => {
+      const { steps: s, close, messages } = steps(prismaExit);
+      close.mockRejectedValueOnce(new Error("Failed to close some servers"));
+
+      expect(await checkMigrations(s)).toBe(verdict);
+      expect(messages.join(" ")).toContain("Failed to close some servers");
+    },
+  );
+
   it("closes the database when running Prisma throws, and does not pass", async () => {
     const { steps: s, close } = steps(async () => {
       throw new Error("spawn failed");

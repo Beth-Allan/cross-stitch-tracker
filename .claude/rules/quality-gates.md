@@ -9,7 +9,7 @@
 prisma generate → check:migrations → format:check → lint → tsc --noEmit → test → build
 ```
 
-~2.5 min end to end; the 3016-test suite itself is ~16s. **`prisma generate` runs first, always**
+~2.5 min end to end; the test suite itself is ~16s. **`prisma generate` runs first, always**
 — without it `tsc` validates against a stale client after any schema change.
 
 Green locally before you push. **Nothing merges red**, and CI is a required check on main,
@@ -26,17 +26,25 @@ visible failure into an invisible one.
 
 ## What `check:migrations` enforces
 
-**`prisma/migrations/` must build exactly what `schema.prisma` describes** (item R-3, Beth's ruling
-D-39). Deploys apply migrations, so a schema edit with no migration would otherwise pass every step,
-merge, and leave production's code asking for a column the database does not have. It fails on any
-difference in either direction, a migration with no schema change included, and on a migration that
+**Replaying `prisma/migrations/` from empty must build what `schema.prisma` describes** (item R-3,
+Beth's ruling D-39). Deploys apply migrations, so a schema edit with no migration would otherwise
+pass every step, merge, and leave production's code asking for a column the database does not have.
+It fails on any difference Prisma's schema can express, in either direction, and on a migration that
 cannot run on an empty database.
+
+**A green check does not say the migrations are right.** It cannot see what `schema.prisma` has no
+words for (a check constraint, a view, a partial index), what a migration does to data, or an edit to
+a migration that has already run, because a replay from empty cannot tell that from a new one. That
+last one is the same failure from another door: production never reruns the file, so the column never
+arrives. `prisma/migrations/` being review-gated is what covers it.
 
 `prisma migrate diff` needs a real Postgres to replay into, and neither machine has one to spare, so
 `prisma/check-migrations.ts` starts `@prisma/dev`'s embedded Postgres in-process. That is what keeps
 the check inside the one invocation, with no Docker and no service container, and CI and pre-push
 identical. It has its own config, `prisma/check-migrations.config.ts`, which names only that
 throwaway database: Prisma wipes what it replays into, so `prisma.config.ts` must never take part.
+The time limit lives on its own thread for the same in-process reason: the database shares the main
+one, so a statement that never returns would stop a timer there too.
 A real migration file is still written against a throwaway Postgres (`docs/INTEGRATIONS.md`).
 
 ## What lint mechanically enforces

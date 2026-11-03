@@ -12,9 +12,10 @@ export type MigrationCheckSteps = {
 };
 
 /**
- * Whether `prisma/migrations/` builds exactly what `schema.prisma` describes, returning the process
- * exit code. Since deploys apply migrations, a schema edit with no migration would otherwise pass
- * every other step and leave production's code asking for a column the database does not have.
+ * Whether replaying `prisma/migrations/` from empty builds what `schema.prisma` describes, returning
+ * the process exit code. Since deploys apply migrations, a schema edit with no migration would
+ * otherwise pass every other step and leave production's code asking for a column the database does
+ * not have. It sees what Prisma's schema can express, so a check constraint or a view is invisible.
  *
  * `--exit-code` is what makes this able to fail: without it `migrate diff` exits 0 on a difference
  * too (0 no difference, 2 a difference, 1 an error). Only a 0 passes.
@@ -37,7 +38,7 @@ export async function checkMigrations(steps: MigrationCheckSteps): Promise<numbe
       database.shadowUrl,
     );
     if (code === 0) {
-      steps.log("prisma/migrations builds exactly what schema.prisma describes.");
+      steps.log("No difference Prisma can see between prisma/migrations and schema.prisma.");
       return 0;
     }
     steps.log(
@@ -47,6 +48,12 @@ export async function checkMigrations(steps: MigrationCheckSteps): Promise<numbe
     );
     return 1;
   } finally {
-    await database.close();
+    await database
+      .close()
+      .catch((error: unknown) =>
+        steps.log(
+          `The throwaway database did not close cleanly, which does not change the result: ${error instanceof Error ? error.message : String(error)}`,
+        ),
+      );
   }
 }
